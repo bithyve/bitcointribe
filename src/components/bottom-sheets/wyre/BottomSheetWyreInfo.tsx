@@ -110,7 +110,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         marginBottom: wp( 5 ),
       }}>{wyreMessage}</Text>
     </View>
-    <TouchableOpacity
+    {/* <TouchableOpacity
       onPress={() => showDropdown( true )}
       style={styles.containerStyle}>
       <View style={styles.headerImageView}>
@@ -146,7 +146,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       <DropDown onClose={( value ) => { setPickReceiveAddressFrom( value.type )
         showDropdown( false ) }}
       dropdownBoxList={dropdownBoxList} />
-    ) : null}
+    ) : null} */}
     <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>

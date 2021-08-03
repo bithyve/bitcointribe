@@ -18,7 +18,7 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
     <TouchableOpacity
       onPress={() => setActiveIndex( index )}
       style={{
-        width: '90%', height: hp( '12%' ), backgroundColor: isSelected ? Colors.lightBlue : Colors.backgroundColor1,
+        width: '90%', height: hp( '11%' ), backgroundColor: isSelected ? Colors.lightBlue : Colors.backgroundColor1,
         alignSelf: 'center', justifyContent: 'center',
         borderRadius: wp( '4' ),
         marginVertical: hp( '1%' ),
@@ -27,7 +27,7 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
       <View style={{
         flexDirection:'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
         marginHorizontal: wp( '5%' ),
         flex: 1,
         marginVertical: hp( '1.8%' )
@@ -66,10 +66,11 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
         />
         }
         <View style={{
-          flex: 1, marginLeft: wp( '4%' )
+          marginLeft: wp( '4%' )
         }}>
           <Text style={{
-            fontSize: RFValue( 13 ), fontFamily: isSelected ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: isSelected ? Colors.white : Colors.blue
+            fontSize: RFValue( 13 ), fontFamily: isSelected ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: isSelected ? Colors.white : Colors.blue,
+            marginBottom: hp( 0.5 )
           }}>
             {mainText}
           </Text>

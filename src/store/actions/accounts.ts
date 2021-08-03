@@ -28,6 +28,7 @@ export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE'
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT'
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES'
 export const ADD_NEW_ACCOUNT_SHELLS = 'ADD_NEW_ACCOUNT_SHELLS'
+export const RESTORE_ACCOUNT_SHELLS = 'RESTORE_ACCOUNT_SHELLS'
 export const ADD_NEW_SECONDARY_SUBACCOUNT = 'ADD_NEW_SECONDARY_SUBACCOUNT'
 export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
   'ADD_NEW_ACCOUNT_SHELL_COMPLETED'
@@ -337,6 +338,20 @@ export const addNewAccountShells = (
   }
 }
 
+export interface RestoreAccountShellsAction extends Action {
+  type: typeof RESTORE_ACCOUNT_SHELLS;
+  payload: Account[];
+}
+
+export const restoreAccountShells = (
+  payload: Account[]
+): RestoreAccountShellsAction => {
+  return {
+    type: RESTORE_ACCOUNT_SHELLS,
+    payload
+  }
+}
+
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,
@@ -495,7 +510,6 @@ export const UPDATE_ACCOUNTS = 'UPDATE_ACCOUNTS'
 export const UPDATE_ACCOUNT_SHELLS = 'UPDATE_ACCOUNT_SHELLS'
 export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
-export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS'
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED'
 export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED'
 export const TRANSACTION_REASSIGNMENT_SUCCEEDED =
@@ -606,15 +620,15 @@ export const updateAccountShells = ( { accounts }: { accounts: Accounts } ) => {
   }
 }
 
-export const restoredAccountShells = ( { accountShells, }: {
-  accountShells: AccountShell[];
-} ) => {
-  return {
-    type: RESTORED_ACCOUNT_SHELLS, payload: {
-      accountShells
-    }
-  }
-}
+// export const restoredAccountShells = ( { accountShells, }: {
+//   accountShells: AccountShell[];
+// } ) => {
+//   return {
+//     type: RESTORE_ACCOUNT_SHELLS, payload: {
+//       accountShells
+//     }
+//   }
+// }
 
 export const accountSettingsUpdateFailed = ( {  error, }: {
   error: Error;

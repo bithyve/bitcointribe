@@ -954,6 +954,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               break
 
             case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
             case DeepLinkEncryptionType.OTP:
               const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
               channelKeys = decryptedKeys.split( '-' )
