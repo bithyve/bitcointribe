@@ -22,20 +22,6 @@ export default function Secure2FA( props ) {
   // const [ contactData, setContactData ] = useState( null )
   const [ phoneNumbers, setPhoneumber ] = useState( props.Contact.phoneNumbers )
   const [ emails, setEmails ] = useState( props.Contact.emails )
-
-  useEffect( ()=>{
-    getContact()
-  }, [] )
-  const getContact = () => {
-    if ( !phoneNumbers || !emails ) {
-      ExpoContacts.getContactsAsync().then( async ( { data } ) => {
-        const filteredData = data.find( item => item.id === props.Contact.id )
-        setPhoneumber( filteredData.phoneNumbers )
-        setEmails( filteredData.emails )
-      // await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
-      } )
-    }
-  }
   return (
     <SafeAreaView style={{
       backgroundColor: Colors.backgroundColor
@@ -83,9 +69,9 @@ export default function Secure2FA( props ) {
           icon={''}
           mainText={'Confirm email address'}
           subText={emails[ 0 ].email}
-          isSelected={activeType === DeepLinkEncryptionType.DEFAULT}
+          isSelected={activeType === DeepLinkEncryptionType.EMAIL}
           setActiveIndex={setActiveType}
-          index={DeepLinkEncryptionType.DEFAULT}
+          index={DeepLinkEncryptionType.EMAIL}
         />
         }
         <CardWithRadioBtn
