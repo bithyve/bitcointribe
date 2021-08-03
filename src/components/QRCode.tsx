@@ -43,15 +43,13 @@ const QRCode: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   containerQrCode: {
-    backgroundColor: 'gray',
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5,
+    backgroundColor: '#e3e3e3',
   },
   textQr: {
-    color: 'white',
+    color: '#6c6c6c',
     fontSize: 17,
     textAlign: 'center',
-    paddingVertical: 5,
+    paddingVertical: 7,
   },
 } )
 
