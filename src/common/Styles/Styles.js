@@ -28,7 +28,7 @@ export default StyleSheet.create( {
 
   headerTitles: {
     color: Colors.blue,
-    fontSize: RFValue( 25 ),
+    fontSize: RFValue( 22 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },

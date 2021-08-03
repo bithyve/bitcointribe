@@ -12,7 +12,7 @@ import Toast from '../../components/Toast'
 import CountDown from 'react-native-countdown-component'
 import Config from '../../bitcoin/HexaConfig'
 import CopyOTP from '../../components/CopyOtp'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export default function ShareOtpWithContact( props ) {
   const [ isCopied, setIsCopied ] = useState( false )
@@ -21,6 +21,20 @@ export default function ShareOtpWithContact( props ) {
   const index = props.index
   return (
     <View style={styles.modalContainer}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {props.onPressBack()}}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity>
       <View style={styles.modalHeaderTitleView}>
         <View style={{
           flexDirection: 'row',
@@ -35,30 +49,6 @@ export default function ShareOtpWithContact( props ) {
               <Text style={styles.modalHeaderTitleText}>
 								Share OTP with{'\n'}trusted contact
               </Text>
-              <AppBottomSheetTouchableWrapper
-                onPress={() => props.onPressOk( index )}
-                style={{
-                  height: wp( '8%' ),
-                  width: wp( '18%' ),
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: Colors.lightBlue,
-                  justifyContent: 'center',
-                  borderRadius: 8,
-                  alignSelf: 'center',
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.white,
-                    fontSize: RFValue( 14 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-									Close
-                </Text>
-                <Ionicons color={Colors.white} size={18} name={'close-outline'} />
-              </AppBottomSheetTouchableWrapper>
             </View>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
 							Please provide this OTP to your trusted contact in order for them to send you the recovery secret
@@ -70,7 +60,7 @@ export default function ShareOtpWithContact( props ) {
         </View>
       </View>
       <View style={{
-        flex: 1, marginLeft: 30, marginRight: 30
+        marginLeft: 30, marginRight: 30
       }}>
         <CopyOTP OTP={OTP} setIsCopied={setIsCopied} />
         <Text numberOfLines={2} style={[ styles.modalHeaderInfoText, {
@@ -91,6 +81,7 @@ export default function ShareOtpWithContact( props ) {
               justifyContent: 'flex-start',
               borderRadius: 8,
               alignSelf: 'center',
+              marginBottom: hp( 2 )
             }}
           >
             <Ionicons color={Colors.white} size={17} name={'checkmark-circle-outline'} style={{
@@ -202,6 +193,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
+    marginBottom: hp( 2 )
   },
   bottomInnerView: {
     flexDirection: 'row',

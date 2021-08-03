@@ -52,6 +52,10 @@ const AppInfo = ( props ) => {
   const walletName = useSelector(
     ( state ) => state.storage.wallet.walletName,
   )
+  const walletId = useSelector(
+    ( state ) => state.storage.wallet.walletId,
+  )
+
   const { security } = useSelector(
     ( state ) => state.storage.wallet,
   )
@@ -66,6 +70,12 @@ const AppInfo = ( props ) => {
       imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
       subtitle: 'Lorem Ipsum dolor amet cons',
       onOptionPressed: () => showModal()
+    },
+    {
+      title: 'Wallet ID',
+      imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
+      subtitle: 'Lorem Ipsum dolor amet cons',
+      screenName: '',
     },
     {
       title: 'Version History',
@@ -218,9 +228,13 @@ const AppInfo = ( props ) => {
                     width: 36, height: 36, resizeMode: 'contain'
                   }}
                 />
-                {menuOption.title === 'Wallet Name' ?
+                {menuOption.title === 'Wallet Name' &&
                   <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
-                  :
+                }
+                { menuOption.title === 'Wallet ID' &&
+                  <Text style={styles.headerTitleText}>{`${walletId.length > 22 ? walletId.substr( 0, 22 )+'...' : walletId}`}</Text>
+                }
+                { menuOption.title === 'Version History' &&
                   <Text style={styles.headerTitleText}>{`Hexa ${data && data.length && data[ 0 ].version}`}</Text>
                 }
               </View>
