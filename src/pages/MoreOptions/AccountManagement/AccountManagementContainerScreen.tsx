@@ -237,8 +237,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             borderWidth: 1,
           }}
           onPress={() => {
-            console.log( 'primarySubAccount', primarySubAccount )
-
             setTimeout( () => {
               setSelectedAccount( primarySubAccount )
             }, 2 )
