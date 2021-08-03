@@ -80,7 +80,7 @@ export default function TrustedContactRequest( props ) {
     }
   }
   const getInputBox = () => {
-    if ( props.inputType == 'email' ) {
+    if ( props.inputType == DeepLinkEncryptionType.EMAIL ) {
       return (
         <View style={styles.textboxView}>
           <TextInput
@@ -278,7 +278,7 @@ export default function TrustedContactRequest( props ) {
         setIsDisabled( false )
       }
     }
-    if ( props.inputType == 'email' ) {
+    if ( props.inputType == DeepLinkEncryptionType.EMAIL ) {
       if ( text.length == 0 ) {
         setWrongInputError( 'Please enter Email, try again' )
         setIsDisabled( true )
@@ -375,7 +375,7 @@ export default function TrustedContactRequest( props ) {
             >
               {props.inputType === DeepLinkEncryptionType.NUMBER
                 ? 'Confirm your mobile number'
-                : props.inputType === 'email'
+                : props.inputType === DeepLinkEncryptionType.EMAIL
                   ? 'Confirm your email address'
                   : null}
             </Text>
@@ -400,7 +400,7 @@ export default function TrustedContactRequest( props ) {
               >
                 {props.inputType === DeepLinkEncryptionType.NUMBER
                   ? 'mobile number, '
-                  : props.inputType === 'email'
+                  : props.inputType === DeepLinkEncryptionType.EMAIL
                     ? 'email address, '
                     : 'otp, '}
                 <Text style={{
@@ -448,7 +448,7 @@ export default function TrustedContactRequest( props ) {
                 const key =
                   props.inputType === DeepLinkEncryptionType.NUMBER
                     ? PhoneNumber
-                    : props.inputType === 'email'
+                    : props.inputType === DeepLinkEncryptionType.EMAIL
                       ? EmailId
                       : passcode.toUpperCase()
                 setTimeout( () => {
@@ -472,7 +472,7 @@ export default function TrustedContactRequest( props ) {
                 const key =
                   props.inputType === DeepLinkEncryptionType.NUMBER
                     ? PhoneNumber
-                    : props.inputType === 'email'
+                    : props.inputType === DeepLinkEncryptionType.EMAIL
                       ? EmailId
                       : null
                 props.onPressReject( key )
