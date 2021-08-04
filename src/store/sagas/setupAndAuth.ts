@@ -36,7 +36,7 @@ import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
 import { newAccountShellCreationCompleted } from '../actions/accounts'
 
 function* updateWalletWorker( { payload } ) {
-  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
+  const { walletName }: { walletName: string } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
 
   yield put( updateWallet( {

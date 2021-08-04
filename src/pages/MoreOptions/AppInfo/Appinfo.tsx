@@ -56,9 +56,6 @@ const AppInfo = ( props ) => {
     ( state ) => state.storage.wallet?.walletId,
   )
 
-  const { security } = useSelector(
-    ( state ) => state.storage.wallet,
-  )
   const dispatch = useDispatch()
 
   const versionHistory = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
@@ -160,7 +157,7 @@ const AppInfo = ( props ) => {
         <EditWalletName
           closeBottomSheet={() => showEditName( false )}
           onPressConfirm={async ( newName ) => {
-            dispatch( updateWalletName( newName, security ) )
+            dispatch( updateWalletName( newName ) )
             showEditName( false )
             setSuccess( true )
           }}
