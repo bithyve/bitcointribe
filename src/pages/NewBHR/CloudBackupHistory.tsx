@@ -21,7 +21,6 @@ import HistoryPageComponent from './HistoryPageComponent'
 import ModalHeader from '../../components/ModalHeader'
 import { updateCloudPermission } from '../../store/actions/health'
 import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../../components/ErrorModalContents'
 import {
   checkMSharesHealth,
 } from '../../store/actions/health'
@@ -30,10 +29,11 @@ import HistoryHeaderComponent from './HistoryHeaderComponent'
 import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { getLevelInfo } from '../../common/CommonFunctions'
-import { setCloudData } from '../../store/actions/cloud'
+import { setCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import ErrorModalContents from '../../components/ErrorModalContents'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -48,14 +48,16 @@ export enum BottomSheetState {
 const CloudBackupHistory = ( props ) => {
   const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
   const [ confirmationModal, setConfirmationModal ] = useState( false )
+  const [ errorModal, setErrorModal ] = useState( false )
   const [
     bottomSheetRef,
     setBottomSheetRef,
   ] = useState( React.createRef() )
   const HealthCheckSuccessBottomSheet = createRef<BottomSheet>()
-
   const cloudBackupHistoryArray = useSelector( ( state ) => state.cloud.cloudBackupHistory )
 
+  const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
+  const [ errorMsg, setErrorMsg ] = useState( '' )
   const s3Service = useSelector( ( state ) => state.health.service )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
 
@@ -114,6 +116,43 @@ const CloudBackupHistory = ( props ) => {
     console.log( cloudBackupHistoryArray )
     if ( cloudBackupHistoryArray ) setCloudBackupHistory( cloudBackupHistoryArray )
   }, [ cloudBackupHistoryArray ] )
+
+  useEffect( () => {
+    if ( cloudErrorMessage !== '' ) {
+      setErrorMsg( cloudErrorMessage )
+      setErrorModal( true )
+      dispatch( setCloudErrorMessage( '' ) )
+    }
+  }, [ cloudErrorMessage ] )
+
+  const renderCloudErrorContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        title={'Cloud Backup Error'}
+        //info={cloudErrorMessage}
+        note={errorMsg}
+        onPressProceed={()=>{
+          setErrorModal( false )
+          setConfirmationModal( true )
+        }}
+        onPressIgnore={()=> {
+          setErrorModal( false )
+        }}
+        proceedButtonText={'Try Again'}
+        cancelButtonText={'Skip'}
+        isIgnoreButton={true}
+        isBottomImage={true}
+        isBottomImageStyle={{
+          width: wp( '30%' ),
+          height: wp( '25%' ),
+          marginLeft: 'auto',
+          resizeMode: 'stretch',
+          marginBottom: hp( '-3%' ),
+        }}
+        bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+      />
+    )
+  }, [ errorMsg ] )
 
   const renderCloudPermissionContent = useCallback( () => {
     return ( <CloudPermissionModalContents
@@ -229,6 +268,9 @@ const CloudBackupHistory = ( props ) => {
       </View>
       <ModalContainer visible={confirmationModal} closeBottomSheet={() => {}}>
         {renderCloudPermissionContent()}
+      </ModalContainer>
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {setErrorModal( false )}}>
+        {renderCloudErrorContent()}
       </ModalContainer>
       {/* <BottomSheet
         enabledInnerScrolling={true}
