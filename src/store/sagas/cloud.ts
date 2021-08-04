@@ -10,6 +10,7 @@ import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
@@ -81,13 +82,13 @@ function* cloudWorker( { payload } ) {
         )
         // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
         const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-
+        const seed = LevelHealth.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
         const data = {
           levelStatus: level ? level : 1,
           shares: shares,
           secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
           encryptedCloudDataJson: encryptedCloudDataJson,
-          seed: shares ? '' : wallet.primaryMnemonic,
+          seed: shares ? '' : seed,
           walletName: wallet.walletName,
           questionId: wallet.security.questionId,
           question: wallet.security.questionId === '0' ? wallet.security.question: '',
@@ -95,7 +96,7 @@ function* cloudWorker( { payload } ) {
           keeperData: JSON.stringify( keeperInfo ),
           bhXpub,
         }
-
+        console.log( 'ICLOUD data', data )
         const isCloudBackupCompleted = yield call ( checkCloudBackupWorker, {
           payload: {
             data, share
@@ -378,6 +379,7 @@ function* updateDataWorker( { payload } ) {
           question: data.question,
           walletId: walletId,
           data: data.encryptedCloudDataJson,
+          seed: data.seed ? data.seed : '',
           shares: data.shares,
           keeperData: data.keeperData,
           dateTime: moment( new Date() ),
@@ -390,6 +392,7 @@ function* updateDataWorker( { payload } ) {
         newArray[ index ].question = data.question,
         newArray[ index ].levelStatus = data.levelStatus
         newArray[ index ].data = data.encryptedCloudDataJson
+        newArray[ index ].seed = data.seed ? data.seed : '',
         newArray[ index ].shares = data.shares ? data.shares : newArray[ index ].shares
         newArray[ index ].keeperData = data.keeperData
         newArray[ index ].dateTime = moment( new Date() )
@@ -423,6 +426,7 @@ function* updateDataWorker( { payload } ) {
       console.log( 'GoogleDrive.updateFile', result )
 
     }
+    console.log( 'newArray', newArray )
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
@@ -449,7 +453,7 @@ function* createFileWorker( { payload } ) {
       question: data.question,
       walletId: walletId,
       data: data.encryptedCloudDataJson,
-      seed: data.seed,
+      seed: data.seed ? data.seed : '',
       shares: data.shares,
       keeperData: data.keeperData,
       dateTime: moment( new Date() ),
@@ -623,7 +627,7 @@ function* uplaodFileWorker( { payload } ) {
           question: data.question,
           walletId: walletId,
           data: data.encryptedCloudDataJson,
-          seed: data.seed,
+          seed: data.seed ? data.seed : '',
           shares: data.shares,
           keeperData: data.keeperData,
           dateTime: moment( new Date() ),
@@ -636,7 +640,7 @@ function* uplaodFileWorker( { payload } ) {
         newArray[ index ].question = data.question
         newArray[ index ].levelStatus = data.levelStatus
         newArray[ index ].data = data.encryptedCloudDataJson
-        newArray[ index ].seed = data.seed
+        newArray[ index ].seed = data.seed ? data.seed : '',
         newArray[ index ].shares = data.shares ? data.shares : newArray[ index ].shares
         newArray[ index ].keeperData = data.keeperData
         newArray[ index ].dateTime = moment( new Date() )

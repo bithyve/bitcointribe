@@ -110,6 +110,7 @@ import {
   editTrustedContactWatcher,
   removeTrustedContactWatcher,
   rejectTrustedContactWatcher,
+  restoreContactsWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -275,6 +276,7 @@ const rootSaga = function* () {
     removeTrustedContactWatcher,
     walletCheckInWatcher,
     syncPermanentChannelsWatcher,
+    restoreContactsWatcher,
 
     // Health
     initHealthWatcher,

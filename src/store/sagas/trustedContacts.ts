@@ -11,6 +11,7 @@ import {
   REJECT_TRUSTED_CONTACT,
   updateTrustedContacts,
   EDIT_TRUSTED_CONTACT,
+  RESTORE_CONTACTS,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -532,4 +533,31 @@ function* walletCheckInWorker( { payload } ) {
 export const walletCheckInWatcher = createWatcher(
   walletCheckInWorker,
   WALLET_CHECK_IN,
+)
+
+function* restoreContactsWorker( { payload } ) {
+  try{
+    const { channelSyncUpdates } = payload
+    console.log( 'channelSyncUpdates', channelSyncUpdates )
+    const { updated, updatedContacts }: {
+      updated: boolean;
+      updatedContacts: Trusted_Contacts
+    } = yield call(
+      TrustedContactsOperations.syncPermanentChannels,
+      channelSyncUpdates
+    )
+    console.log( 'RESTORE_CONTACTS updated', updated )
+    console.log( 'RESTORE_CONTACTS updatedContacts', updatedContacts )
+
+    if ( updated ) {
+      yield put( updateTrustedContacts( updatedContacts ) )
+    }
+  } catch( err ){
+    console.log( 'RESTORE_CONTACTS: ERROR', err )
+  }
+}
+
+export const restoreContactsWatcher = createWatcher(
+  restoreContactsWorker,
+  RESTORE_CONTACTS,
 )

@@ -64,7 +64,7 @@ import {
 import axios from 'axios'
 import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/health'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import { BackupStreamData, KeeperInfoInterface, MetaShare, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, KeeperInfoInterface, MetaShare, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import config from '../../bitcoin/HexaConfig'
 import { textWithoutEncoding, email } from 'react-native-communications'
@@ -200,6 +200,7 @@ interface RestoreWithICloudPropsTypes {
   putKeeperInfo: any;
   keeperInfo: KeeperInfoInterface[];
   setupHealth: any;
+  wallet: Wallet;
 }
 
 class RestoreWithICloud extends Component<
@@ -242,6 +243,7 @@ class RestoreWithICloud extends Component<
         walletId: '',
         walletName: '',
         levelStatus: '',
+        seed: '',
         shares: '',
         keeperData: '',
       },
@@ -271,7 +273,8 @@ class RestoreWithICloud extends Component<
       restoreWallet: false,
       contactListModal: false,
       restoreSuccess: false,
-      currentLevel: 0
+      currentLevel: 0,
+      backupModal: false
     }
   }
 
@@ -324,6 +327,17 @@ class RestoreWithICloud extends Component<
       walletCheckIn()
       // if ( this.loaderBottomSheet as any )
       //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
+      this.setState( {
+        loaderModal: false
+      } )
+      this.props.navigation.navigate( 'HomeNav' )
+    }
+
+    if( prevProps.wallet != this.props.wallet ){
+      await AsyncStorage.setItem( 'walletExists', 'true' )
+      await AsyncStorage.setItem( 'walletRecovered', 'true' )
+      setVersion( 'Restored' )
+      initNewBHRFlow( true )
       this.setState( {
         loaderModal: false
       } )
@@ -598,7 +612,7 @@ class RestoreWithICloud extends Component<
         } )
       } else if ( decryptedCloudDataJson && !selectedBackup.shares ) {
         this.showLoaderModal()
-        recoverWalletUsingIcloud( decryptedCloudDataJson )
+        recoverWalletUsingIcloud( decryptedCloudDataJson, answer, selectedBackup )
       } else {
         // ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
         this.setState( {
@@ -865,22 +879,19 @@ class RestoreWithICloud extends Component<
 
   renderContent = () => {
     const { selectedBackup, hideShow } = this.state
-    const { navigation, database } = this.props
-    let name
-    if ( Platform.OS == 'ios' ) name = 'iCloud'
-    else name = 'GDrive'
+    const { navigation } = this.props
     return (
       <RestoreFromICloud
-        title={'Restore from ' + name}
+        title={`Restore from ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText={
           'Clicking on Restore would source your Recovery Key from iCloud'
         }
         cardInfo={'Restoring Wallet from'}
         cardTitle={selectedBackup.walletName}
         levelStatus={
-          selectedBackup.levelStatus
-            ? name + ' backup at Level ' + selectedBackup.levelStatus
-            : ''
+          `${selectedBackup.levelStatus
+            ? `${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'} backup at Level ${selectedBackup.levelStatus}`
+            : ''}`
         }
         proceedButtonText={'Restore'}
         backButtonText={'Back'}
@@ -900,6 +911,16 @@ class RestoreWithICloud extends Component<
           } )
           navigation.navigate( 'WalletInitialization' )
 
+        }}
+        hideShow={this.state.hideShow}
+        walletsArray={this.state.walletsArray}
+        onPressSelectValue={( value )=>{
+          this.setState( {
+            hideShow: false
+          } )
+          this.setState( {
+            selectedBackup: value
+          } )
         }}
         onPressCard={() => {
           console.log( 'ajfjkh asd', hideShow )
@@ -1159,101 +1180,7 @@ class RestoreWithICloud extends Component<
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
-        {hideShow ? (
-          <Modal
-            animationType='fade'
-            transparent={true}
-            visible={hideShow}
-            onRequestClose={() => {
-              console.log( 'onRequestClose' )
-              this.setState( {
-                hideShow: false
-              } )
-            }}>
-            <TouchableOpacity style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }} onPress={() => {
-              console.log( 'onRequestClose' )
-              this.setState( {
-                hideShow: false
-              } )
-            }}>
 
-              <View style={styles.dropDownView}>
-                <ScrollView>
-                  {walletsArray.map( ( value, index ) => {
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        activeOpacity={10}
-                        onPress={() => {
-                          console.log( 'onPress' )
-                          this.setState( {
-                            hideShow: false
-                          } )
-                          this.setState( {
-                            selectedBackup: value
-                          } )
-                        }}
-                        style={styles.dropDownElement}
-                      >
-                        {value.data && (
-                          <View style={styles.greyBox}>
-                            <View style={styles.greyBoxImage}>
-                              <MaterialCommunityIcons
-                                name={'restore'}
-                                size={RFValue( 25 )}
-                                color={Colors.blue}
-                              />
-                            </View>
-                            <View style={{
-                              marginLeft: 10
-                            }}>
-                              <Text style={styles.greyBoxText}>
-                                {'Restoring Wallet from'}
-                              </Text>
-                              <Text
-                                style={{
-                                  ...styles.greyBoxText,
-                                  fontSize: RFValue( 20 ),
-                                }}
-                              >
-                                {value.walletName}
-                              </Text>
-                              <Text
-                                style={{
-                                  ...styles.greyBoxText,
-                                  fontSize: RFValue( 10 ),
-                                }}
-                              >
-                                {'Last backup : ' +
-                                  timeFormatter(
-                                    moment( new Date() ),
-                                    moment( value.dateTime ).valueOf()
-                                  )}
-                              </Text>
-
-                              <Text
-                                style={{
-                                  ...styles.greyBoxText,
-                                  fontSize: RFValue( 10 ),
-                                }}
-                              >
-                                {'Backup at Level : ' + value.levelStatus}
-                              </Text>
-                            </View>
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    )
-                  } )}
-                </ScrollView>
-              </View>
-            </TouchableOpacity>
-          </Modal>
-        ) : null}
         <ModalContainer visible={restoreModal} closeBottomSheet={() => {
           this.setState( {
             restoreModal: false
@@ -1518,6 +1445,7 @@ const mapStateToProps = ( state ) => {
     cloudData: idx( state, ( _ ) => _.cloud.cloudData ),
     downloadedBackupData: idx( state, ( _ ) => _.health.downloadedBackupData ),
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
   }
 }
 
@@ -1552,33 +1480,6 @@ const styles = StyleSheet.create( {
     paddingTop: 10,
     marginLeft: 20,
     marginRight: 20,
-  },
-  dropDownView: {
-    position: 'absolute',
-    bottom: 0,
-    zIndex: 999,
-    backgroundColor: Colors.white,
-    marginLeft: wp( '10%' ),
-    marginRight: wp( '10%' ),
-    width: '80%',
-    height: '80%',
-    marginTop: wp( '15%' ),
-    marginBottom: wp( '25%' ),
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    overflow: 'hidden',
-  },
-  dropDownElement: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: wp( '3%' ),
-    paddingRight: wp( '3%' ),
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 1,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
@@ -1654,37 +1555,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 9 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
-  },
-  greyBox: {
-    width: wp( '90%' ),
-    borderRadius: 10,
-    backgroundColor: Colors.backgroundColor1,
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  greyBoxImage: {
-    width: wp( '15%' ),
-    height: wp( '15%' ),
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: wp( '15%' ) / 2,
-    borderColor: Colors.white,
-    borderWidth: 1,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.8,
-    shadowColor: Colors.textColorGrey,
-    shadowRadius: 5,
-    elevation: 10,
-  },
-  greyBoxText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 11 ),
   },
   keeperImage: {
     width: wp( '15%' ),

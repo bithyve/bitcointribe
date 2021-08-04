@@ -858,6 +858,20 @@ export interface Account {
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
 }
 
+export interface cloudDataInterface {
+  levelStatus: number;
+  encryptedCloudDataJson: string;
+  walletName: string;
+  questionId: number;
+  question: string;
+  keeperData: string;
+  bhXpub?: string;
+  shares?: any;
+  secondaryShare?: string;
+  seed?: string;
+  regularAccount?: any;
+}
+
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
   xpubs: {                              // xpub set for multi-sig
