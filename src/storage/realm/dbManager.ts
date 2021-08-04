@@ -116,8 +116,6 @@ const createAccount = async ( account ) => {
 }
 
 const updateAccount = async ( accountId, account ) => {
-  console.log( account )
-
   try {
     let acccountRef = db.objects( schema.Account ).filtered( `id = "${accountId}"` )
     const data = {

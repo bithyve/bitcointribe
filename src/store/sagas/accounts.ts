@@ -404,7 +404,7 @@ function* refreshAccountShellWorker( { payload } ) {
   // yield put( rescanSucceeded( rescanTxs ) )
 
   // update F&F channels if any new txs found on an assigned address
-  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
+  if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
 export const refreshAccountShellWatcher = createWatcher(
@@ -412,27 +412,25 @@ export const refreshAccountShellWatcher = createWatcher(
   REFRESH_ACCOUNT_SHELL
 )
 
-function* autoSyncShellsWorker( { payload } ) {
-  yield call( clearAccountSyncCache )
-  const shells = yield select(
+function* autoSyncShellsWorker( ) {
+  const shells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells
   )
+
   for ( const shell of shells ) {
-    if ( shell.syncStatus === SyncStatus.PENDING ) {
-      // yield delay( 3000 )
-      yield call( refreshAccountShellWorker,
-        {
-          payload: {
-            shell: shell,
-            options: {
-              autoSync: true
-            }
-          }
+    if( shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+      const payload = {
+        shell: shell,
+        options: {
         }
-      )
+      }
+      yield call( refreshAccountShellWorker, {
+        payload
+      } )
     }
   }
 }
+
 export const autoSyncShellsWatcher = createWatcher(
   autoSyncShellsWorker,
   AUTO_SYNC_SHELLS

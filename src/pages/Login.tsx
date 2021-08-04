@@ -28,7 +28,7 @@ import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
-import { initMigration, updateLastSeen } from '../store/actions/preferences'
+import { initMigration } from '../store/actions/preferences'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
 import { processDeepLink } from '../common/CommonFunctions'
@@ -139,7 +139,6 @@ export default function Login( props ) {
   }, [] )
 
   useEffect( () => {
-    dispatch( updateLastSeen( null ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
