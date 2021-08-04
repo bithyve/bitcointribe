@@ -33,7 +33,7 @@ import SecurityQuestion from './SecurityQuestion'
 import EnterPasscodeScreen from './EnterPasscodeScreen'
 import EditWalletName from './EditWalletName'
 import EditWalletSuccess from './EditWalletSuccess'
-import { setupWallet } from '../../../store/actions/setupAndAuth'
+import { updateWalletName } from '../../../store/actions/setupAndAuth'
 interface MenuOption {
     title: string;
     subtitle: string;
@@ -50,10 +50,10 @@ const AppInfo = ( props ) => {
   const [ editName, showEditName ] = useState( false )
   const [ success, setSuccess ] = useState( false )
   const walletName = useSelector(
-    ( state ) => state.storage.wallet.walletName,
+    ( state ) => state.storage.wallet?.walletName,
   )
   const walletId = useSelector(
-    ( state ) => state.storage.wallet.walletId,
+    ( state ) => state.storage.wallet?.walletId,
   )
 
   const { security } = useSelector(
@@ -160,7 +160,7 @@ const AppInfo = ( props ) => {
         <EditWalletName
           closeBottomSheet={() => showEditName( false )}
           onPressConfirm={async ( newName ) => {
-            dispatch( setupWallet( newName, security ) )
+            dispatch( updateWalletName( newName, security ) )
             showEditName( false )
             setSuccess( true )
           }}
