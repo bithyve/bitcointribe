@@ -91,16 +91,21 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestEmail()
-                        .requestIdToken("1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com") //Client ID for Web application
-                        .build();
+                try{
+                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestEmail()
+                            .requestIdToken("1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com") //Client ID for Web application
+                            .build();
 
-                googleApiClient = new GoogleApiClient.Builder(activity.getBaseContext())
-                        .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                        .build();
-                googleApiClient.connect();
-                promise.resolve(true);
+                    googleApiClient = new GoogleApiClient.Builder(activity.getBaseContext())
+                            .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                            .build();
+                    googleApiClient.connect();
+                    promise.resolve(true);
+                }catch (Exception e) {
+                    promise.resolve(false);
+                    Log.d(TAG, e.toString());
+                }
             }
         });
     }
@@ -186,6 +191,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         WritableMap map = Arguments.createMap();
         map.putString(EVENT_KEY, ERROR);
         map.putString("error", error);
+        map.putString("code", String.valueOf((code)));
         tokenPromise.resolve(map);
     }
 

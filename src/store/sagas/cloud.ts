@@ -337,6 +337,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
   try {
     const { checkDataIsBackedup, share, googlePermissionCall, data } = payload
     const result = yield call ( GoogleDrive.setup )
+    console.log( 'result', result )
+
     let googleLoginResult
     if( result ){
       googleLoginResult = yield call( GoogleDrive.login )
@@ -355,6 +357,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
             } )
             return fileAvailabelStatus
           } else{
+            const message = getGoogleDriveErrorMessage( result.code )
+            yield put( setCloudErrorMessage( message ) )
             console.log( 'GOOGLE SetupFail else', result )
             yield put( setGoogleCloudLoginFailure( true ) )
             throw new Error( 'Google LoginFail' )
@@ -367,6 +371,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
           } else{
             console.log( 'GOOGLE SetupFail else', result )
             yield put( setGoogleCloudLoginFailure( true ) )
+            const message = getGoogleDriveErrorMessage( result.code )
+            yield put( setCloudErrorMessage( message ) )
             throw new Error( result.eventName )
           }
         }
@@ -450,6 +456,8 @@ function* updateDataWorker( { payload } ) {
         //this.callBack( share )
       }
       else if( result.eventName == 'failure' ){
+        const message = getGoogleDriveErrorMessage( result.code )
+        yield put( setCloudErrorMessage( message ) )
         throw new Error( result.eventName )
       }
       console.log( 'GoogleDrive.updateFile', result )
@@ -551,6 +559,8 @@ function* checkFileIsAvailableWorker( { payload } ) {
         return createFileStatus
       } else if ( result.eventName == 'failure' ) {
         console.log( 'FAILURE' )
+        const message = getGoogleDriveErrorMessage( result.code )
+        yield put( setCloudErrorMessage( message ) )
         throw new Error( result.eventName )
       } else if( result.eventName === 'UseUserRecoverableAuthIOException' )
       {
@@ -692,6 +702,8 @@ function* uplaodFileWorker( { payload } ) {
           //this.callBack( share )
         }
         else if( result.eventName == 'failure' ){
+          const message = getGoogleDriveErrorMessage( result.code )
+          yield put( setCloudErrorMessage( message ) )
           throw new Error( result.eventName )
         }
         console.log( 'GoogleDrive.updateFile', result )
