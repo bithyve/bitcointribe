@@ -59,6 +59,7 @@ import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getIndex } from '../../common/utilities'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -453,7 +454,7 @@ const PersonalCopyHistory = ( props ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
       if( ( selectedKeeper.channelKey || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKey: string = isChange ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKey )
       console.log( 'Contact', Contact )
 

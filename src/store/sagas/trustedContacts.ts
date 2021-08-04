@@ -51,6 +51,7 @@ import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth } from '../actions/health'
 import { getNextFreeAddressWorker } from './accounts'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -278,7 +279,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     channelKey,
     contactsSecondaryChannelKey
   }
-  contactInfo.channelKey = contactInfo.channelKey?  contactInfo.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength ) // channel-key is available during init at approvers end
+  contactInfo.channelKey = contactInfo.channelKey?  contactInfo.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) // channel-key is available during init at approvers end
 
   if( isKeeper ) {
     const channelAssets: ChannelAssets = yield select(
@@ -338,7 +339,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       secondaryMnemonicShard,
       bhXpub,
     }
-    const secondaryChannelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
+    const secondaryChannelKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     contactInfo.secondaryChannelKey = secondaryChannelKey
   }
 
