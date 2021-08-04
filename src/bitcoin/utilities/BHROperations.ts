@@ -27,32 +27,15 @@ export default class BHROperations {
   static hexToString = ( hex: string ): string => secrets.hex2str( hex );
   static stringToHex = ( str: string ): string => secrets.str2hex( str );
 
-  static recoverFromSecretsKeeper = (
-    decryptedSecrets: string[],
-    level?: number
-  ): {
-    mnemonic: string;
-  } => {
-    const levelThreshold = level == 2 ? BHROperations.thresholdLevel1 : level == 3 ? BHROperations.thresholdLevel2 : BHROperations.threshold
-    if ( decryptedSecrets.length >= levelThreshold ) {
-      const secretsArray = []
-      for ( const secret of decryptedSecrets ) {
-        if ( BHROperations.validShare( secret ) ) {
-          secretsArray.push( secret.slice( 0, secret.length - 8 ) )
-        } else {
-          throw new Error( `Invalid checksum, share: ${secret} is corrupt` )
-        }
-      }
-
-      const recoveredMnemonicHex = secrets.combine( secretsArray )
-      return {
-        mnemonic: BHROperations.hexToString( recoveredMnemonicHex )
-      }
-    } else {
-      throw new Error(
-        `supplied number of shares are less than the threshold (${levelThreshold})`,
-      )
+  static generateKey = ( length: number ): string => {
+    let result = ''
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const charactersLength = characters.length
+    for ( let itr = 0; itr < length; itr++ ) {
+      result += characters.charAt( Math.floor( Math.random() * charactersLength ) )
     }
+    return result
   };
 
   static decryptSecrets = (
@@ -492,6 +475,34 @@ export default class BHROperations {
     }
   };
 
+  static recoverFromSecretsKeeper = (
+    decryptedSecrets: string[],
+    level?: number
+  ): {
+    mnemonic: string;
+  } => {
+    const levelThreshold = level == 2 ? BHROperations.thresholdLevel1 : level == 3 ? BHROperations.thresholdLevel2 : BHROperations.threshold
+    if ( decryptedSecrets.length >= levelThreshold ) {
+      const secretsArray = []
+      for ( const secret of decryptedSecrets ) {
+        if ( BHROperations.validShare( secret ) ) {
+          secretsArray.push( secret.slice( 0, secret.length - 8 ) )
+        } else {
+          throw new Error( `Invalid checksum, share: ${secret} is corrupt` )
+        }
+      }
+
+      const recoveredMnemonicHex = secrets.combine( secretsArray )
+      return {
+        mnemonic: BHROperations.hexToString( recoveredMnemonicHex )
+      }
+    } else {
+      throw new Error(
+        `supplied number of shares are less than the threshold (${levelThreshold})`,
+      )
+    }
+  };
+
   static decryptViaOTP = (
     otpEncryptedData: string,
     otp: string,
@@ -656,17 +667,6 @@ export default class BHROperations {
         'sha256',
       )
       .toString( 'hex' )
-  };
-
-  static generateKey = ( length: number ): string => {
-    let result = ''
-    const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    const charactersLength = characters.length
-    for ( let itr = 0; itr < length; itr++ ) {
-      result += characters.charAt( Math.floor( Math.random() * charactersLength ) )
-    }
-    return result
   };
 
   static encryptViaOTP = (

@@ -84,6 +84,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 
 import semver from 'semver'
 import S3Service from '../../bitcoin/services/sss/S3Service'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -424,7 +425,7 @@ class RestoreWithICloud extends Component<
   };
 
   checkForRecoverWallet = ( shares, selectedBackup ) => {
-    const key = SSS.strechKey( this.state.answer )
+    const key = BHROperations.strechKey( this.state.answer )
     const KeeperData = JSON.parse( selectedBackup.keeperData )
     const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
     //console.log('decryptedCloudDataJson checkForRecoverWallet', decryptedCloudDataJson);
@@ -552,7 +553,7 @@ class RestoreWithICloud extends Component<
     const { recoverWalletUsingIcloud, accounts } = this.props
     const { answer, selectedBackup } = this.state
     try {
-      const key = SSS.strechKey( answer )
+      const key = BHROperations.strechKey( answer )
       const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
       console.log( 'decryptedCloudDataJson', decryptedCloudDataJson )
       if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
