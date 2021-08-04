@@ -25,7 +25,7 @@ import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup } from '../actions/health'
+import { initializeHealthSetup, updateWalletImageHealth } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
@@ -42,6 +42,11 @@ function* updateWalletWorker( { payload } ) {
   yield put( updateWallet( {
     ...wallet, walletName: walletName
   } ) )
+  yield call( dbManager.updateWallet, {
+    walletName,
+  } )
+  yield call( dbManager.getWallet )
+  yield put( updateWalletImageHealth() )
 }
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
