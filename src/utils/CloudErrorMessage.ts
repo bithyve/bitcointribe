@@ -59,6 +59,16 @@ export const getGoogleDriveErrorMessage = ( errorCode ) => {
         return 'You are not logged-in into your Google Drive account. Please log in from your Phone Settings.'
       case '15': //SIGN_IN_REQUIRED
         return 'Request timed out. Please try again.'
+      //
+      case '30': //SIGN_IN_FAILED
+        return 'Please check authentication with your google account in settings and try again.'
+      case '33':
+      case '31': //ERROR_IN_UPLOADING_DATA
+        return 'Error in uploading data. Please re-try again.'
+      case '34': //ERROR_IN_READING_DATA
+        return 'Error in reading data. Please re-try again.'
+      case '12501':
+        return 'Sign in action cancelled. Please select your google account.'
       default:
         return `We encountered a non-standard error. Please try again after sometime or contact us with (${errorCode}) Error Code.`
   }
