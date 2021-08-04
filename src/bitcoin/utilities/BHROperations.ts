@@ -4,12 +4,8 @@ import crypto from 'crypto'
 import secrets from 'secrets.js-grempe'
 import config from '../HexaConfig'
 import {
-  BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
   MetaShare,
-  SocialStaticNonPMDD,
-  EncryptedImage,
-  WalletImage,
 } from './Interface'
 
 import { BH_AXIOS } from '../../services/api'
@@ -80,6 +76,45 @@ export default class BHROperations {
     }
     return {
       decryptedSecrets
+    }
+  };
+
+  static encryptWithAnswer = (
+    data: string,
+    answer: string,
+  ): {
+    encryptedData: string;
+  } => {
+    const key = BHROperations.getDerivedKey( answer )
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      key,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update( data, 'utf8', 'hex' )
+    encrypted += cipher.final( 'hex' )
+    return {
+      encryptedData: encrypted
+    }
+  };
+
+  static decryptWithAnswer = (
+    encryptedData: string,
+    answer: string,
+  ): {
+    decryptedData: string;
+  } => {
+    const key = BHROperations.getDerivedKey( answer )
+    const decipher = crypto.createDecipheriv(
+      BHROperations.cipherSpec.algorithm,
+      key,
+      BHROperations.cipherSpec.iv,
+    )
+    let decrypted = decipher.update( encryptedData, 'hex', 'utf8' )
+    decrypted += decipher.final( 'utf8' )
+
+    return {
+      decryptedData: decrypted
     }
   };
 
@@ -443,7 +478,6 @@ export default class BHROperations {
   }> => {
     const {
       metaShare,
-      messageId,
       encryptedDynamicNonPMDD,
     } = await BHROperations.downloadShare( encryptedKey, otp )
 
@@ -709,14 +743,6 @@ export default class BHROperations {
 
     return temp.slice( 0, 8 )
   };
-
-  //   public shareIDsKeeper: string[];
-  //   public encryptedSecretsKeeper: string[];
-  //   public encryptedSecondarySecrets: string[];
-  //   public oldMetaSharesKeeper: MetaShare[];
-  //   public SMMetaSharesKeeper: MetaShare[];
-  //   public healthCheckInitializedKeeper: boolean;
-  //   public pdfHealthKeeper: {};
 
   static generateMessageID = (): string =>
     BHROperations.generateRandomString( config.MSG_ID_LENGTH );
@@ -1160,7 +1186,7 @@ export default class BHROperations {
       minute: '2-digit',
     } )
 
-    const encryptedXpub = BHROperations.encryptWithAnswer( bhXpub, answer )
+    const { encryptedData: encryptedXpub } = BHROperations.encryptWithAnswer( bhXpub, answer )
 
     let keeperMetaShares = []
     let metaShare: MetaShare
@@ -1171,7 +1197,7 @@ export default class BHROperations {
         encryptedShare: {
           pmShare: element,
           smShare: encryptedSecondarySecrets.length ? encryptedSecondarySecrets[ 1 ] : '',
-          bhXpub: encryptedXpub.encryptedString
+          bhXpub: encryptedXpub
         },
         meta: {
           version: version ? version : '0',
@@ -1210,47 +1236,6 @@ export default class BHROperations {
     keeperMetaShares[ index ].meta.reshareVersion + 1
     return keeperMetaShares[ index ]
   };
-
-  //   public restoreMetaSharesKeeper = (
-  //     keeperMetaShares: MetaShare[],
-  //   ): {
-  //     restored: boolean;
-  //   } => {
-  //     if ( !Object.keys( metaShares ).length ) {
-  //       throw new Error( 'Restoration requires metaShares' )
-  //     }
-
-  //     this.metaSharesKeeper = metaShares
-
-  //     // restoring other assets
-
-  //     // restoring healthCheckInit variable
-  //     this.healthCheckInitializedKeeper = true
-
-  //     // enriching pdf health variable if restoration is done via Personal Copy
-  //     // if (this.metaSharesKeeper[3]) {
-  //     //   this.createQR(3);
-  //     // }
-  //     // if (this.metaSharesKeeper[4]) {
-  //     //   this.createQR(4);
-  //     // }
-
-  //     // replenishing shareIDs from any of the available shares
-  //     // for ( const share of metaShares ) {
-  //     //   if ( share ) {
-  //     //     const { decryptedStaticNonPMDD } = this.decryptStaticNonPMDD(
-  //     //       share.encryptedStaticNonPMDD,
-  //     //     )
-  //     //     const { shareIDs } = decryptedStaticNonPMDD
-  //     //     this.shareIDsKeeper = shareIDs
-  //     //     break
-  //     //   }
-  //     // }
-
-  //     return {
-  //       restored: true
-  //     }
-  //   };
 
   static createQR = ( index: number, keeperMetaShares: MetaShare[], keeperPDFHealth ): { qrData: string[], keeperPDFHealth } => {
     const splits: number = config.SSS_METASHARE_SPLITS
@@ -1325,6 +1310,274 @@ export default class BHROperations {
         encryptedPrimarySecrets: encryptedSecretsArr,
         keeperShareIDs: shareIDs
       }
+    }
+  };
+
+  static encryptShares = (
+    primarySecrets: string[],
+    answer: string,
+    secondarySecrets?: string[],
+  ): {
+    encryptedPrimarySecrets: string[];
+    keeperShareIDs: string[];
+    encryptedSecondarySecrets: string[];
+  } => {
+    const key = BHROperations.getDerivedKey( answer )
+    const shareIDs = []
+    const encryptedPrimarySecrets = []
+    for ( const secret of primarySecrets ) {
+      const cipher = crypto.createCipheriv(
+        BHROperations.cipherSpec.algorithm,
+        key,
+        BHROperations.cipherSpec.iv,
+      )
+      let encrypted = cipher.update( secret, 'utf8', 'hex' )
+      encrypted += cipher.final( 'hex' )
+      encryptedPrimarySecrets.push( encrypted )
+      shareIDs.push( BHROperations.getShareId( encrypted ) )
+    }
+
+    const encryptedSecondarySecrets = []
+    if( secondarySecrets ){
+      for ( const secret of secondarySecrets ) {
+        const cipher = crypto.createCipheriv(
+          BHROperations.cipherSpec.algorithm,
+          key,
+          BHROperations.cipherSpec.iv,
+        )
+        let encrypted = cipher.update( secret, 'utf8', 'hex' )
+        encrypted += cipher.final( 'hex' )
+        encryptedSecondarySecrets.push( encrypted )
+      }
+    }
+
+    return {
+      encryptedPrimarySecrets,
+      keeperShareIDs: shareIDs,
+      encryptedSecondarySecrets,
+    }
+  };
+
+  static updateGuardianInMetaShare = (
+    keeperMetaShares: MetaShare[],
+    shareId: string,
+    name: string,
+  ) : { updatedKeeperMetaShares: MetaShare[] } => {
+    for ( let i = 0; i < keeperMetaShares.length; i++ ) {
+      const element = keeperMetaShares[ i ]
+      if( element.shareId == shareId ){
+        keeperMetaShares[ i ].meta.guardian = name.toLowerCase().trim()
+      }
+    }
+    return {
+      updatedKeeperMetaShares: keeperMetaShares
+    }
+  }
+
+  static uploadPDFPrimaryShare = async (
+    share: string,
+    messageId?: string,
+  ): Promise<{success : Boolean}> => {
+    console.log( 'uploadPDFPrimaryShare messageId', messageId )
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'uploadPDFShare', {
+        HEXA_ID,
+        share,
+        messageId
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+    return res.data
+  };
+
+   static uploadPDFSecondaryShare = async (
+     share: string,
+     messageId?: string,
+   ): Promise<{success : Boolean}> => {
+     console.log( 'uploadPDFSecondaryShare messageId', messageId )
+     let res: AxiosResponse
+     try {
+       res = await BH_AXIOS.post( 'uploadPDFSecondaryShare', {
+         HEXA_ID,
+         share,
+         messageId
+       } )
+     } catch ( err ) {
+       if ( err.response ) throw new Error( err.response.data.err )
+       if ( err.code ) throw new Error( err.code )
+     }
+     console.log( 'uploadPDFSecondaryShare res', res )
+     return res.data
+   };
+
+  static removeUnwantedUnderCustody = async (
+    metaShares: MetaShare[],
+  ): Promise<{
+    updationInfo: Array<{
+      walletId: string;
+      shareId: string;
+      updated: boolean;
+      updatedAt?: number;
+      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+      err?: string;
+    }>;
+  }> => {
+    if ( metaShares.length === 0 ) {
+      throw new Error( 'No metaShare supplied' )
+    }
+
+    const toUpdate: Array<{
+      walletId: string;
+      shareId: string;
+      reshareVersion: number;
+    }> = []
+    for ( const metaShare of metaShares ) {
+      toUpdate.push( {
+        walletId: metaShare.meta.walletId,
+        shareId: metaShare.shareId,
+        reshareVersion: metaShare.meta.reshareVersion,
+      } )
+    }
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'removeUnwantedUnderCustody', {
+        HEXA_ID,
+        toUpdate,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { updationInfo } = res.data
+    return {
+      updationInfo
+    }
+  };
+
+  static generateSecondaryShares = ( secondaryMnemonic: string ): {
+    secondaryShares: string[];
+  } => {
+    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+    const shares = secrets.share(
+      BHROperations.stringToHex( secondaryMnemonic.trim() ),
+      config.SSS_LEVEL1_TOTAL,
+      config.SSS_LEVEL1_THRESHOLD,
+    )
+
+    for ( let itr = 0; itr < shares.length; itr++ ) {
+      const checksum = BHROperations.calculateChecksum( shares[ itr ] )
+      shares[ itr ] = shares[ itr ] + checksum
+    }
+
+    return {
+      secondaryShares: shares
+    }
+  };
+
+  static createSecondaryMetaSharesKeeper = (
+    walletId: string,
+    encryptedSecondarySecrets: string[],
+    tag: string,
+    questionId: string,
+    version?: string,
+    question?: string,
+  ): {
+    secondaryMetaShares: MetaShare[];
+  } => {
+    if ( !encryptedSecondarySecrets.length ) throw new Error( 'Can not create secondary MetaShares; missing encryptedSecondarySecrets' )
+
+    const timestamp = new Date().toLocaleString( undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    } )
+
+    let index = 0
+    const secondaryMetaShares: MetaShare[] = []
+    let metaShare: MetaShare
+    for ( const encryptedSecret of encryptedSecondarySecrets ) {
+      metaShare = {
+        encryptedSecret,
+        shareId: BHROperations.getShareId( encryptedSecret ),
+        meta: {
+          version: version ? version : '0',
+          validator: 'HEXA',
+          index,
+          walletId,
+          tag,
+          timestamp,
+          reshareVersion: 0,
+          questionId,
+          question
+        },
+      }
+      secondaryMetaShares.push( metaShare )
+      index++
+    }
+
+    return {
+      secondaryMetaShares
+    }
+  };
+
+  static updateKeeperInfoToMetaShare = ( keeperMetaShares: MetaShare[], oldKeeperMetaShares: MetaShare[], keeperInfo: any, answer: string ): { keeperMetaShares: MetaShare[], oldKeeperMetaShares: MetaShare[]; } => {
+    const { encryptedData } = BHROperations.encryptWithAnswer( JSON.stringify( keeperInfo ), answer )
+    for ( let i = 0; i < keeperMetaShares.length; i++ ) {
+      keeperMetaShares[ i ].meta.encryptedKeeperInfo = encryptedData
+    }
+    if( oldKeeperMetaShares && oldKeeperMetaShares.length ){
+      for ( let i = 0; i < oldKeeperMetaShares.length; i++ ) {
+        oldKeeperMetaShares[ i ].meta.encryptedKeeperInfo = encryptedData
+      }
+    }
+    return {
+      keeperMetaShares, oldKeeperMetaShares,
+    }
+  };
+
+  static getSecondaryMnemonic = ( secretsArray: string[], answer: string ) => {
+    const decryptedShareArr = []
+    for ( let i = 0; i < secretsArray.length; i++ ) {
+      const element = secretsArray[ i ]
+      decryptedShareArr.push( element )
+    }
+    const { decryptedSecrets } = BHROperations.decryptSecrets( decryptedShareArr, answer )
+    const recoveredMnemonicHex = secrets.combine( decryptedSecrets )
+    return {
+      mnemonic: BHROperations.hexToString( recoveredMnemonicHex )
+    }
+  }
+
+  static downloadSMPDFShare = async ( messageId: string, key: string ): Promise<
+    | {
+        status: number;
+        metaShare: MetaShare;
+      }
+    | {
+        status: number;
+        metaShare: MetaShare;
+      }
+  > => {
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'downloadPDFSecondaryShare', {
+        HEXA_ID,
+        messageId,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+    const { decryptedMetaShare } = BHROperations.decryptMetaShare( res.data.share, key )
+    return {
+      status: 200, metaShare: decryptedMetaShare
     }
   };
 }
