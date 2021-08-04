@@ -1,16 +1,16 @@
 import moment from 'moment'
-import { NativeModules, Platform } from 'react-native'
-import { call, put, select } from 'redux-saga/effects'
+import { NativeModules, Platform, Alert } from 'react-native'
+import { call, delay, put, select } from 'redux-saga/effects'
 import { CloudData, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
+import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-
+import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
 
@@ -111,7 +111,7 @@ function* cloudWorker( { payload } ) {
         }
       } )
 
-      if( isCloudBackupCompleted ) {
+      if( typeof isCloudBackupCompleted === 'boolean' ) {
         yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
         yield call( updateHealthForCloudStatusWorker, {
           payload : {
@@ -120,14 +120,32 @@ function* cloudWorker( { payload } ) {
         } )
         const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
         const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-        console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
+        //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
       } else {
-        const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
-        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-        yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+        if( isCloudBackupCompleted.status ) {
+          yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
+          yield call( updateHealthForCloudStatusWorker, {
+            payload : {
+              share
+            }
+          } )
+          const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+          //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
+
+          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+        } else {
+          const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+          yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+          yield delay( 200 )
+          const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( isCloudBackupCompleted.errorCode )}` : 'GoogleDrive backup failed'
+          yield put( setCloudErrorMessage( message ) )
+          //Alert.alert( 'Error', message )
+        }
       }
 
     }
@@ -264,7 +282,10 @@ function* checkCloudBackupWorker ( { payload } ) {
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
       console.log( 'backedJson checkCloudBackupWorker', backedJson )
-      if( backedJson === 'failure' ) return false
+      const json = JSON.parse( backedJson )
+      if( json.status ){
+        return json
+      }
       if ( backedJson ) {
         const isCloudBackupUpdated = yield call( updateDataWorker, {
           payload: {
@@ -274,8 +295,9 @@ function* checkCloudBackupWorker ( { payload } ) {
             data
           }
         } )
-        yield put( setIsCloudBackupUpdated( isCloudBackupUpdated ) )
-        return isCloudBackupUpdated
+        const res = JSON.parse( isCloudBackupUpdated )
+        yield put( setIsCloudBackupUpdated( res.status ) )
+        return res
       } else {
         console.log( 'createFile' )
         const isCloudBackupSuccess = yield call( createFileWorker, {
@@ -408,6 +430,7 @@ function* updateDataWorker( { payload } ) {
       if ( Platform.OS == 'ios' ) {
         if( newArray.length ) {
           const result = yield call( iCloud.startBackup, JSON.stringify( newArray )  )
+          console.log( 'startBackup result', result )
           return result
         }
 
