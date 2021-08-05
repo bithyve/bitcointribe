@@ -17,7 +17,7 @@ import {
   MERGE_ACCOUNT_SHELLS,
   accountShellMergeSucceeded,
   accountShellMergeFailed,
-  REFRESH_ACCOUNT_SHELL,
+  REFRESH_ACCOUNT_SHELLS,
   AUTO_SYNC_SHELLS,
   accountShellRefreshCompleted,
   accountShellRefreshStarted,
@@ -33,7 +33,7 @@ import {
   SYNC_ACCOUNTS,
   updateAccountShells,
   getTestcoins,
-  refreshAccountShell,
+  refreshAccountShells,
   UPDATE_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
@@ -170,7 +170,6 @@ function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
   options: {
     hardRefresh?: boolean;
-    blindRefresh?: boolean;
     syncDonationAccount?: boolean,
   }}} ) {
   const { accounts, options } = payload
@@ -202,7 +201,6 @@ function* syncAccountsWorker( { payload }: {payload: {
       synchedAccounts, txsFound, activeAddressesWithNewTxsMap
     }
   }
-
 }
 
 export const syncAccountsWatcher = createWatcher(
@@ -254,11 +252,8 @@ function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
     accountsState.accountShells.forEach( ( shell )=>{
       if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
     } )
-    // auto-sync test account
-    const options = {
-      autoSync: true
-    }
-    if( testShell ) yield put( refreshAccountShell( testShell, options ) )
+    if( testShell ) yield put( refreshAccountShells( [ testShell ], {
+    } ) )
   }
 }
 
@@ -365,22 +360,25 @@ export const updateDonationPreferencesWatcher = createWatcher(
   UPDATE_DONATION_PREFERENCES
 )
 
-function* refreshAccountShellWorker( { payload } ) {
-  const accountShell: AccountShell = payload.shell
-  yield put( accountShellRefreshStarted( accountShell ) )
+function* refreshAccountShellsWorker( { payload }: { payload: {
+  shells: AccountShell[],
+  options: { hardRefresh?: boolean, syncDonationAccount?: boolean }
+}} ) {
+  const accountShells: AccountShell[] = payload.shells
+  const options: { hardRefresh?: boolean, syncDonationAccount?: boolean } = payload.options
+  yield put( accountShellRefreshStarted( accountShells ) )
   const accountState: AccountsState = yield select(
     ( state ) => state.accounts
   )
 
   const accounts: Accounts = accountState.accounts
-  const options: { autoSync?: boolean, hardRefresh?: boolean, syncDonationAccount?: boolean } = {
-    ...payload.options,
-    syncDonationAccount: accountShell.primarySubAccount.type === AccountType.DONATION_ACCOUNT
-  }
   const accountsToSync: Accounts = {
-    [ accountShell.primarySubAccount.id ]: accounts[ accountShell.primarySubAccount.id ]
   }
-  const { synchedAccounts, txsFound, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
+  for( const accountShell of accountShells ){
+    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
+  }
+
+  const { synchedAccounts, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
     payload: {
       accounts: accountsToSync,
       options,
@@ -390,26 +388,18 @@ function* refreshAccountShellWorker( { payload } ) {
   yield put( updateAccountShells( {
     accounts: synchedAccounts
   } ) )
-  yield put( accountShellRefreshCompleted( accountShell ) )
+  yield put( accountShellRefreshCompleted( accountShells ) )
   for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
     yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
   }
-  // const rescanTxs: RescannedTransactionData[] = []
-  // deltaTxs.forEach( ( deltaTx ) => {
-  //   rescanTxs.push( {
-  //     details: deltaTx,
-  //     accountShell: accountShell,
-  //   } )
-  // } )
-  // yield put( rescanSucceeded( rescanTxs ) )
 
   // update F&F channels if any new txs found on an assigned address
   if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
-export const refreshAccountShellWatcher = createWatcher(
-  refreshAccountShellWorker,
-  REFRESH_ACCOUNT_SHELL
+export const refreshAccountShellsWatcher = createWatcher(
+  refreshAccountShellsWorker,
+  REFRESH_ACCOUNT_SHELLS
 )
 
 function* autoSyncShellsWorker( ) {
@@ -417,18 +407,36 @@ function* autoSyncShellsWorker( ) {
     ( state ) => state.accounts.accountShells
   )
 
+  const shellsToSync: AccountShell[] = []
+  const donationShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
-      const payload = {
-        shell: shell,
+      if( shell.primarySubAccount.type !== AccountType.DONATION_ACCOUNT ) shellsToSync.push( shell )
+      else donationShellsToSync.push( shell )
+    }
+  }
+
+  if( shellsToSync.length )
+    yield call( refreshAccountShellsWorker, {
+      payload: {
+        shells: shellsToSync,
         options: {
         }
       }
-      yield call( refreshAccountShellWorker, {
-        payload
+    } )
+
+  // TODO: enable multi-donation sync
+  if( donationShellsToSync.length )
+    for( const donationAcc of donationShellsToSync ) {
+      yield call( refreshAccountShellsWorker, {
+        payload: {
+          shells: [ donationAcc ],
+          options: {
+            syncDonationAccount: true
+          }
+        }
       } )
     }
-  }
 }
 
 export const autoSyncShellsWatcher = createWatcher(
