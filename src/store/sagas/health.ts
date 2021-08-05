@@ -918,7 +918,8 @@ function* updateWalletImageWorker() {
     contacts : channelIds,
     accounts : acc,
     versionHistory: STATE_DATA.versionHistory,
-    SM_share: wallet.smShare
+    SM_share: wallet.smShare,
+    details2FA: wallet.details2FA
   }
   //console.log( image )
   /*let walletImage: WalletImage = {
