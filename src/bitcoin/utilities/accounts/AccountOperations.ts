@@ -352,17 +352,6 @@ export default class AccountOperations {
         // if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
       }
 
-      const activeExternalAddresses = account.activeAddresses.external
-      const activeInternalAddresses = account.activeAddresses.internal
-      if( !Object.keys( activeExternalAddresses ).length && !Object.keys( activeInternalAddresses ).length ){
-        return {
-          synchedAccounts: accounts,
-          txsFound: [],
-          activeAddressesWithNewTxsMap: {
-          }
-        }
-      }
-
       // garner cached params for bal-tx sync
       let cachedUTXOs =  [ ...account.confirmedUTXOs, ...account.unconfirmedUTXOs ]
       let cachedTxIdMap = account.txIdMap
