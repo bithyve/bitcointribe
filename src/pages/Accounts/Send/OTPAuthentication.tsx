@@ -23,7 +23,7 @@ import SendConfirmationContent from '../SendConfirmationContent'
 import { executeSendStage2, sendTxNotification } from '../../../store/actions/sending'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
-import {  refreshAccountShell } from '../../../store/actions/accounts'
+import {  refreshAccountShells } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
@@ -79,9 +79,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
         onPressOk={() => {
           dismissBottomSheet()
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          dispatch( refreshAccountShell( sourceAccountShell, {
-            autoSync: false,
-            hardRefresh: false,
+          dispatch( refreshAccountShells( [ sourceAccountShell ], {
           } ) )
           navigation.dispatch(
             resetStackToAccountDetails( {

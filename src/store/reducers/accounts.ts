@@ -21,8 +21,8 @@ import {
   ACCOUNT_SHELL_MERGE_FAILED,
   ACCOUNT_SHELLS_ORDER_UPDATED,
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
-  ACCOUNT_SHELL_REFRESH_COMPLETED,
-  ACCOUNT_SHELL_REFRESH_STARTED,
+  ACCOUNT_SHELLS_REFRESH_STARTED,
+  ACCOUNT_SHELLS_REFRESH_COMPLETED,
   CLEAR_ACCOUNT_SYNC_CACHE,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
@@ -439,19 +439,26 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
         }
 
-      case ACCOUNT_SHELL_REFRESH_STARTED:
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).syncStatus = SyncStatus.IN_PROGRESS
+      case ACCOUNT_SHELLS_REFRESH_STARTED:
+        const shellsRefreshing: AccountShell[] = action.payload
+        shellsRefreshing.forEach( refreshingShell => {
+          state.accountShells.find(
+            ( shell ) => shell.id == refreshingShell.id
+          ).syncStatus = SyncStatus.IN_PROGRESS
+        } )
         return {
           ...state,
         }
-      case ACCOUNT_SHELL_REFRESH_COMPLETED:
+
+      case ACCOUNT_SHELLS_REFRESH_COMPLETED:
         // Updating Account Sync State to shell data model
         // This will be used to display sync icon on Home Screen
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).syncStatus = SyncStatus.COMPLETED
+        const shellsRefreshed: AccountShell[] = action.payload
+        shellsRefreshed.forEach( refreshedShell => {
+          state.accountShells.find(
+            ( shell ) => shell.id == refreshedShell.id
+          ).syncStatus = SyncStatus.COMPLETED
+        } )
         return {
           ...state,
         }

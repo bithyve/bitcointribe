@@ -27,7 +27,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShells } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
@@ -112,8 +112,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }
 
   function performRefreshOnPullDown() {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: false,
+    dispatch( refreshAccountShells( [ accountShell ], {
       hardRefresh: true
     } ) )
   }
