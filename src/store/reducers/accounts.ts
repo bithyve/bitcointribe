@@ -24,7 +24,6 @@ import {
   ACCOUNT_SHELL_REFRESH_COMPLETED,
   ACCOUNT_SHELL_REFRESH_STARTED,
   CLEAR_ACCOUNT_SYNC_CACHE,
-  RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
   BLIND_REFRESH_STARTED,
@@ -320,12 +319,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accountShells: shells,
         }
 
-      case RESTORED_ACCOUNT_SHELLS:
-        return {
-          ...state,
-          accountShells: action.payload.accountShells,
-        }
-
       case ACCOUNT_SETTINGS_UPDATED:
       // TODO: Implement Logic for updating the list of account payloads
         return {
@@ -463,14 +456,14 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
         }
 
-      case CLEAR_ACCOUNT_SYNC_CACHE:
-        // This will clear the sync state at the start of each login session
-        // This is required in order to ensure sync icon is shown again for each session
-        state.accountShells.map(
-          ( shell ) => shell.syncStatus = SyncStatus.COMPLETED )
-        return {
-          ...state,
-        }
+        // case CLEAR_ACCOUNT_SYNC_CACHE:
+        //   // This will clear the sync state at the start of each login session
+        //   // This is required in order to ensure sync icon is shown again for each session
+        //   state.accountShells.map(
+        //     ( shell ) => shell.syncStatus = SyncStatus.PENDING )
+        //   return {
+        //     ...state,
+        //   }
 
       case BLIND_REFRESH_STARTED:
         return {

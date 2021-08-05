@@ -80,6 +80,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
@@ -564,7 +565,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       setChosenContact( Contact )
       if( selectedKeeper.shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKeyTemp )
 
       const obj: KeeperInfoInterface = {

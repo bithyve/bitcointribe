@@ -25,7 +25,7 @@ import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup } from '../actions/health'
+import { initializeHealthSetup, updateWalletImageHealth } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
@@ -36,12 +36,17 @@ import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
 import { newAccountShellCreationCompleted } from '../actions/accounts'
 
 function* updateWalletWorker( { payload } ) {
-  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
+  const { walletName }: { walletName: string } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
 
   yield put( updateWallet( {
     ...wallet, walletName: walletName
   } ) )
+  yield call( dbManager.updateWallet, {
+    walletName,
+  } )
+  yield call( dbManager.getWallet )
+  yield put( updateWalletImageHealth() )
 }
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
@@ -67,7 +72,7 @@ function* setupWalletWorker( { payload } ) {
 
   // prepare default accounts for the wallet
   const accountsInfo: newAccountsInfo[] = [];
-  [ AccountType.CHECKING_ACCOUNT, AccountType.SAVINGS_ACCOUNT, AccountType.SWAN_ACCOUNT ].forEach( ( accountType ) => {
+  [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SAVINGS_ACCOUNT, AccountType.SWAN_ACCOUNT ].forEach( ( accountType ) => {
     const accountInfo: newAccountsInfo = {
       accountType
     }

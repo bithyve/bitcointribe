@@ -30,10 +30,10 @@ export const credsAuth = ( passcode, reLogin? ) => {
     }
   }
 }
-export const updateWalletName = ( walletName: string, security: { questionId: string, question: string, answer: string } ) => {
+export const updateWalletName = ( walletName: string ) => {
   return {
     type: UPDATE_WALLET_NAME, payload: {
-      walletName, security
+      walletName
     }
   }
 }

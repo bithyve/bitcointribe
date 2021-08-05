@@ -1242,7 +1242,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <HeaderTitle
               firstLineTitle={'Step 2\nChoose an encryption option'}
-              secondLineTitle={'Select how you want to encrypt the backup'}
+              secondLineTitle={'New wallet creation'}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -1250,7 +1250,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             />
             <CardWithRadioBtn
               icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
-              mainText={'Answer a Security Question'}
+              mainText={'Use answer to a Security Question'}
               subText={'Easier to remember. Recommended'}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
@@ -1283,7 +1283,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Backup lets you restore your wallet even if you lose your phone. Manage from '}
+            infoText={'Initial wallet backup is essentian for security.\nThis can be changed later from the '}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />

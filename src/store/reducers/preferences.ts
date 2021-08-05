@@ -10,7 +10,6 @@ import {
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
   UPDATE_APPLICATION_STATUS,
-  UPDATE_LAST_SEEN,
   CARD_DATA,
   SET_WALLET_ID,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
@@ -121,12 +120,6 @@ export default ( state = initialState, { type, payload } ) => {
           ...state,
           applicationStatus: payload.status,
         }
-
-      case UPDATE_LAST_SEEN:
-        return Object.assign( {
-        }, state, {
-          lastSeen: payload.lastSeen
-        } )
 
       case CARD_DATA:
         return {

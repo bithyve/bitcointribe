@@ -146,6 +146,7 @@ import Relay from '../../bitcoin/utilities/Relay'
 import { updateWallet } from '../actions/storage'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -2125,7 +2126,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
       if( existingContact ){
         const contactInfo = {
           channelKey: channelKey,
-          secondaryChannelKey: SSS.generateKey( config.CIPHER_SPEC.keyLength )
+          secondaryChannelKey: BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
         }
         const primaryData: PrimaryStreamData = {
           contactDetails: contacts[ channelKey ].contactDetails,
