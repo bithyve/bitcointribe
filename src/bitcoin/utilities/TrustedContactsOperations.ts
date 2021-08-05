@@ -488,4 +488,94 @@ export default class TrustedContactsOperations {
        throw new Error( err.message )
      }
    };
+
+   static restoreTrustedContacts = async ( {
+     walletId,
+     channelKeys,
+   }: {
+    walletId: string;
+    channelKeys: string[];
+    } ): Promise<Trusted_Contacts> => {
+     try {
+
+       const channelAddresses = channelKeys.map( ( channelKey ) =>
+         crypto
+           .createHash( 'sha256' )
+           .update( channelKey )
+           .digest( 'hex' )
+       )
+       const res: AxiosResponse = await BH_AXIOS.post( 'retrieveChannels', {
+         HEXA_ID,
+         channelAddresses,
+       } )
+
+       const permanentChannels: {
+        [channelAddress: string]: Streams;
+        } = res.data.permanentChannels
+       if( !Object.keys( permanentChannels ).length ) throw new Error( 'Unable to restore trusted contacts: no permanent channels found' )
+
+       const restoredContacts: Trusted_Contacts = {
+       }
+       const outstreamId = TrustedContactsOperations.getStreamId( walletId )
+       let instreamId: string
+       for ( const channelKey of channelKeys ) {
+         const permanentChannelAddress = crypto
+           .createHash( 'sha256' )
+           .update( channelKey )
+           .digest( 'hex' )
+
+         const permanentChannel: Streams = permanentChannels[ permanentChannelAddress ]
+         const unencryptedPermanentChannel: UnecryptedStreams = {
+         }
+         for( const streamId of Object.keys( permanentChannel ) ) {
+           if( streamId !== outstreamId ) instreamId = streamId
+
+           const stream: StreamData = permanentChannel[ streamId ]
+           unencryptedPermanentChannel[ streamId ] = {
+             streamId,
+             primaryData: TrustedContactsOperations.decryptData( channelKey, stream.primaryEncryptedData ).data,
+             secondaryData: stream.secondaryEncryptedData? TrustedContactsOperations.decryptData( channelKey, stream.secondaryEncryptedData ).data: null,
+             backupData: stream.encryptedBackupData? TrustedContactsOperations.decryptData( channelKey, stream.encryptedBackupData ).data: null,
+             metaData: stream.metaData
+           }
+         }
+
+         const newContact: TrustedContact = {
+           contactDetails: idx(
+             unencryptedPermanentChannel,
+             ( _ ) => _[ outstreamId ].primaryData.contactDetails
+           ),
+           relationType: idx(
+             unencryptedPermanentChannel,
+             ( _ ) => _[ outstreamId ].primaryData.relationType
+           ),
+           channelKey: channelKey,
+           permanentChannelAddress,
+           permanentChannel,
+           unencryptedPermanentChannel,
+           walletID: idx(
+             unencryptedPermanentChannel,
+             ( _ ) => _[ instreamId ].primaryData.walletID
+           ),
+           streamId: instreamId,
+           isActive: idx(
+             unencryptedPermanentChannel,
+             ( _ ) => _[ instreamId ].metaData.flags.active
+           ),
+           hasNewData: idx(
+             unencryptedPermanentChannel,
+             ( _ ) => _[ instreamId ].metaData.flags.newData
+           )
+         }
+
+         restoredContacts[ channelKey ] = newContact
+       }
+
+       return restoredContacts
+     } catch ( err ) {
+       if ( err.response ) throw new Error( err.response.data.err )
+       if ( err.code ) throw new Error( err.code )
+       throw new Error( err.message )
+     }
+   };
 }
