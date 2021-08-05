@@ -22,7 +22,6 @@ export default function RestoreFromICloud( props ) {
       </View>
       {props.hideShow && <ScrollView>
         {props.walletsArray.map( ( value, index ) => {
-          console.log( 'Value', value )
           return (
             <AppBottomSheetTouchableWrapper
               key={index}

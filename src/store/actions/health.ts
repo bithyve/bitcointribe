@@ -1,6 +1,7 @@
 // types and action creators: dispatched by components and sagas
 
 import S3Service from '../../bitcoin/services/sss/S3Service'
+import { BackupStreamData, cloudDataInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -280,11 +281,13 @@ export const ErrorReceiving = ( isFailed ) => {
   }
 }
 
-export const recoverWallet = ( level?, keeperData?, decryptedCloudDataJson? ) => {
+export const recoverWallet = ( payload: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
+  primaryData?: PrimaryStreamData;
+  backupData?: BackupStreamData;
+  secondaryData?: SecondaryStreamData;
+}[] } ) => {
   return {
-    type: RECOVER_WALLET_HEALTH, payload: {
-      level, keeperData, decryptedCloudDataJson
-    }
+    type: RECOVER_WALLET_HEALTH, payload: payload
   }
 }
 

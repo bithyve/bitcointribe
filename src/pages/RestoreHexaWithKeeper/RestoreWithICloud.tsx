@@ -344,7 +344,7 @@ class RestoreWithICloud extends Component<
       this.props.navigation.navigate( 'HomeNav' )
     }
 
-    if ( JSON.stringify( prevProps.downloadedBackupData ) !== JSON.stringify( this.props.downloadedBackupData ) ) {
+    if ( JSON.stringify( prevProps.downloadedBackupData ) != JSON.stringify( this.props.downloadedBackupData ) ) {
       if ( this.props.downloadedBackupData.length ) {
         this.updateList()
       }
@@ -405,22 +405,21 @@ class RestoreWithICloud extends Component<
   }
 
   updateList = () => {
-    //console.log("INSIDE updateList");
     const { listData, selectedBackup } = this.state
     const { downloadedBackupData } = this.props
-
     let updatedListData = []
-    const shares: MetaShare[] = []
+    const shares: {
+      primaryData?: PrimaryStreamData;
+      backupData?: BackupStreamData;
+      secondaryData?: SecondaryStreamData;
+    }[] = []
     updatedListData = [ ...listData ]
-
     for ( let i = 0; i < updatedListData.length; i++ ) {
       if ( downloadedBackupData.find( value => value.backupData.primaryMnemonicShard.shareId == updatedListData[ i ].shareId ) ) {
         updatedListData[ i ].status = 'received'
-        shares.push( downloadedBackupData.find( value => value.backupData.primaryMnemonicShard.shareId == updatedListData[ i ].shareId ).backupData.primaryMnemonicShard )
-        break
+        shares.push( downloadedBackupData.find( value => value.backupData.primaryMnemonicShard.shareId == updatedListData[ i ].shareId ) )
       }
     }
-
     this.setState( {
       listData: updatedListData, showLoader: false
     }, () => {
@@ -430,41 +429,29 @@ class RestoreWithICloud extends Component<
         this.state.showLoader
       )
     } )
-    //console.log("updatedListData shares", shares);
     if ( shares.length === 2 || shares.length === 3 ) {
       this.checkForRecoverWallet( shares, selectedBackup )
     }
-    //console.log("updatedListData sefsgsg", updatedListData);
   };
 
   checkForRecoverWallet = ( shares, selectedBackup ) => {
-    const key = SSS.strechKey( this.state.answer )
-    const KeeperData = JSON.parse( selectedBackup.keeperData )
+    const key = LevelHealth.strechKey( this.state.answer )
     const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
-    //console.log('decryptedCloudDataJson checkForRecoverWallet', decryptedCloudDataJson);
-
-    if ( shares.length === 2 && selectedBackup.levelStatus === 2 ) {
-      //console.log("INSIDE IF SHARES", shares.length, selectedBackup.levelStatus);
+    if ( ( shares.length >= 2 && selectedBackup.levelStatus === 2 ) || ( shares.length >= 3 && selectedBackup.levelStatus === 3 ) ) {
       this.showLoaderModal()
       this.recoverWallet(
         selectedBackup.levelStatus,
-        KeeperData,
-        decryptedCloudDataJson
-      )
-    } else if ( shares.length === 3 && selectedBackup.levelStatus === 3 ) {
-      // console.log("INSIDE IF SHARES ### 3", shares.length, selectedBackup.levelStatus);
-      this.showLoaderModal()
-      this.recoverWallet(
-        selectedBackup.levelStatus,
-        KeeperData,
-        decryptedCloudDataJson
+        decryptedCloudDataJson,
+        shares
       )
     }
   };
 
-  recoverWallet = ( levelStatus, KeeperData, decryptedCloudDataJson ) => {
+  recoverWallet = ( level, image, shares ) => {
     setTimeout( () => {
-      this.props.recoverWallet( levelStatus, KeeperData, decryptedCloudDataJson )
+      this.props.recoverWallet( {
+        level, answer: this.state.answer, selectedBackup: this.state.selectedBackup, image, shares
+      } )
     }, 2 )
   };
 
@@ -564,9 +551,9 @@ class RestoreWithICloud extends Component<
   decryptCloudJson = () => {
     console.log( 'decryptCloudJson Statred' )
     const { recoverWalletUsingIcloud, accounts } = this.props
-    const { answer, selectedBackup } = this.state
+    const { answer, selectedBackup }: {answer: string, selectedBackup:any} = this.state
     try {
-      const key = SSS.strechKey( answer )
+      const key = LevelHealth.strechKey( answer )
       const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
       console.log( 'decryptedCloudDataJson', decryptedCloudDataJson )
       if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
@@ -589,26 +576,29 @@ class RestoreWithICloud extends Component<
         }
         const secondaryData: SecondaryStreamData = {
         }
-        const downloadedBackupData: {
+        const downloadedBackupDataTmp: {
           primaryData?: PrimaryStreamData;
           backupData?: BackupStreamData;
           secondaryData?: SecondaryStreamData;
         } = {
           backupData, secondaryData
         }
-        downloadedBackupData.backupData.primaryMnemonicShard = JSON.parse( selectedBackup.shares )
-        downloadedBackupData.backupData.keeperInfo = KeeperData
-        downloadedBackupData.secondaryData.secondaryMnemonicShard = selectedBackup.secondaryShare
-        downloadedBackupData.secondaryData.bhXpub = selectedBackup.bhXpub
+        downloadedBackupDataTmp.backupData.primaryMnemonicShard = JSON.parse( selectedBackup.shares )
+        downloadedBackupDataTmp.backupData.keeperInfo = KeeperData
+        downloadedBackupDataTmp.secondaryData.secondaryMnemonicShard = selectedBackup.secondaryShare
+        downloadedBackupDataTmp.secondaryData.bhXpub = selectedBackup.bhXpub
 
         this.props.downloadBackupData( {
-          backupData: downloadedBackupData
+          backupData: downloadedBackupDataTmp
         } )
         // this.props.updateCloudMShare( JSON.parse( selectedBackup.shares ), 0 );
         // if(selectedBackup.type == "device"){
         // ( this.RestoreFromICloud as any ).current.snapTo( 0 )
         this.setState( {
           restoreModal: false
+        } )
+        this.setState( {
+          securityQuestionModal: false
         } )
       } else if ( decryptedCloudDataJson && !selectedBackup.shares ) {
         this.showLoaderModal()
@@ -625,9 +615,10 @@ class RestoreWithICloud extends Component<
     }
   }
 
-  setKeeperInfoList = ( levelStatus, KeeperData: KeeperInfoInterface[], time? ) => {
+  setKeeperInfoList = ( levelStatus, KeeperInfo: KeeperInfoInterface[], time? ) => {
     console.log( 'setKeeperInfoList levelStatus', levelStatus )
     const listDataArray = []
+    let KeeperData: KeeperInfoInterface[] = [ ...KeeperInfo ]
     const tempCL = Math.max.apply( Math, KeeperData.map( function ( value ) { return value.currentLevel } ) )
     if ( levelStatus === 2 ) KeeperData = KeeperData.filter( word => word.scheme == '2of3' )
     if ( levelStatus === 3 ) KeeperData = KeeperData.filter( word => word.scheme == '3of5' )
@@ -668,7 +659,7 @@ class RestoreWithICloud extends Component<
       contactList: list,
       listData: listDataArray
     } )
-    this.props.putKeeperInfo( KeeperData )
+    this.props.putKeeperInfo( KeeperInfo )
   }
 
   handleScannedData = async ( scannedData ) => {
@@ -958,9 +949,6 @@ class RestoreWithICloud extends Component<
       backupModal
     } = this.state
     const { navigation, database } = this.props
-    let name
-    if ( Platform.OS == 'ios' ) name = 'iCloud'
-    else name = 'GDrive'
     return (
       <View
         style={{
@@ -1212,21 +1200,22 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={loaderModal} closeBottomSheet={() => { }} >
+        <ModalContainer visible={this.state.restoreSuccess} closeBottomSheet={() => { this.setState( {
+          restoreSuccess: false
+        } )}} >
           <RestoreSuccess
             modalRef={this.RestoreSuccess}
             onPressProceed={() => {
-              // ( this.RestoreSuccess as any ).current.snapTo( 0 )
               this.setState( {
                 restoreSuccess: false
               } )
-
+              this.props.navigation.navigate( 'HomeNav' )
             }}
             onPressBack={() => {
-              // ( this.RestoreSuccess as any ).current.snapTo( 0 )
               this.setState( {
                 restoreSuccess: false
               } )
+              this.props.navigation.navigate( 'HomeNav' )
             }}
           />
         </ModalContainer>
@@ -1294,7 +1283,9 @@ class RestoreWithICloud extends Component<
             />
           )}
         /> */}
-        <ModalContainer visible={securityQuestionModal} closeBottomSheet={() => { }} >
+        <ModalContainer visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
+          securityQuestionModal: false
+        } ) }} >
           <SecurityQuestion
             question={this.state.question}
             // onFocus={() => {

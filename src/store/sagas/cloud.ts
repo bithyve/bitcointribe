@@ -73,7 +73,7 @@ function* cloudWorker( { payload } ) {
       // Create Updated Wallet Image
       const shares = RK ? JSON.stringify( RK ) : ''
       let encryptedCloudDataJson
-      const getWI = yield call( s3Service.fetchWalletImage )
+      const getWI = yield call( S3Service.fetchWalletImage, wallet.walletId )
       if( getWI.status == 200 ){
         console.log( 'getWI.data.walletImage', JSON.stringify( getWI.data.walletImage ) )
         encryptedCloudDataJson = yield call( WIEncryption,
@@ -82,13 +82,14 @@ function* cloudWorker( { payload } ) {
         )
         // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
         const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-        const seed = LevelHealth.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+        const { encryptedString } = LevelHealth.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+        const secondaryMnemonics = wallet.secondaryMnemonic ? LevelHealth.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedString : ''
         const data = {
           levelStatus: level ? level : 1,
           shares: shares,
-          secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
+          secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : secondaryMnemonics,
           encryptedCloudDataJson: encryptedCloudDataJson,
-          seed: shares ? '' : seed,
+          seed: shares ? '' : encryptedString,
           walletName: wallet.walletName,
           questionId: wallet.security.questionId,
           question: wallet.security.questionId === '0' ? wallet.security.question: '',

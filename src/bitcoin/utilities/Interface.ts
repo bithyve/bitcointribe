@@ -862,7 +862,7 @@ export interface cloudDataInterface {
   levelStatus: number;
   encryptedCloudDataJson: string;
   walletName: string;
-  questionId: number;
+  questionId: string;
   question: string;
   keeperData: string;
   bhXpub?: string;

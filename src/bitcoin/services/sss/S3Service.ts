@@ -1450,7 +1450,7 @@ export default class S3Service {
     }
   };
 
-  public fetchWalletImage = async ( walletId? ): Promise<
+  public static fetchWalletImage = async ( walletId ): Promise<
   | {
       status: number;
       data: {
@@ -1469,7 +1469,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.fetchWalletImage( walletId ? walletId : this.sss.walletId ),
+        data: await Relay.fetchWalletImage( walletId ),
       }
     } catch ( err ) {
       return {
