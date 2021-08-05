@@ -79,9 +79,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
         onPressOk={() => {
           dismissBottomSheet()
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          dispatch( refreshAccountShell( sourceAccountShell, {
-            autoSync: false,
-            hardRefresh: false,
+          dispatch( refreshAccountShell( [ sourceAccountShell ], {
           } ) )
           navigation.dispatch(
             resetStackToAccountDetails( {

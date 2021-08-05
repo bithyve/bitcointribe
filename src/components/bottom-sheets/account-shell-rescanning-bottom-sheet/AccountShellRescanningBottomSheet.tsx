@@ -68,8 +68,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
 
   useEffect( () => {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: false,
+    dispatch( refreshAccountShell( [ accountShell ], {
       hardRefresh: true,
     } ) )
   }, [] )

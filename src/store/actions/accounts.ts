@@ -42,11 +42,11 @@ export const MERGE_ACCOUNT_SHELLS = 'MERGE_ACCOUNT_SHELLS'
 export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED'
 export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED'
 export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT'
-export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL'
+export const REFRESH_ACCOUNT_SHELLS = 'REFRESH_ACCOUNT_SHELLS'
 export const BLIND_REFRESH = 'BLIND_REFRESH'
-export const ACCOUNT_SHELL_REFRESH_COMPLETED =
-  'ACCOUNT_SHELL_REFRESH_COMPLETED'
-export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
+export const ACCOUNT_SHELLS_REFRESH_STARTED = 'ACCOUNT_SHELLS_REFRESH_STARTED'
+export const ACCOUNT_SHELLS_REFRESH_COMPLETED =
+  'ACCOUNT_SHELLS_REFRESH_COMPLETED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
 export const FETCH_RECEIVE_ADDRESS = 'FETCH_RECEIVE_ADDRESS'
 export const FETCH_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_RECEIVE_ADDRESS_SUCCEEDED'
@@ -293,12 +293,12 @@ export const remapAccountShells = ( services ) => {
 }
 
 export const refreshAccountShell = (
-  shell: AccountShell,
-  options: { autoSync?: boolean, hardRefresh?: boolean }
+  shells: AccountShell[],
+  options: { hardRefresh?: boolean, syncDonationAccount?: boolean }
 ) => {
   return {
-    type: REFRESH_ACCOUNT_SHELL, payload: {
-      shell, options
+    type: REFRESH_ACCOUNT_SHELLS, payload: {
+      shells, options
     }
   }
 }
@@ -309,17 +309,16 @@ export const blindRefresh = () => {
   }
 }
 
-
-export const accountShellRefreshCompleted = ( payload: AccountShell ) => {
+export const accountShellRefreshStarted = ( payload: AccountShell[] ) => {
   return {
-    type: ACCOUNT_SHELL_REFRESH_COMPLETED,
+    type: ACCOUNT_SHELLS_REFRESH_STARTED,
     payload,
   }
 }
 
-export const accountShellRefreshStarted = ( payload: AccountShell ) => {
+export const accountShellRefreshCompleted = ( payload: AccountShell[] ) => {
   return {
-    type: ACCOUNT_SHELL_REFRESH_STARTED,
+    type: ACCOUNT_SHELLS_REFRESH_COMPLETED,
     payload,
   }
 }
