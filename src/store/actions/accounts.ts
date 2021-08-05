@@ -292,7 +292,7 @@ export const remapAccountShells = ( services ) => {
   }
 }
 
-export const refreshAccountShell = (
+export const refreshAccountShells = (
   shells: AccountShell[],
   options: { hardRefresh?: boolean, syncDonationAccount?: boolean }
 ) => {

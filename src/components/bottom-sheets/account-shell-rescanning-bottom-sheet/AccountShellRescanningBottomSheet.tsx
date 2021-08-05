@@ -9,7 +9,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { refreshAccountShell } from '../../../store/actions/accounts'
+import { refreshAccountShells } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
@@ -68,7 +68,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
 
   useEffect( () => {
-    dispatch( refreshAccountShell( [ accountShell ], {
+    dispatch( refreshAccountShells( [ accountShell ], {
       hardRefresh: true,
     } ) )
   }, [] )

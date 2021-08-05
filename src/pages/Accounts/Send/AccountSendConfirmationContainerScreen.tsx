@@ -18,7 +18,7 @@ import { executeSendStage2, resetSendStage1, sendTxNotification } from '../../..
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import SendConfirmationContent from '../SendConfirmationContent'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { clearTransfer, refreshAccountShell } from '../../../store/actions/accounts'
+import { clearTransfer, refreshAccountShells } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
@@ -90,7 +90,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         // dismissBottomSheet()
           setSuccess( false )
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          dispatch( refreshAccountShell( [ sourceAccountShell ], {
+          dispatch( refreshAccountShells( [ sourceAccountShell ], {
           } ) )
           navigation.dispatch(
             resetStackToAccountDetails( {
