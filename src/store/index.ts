@@ -40,7 +40,6 @@ import {
 
 import {
   setupWalletWatcher,
-  updateWalletWatcher,
   initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
@@ -112,6 +111,8 @@ import {
   rejectTrustedContactWatcher,
   restoreContactsWatcher,
   restoreTrustedContactsWatcher,
+  updateWalletNameToChannelWatcher,
+  updateWalletWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -207,7 +208,6 @@ const rootSaga = function* () {
     // wallet setup watcher
     initServicesWatcher,
     setupWalletWatcher,
-    updateWalletWatcher,
     initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,
@@ -279,7 +279,8 @@ const rootSaga = function* () {
     syncPermanentChannelsWatcher,
     restoreContactsWatcher,
     restoreTrustedContactsWatcher,
-
+    updateWalletNameToChannelWatcher,
+    updateWalletWatcher,
     // Health
     initHealthWatcher,
     checkSharesHealthWatcher,

@@ -26,7 +26,7 @@ const FNFToKeeper = ( props ) => {
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   useEffect( () => {
     const contacts: Trusted_Contacts = trustedContacts
-
+    // getContact( contacts )
     const c = []
     for ( const channelKey of Object.keys( contacts ) ) {
       const contact = contacts[ channelKey ]
@@ -44,6 +44,17 @@ const FNFToKeeper = ( props ) => {
     setContacts( c )
   }, [] )
 
+  // const getContact = () => {
+  //   ExpoContacts.getContactsAsync().then( async ( { data } ) => {
+  //     const filteredData = data.find( item => item.id === contactInfo.id )
+  //     // setPhoneumber( filteredData.phoneNumbers )
+
+  //     setContact( filteredData )
+  //     // setEmails( filteredData.emails )
+  //     // await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
+  //   } )
+  // }
+
   const firstNamePieceText = ( contact ) => {
     return contact.contactName?.split( ' ' )[ 0 ] + ' '
   }
@@ -60,10 +71,7 @@ const FNFToKeeper = ( props ) => {
     contactsType: string;
   }
   ) => {
-    return <TouchableOpacity style={{
-      flexDirection: 'row', alignItems: 'center', margin: wp( 4 ), backgroundColor: Colors.white,
-      borderRadius: wp( 2 ), padding: wp( 3 )
-    }} onPress={() => {
+    return <TouchableOpacity style={styles.listItem} onPress={() => {
       const obj = {
         name: contactDescription.contactDetails.contactName,
         imageAvailable: contactDescription.contactDetails.imageAvailable ? true : false,
@@ -147,15 +155,17 @@ const FNFToKeeper = ( props ) => {
                 } )
                 props.navigation.goBack()
               }}
-              style={{
-
-              }}>
-              {/* <Image /> */}
+              style={styles.addContactBtn}>
+              <Image
+                source={require( '../../assets/images/icons/icon_add_blue.png' )}
+                style={styles.plusIcon}
+              />
               <Text style={{
-                marginHorizontal: wp( 5 ),
+                marginHorizontal: wp( 2 ),
                 color: Colors.gray2,
-                fontFamily: Fonts.FiraSansMedium
-              }}>Add new contact</Text>
+                fontFamily: Fonts.FiraSansMedium,
+                fontSize: RFValue( 14 )
+              }}>Choose from contacts</Text>
             </TouchableOpacity>
             {( contacts.length && contacts.map( ( item, index ) => {
               // if ( !item.contactDetails.contactName ) {
@@ -167,9 +177,7 @@ const FNFToKeeper = ( props ) => {
                 contactsType: 'Other Contacts',
               } )
             } ) ) ||
-            <View style={{
-              height: wp( '22%' ) + 30, alignSelf: 'center', marginTop: hp( 4 ),
-            }} >
+            <View style={styles.noContacts} >
               <Text style={{
                 color: Colors.gray2,
               }}>
@@ -187,12 +195,37 @@ const FNFToKeeper = ( props ) => {
 export default FNFToKeeper
 
 const styles = StyleSheet.create( {
+  noContacts: {
+    height: wp( '22%' ) + 30,
+    alignSelf: 'center',
+    marginTop: hp( 4 ),
+  },
+  addContactBtn: {
+    marginHorizontal: wp( 4 ),
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: hp( 1 )
+  },
+  plusIcon: {
+    height: wp( 12 ),
+    width: wp( 12 )
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: wp( 4 ),
+    marginVertical: hp( 0.5 ),
+    backgroundColor: Colors.backgroundColor1,
+    borderRadius: wp( 2 ),
+    padding: wp( 3 )
+  },
   secondNamePieceText: {
     fontWeight: 'bold',
+    fontSize: RFValue( 13 )
   },
   avatarImage: {
-    ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 12 ) / 2,
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 ) / 2,
     marginHorizontal: wp( 1 )
   },
 } )

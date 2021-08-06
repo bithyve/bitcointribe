@@ -6,7 +6,6 @@ import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 import {
   SETUP_WALLET,
-  UPDATE_WALLET_NAME,
   CREDS_AUTH,
   STORE_CREDS,
   credsStored,
@@ -35,21 +34,7 @@ import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
 import { newAccountShellCreationCompleted } from '../actions/accounts'
 
-function* updateWalletWorker( { payload } ) {
-  const { walletName }: { walletName: string } = payload
-  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
 
-  yield put( updateWallet( {
-    ...wallet, walletName: walletName
-  } ) )
-  yield call( dbManager.updateWallet, {
-    walletName,
-  } )
-  yield call( dbManager.getWallet )
-  yield put( updateWalletImageHealth() )
-}
-
-export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
