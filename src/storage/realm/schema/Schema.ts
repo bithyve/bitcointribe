@@ -270,6 +270,9 @@ export const TransactionSchema: ObjectSchema = {
     receiver: {
       type: 'string', optional: true
     },
+    isNew: {
+      type: 'bool', default: false
+    },
     notes: {
       type: 'string', optional: true
     },

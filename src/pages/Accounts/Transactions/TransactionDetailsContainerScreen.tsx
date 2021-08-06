@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect, useCallback } from 'react'
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
@@ -16,26 +16,33 @@ import config from '../../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-
+import { useSelector, useDispatch } from 'react-redux'
+import { markReadTx } from '../../../store/actions/accounts'
+import { update } from '../../../storage/database'
 export type Props = {
   navigation: any;
 };
 
 
 const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const dispatch = useDispatch()
   const transaction: TransactionDescribing = navigation.getParam( 'transaction' )
   const accountShellID: SubAccountKind = navigation.getParam( 'accountShellID' )
-
   const accountShell = useAccountShellForID( accountShellID )
+
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
-  const confirmationsText = useMemo( () => {
+  useEffect( () => {
+    if( transaction.isNew ) dispatch( markReadTx( transaction.txid, accountShellID ) )
+  }, [ transaction.isNew ] )
+
+  const confirmationsText = useCallback( () => {
     return transaction.confirmations > 6 ?
       '6+'
       : `${transaction.confirmations}`
   }, [ transaction.confirmations ] )
 
-  const feeText = useMemo( () => {
+  const feeText = useCallback( () => {
     const unitText = primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT ?
       displayNameForBitcoinUnit( accountShell.unit )
       : useFormattedUnitText( {
@@ -46,7 +53,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   }, [ primarySubAccount.kind, transaction.fee ] )
 
 
-  const destinationHeadingText = useMemo( () => {
+  const destinationHeadingText = useCallback( () => {
     switch ( transaction.transactionType ) {
         case TransactionKind.RECEIVE:
           return 'From Address'
@@ -57,7 +64,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
     }
   }, [ transaction.transactionType ] )
 
-  const destinationAddressText = useMemo( () => {
+  const destinationAddressText = useCallback( () => {
     switch ( transaction.transactionType ) {
         case TransactionKind.RECEIVE:
           return transaction.senderAddresses ?
@@ -112,18 +119,18 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
         </View>
 
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitleTransaction}>{destinationHeadingText}</Text>
-          <Text style={ListStyles.listItemSubtitle}>{destinationAddressText}</Text>
+          <Text style={ListStyles.listItemTitleTransaction}>{destinationHeadingText()}</Text>
+          <Text style={ListStyles.listItemSubtitle}>{destinationAddressText()}</Text>
         </View>
 
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitleTransaction}>Fees</Text>
-          <Text style={ListStyles.listItemSubtitle}>{feeText}</Text>
+          <Text style={ListStyles.listItemSubtitle}>{feeText()}</Text>
         </View>
 
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitleTransaction}>Confirmations</Text>
-          <Text style={ListStyles.listItemSubtitle}>{confirmationsText}</Text>
+          <Text style={ListStyles.listItemSubtitle}>{confirmationsText()}</Text>
         </View>
 
       </View>

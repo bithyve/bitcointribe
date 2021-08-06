@@ -408,6 +408,7 @@ export default class AccountUtilities {
       nextFreeChangeAddressIndex: number;
       activeAddresses: ActiveAddresses;
       activeAddressesWithNewTxs: ActiveAddresses,
+      hasNewTxn: boolean
     }
    }
   }> => {
@@ -590,7 +591,8 @@ export default class AccountUtilities {
                     primaryAccType,
                     recipientAddresses: tx.RecipientAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
-                    address: addressInfo.Address
+                    address: addressInfo.Address,
+                    isNew: true,
                   }
 
                   const incomingTx = {
@@ -610,6 +612,7 @@ export default class AccountUtilities {
                     primaryAccType,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
+                    isNew: true
                   }
 
                   newTxs.push(
@@ -632,7 +635,8 @@ export default class AccountUtilities {
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
-                    address: addressInfo.Address
+                    address: addressInfo.Address,
+                    isNew: true
                   }
 
                   newTxs.push( transaction )
@@ -661,7 +665,6 @@ export default class AccountUtilities {
               }
             }
           }
-
         const transactions: Transaction[] = [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
 
         const activeAddressesWithNewTxs: ActiveAddresses = {
@@ -673,8 +676,17 @@ export default class AccountUtilities {
         newTxs.forEach( tx => {
           const addresses = txIdMap[ tx.txid ]
           addresses.forEach( address => {
-            if( activeAddresses.external[ address ] ) activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
-            else if( activeAddresses.internal[ address ] ) activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
+            if( activeAddresses.external[ address ] ){
+              activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
+              if( tx.transactionType === 'Received' ) {
+                tx.sender = activeAddresses.external[ address ].assignee.sender
+              }
+            } else if( activeAddresses.internal[ address ] ){
+              activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
+              if( tx.transactionType === 'Received' ) {
+                tx.sender = activeAddresses.external[ address ].assignee.sender
+              }
+            }
           } )
         } )
 
@@ -706,12 +718,12 @@ export default class AccountUtilities {
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
           activeAddresses,
           activeAddressesWithNewTxs,
+          hasNewTxn: newTxs.length > 0
         }
       }
 
       if( usedFallBack )
         Toast( 'We could not connect to your own node.\nRefreshed using the BitHyve node....' )
-
       return {
         synchedAccounts
       }

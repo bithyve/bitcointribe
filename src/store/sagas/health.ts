@@ -666,7 +666,6 @@ function* recoverWalletWorker( { payload } ) {
     if( getWI.status == 200 ) {
       image = getWI.data.walletImage
     }
-
     const contactsChannelKeys = image.contacts
     const accounts = image.accounts
     const acc = []
@@ -687,8 +686,6 @@ function* recoverWalletWorker( { payload } ) {
       accountData[ JSON.parse( decryptedAccData ).type ] = JSON.parse( decryptedAccData ).id
       acc.push( JSON.parse( decryptedAccData ) )
     } )
-    // restore Accounts
-    yield put( restoreAccountShells( acc ) )
 
     // Update Wallet
     const wallet: Wallet = {
@@ -706,6 +703,10 @@ function* recoverWalletWorker( { payload } ) {
     }
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
+    yield call( dbManager.createWallet, wallet )
+    // restore Accounts
+    yield put( restoreAccountShells( acc ) )
+    // restore health
     yield call( setupLevelHealthWorker, {
       payload: {
         level: level, keeperInfo: JSON.parse( selectedBackup.keeperData )
@@ -715,16 +716,13 @@ function* recoverWalletWorker( { payload } ) {
     yield put( restoreTrustedContacts( {
       walletId: wallet.walletId, channelKeys: contactsChannelKeys
     } ) )
+
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
-    console.log( {
-      err: err.message
-    } )
+    console.log( err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )
   }
-
-
 }
 
 export const recoverWalletHealthWatcher = createWatcher(

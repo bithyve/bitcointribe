@@ -22,7 +22,7 @@ import idx from 'idx'
 import { withNavigationFocus } from 'react-navigation'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
-import { setShowAllAccount } from '../../store/actions/accounts'
+import { setShowAllAccount, markAccountChecked } from '../../store/actions/accounts'
 import { SwanIntegrationState } from '../../store/reducers/SwanIntegration'
 import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -52,7 +52,8 @@ interface HomePropsTypes {
   currencyCode: any;
   setShowAllAccount: any;
   openBottomSheet: any;
-  swanDeepLinkContent: string | null
+  swanDeepLinkContent: string | null;
+  markAccountChecked: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -82,6 +83,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     //   this.props.openBottomSheet( 6, null, true )
 
     // } else {
+    if( selectedAccount.primarySubAccount.hasNewTxn ) {
+      this.props.markAccountChecked( selectedAccount.id )
+    }
     this.props.navigation.navigate( 'AccountDetails', {
       accountShellID: selectedAccount.id,
       swanDeepLinkContent: this.props.swanDeepLinkContent
@@ -179,6 +183,7 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    setShowAllAccount
+    setShowAllAccount,
+    markAccountChecked
   } )( Home )
 )

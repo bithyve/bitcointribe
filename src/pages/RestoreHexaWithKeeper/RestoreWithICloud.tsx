@@ -317,8 +317,6 @@ class RestoreWithICloud extends Component<
         backupModal: true
       } )
     }
-    console.log( 'SERVICES', SERVICES )
-    console.log( 'walletImageChecked', walletImageChecked )
     if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
       await AsyncStorage.setItem( 'walletExists', 'true' )
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
@@ -387,21 +385,17 @@ class RestoreWithICloud extends Component<
     }
 
     if ( prevProps.downloadedBackupData.length == 0 && prevProps.downloadedBackupData != this.props.downloadedBackupData && this.props.downloadedBackupData.length == 1 ) {
-      console.log( 'dsfsd', this.props.keeperInfo )
       if ( this.props.keeperInfo.length == 0 ) {
-        console.log( 'dsfsd', this.props.keeperInfo )
         this.setKeeperInfoList( 0, this.props.downloadedBackupData[ 0 ].backupData.keeperInfo )
       }
     }
 
     if ( prevProps.s3Service != this.props.s3Service && this.props.s3Service.levelhealth ) {
-      console.log( 'this.state.currentLevel', this.state.currentLevel )
       this.props.setupHealth( this.state.currentLevel )
     }
   };
 
   componentWillUnmount = () => {
-    console.log( 'Inside componentWillUnmount' )
     this.props.clearCloudCache()
   }
 
@@ -424,11 +418,6 @@ class RestoreWithICloud extends Component<
     this.setState( {
       listData: updatedListData, showLoader: false
     }, () => {
-      console.log(
-        'listData inside setState',
-        this.state.listData,
-        this.state.showLoader
-      )
     } )
     if ( shares.length === 2 || shares.length === 3 ) {
       this.checkForRecoverWallet( shares, selectedBackup )
@@ -457,7 +446,6 @@ class RestoreWithICloud extends Component<
   };
 
   getData = ( result ) => {
-    console.log( 'FILE DATA', result )
     if ( result ) {
       let arr = []
       const newArray = []
@@ -471,7 +459,6 @@ class RestoreWithICloud extends Component<
           newArray.push( arr[ i ] )
         }
       }
-      console.log( 'ARR', newArray )
       this.setState( ( state ) => ( {
         selectedBackup: newArray[ 0 ],
         walletsArray: newArray,
@@ -510,7 +497,6 @@ class RestoreWithICloud extends Component<
 
   restoreWallet = () => {
     const { selectedBackup } = this.state
-    console.log( 'selectedBackup', selectedBackup )
     this.setState( {
       walletName: selectedBackup.walletName
     } )
@@ -521,7 +507,6 @@ class RestoreWithICloud extends Component<
   getSecurityQuestion = ( questionId, question1 ) => {
     if ( questionId > 0 ) {
       const question = this.getQuestion( questionId )
-      console.log( 'Question', question )
       this.setState( {
         question: question[ 0 ].question
       } )
@@ -538,7 +523,6 @@ class RestoreWithICloud extends Component<
 
   setSecurityQuestionAndName = async () => {
     const { answer, question, walletName, } = this.state
-    console.log( 'answer, question, walletName', answer, question, walletName )
     if ( answer && question && walletName ) {
       const security = {
         question,
@@ -550,19 +534,14 @@ class RestoreWithICloud extends Component<
   }
 
   decryptCloudJson = () => {
-    console.log( 'decryptCloudJson Statred' )
     const { recoverWalletUsingIcloud, accounts } = this.props
     const { answer, selectedBackup }: {answer: string, selectedBackup:any} = this.state
     try {
       const key = BHROperations.strechKey( answer )
       const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
-      console.log( 'decryptedCloudDataJson', decryptedCloudDataJson )
       if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
       const KeeperData: KeeperInfoInterface[] = JSON.parse( selectedBackup.keeperData )
-      console.log( 'decryptCloudJson KeeperData', KeeperData )
-      console.log( 'decryptCloudJson selectedBackup.levelStatus', selectedBackup.levelStatus )
       if ( this.props.keeperInfo.length == 0 ) {
-        console.log( 'decryptCloudJson IF this.props.keeperInfo', this.props.keeperInfo )
         this.setKeeperInfoList( selectedBackup.levelStatus, KeeperData, selectedBackup.dateTime )
       }
       if (
@@ -617,7 +596,6 @@ class RestoreWithICloud extends Component<
   }
 
   setKeeperInfoList = ( levelStatus, KeeperInfo: KeeperInfoInterface[], time? ) => {
-    console.log( 'setKeeperInfoList levelStatus', levelStatus )
     const listDataArray = []
     let KeeperData: KeeperInfoInterface[] = [ ...KeeperInfo ]
     const tempCL = Math.max.apply( Math, KeeperData.map( function ( value ) { return value.currentLevel } ) )
@@ -628,13 +606,11 @@ class RestoreWithICloud extends Component<
       if ( tempCL === 2 ) KeeperData = KeeperData.filter( word => word.scheme == '2of3' )
       if ( tempCL === 3 ) KeeperData = KeeperData.filter( word => word.scheme == '3of5' )
     }
-    console.log( 'levelStatus', levelStatus )
     this.setState( {
       currentLevel: levelStatus
     } )
     let obj
     const list = []
-    //console.log("KEEPERDATA slice", KeeperData)
     for ( let i = 0; i < KeeperData.length; i++ ) {
       obj = {
         type: KeeperData[ i ].type,
@@ -649,13 +625,11 @@ class RestoreWithICloud extends Component<
         shareId: KeeperData[ i ].shareId,
         data: KeeperData[ i ].data,
       }
-      console.log( 'KeeperData[i].type', KeeperData[ i ] )
       if ( KeeperData[ i ].type == 'contact' ) {
         list.push( KeeperData[ i ] )
       }
       listDataArray.push( obj )
     }
-    console.log( 'list', list )
     this.setState( {
       contactList: list,
       listData: listDataArray
@@ -664,7 +638,6 @@ class RestoreWithICloud extends Component<
   }
 
   handleScannedData = async ( scannedData ) => {
-    console.log( 'scannedData', scannedData )
     const { downloadedBackupData } = this.props
     this.props.downloadBackupData( {
       scannedData: scannedData
@@ -703,20 +676,14 @@ class RestoreWithICloud extends Component<
   createLink = ( selectedContact, index ) => {
     const { database } = this.props
     const requester = this.state.walletName //database.WALLET_SETUP.walletName
-    console.log( 'index', index )
     const { REQUEST_DETAILS } = database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[
       index == 0 ? 1 : 2
     ]
-    console.log(
-      'database.DECENTRALIZED_BACKUP.RECOVERY_SHARES',
-      database.DECENTRALIZED_BACKUP.RECOVERY_SHARES
-    )
     const appVersion = DeviceInfo.getVersion()
     if (
       selectedContact.data.phoneNumbers &&
       selectedContact.data.phoneNumbers.length
     ) {
-      console.log( 'selectedContact.data', selectedContact.data )
       let number = selectedContact.data.phoneNumbers.length
         ? selectedContact.data.phoneNumbers[ 0 ].number
         : ''
@@ -796,9 +763,6 @@ class RestoreWithICloud extends Component<
           !RECOVERY_SHARES[ shareIndex ].META_SHARE && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS.KEY
         ) {
           const { KEY } = RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS
-          console.log( {
-            KEY,
-          } )
 
           this.props.downloadMShare( {
             encryptedKey: KEY,
@@ -814,7 +778,6 @@ class RestoreWithICloud extends Component<
   };
 
   onRefresh = () => {
-    console.log( 'gggg' )
     this.downloadSecret()
   };
 
