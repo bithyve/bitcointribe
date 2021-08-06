@@ -68,7 +68,7 @@ export const getGoogleDriveErrorMessage = ( errorCode ) => {
       case '34': //ERROR_IN_READING_DATA
         return 'Error in reading data. Please re-try again.'
       case '12501':
-        return 'Sign in action cancelled. Please select your google account.'
+        return 'We recommend signing in as it easily allows you to backup your wallet on your personal cloud.'
       default:
         return `We encountered a non-standard error. Please try again after sometime or contact us with (${errorCode}) Error Code.`
   }

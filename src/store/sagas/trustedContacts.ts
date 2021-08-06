@@ -12,6 +12,7 @@ import {
   updateTrustedContacts,
   EDIT_TRUSTED_CONTACT,
   RESTORE_CONTACTS,
+  RESTORE_TRUSTED_CONTACTS,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -198,7 +199,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
       } )
       yield put( updateTrustedContacts( updatedContacts ) )
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
-        dbManager.updateContact( value )
+        yield call( dbManager.updateContact, value )
       }
       yield put( updateWalletImageHealth() )
 
@@ -428,7 +429,7 @@ function* editTrustedContactWorker( { payload }: { payload: { channelKey: string
     [ contactToUpdate.channelKey ]: contactToUpdate
   }
   yield put( updateTrustedContacts( updatedContacts ) )
-  dbManager.updateContact( contactToUpdate )
+  yield call ( dbManager.updateContact, contactToUpdate )
   yield put( updateWalletImageHealth() )
 
 }
@@ -498,6 +499,23 @@ function* removeTrustedContactWorker( { payload }: { payload: { channelKey: stri
 export const removeTrustedContactWatcher = createWatcher(
   removeTrustedContactWorker,
   REMOVE_TRUSTED_CONTACT,
+)
+
+
+function* restoreTrustedContactsWorker( { payload }: { payload: { walletId: string, channelKeys: string[] }} ) {
+  const { walletId, channelKeys } = payload
+  const restoredTrustedContacts: Trusted_Contacts = yield call( TrustedContactsOperations.restoreTrustedContacts, {
+    walletId, channelKeys
+  } )
+  yield put( updateTrustedContacts( restoredTrustedContacts ) )
+  for ( const [ key, value ] of Object.entries( restoredTrustedContacts ) ) {
+    yield call( dbManager.updateContact, value )
+  }
+}
+
+export const restoreTrustedContactsWatcher = createWatcher(
+  restoreTrustedContactsWorker,
+  RESTORE_TRUSTED_CONTACTS,
 )
 
 function* walletCheckInWorker( { payload } ) {

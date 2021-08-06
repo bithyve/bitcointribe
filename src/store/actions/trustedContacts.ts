@@ -11,6 +11,7 @@ export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
 export const REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
 export const EDIT_TRUSTED_CONTACT = 'EDIT_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
+export const RESTORE_TRUSTED_CONTACTS = 'RESTORE_TRUSTED_CONTACTS'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 
 export enum PermanentChannelsSyncKind {
@@ -112,6 +113,16 @@ export const removeTrustedContact = ( { channelKey } : {channelKey: string} ) =>
     type: REMOVE_TRUSTED_CONTACT,
     payload: {
       channelKey
+    },
+  }
+}
+
+export const restoreTrustedContacts = ( { walletId, channelKeys } : {walletId: string, channelKeys: string[]} ) => {
+  return {
+    type: RESTORE_TRUSTED_CONTACTS,
+    payload: {
+      walletId,
+      channelKeys
     },
   }
 }
