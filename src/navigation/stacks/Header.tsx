@@ -50,7 +50,7 @@ import NotificationInfoContents from '../../components/NotificationInfoContents'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import { resetToHomeAction } from '../actions/NavigationActions'
-import { QRCodeTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, QRCodeTypes } from '../../bitcoin/utilities/Interface'
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
 export enum BottomSheetKind {
@@ -455,12 +455,26 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { navigation } = this.props
     const { trustedContactRequest } = this.state
 
-    if( !trustedContactRequest.isQR ){
-      try{
-        trustedContactRequest.channelKey = TrustedContactsOperations.decryptData( key, trustedContactRequest.encryptedencryptedChannelKeys ).data
-      } catch( err ){
-        Toast( 'Invalid key' )
+    let channelKeys: string[]
+    try{
+      switch( trustedContactRequest.encryptionType ){
+          case DeepLinkEncryptionType.DEFAULT:
+            channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+            break
+
+          case DeepLinkEncryptionType.NUMBER:
+          case DeepLinkEncryptionType.EMAIL:
+          case DeepLinkEncryptionType.OTP:
+            const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+            channelKeys = decryptedKeys.split( '-' )
+            break
       }
+
+      trustedContactRequest.channelKey = channelKeys[ 0 ]
+      trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+    } catch( err ){
+      Toast( 'Invalid key' )
+      return
     }
 
     if( trustedContactRequest.isExistingContact ){

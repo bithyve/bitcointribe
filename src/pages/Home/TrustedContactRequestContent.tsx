@@ -19,11 +19,11 @@ const TrustedContactRequestContent: React.FC<Props> = ( {
   onPhoneNumberChange,
 }: Props ) => {
   if ( !trustedContactRequest ) return
-  const { walletName, isKeeper, isQR, encryptionType, encryptionHint } = trustedContactRequest
+  const { walletName, isKeeper, encryptionType, encryptionHint } = trustedContactRequest
 
   return (
     <TrustedContactRequest
-      inputNotRequired={isQR || encryptionType === DeepLinkEncryptionType.DEFAULT }
+      inputNotRequired={encryptionType === DeepLinkEncryptionType.DEFAULT }
       inputType={encryptionType}
       isGuardian={isKeeper}
       isRecovery={false}
