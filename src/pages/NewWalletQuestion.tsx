@@ -1249,7 +1249,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             />
             <CardWithRadioBtn
               icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
-              mainText={'Use answer to a Security Question'}
+              mainText={'Answer a Security Question'}
               subText={'Easier to remember. Recommended'}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
@@ -1282,7 +1282,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Initial wallet backup is essentian for security.\nThis can be changed later from the '}
+            infoText={'Backup lets you restore your wallet even if you lose your phone. Manage from '}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />

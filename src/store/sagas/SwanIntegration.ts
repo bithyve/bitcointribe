@@ -62,7 +62,16 @@ client_id=${Config.SWAN_CLIENT_ID}\
 &code_challenge_method=S256\
 &response_mode=query\
 `
-
+//   const swanAuthenticationUrl = `https://dev-app.swanbitcoin.com/login?
+//   uid=9XtD4QRzKYLqAgDFnyTKY&
+//   returnTo=http://dev-api.swanbitcoin.com/oidc/auth/9XtD4QRzKYLqAgDFnyTKY&
+//   client_id=hexa-dev&
+//   code_challenge=7tTtm8L_6vUxkqG0ewv9eyYJyGwcjk-ABt8B5dfiSxM&
+//   code_challenge_method=S256&
+//   redirect_uri=https://dev-relay.bithyve.com/deepLink/dev/swan/&
+//   response_mode=query&response_type=code&
+//   scope=openid v1 write:vendor_wallet read:vendor_wallet write:automatic_withdrawal read:automatic_withdrawal&state=22405830144-J0s
+// `
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
   } ) )

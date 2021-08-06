@@ -13,6 +13,8 @@ export const EDIT_TRUSTED_CONTACT = 'EDIT_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const RESTORE_TRUSTED_CONTACTS = 'RESTORE_TRUSTED_CONTACTS'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
+export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
+export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
 
 export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
@@ -154,6 +156,20 @@ export const updateTrustedContacts = ( contacts: Trusted_Contacts ) => {
     type: UPDATE_TRUSTED_CONTACTS,
     payload: {
       contacts
+    }
+  }
+}
+
+export const updateWalletNameToChannel = () => {
+  return {
+    type: UPDATE_WALLET_NAME_TO_CHANNEL,
+  }
+}
+
+export const updateWalletName = ( walletName: string ) => {
+  return {
+    type: UPDATE_WALLET_NAME, payload: {
+      walletName
     }
   }
 }
