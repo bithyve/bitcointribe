@@ -86,7 +86,6 @@ interface UpgradeBackupStateTypes {
     status: String;
   }[];
   selectedContact: any[];
-  encryptedCloudDataJson: any;
   isCloudBackupProcessing: Boolean;
   showLoader: boolean;
   totalKeeper: number;
@@ -194,7 +193,6 @@ class UpgradeBackup extends Component<
     this.state = {
       isCloudBackupProcessing: false,
       selectedIds: [],
-      encryptedCloudDataJson: [],
       listData: [
         {
           title: 'Wallet Backup',

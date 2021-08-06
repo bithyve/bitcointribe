@@ -110,6 +110,7 @@ import {
   editTrustedContactWatcher,
   removeTrustedContactWatcher,
   rejectTrustedContactWatcher,
+  restoreContactsWatcher,
   restoreTrustedContactsWatcher,
 } from './sagas/trustedContacts'
 
@@ -164,7 +165,8 @@ import {
   setupHealthWatcher,
   updateKeeperInfoToChannelWatcher,
   acceptExistingContactRequestWatcher,
-  setupPasswordWatcher
+  setupPasswordWatcher,
+  setupLevelHealthWatcher
 } from './sagas/health'
 
 import {
@@ -275,6 +277,7 @@ const rootSaga = function* () {
     removeTrustedContactWatcher,
     walletCheckInWatcher,
     syncPermanentChannelsWatcher,
+    restoreContactsWatcher,
     restoreTrustedContactsWatcher,
 
     // Health
@@ -310,6 +313,7 @@ const rootSaga = function* () {
     updateKeeperInfoToChannelWatcher,
     acceptExistingContactRequestWatcher,
     setupPasswordWatcher,
+    setupLevelHealthWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

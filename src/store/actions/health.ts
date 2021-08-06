@@ -1,6 +1,7 @@
 // types and action creators: dispatched by components and sagas
 
 import S3Service from '../../bitcoin/services/sss/S3Service'
+import { BackupStreamData, cloudDataInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -72,6 +73,7 @@ export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
 export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
 export const SETUP_PASSWORD = 'SETUP_PASSWORD'
+export const SETUP_LEVEL_HEALTH = 'SETUP_LEVEL_HEALTH'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -107,10 +109,10 @@ export const healthInitialize = () => {
   }
 }
 
-export const recoverWalletUsingIcloud = ( icloudData ) => {
+export const recoverWalletUsingIcloud = ( icloudData, answer, selectedBackup? ) => {
   return {
     type: RECOVER_WALLET_USING_ICLOUD, payload: {
-      icloudData
+      icloudData, selectedBackup, answer
     }
   }
 }
@@ -279,11 +281,13 @@ export const ErrorReceiving = ( isFailed ) => {
   }
 }
 
-export const recoverWallet = ( level?, keeperData?, decryptedCloudDataJson? ) => {
+export const recoverWallet = ( payload: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
+  primaryData?: PrimaryStreamData;
+  backupData?: BackupStreamData;
+  secondaryData?: SecondaryStreamData;
+}[] } ) => {
   return {
-    type: RECOVER_WALLET_HEALTH, payload: {
-      level, keeperData, decryptedCloudDataJson
-    }
+    type: RECOVER_WALLET_HEALTH, payload: payload
   }
 }
 

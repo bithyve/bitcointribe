@@ -1,7 +1,7 @@
 import moment from 'moment'
-import { NativeModules, Platform, Alert } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
 import { call, delay, put, select } from 'redux-saga/effects'
-import { CloudData, getLevelInfo } from '../../common/CommonFunctions'
+import { WIEncryption, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
@@ -10,13 +10,14 @@ import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
+
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
 
 const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[] ) => {
 
-  console.log( 'cloudBackupHistory', cloudBackupHistory )
   const obj ={
     title,
     confirmed: Date.now(),
@@ -24,7 +25,6 @@ const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[]
   }
   const updatedCloudBackupHistory = cloudBackupHistory
   updatedCloudBackupHistory.push( obj )
-  console.log( 'updatedCloudBackupHistory', updatedCloudBackupHistory )
   return updatedCloudBackupHistory
 }
 
@@ -41,7 +41,6 @@ function* cloudWorker( { payload } ) {
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
       console.log( 'CLOUD CALL PAYLOAD', payload )
       const index: number = MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== null || MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== undefined ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
-      console.log( 'CLOUD CALL PAYLOAD', index )
       const RK: MetaShare = index != null && MetaShares.length ? MetaShares[ index ] : null
 
       const obj: KeeperInfoInterface = {
@@ -55,7 +54,6 @@ function* cloudWorker( { payload } ) {
         data: {
         }
       }
-      console.log( 'CLOUD obj', obj )
       const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
       for ( let i = 0; i < keeperInfo.length; i++ ) {
         if( level == 1 && keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = level
@@ -65,66 +63,49 @@ function* cloudWorker( { payload } ) {
       if ( !keeperInfo.find( value=>value.shareId == obj.shareId ) ) {
         keeperInfo.push( obj )
       }
-      console.log( 'CLOUD keeperInfo', keeperInfo )
       yield put( putKeeperInfo( keeperInfo ) )
       const regularAccount = yield select( ( state ) => state.accounts[ REGULAR_ACCOUNT ].service )
-      const database = yield select( ( state ) => state.storage.database )
-      const accountShells = yield select( ( state ) => state.accounts.accountShells )
-      const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
-      const versionHistory = yield select( ( state ) => state.versionHistory.versions )
-      const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
       const cloudBackupHistory = yield select( ( state ) => state.cloud.cloudBackupHistory )
       const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
       const wallet: Wallet = yield select(
         ( state ) => state.storage.wallet
       )
 
-      let encryptedCloudDataJson
+      // Create Updated Wallet Image
       const shares = RK ? JSON.stringify( RK ) : ''
-      encryptedCloudDataJson = yield call( CloudData,
-        database,
-        accountShells,
-        activePersonalNode,
-        versionHistory,
-        trustedContactsInfo
-      )
-      console.log( 'CLOUD shares', shares )
-      // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
-      const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-
-      const data = {
-        levelStatus: level ? level : 1,
-        shares: shares,
-        secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
-        encryptedCloudDataJson: encryptedCloudDataJson,
-        walletName: wallet.walletName,
-        questionId: wallet.security.questionId,
-        question: wallet.security.questionId === '0' ? wallet.security.question: '',
-        regularAccount: regularAccount,
-        keeperData: JSON.stringify( keeperInfo ),
-        bhXpub,
-      }
-
-      const isCloudBackupCompleted = yield call ( checkCloudBackupWorker, {
-        payload: {
-          data, share
+      let encryptedCloudDataJson
+      const getWI = yield call( S3Service.fetchWalletImage, wallet.walletId )
+      if( getWI.status == 200 ){
+        console.log( 'getWI.data.walletImage', JSON.stringify( getWI.data.walletImage ) )
+        encryptedCloudDataJson = yield call( WIEncryption,
+          getWI.data.walletImage,
+          wallet.security.answer
+        )
+        // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
+        const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
+        const { encryptedString } = LevelHealth.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+        const secondaryMnemonics = wallet.secondaryMnemonic ? LevelHealth.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedString : ''
+        const data = {
+          levelStatus: level ? level : 1,
+          shares: shares,
+          secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : secondaryMnemonics,
+          encryptedCloudDataJson: encryptedCloudDataJson,
+          seed: shares ? '' : encryptedString,
+          walletName: wallet.walletName,
+          questionId: wallet.security.questionId,
+          question: wallet.security.questionId === '0' ? wallet.security.question: '',
+          regularAccount: regularAccount,
+          keeperData: JSON.stringify( keeperInfo ),
+          bhXpub,
         }
-      } )
-
-      if( typeof isCloudBackupCompleted === 'boolean' ) {
-        yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
-        yield call( updateHealthForCloudStatusWorker, {
-          payload : {
-            share
+        console.log( 'ICLOUD data', data )
+        const isCloudBackupCompleted = yield call ( checkCloudBackupWorker, {
+          payload: {
+            data, share
           }
         } )
-        const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
-        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-        //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
-        yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-      } else {
-        if( isCloudBackupCompleted.status ) {
+        if( typeof isCloudBackupCompleted === 'boolean' ) {
           yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
           yield call( updateHealthForCloudStatusWorker, {
             payload : {
@@ -135,19 +116,53 @@ function* cloudWorker( { payload } ) {
           const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
           //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
-          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-        } else {
-          const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
-          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-          yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-          yield delay( 200 )
-          const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( isCloudBackupCompleted.errorCode )}` : 'GoogleDrive backup failed'
-          yield put( setCloudErrorMessage( message ) )
-          //Alert.alert( 'Error', message )
-        }
-      }
+          if( isCloudBackupCompleted ) {
+            yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
+            yield call( updateHealthForCloudStatusWorker, {
+              payload : {
+                share
+              }
+            } )
+            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
 
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+          } else {
+            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+            yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+          }
+        } else {
+          if( isCloudBackupCompleted.status ) {
+            yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
+            yield call( updateHealthForCloudStatusWorker, {
+              payload : {
+                share
+              }
+            } )
+            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+            //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
+
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+          } else {
+            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+            yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+            yield delay( 200 )
+            const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( isCloudBackupCompleted.errorCode )}` : 'GoogleDrive backup failed'
+            yield put( setCloudErrorMessage( message ) )
+          //Alert.alert( 'Error', message )
+          }
+        }
+      } else {
+        const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+        yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+      }
     }
   }
   catch ( error ) {
@@ -162,7 +177,6 @@ export const cloudWatcher = createWatcher(
 )
 
 function* updateHealthForCloudStatusWorker( { payload } ) {
-  console.log( 'updateHealthForCloudStatusWorker', payload )
   try {
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
 
@@ -195,7 +209,6 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 function* updateHealthForCloudWorker( { payload } ) {
   try {
     const { share } = payload
-    console.log( 'updateHealthForCloudWorker payload', payload )
     const levelHealth = yield select( ( state ) => state.health.levelHealth )
     const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
     const s3Service = yield select( ( state ) => state.health.service )
@@ -228,7 +241,6 @@ function* updateHealthForCloudWorker( { payload } ) {
       shareType: 'cloud',
       name: levelHealthVar.name
     }
-    console.log( 'updateHealthForCloudStatusWorker shareObj', shareObj )
     yield put( updateMSharesHealth( shareObj ) )
     // }
   }
@@ -248,7 +260,6 @@ function* getCloudBackupRecoveryWorker () {
   try {
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      console.log( 'backedJson getCloudBackupRecoveryWorker', backedJson )
       if( backedJson === 'failure' ) {
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
         return false
@@ -415,6 +426,7 @@ function* updateDataWorker( { payload } ) {
           question: data.question,
           walletId: walletId,
           data: data.encryptedCloudDataJson,
+          seed: data.seed ? data.seed : '',
           shares: data.shares,
           keeperData: data.keeperData,
           dateTime: moment( new Date() ),
@@ -427,6 +439,7 @@ function* updateDataWorker( { payload } ) {
         newArray[ index ].question = data.question,
         newArray[ index ].levelStatus = data.levelStatus
         newArray[ index ].data = data.encryptedCloudDataJson
+        newArray[ index ].seed = data.seed ? data.seed : '',
         newArray[ index ].shares = data.shares ? data.shares : newArray[ index ].shares
         newArray[ index ].keeperData = data.keeperData
         newArray[ index ].dateTime = moment( new Date() )
@@ -463,6 +476,7 @@ function* updateDataWorker( { payload } ) {
       console.log( 'GoogleDrive.updateFile', result )
 
     }
+    console.log( 'newArray', newArray )
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
@@ -489,6 +503,7 @@ function* createFileWorker( { payload } ) {
       question: data.question,
       walletId: walletId,
       data: data.encryptedCloudDataJson,
+      seed: data.seed ? data.seed : '',
       shares: data.shares,
       keeperData: data.keeperData,
       dateTime: moment( new Date() ),
@@ -664,6 +679,7 @@ function* uplaodFileWorker( { payload } ) {
           question: data.question,
           walletId: walletId,
           data: data.encryptedCloudDataJson,
+          seed: data.seed ? data.seed : '',
           shares: data.shares,
           keeperData: data.keeperData,
           dateTime: moment( new Date() ),
@@ -672,10 +688,11 @@ function* uplaodFileWorker( { payload } ) {
         }
         newArray.push( tempData )
       } else {
-        newArray[ index ].questionId = data.questionId,
-        newArray[ index ].question = data.question,
+        newArray[ index ].questionId = data.questionId
+        newArray[ index ].question = data.question
         newArray[ index ].levelStatus = data.levelStatus
         newArray[ index ].data = data.encryptedCloudDataJson
+        newArray[ index ].seed = data.seed ? data.seed : '',
         newArray[ index ].shares = data.shares ? data.shares : newArray[ index ].shares
         newArray[ index ].keeperData = data.keeperData
         newArray[ index ].dateTime = moment( new Date() )

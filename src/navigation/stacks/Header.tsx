@@ -77,7 +77,6 @@ interface HomeStateTypes {
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
-  encryptedCloudDataJson: any;
   notificationTitle: string | null;
   notificationInfo: string | null;
   notificationNote: string | null;
@@ -138,7 +137,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       custodyRequest: null,
       isLoadContacts: false,
       notificationLoading: true,
-      encryptedCloudDataJson: [],
       notificationTitle: null,
       notificationInfo: null,
       notificationNote: null,

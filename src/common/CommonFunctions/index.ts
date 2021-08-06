@@ -6,6 +6,7 @@ import config from '../../bitcoin/HexaConfig'
 import { Alert } from 'react-native'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
+import SSS from '../../bitcoin/utilities/sss/SSS'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -161,6 +162,12 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
     // console.log('encryptedDatabase', encryptedCloudDataJson);
     return encryptedCloudDataJson
   }
+}
+
+export const WIEncryption = async ( image, answer ) => {
+  console.log( 'image', image )
+  const key = SSS.strechKey( answer )
+  return await encrypt( image, key )
 }
 
 export const getCurrencyImageByRegion = (

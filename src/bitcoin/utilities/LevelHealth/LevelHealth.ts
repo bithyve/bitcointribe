@@ -1668,18 +1668,20 @@ export default class LevelHealth {
   ): {
     decryptedString: string;
   } => {
-    const key = LevelHealth.getDerivedKey( answer )
-    const decryptedSecrets: string[] = []
-    const decipher = crypto.createDecipheriv(
-      LevelHealth.cipherSpec.algorithm,
-      key,
-      LevelHealth.cipherSpec.iv,
-    )
-    let decrypted = decipher.update( secretsToDecrypt, 'hex', 'utf8' )
-    decrypted += decipher.final( 'utf8' )
-
-    return {
-      decryptedString: decrypted
+    try {
+      const key = LevelHealth.getDerivedKey( answer )
+      const decipher = crypto.createDecipheriv(
+        LevelHealth.cipherSpec.algorithm,
+        key,
+        LevelHealth.cipherSpec.iv,
+      )
+      let decrypted = decipher.update( secretsToDecrypt, 'hex', 'utf8' )
+      decrypted += decipher.final( 'utf8' )
+      return {
+        decryptedString: decrypted
+      }
+    } catch ( error ) {
+      console.log( 'error', error )
     }
   };
 
@@ -1864,14 +1866,19 @@ export default class LevelHealth {
     }
   };
 
-  public static getSecondaryMnemonics = ( secretsArray: string[], answer: string ) => {
-    const decryptedShareArr = []
-    for ( let i = 0; i < secretsArray.length; i++ ) {
-      const element = secretsArray[ i ]
-      decryptedShareArr.push( element )
+  public static getMnemonics = ( secretsArray: string[], answer: string, isPrimary?: boolean ) => {
+    const { decryptedSecrets } = LevelHealth.decryptSecrets( secretsArray, answer )
+    const shareArr = isPrimary ? [] : decryptedSecrets
+    if( isPrimary ){
+      for ( const secret of decryptedSecrets ) {
+        if ( LevelHealth.validShare( secret ) ) {
+          shareArr.push( secret.slice( 0, secret.length - 8 ) )
+        } else {
+          throw new Error( `Invalid checksum, share: ${secret} is corrupt` )
+        }
+      }
     }
-    const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
-    const recoveredMnemonicHex = secrets.combine( decryptedSecrets )
+    const recoveredMnemonicHex = secrets.combine( shareArr )
     return {
       mnemonic: LevelHealth.hexToString( recoveredMnemonicHex )
     }
