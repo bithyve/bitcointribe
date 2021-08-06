@@ -97,10 +97,16 @@ export interface Transaction {
    */
   address?: string
   type?: string
+  // sender name
   sender?: string
+  // receiver name
   receiver?: string
+  // txn tags
   tags?: string[]
+  // txn notes
   notes?: string
+  // indicates that this is a new tx
+  isNew?: boolean
 }
 
 export type TransactionDetails = Transaction
@@ -856,6 +862,7 @@ export interface Account {
   newTransactions?: Transaction[];      // new transactions arrived during the current sync
   txIdMap?: {[txid: string]: string[]}; // tx-mapping; tx insertion checker
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
+  hasNewTxn?: boolean                   // indicates new txns
 }
 
 export interface cloudDataInterface {

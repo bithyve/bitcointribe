@@ -391,7 +391,6 @@ export default class AccountOperations {
     }
 
     const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network )
-
     const txsFound: Transaction[] = []
     const activeAddressesWithNewTxsMap: {[accountId: string]: ActiveAddresses} = {
     }
@@ -405,7 +404,8 @@ export default class AccountOperations {
         nextFreeAddressIndex,
         nextFreeChangeAddressIndex,
         activeAddresses,
-        activeAddressesWithNewTxs
+        activeAddressesWithNewTxs,
+        hasNewTxn
       } = synchedAccounts[ account.id ]
       const { internalAddresses } = accountsInternals[ account.id ]
 
@@ -442,6 +442,7 @@ export default class AccountOperations {
       account.nextFreeAddressIndex = nextFreeAddressIndex
       account.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
       account.activeAddresses = activeAddresses
+      account.hasNewTxn = hasNewTxn
 
       if( ( account as MultiSigAccount ).is2FA ) account.receivingAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeAddressIndex, false ).address
       else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
@@ -460,8 +461,8 @@ export default class AccountOperations {
       account.newTransactions = newTransactions
       account.lastSynched = lastSynched
       activeAddressesWithNewTxsMap[ account.id ] = activeAddressesWithNewTxs
+      account.hasNewTxn = hasNewTxn
     }
-
     return {
       synchedAccounts: accounts,
       txsFound,
@@ -476,7 +477,6 @@ export default class AccountOperations {
     const xpubId = account.id
     const donationId = account.id.slice( 0, 15 )
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, utxos, balances, transactions } = await AccountUtilities.syncViaXpubAgent( xpubId, donationId )
-
     const internalAddresses = []
     for ( let itr = 0; itr < nextFreeChangeAddressIndex + config.DONATION_GAP_LIMIT_INTERNAL; itr++ )
     {
@@ -513,7 +513,7 @@ export default class AccountOperations {
     account.transactions = transactions
     account.newTransactions = newTransactions
     account.lastSynched = lastSynched
-
+    //account.hasNewTxn = hasNewTxn
     return {
       synchedAccount: account
     }
