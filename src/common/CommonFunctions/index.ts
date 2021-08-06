@@ -313,7 +313,9 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
       `/${encryptionType}-${encryptionHint}` +
       `/v${appVersion}`
 
-  return deepLink
+  return {
+    deepLink, encryptedChannelKeys, encryptionType, encryptionHint
+  }
 }
 
 export const processDeepLink = async ( deepLink: string ) =>{
@@ -336,10 +338,10 @@ export const processDeepLink = async ( deepLink: string ) =>{
       const trustedContactRequest = {
         walletName: splits[ 5 ],
         encryptedChannelKeys: splits[ 6 ],
-        isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-        isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
         encryptionType,
         encryptionHint,
+        isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+        isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
         isQR: false,
         version,
       }
@@ -376,13 +378,14 @@ export const processFriendsAndFamilyQR = ( qrData: string ) => {
         case QRCodeTypes.KEEPER_REQUEST:
           trustedContactRequest = {
             walletName: scannedData.walletName,
-            channelKey: scannedData.channelKey,
-            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            encryptedChannelKeys: scannedData.encryptedChannelKeys,
+            encryptionType: scannedData.encryptionType,
+            encryptionHint: scannedData.encryptionHint,
             isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+            isExistingContact: false,
             isQR: true,
             version: scannedData.version,
             type: scannedData.type,
-            isExistingContact: false
           }
           break
 
