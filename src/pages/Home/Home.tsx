@@ -166,7 +166,6 @@ interface HomeStateTypes {
   swanDeepLinkContent: string | null;
   isBalanceLoading: boolean;
   addContactModalOpened: boolean;
-  encryptedCloudDataJson: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
   rampFromBuyMenu: boolean | null;
@@ -302,7 +301,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       swanDeepLinkContent: null,
       isBalanceLoading: true,
       addContactModalOpened: false,
-      encryptedCloudDataJson: [],
       wyreDeepLinkContent: null,
       rampDeepLinkContent: null,
       rampFromBuyMenu: null,
@@ -947,28 +945,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet()
     const { navigation } = this.props
     const { trustedContactRequest } = this.state
-    if( !trustedContactRequest.isQR ){
-      let channelKeys: string[]
-      try{
-        switch( trustedContactRequest.encryptionType ){
-            case DeepLinkEncryptionType.DEFAULT:
-              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
-              break
 
-            case DeepLinkEncryptionType.NUMBER:
-            case DeepLinkEncryptionType.EMAIL:
-            case DeepLinkEncryptionType.OTP:
-              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
-              channelKeys = decryptedKeys.split( '-' )
-              break
-        }
+    let channelKeys: string[]
+    try{
+      switch( trustedContactRequest.encryptionType ){
+          case DeepLinkEncryptionType.DEFAULT:
+            channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+            break
 
-        trustedContactRequest.channelKey = channelKeys[ 0 ]
-        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
-      } catch( err ){
-        Toast( 'Invalid key' )
-        return
+          case DeepLinkEncryptionType.NUMBER:
+          case DeepLinkEncryptionType.EMAIL:
+          case DeepLinkEncryptionType.OTP:
+            const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+            channelKeys = decryptedKeys.split( '-' )
+            break
       }
+
+      trustedContactRequest.channelKey = channelKeys[ 0 ]
+      trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+    } catch( err ){
+      Toast( 'Invalid key' )
+      return
     }
 
     if( trustedContactRequest.isExistingContact ){

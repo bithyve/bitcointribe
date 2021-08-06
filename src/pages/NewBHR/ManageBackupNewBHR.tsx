@@ -558,7 +558,6 @@ class ManageBackupNewBHR extends Component<
 
   goToHistory = ( value ) => {
     const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
-    console.log( 'value', value )
     this.setState( {
       showLoader: false
     } )
@@ -1164,7 +1163,6 @@ Wallet Backup
                   }
                 } catch( err ){
                   console.log( 'err', err )
-
                 }
               }}
               onPressBack={() =>{

@@ -187,6 +187,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
+  const updateWIStatus: boolean = useSelector( ( state ) => state.health.loading.updateWIStatus )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
@@ -255,10 +256,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   useEffect( ()=>{
     if( levelHealth.length && s3service && s3service.levelhealth && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true && !isSkipClicked ){
+      cloudPermissionGranted === true && !isSkipClicked && updateWIStatus === false ){
       dispatch( setCloudData() )
     }
-  }, [ s3service, cloudPermissionGranted, levelHealth ] )
+  }, [ s3service, cloudPermissionGranted, levelHealth, updateWIStatus ] )
 
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )

@@ -850,7 +850,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     sharesArray.push( shard )
 
     if( sharesArray.length>1 ){
-      secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray, wallet.security.answer )
+      secondaryMnemonic = LevelHealth.getMnemonics( sharesArray, wallet.security.answer )
     }
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )

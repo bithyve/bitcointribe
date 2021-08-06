@@ -202,15 +202,16 @@ export default function AddContactSendRequest( props ) {
             break
       }
 
-    setTrustedLink( generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName ) )
-    const { secondaryChannelKey } = currentContact
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
+    setTrustedLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
       JSON.stringify( {
         type: existingContact ? QRCodeTypes.EXISTING_CONTACT : isKeeper ? QRCodeTypes.KEEPER_REQUEST : QRCodeTypes.CONTACT_REQUEST,
-        channelKey,
+        encryptedChannelKeys: encryptedChannelKeys,
+        encryptionType,
+        encryptionHint,
         walletName: wallet.walletName,
-        secondaryChannelKey,
         version: appVersion,
       } )
     )
@@ -337,6 +338,8 @@ export default function AddContactSendRequest( props ) {
       />
     )
   }, [ OTP, renderTimer ] )
+
+  console.log( 'trustedQR', trustedQR )
 
   return (
     <SafeAreaView style={{

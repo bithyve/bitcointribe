@@ -71,6 +71,8 @@ interface SubAccountDescribing {
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
   // transactionIDs: string[];
   transactions: TransactionDetails[];
+  // if new txn exists
+  hasNewTxn?: boolean
 }
 
 export type HexaSubAccountDescribing = SubAccountDescribing

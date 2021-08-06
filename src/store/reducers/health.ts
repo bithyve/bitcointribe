@@ -59,6 +59,7 @@ const initialState: {
     downloadBackupDataStatus: boolean;
     updateKIToChStatus: boolean;
     setupPasswordStatus: boolean;
+    updateWIStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -119,7 +120,8 @@ const initialState: {
     downloadSMShareLoader: false,
     downloadBackupDataStatus: false,
     updateKIToChStatus: false,
-    setupPasswordStatus: false
+    setupPasswordStatus: false,
+    updateWIStatus: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,

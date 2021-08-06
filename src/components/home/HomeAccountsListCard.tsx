@@ -47,7 +47,11 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         style={styles.headerAccountImage}
         source={getAvatarForSubAccount( primarySubAccount )}
       />
-
+      {
+        accountShell.primarySubAccount.hasNewTxn && (
+          <View style={styles.dot}/>
+        )
+      }
       <View style={styles.headerBadgeContainer}>
 
         {/*
@@ -158,6 +162,15 @@ const styles = StyleSheet.create( {
     marginBottom: widthPercentageToDP( -2 ),
     marginLeft: widthPercentageToDP( -2 ),
     marginTop: widthPercentageToDP( -1.7 )
+  },
+
+  dot: {
+    height: 7,
+    width: 7,
+    borderRadius: 5,
+    backgroundColor: 'tomato',
+    position: 'absolute',
+    left: widthPercentageToDP( 8 ),
   },
 
   headerAccountImage: {

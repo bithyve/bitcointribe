@@ -141,6 +141,7 @@ export const walletCheckIn = ( currencyCode?: string ) => {
 // types and action creators: dispatched by sagas
 export const EXISTING_PERMANENT_CHANNELS_SYNCHED = 'EXISTING_PERMANENT_CHANNELS_SYNCHED'
 export const UPDATE_TRUSTED_CONTACTS = 'UPDATE_TRUSTED_CONTACTS'
+export const RESTORE_CONTACTS = 'RESTORE_CONTACTS'
 
 export const existingPermanentChannelsSynched = ( { successful }: {successful: boolean} ) => {
   return {
@@ -170,6 +171,17 @@ export const updateWalletName = ( walletName: string ) => {
   return {
     type: UPDATE_WALLET_NAME, payload: {
       walletName
+    }
+  }
+}
+export const restoreContacts = ( channelSyncUpdates: {
+  channelKey: string;
+  streamId: string;
+}[] ) => {
+  return {
+    type: RESTORE_CONTACTS,
+    payload: {
+      channelSyncUpdates
     }
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -10,6 +10,8 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import moment from 'moment'
+import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 
 export default function RestoreFromICloud( props ) {
   return (
@@ -18,10 +20,69 @@ export default function RestoreFromICloud( props ) {
         <Text style={styles.headerTitleText}>{props.title}</Text>
         <Text style={styles.headerInfoText}>{props.subText}</Text>
       </View>
-      <AppBottomSheetTouchableWrapper
+      {props.hideShow && <ScrollView>
+        {props.walletsArray.map( ( value, index ) => {
+          return (
+            <AppBottomSheetTouchableWrapper
+              key={index}
+              activeOpacity={10}
+              onPress={() => {props.onPressCard();props.onPressSelectValue( value )}}
+              style={styles.dropDownElement}
+            >
+              {value.data && (
+                <View style={styles.greyBox}>
+                  <View style={styles.greyBoxImage}>
+                    <MaterialCommunityIcons
+                      name={'restore'}
+                      size={RFValue( 25 )}
+                      color={Colors.blue}
+                    />
+                  </View>
+                  <View style={{
+                    marginLeft: 10
+                  }}>
+                    <Text style={styles.greyBoxText}>
+                      {'Restoring Wallet from'}
+                    </Text>
+                    <Text
+                      style={{
+                        ...styles.greyBoxText,
+                        fontSize: RFValue( 20 ),
+                      }}
+                    >
+                      {value.walletName}
+                    </Text>
+                    <Text
+                      style={{
+                        ...styles.greyBoxText,
+                        fontSize: RFValue( 10 ),
+                      }}
+                    >
+                      {'Last backup : ' +
+                                  timeFormatter(
+                                    moment( new Date() ),
+                                    moment( value.dateTime ).valueOf()
+                                  )}
+                    </Text>
+
+                    <Text
+                      style={{
+                        ...styles.greyBoxText,
+                        fontSize: RFValue( 10 ),
+                      }}
+                    >
+                      {'Backup at Level : ' + value.levelStatus}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </AppBottomSheetTouchableWrapper>
+          )
+        } )}
+      </ScrollView> }
+      {!props.hideShow && <AppBottomSheetTouchableWrapper
         activeOpacity={10}
-        onPress={() => props.onPressCard ? props.onPressCard() : {
-        }}
+        onPress={() =>{props.onPressCard()}}
         style={{
           justifyContent: 'center', alignItems: 'center'
         }}
@@ -57,7 +118,7 @@ export default function RestoreFromICloud( props ) {
           </View>
           {!props.isUpgradeBackup ? <View style={styles.arrowIconView}>
             <Ionicons
-              name="ios-arrow-down"
+              name="ios-arrow-up"
               color={Colors.textColorGrey}
               size={15}
               style={{
@@ -66,7 +127,7 @@ export default function RestoreFromICloud( props ) {
             />
           </View> : null}
         </View>
-      </AppBottomSheetTouchableWrapper>
+      </AppBottomSheetTouchableWrapper>}
       {props.info ? <View style={styles.successModalAmountView}>
         <Text style={styles.bottomInfoText}>{props.info}</Text>
       </View> : null}
@@ -212,5 +273,13 @@ const styles = StyleSheet.create( {
     marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  dropDownElement: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: wp( '3%' ),
+    paddingRight: wp( '3%' ),
+    borderBottomColor: Colors.borderColor,
+    borderBottomWidth: 1,
   },
 } )
