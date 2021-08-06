@@ -137,7 +137,7 @@ import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../com
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, restoreContacts, syncPermanentChannels } from '../actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, restoreContacts, restoreTrustedContacts, syncPermanentChannels } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker } from '../sagas/trustedContacts'
 
 import SSS from '../../bitcoin/utilities/sss/SSS'
@@ -711,17 +711,10 @@ function* recoverWalletWorker( { payload } ) {
         level: level, keeperInfo: JSON.parse( selectedBackup.keeperData )
       }
     } )
-    const streamId = TrustedContactsOperations.getStreamId( wallet.walletId )
-    const channelSyncUpdates = []
-    for ( let i = 0; i < contactsChannelKeys.length; i++ ) {
-      const element = contactsChannelKeys[ i ]
-      channelSyncUpdates.push( {
-        channelKey: element,
-        streamId
-      } )
-    }
     // restore Contacts
-    yield put( restoreContacts( channelSyncUpdates ) )
+    yield put( restoreTrustedContacts( {
+      walletId: wallet.walletId, channelKeys: contactsChannelKeys
+    } ) )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
     console.log( {
