@@ -630,19 +630,16 @@ export default class AccountUtilities {
           internal: {
           }
         }
+
         newTxs.forEach( tx => {
           const addresses = txIdMap[ tx.txid ]
           addresses.forEach( address => {
             if( activeAddresses.external[ address ] ){
               activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
-              if( tx.transactionType === 'Received' ) {
-                tx.sender = activeAddresses.external[ address ].assignee.sender
-              }
+              if( tx.transactionType === 'Received' ) tx.sender = activeAddresses.external[ address ].assignee.sender
             } else if( activeAddresses.internal[ address ] ){
               activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
-              if( tx.transactionType === 'Received' ) {
-                tx.sender = activeAddresses.external[ address ].assignee.sender
-              }
+              if( tx.transactionType === 'Received' ) tx.sender = activeAddresses.external[ address ].assignee.sender
             }
           } )
         } )
