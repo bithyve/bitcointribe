@@ -5,10 +5,11 @@ import {
   Linking,
   ImageBackground,
   AppState,
-  Alert
+  Alert,
+  StyleSheet
 } from 'react-native'
 import {
-  heightPercentageToDP,
+  heightPercentageToDP, widthPercentageToDP,
   // widthPercentageToDP,
 } from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
@@ -64,8 +65,6 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import {
   downloadMShare,
 } from '../../store/actions/sss'
-
-
 import {
   initializeHealthSetup,
   updateCloudPermission,
@@ -271,6 +270,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationData: [],
       CurrencyCode: 'USD',
       netBalance: 0,
+      bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
       secondaryDeviceOtp: {
       },
@@ -1416,6 +1416,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     )
   }
 }
+
+const styles = StyleSheet.create( {
+  cloudErrorModalImage: {
+    width: widthPercentageToDP( '30%' ),
+    height: widthPercentageToDP( '25%' ),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
+    marginBottom: heightPercentageToDP( '-3%' ),
+  }
+} )
 
 const mapStateToProps = ( state ) => {
   return {
