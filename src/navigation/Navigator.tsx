@@ -47,6 +47,7 @@ import Svg, { G, Path, Defs } from 'react-native-svg'
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
 import SecurityStack from './stacks/security/Security&Privacy'
 import BuyStack from './stacks/buy/BuyStack'
+import Header from './stacks/Header'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -447,10 +448,38 @@ const Bottomtab = createBottomTabNavigator(
 
   },
 )
+const HomeNavigator = createStackNavigator(
+  {
+    Landing: {
+      screen: Bottomtab,
+      // navigationOptions: {
+      //   gesturesEnabled: false,
+      // },
+    },
+  }, {
+    defaultNavigationOptions: ( { navigation } ) => {
+      if ( ( navigation.state.routes[ 0 ].routes.length == 1 ) &&
+      ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
+      ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
+      ( navigation.state.routes[ 3 ].routes.length == 1 )
+      ) {
+        return {
+          header: () => {
+            return <Header />
+          },
+        }
+      } else {
+        return {
+          header: null
+        }
+      }
+    },
+  }
+)
 
 const Navigator = createSwitchNavigator( {
   SetupNav: SetupNavigator,
-  HomeNav: Bottomtab,
+  HomeNav: HomeNavigator,
 } )
 
 

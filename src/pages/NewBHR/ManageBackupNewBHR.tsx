@@ -837,24 +837,16 @@ class ManageBackupNewBHR extends Component<
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
-      <ImageBackground
-        source={require( '../../assets/images/home-bg.png' )}
-        style={{
-          width: '100%',
-          height: '100%',
-          flex: 1,
-        }}
-        imageStyle={{
-          resizeMode: 'stretch',
-        }}
-      >
+      <View style={{
+        backgroundColor: Colors.blue
+      }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         {/* <Suspense fallback={
           <ActivityIndicator color={Colors.white} size='large'/>
         }>
           <HeaderComponent />
         </Suspense> */}
-        <Header fromScreen={'ManageBackup'} />
+        {/* <Header fromScreen={'ManageBackup'} /> */}
         <View style={styles.accountCardsSectionContainer}>
           {/* <View style={{
         flex: 1, backgroundColor: 'white'
@@ -1257,7 +1249,7 @@ Wallet Backup
             {this.renderKnowMoreModalContent()}
           </ModalContainer>
         </View>
-      </ImageBackground>
+      </View>
     )
   }
 }

@@ -517,19 +517,11 @@ class FriendsAndFamilyScreen extends PureComponent<
       showIndicator
     } = this.state
     return (
-      <ImageBackground
-        source={require( '../../assets/images/home-bg.png' )}
-        style={{
-          width: '100%',
-          height: '100%',
-          flex: 1,
-        }}
-        imageStyle={{
-          resizeMode: 'stretch',
-        }}
-      >
+      <View style={{
+        backgroundColor: Colors.blue
+      }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <Header fromScreen={'F&F'} />
+        {/* <Header fromScreen={'F&F'} /> */}
         {/* {addFnF && */}
         {/* <ModalContainer visible={addFnF} closeBottomSheet={() => {}}>
           {this.renderAddFnFModal()}
@@ -825,7 +817,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             } )
           }}
         />
-      </ImageBackground>
+      </View>
     /* feature/2.0 */
     )
   }
