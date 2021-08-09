@@ -113,7 +113,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const currencyCode = useSelector(
     ( state ) => state.preferences.currencyCode,
   )
-  console.log( 'currencyCode>>>>>>>. ', currencyCode )
 
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
@@ -131,19 +130,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [ currencyKind ] )
 
   return (
-    <ImageBackground
-      source={require( '../../assets/images/home-bg.png' )}
-      style={{
-        width: '100%',
-        height: '100%',
-        flex: 1,
-      }}
-      imageStyle={{
-        resizeMode: 'stretch',
-      }}
-    >
+    <View style={{
+      backgroundColor: Colors.blue
+    }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      <Header from={'More'} />
+      {/* <Header from={'More'} /> */}
       <View style={styles.accountCardsSectionContainer}>
         <ScrollView>
           <Text style={{
@@ -385,7 +376,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         </View> */}
         </ScrollView>
       </View>
-    </ImageBackground>
+    </View>
   )
 }
 
