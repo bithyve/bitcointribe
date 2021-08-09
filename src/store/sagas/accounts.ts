@@ -306,15 +306,18 @@ function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string 
   const { secret: twoFAKey } = yield call( AccountUtilities.resetTwoFA, wallet.walletId, wallet.secondaryWalletId, secondaryMnemonic, wallet.details2FA.secondaryXpub, network )
 
   if( twoFAKey ){
+    const details2FA = {
+      ...wallet.details2FA,
+      twoFAKey
+    }
     const updatedWallet = {
       ...wallet,
-      details2FA: {
-        ...wallet.details2FA,
-        twoFAKey
-      }
+      details2FA
     }
     yield put( updateWallet( updatedWallet ) )
-    yield call ( dbManager.updateWallet, updatedWallet )
+    yield call ( dbManager.updateWallet, {
+      details2FA
+    } )
     yield put( twoFAResetted( true ) )
   }
   else {
@@ -417,26 +420,31 @@ function* autoSyncShellsWorker( ) {
     }
   }
 
-  if( shellsToSync.length )
-    yield call( refreshAccountShellsWorker, {
-      payload: {
-        shells: shellsToSync,
-        options: {
-        }
+  if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
+    payload: {
+      shells: shellsToSync,
+      options: {
+        hardRefresh: false
       }
-    } )
+    }
+  } )
 
   // TODO: enable multi-donation sync
   if( donationShellsToSync.length )
-    for( const donationAcc of donationShellsToSync ) {
-      yield call( refreshAccountShellsWorker, {
-        payload: {
-          shells: [ donationAcc ],
-          options: {
-            syncDonationAccount: true
+    try {
+      for( const donationAcc of donationShellsToSync ) {
+        yield call( refreshAccountShellsWorker, {
+          payload: {
+            shells: [ donationAcc ],
+            options: {
+              syncDonationAccount: true
+            }
           }
-        }
-      } )
+        } )
+      }
+    }
+    catch( err ){
+      console.log( `Sync via xpub agent failed w/ the following err: ${err}` )
     }
 }
 
@@ -711,9 +719,9 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     accounts,
   } ) )
   yield call( dbManager.createAccounts, accounts )
-
-  // TODO: we need an updateWallet call on the dbManager
-  yield call( dbManager.createWallet, updatedWallet )
+  yield call( dbManager.updateWallet, {
+    accounts: presentAccounts
+  } )
   yield put( updateWalletImageHealth() )
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
@@ -872,13 +880,49 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts }: {pay
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
   }
+
+  // restore account shells for respective accountss
   for ( const account of restoredAccounts ){
     const accountShell = yield call( generateShellFromAccount, account )
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
-    // yield put( accountShellOrderedToFront( accountShell ) )
   }
 
+  // restore account's balance and transactions
+  const shellsToSync: AccountShell[] = []
+  const donationShellsToSync: AccountShell[] = []
+  for ( const shell of newAccountShells ) {
+    if( shell.primarySubAccount.type !== AccountType.DONATION_ACCOUNT ) shellsToSync.push( shell )
+    else donationShellsToSync.push( shell )
+  }
+
+  if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
+    payload: {
+      shells: shellsToSync,
+      options: {
+        hardRefresh: true,
+      }
+    }
+  } )
+
+  if( donationShellsToSync.length )
+    try{
+      for( const donationAcc of donationShellsToSync ) {
+        yield call( refreshAccountShellsWorker, {
+          payload: {
+            shells: [ donationAcc ],
+            options: {
+              syncDonationAccount: true
+            }
+          }
+        } )
+      }
+    } catch( err ){
+      console.log( `Sync via xpub agent failed w/ the following err: ${err}` )
+    }
+
+
+  // update redux store & database
   const wallet: Wallet = yield select( state => state.storage.wallet )
   let presentAccounts = {
   }
@@ -893,17 +937,16 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts }: {pay
     ...wallet,
     accounts: presentAccounts,
   }
-  yield put( updateWallet( updatedWallet ) )
 
+  yield put( updateWallet( updatedWallet ) )
   yield put( newAccountShellsAdded( {
     accountShells: newAccountShells,
     accounts,
   } ) )
   yield call( dbManager.createAccounts, accounts )
-
-  // TODO: we need an updateWallet call on the dbManager
-  yield call( dbManager.createWallet, updatedWallet )
-  yield put( updateWalletImageHealth() )
+  yield call( dbManager.updateWallet, {
+    accounts: presentAccounts
+  } )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(
