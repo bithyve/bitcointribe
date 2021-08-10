@@ -19,6 +19,7 @@ import {
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
+import idx from 'idx'
 export default class AccountOperations {
 
   static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ): { updatedAccount: Account | MultiSigAccount, receivingAddress: string} => {
@@ -355,8 +356,7 @@ export default class AccountOperations {
     const activeInternalAddresses = account.activeAddresses.internal
 
     const recipientInfo = {
-      txid,
-      details: recipients.map( recipient => {
+      [ txid ]:recipients.map( recipient => {
         return {
           name: recipient.name, amount: recipient.amount
         }} ),
@@ -385,7 +385,10 @@ export default class AccountOperations {
               ...activeExternalAddresses[ address ],
               assignee: {
                 ...activeExternalAddresses[ address ].assignee,
-                recipientInfo,
+                recipientInfo: idx( activeExternalAddresses[ address ], _ => _.assignee.recipientInfo )? {
+                  ...activeExternalAddresses[ address ].assignee.recipientInfo,
+                  ...recipientInfo
+                }: recipientInfo,
               }
             }
           found = true
@@ -415,7 +418,10 @@ export default class AccountOperations {
                 ...activeInternalAddresses[ address ],
                 assignee: {
                   ...activeInternalAddresses[ address ].assignee,
-                  recipientInfo
+                  recipientInfo: idx( activeInternalAddresses[ address ], _ => _.assignee.recipientInfo )? {
+                    ...activeInternalAddresses[ address ].assignee.recipientInfo,
+                    ...recipientInfo
+                  }: recipientInfo
                 }
               }
             found = true
