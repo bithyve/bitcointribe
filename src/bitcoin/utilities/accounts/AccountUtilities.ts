@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses, TransactionType } from '../Interface'
 import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -540,7 +540,7 @@ export default class AccountUtilities {
                     date: tx.Status.block_time
                       ? new Date( tx.Status.block_time * 1000 ).toUTCString()
                       : new Date( Date.now() ).toUTCString(),
-                    transactionType: 'Sent',
+                    transactionType: TransactionType.SENT,
                     amount: tx.SentAmount,
                     accountType:
                     accountType === SUB_PRIMARY_ACCOUNT
@@ -561,7 +561,7 @@ export default class AccountUtilities {
                     date: tx.Status.block_time
                       ? new Date( tx.Status.block_time * 1000 ).toUTCString()
                       : new Date( Date.now() ).toUTCString(),
-                    transactionType: 'Received',
+                    transactionType: TransactionType.RECEIVED,
                     amount: tx.ReceivedAmount,
                     accountType:
                     accountType === SUB_PRIMARY_ACCOUNT
@@ -637,12 +637,19 @@ export default class AccountUtilities {
           addresses.forEach( address => {
             if( activeAddresses.external[ address ] ){
               activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
-              if( tx.transactionType === 'Received' ) tx.sender = idx( activeAddresses.external[ address ].assignee, _ => _.senderInfo.name )
+              if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.name )
+              else if( tx.transactionType === TransactionType.SENT ) {
+                const recipientInfo = idx( activeAddresses.external[ address ], _ => _.assignee.recipientInfo )
+                if( recipientInfo && recipientInfo.txid === tx.txid ) tx.receivers =  recipientInfo.details
+              }
             } else if( activeAddresses.internal[ address ] ){
               activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
-              if( tx.transactionType === 'Received' ) tx.sender = idx( activeAddresses.internal[ address ].assignee, _ => _.senderInfo.name )
-            }
-          } )
+              if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.internal[ address ], _ => _.assignee.senderInfo.name )
+              else if( tx.transactionType === TransactionType.SENT ) {
+                const recipientInfo = idx( activeAddresses.internal[ address ], _ => _.assignee.recipientInfo )
+                if( recipientInfo && recipientInfo.txid === tx.txid ) tx.receivers =  recipientInfo.details
+              }
+            } } )
         } )
 
         // pop addresses from the activeAddresses if tx-conf > 6
@@ -748,7 +755,7 @@ export default class AccountUtilities {
     let latestSync = lastSynced
     const newTransactions = [] // delta transactions
     for ( const tx of transactions ) {
-      if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
+      if ( tx.status === 'Confirmed' && tx.transactionType === TransactionType.RECEIVED ) {
         if ( tx.blockTime > lastSynced ) newTransactions.push( tx )
         if ( tx.blockTime > latestSync ) latestSync = tx.blockTime
       }
