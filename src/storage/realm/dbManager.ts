@@ -204,8 +204,12 @@ const updateS3Services = async ( data ) => {
   console.log( 'updateS3Services', data )
   try {
     const dbRef = db.objects( schema.S3Services )
-    db.deleteAll( dbRef )
-    db.create( schema.S3Services, data, true )
+    if( dbRef && dbRef.length ){
+      let s3 = dbRef[ 0 ]
+      db.write( () => {
+        s3 = data
+      } )
+    } else db.create( schema.S3Services, data, true )
     return true
   } catch ( error ) {
     return false
@@ -223,7 +227,8 @@ const getS3Services = () => {
   try {
     const dbRef = db.objects( schema.S3Services )
     const s3Services = Array.from( dbRef )
-    if( s3Services.length > 0 ) {
+    console.log( 's3Services', JSON.stringify( s3Services ) )
+    if( s3Services && s3Services.length > 0 ) {
       return s3Services[ 0 ]
     } else {
       return {

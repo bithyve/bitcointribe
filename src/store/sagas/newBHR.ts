@@ -16,9 +16,9 @@ function* onPressKeeperChannelWorker( { payload } ) {
     const isLevel3Initialized = yield select( ( state ) => state.health.isLevel3Initialized )
     const isLevelTwoMetaShareCreated = yield select( ( state ) => state.health.isLevelTwoMetaShareCreated )
     const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
-    // const s3 = yield call( dbManager.getS3Services )
-    // console.log( 's3', s3 )
-    const metaSharesKeeper: MetaShare[] = []//[ ...s3.metaSharesKeeper ]
+    const s3 = yield call( dbManager.getS3Services )
+    console.log( 's3', s3 )
+    const metaSharesKeeper: MetaShare[] = [ ...s3.metaSharesKeeper ]
     console.log( 'currentLevel', currentLevel )
 
     if( currentLevel === 0 && value.id === 1 && levelHealth[ 0 ].levelInfo[ 0 ].status=='notSetup' ){
