@@ -1,9 +1,10 @@
-import { put, select } from 'redux-saga/effects'
+import { put, select, call } from 'redux-saga/effects'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import { generateMetaShare } from '../actions/health'
 import { navigateToHistoryPage, ON_PRESS_KEEPER, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError } from '../actions/newBHR'
 import { createWatcher } from '../utils/utilities'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
+import dbManager from '../../storage/realm/dbManager'
 
 function* onPressKeeperChannelWorker( { payload } ) {
   try {
@@ -15,7 +16,9 @@ function* onPressKeeperChannelWorker( { payload } ) {
     const isLevel3Initialized = yield select( ( state ) => state.health.isLevel3Initialized )
     const isLevelTwoMetaShareCreated = yield select( ( state ) => state.health.isLevelTwoMetaShareCreated )
     const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
-    const metaSharesKeeper = yield select( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
+    // const s3 = yield call( dbManager.getS3Services )
+    // console.log( 's3', s3 )
+    const metaSharesKeeper: MetaShare[] = []//[ ...s3.metaSharesKeeper ]
     console.log( 'currentLevel', currentLevel )
 
     if( currentLevel === 0 && value.id === 1 && levelHealth[ 0 ].levelInfo[ 0 ].status=='notSetup' ){

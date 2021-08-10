@@ -86,6 +86,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import { ActivityIndicator } from 'react-native-paper'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
+import dbManager from '../../storage/realm/dbManager'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -185,6 +186,7 @@ class ManageBackupNewBHR extends Component<
   QrBottomSheet: any;
   loaderBottomSheet: any
   knowMoreBottomSheet: any
+  metaSharesKeeper: MetaShare[]
 
   constructor( props ) {
     super( props )
@@ -193,7 +195,9 @@ class ManageBackupNewBHR extends Component<
     this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
-
+    // const s3 = dbManager.getS3Services()
+    // console.log( 's3', typeof s3, s3 )
+    // this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
     const obj = {
       shareType: '',
       updatedAt: 0,

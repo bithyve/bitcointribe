@@ -199,7 +199,6 @@ export const initHealthWatcher = createWatcher(
 )
 
 function* generateMetaSharesWorker( { payload } ) {
-  const s3Service: S3Service = yield select( ( state ) => state.health.service )
   const version = DeviceInfo.getVersion()
   const { level, SM, isUpgrade } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -235,8 +234,9 @@ function* generateLevel1SharesWorker( { payload } ){
   const { shares, smShares } = BHROperations.generateLevel1Shares( wallet.primaryMnemonic, wallet.secondaryMnemonic )
   const { encryptedPrimarySecrets, keeperShareIDs, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer, smShares )
   const { metaShares, oldMetaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer, secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
-  console.log( 'metaShares', metaShares )
+  console.log( 'generateLevel1SharesWorker metaShares', metaShares )
   if ( metaShares ) {
+    console.log( 'generateLevel1SharesWorker encryptedSecondarySecrets', encryptedSecondarySecrets )
     dbManager.updateWallet( {
       smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
     } )
@@ -373,7 +373,6 @@ function* updateHealthLevel2Worker( { payload } ) {
   }
   if ( !isLevelInitialized ) {
     yield put( switchS3LoaderKeeper( 'initLoader' ) )
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const s3 = yield call( dbManager.getS3Services )
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const Health: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -1130,7 +1129,6 @@ function* confirmPDFSharedWorker( { payload } ) {
   try {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const s3 = yield call( dbManager.getS3Services )
     const metaShare: MetaShare[] = [ ...s3.metaSharesKeeper ]
@@ -1279,14 +1277,11 @@ function* autoShareLevel2KeepersWorker( ) {
     console.log( 'AUTO SHARE LEVEL 2 STARTED' )
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
-    const service: S3Service = yield select( ( state ) => state.health.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const Contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    // const MetaShares: MetaShare[] = service.levelhealth.metaSharesKeeper
     const s3 = yield call( dbManager.getS3Services )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-    const walletId = service.levelhealth.walletId
-    const { walletName } = yield select( ( state ) => state.storage.wallet )
+    const { walletName, walletId }: Wallet = yield select( ( state ) => state.storage.wallet )
     const shareIds = []
     if( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.length == 6 ) {
       for ( let i = 2; i < levelHealth[ 1 ].levelInfo.length - 2; i++ ) {
@@ -1386,7 +1381,6 @@ function* setLevelToNotSetupStatusWorker( ) {
     yield put( switchS3LoaderKeeper( 'setToBaseStatus' ) )
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    // const service: S3Service = yield select( ( state ) => state.health.service )
     const s3 = yield call( dbManager.getS3Services )
     const wallet = yield call( dbManager.getWallet )
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
@@ -1447,7 +1441,7 @@ function* setHealthStatusWorker( ) {
     yield put( switchS3LoaderKeeper( 'healthExpiryStatus' ) )
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    const service: S3Service = yield select( ( state ) => state.health.service )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS
     const shareArray = []
     if( currentLevel && levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo ){
@@ -1460,7 +1454,7 @@ function* setHealthStatusWorker( ) {
           if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
             levelHealth[ 0 ].levelInfo[ i ].status = 'notAccessible'
             shareArray.push( {
-              walletId: service.getWalletId().data.walletId,
+              walletId: wallet.walletId,
               shareId: element2.shareId,
               reshareVersion: element2.reshareVersion,
               status: 'notAccessible',
@@ -1490,8 +1484,7 @@ function* createChannelAssetsWorker( { payload } ) {
     const { shareId } = payload
     const s3 = yield call( dbManager.getS3Services )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-    const service: S3Service = yield select( ( state ) => state.health.service )
-    const encryptedSecondaryShares: string[] = service.levelhealth.encryptedSMSecretsKeeper
+    const encryptedSecondaryShares: string[] = s3.encryptedSMSecretsKeeper
     if( MetaShares && MetaShares.length ){
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
@@ -1538,7 +1531,6 @@ function* downloadSMShareWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
     const { scannedData } = payload
     if( scannedData ) {
-      const s3Service = yield select( ( state ) => state.health.service )
       const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
       const walletId = wallet.walletId
       const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
@@ -1813,7 +1805,6 @@ export const downloadBackupDataWatcher = createWatcher(
 
 function* setupHealthWorker( { payload } ) {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-  const s3Service: S3Service = yield select( ( state ) => state.health.service )
   if ( levelHealth && levelHealth.length ) return
   const downloadedBackupData: {
     primaryData?: PrimaryStreamData;
@@ -1950,9 +1941,7 @@ function* updateKeeperInfoToChannelWorker( ) {
       }
     }
     yield put( putKeeperInfo( keeperInfo ) )
-    const service: S3Service = yield select( ( state ) => state.health.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const s3 = yield call( dbManager.getS3Services )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
@@ -2050,10 +2039,8 @@ function* acceptExistingContactRequestWorker( { payload } ) {
       }
     }
     yield put( putKeeperInfo( keeperInfo ) )
-    const service: S3Service = yield select( ( state ) => state.health.service )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    const walletId = service.levelhealth.walletId
-    const { walletName } = yield select( ( state ) => state.storage.wallet )
+    const { walletName, walletId } = yield select( ( state ) => state.storage.wallet )
     const contactInfo = {
       channelKey,
       contactsSecondaryChannelKey
@@ -2172,8 +2159,6 @@ function* setupLevelHealthWorker( { payload } ) {
       } ], level, 'SETUP_LEVEL_HEALTH' ) )
     } else {
       if ( level == 2 || level == 3 ) {
-        const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-        const s3Service: S3Service = yield select( ( state ) => state.health.service )
         const levelInfo: LevelInfo[] = [
           {
             shareType: 'securityQuestion',
@@ -2247,36 +2232,43 @@ export const setupLevelHealthWatcher = createWatcher(
 
 function* retrieveMetaSharesWorker( ) {
   try {
-    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
-    // const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    // const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
-    // const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
-    // const levelData: LevelData[] = yield select( ( state ) => state.health.levelData )
-    // const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    // const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    // // TODO: => get MetaShares and Add to DB
-    // const keepers = []
-    // let channelKey
-    // if( contacts ){
-    //   for( const ck of Object.keys( contacts ) ){
-    //     channelKey=ck
-    //     if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER ){
-    //       const res = yield call( TrustedContacts.retrieveFromStream, {
-    //         walletId: wallet.walletId, channelKey, options: {
-    //           retrieveBackupData: true,
-    //         }
-    //       } )
-    //     }
+    yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
+    const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
+    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    // TODO: => get MetaShares and Add to DB
+    const Rk: MetaShare[] = []
+    const metaShares: MetaShare[] = []
+    let keepers:KeeperInfoInterface[] = []
+    if ( currentLevel === 2 ) keepers = keeperInfo.filter( word => word.scheme == '2of3' )
+    if ( currentLevel === 3 ) keepers = keeperInfo.filter( word => word.scheme == '3of5' )
 
-    //   }
-    // }
+    let channelKey
+    if( contacts ){
+      for( const ck of Object.keys( contacts ) ){
+        channelKey=ck
+        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER ){
+          const res = yield call( TrustedContacts.retrieveFromStream, {
+            walletId: wallet.walletId, channelKey, options: {
+              retrieveBackupData: true,
+            }
+          } )
+          if( res.backupData && res.backupData.primaryMnemonicShard ){
+            Rk.push( res.backupData.primaryMnemonicShard )
+          }
+        }
+      }
+    }
+    for ( let i = 0; i < keepers.length; i++ ) {
+      const element = keepers[ i ]
+      metaShares[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId )
+    }
+    // TODO: => store metaShares to DB and reducer
 
-    // if( res.backupData && res.backupData.primaryMnemonicShard ) {
-    //   console.log( 'res.backupData.primaryMnemonicShard', res.backupData.primaryMnemonicShard )
-    // }
-    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+    yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
   } catch ( error ) {
-    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+    yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
     console.log( 'Error EF channel', error )
   }
 }
