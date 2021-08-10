@@ -339,7 +339,8 @@ export default function RestoreSelectedContactsList( props ) {
           console.log( {
             KEY
           } )
-          dispatch( downloadMShare( KEY, null, 'recovery' ) )
+          // Removed this method
+          // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
           Alert.alert(
             'Key Exists',
@@ -348,7 +349,8 @@ export default function RestoreSelectedContactsList( props ) {
         }
       } else if ( key ) {
         // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
-        dispatch( downloadMShare( key, null, 'recovery' ) )
+        // Removed this method
+        // dispatch( downloadMShare( key, null, 'recovery' ) )
       }
     },
     [ RECOVERY_SHARES ],

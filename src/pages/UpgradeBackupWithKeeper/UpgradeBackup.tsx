@@ -251,7 +251,7 @@ class UpgradeBackup extends Component<
   }
 
   componentDidMount = () => {
-    this.props.checkMSharesHealth()
+    // this.props.checkMSharesHealth()
     const { trustedContactsInfo, overallHealth } = this.props
     let TotalKeeper = 1
     let keepersInfo: {shareId: string; type: string; count: number; contactDetails?: any; status?: boolean}[] = [ {
@@ -305,7 +305,8 @@ class UpgradeBackup extends Component<
       this.props.updateLevelToSetup( this.props.currentLevel + 1 )
       this.props.generateMetaShare( this.props.currentLevel + 1 )
       if( !this.props.isSmMetaSharesCreatedFlag ){
-        this.props.generateSMMetaShares()
+        // REMOVED from SAGA and action
+        // this.props.generateSMMetaShares()
       }
     }
     this.ProcessInfoBottomSheet.current.snapTo( 1 )
@@ -542,7 +543,8 @@ class UpgradeBackup extends Component<
       updateLevelToSetup( currentLevel + 1 )
       generateMetaShare( currentLevel + 1 )
       if( !isSmMetaSharesCreatedFlag ){
-        generateSMMetaShares()
+        // REMOVED from SAGA and action
+        // generateSMMetaShares()
       }
     }
 
@@ -599,7 +601,8 @@ class UpgradeBackup extends Component<
     } else {
       this.props.generateMetaShare( levelToSetup, true )
       if( !this.props.isSmMetaSharesCreatedFlag ){
-        this.props.generateSMMetaShares( this.state.secondaryMnemonics )
+        // REMOVED from SAGA and action
+        // this.props.generateSMMetaShares( this.state.secondaryMnemonics )
       }
     }
   };

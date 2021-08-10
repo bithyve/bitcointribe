@@ -13,6 +13,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
 
@@ -74,7 +75,7 @@ function* cloudWorker( { payload } ) {
       // Create Updated Wallet Image
       const shares = RK ? JSON.stringify( RK ) : ''
       let encryptedCloudDataJson
-      const getWI = yield call( S3Service.fetchWalletImage, wallet.walletId )
+      const getWI = yield call( BHROperations.fetchWalletImage, wallet.walletId )
       if( getWI.status == 200 ){
         console.log( 'getWI.data.walletImage', JSON.stringify( getWI.data.walletImage ) )
         encryptedCloudDataJson = yield call( WIEncryption,

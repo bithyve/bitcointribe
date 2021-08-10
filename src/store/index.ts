@@ -135,15 +135,12 @@ import walletRescanningReducer from './reducers/wallet-rescanning'
 
 import {
   initHealthWatcher,
-  checkSharesHealthWatcher,
   updateSharesHealthWatcher,
   generateMetaSharesWatcher,
   updateHealthLevel2Watcher,
   recoverWalletFromIcloudWatcher,
   recoverWalletHealthWatcher,
-  downloadMetaShareHealthWatcher,
   cloudMetaShareHealthWatcher,
-  fetchWalletImageHealthWatcher,
   recoverMnemonicHealthWatcher,
   getPDFDataWatcher,
   sharePDFWatcher,
@@ -151,8 +148,6 @@ import {
   updatedKeeperInfoWatcher,
   updateWalletImageHealthWatcher,
   emptyShareTransferDetailsForContactChangeWatcher,
-  removeUnwantedUnderCustodySharesWatcher,
-  generateSMMetaSharesWatcher,
   deletePrivateDataWatcher,
   autoShareLevel2KeepersWatcher,
   setLevelToNotSetupStatusWatcher,
@@ -166,7 +161,8 @@ import {
   updateKeeperInfoToChannelWatcher,
   acceptExistingContactRequestWatcher,
   setupPasswordWatcher,
-  setupLevelHealthWatcher
+  setupLevelHealthWatcher,
+  generateLevel1SharesWatcher
 } from './sagas/health'
 
 import {
@@ -282,15 +278,12 @@ const rootSaga = function* () {
 
     // Health
     initHealthWatcher,
-    checkSharesHealthWatcher,
     updateSharesHealthWatcher,
     generateMetaSharesWatcher,
     updateHealthLevel2Watcher,
     recoverWalletFromIcloudWatcher,
     recoverWalletHealthWatcher,
-    downloadMetaShareHealthWatcher,
     cloudMetaShareHealthWatcher,
-    fetchWalletImageHealthWatcher,
     updateWalletImageHealthWatcher,
     recoverMnemonicHealthWatcher,
     getPDFDataWatcher,
@@ -298,8 +291,6 @@ const rootSaga = function* () {
     confirmPDFSharedWatcher,
     updatedKeeperInfoWatcher,
     emptyShareTransferDetailsForContactChangeWatcher,
-    removeUnwantedUnderCustodySharesWatcher,
-    generateSMMetaSharesWatcher,
     deletePrivateDataWatcher,
     autoShareLevel2KeepersWatcher,
     setLevelToNotSetupStatusWatcher,
@@ -314,6 +305,7 @@ const rootSaga = function* () {
     acceptExistingContactRequestWatcher,
     setupPasswordWatcher,
     setupLevelHealthWatcher,
+    generateLevel1SharesWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

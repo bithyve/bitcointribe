@@ -841,34 +841,6 @@ export default class LevelHealth {
     }
   };
 
-  public checkHealthKeeper = async (): Promise<{
-    data: {};
-  }> => {
-    let response = {
-    }
-    let res: AxiosResponse
-    try {
-      res = await BH_AXIOS.post( 'checkSharesHealth2', {
-        HEXA_ID,
-        walletID: this.walletId,
-      } )
-      response = res
-    } catch ( err ) {
-      if ( err.response ) throw new Error( err.response.data.err )
-      if ( err.code ) throw new Error( err.code )
-      response = err
-    }
-    if( res.data ){
-      return {
-        data: res.data
-      }
-    }
-    else return {
-      data: response
-    }
-
-  };
-
   public updateHealthLevel2 = async ( SecurityQuestionHealth, _level ): Promise<{
     success: boolean;
     message: string;
@@ -1592,57 +1564,6 @@ export default class LevelHealth {
     }
   };
 
-  public fetchWalletImage = async (): Promise<{
-    walletImage: WalletImage;
-  }> => {
-    // disabled legacy WI fetch; use WI fetch from Relay.ts
-    try {
-      // let res: AxiosResponse
-      // try {
-      //   res = await BH_AXIOS.post( 'fetchWalletImage', {
-      //     HEXA_ID,
-      //     walletID: this.walletId,
-      //   } )
-      // } catch ( err ) {
-      //   if ( err.response ) throw new Error( err.response.data.err )
-      //   if ( err.code ) throw new Error( err.code )
-      // }
-      // const { encryptedImage } = res.data
-      // if ( !encryptedImage ) throw new Error()
-
-      // const { walletImage } = this.decryptWI( encryptedImage )
-      // console.log( {
-      //   walletImage
-      // } )
-      return {
-        walletImage: {
-        }
-      }
-    } catch ( err ) {
-      throw new Error( 'Failed to fetch Wallet Image' )
-    }
-  };
-
-  public updateGuardianInMetaShare = async (
-    shareId: string,
-    name: string,
-  ) : Promise<{
-   data: MetaShare[];
-  }> => {
-    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
-      const element = this.metaSharesKeeper[ i ]
-      console.log( 'updateGuardianInMetaShare Guardian name', name )
-      if( element.shareId == shareId ){
-        console.log( 'updateGuardianInMetaShare element.shareId inside if', shareId )
-        this.metaSharesKeeper[ i ].meta.guardian = name.toLowerCase().trim()
-      }
-    }
-    console.log( 'updateGuardianInMetaShare outside for', this.metaSharesKeeper )
-    return {
-      data: this.metaSharesKeeper
-    }
-  }
-
   public static encryptWithAnswer = (
     secretsToEncrypt: string,
     answer: string,
@@ -1685,110 +1606,6 @@ export default class LevelHealth {
     }
   };
 
-  public static uploadPDFPrimaryShare = async (
-    share: string,
-    messageId?: string,
-  ): Promise<{success : Boolean}> => {
-    console.log( 'uploadPDFPrimaryShare messageId', messageId )
-    let res: AxiosResponse
-    try {
-      res = await BH_AXIOS.post( 'uploadPDFShare', {
-        HEXA_ID,
-        share,
-        messageId
-      } )
-    } catch ( err ) {
-      if ( err.response ) throw new Error( err.response.data.err )
-      if ( err.code ) throw new Error( err.code )
-    }
-    return res.data
-  };
-
-   public static uploadPDFSecondaryShare = async (
-     share: string,
-     messageId?: string,
-   ): Promise<{success : Boolean}> => {
-     console.log( 'uploadPDFSecondaryShare messageId', messageId )
-     let res: AxiosResponse
-     try {
-       res = await BH_AXIOS.post( 'uploadPDFSecondaryShare', {
-         HEXA_ID,
-         share,
-         messageId
-       } )
-     } catch ( err ) {
-       if ( err.response ) throw new Error( err.response.data.err )
-       if ( err.code ) throw new Error( err.code )
-     }
-     console.log( 'uploadPDFSecondaryShare res', res )
-     return res.data
-   };
-
-  public static removeUnwantedUnderCustody = async (
-    metaShares: MetaShare[],
-  ): Promise<{
-    updationInfo: Array<{
-      walletId: string;
-      shareId: string;
-      updated: boolean;
-      updatedAt?: number;
-      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
-      err?: string;
-    }>;
-  }> => {
-    if ( metaShares.length === 0 ) {
-      throw new Error( 'No metaShare supplied' )
-    }
-
-    const toUpdate: Array<{
-      walletId: string;
-      shareId: string;
-      reshareVersion: number;
-    }> = []
-    for ( const metaShare of metaShares ) {
-      toUpdate.push( {
-        walletId: metaShare.meta.walletId,
-        shareId: metaShare.shareId,
-        reshareVersion: metaShare.meta.reshareVersion,
-      } )
-    }
-
-    let res: AxiosResponse
-    try {
-      res = await BH_AXIOS.post( 'removeUnwantedUnderCustody', {
-        HEXA_ID,
-        toUpdate,
-      } )
-    } catch ( err ) {
-      if ( err.response ) throw new Error( err.response.data.err )
-      if ( err.code ) throw new Error( err.code )
-    }
-
-    const { updationInfo } = res.data
-    return {
-      updationInfo
-    }
-  };
-
-  public generateSMShares = ( secondaryMnemonics: string ): {
-    shares: string[];
-  } => {
-    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
-    const shares = secrets.share(
-      this.stringToHex( secondaryMnemonics.trim() ),
-      config.SSS_LEVEL1_TOTAL,
-      config.SSS_LEVEL1_THRESHOLD,
-    )
-
-    for ( let itr = 0; itr < shares.length; itr++ ) {
-      const checksum = LevelHealth.calculateChecksum( shares[ itr ] )
-      shares[ itr ] = shares[ itr ] + checksum
-    }
-
-    return {
-      shares
-    }
-  };
   public createSMMetaSharesKeeper = (
     secondaryMnemonic: string,
     tag: string,
@@ -1851,21 +1668,6 @@ export default class LevelHealth {
     }
   };
 
-  public updateKeeperInfoToMetaShare = ( keeperInfo: any, answer: string ): { metaShares: MetaShare[], oldMetaShares: MetaShare[]; } => {
-    const { encryptedString } = LevelHealth.encryptWithAnswer( JSON.stringify( keeperInfo ), answer )
-    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
-      this.metaSharesKeeper[ i ].meta.encryptedKeeperInfo = encryptedString
-    }
-    if( this.oldMetaSharesKeeper && this.oldMetaSharesKeeper.length ){
-      for ( let i = 0; i < this.oldMetaSharesKeeper.length; i++ ) {
-        this.oldMetaSharesKeeper[ i ].meta.encryptedKeeperInfo = encryptedString
-      }
-    }
-    return {
-      metaShares: this.metaSharesKeeper, oldMetaShares: this.oldMetaSharesKeeper
-    }
-  };
-
   public static getMnemonics = ( secretsArray: string[], answer: string, isPrimary?: boolean ) => {
     const { decryptedSecrets } = LevelHealth.decryptSecrets( secretsArray, answer )
     const shareArr = isPrimary ? [] : decryptedSecrets
@@ -1883,33 +1685,4 @@ export default class LevelHealth {
       mnemonic: LevelHealth.hexToString( recoveredMnemonicHex )
     }
   }
-
-  public static downloadSMPDFShare = async ( messageId: string, key: string ): Promise<
-    | {
-        status: number;
-        metaShare: MetaShare;
-      }
-    | {
-        status: number;
-        metaShare: MetaShare;
-      }
-  > => {
-    let res: AxiosResponse
-    try {
-      res = await BH_AXIOS.post( 'downloadPDFSecondaryShare', {
-        HEXA_ID,
-        messageId,
-      } )
-    } catch ( err ) {
-      if ( err.response ) throw new Error( err.response.data.err )
-      if ( err.code ) throw new Error( err.code )
-    }
-    console.log( 'downloadSMPDFShare res', res )
-    const { decryptedMetaShare } = LevelHealth.decryptMetaShare( res.data.share, key )
-
-    const { share } = res.data
-    return {
-      status: 200, metaShare: decryptedMetaShare
-    }
-  };
 }

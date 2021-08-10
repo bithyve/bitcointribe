@@ -1212,7 +1212,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       )
                     } else {
                       if ( custodyRequest.isQR ) {
-                        downloadMShare( custodyRequest.ek, custodyRequest.otp )
+                        // removed this method
+                        // downloadMShare( custodyRequest.ek, custodyRequest.otp )
                       } else {
                         navigation.navigate( 'CustodianRequestOTP', {
                           custodyRequest,

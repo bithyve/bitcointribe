@@ -58,7 +58,7 @@ function* initLevelsWorker( { payload } ) {
         }
       } )
       // Update Health to reducer
-      yield put( checkMSharesHealth() )
+      // yield put( checkMSharesHealth() )
       yield put( isUpgradeLevelInitializedStatus() )
       if ( level == 2 ) yield put( isLevel2InitializedStatus() )
       if ( level == 3 ) {
@@ -130,7 +130,8 @@ function* autoShareSecondaryWorker( { payload } ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
+    // updateKeeperInfoToMetaShare Got removed
+    // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
@@ -239,7 +240,8 @@ function* autoShareContactKeeperWorker( { payload } ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
+    // updateKeeperInfoToMetaShare Got removed
+    // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )

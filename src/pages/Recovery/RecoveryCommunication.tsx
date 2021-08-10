@@ -267,7 +267,8 @@ export default function RecoveryCommunication( props ) {
         shareIndex, key
       } )
       if ( shareIndex && key ) {
-        dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
+        // Removed this method
+        // dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
       } else if ( shareIndex ) {
         const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[ shareIndex ]
 
@@ -276,7 +277,8 @@ export default function RecoveryCommunication( props ) {
           console.log( {
             KEY
           } )
-          dispatch( downloadMShare( KEY, null, 'recovery' ) )
+          // Removed this method
+          // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
           Alert.alert(
             'Key Exists',
@@ -285,7 +287,8 @@ export default function RecoveryCommunication( props ) {
         }
       } else if ( key ) {
         // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
-        dispatch( downloadMShare( key, null, 'recovery' ) )
+        // Removed this method
+        // dispatch( downloadMShare( key, null, 'recovery' ) )
       }
     },
     [ RECOVERY_SHARES ],

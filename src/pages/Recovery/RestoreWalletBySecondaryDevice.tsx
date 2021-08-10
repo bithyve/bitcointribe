@@ -115,10 +115,10 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             }
 
             // downloadSecret(index, recoveryRequest.publicKey);
-
-            dispatch(
-              downloadMShare( recoveryRequest.publicKey, null, 'recovery', 0 ),
-            )
+            // Removed this method
+            // dispatch(
+            //   downloadMShare( recoveryRequest.publicKey, null, 'recovery', 0 ),
+            // )
 
             setTimeout( () => {
               props.navigation.navigate( 'RestoreSelectedContactsList' )
@@ -231,9 +231,10 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             >
               <TouchableOpacity
                 onPress={() => {
-                  dispatch(
-                    downloadMShare( REQUEST_DETAILS.KEY, null, 'recovery' ),
-                  )
+                  // Removed this method
+                  // dispatch(
+                  //   downloadMShare( REQUEST_DETAILS.KEY, null, 'recovery' ),
+                  // )
                   props.navigation.goBack()
                 }}
                 disabled={!!META_SHARE}

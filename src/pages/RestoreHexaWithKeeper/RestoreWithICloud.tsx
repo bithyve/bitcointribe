@@ -324,7 +324,7 @@ class RestoreWithICloud extends Component<
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
       setVersion( 'Restored' )
       initNewBHRFlow( true )
-      checkMSharesHealth()
+      // checkMSharesHealth()
       walletCheckIn()
       // if ( this.loaderBottomSheet as any )
       //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
@@ -799,12 +799,12 @@ class RestoreWithICloud extends Component<
           console.log( {
             KEY,
           } )
-
-          this.props.downloadMShare( {
-            encryptedKey: KEY,
-            downloadType: 'recovery',
-            replaceIndex: shareIndex,
-          } )
+          // Removed this method
+          // this.props.downloadMShare( {
+          //   encryptedKey: KEY,
+          //   downloadType: 'recovery',
+          //   replaceIndex: shareIndex,
+          // } )
         }
       }
       this.setState( {

@@ -84,7 +84,8 @@ export default function CustodianRequestOTP( props ) {
   const onOTPSubmit = () => {
     if ( passcode.join( '' ).length !== 6 || !ek ) return
     setIsConfirmDisabled( true )
-    dispatch( downloadMShare( ek, passcode.join( '' ) ) )
+    // Removed this method
+    // dispatch( downloadMShare( ek, passcode.join( '' ) ) )
   }
 
   const { UNDER_CUSTODY } = useSelector(

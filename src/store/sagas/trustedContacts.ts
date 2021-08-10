@@ -54,6 +54,7 @@ import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth } from '../actions/health'
 import { getNextFreeAddressWorker } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 
 export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -504,13 +505,25 @@ export const removeTrustedContactWatcher = createWatcher(
 
 function* restoreTrustedContactsWorker( { payload }: { payload: { walletId: string, channelKeys: string[] }} ) {
   const { walletId, channelKeys } = payload
+  // const { }
   const restoredTrustedContacts: Trusted_Contacts = yield call( TrustedContactsOperations.restoreTrustedContacts, {
     walletId, channelKeys
   } )
+  // Reducer update
   yield put( updateTrustedContacts( restoredTrustedContacts ) )
+  // DB update
   for ( const [ key, value ] of Object.entries( restoredTrustedContacts ) ) {
     yield call( dbManager.updateContact, value )
   }
+  // TODO: => get MetaShares and Add to DB
+  // const res = yield call( TrustedContacts.retrieveFromStream, {
+  //   walletId, channelKey, options: {
+  //     retrieveBackupData: true,
+  //   }
+  // } )
+  // if( res.backupData && res.backupData.primaryMnemonicShard ) {
+  //   console.log( 'res.backupData.primaryMnemonicShard', res.backupData.primaryMnemonicShard )
+  // }
 }
 
 export const restoreTrustedContactsWatcher = createWatcher(
