@@ -11,6 +11,7 @@ import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constant
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
+import idx from 'idx'
 
 
 const { REQUEST_TIMEOUT } = config
@@ -636,10 +637,10 @@ export default class AccountUtilities {
           addresses.forEach( address => {
             if( activeAddresses.external[ address ] ){
               activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
-              if( tx.transactionType === 'Received' ) tx.sender = activeAddresses.external[ address ].assignee.sender
+              if( tx.transactionType === 'Received' ) tx.sender = idx( activeAddresses.external[ address ].assignee, _ => _.senderInfo.name )
             } else if( activeAddresses.internal[ address ] ){
               activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
-              if( tx.transactionType === 'Received' ) tx.sender = activeAddresses.external[ address ].assignee.sender
+              if( tx.transactionType === 'Received' ) tx.sender = idx( activeAddresses.internal[ address ].assignee, _ => _.senderInfo.name )
             }
           } )
         } )

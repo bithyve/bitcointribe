@@ -55,7 +55,9 @@ function* processRecipients( accountShell: AccountShell ){
           const assigneeInfo: ActiveAddressAssignee = {
             type: accountShell.primarySubAccount.type,
             id: accountShell.primarySubAccount.id,
-            sender: accountShell.primarySubAccount.customDisplayName,
+            senderInfo: {
+              name: accountShell.primarySubAccount.customDisplayName
+            },
           }
           const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, assigneeInfo )
           recipients.push( {

@@ -359,7 +359,7 @@ export default class AccountOperations {
               index: itr,
               assignee: {
                 type: account.type,
-                id: account.id
+                id: account.id,
               },
             } // include out of bound(soft-refresh range) ext address
           found = true

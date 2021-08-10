@@ -362,7 +362,9 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const assigneeInfo: ActiveAddressAssignee = {
     type: AccountType.FNF_ACCOUNT,
     id: contactInfo.channelKey,
-    sender: contactInfo.contactDetails.contactName,
+    senderInfo: {
+      name: contactInfo.contactDetails.contactName
+    },
   }
   for( const shell of accountsState.accountShells ){
     const { primarySubAccount } = shell

@@ -798,7 +798,13 @@ export interface UTXO {
 export interface ActiveAddressAssignee{
     type: AccountType;
     id?: string;
-    sender?: string;
+    senderInfo?: {
+      name: string,
+    };
+    recipientInfo?: {
+      txid: string,
+      name: string,
+    };
 }
 export interface ActiveAddresses {
   external: {
