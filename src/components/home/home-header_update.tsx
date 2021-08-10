@@ -241,7 +241,7 @@ const HomeHeader = ( {
         }}>
           <View
             style={{
-              marginBottom: wp( '2%' ),
+              marginBottom: hp( '1.8%' ),
               justifyContent: 'center',
               alignItems: 'flex-start',
             }}
@@ -445,7 +445,7 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 25 ),
-    marginBottom: wp( '1%' ),
+    marginBottom: wp( '1.8%' ),
   },
   cardBitCoinImage: {
     width: wp( '3.5%' ),

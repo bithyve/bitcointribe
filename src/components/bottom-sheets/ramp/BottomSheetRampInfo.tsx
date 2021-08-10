@@ -53,6 +53,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   useRampReservationFetchEffect( {
     onSuccess: () => {
       openLink( rampHostedUrl )
+      onClickSetting()
     },
     onFailure: () => {
       setHasButtonBeenPressed( true )

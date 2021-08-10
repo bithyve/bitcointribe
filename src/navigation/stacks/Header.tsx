@@ -32,6 +32,7 @@ import NotificationListContent from '../../components/NotificationListContent'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
+import Colors from '../../common/Colors'
 import idx from 'idx'
 import { v4 as uuid } from 'uuid'
 import moment from 'moment'
@@ -1369,24 +1370,36 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currentLevel,
     } = this.props
     return (
-      <ImageBackground
-        source={require( '../../assets/images/home-bg.png' )}
+      // <ImageBackground
+      //   source={require( '../../assets/images/home-bg.png' )}
+      //   style={{
+      //     width: '100%',
+      //     height: '100%',
+      //     flex: 1,
+      //   }}
+      //   imageStyle={{
+      //     resizeMode: 'stretch',
+      //   }}
+      // >
+      <View
         style={{
-          width: '100%',
-          height: '100%',
-          flex: 1,
-        }}
-        imageStyle={{
-          resizeMode: 'stretch',
+          height: heightPercentageToDP( '21.33%' ),
+          backgroundColor: Colors.blue,
+          paddingTop:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch
+                  ? heightPercentageToDP( '4%' )
+                  : 0,
         }}
       >
-        <View
+        <ImageBackground
+          source={require( '../../assets/images/home-bg.png' )}
           style={{
-            height: heightPercentageToDP( '21%' ),
-            paddingTop:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch
-                  ? heightPercentageToDP( '5%' )
-                  : 0,
+            width: '100%',
+            height: '100%',
+            flex: 1,
+          }}
+          imageStyle={{
+            resizeMode: 'stretch',
           }}
         >
           <HomeHeader
@@ -1411,8 +1424,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           >
             {this.renderBottomSheetContent()}
           </ModalContainer>
-        </View>
-      </ImageBackground>
+        </ImageBackground>
+      </View>
     )
   }
 }
