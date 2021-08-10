@@ -25,7 +25,14 @@ export type SendingState = {
     isSuccessful: boolean,
 
     // data elements carried over to the next send stage(2)
-    carryOver: { txPrerequisites: TransactionPrerequisite } | null;
+    carryOver: {
+      txPrerequisites: TransactionPrerequisite,
+      recipients: {
+      address: string;
+      amount: number;
+      name?: string
+    }[]
+    } | null;
   };
 
   customPriorityST1: {
@@ -180,9 +187,11 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
       case SEND_STAGE1_EXECUTED:
         const transactionFeeInfo: TransactionFeeInfo = state.transactionFeeInfo
         let txPrerequisites: TransactionPrerequisite
+        let recipients
         if( action.payload.successful ){
           const carryOver = action.payload.carryOver
           txPrerequisites = carryOver.txPrerequisites
+          recipients = carryOver.recipients
           Object.keys( txPrerequisites ).forEach( ( priority ) =>{
             transactionFeeInfo[ priority.toUpperCase() ].amount = txPrerequisites[ priority ].fee
             transactionFeeInfo[ priority.toUpperCase() ].estimatedBlocksBeforeConfirmation = txPrerequisites[ priority ].estimatedBlocks
@@ -196,7 +205,8 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             failedErrorMessage: !action.payload.successful? action.payload.err : null,
             isSuccessful: action.payload.successful,
             carryOver: {
-              txPrerequisites
+              txPrerequisites,
+              recipients,
             }
           },
           transactionFeeInfo
