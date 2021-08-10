@@ -806,8 +806,7 @@ export interface ActiveAddressAssignee{
       name: string,
     };
     recipientInfo?: {
-      txid: string,
-      details: {name: string, amount: number}[],
+      [txid: string]: {name: string, amount: number}[],
     };
 }
 export interface ActiveAddresses {

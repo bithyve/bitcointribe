@@ -640,14 +640,14 @@ export default class AccountUtilities {
               if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.name )
               else if( tx.transactionType === TransactionType.SENT ) {
                 const recipientInfo = idx( activeAddresses.external[ address ], _ => _.assignee.recipientInfo )
-                if( recipientInfo && recipientInfo.txid === tx.txid ) tx.receivers =  recipientInfo.details
+                if( recipientInfo ) tx.receivers =  recipientInfo[ tx.txid ]
               }
             } else if( activeAddresses.internal[ address ] ){
               activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
               if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.internal[ address ], _ => _.assignee.senderInfo.name )
               else if( tx.transactionType === TransactionType.SENT ) {
                 const recipientInfo = idx( activeAddresses.internal[ address ], _ => _.assignee.recipientInfo )
-                if( recipientInfo && recipientInfo.txid === tx.txid ) tx.receivers =  recipientInfo.details
+                if( recipientInfo ) tx.receivers =  recipientInfo[ tx.txid ]
               }
             } } )
         } )
