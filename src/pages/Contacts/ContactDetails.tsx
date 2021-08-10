@@ -478,7 +478,7 @@ class ContactDetails extends PureComponent<
       contacts.relationType == TrustedContactRelationTypes.WARD )
     ) {
       Alert.alert(
-        'Restore request failed',
+        'Recover request failed',
         'You are not a keeper of the selected contact'
       )
       return
@@ -654,7 +654,7 @@ class ContactDetails extends PureComponent<
     return (
       <SendViaQR
         headerText={'Encrypted Exit Key'}
-        subHeaderText={'You should scan the QR to restore Personal Copy'}
+        subHeaderText={'You should scan the QR to recover Personal Copy'}
         contactText={''}
         contact={this.contact}
         QR={this.state.encryptedExitKey}
@@ -1037,7 +1037,7 @@ class ContactDetails extends PureComponent<
                     </Text>
                     {encryptedExitKey ? (
                       <Text numberOfLines={1} style={styles.buttonInfo}>
-                        {'Help restore PDF'}
+                        {'Help recover PDF'}
                       </Text>
                     ) : null}
                   </View>

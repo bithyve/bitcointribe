@@ -199,7 +199,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             marginBottom: 22
           }}>
             <HeaderTitle
-              firstLineTitle={'Restore wallet using'}
+              firstLineTitle={'Recover wallet using'}
               secondLineTitle={'Keeper Device'}
               infoTextNormal={
                 'Use the Recovery Key stored in your Keeper device. '

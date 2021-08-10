@@ -79,7 +79,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
             <Text style={{
               fontFamily: Fonts.FiraSansMediumItalic
             }}>
-              _unknown_
+              Unknown
             </Text>
           )}
         </ListItem.Subtitle>

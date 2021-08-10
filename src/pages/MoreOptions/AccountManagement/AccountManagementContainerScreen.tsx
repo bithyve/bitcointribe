@@ -23,6 +23,8 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
 import ModalContainer from '../../../components/home/ModalContainer'
+import { resetStackToAccountDetails, resetToHomeAction } from '../../../navigation/actions/NavigationActions'
+import { NavigationActions, StackActions } from 'react-navigation'
 
 
 export type Props = {
@@ -128,9 +130,18 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           if( primarySubAccount && ( primarySubAccount.visibility == AccountVisibility.ARCHIVED || primarySubAccount.visibility == AccountVisibility.HIDDEN ) )
             setAccountVisibility( primarySubAccount.visibility )
           changeVisisbility( accounShell, AccountVisibility.DEFAULT )
+          const resetAction = StackActions.reset( {
+            index: 0,
+            actions: [
+              NavigationActions.navigate( {
+                routeName: 'Landing'
+              } )
+            ],
+          } )
+
+          navigation.dispatch( resetAction )
           navigation.navigate( 'AccountDetails', {
             accountShellID: accounShell.id,
-            swanDeepLinkContent: null
           } )
           showUnHideArchiveModal( false )
         }

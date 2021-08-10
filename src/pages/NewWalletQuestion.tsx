@@ -1283,7 +1283,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Backup lets you restore your wallet even if you lose your phone. Manage from '}
+            infoText={'Backup lets you recover your wallet even if you lose your phone. Manage from '}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />
