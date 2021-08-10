@@ -542,9 +542,7 @@ function* recoverWalletWorker( { payload } ) {
 
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
-    console.log( {
-      err: err.message
-    } )
+    console.log( err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )
   }

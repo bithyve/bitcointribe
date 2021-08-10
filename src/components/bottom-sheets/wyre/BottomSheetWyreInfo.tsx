@@ -46,13 +46,14 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   const wyreReceiveAddress = useReceivingAddressFromAccount( AccountType.WYRE_ACCOUNT, pickReceiveAddressFrom )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   function handleProceedButtonPress() {
-    if( !hasButtonBeenPressed ){dispatch( fetchWyreReservation() )}
+    if( !hasButtonBeenPressed ){dispatch( fetchWyreReservation( wyreReceiveAddress ) )}
     setHasButtonBeenPressed( true )
   }
 
   useWyreReservationFetchEffect( {
     onSuccess: () => {
       openLink( wyreHostedUrl )
+      onClickSetting()
     },
     onFailure: () => {
       setHasButtonBeenPressed( true )

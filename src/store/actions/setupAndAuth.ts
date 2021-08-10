@@ -2,7 +2,7 @@
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
 export const SETUP_WALLET = 'SETUP_WALLET'
-export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
+
 export const WALLET_SETUP_COMPLETION = 'WALLET_SETUP_COMPLETION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
@@ -30,13 +30,7 @@ export const credsAuth = ( passcode, reLogin? ) => {
     }
   }
 }
-export const updateWalletName = ( walletName: string ) => {
-  return {
-    type: UPDATE_WALLET_NAME, payload: {
-      walletName
-    }
-  }
-}
+
 
 export const setupWallet = ( walletName: string, security: { questionId: string, question: string, answer: string } ) => {
   return {

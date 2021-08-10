@@ -51,6 +51,8 @@ export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
 export const FETCH_RECEIVE_ADDRESS = 'FETCH_RECEIVE_ADDRESS'
 export const FETCH_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_RECEIVE_ADDRESS_SUCCEEDED'
 export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
+export const MARK_READ_TRANSACTION = 'MARK_READ_TRANSACTION'
+export const MARK_ACCOUNT_CHECKED = 'MARK_ACCOUNT_CHECKED'
 
 export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
 export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
@@ -74,6 +76,24 @@ export const setAllAccountsData = ( accounts ) => {
   }
 }
 
+export const markAccountChecked = ( shellId: string ) => {
+  return {
+    type: MARK_ACCOUNT_CHECKED,
+    payload: {
+      shellId
+    },
+  }
+}
+
+export const markReadTx = ( txId: string, shellId: string ) => {
+  return {
+    type: MARK_READ_TRANSACTION,
+    payload: {
+      txId,
+      shellId
+    },
+  }
+}
 
 export const fetchBalanceTx = (
   serviceType: string,

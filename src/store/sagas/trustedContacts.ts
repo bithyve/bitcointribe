@@ -13,6 +13,8 @@ import {
   EDIT_TRUSTED_CONTACT,
   RESTORE_CONTACTS,
   RESTORE_TRUSTED_CONTACTS,
+  UPDATE_WALLET_NAME_TO_CHANNEL,
+  UPDATE_WALLET_NAME,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -54,7 +56,27 @@ import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth } from '../actions/health'
 import { getNextFreeAddressWorker } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
+import { updateWalletNameToChannel } from '../actions/trustedContacts'
+import { updateWallet } from '../actions/storage'
+
+function* updateWalletWorker( { payload } ) {
+  const { walletName }: { walletName: string } = payload
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+
+  yield put( updateWallet( {
+    ...wallet, walletName: walletName
+  } ) )
+  yield call( dbManager.updateWallet, {
+    walletName,
+  } )
+  yield call( dbManager.getWallet )
+  yield put( updateWalletImageHealth() )
+  yield put ( updateWalletNameToChannel() )
+}
+
+export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
 export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -261,6 +283,49 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
 export const syncPermanentChannelsWatcher = createWatcher(
   syncPermanentChannelsWorker,
   SYNC_PERMANENT_CHANNELS,
+)
+
+function* updateWalletNameToAllChannel() {
+  const channelUpdates = []
+  const service: S3Service = yield select( ( state ) => state.health.service )
+  const walletId = service.levelhealth.walletId
+  const { walletName } = yield select( ( state ) => state.storage.wallet )
+  const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+  Object.keys( contacts ).forEach( channelKey => {
+    const contactInfo = {
+      channelKey,
+    }
+    const primaryData: PrimaryStreamData = {
+      walletName,
+    }
+    const streamUpdates: UnecryptedStreamData = {
+      streamId: TrustedContacts.getStreamId( walletId ),
+      primaryData,
+      metaData: {
+        flags:{
+          active: true,
+          newData: true,
+          lastSeen: Date.now(),
+        },
+        version: DeviceInfo.getVersion()
+      }
+    }
+    // initiate permanent channel
+    const channelUpdate =  {
+      contactInfo, streamUpdates
+    }
+    channelUpdates.push( channelUpdate )
+  } )
+
+  yield put( syncPermanentChannels( {
+    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+    channelUpdates: channelUpdates,
+  } ) )
+}
+
+export const updateWalletNameToChannelWatcher = createWatcher(
+  updateWalletNameToAllChannel,
+  UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
 function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {

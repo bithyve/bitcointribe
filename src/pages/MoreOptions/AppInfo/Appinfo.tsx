@@ -33,7 +33,7 @@ import SecurityQuestion from './SecurityQuestion'
 import EnterPasscodeScreen from './EnterPasscodeScreen'
 import EditWalletName from './EditWalletName'
 import EditWalletSuccess from './EditWalletSuccess'
-import { updateWalletName } from '../../../store/actions/setupAndAuth'
+import { updateWalletName } from '../../../store/actions/trustedContacts'
 interface MenuOption {
     title: string;
     subtitle: string;

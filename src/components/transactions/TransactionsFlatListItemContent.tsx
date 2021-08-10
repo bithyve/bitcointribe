@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { StyleSheet, Image } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { ListItem, Icon } from 'react-native-elements'
 import moment from 'moment'
 import Colors from '../../common/Colors'
@@ -61,6 +61,11 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
   return (
     <>
+      {
+        transaction.isNew &&(
+          <View style={styles.dot}/>
+        )
+      }
       <Icon
         style={styles.transactionKindIcon}
         name={transactionKindIconName}
@@ -71,7 +76,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title style={styles.titleText} numberOfLines={1}>
-          {transaction.accountName? transaction.accountName: transaction.accountType}
+          {transaction.transactionType === TransactionKind.RECEIVE ? transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType ) : transaction.accountName? transaction.accountName: transaction.accountType}
         </ListItem.Title>
         <ListItem.Subtitle style={styles.subtitleText}>
           {formattedDateText}
@@ -150,6 +155,14 @@ const styles = StyleSheet.create( {
   amountText: {
     fontFamily: Fonts.OpenSans,
     fontSize: RFValue( 17 ),
+  },
+
+  dot: {
+    height: 7,
+    width: 7,
+    backgroundColor: 'tomato',
+    borderRadius: 5,
+    marginRight: 5,
   },
 } )
 

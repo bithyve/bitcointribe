@@ -46,13 +46,14 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
     type: AccountType.DEPOSIT_ACCOUNT
   } ]
   function handleProceedButtonPress() {
-    if( !hasButtonBeenPressed && rampFromBuyMenu ){dispatch( fetchRampReservation() )}
+    if( !hasButtonBeenPressed && rampFromBuyMenu ){dispatch( fetchRampReservation( rampReceiveAddress ) )}
     setHasButtonBeenPressed( true )
   }
 
   useRampReservationFetchEffect( {
     onSuccess: () => {
       openLink( rampHostedUrl )
+      onClickSetting()
     },
     onFailure: () => {
       setHasButtonBeenPressed( true )

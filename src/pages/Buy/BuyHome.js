@@ -35,7 +35,7 @@ const BuyMenu = () => {
       }}
     >
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      <Header fromScreen={'Buy'} />
+      {/* <Header fromScreen={'Buy'} /> */}
       <BuyContainer containerView={styles.accountCardsSectionContainer} />
 
     </ImageBackground>

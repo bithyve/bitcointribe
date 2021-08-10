@@ -38,11 +38,10 @@ export const clearWyreCache = ( ) => {
 export interface WyreReservationFetchAction extends Action {
   type: typeof FETCH_WYRE_RESERVATION;
   payload: {
+    address: string,
     amount?: number;
     currencyCode?: string;
     country?: string;
-    instance?: number;
-    sourceKind?: SourceAccountKind;
   };
 }
 
@@ -55,16 +54,15 @@ export interface WyreReceiveAddressFetchAction extends Action {
 }
 
 export const fetchWyreReservation = (
+  address: string,
   amount?: number,
   currencyCode?: string,
   country?: string,
-  instance?: number,
-  sourceKind?: SourceAccountKind,
 ): WyreReservationFetchAction => {
   return {
     type: FETCH_WYRE_RESERVATION,
     payload: {
-      amount, currencyCode, country, instance, sourceKind
+      address, amount, currencyCode, country
     },
   }
 }
