@@ -23,6 +23,9 @@ export default function useReceivingAddressFromAccount(
 
     const assigneeInfo: ActiveAddressAssignee = {
       type: pickAddressFor,
+      senderInfo: {
+        name: pickAddressFor === AccountType.WYRE_ACCOUNT? 'Wyre': 'Ramp'
+      }
     }
     switch( pickAddressFor ) {
         case AccountType.WYRE_ACCOUNT:

@@ -30,6 +30,10 @@ export interface TransactionPrerequisite {
   [txnPriority: string]: TransactionPrerequisiteElements
 }
 
+export enum TransactionType {
+  RECEIVED = 'Received',
+  SENT = 'Sent',
+}
 export interface Transaction {
   txid: string;
   status: string;
@@ -48,7 +52,7 @@ export interface Transaction {
   /**
    * Inbound(Received)/Outbound(Sent) transaction
    */
-  transactionType: string;
+  transactionType: TransactionType;
 
   /**
    * Amount in Satoshis.
@@ -99,8 +103,8 @@ export interface Transaction {
   type?: string
   // sender name
   sender?: string
-  // receiver name
-  receiver?: string
+  // receivers info
+  receivers?: {name: string, amount: number}[]
   // txn tags
   tags?: string[]
   // txn notes
@@ -798,7 +802,13 @@ export interface UTXO {
 export interface ActiveAddressAssignee{
     type: AccountType;
     id?: string;
-    sender?: string;
+    senderInfo?: {
+      name: string,
+    };
+    recipientInfo?: {
+      txid: string,
+      details: {name: string, amount: number}[],
+    };
 }
 export interface ActiveAddresses {
   external: {
