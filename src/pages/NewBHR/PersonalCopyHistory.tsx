@@ -51,6 +51,7 @@ import { historyArray } from '../../common/CommonVars/commonVars'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import dbManager from '../../storage/realm/dbManager'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -104,9 +105,8 @@ const PersonalCopyHistory = ( props ) => {
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
-  const MetaShares: MetaShare[] = useSelector(
-    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
-  )
+  const s3 = dbManager.getS3Services()
+  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useSelector(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -533,7 +533,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"sas","channelId":"acd93b9dc1ed80ad0e0b0dc997e3375efff3e943d2f7b16fab314d40cd8908fa","streamId":"9ac2d678e","channelKey":"LkidfBLLgY5sWG272zqVvXrW","secondaryChannelKey":"pcYV5kMTFM3VDvCJevWlb25c","version":"1.9.0","walletId":"41b18c3f78b9b5e43ac200f47baef8f2613dcb1674f6407de196adc8da914bdb","encryptedKey":"68a2110634e053657687cc06e4dfe456142e34cdb2469145a398ceff9573f3cece4b7fd53b935c0c05d41ddac8e17653f0744ae3a5da10b38d553e18bf653c5e5646e5ab3e1e460b6c3beb632cac2ab1"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Scas","channelId":"236d6eb91d0f0837fc751bbd1b1e5c81094442d818c0ef976d7d501eda3d121a","streamId":"e9a6b3880","channelKey":"avNYpA15zG6xh24jOraFHjJw","secondaryChannelKey":"129fd4D5Gz9R6szzTAJTpPnh","version":"1.9.0","walletId":"de6a159f6a77b88748f0620cad45f614b66f46652d9318b253d66dfe847ab459","encryptedKey":"95ad66a7354de9920e93bf47f77aa82030b51a6c56605ddb8290dbc4617fedb5a83b4827460677dcb7c6c7f62df441f30526752ce8e9ac4863ffc588eb8732c5e7e9e68c3fb83135aff214b9b816c540"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {

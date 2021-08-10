@@ -378,12 +378,12 @@ class ManageBackupNewBHR extends Component<
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
-      if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
+      if ( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
           refreshControlLoader: true,
           showLoader: true
         } )
-      } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
+      } else if ( ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
         this.setState( {
           refreshControlLoader: false,
           showLoader: false
@@ -422,7 +422,7 @@ class ManageBackupNewBHR extends Component<
     }
 
     if (
-      prevProps.initLoading !== this.props.initLoading && this.props.metaSharesKeeper.length == 3
+      prevProps.initLoading !== this.props.initLoading && this.metaSharesKeeper.length == 3
     ) {
       const obj = {
         id: 2,
@@ -455,7 +455,7 @@ class ManageBackupNewBHR extends Component<
     }
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && prevProps.metaSharesKeeper.length == 3 && this.props.metaSharesKeeper.length == 5
+      JSON.stringify( this.metaSharesKeeper ) && prevProps.metaSharesKeeper.length == 3 && this.metaSharesKeeper.length == 5
     ) {
       const obj = {
         id: 2,
@@ -1135,7 +1135,7 @@ Wallet Backup
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2 &&
-                  this.props.metaSharesKeeper.length != 5
+                  this.metaSharesKeeper.length != 5
                   ) {
                     this.props.generateMetaShare( selectedLevelId )
                   } else if( selectedLevelId == 3 ) {
@@ -1145,7 +1145,7 @@ Wallet Backup
                       id: selectedLevelId,
                       selectedKeeper: {
                         ...selectedKeeper, name: name, shareType: type,
-                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.metaSharesKeeper[ 1 ] ? this.metaSharesKeeper[ 1 ].shareId: '' : this.metaSharesKeeper[ 4 ] ? this.metaSharesKeeper[ 4 ].shareId : ''
                       },
                       isSetup: true,
                     }
@@ -1235,7 +1235,7 @@ Wallet Backup
                   id: selectedLevelId,
                   selectedKeeper: {
                     ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.metaSharesKeeper[ 1 ] ? this.metaSharesKeeper[ 1 ].shareId: '' : this.metaSharesKeeper[ 4 ] ? this.metaSharesKeeper[ 4 ].shareId : ''
                   },
                   isSetup: true,
                 }
