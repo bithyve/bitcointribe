@@ -282,7 +282,7 @@ export default function Receive( props ) {
             }}>
               <BottomInfoBox
                 title="Note"
-                infoText="It would take some time for the sats to reflect in your account based on the network condition"
+                infoText="It would take some time for the sats to reflect in your account based on the network congestion"
               />
             </View>
           </View>

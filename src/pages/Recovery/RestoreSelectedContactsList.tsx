@@ -503,12 +503,12 @@ export default function RestoreSelectedContactsList( props ) {
         }
       >
         <HeaderTitle
-          firstLineTitle={'Restore wallet using'}
+          firstLineTitle={'Recover wallet using'}
           secondLineTitle={'Recovery Keys'}
           infoTextNormal={
             'These are the Recovery Keys that you have stored in five places. '
           }
-          infoTextBold={'You need three of them restore your wallet'}
+          infoTextBold={'You need three of them recover your wallet'}
         />
         <TouchableOpacity
           style={{

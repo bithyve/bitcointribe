@@ -20,6 +20,7 @@ import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accoun
 import openLink from '../../../utils/OpenLink'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
 import { ListItem } from 'react-native-elements'
+import BottomInfoBox from '../../BottomInfoBox'
 
 const swanAccountCount = 0
 
@@ -139,6 +140,13 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             ...styles.modalInfoText,
 
           }}>{swanMessage}</Text>
+          <BottomInfoBox
+            backgroundColor={Colors.white}
+            title={'Note'}
+            infoText={
+              'Please register with Swan Bitcoin to use this account'
+            }
+          />
           {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
           ||
           swanAccountCreationStatus == SwanAccountCreationStatus.ACCOUNT_CREATED ) ? renderAccount() : null}
@@ -267,7 +275,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
@@ -281,8 +289,8 @@ const styles = StyleSheet.create( {
     color: Colors.black,
   },
   successModalHeaderView: {
-    marginRight: wp( '10%' ),
-    marginLeft: wp( '4%' ),
+    marginRight: wp( '7%' ),
+    // marginLeft: wp( '5%' ),
     marginTop: wp( '5%' ),
     // flex: 1.7
   },
@@ -291,16 +299,16 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 10
+    marginLeft: wp( '6%' )
   },
   modalInfoText: {
-    marginLeft: wp( '3%' ),
+    marginLeft: wp( '6%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
     // marginTop: wp( 1 ),
-    marginBottom: wp( 10 ),
+    marginBottom: wp( 4 ),
     marginRight: wp( 5 ),
     lineHeight: 18,
     letterSpacing: 0.6

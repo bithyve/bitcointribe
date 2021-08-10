@@ -6,6 +6,7 @@ import { Account, AccountType, ScannedAddressKind } from '../../bitcoin/utilitie
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import AccountShell from '../../common/data/models/AccountShell'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 const SAMPLE_ADDRESS = '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8'
 
@@ -76,7 +77,9 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
             padding: 6, marginLeft: 'auto'
           }}
         >
-          <Text style={FormStyles.hintText}>
+          <Text style={[ FormStyles.hintText, {
+            marginRight: widthPercentageToDP( 4 )
+          } ]}>
             Send it to a sample address!
           </Text>
         </TouchableOpacity>

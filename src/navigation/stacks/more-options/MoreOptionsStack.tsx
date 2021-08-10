@@ -22,6 +22,7 @@ import Intermediate from '../../../pages/Intermediate'
 import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
 import AppInfo from '../../../pages/MoreOptions/AppInfo/Appinfo'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -110,6 +111,13 @@ const MoreOptionsStack = createStackNavigator(
       screen: VersionHistoryScreen,
       navigationOptions: {
         title: 'Version History',
+      },
+    },
+    AccountDetails: {
+      screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
       },
     },
   },
