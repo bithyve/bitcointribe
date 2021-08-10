@@ -53,6 +53,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   useWyreReservationFetchEffect( {
     onSuccess: () => {
       openLink( wyreHostedUrl )
+      onClickSetting()
     },
     onFailure: () => {
       setHasButtonBeenPressed( true )
