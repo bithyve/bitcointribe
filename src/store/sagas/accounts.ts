@@ -415,8 +415,18 @@ function* autoSyncShellsWorker( ) {
   const donationShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
-      if( shell.primarySubAccount.type !== AccountType.DONATION_ACCOUNT ) shellsToSync.push( shell )
-      else donationShellsToSync.push( shell )
+      switch( shell.primarySubAccount.type ){
+          case AccountType.TEST_ACCOUNT:
+          // skip test account auto-sync
+            break
+
+          case AccountType.DONATION_ACCOUNT:
+            donationShellsToSync.push( shell )
+            break
+
+          default:
+            shellsToSync.push( shell )
+      }
     }
   }
 
@@ -556,7 +566,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
 
   const accountShell = new AccountShell( {
     primarySubAccount,
-    unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
+    unit: account.networkType === NetworkType.TESTNET ? BitcoinUnit.TSATS: BitcoinUnit.SATS,
     displayOrder: 1
   } )
   accountShell.syncStatus = SyncStatus.COMPLETED
@@ -892,8 +902,18 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts }: {pay
   const shellsToSync: AccountShell[] = []
   const donationShellsToSync: AccountShell[] = []
   for ( const shell of newAccountShells ) {
-    if( shell.primarySubAccount.type !== AccountType.DONATION_ACCOUNT ) shellsToSync.push( shell )
-    else donationShellsToSync.push( shell )
+    switch( shell.primarySubAccount.type ){
+        case AccountType.TEST_ACCOUNT:
+          // skip test account auto-sync
+          break
+
+        case AccountType.DONATION_ACCOUNT:
+          donationShellsToSync.push( shell )
+          break
+
+        default:
+          shellsToSync.push( shell )
+    }
   }
 
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
