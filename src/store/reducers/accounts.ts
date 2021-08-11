@@ -56,7 +56,6 @@ const ACCOUNT_VARS: AccountVars  = {
 }
 
 export type AccountsState = {
-  servicesEnriched: boolean;
   accountsSynched: boolean;
   testCoinsReceived: boolean,
 
@@ -110,7 +109,6 @@ export type AccountsState = {
 };
 
 const initialState: AccountsState = {
-  servicesEnriched: false,
   accountsSynched: false,
   exchangeRates: null,
   testCoinsReceived: false,

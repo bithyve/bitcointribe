@@ -14,14 +14,12 @@ import {
   isUpgradeLevelInitializedStatus,
   CONFIRM_PDF_SHARED_UPGRADE,
 } from '../actions/upgradeToNewBhr'
-import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
+import { healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
-import { insertDBWorker } from './storage'
 import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements, Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setCloudData } from '../actions/cloud'
-import semver from 'semver'
 import Relay from '../../bitcoin/utilities/Relay'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 
@@ -51,11 +49,11 @@ function* initLevelsWorker( { payload } ) {
         ...SERVICES,
         S3_SERVICE: JSON.stringify( s3Service ),
       }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        }
-      } )
+      // yield call( insertDBWorker, {
+      //   payload: {
+      //     SERVICES: updatedSERVICES
+      //   }
+      // } )
       // Update Health to reducer
       // yield put( checkMSharesHealth() )
       yield put( isUpgradeLevelInitializedStatus() )
@@ -156,11 +154,11 @@ function* autoShareSecondaryWorker( { payload } ) {
         S3_SERVICE: JSON.stringify( s3Service ),
         TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
       }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        },
-      } )
+      // yield call( insertDBWorker, {
+      //   payload: {
+      //     SERVICES: updatedSERVICES
+      //   },
+      // } )
       yield put( updateMSharesHealth( [
         {
           walletId: walletId,
@@ -276,11 +274,11 @@ function* autoShareContactKeeperWorker( { payload } ) {
           S3_SERVICE: JSON.stringify( s3Service ),
           TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
         }
-        yield call( insertDBWorker, {
-          payload: {
-            SERVICES: updatedSERVICES
-          },
-        } )
+        // yield call( insertDBWorker, {
+        //   payload: {
+        //     SERVICES: updatedSERVICES
+        //   },
+        // } )
         yield put( updateMSharesHealth( {
           walletId: walletId,
           shareId: shareId,

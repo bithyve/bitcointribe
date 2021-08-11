@@ -1007,17 +1007,6 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@expo/websql@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@expo/websql/-/websql-1.0.1.tgz#fff0cf9c1baa1f70f9e1d658b7c39a420d9b10a9"
-  integrity sha1-//DPnBuqH3D54dZYt8OaQg2bEKk=
-  dependencies:
-    argsarray "^0.0.1"
-    immediate "^3.2.2"
-    noop-fn "^1.0.0"
-    pouchdb-collections "^1.0.1"
-    tiny-queue "^0.2.1"
-
 "@gorhom/bottom-sheet@^1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-1.4.1.tgz#5a9028ea243b93e0f31044b5aada58fd183f9b23"
@@ -2136,7 +2125,7 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
-argsarray@0.0.1, argsarray@^0.0.1:
+argsarray@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/argsarray/-/argsarray-0.0.1.tgz#6e7207b4ecdb39b0af88303fa5ae22bda8df61cb"
   integrity sha1-bnIHtOzbObCviDA/pa4ivajfYcs=
@@ -4345,14 +4334,6 @@ expo-secure-store@^9.2.0:
   resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-9.3.0.tgz#b716d5d115cc50a34037d1afef84fe4b8ea0745c"
   integrity sha512-dNhKcoUUn+1kmEfFVxSU7h+YsqODqlExZQJcQgxgeiuCeeDvJWkE10t3jjrO6aNfrdM5i/X2l3oh401EDslWsQ==
 
-expo-sqlite@^8.4.0:
-  version "8.5.0"
-  resolved "https://registry.yarnpkg.com/expo-sqlite/-/expo-sqlite-8.5.0.tgz#236b87b72b6855a01db8869514dfa2da3da563ac"
-  integrity sha512-8VMFrjagl8qE+BWqdacl2I0KLwF6SPMFHqJHHB5vlT/cxOi4PAk1SpmCIvALgZhrtO6UXG6eOG27gICONZtlVg==
-  dependencies:
-    "@expo/websql" "^1.0.1"
-    lodash "^4.17.15"
-
 extend-shallow@^1.1.2:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/extend-shallow/-/extend-shallow-1.1.4.tgz#19d6bf94dfc09d76ba711f39b872d21ff4dd9071"
@@ -5153,11 +5134,6 @@ image-size@^0.6.0:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.6.3.tgz#e7e5c65bb534bd7cdcedd6cb5166272a85f75fb2"
   integrity sha512-47xSUiQioGaB96nqtp5/q55m0aBQSQdyIloMOc/x+QVTDZLNmXE892IIDrJ0hM1A5vcNUDD5tDffkSP5lCaIIA==
-
-immediate@^3.2.2:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.3.0.tgz#1aef225517836bcdf7f2a2de2600c79ff0269266"
-  integrity sha512-HR7EVodfFUdQCTIeySw+WDRFJlPcLOJbXfwwZ7Oom6tjsvZ3bOkCDJHehQC3nxJrv7+f9XecwazynjU8e4Vw3Q==
 
 import-fresh@^2.0.0:
   version "2.0.0"
@@ -7355,11 +7331,6 @@ node-stream-zip@^1.9.1:
   resolved "https://registry.yarnpkg.com/node-stream-zip/-/node-stream-zip-1.12.0.tgz#f69af78799531b928662f4900d345387fa0b3777"
   integrity sha512-HZ3XehqShTFj9gHauRJ3Bri9eiCTOII7/crtXzURtT14NdnOFs9Ia5E82W7z3izVBNx760tqwddxrBJVG52Y1Q==
 
-noop-fn@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/noop-fn/-/noop-fn-1.0.0.tgz#5f33d47f13d2150df93e0cb036699e982f78ffbf"
-  integrity sha1-XzPUfxPSFQ35PgywNmmemC94/78=
-
 normalize-package-data@^2.3.2, normalize-package-data@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/normalize-package-data/-/normalize-package-data-2.5.0.tgz#e66db1838b200c1dfc233225d12cb36520e234a8"
@@ -7945,11 +7916,6 @@ posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
-
-pouchdb-collections@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/pouchdb-collections/-/pouchdb-collections-1.0.1.tgz#fe63a17da977611abef7cb8026cb1a9553fd8359"
-  integrity sha1-/mOhfal3YRq+98uAJssalVP9g1k=
 
 prebuild-install@^6.1.1:
   version "6.1.3"
@@ -10124,11 +10090,6 @@ tiny-queue@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/tiny-queue/-/tiny-queue-0.2.0.tgz#c49fcb5c87555be1b4a5df7eb87101d5b78bc9dc"
   integrity sha1-xJ/LXIdVW+G0pd9+uHEB1beLydw=
-
-tiny-queue@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/tiny-queue/-/tiny-queue-0.2.1.tgz#25a67f2c6e253b2ca941977b5ef7442ef97a6046"
-  integrity sha1-JaZ/LG4lOyypQZd7XvdELvl6YEY=
 
 tiny-secp256k1@^1.1.1, tiny-secp256k1@^1.1.3:
   version "1.1.6"
