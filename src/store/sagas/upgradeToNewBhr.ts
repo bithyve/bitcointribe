@@ -237,11 +237,11 @@ function* autoShareContactKeeperWorker( { payload } ) {
     }
     const walletId = wallet.walletId
     const { SERVICES } = yield select( ( state ) => state.storage.database )
-
+    const secondaryMetaShares: MetaShare[] = [ ...s3.encryptedSMSecretsKeeper ]
     const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
     // updateKeeperInfoToMetaShare Got removed
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
-    const secondaryMetaShares: MetaShare[] = [ ...s3.encryptedSMSecretsKeeper ]
+
     const trustedContacts: any = yield select( ( state ) => state.trustedContacts.service )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     for ( let i = 0; i < shareIds.length; i++ ) {
