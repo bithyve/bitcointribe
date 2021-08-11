@@ -215,7 +215,7 @@ function* generateLevel1SharesWorker( { payload } ){
     dbManager.updateWallet( {
       smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
     } )
-    dbManager.updateS3Services( {
+    dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
       encryptedSMSecretsKeeper: encryptedSecondarySecrets,
@@ -244,7 +244,7 @@ function* generateLevel2SharesWorker( { payload } ){
   const { level, secureAssets, version } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   // const walletDB = yield call( dbManager.getWallet )
-  const s3 = yield call( dbManager.getS3Services )
+  const s3 = yield call( dbManager.getBHR )
   console.log( 's3', Array.from( s3 ) )
   const existingMetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const existingEncryptedSecondarySecrets: string[] = [ ...s3.encryptedSMSecretsKeeper ]
@@ -252,7 +252,7 @@ function* generateLevel2SharesWorker( { payload } ){
   const { encryptedPrimarySecrets, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
   const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer,  secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
-    dbManager.updateS3Services( {
+    dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
       encryptedSMSecretsKeeper: existingEncryptedSecondarySecrets,
@@ -348,7 +348,7 @@ function* updateHealthLevel2Worker( { payload } ) {
   }
   if ( !isLevelInitialized ) {
     yield put( switchS3LoaderKeeper( 'initLoader' ) )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const Health: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
@@ -963,7 +963,7 @@ function* confirmPDFSharedWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const metaShare: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const walletId = wallet.walletId
     const answer = yield select( ( state ) => state.storage.wallet.security.answer )
@@ -1112,7 +1112,7 @@ function* autoShareLevel2KeepersWorker( ) {
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const Contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const { walletName, walletId }: Wallet = yield select( ( state ) => state.storage.wallet )
     const shareIds = []
@@ -1214,7 +1214,7 @@ function* setLevelToNotSetupStatusWorker( ) {
     yield put( switchS3LoaderKeeper( 'setToBaseStatus' ) )
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const wallet = yield call( dbManager.getWallet )
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     let toDelete:LevelInfo[]
@@ -1315,7 +1315,7 @@ export const setHealthStatusWatcher = createWatcher(
 function* createChannelAssetsWorker( { payload } ) {
   try {
     const { shareId } = payload
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const encryptedSecondaryShares: string[] = s3.encryptedSMSecretsKeeper
     if( MetaShares && MetaShares.length ){
@@ -1406,7 +1406,7 @@ export const downloadSMShareWatcher = createWatcher(
 function* createOrChangeGuardianWorker( { payload: data } ) {
   try {
     const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = data
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const contactInfo = {
       channelKey,
@@ -1680,7 +1680,7 @@ function* setupHealthWorker( { payload } ) {
       levelInfo: levelInfo,
     } ], level, 'setupHealthWatcher' ) )
   } else {
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     let isLevelInitialized = yield select(
       ( state ) => state.bhr.isLevel3Initialized
@@ -1776,7 +1776,7 @@ function* updateKeeperInfoToChannelWorker( ) {
     yield put( putKeeperInfo( keeperInfo ) )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const wallet = yield call( dbManager.getWallet )
     const { walletName } = yield select( ( state ) => state.storage.wallet )
@@ -2121,7 +2121,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
     const isLevel3Initialized = yield select( ( state ) => state.bhr.isLevel3Initialized )
     const isLevelTwoMetaShareCreated = yield select( ( state ) => state.bhr.isLevelTwoMetaShareCreated )
     const isLevel2Initialized = yield select( ( state ) => state.bhr.isLevel2Initialized )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     console.log( 's3', s3 )
     const metaSharesKeeper: MetaShare[] = [ ...s3.metaSharesKeeper ]
     console.log( 'currentLevel', currentLevel )
