@@ -18,7 +18,6 @@ import { healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedS
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements, Wallet } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setCloudData } from '../actions/cloud'
 import Relay from '../../bitcoin/utilities/Relay'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -131,7 +130,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const trustedContacts: any = yield select( ( state ) => state.trustedContacts.service )
     const share: MetaShare = metaShares.find( value => value.shareId == shareId )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     const oldKeeperInfo  = trustedContactsInfo[ 'Secondary Device'.toLowerCase() ]
@@ -241,7 +240,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const trustedContacts: any = yield select( ( state ) => state.trustedContacts.service )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     for ( let i = 0; i < shareIds.length; i++ ) {
       const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName

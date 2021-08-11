@@ -30,7 +30,6 @@ import {
   Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
 import SmallHeaderModal from '../../components/SmallHeaderModal'

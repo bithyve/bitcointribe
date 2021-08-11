@@ -146,7 +146,6 @@ export default BuyMenu
 // import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 // import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 // import config from '../../bitcoin/HexaConfig'
-// import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 // //import HomeHeader from '../../components/home/home-header'
 // import idx from 'idx'
 // import { v4 as uuid } from 'uuid'
@@ -306,7 +305,6 @@ export default BuyMenu
 //     fetchFeeAndExchangeRates: any;
 //     createTempSwanAccountInfo: any;
 //     addTransferDetails: any;
-//     trustedContacts: TrustedContactsService;
 //     isFocused: boolean;
 //     notificationListNew: any;
 //     notificationsUpdated: any;
@@ -1887,7 +1885,6 @@ export default BuyMenu
 //         secureAccount: idx(state, (_) => _.accounts[SECURE_ACCOUNT].service),
 //         s3Service: idx(state, (_) => _.bhr.service),
 //         overallHealth: idx(state, (_) => _.sss.overallHealth),
-//         trustedContacts: idx(state, (_) => _.trustedContacts.service),
 //         notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
 //         currencyCode: idx(state, (_) => _.preferences.currencyCode),
 //         fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),

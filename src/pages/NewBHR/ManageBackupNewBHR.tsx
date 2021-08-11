@@ -1,16 +1,13 @@
-import React, { Component, lazy, Suspense } from 'react'
+import React, { Component } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   RefreshControl,
   ImageBackground,
-  Platform,
-  Switch,
   Image,
   InteractionManager
 } from 'react-native'
@@ -22,10 +19,6 @@ import {
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
@@ -67,21 +60,12 @@ import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBN
 import debounce from 'lodash.debounce'
 import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/BHR'
 import LevelStatus from '../../common/data/enums/LevelStatus'
-import Header from '../../navigation/stacks/Header'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { ListItem } from 'react-native-elements'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import ManageBackupCard from './ManageBackupCard'
-import { TrustedContactRelationTypes, UnecryptedStreamData } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import { TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
-import { ActivityIndicator } from 'react-native-paper'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import dbManager from '../../storage/realm/dbManager'

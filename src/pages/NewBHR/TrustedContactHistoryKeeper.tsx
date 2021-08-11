@@ -29,7 +29,6 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
 import HistoryPageComponent from './HistoryPageComponent'
-import TrustedContacts from './TrustedContacts'
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact'
 import moment from 'moment'
 import _ from 'underscore'
@@ -45,9 +44,6 @@ import {
   downloadSMShare,
 } from '../../store/actions/BHR'
 import { useDispatch } from 'react-redux'
-import SendViaLink from '../../components/SendViaLink'
-import SendViaQR from '../../components/SendViaQR'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
   KeeperInfoInterface,
   Keepers,

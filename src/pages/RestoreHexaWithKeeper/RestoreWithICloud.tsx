@@ -64,7 +64,6 @@ import { BackupStreamData, KeeperInfoInterface, MetaShare, PrimaryStreamData, Se
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import config from '../../bitcoin/HexaConfig'
 import { textWithoutEncoding, email } from 'react-native-communications'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import ContactListForRestore from './ContactListForRestore'
 import SendViaLink from '../../components/SendViaLink'
 import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
@@ -78,6 +77,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 
 import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -680,11 +680,11 @@ class RestoreWithICloud extends Component<
       number = number.slice( number.length - 10 ) // last 10 digits only
       const numHintType = 'num'
       const numHint = number[ 0 ] + number.slice( number.length - 2 )
-      const numberEncKey = TrustedContactsService.encryptPub(
+      const numberEncKey = TrustedContactsOperations.encryptData(
         // using TCs encryption mech
         REQUEST_DETAILS.KEY,
         number
-      ).encryptedPub
+      ).encryptedData
       const numberDL =
         `https://hexawallet.io/${config.APP_STAGE}/rk` +
         `/${requester}` +
@@ -705,10 +705,10 @@ class RestoreWithICloud extends Component<
       const Email = email.replace( '.com', '' )
       const emailHintType = 'eml'
       const emailHint = email[ 0 ] + Email.slice( Email.length - 2 )
-      const emailEncPubKey = TrustedContactsService.encryptPub(
+      const emailEncPubKey = TrustedContactsOperations.encryptData(
         REQUEST_DETAILS.KEY,
         email
-      ).encryptedPub
+      ).encryptedData
       const emailDL =
         `https://hexawallet.io/${config.APP_STAGE}/rk` +
         `/${requester}` +
@@ -723,10 +723,10 @@ class RestoreWithICloud extends Component<
       const otp = BHROperations.generateOTP( parseInt( config.SSS_OTP_LENGTH, 10 ) )
       const otpHintType = 'otp'
       const otpHint = 'xxx'
-      const otpEncPubKey = TrustedContactsService.encryptPub(
+      const otpEncPubKey = TrustedContactsOperations.encryptData(
         REQUEST_DETAILS.KEY,
         otp
-      ).encryptedPub
+      ).encryptedData
       const otpDL =
         `https://hexawallet.io/${config.APP_STAGE}/rk` +
         `/${requester}` +
@@ -1374,7 +1374,6 @@ const mapStateToProps = ( state ) => {
     },
     security: idx( state, ( _ ) => _.storage.wallet.security ),
     overallHealth: idx( state, ( _ ) => _.bhr.overallHealth ),
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     walletImageChecked: idx( state, ( _ ) => _.bhr.walletImageChecked ),
     SERVICES: idx( state, ( _ ) => _.storage.database.SERVICES ),
     walletRecoveryFailed: idx( state, ( _ ) => _.bhr.walletRecoveryFailed ),

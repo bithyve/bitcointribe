@@ -104,7 +104,6 @@ import idx from 'idx'
 import { restoreAccountShells } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
-import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, restoreTrustedContacts, syncPermanentChannels } from '../actions/trustedContacts'
@@ -767,7 +766,7 @@ function* getPDFDataWorker( { payload } ) {
         type: QRCodeTypes.RECOVERY_REQUEST,
         walletName: wallet.walletName,
         channelId: currentContact.permanentChannelAddress,
-        streamId: TrustedContacts.getStreamId( walletId ),
+        streamId: TrustedContactsOperations.getStreamId( walletId ),
         channelKey: channelKey,
         secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
@@ -781,7 +780,7 @@ function* getPDFDataWorker( { payload } ) {
         type: QRCodeTypes.RECOVERY_REQUEST,
         walletName: wallet.walletName,
         channelId: currentContact.permanentChannelAddress,
-        streamId: TrustedContacts.getStreamId( walletId ),
+        streamId: TrustedContactsOperations.getStreamId( walletId ),
         secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
         walletId
@@ -1154,7 +1153,7 @@ function* autoShareLevel2KeepersWorker( ) {
           keeperInfo
         }
         const streamUpdates: UnecryptedStreamData = {
-          streamId: TrustedContacts.getStreamId( walletId ),
+          streamId: TrustedContactsOperations.getStreamId( walletId ),
           primaryData,
           backupData,
           metaData: {
@@ -1379,7 +1378,7 @@ function* downloadSMShareWorker( { payload } ) {
           }
         }
       }
-      const res = yield call( TrustedContacts.retrieveFromStream, {
+      const res = yield call( TrustedContactsOperations.retrieveFromStream, {
         walletId, channelKey, options: {
           retrieveSecondaryData: true,
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
@@ -1449,7 +1448,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           keeperInfo
         }
         const streamUpdates: UnecryptedStreamData = {
-          streamId: TrustedContacts.getStreamId( walletId ),
+          streamId: TrustedContactsOperations.getStreamId( walletId ),
           primaryData,
           secondaryData,
           backupData,
@@ -1515,7 +1514,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           relationType: TrustedContactRelationTypes.CONTACT,
         }
         const streamUpdates: UnecryptedStreamData = {
-          streamId: TrustedContacts.getStreamId( walletId ),
+          streamId: TrustedContactsOperations.getStreamId( walletId ),
           primaryData,
           secondaryData: null,
           backupData: null,
@@ -1610,7 +1609,7 @@ function* downloadBackupDataWorker( { payload } ) {
       downloadedBackupData.push( backupData )
     } else {
       const qrDataObj = scannedData
-      const res = yield call( TrustedContacts.retrieveFromStream, {
+      const res = yield call( TrustedContactsOperations.retrieveFromStream, {
         walletId: qrDataObj.walletId,
         channelKey: qrDataObj.channelKey,
         options: {
@@ -1809,7 +1808,7 @@ function* updateKeeperInfoToChannelWorker( ) {
         }
 
         const streamUpdates: UnecryptedStreamData = {
-          streamId: TrustedContacts.getStreamId( wallet.walletId ),
+          streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
           primaryData,
           backupData,
           metaData: {
@@ -1885,7 +1884,7 @@ function* acceptExistingContactRequestWorker( { payload } ) {
       relationType: TrustedContactRelationTypes.KEEPER,
     }
     const streamUpdates: UnecryptedStreamData = {
-      streamId: TrustedContacts.getStreamId( walletId ),
+      streamId: TrustedContactsOperations.getStreamId( walletId ),
       primaryData,
       metaData: {
         flags:{
@@ -2082,7 +2081,7 @@ function* retrieveMetaSharesWorker( ) {
       for( const ck of Object.keys( contacts ) ){
         channelKey=ck
         if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER ){
-          const res = yield call( TrustedContacts.retrieveFromStream, {
+          const res = yield call( TrustedContactsOperations.retrieveFromStream, {
             walletId: wallet.walletId, channelKey, options: {
               retrieveBackupData: true,
             }

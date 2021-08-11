@@ -28,7 +28,6 @@ import {
 } from '../../common/CommonFunctions/index'
 import NotificationListContent from '../../components/NotificationListContent'
 // import AddContactAddressBook from '../Contacts/AddContactAddressBook'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import Colors from '../../common/Colors'
@@ -180,7 +179,6 @@ interface HomePropsTypes {
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   currentLevel: number;
-  trustedContacts: TrustedContactsService;
   isFocused: boolean;
   setCurrencyCode: any;
   currencyCode: any;
@@ -1378,7 +1376,6 @@ const mapStateToProps = ( state ) => {
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),

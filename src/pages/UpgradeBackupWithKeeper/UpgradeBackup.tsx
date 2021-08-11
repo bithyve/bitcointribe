@@ -63,7 +63,6 @@ import { setCloudDataForLevel, autoUploadSecondaryShare, autoShareContactKeeper,
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
@@ -128,7 +127,7 @@ interface UpgradeBackupPropsTypes {
   healthCheckInitializedKeeper: boolean;
   setCloudDataForLevel: any;
   addNewSecondarySubAccount: any;
-  trustedContacts: TrustedContactsService
+  trustedContacts: any;
   SHARES_TRANSFER_DETAILS: any;
   keeperProcessStatus: any;
   updatedKeeperInfo: any;
