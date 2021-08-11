@@ -63,9 +63,9 @@ const WalletInitializationScreen = props => {
         <View style={{
           ...styles.viewSetupWallet, paddingTop: wp( '10%' )
         }}>
-          <Text style={styles.headerTitleText}>Restore Wallet</Text>
+          <Text style={styles.headerTitleText}>Recover Wallet</Text>
           <Text style={styles.headerInfoText}>
-            If you would like to restore an existing Hexa Wallet
+            If you would like to recover an existing Hexa Wallet
           </Text>
           <TouchableOpacity
             onPress={async () => {

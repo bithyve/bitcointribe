@@ -239,7 +239,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           const notification: INotification = {
             notificationType: notificationType.FNF_KEEPER_REQUEST_ACCEPTED,
             title: 'Friends and Family notification',
-            body: `F&F keeper request approved by ${nameAssociatedByContact || wallet.walletName}`,
+            body: `F&F keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`,
             data: {
             },
             tag: notificationTag.IMP,
@@ -362,7 +362,9 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const assigneeInfo: ActiveAddressAssignee = {
     type: AccountType.FNF_ACCOUNT,
     id: contactInfo.channelKey,
-    sender: contactInfo.contactDetails.contactName,
+    senderInfo: {
+      name: contactInfo.contactDetails.contactName
+    },
   }
   for( const shell of accountsState.accountShells ){
     const { primarySubAccount } = shell

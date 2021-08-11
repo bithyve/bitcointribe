@@ -33,12 +33,12 @@ function* processRecipients( accountShell: AccountShell ){
     ( state ) => state.trustedContacts.contacts,
   )
 
-  const recipients: [
+  const recipients:
     {
       address: string;
       amount: number;
-    }?
-  ]  = []
+      name?: string
+    }[]  = []
 
   for( const recipient of selectedRecipients ){
     switch( recipient.kind ){
@@ -55,12 +55,15 @@ function* processRecipients( accountShell: AccountShell ){
           const assigneeInfo: ActiveAddressAssignee = {
             type: accountShell.primarySubAccount.type,
             id: accountShell.primarySubAccount.id,
-            sender: accountShell.primarySubAccount.customDisplayName,
+            senderInfo: {
+              name: accountShell.primarySubAccount.customDisplayName
+            },
           }
           const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, assigneeInfo )
           recipients.push( {
             address: recipientAddress,
             amount: recipient.amount,
+            name: recipientShell.primarySubAccount.customDisplayName
           } )
 
           break
@@ -68,6 +71,7 @@ function* processRecipients( accountShell: AccountShell ){
         case RecipientKind.CONTACT:
           const contact = trustedContacts[ ( recipient as ContactRecipientDescribing ).channelKey ]
           const paymentAddresses = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.paymentAddresses )
+
           if( !paymentAddresses ) throw new Error( `Payment addresses missing for: ${recipient.displayedName}` )
 
           let paymentAddress
@@ -81,10 +85,10 @@ function* processRecipients( accountShell: AccountShell ){
           }
           if( !paymentAddress ) throw new Error( `Payment address missing for: ${recipient.displayedName}` )
 
-          SubAccountKind.TRUSTED_CONTACTS
           recipients.push( {
             address: paymentAddress,
             amount: recipient.amount,
+            name: contact.contactDetails.contactName || idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.walletName ),
           } )
           break
     }
@@ -119,7 +123,8 @@ function* executeSendStage1( { payload }: {payload: {
     if ( txPrerequisites )
       yield put( sendStage1Executed( {
         successful: true, carryOver: {
-          txPrerequisites
+          txPrerequisites,
+          recipients
         }
       } ) )
     else
@@ -157,10 +162,12 @@ function* executeSendStage2( { payload }: {payload: {
   const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
+  const recipients = idx( sending, ( _ ) => _.sendST1.carryOver.recipients )
+
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
   const network = AccountUtilities.getNetworkByType( account.networkType )
 
-  const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, token, customTxPrerequisites )
+  const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, recipients, token, customTxPrerequisites )
 
   if ( txid ){
     yield put( sendStage2Executed( {

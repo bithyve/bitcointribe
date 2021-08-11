@@ -1040,7 +1040,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the '}
+            infoText={'Initial cloud backup ensures you have a way to recover if you lose your phone. You can change this from the '}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />

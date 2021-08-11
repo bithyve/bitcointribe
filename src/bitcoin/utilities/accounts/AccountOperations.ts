@@ -19,6 +19,7 @@ import {
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
+import idx from 'idx'
 export default class AccountOperations {
 
   static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ): { updatedAccount: Account | MultiSigAccount, receivingAddress: string} => {
@@ -340,11 +341,27 @@ export default class AccountOperations {
     }
   }
 
-  static updateActiveAddresses = ( account: Account, consumedUTXOs: {[txid: string]: InputUTXOs} ) => {
+  static updateActiveAddresses = (
+    account: Account,
+    consumedUTXOs: {[txid: string]: InputUTXOs},
+    txid: string,
+    recipients: {
+    address: string;
+    amount: number;
+    name?: string
+    }[] ) => {
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
     const activeExternalAddresses = account.activeAddresses.external
     const activeInternalAddresses = account.activeAddresses.internal
+
+    const recipientInfo = {
+      [ txid ]:recipients.map( recipient => {
+        return {
+          name: recipient.name, amount: recipient.amount
+        }} ),
+    }
+
     for( const consumedUTXO of Object.values( consumedUTXOs ) ){
       let found = false
       // is out of bound external address?
@@ -359,9 +376,21 @@ export default class AccountOperations {
               index: itr,
               assignee: {
                 type: account.type,
-                id: account.id
+                id: account.id,
+                recipientInfo,
               },
-            } // include out of bound(soft-refresh range) ext address
+            } // include out of bound ext address
+          else
+            activeExternalAddresses[ address ] = {
+              ...activeExternalAddresses[ address ],
+              assignee: {
+                ...activeExternalAddresses[ address ].assignee,
+                recipientInfo: idx( activeExternalAddresses[ address ], _ => _.assignee.recipientInfo )? {
+                  ...activeExternalAddresses[ address ].assignee.recipientInfo,
+                  ...recipientInfo
+                }: recipientInfo,
+              }
+            }
           found = true
           break
         }
@@ -380,9 +409,21 @@ export default class AccountOperations {
                 index: itr,
                 assignee: {
                   type: account.type,
-                  id: account.id
+                  id: account.id,
+                  recipientInfo
                 },
               } // include out of bound(soft-refresh range) int address
+            else
+              activeInternalAddresses[ address ] = {
+                ...activeInternalAddresses[ address ],
+                assignee: {
+                  ...activeInternalAddresses[ address ].assignee,
+                  recipientInfo: idx( activeInternalAddresses[ address ], _ => _.assignee.recipientInfo )? {
+                    ...activeInternalAddresses[ address ].assignee.recipientInfo,
+                    ...recipientInfo
+                  }: recipientInfo
+                }
+              }
             found = true
             break
           }
@@ -409,7 +450,15 @@ export default class AccountOperations {
     account.nextFreeChangeAddressIndex++
   }
 
-  static removeConsumedUTXOs= ( account: Account | MultiSigAccount, inputs: InputUTXOs[] ) => {
+  static removeConsumedUTXOs= (
+    account: Account | MultiSigAccount,
+    inputs: InputUTXOs[],
+    txid: string,
+    recipients: {
+    address: string;
+    amount: number;
+    name?: string
+  }[] ) => {
     const consumedUTXOs: {[txid: string]: InputUTXOs} = {
     }
     inputs.forEach( ( input ) => {
@@ -433,7 +482,7 @@ export default class AccountOperations {
     account.confirmedUTXOs = updatedUTXOSet
 
     // AccountOperations.updateQueryList( account, consumedUTXOs )
-    AccountOperations.updateActiveAddresses( account, consumedUTXOs )
+    AccountOperations.updateActiveAddresses( account, consumedUTXOs, txid, recipients )
   }
 
   static calculateSendMaxFee = (
@@ -824,6 +873,11 @@ export default class AccountOperations {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: TxPriority,
     network: bitcoinJS.networks.Network,
+    recipients: {
+      address: string;
+      amount: number;
+      name?: string
+    }[],
     token?: number,
     customTxPrerequisites?: TransactionPrerequisiteElements,
     nSequence?: number,
@@ -873,7 +927,7 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs )  // chip consumed utxos
+    if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
     else throw new Error( 'Failed to broadcast transaction, txid missing' )
     return {
       txid
