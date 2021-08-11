@@ -19,11 +19,11 @@ import moment from 'moment'
 import _ from 'underscore'
 import HistoryPageComponent from './HistoryPageComponent'
 import ModalHeader from '../../components/ModalHeader'
-import { updateCloudPermission } from '../../store/actions/health'
+import { updateCloudPermission } from '../../store/actions/BHR'
 import DeviceInfo from 'react-native-device-info'
 import {
   checkMSharesHealth,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
@@ -58,13 +58,13 @@ const CloudBackupHistory = ( props ) => {
 
   const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const [ errorMsg, setErrorMsg ] = useState( '' )
-  const s3Service = useSelector( ( state ) => state.health.service )
+  const s3Service = useSelector( ( state ) => state.bhr.service )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
 
-  const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
+  const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
 
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  let currentLevel = useSelector( ( state ) => state.health.currentLevel )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  let currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
 
   const next = props.navigation.getParam( 'next' )
   const dispatch = useDispatch()

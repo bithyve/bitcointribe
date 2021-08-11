@@ -57,9 +57,9 @@ import {
   downloadBackupData,
   putKeeperInfo,
   setupHealth
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import axios from 'axios'
-import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/health'
+import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/BHR'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { BackupStreamData, KeeperInfoInterface, MetaShare, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
@@ -1376,21 +1376,21 @@ const mapStateToProps = ( state ) => {
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     security: idx( state, ( _ ) => _.storage.wallet.security ),
-    overallHealth: idx( state, ( _ ) => _.health.overallHealth ),
+    overallHealth: idx( state, ( _ ) => _.bhr.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    walletImageChecked: idx( state, ( _ ) => _.health.walletImageChecked ),
+    walletImageChecked: idx( state, ( _ ) => _.bhr.walletImageChecked ),
     SERVICES: idx( state, ( _ ) => _.storage.database.SERVICES ),
-    walletRecoveryFailed: idx( state, ( _ ) => _.health.walletRecoveryFailed ),
+    walletRecoveryFailed: idx( state, ( _ ) => _.bhr.walletRecoveryFailed ),
     DECENTRALIZED_BACKUP:
       idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP ) || {
       },
     errorReceiving:
-      idx( state, ( _ ) => _.health.errorReceiving ) || {
+      idx( state, ( _ ) => _.bhr.errorReceiving ) || {
       },
-    downloadMetaShare: idx( state, ( _ ) => _.health.loading.downloadMetaShare ),
+    downloadMetaShare: idx( state, ( _ ) => _.bhr.loading.downloadMetaShare ),
     cloudData: idx( state, ( _ ) => _.cloud.cloudData ),
-    downloadedBackupData: idx( state, ( _ ) => _.health.downloadedBackupData ),
-    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
+    downloadedBackupData: idx( state, ( _ ) => _.bhr.downloadedBackupData ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
     wallet: idx( state, ( _ ) => _.storage.wallet ),
   }
 }

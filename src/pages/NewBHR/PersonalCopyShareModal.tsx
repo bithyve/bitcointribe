@@ -22,7 +22,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
-import { sharePDF } from '../../store/actions/health'
+import { sharePDF } from '../../store/actions/BHR'
 
 export default function PersonalCopyShareModal( props ) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);

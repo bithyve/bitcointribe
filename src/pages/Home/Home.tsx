@@ -28,7 +28,7 @@ import {
   initializeHealthSetup,
   updateCloudPermission,
   acceptExistingContactRequest
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import { connect } from 'react-redux'
 import {
   initializeTrustedContact,
@@ -513,7 +513,7 @@ const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications.notifications,
     accountsState: state.accounts,
-    cloudPermissionGranted: state.health.cloudPermissionGranted,
+    cloudPermissionGranted: state.bhr.cloudPermissionGranted,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     wallet: idx( state, ( _ ) => _.storage.wallet ),
     UNDER_CUSTODY: idx(
@@ -535,18 +535,18 @@ const mapStateToProps = ( state ) => {
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
-    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
+    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
-    newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
+    newBHRFlowStarted: idx( state, ( _ ) => _.bhr.newBHRFlowStarted ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
     isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),
     asyncNotificationList: idx( state, ( _ ) => _.notifications.updatedNotificationList ),
     fetchStarted: idx( state, ( _ ) => _.notifications.fetchStarted ),
     messages: state.notifications.messages,
-    initLoader: idx( state, ( _ ) => _.health.loading.initLoader ),
+    initLoader: idx( state, ( _ ) => _.bhr.loading.initLoader ),
   }
 }
 

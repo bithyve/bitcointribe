@@ -35,7 +35,7 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ErrorReceiving,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import ModalHeader from '../../components/ModalHeader'
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents'
 
@@ -63,11 +63,11 @@ export default function RestoreSelectedContactsList( props ) {
 
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const { downloadMetaShare } = useSelector( ( state ) => state.health.loading )
+  const { downloadMetaShare } = useSelector( ( state ) => state.bhr.loading )
   // Removed sss file
   const isWalletRecoveryFailed = false
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.health.errorReceiving,
+    ( state ) => state.bhr.errorReceiving,
   )
 
   const [ exchangeRates, setExchangeRates ] = useState()
@@ -300,7 +300,7 @@ export default function RestoreSelectedContactsList( props ) {
   }, [ SD_META_SHARE ] )
 
   const walletImageChecked: Boolean = useSelector(
-    ( state ) => state.health.walletImageChecked,
+    ( state ) => state.bhr.walletImageChecked,
   )
 
   useEffect( () => {

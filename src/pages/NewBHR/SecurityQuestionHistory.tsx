@@ -26,7 +26,7 @@ import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import {
   updateMSharesHealth,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -79,11 +79,11 @@ const SecurityQuestionHistory = ( props ) => {
       reshareVersion?: number;
       name?: string;
     }[];
-  }[] = useSelector( ( state ) => state.health.levelHealth )
+  }[] = useSelector( ( state ) => state.bhr.levelHealth )
   const currentLevel: Number = useSelector(
-    ( state ) => state.health.currentLevel,
+    ( state ) => state.bhr.currentLevel,
   )
-  const s3Service = useSelector( ( state ) => state.health.service )
+  const s3Service = useSelector( ( state ) => state.bhr.service )
   const next = props.navigation.getParam( 'next' )
   const dispatch = useDispatch()
 

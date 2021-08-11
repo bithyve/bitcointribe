@@ -176,7 +176,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 const mapStateToProps = ( state ) => {
   return {
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     startRegistration: idx( state, ( _ ) => _.swanIntegration.startRegistration ),
   }
 }

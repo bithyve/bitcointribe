@@ -42,7 +42,7 @@ import {
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
-} from '../actions/health'
+} from '../actions/BHR'
 import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
@@ -843,7 +843,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const { qrdata, QRModalHeader, accountShell } = payload
     const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    const s3Service = yield select( ( state ) => state.health.service )
+    const s3Service = yield select( ( state ) => state.bhr.service )
     const walletId = s3Service.levelhealth.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contact )
     let secondaryMnemonic

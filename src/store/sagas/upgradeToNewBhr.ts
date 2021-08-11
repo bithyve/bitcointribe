@@ -14,7 +14,7 @@ import {
   isUpgradeLevelInitializedStatus,
   CONFIRM_PDF_SHARED_UPGRADE,
 } from '../actions/upgradeToNewBhr'
-import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
+import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import { insertDBWorker } from './storage'
@@ -29,7 +29,7 @@ function* initLevelsWorker( { payload } ) {
   try {
     const { level } = payload
     yield put( switchUpgradeLoader( 'initLevels' ) )
-    const s3Service: any = yield select( ( state ) => state.health.service )
+    const s3Service: any = yield select( ( state ) => state.bhr.service )
     const randomIdForSecurityQ = generateRandomString( 8 )
     const SecurityQuestionHealth = {
       shareType: 'securityQuestion',
@@ -79,11 +79,11 @@ function* setCloudDataForLevelWorker( { payload } ) {
   try {
     const { level } = payload
     yield put( switchUpgradeLoader( 'cloudDataForLevel' ) )
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
-    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
+    const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
+    const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     console.log( 'levelHealth', levelHealth )
     console.log( 'level', level )
     let share: MetaShare
@@ -111,7 +111,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
     const { shareId } = payload
     const name = 'Personal Device1'
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
     const obj: KeeperInfoInterface = {
       shareId: shareId,
       name: name,
@@ -128,7 +128,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     const walletId = s3Service.getWalletId().data.walletId
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.database )
-    const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
+    const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
     // updateKeeperInfoToMetaShare Got removed
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
@@ -210,7 +210,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
     const { contactList, shareIds } = payload
     const contactListToMarkDone:{type: string; name: string;}[] = []
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
     const levelToSetup: number = yield select( ( state ) => state.upgradeToNewBhr.levelToSetup )
     for ( let i = 0; i < shareIds.length; i++ ) {
       const element = shareIds[ i ]
@@ -238,7 +238,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
     const walletId = s3Service.getWalletId().data.walletId
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.database )
-    const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
+    const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
     // updateKeeperInfoToMetaShare Got removed
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
@@ -363,7 +363,7 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
     const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const walletId = s3Service.levelhealth.walletId
     const answer = yield select( ( state ) => state.storage.wallet.security.answer )

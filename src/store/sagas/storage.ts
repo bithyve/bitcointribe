@@ -13,7 +13,7 @@ import {
 import dataManager from '../../storage/database-manager'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { walletCheckIn } from '../actions/trustedContacts'
-import { updateWalletImageHealth } from '../actions/health'
+import { updateWalletImageHealth } from '../actions/BHR'
 import { clearAccountSyncCache } from '../actions/accounts'
 
 function* initDBWorker() {
@@ -32,7 +32,7 @@ function* fetchDBWorker() {
   try {
     // let t = timer('fetchDBWorker')
     const key = yield select( ( state ) => state.storage.key )
-    const newBHRFlowStarted = yield select( ( state ) => state.health.newBHRFlowStarted )
+    const newBHRFlowStarted = yield select( ( state ) => state.bhr.newBHRFlowStarted )
 
     const database = yield call( dataManager.fetch, key )
     if ( key && database ) {

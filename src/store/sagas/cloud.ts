@@ -4,7 +4,7 @@ import { call, delay, put, select } from 'redux-saga/effects'
 import { WIEncryption, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
-import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
+import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
@@ -31,7 +31,7 @@ const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[]
 function* cloudWorker( { payload } ) {
   try{
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
-    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) {
 
       const s3 = yield call( dbManager.getS3Services )
@@ -53,7 +53,7 @@ function* cloudWorker( { payload } ) {
         data: {
         }
       }
-      const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
+      const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
       for ( let i = 0; i < keeperInfo.length; i++ ) {
         if( level == 1 && keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = level
         else if( level == 2 && keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = level
@@ -177,7 +177,7 @@ export const cloudWatcher = createWatcher(
 
 function* updateHealthForCloudStatusWorker( { payload } ) {
   try {
-    const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
 
     if ( currentLevel == 0 ) {
       yield call( updateHealthForCloudWorker, {
@@ -208,9 +208,9 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 function* updateHealthForCloudWorker( { payload } ) {
   try {
     const { share } = payload
-    const levelHealth = yield select( ( state ) => state.health.levelHealth )
-    const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
-    const s3Service = yield select( ( state ) => state.health.service )
+    const levelHealth = yield select( ( state ) => state.bhr.levelHealth )
+    const isLevel2Initialized = yield select( ( state ) => state.bhr.isLevel2Initialized )
+    const s3Service = yield select( ( state ) => state.bhr.service )
 
     let levelHealthVar = levelHealth[ 0 ].levelInfo[ 1 ]
     if (
@@ -742,9 +742,9 @@ function* updateCloudBackupWorker( ) {
   try{
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-      const levelHealth = yield select( ( state ) => state.health.levelHealth )
-      const currentLevel = yield select( ( state ) => state.health.currentLevel )
-      const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
+      const levelHealth = yield select( ( state ) => state.bhr.levelHealth )
+      const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
+      const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
       const s3 = yield call( dbManager.getS3Services )
       const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
       let secretShare = {

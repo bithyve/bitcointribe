@@ -74,16 +74,16 @@ const HomeHeader = ( {
 } ) => {
   const fiatCurrencyCode = useCurrencyCode()
   const levelHealth: LevelHealthInterface[] = useSelector(
-    ( state ) => state.health.levelHealth
+    ( state ) => state.bhr.levelHealth
   )
   const levelData = useSelector(
-    ( state ) => state.health.levelData
+    ( state ) => state.bhr.levelData
   )
   const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
 
   const newBHRFlowStarted = useSelector(
-    ( state ) => state.health.newBHRFlowStarted
+    ( state ) => state.bhr.newBHRFlowStarted
   )
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN

@@ -44,9 +44,9 @@ export default function KeeperTypeModalContents( props ) {
     name: '',
   } )
   const levelHealth: LevelHealthInterface[] = useSelector(
-    ( state ) => state.health.levelHealth
+    ( state ) => state.bhr.levelHealth
   )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const [ completedKeeperType, setCompletedKeeperType ] = useState( [] )
 
   const restrictChangeToContactType = () => {

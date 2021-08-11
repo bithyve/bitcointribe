@@ -32,8 +32,8 @@ import ModalHeader from '../../components/ModalHeader'
 import DeviceInfo from 'react-native-device-info'
 import {
   ErrorSending,
-} from '../../store/actions/health'
-import { UploadSMSuccessfully } from '../../store/actions/health'
+} from '../../store/actions/BHR'
+import { UploadSMSuccessfully } from '../../store/actions/BHR'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
@@ -1206,7 +1206,7 @@ class ContactDetails extends PureComponent<
 }
 const mapStateToProps = ( state ) => {
   return {
-    errorSending: idx( state, ( _ ) => _.health.errorSending ),
+    errorSending: idx( state, ( _ ) => _.bhr.errorSending ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     trustedContactRecipients: idx( state, ( _ ) => _.trustedContacts.trustedContactRecipients ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
@@ -1223,8 +1223,8 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel
     ),
-    hasSMUploadedSuccessfully: idx( state, ( _ ) => _.health.hasSMUploadedSuccessfully ),
-    newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
+    hasSMUploadedSuccessfully: idx( state, ( _ ) => _.bhr.hasSMUploadedSuccessfully ),
+    newBHRFlowStarted: idx( state, ( _ ) => _.bhr.newBHRFlowStarted ),
   }
 }
 export default connect( mapStateToProps, {

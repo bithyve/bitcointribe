@@ -20,7 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { ErrorReceiving } from '../../store/actions/health'
+import { ErrorReceiving } from '../../store/actions/BHR'
 import { useDispatch, useSelector } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyle from '../../common/Styles/Styles'
@@ -35,7 +35,7 @@ export default function CustodianRequestOTP( props ) {
   const [ buttonText, setButtonText ] = useState( 'Try again' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.health.errorReceiving,
+    ( state ) => state.bhr.errorReceiving,
   )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( false )
   const custodyRequest = props.navigation.getParam( 'custodyRequest' )
@@ -75,7 +75,7 @@ export default function CustodianRequestOTP( props ) {
   }
 
   const dispatch = useDispatch()
-  const { loading } = useSelector( ( state ) => state.health )
+  const { loading } = useSelector( ( state ) => state.bhr )
 
   // useEffect( () => {
   // removed sss file

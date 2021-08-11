@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 import ListStyles from '../../common/Styles/ListStyles'
@@ -42,6 +42,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
 
   function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
+    console.log( 'scannedData', scannedData )
     const networkType: NetworkType = AccountUtilities.networkType( scannedData )
     if ( networkType ) {
       const network = AccountUtilities.getNetworkByType( networkType )
@@ -157,6 +158,14 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               onPress={() => { navigation.navigate( 'ReceiveQR' )}}
             />
           </View>
+          <TouchableOpacity onPress={()=>{
+            const qrScannedData = {
+              data: '{"type":"KEEPER_REQUEST","channelKey":"nBeLSFNLxhRmuq4JWNQTBWgv","walletName":"Scas","secondaryChannelKey":"HcB1rVJrYMss0QjlyDD1KRPA","version":"1.9.0"}'
+            }
+            handleBarcodeRecognized( qrScannedData )
+          }} >
+            <Text>Continue</Text>
+          </TouchableOpacity>
           <View style={{
             marginTop: 'auto'
           }}>

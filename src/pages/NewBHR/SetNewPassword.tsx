@@ -32,12 +32,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
-import { setupPassword } from '../../store/actions/health'
+import { setupPassword } from '../../store/actions/BHR'
 import {  setCloudData } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../../components/home/ModalContainer'
 import ButtonBlue from '../../components/ButtonBlue'
-import { updateCloudPermission } from '../../store/actions/health'
+import { updateCloudPermission } from '../../store/actions/BHR'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
@@ -115,9 +115,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
-  const setupPasswordStatus = useSelector( ( state ) => state.health.loading.setupPasswordStatus )
-  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
+  const setupPasswordStatus = useSelector( ( state ) => state.bhr.loading.setupPasswordStatus )
+  const cloudPermissionGranted = useSelector( ( state ) => state.bhr.cloudPermissionGranted )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
 
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(

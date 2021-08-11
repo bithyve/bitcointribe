@@ -18,6 +18,7 @@ import {
   SECURE_ACCOUNT,
 } from '../common/constants/wallet-service-types'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { ContactRecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
 
 export default function SendViaQR( props ) {
   const [ contactName, setContactName ] = useState( '' )
@@ -83,6 +84,32 @@ export default function SendViaQR( props ) {
     let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
     number = number.slice( number.length - 10 ) // last 10 digits only
     return number
+  }
+
+  const getImageIcon = ( item: ContactRecipientDescribing ) => {
+    if ( Object.keys( item ).length ) {
+      if ( item.avatarImageSource ) {
+        return (
+          <View style={styles.headerImageView}>
+            <Image source={item.avatarImageSource} style={styles.headerImage} />
+          </View>
+        )
+      } else {
+        return (
+          <View style={styles.headerImageView}>
+            <View style={styles.headerImageInitials}>
+              <Text style={styles.headerImageInitialsText}>
+                {item.displayedName
+                  ? nameToInitials(
+                    item.displayedName
+                  )
+                  : ''}
+              </Text>
+            </View>
+          </View>
+        )
+      }
+    }
   }
 
   return (
@@ -207,7 +234,9 @@ export default function SendViaQR( props ) {
                           <Text style={styles.contactNameText}>
                             {contactName}
                           </Text>
-                        ) : null}
+                        ) : Contact.displayedName ? <Text style={styles.contactNameText}>
+                          {Contact.displayedName}
+                        </Text> : null}
                         {Contact &&
                           Contact.connectedVia && (
                           <Text
@@ -224,57 +253,7 @@ export default function SendViaQR( props ) {
                         )}
                       </View>
                     </View>
-                    {Contact && Contact.image ? (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          marginLeft: 15,
-                          marginRight: 15,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          shadowOpacity: 1,
-                          shadowOffset: {
-                            width: 2, height: 2
-                          },
-                        }}
-                      >
-                        <Image
-                          source={Contact && Contact.image}
-                          style={{
-                            ...styles.contactProfileImage
-                          }}
-                        />
-                      </View>
-                    ) : (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          marginLeft: 15,
-                          marginRight: 15,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          width: 70,
-                          height: 70,
-                          borderRadius: 70 / 2,
-                          shadowColor: Colors.shadowBlue,
-                          shadowOpacity: 1,
-                          shadowOffset: {
-                            width: 2, height: 2
-                          },
-                        }}
-                      >
-                        <Text
-                          style={{
-                            textAlign: 'center',
-                            fontSize: RFValue( 20 ),
-                            lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
-                          }}
-                        >
-                          {nameToInitials( contactName )}
-                        </Text>
-                      </View>
-                    )}
+                    {getImageIcon( Contact )}
                   </View>
                 </View>
               )}
@@ -552,5 +531,37 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMediumItalic,
     fontStyle: 'italic',
     color: Colors.blue,
+  },
+  headerImageView: {
+    width: wp( '17%' ),
+    height: wp( '17%' ),
+    borderColor: 'red',
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 10,
+    shadowOffset: {
+      width: 2, height: 2
+    },
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: wp( '17%' ) / 2,
+  },
+  headerImage: {
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    borderRadius: wp( '15%' ) / 2,
+  },
+  headerImageInitials: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.shadowBlue,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    borderRadius: wp( '15%' ) / 2,
+  },
+  headerImageInitialsText: {
+    textAlign: 'center',
+    fontSize: RFValue( 17 ),
   },
 } )

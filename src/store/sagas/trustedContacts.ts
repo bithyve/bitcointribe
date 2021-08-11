@@ -51,7 +51,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
-import { updateWalletImageHealth } from '../actions/health'
+import { updateWalletImageHealth } from '../actions/BHR'
 import { getNextFreeAddressWorker } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
@@ -348,7 +348,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   if( isKeeper ) {
     const channelAssets: ChannelAssets = yield select(
-      ( state ) => state.health.channelAssets,
+      ( state ) => state.bhr.channelAssets,
     )
     if( channelAssets.shareId == shareId ) delete channelAssets[ 'shareId' ]
     contactInfo.isKeeper = isKeeper
