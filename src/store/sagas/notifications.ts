@@ -1,5 +1,4 @@
 import { call, put, select } from 'redux-saga/effects'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -46,17 +45,10 @@ export const updateFCMTokensWatcher = createWatcher(
 
 export function* fetchNotificationsWorker() {
   yield put( fetchNotificationStarted( true ) )
-  const service: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  const { walletId } = yield select(
+    ( state ) => state.storage.wallet,
   )
-  console.log( 'service', service )
-  const { data } = yield call( service.getWalletId )
-  console.log( 'data', data )
-
-  const { notifications } = yield call( Relay.fetchNotifications, data.walletId )
-  const payload = {
-    notifications
-  }
+  const { notifications } = yield call( Relay.fetchNotifications, walletId )
   yield call( notificationsFetched, notifications )
   //yield call( setupNotificationListWorker )
   yield put( fetchNotificationStarted( false ) )

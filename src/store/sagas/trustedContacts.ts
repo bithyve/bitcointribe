@@ -36,10 +36,6 @@ import {
   AccountType,
   ActiveAddressAssignee,
 } from '../../bitcoin/utilities/Interface'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
 import {  exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
@@ -54,7 +50,6 @@ import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth } from '../actions/BHR'
 import { getNextFreeAddressWorker } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { updateWalletNameToChannel } from '../actions/trustedContacts'
 import { updateWallet } from '../actions/storage'
 
@@ -296,7 +291,7 @@ function* updateWalletNameToAllChannel() {
       walletName,
     }
     const streamUpdates: UnecryptedStreamData = {
-      streamId: TrustedContacts.getStreamId( walletId ),
+      streamId: TrustedContactsOperations.getStreamId( walletId ),
       primaryData,
       metaData: {
         flags:{
@@ -579,8 +574,9 @@ function* restoreTrustedContactsWorker( { payload }: { payload: { walletId: stri
   for ( const [ key, value ] of Object.entries( restoredTrustedContacts ) ) {
     yield call( dbManager.updateContact, value )
   }
+
   // TODO: => get MetaShares and Add to DB
-  // const res = yield call( TrustedContacts.retrieveFromStream, {
+  // const res = yield call( TrustedContactsOperations.retrieveFromStream, {
   //   walletId, channelKey, options: {
   //     retrieveBackupData: true,
   //   }

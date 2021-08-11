@@ -20,17 +20,16 @@ export const resetToHomeAction = ( params = {
   } )
 }
 
-
 export const resetStackToAccountDetails = ( params ) => {
   return StackActions.reset( {
     index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Landing'
-      } ),
-      NavigationActions.navigate( {
-        routeName: 'AccountDetails',
-        params,
+        routeName: 'Landing',
+        action: NavigationActions.navigate( {
+          routeName: 'AccountDetails',
+          params,
+        } ),
       } ),
     ],
   } )

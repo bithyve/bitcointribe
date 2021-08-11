@@ -30,15 +30,7 @@ const config = {
 }
 
 import {
-  initDBWatcher,
-  fetchDBWatcher,
-  insertDBWatcher,
-  servicesEnricherWatcher,
-} from './sagas/storage'
-
-import {
   setupWalletWatcher,
-  initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
   changeAuthCredWatcher,
@@ -170,15 +162,8 @@ import {
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 const rootSaga = function* () {
   const sagas = [
-    // database watchers
-    initDBWatcher,
-    fetchDBWatcher,
-    insertDBWatcher,
-    servicesEnricherWatcher,
-
     // wallet setup watcher
     setupWalletWatcher,
-    initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,
     changeAuthCredWatcher,

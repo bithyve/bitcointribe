@@ -30,7 +30,6 @@ import {
   Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -96,7 +95,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
-  const s3 = dbManager.getS3Services()
+  const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const dispatch = useDispatch()
 

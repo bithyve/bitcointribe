@@ -27,10 +27,11 @@ const SecondaryStreamData = 'SecondaryStreamData'
 const BackupStreamData = 'BackupStreamData'
 const MetaShare = 'MetaShare'
 const S3MetaShare = 'S3MetaShare'
-const S3Services = 'S3Services'
+const BHR = 'BHR'
 const EncryptedShare = 'EncryptedShare'
 const Meta = 'Meta'
 const KeeperInfo = 'KeeperInfo'
+const Receiver = 'Receiver'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -213,6 +214,18 @@ export const XPubSchema: ObjectSchema = {
   },
 }
 
+export const ReceiverSchema: ObjectSchema = {
+  name: Receiver,
+  properties: {
+    name: {
+      type: 'string', optional: true
+    },
+    amount: {
+      type: 'int', optional: true
+    },
+  },
+}
+
 export const TransactionSchema: ObjectSchema = {
   name: Transaction,
   primaryKey: 'txid',
@@ -269,8 +282,8 @@ export const TransactionSchema: ObjectSchema = {
     sender: {
       type: 'string', optional: true
     },
-    receiver: {
-      type: 'string', optional: true
+    receivers: {
+      type: 'list', objectType: Receiver, default: []
     },
     isNew: {
       type: 'bool', default: false
@@ -682,8 +695,8 @@ export const S3MetaShareSchema: ObjectSchema = {
   },
 }
 
-export const S3ServicesSchema: ObjectSchema = {
-  name: S3Services,
+export const BHRSchemaSchema: ObjectSchema = {
+  name: BHR,
   properties: {
     encryptedSecretsKeeper: {
       type: 'string?[]', optional: true
@@ -724,6 +737,6 @@ export default {
   Meta,
   KeeperInfo,
   WalletSecurity,
-  S3Services,
+  BHR,
   S3MetaShare,
 }

@@ -28,7 +28,6 @@ import {
 } from '../../common/CommonFunctions/index'
 import NotificationListContent from '../../components/NotificationListContent'
 // import AddContactAddressBook from '../Contacts/AddContactAddressBook'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import Colors from '../../common/Colors'
@@ -37,7 +36,6 @@ import { v4 as uuid } from 'uuid'
 import moment from 'moment'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
@@ -181,12 +179,10 @@ interface HomePropsTypes {
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   currentLevel: number;
-  trustedContacts: TrustedContactsService;
   isFocused: boolean;
   setCurrencyCode: any;
   currencyCode: any;
   setSecondaryDeviceAddress: any;
-  regularAccount: RegularAccount;
   accountShells: AccountShell[];
   messages: any;
   updateMessageStatusInApp: any;
@@ -1380,7 +1376,6 @@ const mapStateToProps = ( state ) => {
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),

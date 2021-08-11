@@ -1,16 +1,13 @@
-import React, { Component, lazy, Suspense } from 'react'
+import React, { Component } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   RefreshControl,
   ImageBackground,
-  Platform,
-  Switch,
   Image,
   InteractionManager
 } from 'react-native'
@@ -22,10 +19,6 @@ import {
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
@@ -67,22 +60,12 @@ import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBN
 import debounce from 'lodash.debounce'
 import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/BHR'
 import LevelStatus from '../../common/data/enums/LevelStatus'
-import Header from '../../navigation/stacks/Header'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { ListItem } from 'react-native-elements'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import ManageBackupCard from './ManageBackupCard'
-import { TrustedContactRelationTypes, UnecryptedStreamData } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import { TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
-import { ActivityIndicator } from 'react-native-paper'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import dbManager from '../../storage/realm/dbManager'
@@ -159,7 +142,6 @@ interface ManageBackupNewBHRPropsTypes {
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
   trustedContacts: Trusted_Contacts;
-  regularAccount: RegularAccount;
   createChannelAssets: any;
   setApprovalStatus: any;
   approvalStatus: boolean;
@@ -192,7 +174,7 @@ class ManageBackupNewBHR extends Component<
     this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
-    const s3 = dbManager.getS3Services()
+    const s3 = dbManager.getBHR()
     console.log( 's3', typeof s3, s3 )
     this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
     const obj = {
@@ -1282,7 +1264,6 @@ const mapStateToProps = ( state ) => {
     shieldHealth: idx( state, ( _ ) => _.bhr.shieldHealth ),
     modifyLevelDataStatus: idx( state, ( _ ) => _.bhr.loading.modifyLevelDataStatus ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     approvalStatus: idx( state, ( _ ) => _.bhr.approvalStatus ),
     isKeeperInfoUpdated2: idx( state, ( _ ) => _.bhr.isKeeperInfoUpdated2 ),
     generateMetaShareStatus: idx( state, ( _ ) => _.bhr.loading.generateMetaShareStatus ),

@@ -46,32 +46,13 @@ import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import { Account, Accounts } from '../../bitcoin/utilities/Interface'
 
-export type AccountVars = {
-  service: any;
-}
-
-// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
-const ACCOUNT_VARS: AccountVars  = {
-  service: null,
-}
-
 export type AccountsState = {
-  servicesEnriched: boolean;
   accountsSynched: boolean;
-  testCoinsReceived: boolean,
-
   accounts: Accounts,
   accountShells: AccountShell[];
 
-  // TODO: Consider removing these in favor of just looking
-  // up account data from `activeAccounts` using a UUID.
-  REGULAR_ACCOUNT: AccountVars;
-  TEST_ACCOUNT: AccountVars;
-  SECURE_ACCOUNT: AccountVars;
-
   exchangeRates?: any;
   averageTxFees: any;
-
   twoFAHelpFlags: {
       xprivGenerated: boolean | null;
       twoFAValid: boolean | null;
@@ -97,11 +78,8 @@ export type AccountsState = {
   accountShellMergeSource: AccountShell | null;
   accountShellMergeDestination: AccountShell | null;
 
-  // currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  // currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-  // currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
-
   refreshed: boolean;
+  testCoinsReceived: boolean,
 
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
@@ -110,14 +88,8 @@ export type AccountsState = {
 };
 
 const initialState: AccountsState = {
-  servicesEnriched: false,
   accountsSynched: false,
   exchangeRates: null,
-  testCoinsReceived: false,
-
-  REGULAR_ACCOUNT: ACCOUNT_VARS,
-  TEST_ACCOUNT: ACCOUNT_VARS,
-  SECURE_ACCOUNT: ACCOUNT_VARS,
 
   averageTxFees: null,
   accounts: {
@@ -154,6 +126,7 @@ const initialState: AccountsState = {
   // currentSwanSubAccount: null,
 
   refreshed: false,
+  testCoinsReceived: false,
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,

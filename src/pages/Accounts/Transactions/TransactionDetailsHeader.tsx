@@ -46,6 +46,23 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
     }
   }, [ transaction.transactionType ] )
 
+  const title = useMemo( () => {
+    if( transaction.transactionType === TransactionKind.RECEIVE ) {
+      return transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType )
+    } else {
+      let name = ''
+      if( transaction.receivers.length > 0 ) {
+        transaction.receivers.forEach( receiver => {
+          name += `${receiver.name}, `
+        } )
+        return name
+      } else {
+        name = transaction.receivers[ 0 ].name ||  transaction.accountType || transaction.accountName
+      }
+      return name
+    }
+  }, [ transaction.transactionType ] )
+
   return (
     <View style={styles.rootContainer}>
       <View style={styles.contentContainer}>
@@ -62,7 +79,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
             style={ListStyles.listItemTitle}
             numberOfLines={1}
           >
-            {`${primarySubAccount.customDisplayName || primarySubAccount.defaultTitle}-${primarySubAccount.customDescription || primarySubAccount.defaultDescription}`}
+            {title}
           </Text>
 
           <Text

@@ -3,25 +3,17 @@ import {
   StyleSheet,
   StatusBar,
   View,
-  Platform,
-  Linking,
-  Alert,
-  AppState,
 } from 'react-native'
 import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from 'react-native-responsive-screen'
-import DeviceInfo from 'react-native-device-info'
-import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
-import * as RNLocalize from 'react-native-localize'
 import Colors from '../../common/Colors'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import {
-  REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
@@ -34,8 +26,6 @@ import {
   initializeTrustedContact,
   rejectTrustedContact,
   syncPermanentChannels,
-  PermanentChannelsSyncKind,
-  InitTrustedContactFlowKind
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -51,18 +41,8 @@ import {
   setCardData,
   setIsPermissionGiven,
 } from '../../store/actions/preferences'
-import {
-  processDeepLink,
-} from '../../common/CommonFunctions/index'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import Toast from '../../components/Toast'
-import PushNotification from 'react-native-push-notification'
-import NotificationListContent from '../../components/NotificationListContent'
-import AddContactAddressBook from '../Contacts/AddContactAddressBook'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
-import { v4 as uuid } from 'uuid'
 import {
   BottomTab,
 } from '../../components/home/custom-bottom-tabs'
@@ -72,33 +52,23 @@ import {
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
-  AccountType,
-  DeepLinkEncryptionType,
   LevelHealthInterface,
-  QRCodeTypes,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
-import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
+import { withNavigationFocus } from 'react-navigation'
 import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import BottomSheet from '@gorhom/bottom-sheet'
-import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import { AccountsState } from '../../store/reducers/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
-import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import messaging from '@react-native-firebase/messaging'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
@@ -111,11 +81,7 @@ import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
 import HomeContainer from './HomeContainer'
-import Header from '../../navigation/stacks/Header'
-import { NotificationType } from '../../components/home/NotificationType'
-import NotificationInfoContents from '../../components/NotificationInfoContents'
 import ModalContainer from '../../components/home/ModalContainer'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -202,7 +168,6 @@ interface HomePropsTypes {
   fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
-  trustedContacts: TrustedContactsService;
   isFocused: boolean;
   notificationListNew: any;
   notificationsUpdated: any;
@@ -215,7 +180,6 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   swanDeepLinkContent: string | null;
-  regularAccount: RegularAccount;
   database: any;
   setCardData: any;
   cardDataProps: any;
@@ -523,7 +487,6 @@ const mapStateToProps = ( state ) => {
     cardDataProps: idx( state, ( _ ) => _.preferences.cardData ),
     secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     existingFCMToken: idx( state, ( _ ) => _.preferences.existingFCMToken ),
@@ -532,7 +495,6 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.preferences.secondaryDeviceAddressValue
     ),
     releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),

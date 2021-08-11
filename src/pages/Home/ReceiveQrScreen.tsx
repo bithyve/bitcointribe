@@ -17,14 +17,12 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { ScrollView } from 'react-native-gesture-handler'
 import { getAllAccountsData } from '../../store/actions/accounts'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import { AccountsState } from '../../store/reducers/accounts'
 import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import ModalContainer from '../../components/home/ModalContainer'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 export type Props = {
   navigation: any;
@@ -71,8 +69,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   useEffect( () => {
     let receiveAt = selectedAccount && selectedAccount.receivingAddress ? selectedAccount.receivingAddress : ''
     if ( amount ) {
-      const service: TestAccount | RegularAccount | SecureAccount = accountState[ selectedAccount.shell.primarySubAccount.sourceKind ].service
-      receiveAt = service.getPaymentURI( receiveAt, {
+      receiveAt = AccountUtilities.generatePaymentURI( receiveAt, {
         amount: parseInt( amount ) / SATOSHIS_IN_BTC,
       } ).paymentURI
     }

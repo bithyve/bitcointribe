@@ -20,9 +20,7 @@ import {
   completedWalletSetup,
   WALLET_SETUP_COMPLETION,
 } from '../actions/setupAndAuth'
-import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
-import { Database } from '../../common/interfaces/Interfaces'
-import { insertDBWorker } from './storage'
+import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
 import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
 import dbManager from '../../storage/realm/dbManager'
@@ -70,38 +68,10 @@ function* setupWalletWorker( { payload } ) {
   yield put( completedWalletSetup( ) )
   yield call( dbManager.createWallet, wallet )
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
-
-  // TODO: remove legacy DB post S3 service functionalization
-  const initialDatabase: Database = {
-    SERVICES: {
-      S3_SERVICE: ''// JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
-    },
-  }
-
-  yield call( insertDBWorker, {
-    payload: initialDatabase
-  } )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
-
-function* initRecoveryWorker( { payload } ) {
-  const initialDatabase: Database = {
-  }
-
-  yield call( insertDBWorker, {
-    payload: initialDatabase
-  } )
-  yield put( initializeRecoveryCompleted( true ) )
-  // yield call(AsyncStorage.setItem, "walletExists", "true");
-  // yield put(setupInitialized());
-}
-
-export const initRecoveryWatcher = createWatcher(
-  initRecoveryWorker,
-  INIT_RECOVERY,
-)
 
 function* credentialsStorageWorker( { payload } ) {
   yield put( switchSetupLoader( 'storingCreds' ) )
@@ -161,9 +131,6 @@ function* credentialsAuthWorker( { payload } ) {
     // initialize configuration file
     const { activePersonalNode } = yield select( state => state.nodeSettings )
     if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
-
-    // TODO -- this need to be done on
-    yield put( fetchFromDB() )
   }
 }
 

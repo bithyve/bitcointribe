@@ -19,6 +19,7 @@ import Fonts from '../../../common/Fonts'
 import { useSelector, useDispatch } from 'react-redux'
 import { markReadTx } from '../../../store/actions/accounts'
 import { update } from '../../../storage/database'
+import { TransactionType } from '../../../bitcoin/utilities/Interface'
 export type Props = {
   navigation: any;
 };
@@ -90,11 +91,11 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
       <View style={styles.bodySection}>
 
-        {/* <View style={styles.lineItem}>
+        <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitleTransaction}>Amount</Text>
 
           <LabeledBalanceDisplay
-            balance={transaction.amount}
+            balance={transaction.transactionType === TransactionType.RECEIVED ? transaction.amount : transaction.amount - Number( transaction.fee )}
             isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
             unitTextStyle={{
               ...ListStyles.listItemSubtitle, marginBottom: 3
@@ -106,7 +107,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
               marginBottom: -3
             }}
           />
-        </View> */}
+        </View>
 
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitleTransaction}>Transaction ID</Text>

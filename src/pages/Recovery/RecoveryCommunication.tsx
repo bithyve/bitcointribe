@@ -28,10 +28,10 @@ import { nameToInitials } from '../../common/CommonFunctions'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
 import RecoveryTrustedQR from './RecoveryTrustedQR'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import Toast from '../../components/Toast'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 export default function RecoveryCommunication( props ) {
   const contact = props.navigation.getParam( 'contact' )
@@ -146,11 +146,11 @@ export default function RecoveryCommunication( props ) {
           number = number.slice( number.length - 10 ) // last 10 digits only
           const numHintType = 'num'
           const numHint = number[ 0 ] + number.slice( number.length - 2 )
-          const numberEncKey = TrustedContactsService.encryptPub(
+          const numberEncKey = TrustedContactsOperations.encryptData(
           // using TCs encryption mech
             REQUEST_DETAILS.KEY,
             number,
-          ).encryptedPub
+          ).encryptedData
 
           const numberDL =
           `https://hexawallet.io/${config.APP_STAGE}/rk` +
@@ -182,10 +182,10 @@ export default function RecoveryCommunication( props ) {
           const trucatedEmail = Email.replace( '.com', '' )
           const emailHint =
           Email[ 0 ] + trucatedEmail.slice( trucatedEmail.length - 2 )
-          const emailEncPubKey = TrustedContactsService.encryptPub(
+          const emailEncPubKey = TrustedContactsOperations.encryptData(
             REQUEST_DETAILS.KEY,
             Email,
-          ).encryptedPub
+          ).encryptedData
           const emailDL =
           `https://hexawallet.io/${config.APP_STAGE}/rk` +
           `/${requester}` +

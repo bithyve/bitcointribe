@@ -29,7 +29,6 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
 import HistoryPageComponent from './HistoryPageComponent'
-import TrustedContacts from './TrustedContacts'
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact'
 import moment from 'moment'
 import _ from 'underscore'
@@ -45,9 +44,6 @@ import {
   downloadSMShare,
 } from '../../store/actions/BHR'
 import { useDispatch } from 'react-redux'
-import SendViaLink from '../../components/SendViaLink'
-import SendViaQR from '../../components/SendViaQR'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
   KeeperInfoInterface,
   Keepers,
@@ -146,7 +142,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
   const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
-  const s3 = dbManager.getS3Services()
+  const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )

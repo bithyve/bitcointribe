@@ -14,14 +14,11 @@ import {
   isUpgradeLevelInitializedStatus,
   CONFIRM_PDF_SHARED_UPGRADE,
 } from '../actions/upgradeToNewBhr'
-import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
+import { healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
-import { insertDBWorker } from './storage'
 import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements, Wallet } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setCloudData } from '../actions/cloud'
-import semver from 'semver'
 import Relay from '../../bitcoin/utilities/Relay'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
@@ -52,11 +49,11 @@ function* initLevelsWorker( { payload } ) {
         ...SERVICES,
         S3_SERVICE: JSON.stringify( s3Service ),
       }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        }
-      } )
+      // yield call( insertDBWorker, {
+      //   payload: {
+      //     SERVICES: updatedSERVICES
+      //   }
+      // } )
       // Update Health to reducer
       // yield put( checkMSharesHealth() )
       yield put( isUpgradeLevelInitializedStatus() )
@@ -80,7 +77,7 @@ function* setCloudDataForLevelWorker( { payload } ) {
   try {
     const { level } = payload
     yield put( switchUpgradeLoader( 'cloudDataForLevel' ) )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
@@ -113,7 +110,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     const { shareId } = payload
     const name = 'Personal Device1'
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const metaSharesKeeper: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const obj: KeeperInfoInterface = {
       shareId: shareId,
@@ -134,7 +131,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     // updateKeeperInfoToMetaShare Got removed
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const secondaryMetaShares: MetaShare[] = [ ...s3.encryptedSMSecretsKeeper ]
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const trustedContacts: any = yield select( ( state ) => state.trustedContacts.service )
     const share: MetaShare = metaSharesKeeper.find( value => value.shareId == shareId )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     const oldKeeperInfo  = trustedContactsInfo[ 'Secondary Device'.toLowerCase() ]
@@ -157,11 +154,11 @@ function* autoShareSecondaryWorker( { payload } ) {
         S3_SERVICE: JSON.stringify( s3Service ),
         TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
       }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        },
-      } )
+      // yield call( insertDBWorker, {
+      //   payload: {
+      //     SERVICES: updatedSERVICES
+      //   },
+      // } )
       yield put( updateMSharesHealth( [
         {
           walletId: walletId,
@@ -211,7 +208,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
     const { contactList, shareIds } = payload
     const contactListToMarkDone:{type: string; name: string;}[] = []
-    const s3 = yield call( dbManager.getS3Services )
+    const s3 = yield call( dbManager.getBHR )
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const levelToSetup: number = yield select( ( state ) => state.upgradeToNewBhr.levelToSetup )
@@ -245,7 +242,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
     // updateKeeperInfoToMetaShare Got removed
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const secondaryMetaShares: MetaShare[] = [ ...s3.encryptedSMSecretsKeeper ]
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const trustedContacts: any = yield select( ( state ) => state.trustedContacts.service )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     for ( let i = 0; i < shareIds.length; i++ ) {
       const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName
@@ -278,11 +275,11 @@ function* autoShareContactKeeperWorker( { payload } ) {
           S3_SERVICE: JSON.stringify( s3Service ),
           TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
         }
-        yield call( insertDBWorker, {
-          payload: {
-            SERVICES: updatedSERVICES
-          },
-        } )
+        // yield call( insertDBWorker, {
+        //   payload: {
+        //     SERVICES: updatedSERVICES
+        //   },
+        // } )
         yield put( updateMSharesHealth( {
           walletId: walletId,
           shareId: shareId,
