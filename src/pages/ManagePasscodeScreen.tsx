@@ -31,6 +31,9 @@ export default function ManagePasscodeScreen( props ) {
       setPin( pin.slice( 0, -1 ) )
       setCheckAuth( false )
     }
+    if ( checkAuth ) {
+      setCheckAuth( false )
+    }
   }
   const [ checkAuth, setCheckAuth ] = useState( false )
 
@@ -49,6 +52,7 @@ export default function ManagePasscodeScreen( props ) {
   useEffect( () => {
     if ( authenticationFailed && pin ) {
       setCheckAuth( true )
+      setPin( '' )
     } else {
       setCheckAuth( false )
     }
