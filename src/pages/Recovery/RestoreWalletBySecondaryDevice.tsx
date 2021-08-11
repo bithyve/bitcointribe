@@ -24,10 +24,8 @@ import HeaderTitle from '../../components/HeaderTitle'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  requestShare,
-  downloadMShare,
   ErrorReceiving,
-} from '../../store/actions/sss'
+} from '../../store/actions/health'
 import Toast from '../../components/Toast'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
@@ -43,7 +41,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.sss.errorReceiving,
+    ( state ) => state.health.errorReceiving,
   )
   const { DECENTRALIZED_BACKUP } = useSelector(
     ( state ) => state.storage.database,
@@ -73,7 +71,8 @@ export default function RestoreWalletBySecondaryDevice( props ) {
 
   const dispatch = useDispatch()
   useEffect( () => {
-    if ( !REQUEST_DETAILS ) dispatch( requestShare( 0 ) )
+    // Removed sss file
+    // if ( !REQUEST_DETAILS ) dispatch( requestShare( 0 ) )
   }, [] )
 
   if ( META_SHARE ) {
@@ -115,7 +114,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             }
 
             // downloadSecret(index, recoveryRequest.publicKey);
-            // Removed this method
+            // Removed sss file
             // dispatch(
             //   downloadMShare( recoveryRequest.publicKey, null, 'recovery', 0 ),
             // )

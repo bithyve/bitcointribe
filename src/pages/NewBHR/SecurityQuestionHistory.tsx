@@ -25,7 +25,6 @@ import SecurityQuestion from './SecurityQuestion'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import {
-  checkMSharesHealth,
   updateMSharesHealth,
 } from '../../store/actions/health'
 import { useSelector } from 'react-redux'
@@ -118,7 +117,6 @@ const SecurityQuestionHistory = ( props ) => {
         onPressProceed={() => {
           // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
           showSuccessModal( false )
-          dispatch( checkMSharesHealth() )
           props.navigation.goBack()
         }}
         isBottomImage={true}

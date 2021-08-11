@@ -8,7 +8,6 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import storageReducer from './reducers/storage'
 import setupAndAuthReducer from './reducers/setupAndAuth'
 import accountsReducer from './reducers/accounts'
-import sssReducer from './reducers/sss'
 import healthReducer from './reducers/health'
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
@@ -32,7 +31,6 @@ const config = {
 
 import {
   initDBWatcher,
-  initServicesWatcher,
   fetchDBWatcher,
   insertDBWatcher,
   servicesEnricherWatcher,
@@ -63,29 +61,6 @@ import {
   updateAccountSettingsWatcher,
   restoreAccountShellsWatcher
 } from './sagas/accounts'
-
-import {
-  initHCWatcher,
-  uploadEncMetaShareWatcher,
-  downloadMetaShareWatcher,
-  updateMSharesHealthWatcher,
-  checkMSharesHealthWatcher,
-  overallHealthWatcher,
-  uploadRequestedShareWatcher,
-  requestShareWatcher,
-  updateDynamicNonPMDDWatcher,
-  downloadDynamicNonPMDDWatcher,
-  recoverMnemonicWatcher,
-  recoverWalletWatcher,
-  restoreDynamicNonPMDDWatcher,
-  generatePersonalCopyWatcher,
-  checkPDFHealthWatcher,
-  restoreShareFromQRWatcher,
-  shareHistoryUpdateWatcher,
-  updateWalletImageWatcher,
-  fetchWalletImageWatcher,
-  sharePersonalCopyWatcher,
-} from './sagas/sss'
 
 import {
   accountSyncWatcher,
@@ -163,7 +138,8 @@ import {
   acceptExistingContactRequestWatcher,
   setupPasswordWatcher,
   setupLevelHealthWatcher,
-  generateLevel1SharesWatcher
+  generateLevel1SharesWatcher,
+  retrieveMetaSharesWatcher,
 } from './sagas/health'
 
 import {
@@ -202,7 +178,6 @@ const rootSaga = function* () {
     servicesEnricherWatcher,
 
     // wallet setup watcher
-    initServicesWatcher,
     setupWalletWatcher,
     initRecoveryWatcher,
     credentialStorageWatcher,
@@ -225,28 +200,6 @@ const rootSaga = function* () {
     validateTwoFAWatcher,
     createSmNResetTFAOrXPrivWatcher,
     updateAccountSettingsWatcher,
-
-    // sss watchers
-    initHCWatcher,
-    uploadEncMetaShareWatcher,
-    downloadMetaShareWatcher,
-    generatePersonalCopyWatcher,
-    sharePersonalCopyWatcher,
-    updateMSharesHealthWatcher,
-    checkMSharesHealthWatcher,
-    checkPDFHealthWatcher,
-    overallHealthWatcher,
-    uploadRequestedShareWatcher,
-    requestShareWatcher,
-    updateDynamicNonPMDDWatcher,
-    downloadDynamicNonPMDDWatcher,
-    restoreDynamicNonPMDDWatcher,
-    recoverMnemonicWatcher,
-    recoverWalletWatcher,
-    restoreShareFromQRWatcher,
-    shareHistoryUpdateWatcher,
-    updateWalletImageWatcher,
-    fetchWalletImageWatcher,
 
     //fBTC
     accountSyncWatcher,
@@ -307,6 +260,7 @@ const rootSaga = function* () {
     setupPasswordWatcher,
     setupLevelHealthWatcher,
     generateLevel1SharesWatcher,
+    retrieveMetaSharesWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
@@ -375,7 +329,6 @@ const rootReducer = combineReducers( {
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
-  sss: sssReducer,
   health: healthReducer,
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,

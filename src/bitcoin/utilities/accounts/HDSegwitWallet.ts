@@ -39,7 +39,7 @@ import {
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import _ from 'lodash'
-import SSS from '../sss/SSS'
+import BHROperations from '../BHROperations'
 const { HEXA_ID } = config
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -938,7 +938,7 @@ export default class HDSegwitWallet extends Bitcoin {
           break
 
         case TRUSTED_CONTACTS:
-          const key = channelKey? channelKey: SSS.generateKey( config.CIPHER_SPEC.keyLength )
+          const key = channelKey? channelKey: BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
           const trustedAccounts: TrustedContactDerivativeAccount = this
             .derivativeAccounts[ accountType ]
 

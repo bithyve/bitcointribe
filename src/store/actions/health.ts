@@ -1,6 +1,4 @@
 // types and action creators: dispatched by components and sagas
-
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import { BackupStreamData, cloudDataInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
@@ -278,12 +276,6 @@ export const switchS3LoaderKeeper = ( beingLoaded ) => {
     type: S3_LOADING_KEEPER, payload: {
       beingLoaded
     }
-  }
-}
-
-export const generatePDF = () => {
-  return {
-    type: GENERATE_PDF
   }
 }
 

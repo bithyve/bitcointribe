@@ -54,7 +54,6 @@ import {
   MetaShare,
   Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import ModalHeader from '../../components/ModalHeader'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { setCloudData, updateCloudData } from '../../store/actions/cloud'
@@ -131,7 +130,6 @@ interface ManageBackupNewBHRPropsTypes {
   checkMSharesHealth: any;
   isLevel3Initialized: Boolean;
   initLevelTwo: any;
-  s3Service: S3Service;
   keeperInfo: any[];
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
@@ -195,9 +193,9 @@ class ManageBackupNewBHR extends Component<
     this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
-    // const s3 = dbManager.getS3Services()
-    // console.log( 's3', typeof s3, s3 )
-    // this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
+    const s3 = dbManager.getS3Services()
+    console.log( 's3', typeof s3, s3 )
+    this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
     const obj = {
       shareType: '',
       updatedAt: 0,
@@ -432,7 +430,7 @@ class ManageBackupNewBHR extends Component<
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
+          shareId: this.metaSharesKeeper[ 1 ]
             .shareId,
           data: {
           },
@@ -465,7 +463,7 @@ class ManageBackupNewBHR extends Component<
           reshareVersion: 0,
           status: 'notAccessible',
           updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 3 ]
+          shareId: this.metaSharesKeeper[ 3 ]
             .shareId,
           data: {
           },
@@ -1264,7 +1262,6 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.health.service.levelhealth.metaSharesKeeper
     ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),

@@ -20,7 +20,6 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { useDispatch } from 'react-redux'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { sharePersonalCopy } from '../../store/actions/sss'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
 import { sharePDF } from '../../store/actions/health'

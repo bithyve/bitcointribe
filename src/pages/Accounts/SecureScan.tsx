@@ -22,20 +22,20 @@ import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { uploadEncMShare, ErrorSending } from '../../store/actions/sss'
 import DeviceInfo from 'react-native-device-info'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
 import QRCode from '../../components/QRCode'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import { ErrorSending } from '../../store/actions/health'
 
 
 const SecureScan = props => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const isErrorSendingFailed = useSelector( state => state.sss.errorSending )
+  const isErrorSendingFailed = useSelector( state => state.health.errorSending )
   // console.log('isErrorSendingFailed', isErrorSendingFailed);
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
@@ -50,7 +50,7 @@ const SecureScan = props => {
   const wallet: Wallet = useSelector(
     state => state.storage.wallet,
   )
-  const { loading } = useSelector( state => state.sss )
+  const { loading } = useSelector( state => state.health )
   const [ selectedStatus, setSelectedStatus ] = useState( 'Ugly' ) // for preserving health of this entity
   const [ secondaryQR, setSecondaryQR ] = useState( '' )
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP
@@ -69,11 +69,12 @@ const SecureScan = props => {
     : ''
   const dispatch = useDispatch()
 
-  useEffect( () => {
-    if ( !secondaryQR ) {
-      dispatch( uploadEncMShare( 0 ) )
-    }
-  }, [] )
+  // useEffect( () => {
+  //   if ( !secondaryQR ) {
+  // sss file removed
+  //     dispatch( uploadEncMShare( 0 ) )
+  //   }
+  // }, [] )
 
   const renderErrorModalContent = useCallback( () => {
     return (

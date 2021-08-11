@@ -28,7 +28,6 @@ import { initializeHealthSetup, updateWalletImageHealth } from '../actions/healt
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
@@ -75,7 +74,7 @@ function* setupWalletWorker( { payload } ) {
   // TODO: remove legacy DB post S3 service functionalization
   const initialDatabase: Database = {
     SERVICES: {
-      S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
+      S3_SERVICE: ''// JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
     },
   }
 

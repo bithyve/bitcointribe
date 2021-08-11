@@ -1,6 +1,5 @@
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { take, fork } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -15,7 +14,7 @@ export const serviceGenerator = async (
   regularAcc: RegularAccount;
   testAcc: TestAccount;
   secureAcc: SecureAccount;
-  s3Service: S3Service;
+  s3Service: any;
   trustedContacts: TrustedContactsService;
 }> => {
   // Regular account
@@ -36,15 +35,15 @@ export const serviceGenerator = async (
   const testAcc = new TestAccount( primaryMnemonic )
 
   // Share generation/restoration
-  const s3Service = new S3Service( primaryMnemonic )
-  if ( metaShares ) {
-    res = s3Service.restoreMetaShares( metaShares )
-    if ( res.status !== 200 ) throw new Error( 'Share restoration failed' )
-  } else {
-    // res = s3Service.generateLevel1Shares(securityAns);
-    res = s3Service.generateShares( securityAns )
-    if ( res.status !== 200 ) throw new Error( 'Share generation failed' )
-  }
+  // const s3Service = new S3Service( primaryMnemonic )
+  // if ( metaShares ) {
+  //   res = s3Service.restoreMetaShares( metaShares )
+  //   if ( res.status !== 200 ) throw new Error( 'Share restoration failed' )
+  // } else {
+  //   // res = s3Service.generateLevel1Shares(securityAns);
+  //   res = s3Service.generateShares( securityAns )
+  //   if ( res.status !== 200 ) throw new Error( 'Share generation failed' )
+  // }
 
   // share history initialization
   const createdAt = Date.now()
@@ -134,7 +133,7 @@ export const serviceGeneratorForNewBHR = async (
   regularAcc: RegularAccount;
   testAcc: TestAccount;
   secureAcc: SecureAccount;
-  s3Service: S3Service;
+  s3Service: any;
   trustedContacts: TrustedContactsService;
 }> => {
   // Regular account
@@ -155,12 +154,12 @@ export const serviceGeneratorForNewBHR = async (
   const testAcc = new TestAccount( primaryMnemonic )
 
   // Share generation/restoration
-  const s3Service = new S3Service( primaryMnemonic )
+  // const s3Service = new S3Service( primaryMnemonic )
 
-  if ( metaShares && metaShares.length ) {
-    res = s3Service.restoreMetaSharesKeeper( metaShares )
-    if ( res.status !== 200 ) throw new Error( 'Share restoration failed' )
-  }
+  // if ( metaShares && metaShares.length ) {
+  //   res = s3Service.restoreMetaSharesKeeper( metaShares )
+  //   if ( res.status !== 200 ) throw new Error( 'Share restoration failed' )
+  // }
   // share history initialization
   const createdAt = Date.now()
   const shareHistory = [

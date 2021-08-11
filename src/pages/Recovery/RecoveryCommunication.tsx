@@ -24,7 +24,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { textWithoutEncoding, email } from 'react-native-communications'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import commonStyle from '../../common/Styles/Styles'
-import { requestShare, downloadMShare } from '../../store/actions/sss'
 import { nameToInitials } from '../../common/CommonFunctions'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
@@ -91,7 +90,8 @@ export default function RecoveryCommunication( props ) {
 
   const dispatch = useDispatch()
   useEffect( () => {
-    if ( !REQUEST_DETAILS ) dispatch( requestShare( index ) )
+    // Removed sss file
+    // if ( !REQUEST_DETAILS ) dispatch( requestShare( index ) )
 
     const contactInfoTemp = communicationInfo.map( ( { number, email }, index ) => {
       if ( number || email ) {

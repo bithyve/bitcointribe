@@ -34,8 +34,6 @@ function setCurrencyCodeToImage( currencyName, currencyColor ) {
 }
 export enum BottomSheetKind {
     TAB_BAR_BUY_MENU,
-    CUSTODIAN_REQUEST,
-    CUSTODIAN_REQUEST_REJECTED,
     TRUSTED_CONTACT_REQUEST,
     ADD_CONTACT_FROM_ADDRESS_BOOK,
     NOTIFICATIONS_LIST,

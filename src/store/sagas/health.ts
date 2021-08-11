@@ -23,7 +23,6 @@ import {
   CLOUD_MSHARE,
   switchS3LoaderKeeper,
   isLevel3InitializedStatus,
-  GENERATE_PDF,
   pdfGenerated,
   RECOVER_MNEMONIC_HEALTH,
   mnemonicRecoveredHealth,
@@ -67,7 +66,6 @@ import {
   GENERATE_LEVEL2_SHARES,
   RETRIEVE_METASHRES
 } from '../actions/health'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
 import {
   switchS3LoadingStatus,
@@ -109,7 +107,6 @@ import {
   NewWalletImage,
   cloudDataInterface
 } from '../../bitcoin/utilities/Interface'
-import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import moment from 'moment'
 import crypto from 'crypto'
 import { Alert } from 'react-native'
@@ -134,8 +131,6 @@ import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, restoreContacts, restoreTrustedContacts, syncPermanentChannels } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker } from '../sagas/trustedContacts'
-
-import SSS from '../../bitcoin/utilities/sss/SSS'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWallet } from '../actions/storage'
@@ -450,8 +445,8 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     console.log( 'payload.icloudData', payload.icloudData )
     console.log( 'payload.selectedBackup', payload.selectedBackup )
     console.log( 'payload.answer', payload.answer )
-    const primaryMnemonic = LevelHealth.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedString
-    const secondaryMnemonics = LevelHealth.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedString
+    const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedString
+    const secondaryMnemonics = BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedString
     const image: NewWalletImage = icloudData
     yield call( recoverWalletWorker, {
       payload: {
@@ -491,8 +486,8 @@ function* recoverWalletWorker( { payload } ) {
         pmShares.push( element.backupData.primaryMnemonicShard.encryptedShare.pmShare )
         smShares.push( element.secondaryData.secondaryMnemonicShard )
       }
-      secondaryMnemonics = LevelHealth.getMnemonics( smShares, answer ).mnemonic
-      primaryMnemonic = LevelHealth.getMnemonics( pmShares, answer, true ).mnemonic
+      secondaryMnemonics = BHROperations.getMnemonics( smShares, answer ).mnemonic
+      primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
     }
 
     const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
@@ -504,14 +499,14 @@ function* recoverWalletWorker( { payload } ) {
     const acc = []
     const accountData = {
     }
-    const decKey = LevelHealth.getDerivedKey(
+    const decKey = BHROperations.getDerivedKey(
       bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
     )
     Object.keys( accounts ).forEach( ( key ) => {
       const decipher = crypto.createDecipheriv(
-        LevelHealth.cipherSpec.algorithm,
+        BHROperations.cipherSpec.algorithm,
         decKey,
-        LevelHealth.cipherSpec.iv,
+        BHROperations.cipherSpec.iv,
       )
       const account = accounts[ key ]
       let decryptedAccData = decipher.update( account.encryptedData, 'hex', 'utf8' )
@@ -677,16 +672,16 @@ function* updateWalletImageWorker() {
   const wallet = yield call( dbManager.getWallet )
   const contacts = yield call( dbManager.getTrustedContacts )
   const accounts = yield call( dbManager.getAccounts )
-  const encKey = LevelHealth.getDerivedKey(
+  const encKey = BHROperations.getDerivedKey(
     bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' ),
   )
   const acc = {
   }
   accounts.forEach( account => {
     const cipher = crypto.createCipheriv(
-      LevelHealth.cipherSpec.algorithm,
+      BHROperations.cipherSpec.algorithm,
       encKey,
-      LevelHealth.cipherSpec.iv,
+      BHROperations.cipherSpec.iv,
     )
     let encrypted = cipher.update(
       JSON.stringify( account ),
@@ -731,147 +726,6 @@ function* updateWalletImageWorker() {
 export const updateWalletImageHealthWatcher = createWatcher(
   updateWalletImageWorker,
   UPDATE_WALLET_IMAGE_HEALTH,
-)
-
-function* generatePDFWorker( { payload } ) {
-  // yield put(switchS3Loader('generatePDF'));
-  const { selectedPersonalCopy } = payload // corresponds to metaShare index (3/4)
-  //const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
-  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
-  // const res = yield call(s3Service.createQRKeeper, shareIndex);
-  // if (res.status !== 200) {
-  //   console.log({ err: res.err });
-  //   return;
-  // }
-  const secureAccount: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
-  )
-  const qrData = {
-    secondaryMnemonic: '',
-    secondaryXpub: '',
-    bhXpub: '',
-  }
-
-  const pdfData = {
-    qrData: qrData,
-  }
-
-  const { security, walletName } = yield select(
-    ( state ) => state.storage.wallet
-  )
-
-  try {
-    const pdfPath = yield call(
-      generatePDFKeeper,
-      pdfData,
-      `Hexa_Recovery_Key_${walletName}.pdf`,
-      `Hexa Recovery Key for ${walletName}'s Wallet`
-    )
-
-    let personalCopyDetails = yield call(
-      AsyncStorage.getItem,
-      'personalCopyDetails'
-    )
-    // console.log('/sagas/sss ', {personalCopyDetails})
-    if ( !personalCopyDetails ) {
-      personalCopyDetails = {
-        [ selectedPersonalCopy.type ]: {
-          path: pdfPath,
-          shared: false,
-          sharingDetails: {
-          },
-        },
-      }
-    } else {
-      personalCopyDetails = JSON.parse( personalCopyDetails )
-      const originalSharedStatus = personalCopyDetails[
-        selectedPersonalCopy.type
-      ]
-        ? personalCopyDetails[ selectedPersonalCopy.type ].shared
-        : false
-      const originalSharingDetails =
-        personalCopyDetails[ selectedPersonalCopy.type ] &&
-        personalCopyDetails[ selectedPersonalCopy.type ].sharingDetails
-          ? personalCopyDetails[ selectedPersonalCopy.type ].sharingDetails
-          : {
-          }
-      personalCopyDetails = {
-        ...personalCopyDetails,
-        [ selectedPersonalCopy.type ]: {
-          path: pdfPath,
-          shared: !!originalSharedStatus,
-          sharingDetails: originalSharingDetails,
-        },
-      }
-    }
-    // console.log('/sagas/sss ', {personalCopyDetails})
-    yield call(
-      AsyncStorage.setItem,
-      'personalCopyDetails',
-      JSON.stringify( personalCopyDetails )
-    )
-
-    // reset PDF health (if present) post reshare
-    let storedPDFHealth = yield call( AsyncStorage.getItem, 'PDF Health' )
-    // console.log('/sagas/sss ', {storedPDFHealth})
-    if ( storedPDFHealth ) {
-      const { pdfHealthKeeper } = s3Service.levelhealth
-      storedPDFHealth = JSON.parse( storedPDFHealth )
-      storedPDFHealth = {
-        ...storedPDFHealth,
-        // [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
-      }
-      // console.log('/sagas/sss ', {storedPDFHealth})
-      yield call(
-        AsyncStorage.setItem,
-        'PDF Health',
-        JSON.stringify( storedPDFHealth )
-      )
-    }
-
-    yield put( pdfGenerated( true ) )
-
-    // if (Object.keys(personalCopyDetails).length == 2) {
-    //   // remove sec-mne once both the personal copies are generated
-    //   const { removed } = secureAccount.removeSecondaryMnemonic();
-    //   if (!removed) console.log('Failed to remove sec-mne');
-    // }
-
-    // remove secondary mnemonic (if the secondary menmonic has been removed and re-injected)
-    const blockPCShare = yield call( AsyncStorage.getItem, 'blockPCShare' )
-    // if (blockPCShare) {
-    //   if (secureAccount.secureHDWallet.secondaryMnemonic) {
-    //     const { removed } = secureAccount.removeSecondaryMnemonic();
-    //     if (!removed) {
-    //       console.log('Failed to remove the secondary mnemonic');
-    //     }
-    //   }
-    // }
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      SECURE_ACCOUNT: JSON.stringify( secureAccount ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-    }
-
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } catch ( err ) {
-    console.log( {
-      err
-    } )
-    yield put( pdfGenerated( false ) )
-  }
-  //yield put(switchS3Loader('generatePDF'));
-}
-
-export const generatePDFWatcher = createWatcher(
-  generatePDFWorker,
-  GENERATE_PDF
 )
 
 function* recoverMnemonicHealthWorker( { payload } ) {
@@ -939,10 +793,10 @@ function* getPDFDataWorker( { payload } ) {
         secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
         walletId,
-        encryptedKey: LevelHealth.encryptWithAnswer(
+        encryptedKey: BHROperations.encryptWithAnswer(
           shareId,
           wallet.security.answer
-        ).encryptedString,
+        ).encryptedData,
       }
       const secondaryData = {
         type: QRCodeTypes.RECOVERY_REQUEST,
@@ -1149,7 +1003,7 @@ function* confirmPDFSharedWorker( { payload } ) {
       version: string,
       encryptedKey: string,
     } = JSON.parse( scannedData )
-    const decryptedData = LevelHealth.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
+    const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
     if( decryptedData == shareId ){
       const shareObj = {
         walletId: walletId,
@@ -1241,27 +1095,27 @@ export const emptyShareTransferDetailsForContactChangeWatcher = createWatcher(
 function* deletePrivateDataWorker() {
   try {
     // Transfer: Guardian >>> User
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    // const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const s3ServiceSecure: SecureAccount = yield select(
       ( state ) => state.accounts[ SECURE_ACCOUNT ].service
     )
-    // Delete Sm shares and Primary Mnemonics
-    s3Service.deletePrivateData()
+    // // Delete Sm shares and Primary Mnemonics
+    // s3Service.deletePrivateData()
 
-    // Delete Sm
-    s3ServiceSecure.deleteSecondaryMnemonics()
+    // // Delete Sm
+    // s3ServiceSecure.deleteSecondaryMnemonics()
 
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      SECURE_ACCOUNT: JSON.stringify( s3ServiceSecure ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
+    // const { SERVICES } = yield select( ( state ) => state.storage.database )
+    // const updatedSERVICES = {
+    //   ...SERVICES,
+    //   SECURE_ACCOUNT: JSON.stringify( s3ServiceSecure ),
+    //   S3_SERVICE: JSON.stringify( s3Service ),
+    // }
+    // yield call( insertDBWorker, {
+    //   payload: {
+    //     SERVICES: updatedSERVICES
+    //   }
+    // } )
   } catch ( error ) {
     console.log( 'RECOVERY error', error )
   }
@@ -1859,7 +1713,7 @@ function* setupHealthWorker( { payload } ) {
     }
     if ( !isLevelInitialized ) {
       const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-      const wallet: S3Service = yield select( ( state ) => state.storage.wallet )
+      const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
       console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
 
       const levelInfo: LevelInfo[] = [

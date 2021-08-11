@@ -34,11 +34,8 @@ import RecoverySuccessModalContents from '../../components/RecoverySuccessModalC
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  downloadMShare,
-  recoverWallet,
-  walletRecoveryFailed,
   ErrorReceiving,
-} from '../../store/actions/sss'
+} from '../../store/actions/health'
 import ModalHeader from '../../components/ModalHeader'
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents'
 
@@ -66,13 +63,11 @@ export default function RestoreSelectedContactsList( props ) {
 
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const { downloadMetaShare } = useSelector( ( state ) => state.sss.loading )
-
-  const isWalletRecoveryFailed = useSelector(
-    ( state ) => state.sss.walletRecoveryFailed,
-  )
+  const { downloadMetaShare } = useSelector( ( state ) => state.health.loading )
+  // Removed sss file
+  const isWalletRecoveryFailed = false
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.sss.errorReceiving,
+    ( state ) => state.health.errorReceiving,
   )
 
   const [ exchangeRates, setExchangeRates ] = useState()
@@ -265,8 +260,8 @@ export default function RestoreSelectedContactsList( props ) {
       }, 2 );
       ( ErrorBottomSheet as any ).current.snapTo( 1 );
       ( loaderBottomSheet as any ).current.snapTo( 0 )
-
-      dispatch( walletRecoveryFailed( null ) )
+      // Removed sss file
+      // dispatch( walletRecoveryFailed( null ) )
     }
   }, [ isWalletRecoveryFailed ] )
 
@@ -305,7 +300,7 @@ export default function RestoreSelectedContactsList( props ) {
   }, [ SD_META_SHARE ] )
 
   const walletImageChecked: Boolean = useSelector(
-    ( state ) => state.sss.walletImageChecked,
+    ( state ) => state.health.walletImageChecked,
   )
 
   useEffect( () => {
@@ -339,7 +334,7 @@ export default function RestoreSelectedContactsList( props ) {
           console.log( {
             KEY
           } )
-          // Removed this method
+          // Removed sss file
           // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
           Alert.alert(
@@ -349,7 +344,7 @@ export default function RestoreSelectedContactsList( props ) {
         }
       } else if ( key ) {
         // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
-        // Removed this method
+        // Removed sss file
         // dispatch( downloadMShare( key, null, 'recovery' ) )
       }
     },
@@ -975,7 +970,8 @@ export default function RestoreSelectedContactsList( props ) {
                 setTimeout( () => {
                   setElevation( 0 )
                 }, 2 )
-                dispatch( recoverWallet() )
+                // Removed sss file
+                // dispatch( recoverWallet() )
                 dispatch( setVersion( 'Restored' ) )
               }}
             >

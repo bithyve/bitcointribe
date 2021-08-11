@@ -46,7 +46,6 @@ import CloudPermissionModalContents from '../components/CloudPermissionModalCont
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
-import S3Service from '../bitcoin/services/sss/S3Service'
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
@@ -181,7 +180,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ securityQue, showSecurityQue ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
-  const s3service: S3Service = useSelector( ( state ) => state.health.service )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
@@ -223,14 +221,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     //     walletName,
     //   } )
     // }
-    if( walletSetupCompleted && s3service && s3service.levelhealth && ( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.FAILED || isSkipClicked ) && ( cloudPermissionGranted === true || cloudPermissionGranted === false ) ) {
+    if( walletSetupCompleted && ( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.FAILED || isSkipClicked ) && ( cloudPermissionGranted === true || cloudPermissionGranted === false ) ) {
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
     }
-  }, [ walletSetupCompleted, s3service, cloudBackupStatus ] )
+  }, [ walletSetupCompleted, cloudBackupStatus ] )
 
   const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
@@ -255,11 +253,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   useEffect( ()=>{
-    if( levelHealth.length && s3service && s3service.levelhealth && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+    if( levelHealth.length && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
       cloudPermissionGranted === true && !isSkipClicked && updateWIStatus === false ){
       dispatch( setCloudData() )
     }
-  }, [ s3service, cloudPermissionGranted, levelHealth, updateWIStatus ] )
+  }, [ cloudPermissionGranted, levelHealth, updateWIStatus ] )
 
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )

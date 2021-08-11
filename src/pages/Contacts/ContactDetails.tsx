@@ -30,13 +30,10 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import SendViaLink from '../../components/SendViaLink'
 import ModalHeader from '../../components/ModalHeader'
 import DeviceInfo from 'react-native-device-info'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
   ErrorSending,
-  UploadSuccessfully,
-} from '../../store/actions/sss'
+} from '../../store/actions/health'
 import { UploadSMSuccessfully } from '../../store/actions/health'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
@@ -87,7 +84,6 @@ interface ContactDetailsPropTypes {
   trustedContactRecipients: ContactRecipientDescribing[],
   accountShells: AccountShell[];
   errorSending: any;
-  uploadSuccessfull: any;
   UNDER_CUSTODY: any;
   DECENTRALIZED_BACKUP: any;
   wallet: Wallet;
@@ -97,14 +93,12 @@ interface ContactDetailsPropTypes {
   addRecipientForSending: any;
   recipientSelectedForAmountSetting: any;
   amountForRecipientUpdated: any;
-  UploadSuccessfully: any;
   removeTrustedContact: any;
   syncPermanentChannels: any;
   uploadRequestedSMShare: any;
   hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
   newBHRFlowStarted : any;
-  s3Service: S3Service
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -466,7 +460,7 @@ class ContactDetails extends PureComponent<
     const appVersion = DeviceInfo.getVersion()
     const { trustedContacts } = this.props
     const contacts: TrustedContact = trustedContacts[ this.contact.channelKey ]
-    const instream: StreamData = useStreamFromContact( contacts, this.props.s3Service.levelhealth.walletId, true )
+    const instream: StreamData = useStreamFromContact( contacts, this.props.wallet.walletId, true )
     if ( !this.contact ) {
       Alert.alert( 'contact details missing' )
       return
@@ -1212,8 +1206,7 @@ class ContactDetails extends PureComponent<
 }
 const mapStateToProps = ( state ) => {
   return {
-    errorSending: idx( state, ( _ ) => _.sss.errorSending ),
-    uploadSuccessfull: idx( state, ( _ ) => _.sss.uploadSuccessfully ),
+    errorSending: idx( state, ( _ ) => _.health.errorSending ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     trustedContactRecipients: idx( state, ( _ ) => _.trustedContacts.trustedContactRecipients ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
@@ -1232,7 +1225,6 @@ const mapStateToProps = ( state ) => {
     ),
     hasSMUploadedSuccessfully: idx( state, ( _ ) => _.health.hasSMUploadedSuccessfully ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
-    s3Service: idx( state, ( _ ) => _.health.service )
   }
 }
 export default connect( mapStateToProps, {
@@ -1240,7 +1232,6 @@ export default connect( mapStateToProps, {
   addRecipientForSending,
   recipientSelectedForAmountSetting,
   amountForRecipientUpdated,
-  UploadSuccessfully,
   ErrorSending,
   removeTrustedContact,
   syncPermanentChannels,

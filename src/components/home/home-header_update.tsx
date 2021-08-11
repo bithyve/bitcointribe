@@ -35,7 +35,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { currencyKindSet } from '../../store/actions/preferences'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
@@ -82,10 +81,6 @@ const HomeHeader = ( {
   )
   const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
-
-  const s3Service: S3Service = useSelector(
-    ( state ) => state.health.service
-  )
 
   const newBHRFlowStarted = useSelector(
     ( state ) => state.health.newBHRFlowStarted

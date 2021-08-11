@@ -1,7 +1,6 @@
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import dataManager from '../../storage/database-manager'
@@ -11,19 +10,12 @@ export const INIT_DB = 'INIT_DB'
 export const FETCH_FROM_DB = 'FETCH_FROM_DB'
 export const INSERT_INTO_DB = 'INSERT_INTO_DB'
 export const KEY_FETCHED = 'KEY_FETCHED'
-export const INITIALIZE_SERVICES = 'INITIALIZE_SERVICES'
 export const ENRICH_SERVICES = 'ENRICH_SERVICES'
 
 
 export const initializeDB = () => {
   return {
     type: INIT_DB
-  }
-}
-
-export const initializeServices= ( ) => {
-  return {
-    type: INITIALIZE_SERVICES
   }
 }
 
@@ -56,7 +48,6 @@ export const enrichServices = ( database ) => {
 // types and action creators (saga): dispatched by saga workers
 export const UPDATE_WALLET = 'UPDATE_WALLET'
 export const DB_INITIALIZED = 'DB_INITIALIZED'
-export const SERVICES_INITIALIZED = 'SERVICES_INITIALIZED'
 export const DB_FETCHED = 'DB_FETCHED'
 export const DB_INSERTED = 'DB_INSERTED'
 export const SERVICES_ENRICHED = 'SERVICES_ENRICHED'
@@ -74,21 +65,6 @@ export const dbInitialized = ( initialized ) => {
   return {
     type: DB_INITIALIZED, payload: {
       initialized
-    }
-  }
-}
-
-export const servicesInitialized = ( services: {
-  regularAcc: RegularAccount;
-  testAcc: TestAccount;
-  secureAcc: SecureAccount;
-  s3Service: S3Service;
-  trustedContacts: TrustedContactsService;
-} ) => {
-  return {
-    type: SERVICES_INITIALIZED,
-    payload:{
-      services
     }
   }
 }

@@ -8,9 +8,6 @@ import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../action
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -85,14 +82,14 @@ function* cloudWorker( { payload } ) {
         )
         // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
         const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-        const { encryptedString } = LevelHealth.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
-        const secondaryMnemonics = wallet.secondaryMnemonic ? LevelHealth.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedString : ''
+        const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+        const secondaryMnemonics = wallet.secondaryMnemonic ? BHROperations.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedData : ''
         const data = {
           levelStatus: level ? level : 1,
           shares: shares,
           secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : secondaryMnemonics,
           encryptedCloudDataJson: encryptedCloudDataJson,
-          seed: shares ? '' : encryptedString,
+          seed: shares ? '' : encryptedData,
           walletName: wallet.walletName,
           questionId: wallet.security.questionId,
           question: wallet.security.questionId === '0' ? wallet.security.question: '',

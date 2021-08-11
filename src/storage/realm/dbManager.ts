@@ -201,7 +201,6 @@ const updateContact = async ( contact ) => {
 }
 
 const updateS3Services = async ( data ) => {
-  console.log( 'updateS3Services', data )
   try {
     const dbRef = db.objects( schema.S3Services )
     if( dbRef && dbRef.length ){
@@ -227,7 +226,6 @@ const getS3Services = () => {
   try {
     const dbRef = db.objects( schema.S3Services )
     const s3Services = Array.from( dbRef )
-    console.log( 's3Services', JSON.stringify( s3Services ) )
     if( s3Services && s3Services.length > 0 ) {
       return s3Services[ 0 ]
     } else {
