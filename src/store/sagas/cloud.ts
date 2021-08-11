@@ -64,9 +64,7 @@ function* cloudWorker( { payload } ) {
         keeperInfo.push( obj )
       }
       yield put( putKeeperInfo( keeperInfo ) )
-      const regularAccount = yield select( ( state ) => state.accounts[ REGULAR_ACCOUNT ].service )
       const cloudBackupHistory = yield select( ( state ) => state.cloud.cloudBackupHistory )
-      const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
       const wallet: Wallet = yield select(
         ( state ) => state.storage.wallet
       )
@@ -104,13 +102,13 @@ function* cloudWorker( { payload } ) {
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
-        secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : secondaryMnemonics,
+        secondaryShare: walletDB.smShare ? walletDB.smShare : secondaryMnemonics,
         encryptedCloudDataJson: encryptedCloudDataJson,
         seed: shares ? '' : encryptedData,
         walletName: wallet.walletName,
         questionId: wallet.security.questionId,
         question: wallet.security.questionId === '0' ? wallet.security.question: '',
-        regularAccount: regularAccount,
+        regularAccount: '',
         keeperData: JSON.stringify( keeperInfo ),
         bhXpub,
       }

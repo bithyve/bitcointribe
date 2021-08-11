@@ -99,6 +99,7 @@ interface ManageBackupNewBHRStateTypes {
   approvePrimaryKeeper: boolean;
   loaderModal: boolean;
   knwowMoreModal: boolean;
+  metaSharesKeeper: MetaShare[]
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -165,7 +166,6 @@ class ManageBackupNewBHR extends Component<
   QrBottomSheet: any;
   loaderBottomSheet: any
   knowMoreBottomSheet: any
-  metaSharesKeeper: MetaShare[]
 
   constructor( props ) {
     super( props )
@@ -176,7 +176,7 @@ class ManageBackupNewBHR extends Component<
     this.keeperTypeBottomSheet
     const s3 = dbManager.getBHR()
     console.log( 's3', typeof s3, s3 )
-    this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
+
     const obj = {
       shareType: '',
       updatedAt: 0,
@@ -210,6 +210,7 @@ class ManageBackupNewBHR extends Component<
       approvePrimaryKeeper: false,
       loaderModal: false,
       knwowMoreModal: false,
+      metaSharesKeeper: [ ...s3.metaSharesKeeper ]
     }
   }
 
@@ -399,9 +400,11 @@ class ManageBackupNewBHR extends Component<
         loaderModal: false
       } )
     }
-
+    console.log( 'this.state.metaSharesKeeper.length', this.state.metaSharesKeeper.length )
+    console.log( 'prevProps.initLoading', prevProps.initLoading )
+    console.log( 'this.props.initLoading', this.props.initLoading )
     if (
-      prevProps.initLoading !== this.props.initLoading && this.metaSharesKeeper.length == 3
+      prevProps.initLoading !== this.props.initLoading && this.state.metaSharesKeeper.length == 3
     ) {
       const obj = {
         id: 2,
@@ -411,7 +414,7 @@ class ManageBackupNewBHR extends Component<
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
-          shareId: this.metaSharesKeeper[ 1 ]
+          shareId: this.state.metaSharesKeeper[ 1 ]
             .shareId,
           data: {
           },
@@ -433,7 +436,7 @@ class ManageBackupNewBHR extends Component<
       // this.loaderBottomSheet.snapTo( 0 )
     }
     if (
-      prevProps.generateMetaShareStatus !== this.props.generateMetaShareStatus && !this.props.generateMetaShareStatus && this.metaSharesKeeper.length == 5
+      prevProps.generateMetaShareStatus !== this.props.generateMetaShareStatus && !this.props.generateMetaShareStatus && this.state.metaSharesKeeper.length == 5
     ) {
       const obj = {
         id: 2,
@@ -443,7 +446,7 @@ class ManageBackupNewBHR extends Component<
           reshareVersion: 0,
           status: 'notAccessible',
           updatedAt: 0,
-          shareId: this.metaSharesKeeper[ 3 ]
+          shareId: this.state.metaSharesKeeper[ 3 ]
             .shareId,
           data: {
           },
@@ -1113,7 +1116,7 @@ Wallet Backup
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2 &&
-                  this.metaSharesKeeper.length != 5
+                  this.state.metaSharesKeeper.length != 5
                   ) {
                     this.props.generateMetaShare( selectedLevelId )
                   } else if( selectedLevelId == 3 ) {
@@ -1123,7 +1126,7 @@ Wallet Backup
                       id: selectedLevelId,
                       selectedKeeper: {
                         ...selectedKeeper, name: name, shareType: type,
-                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.metaSharesKeeper[ 1 ] ? this.metaSharesKeeper[ 1 ].shareId: '' : this.metaSharesKeeper[ 4 ] ? this.metaSharesKeeper[ 4 ].shareId : ''
+                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
                       },
                       isSetup: true,
                     }
@@ -1213,7 +1216,7 @@ Wallet Backup
                   id: selectedLevelId,
                   selectedKeeper: {
                     ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.metaSharesKeeper[ 1 ] ? this.metaSharesKeeper[ 1 ].shareId: '' : this.metaSharesKeeper[ 4 ] ? this.metaSharesKeeper[ 4 ].shareId : ''
+                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
                   },
                   isSetup: true,
                 }

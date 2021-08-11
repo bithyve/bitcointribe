@@ -362,14 +362,15 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
-    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
-    const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
-    const walletId = s3Service.levelhealth.walletId
-    const answer = yield select( ( state ) => state.storage.wallet.security.answer )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const s3 = yield call( dbManager.getBHR )
+    const metaShare: MetaShare[] = [ ...s3.metaSharesKeeper ]
+    const walletId = wallet.walletId
+    const answer = wallet.security.answer
     let shareIndex = 3
     if (
       shareId &&
-      s3Service.levelhealth.metaSharesKeeper.length &&
+      metaShare.length &&
       metaShare.findIndex( ( value ) => value.shareId == shareId ) > -1
     ) {
       shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )

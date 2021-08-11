@@ -381,10 +381,8 @@ function* updateHealthLevel2Worker( { payload } ) {
     levelInfo[ 0 ] = SecurityQuestionHealth
     for ( let i = 1; i < metaShares.length; i++ ) {
       const element = metaShares[ i ]
-      let shareType = ''
-      if ( i == 1 ) shareType = 'cloud'
       const obj = {
-        shareType: shareType,
+        shareType: '',
         updatedAt: 0,
         status: 'notSetup',
         shareId: element.shareId,
@@ -395,7 +393,7 @@ function* updateHealthLevel2Worker( { payload } ) {
     levelHealth.push( {
       levelInfo, level
     } )
-    console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
+    console.log( 'INIT_LEVEL_TWO levelHealth', JSON.stringify( levelHealth ) )
     yield put( updateHealth( levelHealth, currentLevel, 'updateHealthLevel2Watcher' ) )
     if ( level == 2 ) yield put( isLevel2InitializedStatus() )
     if ( level == 3 ) yield put( isLevel3InitializedStatus() )
