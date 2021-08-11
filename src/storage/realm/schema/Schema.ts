@@ -213,6 +213,18 @@ export const XPubSchema: ObjectSchema = {
   },
 }
 
+export const ReceiverSchema: ObjectSchema = {
+  name: Receiver,
+  properties: {
+    name: {
+      type: 'string', optional: true
+    },
+    amount: {
+      type: 'int', optional: true
+    },
+  },
+}
+
 export const TransactionSchema: ObjectSchema = {
   name: Transaction,
   primaryKey: 'txid',
@@ -269,8 +281,8 @@ export const TransactionSchema: ObjectSchema = {
     sender: {
       type: 'string', optional: true
     },
-    receiver: {
-      type: 'string', optional: true
+    receivers: {
+      type: 'list', objectType: Receiver, default: []
     },
     isNew: {
       type: 'bool', default: false

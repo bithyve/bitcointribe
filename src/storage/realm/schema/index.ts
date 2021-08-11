@@ -28,7 +28,8 @@ import {
   TrustedContactSchema,
   WalletSecuritySchema,
   S3MetaShareSchema,
-  S3ServicesSchema,
+  BHRSchemaSchema,
+  ReceiverSchema,
 } from './Schema'
 
 export default
@@ -62,5 +63,6 @@ export default
   ContactDetailsSchema,
   TrustedContactSchema,
   S3MetaShareSchema,
-  S3ServicesSchema,
+  BHRSchemaSchema,
+  ReceiverSchema,
 ]
