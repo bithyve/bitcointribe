@@ -58,7 +58,6 @@ const CloudBackupHistory = ( props ) => {
 
   const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const [ errorMsg, setErrorMsg ] = useState( '' )
-  const s3Service = useSelector( ( state ) => state.bhr.service )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
 
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )

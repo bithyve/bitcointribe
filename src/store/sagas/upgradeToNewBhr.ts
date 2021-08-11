@@ -21,6 +21,7 @@ import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, Meta
 import { setCloudData } from '../actions/cloud'
 import Relay from '../../bitcoin/utilities/Relay'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import dbManager from '../../storage/realm/dbManager'
 
 function* initLevelsWorker( { payload } ) {
   try {
@@ -76,8 +77,8 @@ function* setCloudDataForLevelWorker( { payload } ) {
   try {
     const { level } = payload
     yield put( switchUpgradeLoader( 'cloudDataForLevel' ) )
-    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
-    const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
+    const s3 = yield call( dbManager.getBHR )
+    const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
@@ -108,30 +109,30 @@ function* autoShareSecondaryWorker( { payload } ) {
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
     const { shareId } = payload
     const name = 'Personal Device1'
-    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const s3 = yield call( dbManager.getBHR )
+    const metaSharesKeeper: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const obj: KeeperInfoInterface = {
       shareId: shareId,
       name: name,
       type: 'device',
-      scheme: s3Service.levelhealth.metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+      scheme: metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
       currentLevel: this.props.levelToSetup,
       createdAt: moment( new Date() ).valueOf(),
-      sharePosition: s3Service.levelhealth.metaSharesKeeper.findIndex( value => value.shareId == shareId ),
+      sharePosition: metaSharesKeeper.findIndex( value => value.shareId == shareId ),
       data: {
         name: name, index: 0
       }
     }
     yield put( updatedKeeperInfo( obj ) )
-    const walletId = s3Service.getWalletId().data.walletId
+    const walletId = wallet.walletId
     const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
     // updateKeeperInfoToMetaShare Got removed
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
-    const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
-    const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
+    const secondaryMetaShares: MetaShare[] = [ ...s3.encryptedSMSecretsKeeper ]
     const trustedContacts: any = yield select( ( state ) => state.trustedContacts.service )
-    const share: MetaShare = metaShares.find( value => value.shareId == shareId )
+    const share: MetaShare = metaSharesKeeper.find( value => value.shareId == shareId )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     const oldKeeperInfo  = trustedContactsInfo[ 'Secondary Device'.toLowerCase() ]
     const status = 'accessible'
@@ -207,7 +208,9 @@ function* autoShareContactKeeperWorker( { payload } ) {
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
     const { contactList, shareIds } = payload
     const contactListToMarkDone:{type: string; name: string;}[] = []
-    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
+    const s3 = yield call( dbManager.getBHR )
+    const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+    const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const levelToSetup: number = yield select( ( state ) => state.upgradeToNewBhr.levelToSetup )
     for ( let i = 0; i < shareIds.length; i++ ) {
       const element = shareIds[ i ]
@@ -222,24 +225,23 @@ function* autoShareContactKeeperWorker( { payload } ) {
         shareId: element,
         name: name,
         type: 'contact',
-        scheme: s3Service.levelhealth.metaSharesKeeper.find( value => value.shareId == element ).meta.scheme,
+        scheme: metaShares.find( value => value.shareId == element ).meta.scheme,
         currentLevel: levelToSetup,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: s3Service.levelhealth.metaSharesKeeper.findIndex( value => value.shareId == element ),
+        sharePosition: metaShares.findIndex( value => value.shareId == element ),
         data: {
           ...contactList[ i ], index: i + 1
         }
       }
       yield put( updatedKeeperInfo( obj ) )
     }
-    const walletId = s3Service.getWalletId().data.walletId
+    const walletId = wallet.walletId
     const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const wallet: Wallet = yield select( ( state ) => state.storage.database )
+    const secondaryMetaShares: MetaShare[] = [ ...s3.encryptedSMSecretsKeeper ]
     const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
     // updateKeeperInfoToMetaShare Got removed
     // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
-    const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
-    const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
+
     const trustedContacts: any = yield select( ( state ) => state.trustedContacts.service )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     for ( let i = 0; i < shareIds.length; i++ ) {
@@ -360,14 +362,15 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
-    const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
-    const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
-    const walletId = s3Service.levelhealth.walletId
-    const answer = yield select( ( state ) => state.storage.wallet.security.answer )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const s3 = yield call( dbManager.getBHR )
+    const metaShare: MetaShare[] = [ ...s3.metaSharesKeeper ]
+    const walletId = wallet.walletId
+    const answer = wallet.security.answer
     let shareIndex = 3
     if (
       shareId &&
-      s3Service.levelhealth.metaSharesKeeper.length &&
+      metaShare.length &&
       metaShare.findIndex( ( value ) => value.shareId == shareId ) > -1
     ) {
       shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )

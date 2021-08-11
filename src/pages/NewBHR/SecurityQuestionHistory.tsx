@@ -30,6 +30,7 @@ import {
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import ModalContainer from '../../components/home/ModalContainer'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 const SecurityQuestionHistory = ( props ) => {
   const [ securityQuestionsHistory, setSecuirtyQuestionHistory ] = useState( [
@@ -83,7 +84,7 @@ const SecurityQuestionHistory = ( props ) => {
   const currentLevel: Number = useSelector(
     ( state ) => state.bhr.currentLevel,
   )
-  const s3Service = useSelector( ( state ) => state.bhr.service )
+  const wallet: Wallet = useSelector( ( state ) => state.bhr.wallet )
   const next = props.navigation.getParam( 'next' )
   const dispatch = useDispatch()
 
@@ -194,7 +195,7 @@ const SecurityQuestionHistory = ( props ) => {
     if ( levelHealth.length > 0 && levelHealth[ 0 ].levelInfo.length > 0 ) {
       const shareObj =
         {
-          walletId: s3Service.getWalletId().data.walletId,
+          walletId: wallet.walletId,
           shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
           reshareVersion: levelHealth[ 0 ].levelInfo[ 0 ].reshareVersion,
           updatedAt: moment( new Date() ).valueOf(),

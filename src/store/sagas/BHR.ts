@@ -174,7 +174,7 @@ export const initHealthWatcher = createWatcher(
 function* generateMetaSharesWorker( { payload } ) {
   yield put( switchS3LoaderKeeper( 'generateMetaShareStatus' ) )
   const version = DeviceInfo.getVersion()
-  const { level, SM, isUpgrade } = payload
+  const { level, SM } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMnemonic ? wallet.secondaryMnemonic : ''
 
@@ -206,11 +206,9 @@ function* generateLevel1SharesWorker( { payload } ){
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const existingMetaShares: MetaShare[] = yield select( ( state ) => state.storage.wallet )
   const { shares, smShares } = BHROperations.generateLevel1Shares( wallet.primaryMnemonic, wallet.secondaryMnemonic )
-  const { encryptedPrimarySecrets, keeperShareIDs, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer, smShares )
-  const { metaShares, oldMetaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer, secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
-  console.log( 'generateLevel1SharesWorker metaShares', metaShares )
+  const { encryptedPrimarySecrets, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer, smShares )
+  const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer, secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
-    console.log( 'generateLevel1SharesWorker encryptedSecondarySecrets', encryptedSecondarySecrets )
     dbManager.updateWallet( {
       smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
     } )
@@ -265,8 +263,6 @@ function* generateLevel2SharesWorker( { payload } ){
         yield put( initLevelTwo( level ) )
       }
     }
-
-    // TODO: => Save metaShares, smMetaShares, oldMetaShares, encryptedSecondarySecrets
   } else {
     throw new Error( 'ERROR' )
   }
@@ -385,10 +381,8 @@ function* updateHealthLevel2Worker( { payload } ) {
     levelInfo[ 0 ] = SecurityQuestionHealth
     for ( let i = 1; i < metaShares.length; i++ ) {
       const element = metaShares[ i ]
-      let shareType = ''
-      if ( i == 1 ) shareType = 'cloud'
       const obj = {
-        shareType: shareType,
+        shareType: '',
         updatedAt: 0,
         status: 'notSetup',
         shareId: element.shareId,
@@ -399,7 +393,7 @@ function* updateHealthLevel2Worker( { payload } ) {
     levelHealth.push( {
       levelInfo, level
     } )
-    console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
+    console.log( 'INIT_LEVEL_TWO levelHealth', JSON.stringify( levelHealth ) )
     yield put( updateHealth( levelHealth, currentLevel, 'updateHealthLevel2Watcher' ) )
     if ( level == 2 ) yield put( isLevel2InitializedStatus() )
     if ( level == 3 ) yield put( isLevel3InitializedStatus() )
