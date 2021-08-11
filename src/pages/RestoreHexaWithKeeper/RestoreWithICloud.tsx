@@ -42,7 +42,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import { requestTimedout } from '../../store/utils/utilities'
 import RestoreWallet from './RestoreWallet'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { isEmpty } from '../../common/CommonFunctions'
 import CloudBackup from '../../common/CommonFunctions/CloudBackup'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -158,7 +157,6 @@ interface RestoreWithICloudStateTypes {
 
 interface RestoreWithICloudPropsTypes {
   navigation: any;
-  regularAccount: RegularAccount;
   cloudBackupStatus: any;
   database: any;
   security: any;
@@ -1370,7 +1368,6 @@ class RestoreWithICloud extends Component<
 const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     database: idx( state, ( _ ) => _.storage.database ) || {

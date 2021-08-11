@@ -53,7 +53,6 @@ import {
   checkMSharesHealth,
 } from '../../store/actions/BHR'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { KeeperInfoInterface, LevelHealthInterface, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
@@ -71,7 +70,6 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
 import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import QRModal from '../Accounts/QRModal'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
 import dbManager from '../../storage/realm/dbManager'
@@ -109,7 +107,6 @@ interface UpgradeBackupPropsTypes {
   navigation: any;
   initializeHealthSetup: any;
   walletName: string;
-  regularAccount: RegularAccount;
   database: any;
   updateHealthForCloud: any;
   cloudBackupStatus: CloudBackupStatus;
@@ -1496,7 +1493,6 @@ const mapStateToProps = ( state ) => {
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     cloudBackupStatus:

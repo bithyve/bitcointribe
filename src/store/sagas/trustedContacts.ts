@@ -36,10 +36,6 @@ import {
   AccountType,
   ActiveAddressAssignee,
 } from '../../bitcoin/utilities/Interface'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
 import {  exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
