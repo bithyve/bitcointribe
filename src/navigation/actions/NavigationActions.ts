@@ -2,7 +2,7 @@ import { NavigationActions, StackActions } from 'react-navigation'
 
 
 export const goHomeAction = NavigationActions.navigate( {
-  routeName: 'Home',
+  routeName: 'Landing',
 } )
 
 
@@ -13,7 +13,7 @@ export const resetToHomeAction = ( params = {
     index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Home',
+        routeName: 'Landing',
         params,
       } ),
     ],
@@ -23,10 +23,10 @@ export const resetToHomeAction = ( params = {
 
 export const resetStackToAccountDetails = ( params ) => {
   return StackActions.reset( {
-    index: 1,
+    index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Home'
+        routeName: 'Landing'
       } ),
       NavigationActions.navigate( {
         routeName: 'AccountDetails',
@@ -38,21 +38,21 @@ export const resetStackToAccountDetails = ( params ) => {
 
 export const resetStackToSend = ( params ) => {
   return StackActions.reset( {
-    index: 1,
+    index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Home'
-      } ),
-      NavigationActions.navigate( {
-        routeName: 'AccountDetails',
-        action: NavigationActions.navigate( {
-          routeName: 'Send',
+        routeName: 'Landing',
+        action:NavigationActions.navigate( {
+          routeName: 'AccountDetails',
           action: NavigationActions.navigate( {
-            routeName: 'SentAmountForContactForm',
-            params,
+            routeName: 'Send',
+            action: NavigationActions.navigate( {
+              routeName: 'SentAmountForContactForm',
+              params,
+            } ),
           } ),
         } ),
-      } ),
+      } )
     ]
   } )
 }

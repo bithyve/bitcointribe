@@ -374,7 +374,7 @@ export default function ContactList( props ) {
         // modalRef={contactPermissionBottomSheet}
         title={'Hexa needs access to your address book.'}
         info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-        otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
+        otherText={'We neither store this data nor pass it to anyone else. This is for your convenience only'}
         proceedButtonText={'Continue'}
         isIgnoreButton={false}
         onPressProceed={() => {

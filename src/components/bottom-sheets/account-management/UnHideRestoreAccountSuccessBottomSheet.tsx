@@ -88,14 +88,14 @@ const UnHideRestoreAccountSuccessBottomSheet: React.FC<Props> = ( {
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {'You can now find this account in My Portfolio'}
+          {'You can now find this account in My Accounts'}
         </Text>
         {renderAccount( accountInfo, accountVisibility )}
 
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountVisibility === AccountVisibility.HIDDEN ? 'The account can be seen under My Portfolio and the balance of this account will be added to the overall portfolio value' : 'You can now use this account to send and receive sats like a normal account'}
+          {accountVisibility === AccountVisibility.HIDDEN ? 'The account can be seen under My Accounts and the balance of this account will be added to the overall account value' : 'You can now use this account to send and receive sats like a normal account'}
         </Text>
       </View>
       <View style={styles.footerSectionContainer}>
