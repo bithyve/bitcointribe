@@ -29,7 +29,7 @@ import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
+import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
 import { DeepLinkEncryptionType, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
@@ -150,8 +150,10 @@ export default function AddContactSendRequest( props ) {
   }, [ Contact ] )
 
   useEffect( () => {
+    console.log( 'useEffect Contact', Contact )
     // capture the contact
     if( !Contact ) return
+    console.log( 'Contact', Contact )
     const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string

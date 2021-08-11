@@ -160,7 +160,7 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
   return levelHealthVar
 }
 
-export const getLevelInfoStatus = ( levelDataTemp ) => {
+export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
   const levelData: LevelData[] = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
@@ -186,7 +186,7 @@ export const getLevelInfoStatus = ( levelDataTemp ) => {
       levelData[ i ].note= 'Backup Level 1 is secure, \nupgrade to Backup Level 2'
     }
     // BOTH ACCESSIBLE
-    if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
+    if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' && currentLevel == 2 ){
       levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, \nupgrade to Backup Level 3' : 'Level is complete'
     }
     // ONLY ONE ACCESSIBLE

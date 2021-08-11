@@ -41,7 +41,6 @@ import SecurityQuestion from '../NewBHR/SecurityQuestion'
 import UpgradingKeeperContact from './UpgradingKeeperContact'
 import UpgradePdfKeeper from './UpgradePdfKeeper'
 import Dash from 'react-native-dash'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import {
   initializeHealthSetup,
   updateMSharesHealth,
@@ -107,7 +106,6 @@ interface UpgradeBackupStateTypes {
 
 interface UpgradeBackupPropsTypes {
   navigation: any;
-  s3Service: S3Service;
   initializeHealthSetup: any;
   walletName: string;
   regularAccount: RegularAccount;
@@ -251,7 +249,7 @@ class UpgradeBackup extends Component<
   }
 
   componentDidMount = () => {
-    this.props.checkMSharesHealth()
+    // this.props.checkMSharesHealth()
     const { trustedContactsInfo, overallHealth } = this.props
     let TotalKeeper = 1
     let keepersInfo: {shareId: string; type: string; count: number; contactDetails?: any; status?: boolean}[] = [ {
@@ -305,7 +303,8 @@ class UpgradeBackup extends Component<
       this.props.updateLevelToSetup( this.props.currentLevel + 1 )
       this.props.generateMetaShare( this.props.currentLevel + 1 )
       if( !this.props.isSmMetaSharesCreatedFlag ){
-        this.props.generateSMMetaShares()
+        // REMOVED from SAGA and action
+        // this.props.generateSMMetaShares()
       }
     }
     this.ProcessInfoBottomSheet.current.snapTo( 1 )
@@ -542,7 +541,8 @@ class UpgradeBackup extends Component<
       updateLevelToSetup( currentLevel + 1 )
       generateMetaShare( currentLevel + 1 )
       if( !isSmMetaSharesCreatedFlag ){
-        generateSMMetaShares()
+        // REMOVED from SAGA and action
+        // generateSMMetaShares()
       }
     }
 
@@ -599,7 +599,8 @@ class UpgradeBackup extends Component<
     } else {
       this.props.generateMetaShare( levelToSetup, true )
       if( !this.props.isSmMetaSharesCreatedFlag ){
-        this.props.generateSMMetaShares( this.state.secondaryMnemonics )
+        // REMOVED from SAGA and action
+        // this.props.generateSMMetaShares( this.state.secondaryMnemonics )
       }
     }
   };
@@ -778,7 +779,7 @@ class UpgradeBackup extends Component<
     else contactName = 'Personal Device3'
     const shareObj =
       {
-        walletId: this.props.s3Service.getWalletId().data.walletId,
+        walletId: this.props.wallet.walletId,
         shareId: this.state.selectedShareId[ 0 ],
         reshareVersion: 0,
         updatedAt: moment( new Date() ).valueOf(),
@@ -1491,7 +1492,6 @@ const mapStateToProps = ( state ) => {
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },

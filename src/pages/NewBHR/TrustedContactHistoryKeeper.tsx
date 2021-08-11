@@ -71,7 +71,6 @@ import { StackActions } from 'react-navigation'
 import ApproveSetup from './ApproveSetup'
 import semver from 'semver'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import SSS from '../../bitcoin/utilities/sss/SSS'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
@@ -81,6 +80,7 @@ import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import dbManager from '../../storage/realm/dbManager'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
@@ -141,7 +141,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
   const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
-  const MetaShares: MetaShare[] = useSelector( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
+  const s3 = dbManager.getS3Services()
+  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )

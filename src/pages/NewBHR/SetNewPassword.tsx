@@ -40,7 +40,6 @@ import ButtonBlue from '../../components/ButtonBlue'
 import { updateCloudPermission } from '../../store/actions/health'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
@@ -115,7 +114,6 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const [ securityQue, showSecurityQue ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
-  const s3service: S3Service = useSelector( ( state ) => state.health.service )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const setupPasswordStatus = useSelector( ( state ) => state.health.loading.setupPasswordStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
@@ -168,11 +166,11 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   }
 
   useEffect( ()=>{
-    if( s3service && s3service.levelhealth && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+    if( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
       cloudPermissionGranted === true && !isSkipClicked && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
       dispatch( setCloudData() )
     }
-  }, [ s3service, cloudPermissionGranted, levelHealth ] )
+  }, [ cloudPermissionGranted, levelHealth ] )
 
   const showLoader = () => {
     setLoaderModal( true )

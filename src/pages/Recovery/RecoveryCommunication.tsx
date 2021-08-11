@@ -24,7 +24,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { textWithoutEncoding, email } from 'react-native-communications'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import commonStyle from '../../common/Styles/Styles'
-import { requestShare, downloadMShare } from '../../store/actions/sss'
 import { nameToInitials } from '../../common/CommonFunctions'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
@@ -91,7 +90,8 @@ export default function RecoveryCommunication( props ) {
 
   const dispatch = useDispatch()
   useEffect( () => {
-    if ( !REQUEST_DETAILS ) dispatch( requestShare( index ) )
+    // Removed sss file
+    // if ( !REQUEST_DETAILS ) dispatch( requestShare( index ) )
 
     const contactInfoTemp = communicationInfo.map( ( { number, email }, index ) => {
       if ( number || email ) {
@@ -267,7 +267,8 @@ export default function RecoveryCommunication( props ) {
         shareIndex, key
       } )
       if ( shareIndex && key ) {
-        dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
+        // Removed this method
+        // dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
       } else if ( shareIndex ) {
         const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[ shareIndex ]
 
@@ -276,7 +277,8 @@ export default function RecoveryCommunication( props ) {
           console.log( {
             KEY
           } )
-          dispatch( downloadMShare( KEY, null, 'recovery' ) )
+          // Removed this method
+          // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
           Alert.alert(
             'Key Exists',
@@ -285,7 +287,8 @@ export default function RecoveryCommunication( props ) {
         }
       } else if ( key ) {
         // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
-        dispatch( downloadMShare( key, null, 'recovery' ) )
+        // Removed this method
+        // dispatch( downloadMShare( key, null, 'recovery' ) )
       }
     },
     [ RECOVERY_SHARES ],

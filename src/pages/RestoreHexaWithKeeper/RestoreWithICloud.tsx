@@ -46,15 +46,12 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { isEmpty } from '../../common/CommonFunctions'
 import CloudBackup from '../../common/CommonFunctions/CloudBackup'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import SSS from '../../bitcoin/utilities/sss/SSS'
 import { decrypt, decrypt1 } from '../../common/encryption'
 import LoaderModal from '../../components/LoaderModal'
 import TransparentHeaderModal from '../../components/TransparentHeaderModal'
 import Loader from '../../components/loader'
 import {
-  checkMSharesHealth,
   recoverWalletUsingIcloud,
-  downloadMShare,
   recoverWallet,
   updateCloudMShare,
   downloadBackupData,
@@ -69,11 +66,9 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import config from '../../bitcoin/HexaConfig'
 import { textWithoutEncoding, email } from 'react-native-communications'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { requestShare } from '../../store/actions/sss'
 import ContactListForRestore from './ContactListForRestore'
 import SendViaLink from '../../components/SendViaLink'
-import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
-import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
+import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
 import { getCloudDataRecovery, clearCloudCache, setCloudBackupStatus } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -83,7 +78,6 @@ import { initializeRecovery } from '../../store/actions/setupAndAuth'
 import ModalContainer from '../../components/home/ModalContainer'
 
 import semver from 'semver'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
@@ -165,7 +159,6 @@ interface RestoreWithICloudStateTypes {
 interface RestoreWithICloudPropsTypes {
   navigation: any;
   regularAccount: RegularAccount;
-  s3Service: S3Service;
   cloudBackupStatus: any;
   database: any;
   security: any;
@@ -173,10 +166,8 @@ interface RestoreWithICloudPropsTypes {
   accounts: any;
   walletImageChecked: any;
   SERVICES: any;
-  checkMSharesHealth: any;
   calculateExchangeRate: any;
   initializeHealthSetup: any;
-  downloadMShare: any;
   DECENTRALIZED_BACKUP: any;
   recoverWallet: any;
   updateCloudMShare: any;
@@ -295,7 +286,6 @@ class RestoreWithICloud extends Component<
     const {
       walletImageChecked,
       SERVICES,
-      checkMSharesHealth,
       walletRecoveryFailed,
       cloudData,
       walletCheckIn,
@@ -322,7 +312,6 @@ class RestoreWithICloud extends Component<
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
       setVersion( 'Restored' )
       initNewBHRFlow( true )
-      checkMSharesHealth()
       walletCheckIn()
       // if ( this.loaderBottomSheet as any )
       //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
@@ -390,9 +379,9 @@ class RestoreWithICloud extends Component<
       }
     }
 
-    if ( prevProps.s3Service != this.props.s3Service && this.props.s3Service.levelhealth ) {
-      this.props.setupHealth( this.state.currentLevel )
-    }
+    // if ( prevProps.s3Service != this.props.s3Service && this.props.s3Service.levelhealth ) {
+    //   this.props.setupHealth( this.state.currentLevel )
+    // }
   };
 
   componentWillUnmount = () => {
@@ -645,14 +634,15 @@ class RestoreWithICloud extends Component<
   };
 
   onCreatLink = () => {
-    const { database, requestShare } = this.props
+    const { database } = this.props
     const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP
     if ( this.state.contactList.length && this.state.contactList.length == 1 ) {
       if (
         ( RECOVERY_SHARES[ 1 ] && !RECOVERY_SHARES[ 1 ].REQUEST_DETAILS ) ||
         !RECOVERY_SHARES[ 1 ]
       ) {
-        requestShare( 1 )
+        // Removed sss file
+        // requestShare( 1 )
       }
     } else if (
       this.state.contactList.length &&
@@ -662,13 +652,15 @@ class RestoreWithICloud extends Component<
         ( RECOVERY_SHARES[ 1 ] && !RECOVERY_SHARES[ 1 ].REQUEST_DETAILS ) ||
         !RECOVERY_SHARES[ 1 ]
       ) {
-        requestShare( 1 )
+        // Removed sss file
+        // requestShare( 1 )
       }
       if (
         ( RECOVERY_SHARES[ 2 ] && !RECOVERY_SHARES[ 2 ].REQUEST_DETAILS ) ||
         !RECOVERY_SHARES[ 2 ]
       ) {
-        requestShare( 2 )
+        // Removed sss file
+        // requestShare( 2 )
       }
     }
   };
@@ -730,7 +722,7 @@ class RestoreWithICloud extends Component<
         linkToRequest: emailDL
       } )
     } else {
-      const otp = LevelHealth.generateOTP( parseInt( config.SSS_OTP_LENGTH, 10 ) )
+      const otp = BHROperations.generateOTP( parseInt( config.SSS_OTP_LENGTH, 10 ) )
       const otpHintType = 'otp'
       const otpHint = 'xxx'
       const otpEncPubKey = TrustedContactsService.encryptPub(
@@ -763,12 +755,12 @@ class RestoreWithICloud extends Component<
           !RECOVERY_SHARES[ shareIndex ].META_SHARE && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS.KEY
         ) {
           const { KEY } = RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS
-
-          this.props.downloadMShare( {
-            encryptedKey: KEY,
-            downloadType: 'recovery',
-            replaceIndex: shareIndex,
-          } )
+          // Removed this method
+          // this.props.downloadMShare( {
+          //   encryptedKey: KEY,
+          //   downloadType: 'recovery',
+          //   replaceIndex: shareIndex,
+          // } )
         }
       }
       this.setState( {
@@ -1378,7 +1370,6 @@ class RestoreWithICloud extends Component<
 const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
-    s3Service: idx( state, ( _ ) => _.health.service ),
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
@@ -1407,12 +1398,9 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     recoverWalletUsingIcloud,
-    checkMSharesHealth,
     initializeHealthSetup,
-    downloadMShare,
     recoverWallet,
     updateCloudMShare,
-    requestShare,
     getCloudDataRecovery,
     clearCloudCache,
     initNewBHRFlow,

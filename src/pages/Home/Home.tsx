@@ -25,9 +25,6 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
-  downloadMShare,
-} from '../../store/actions/sss'
-import {
   initializeHealthSetup,
   updateCloudPermission,
   acceptExistingContactRequest
@@ -53,7 +50,6 @@ import {
   setCurrencyCode,
   setCardData,
   setIsPermissionGiven,
-  updateLastSeen
 } from '../../store/actions/preferences'
 import {
   processDeepLink,
@@ -128,8 +124,6 @@ export enum BottomSheetState {
 }
 export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
-  CUSTODIAN_REQUEST,
-  CUSTODIAN_REQUEST_REJECTED,
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
   NOTIFICATIONS_LIST,
@@ -193,7 +187,6 @@ interface HomePropsTypes {
   wallet: Wallet;
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
-  downloadMShare: any;
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   initializeHealthSetup: any;
@@ -243,7 +236,6 @@ interface HomePropsTypes {
   setShowAllAccount: any;
   setIsPermissionGiven: any;
   isPermissionSet: any;
-  updateLastSeen: any;
   isAuthenticated: any;
   setupNotificationList: any;
   asyncNotificationList: any;
@@ -315,8 +307,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currentMessage: null,
     }
   }
-
-
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
 
@@ -564,7 +554,6 @@ export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
     initializeTrustedContact,
-    downloadMShare,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
@@ -588,7 +577,6 @@ export default withNavigationFocus(
     credsAuthenticated,
     setShowAllAccount,
     setIsPermissionGiven,
-    updateLastSeen,
     setupNotificationList,
     updateNotificationList,
     updateMessageStatusInApp,

@@ -54,7 +54,6 @@ import {
   MetaShare,
   Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import ModalHeader from '../../components/ModalHeader'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { setCloudData, updateCloudData } from '../../store/actions/cloud'
@@ -86,6 +85,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import { ActivityIndicator } from 'react-native-paper'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
+import dbManager from '../../storage/realm/dbManager'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -130,7 +130,6 @@ interface ManageBackupNewBHRPropsTypes {
   checkMSharesHealth: any;
   isLevel3Initialized: Boolean;
   initLevelTwo: any;
-  s3Service: S3Service;
   keeperInfo: any[];
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
@@ -185,6 +184,7 @@ class ManageBackupNewBHR extends Component<
   QrBottomSheet: any;
   loaderBottomSheet: any
   knowMoreBottomSheet: any
+  metaSharesKeeper: MetaShare[]
 
   constructor( props ) {
     super( props )
@@ -193,7 +193,9 @@ class ManageBackupNewBHR extends Component<
     this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
-
+    const s3 = dbManager.getS3Services()
+    console.log( 's3', typeof s3, s3 )
+    this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
     const obj = {
       shareType: '',
       updatedAt: 0,
@@ -374,12 +376,12 @@ class ManageBackupNewBHR extends Component<
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
-      if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
+      if ( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
           refreshControlLoader: true,
           showLoader: true
         } )
-      } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
+      } else if ( ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
         this.setState( {
           refreshControlLoader: false,
           showLoader: false
@@ -418,7 +420,7 @@ class ManageBackupNewBHR extends Component<
     }
 
     if (
-      prevProps.initLoading !== this.props.initLoading && this.props.metaSharesKeeper.length == 3
+      prevProps.initLoading !== this.props.initLoading && this.metaSharesKeeper.length == 3
     ) {
       const obj = {
         id: 2,
@@ -428,7 +430,7 @@ class ManageBackupNewBHR extends Component<
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
+          shareId: this.metaSharesKeeper[ 1 ]
             .shareId,
           data: {
           },
@@ -451,7 +453,7 @@ class ManageBackupNewBHR extends Component<
     }
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && prevProps.metaSharesKeeper.length == 3 && this.props.metaSharesKeeper.length == 5
+      JSON.stringify( this.metaSharesKeeper ) && prevProps.metaSharesKeeper.length == 3 && this.metaSharesKeeper.length == 5
     ) {
       const obj = {
         id: 2,
@@ -461,7 +463,7 @@ class ManageBackupNewBHR extends Component<
           reshareVersion: 0,
           status: 'notAccessible',
           updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 3 ]
+          shareId: this.metaSharesKeeper[ 3 ]
             .shareId,
           data: {
           },
@@ -1131,7 +1133,7 @@ Wallet Backup
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2 &&
-                  this.props.metaSharesKeeper.length != 5
+                  this.metaSharesKeeper.length != 5
                   ) {
                     this.props.generateMetaShare( selectedLevelId )
                   } else if( selectedLevelId == 3 ) {
@@ -1141,7 +1143,7 @@ Wallet Backup
                       id: selectedLevelId,
                       selectedKeeper: {
                         ...selectedKeeper, name: name, shareType: type,
-                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.metaSharesKeeper[ 1 ] ? this.metaSharesKeeper[ 1 ].shareId: '' : this.metaSharesKeeper[ 4 ] ? this.metaSharesKeeper[ 4 ].shareId : ''
                       },
                       isSetup: true,
                     }
@@ -1231,7 +1233,7 @@ Wallet Backup
                   id: selectedLevelId,
                   selectedKeeper: {
                     ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.metaSharesKeeper[ 1 ] ? this.metaSharesKeeper[ 1 ].shareId: '' : this.metaSharesKeeper[ 4 ] ? this.metaSharesKeeper[ 4 ].shareId : ''
                   },
                   isSetup: true,
                 }
@@ -1260,7 +1262,6 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.health.service.levelhealth.metaSharesKeeper
     ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),

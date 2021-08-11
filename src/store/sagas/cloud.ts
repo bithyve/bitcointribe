@@ -8,11 +8,10 @@ import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../action
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import dbManager from '../../storage/realm/dbManager'
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
 
@@ -35,8 +34,8 @@ function* cloudWorker( { payload } ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) {
 
-      const s3Service: S3Service = yield select( ( state ) => state.health.service )
-      const MetaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
+      const s3 = yield call( dbManager.getS3Services )
+      const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
       console.log( 'CLOUD CALL PAYLOAD', payload )
@@ -74,7 +73,7 @@ function* cloudWorker( { payload } ) {
       // Create Updated Wallet Image
       const shares = RK ? JSON.stringify( RK ) : ''
       let encryptedCloudDataJson
-      const getWI = yield call( S3Service.fetchWalletImage, wallet.walletId )
+      const getWI = yield call( BHROperations.fetchWalletImage, wallet.walletId )
       if( getWI.status == 200 ){
         console.log( 'getWI.data.walletImage', JSON.stringify( getWI.data.walletImage ) )
         encryptedCloudDataJson = yield call( WIEncryption,
@@ -83,14 +82,14 @@ function* cloudWorker( { payload } ) {
         )
         // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
         const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-        const { encryptedString } = LevelHealth.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
-        const secondaryMnemonics = wallet.secondaryMnemonic ? LevelHealth.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedString : ''
+        const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+        const secondaryMnemonics = wallet.secondaryMnemonic ? BHROperations.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedData : ''
         const data = {
           levelStatus: level ? level : 1,
           shares: shares,
           secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : secondaryMnemonics,
           encryptedCloudDataJson: encryptedCloudDataJson,
-          seed: shares ? '' : encryptedString,
+          seed: shares ? '' : encryptedData,
           walletName: wallet.walletName,
           questionId: wallet.security.questionId,
           question: wallet.security.questionId === '0' ? wallet.security.question: '',
@@ -745,9 +744,9 @@ function* updateCloudBackupWorker( ) {
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       const levelHealth = yield select( ( state ) => state.health.levelHealth )
       const currentLevel = yield select( ( state ) => state.health.currentLevel )
-      const s3Service = yield select( ( state ) => state.health.service )
       const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-
+      const s3 = yield call( dbManager.getS3Services )
+      const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
       let secretShare = {
       }
       if ( levelHealth.length > 0 ) {
@@ -759,12 +758,8 @@ function* updateCloudBackupWorker( ) {
             levelInfo[ 2 ].status == 'accessible' &&
             levelInfo[ 3 ].status == 'accessible'
           ) {
-            for (
-              let i = 0;
-              i < s3Service.levelhealth.metaSharesKeeper.length;
-              i++
-            ) {
-              const element = s3Service.levelhealth.metaSharesKeeper[ i ]
+            for ( let i = 0; i < MetaShares.length; i++ ) {
+              const element = MetaShares[ i ]
               if ( levelInfo[ 1 ].shareId == element.shareId ) {
                 secretShare = element
                 break

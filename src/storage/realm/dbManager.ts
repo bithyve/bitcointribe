@@ -200,10 +200,45 @@ const updateContact = async ( contact ) => {
   }
 }
 
+const updateS3Services = async ( data ) => {
+  try {
+    const dbRef = db.objects( schema.S3Services )
+    if( dbRef && dbRef.length ){
+      let s3 = dbRef[ 0 ]
+      db.write( () => {
+        s3 = data
+      } )
+    } else db.create( schema.S3Services, data, true )
+    return true
+  } catch ( error ) {
+    return false
+    console.log( error )
+  }
+}
+
 const getWallet = () => {
   const walletsRef = db.objects( schema.Wallet )
   const wallets = Array.from( walletsRef )
   return wallets[ 0 ]
+}
+
+const getS3Services = () => {
+  try {
+    const dbRef = db.objects( schema.S3Services )
+    const s3Services = Array.from( dbRef )
+    if( s3Services && s3Services.length > 0 ) {
+      return s3Services[ 0 ]
+    } else {
+      return {
+        encryptedSecretsKeeper: [],
+        metaSharesKeeper: [],
+        encryptedSMSecretsKeeper: [],
+        oldMetaSharesKeeper:[],
+      }
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
 }
 
 const getTrustedContacts = () => {
@@ -233,4 +268,6 @@ export default {
   updateContact,
   updateWallet,
   getTrustedContacts,
+  getS3Services,
+  updateS3Services,
 }

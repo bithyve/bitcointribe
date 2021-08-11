@@ -11,12 +11,9 @@ import {
   servicesEnriched,
 } from '../actions/storage'
 import dataManager from '../../storage/database-manager'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { walletCheckIn } from '../actions/trustedContacts'
 import { updateWalletImageHealth } from '../actions/health'
-import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
-import { updateWalletImage } from '../actions/sss'
 import { clearAccountSyncCache } from '../actions/accounts'
 
 function* initDBWorker() {
@@ -30,15 +27,6 @@ function* initDBWorker() {
 }
 
 export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
-
-function* initServicesWorker() {
-  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  yield put( servicesInitialized( {
-    regularAcc, testAcc, secureAcc, s3Service, trustedContacts
-  } ) )
-}
-
-export const initServicesWatcher = createWatcher( initServicesWorker, INITIALIZE_SERVICES )
 
 function* fetchDBWorker() {
   try {
@@ -71,7 +59,8 @@ function* fetchDBWorker() {
         if( newBHRFlowStarted === true ){
           yield put( updateWalletImageHealth() )
         }else{
-          yield put( updateWalletImage() )
+          // Removed sss file
+          // yield put( updateWalletImage() )
         }
       }
     } else {
@@ -135,7 +124,7 @@ function* servicesEnricherWorker( { payload } ) {
     const { S3_SERVICE, } = database.SERVICES
 
     const services = {
-      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
+      S3_SERVICE: ''//S3Service.fromJSON( S3_SERVICE ),
     }
 
     yield put( servicesEnriched( services ) )

@@ -26,6 +26,8 @@ const PrimaryStreamData = 'PrimaryStreamData'
 const SecondaryStreamData = 'SecondaryStreamData'
 const BackupStreamData = 'BackupStreamData'
 const MetaShare = 'MetaShare'
+const S3MetaShare = 'S3MetaShare'
+const S3Services = 'S3Services'
 const EncryptedShare = 'EncryptedShare'
 const Meta = 'Meta'
 const KeeperInfo = 'KeeperInfo'
@@ -664,6 +666,40 @@ export const TrustedContactSchema: ObjectSchema = {
   },
 }
 
+export const S3MetaShareSchema: ObjectSchema = {
+  name: S3MetaShare,
+  //primaryKey: 'shareId',
+  properties: {
+    shareId: {
+      type: 'string', optional: true
+    },
+    encryptedShare: {
+      type: EncryptedShare, optional: true
+    },
+    meta:{
+      type: Meta, optional: true
+    },
+  },
+}
+
+export const S3ServicesSchema: ObjectSchema = {
+  name: S3Services,
+  properties: {
+    encryptedSecretsKeeper: {
+      type: 'string?[]', optional: true
+    },
+    metaSharesKeeper: {
+      type: 'list', objectType: S3MetaShare, default: []
+    },
+    encryptedSMSecretsKeeper: {
+      type: 'string?[]', optional: true
+    },
+    oldMetaSharesKeeper:{
+      type: 'list', objectType: S3MetaShare, default: []
+    },
+  },
+}
+
 export default {
   Wallet,
   UTXO,
@@ -688,4 +724,6 @@ export default {
   Meta,
   KeeperInfo,
   WalletSecurity,
+  S3Services,
+  S3MetaShare,
 }

@@ -1,8 +1,5 @@
-import { Platform } from 'react-native'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import { BackupStreamData, ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 import { LevelDataVar } from '../../common/CommonVars/commonVars'
-import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
   HEALTH_CHECK_INITIALIZE,
@@ -41,7 +38,6 @@ import { SERVICES_ENRICHED } from '../actions/storage'
 
 const initialState: {
   mnemonic: string;
-  service: S3Service;
   loading: {
     levelHealthCheck: Boolean;
     checkMSharesHealth: Boolean;
@@ -103,7 +99,6 @@ const initialState: {
   isKeeperInfoUpdated3: boolean;
 } = {
   mnemonic: '',
-  service: null,
   loading: {
     levelHealthCheck: false,
     checkMSharesHealth: false,
@@ -241,13 +236,6 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           errorReceiving: action.payload.isFailed,
-        }
-
-      case SERVICES_ENRICHED:
-        return {
-          ...state,
-          service: action.payload.services[ S3_SERVICE ],
-          serviceEnriched: true,
         }
 
       case WALLET_RECOVERY_FAILED_HEALTH:

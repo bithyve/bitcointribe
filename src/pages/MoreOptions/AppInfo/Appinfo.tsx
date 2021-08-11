@@ -28,7 +28,6 @@ import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomShe
 import { getVersions } from '../../../common/utilities'
 import ModalContainer from '../../../components/home/ModalContainer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { updateShareHistory } from '../../../store/actions/sss'
 import SecurityQuestion from './SecurityQuestion'
 import EnterPasscodeScreen from './EnterPasscodeScreen'
 import EditWalletName from './EditWalletName'
@@ -113,7 +112,8 @@ const AppInfo = ( props ) => {
         ...securityQuestionHistory,
         confirmed: Date.now(),
       }
-      updateShareHistory( updatedSecurityQuestionsHistory )
+      // Removed sss file
+      // updateShareHistory( updatedSecurityQuestionsHistory )
       await AsyncStorage.setItem(
         'securityQuestionHistory',
         JSON.stringify( updatedSecurityQuestionsHistory ),

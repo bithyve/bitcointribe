@@ -37,11 +37,9 @@ import {
   ActiveAddressAssignee,
 } from '../../bitcoin/utilities/Interface'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-//import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import SSS from '../../bitcoin/utilities/sss/SSS'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
 import {  exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
@@ -56,7 +54,6 @@ import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth } from '../actions/health'
 import { getNextFreeAddressWorker } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { updateWalletNameToChannel } from '../actions/trustedContacts'
 import { updateWallet } from '../actions/storage'
@@ -287,8 +284,8 @@ export const syncPermanentChannelsWatcher = createWatcher(
 
 function* updateWalletNameToAllChannel() {
   const channelUpdates = []
-  const service: S3Service = yield select( ( state ) => state.health.service )
-  const walletId = service.levelhealth.walletId
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const walletId = wallet.walletId
   const { walletName } = yield select( ( state ) => state.storage.wallet )
   const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
   Object.keys( contacts ).forEach( channelKey => {
@@ -572,13 +569,25 @@ export const removeTrustedContactWatcher = createWatcher(
 
 function* restoreTrustedContactsWorker( { payload }: { payload: { walletId: string, channelKeys: string[] }} ) {
   const { walletId, channelKeys } = payload
+  // const { }
   const restoredTrustedContacts: Trusted_Contacts = yield call( TrustedContactsOperations.restoreTrustedContacts, {
     walletId, channelKeys
   } )
+  // Reducer update
   yield put( updateTrustedContacts( restoredTrustedContacts ) )
+  // DB update
   for ( const [ key, value ] of Object.entries( restoredTrustedContacts ) ) {
     yield call( dbManager.updateContact, value )
   }
+  // TODO: => get MetaShares and Add to DB
+  // const res = yield call( TrustedContacts.retrieveFromStream, {
+  //   walletId, channelKey, options: {
+  //     retrieveBackupData: true,
+  //   }
+  // } )
+  // if( res.backupData && res.backupData.primaryMnemonicShard ) {
+  //   console.log( 'res.backupData.primaryMnemonicShard', res.backupData.primaryMnemonicShard )
+  // }
 }
 
 export const restoreTrustedContactsWatcher = createWatcher(

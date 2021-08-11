@@ -70,7 +70,6 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 import { AccountsState } from '../reducers/accounts'
-import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
@@ -94,6 +93,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { syncPermanentChannelsWorker } from './trustedContacts'
 import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -869,7 +869,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     sharesArray.push( shard )
 
     if( sharesArray.length>1 ){
-      secondaryMnemonic = LevelHealth.getMnemonics( sharesArray, wallet.security.answer )
+      secondaryMnemonic = BHROperations.getMnemonics( sharesArray, wallet.security.answer )
     }
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )

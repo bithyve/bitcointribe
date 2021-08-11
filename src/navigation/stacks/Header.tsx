@@ -13,7 +13,6 @@ import {
   // widthPercentageToDP,
 } from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
-import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
 import * as RNLocalize from 'react-native-localize'
 import { connect } from 'react-redux'
 import messaging from '@react-native-firebase/messaging'
@@ -57,15 +56,11 @@ import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import AddContactAddressBook from '../../pages/Contacts/AddContactAddressBook'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
 import BottomSheetHeader from '../../pages/Accounts/BottomSheetHeader'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import {
-  downloadMShare,
-} from '../../store/actions/sss'
 import {
   initializeHealthSetup,
   updateCloudPermission,
@@ -84,7 +79,6 @@ import {
   setCurrencyCode,
   setCardData,
   setIsPermissionGiven,
-  updateLastSeen
 } from '../../store/actions/preferences'
 import {
   processDeepLink,
@@ -122,8 +116,6 @@ export enum BottomSheetState {
 
 export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
-  CUSTODIAN_REQUEST,
-  CUSTODIAN_REQUEST_REJECTED,
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
   NOTIFICATIONS_LIST,
@@ -201,7 +193,6 @@ interface HomePropsTypes {
   updateMessageStatus: any;
   fromScreen: string;
   cloudPermissionGranted: any;
-  downloadMShare: any;
   initializeHealthSetup: any;
   overallHealth: any;
   keeperInfo: any[];
@@ -240,7 +231,6 @@ interface HomePropsTypes {
   setShowAllAccount: any;
   setIsPermissionGiven: any;
   isPermissionSet: any;
-  updateLastSeen: any;
   isAuthenticated: any;
   setupNotificationList: any;
   asyncNotificationList: any;
@@ -474,7 +464,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               key: 'hasShownNoInternetWarning',
               value: false,
             } )
-            this.props.updateLastSeen( new Date() )
+            // sss files removed
+            // this.props.updateLastSeen( new Date() )
             this.props.navigation.dispatch( StackActions.reset( {
               index: 0,
               actions: [ NavigationActions.navigate( {
@@ -752,7 +743,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinkModal = () => {
-    const custodyRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.custodyRequest : null//this.props.navigation.getParam( 'custodyRequest' )
     const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
     const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
     const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
@@ -768,16 +758,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     }
 
-    if ( custodyRequest ) {
-      this.setState(
-        {
-          custodyRequest,
-        },
-        () => {
-          this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
-        }
-      )
-    } else if ( recoveryRequest || trustedContactRequest ) {
+    if ( recoveryRequest || trustedContactRequest ) {
       this.setState(
         {
           recoveryRequest,
@@ -1174,55 +1155,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             </>
           )
 
-        case BottomSheetKind.CUSTODIAN_REQUEST:
-          return (
-            <>
-              <CustodianRequestModalContents
-                userName={custodyRequest.requester}
-                onPressAcceptSecret={() => {
-                  this.closeBottomSheet()
-
-                  if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
-                    Alert.alert(
-                      'Request expired!',
-                      'Please ask the sender to initiate a new request',
-                    )
-                  } else {
-                    if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
-                      Alert.alert(
-                        'Failed to store',
-                        'You cannot custody multiple shares of the same user.',
-                      )
-                    } else {
-                      if ( custodyRequest.isQR ) {
-                        downloadMShare( custodyRequest.ek, custodyRequest.otp )
-                      } else {
-                        navigation.navigate( 'CustodianRequestOTP', {
-                          custodyRequest,
-                        } )
-                      }
-                    }
-                  }
-                }}
-                onPressRejectSecret={() => {
-                  this.closeBottomSheet()
-                  this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
-                }}
-              />
-
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-              />
-            </>
-          )
-        case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
-          return (
-            <CustodianRequestRejectedModalContents
-              onPressViewTrustedContacts={this.closeBottomSheet}
-              userName={custodyRequest.requester}
-            />
-          )
-
         case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
           const { trustedContactRequest } = this.state
 
@@ -1461,7 +1393,6 @@ export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
     initializeTrustedContact,
-    downloadMShare,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
@@ -1485,7 +1416,6 @@ export default withNavigationFocus(
     credsAuthenticated,
     setShowAllAccount,
     setIsPermissionGiven,
-    updateLastSeen,
     setupNotificationList,
     updateNotificationList,
     updateMessageStatusInApp,

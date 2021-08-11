@@ -40,12 +40,12 @@ import ApproveSetup from './ApproveSetup'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import semver from 'semver'
 import { v4 as uuid } from 'uuid'
-import SSS from '../../bitcoin/utilities/sss/SSS'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import dbManager from '../../storage/realm/dbManager'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -94,7 +94,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
   const createChannelAssetsStatus = useSelector( ( state ) => state.health.loading.createChannelAssetsStatus )
-  const MetaShares: MetaShare[] = useSelector( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
+  const s3 = dbManager.getS3Services()
+  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const dispatch = useDispatch()
 
   const index = props.navigation.getParam( 'index' )

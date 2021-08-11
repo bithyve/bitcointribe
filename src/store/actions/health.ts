@@ -1,6 +1,4 @@
 // types and action creators: dispatched by components and sagas
-
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import { BackupStreamData, cloudDataInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
@@ -11,7 +9,6 @@ export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK'
 export const S3_LOADING_STATUS = 'S3_LOADING_STATUS'
 export const PREPARE_MSHARES = 'PREPARE_MSHARES'
 export const UPDATE_HEALTH = 'UPDATE_HEALTH'
-export const CHECK_SHARES_HEALTH = 'CHECK_SHARES_HEALTH'
 export const ERROR_SENDING = 'ERROR_SENDING'
 export const UPDATE_SHARES_HEALTH = 'UPDATE_SHARES_HEALTH'
 export const GENERATE_META_SHARE = 'GENERATE_META_SHARE'
@@ -27,9 +24,7 @@ export const UPDATE_CLOUD_PERMISSION = 'UPDATE_CLOUD_PERMISSION'
 export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD'
 export const WALLET_RECOVERY_FAILED_HEALTH = 'WALLET_RECOVERY_FAILED_HEALTH'
 export const WALLET_IMAGE_HEALTH_CHECKED = 'WALLET_IMAGE_HEALTH_CHECKED'
-export const DOWNLOAD_MSHARE_HEALTH = 'DOWNLOAD_MSHARE_HEALTH'
 export const ERROR_RECEIVING_HEALTH = 'ERROR_RECEIVING_HEALTH'
-export const FETCH_WALLET_IMAGE_HEALTH = 'FETCH_WALLET_IMAGE_HEALTH'
 export const RECOVER_WALLET_HEALTH = 'RECOVER_WALLET_HEALTH'
 export const CLOUD_MSHARE = 'CLOUD_MSHARE'
 export const S3_LOADING_KEEPER = 'S3_LOADING_KEEPER'
@@ -47,8 +42,6 @@ export const CONFIRM_PDF_SHARED = 'CONFIRM_PDF_SHARED'
 export const UPLOAD_SM_SHARE = 'UPLOAD_SM_SHARE'
 export const UPDATE_WALLET_IMAGE_HEALTH = 'UPDATE_WALLET_IMAGE_HEALTH'
 export const EMPTY_SHARE_TRANSFER_DETAILS = 'EMPTY_SHARE_TRANSFER_DETAILS'
-export const REMOVE_UNWANTED_UNDER_CUSTODY = 'REMOVE_UNWANTED_UNDER_CUSTODY'
-export const GENERATE_SM_META_SHARE = 'GENERATE_SM_META_SHARE'
 export const SM_META_SHARE_GENERATE = 'SM_META_SHARE_GENERATE'
 export const UPLOAD_SUCCESSFULLY_SM = 'UPLOAD_SUCCESSFULLY_SM'
 export const DELETE_SM_AND_SMSHARES = 'DELETE_SM_AND_SMSHARES'
@@ -74,6 +67,9 @@ export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
 export const SETUP_PASSWORD = 'SETUP_PASSWORD'
 export const SETUP_LEVEL_HEALTH = 'SETUP_LEVEL_HEALTH'
+export const GENERATE_LEVEL1_SHARES = 'GENERATE_LEVEL1_SHARES'
+export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
+export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -148,12 +144,6 @@ export const healthCheckInitialized = () => {
 export const prepareMShares = () => {
   return {
     type: PREPARE_MSHARES
-  }
-}
-
-export const checkMSharesHealth = () => {
-  return {
-    type: CHECK_SHARES_HEALTH
   }
 }
 
@@ -255,24 +245,6 @@ export const putKeeperInfo = ( info ) =>{
   }
 }
 
-export const downloadMShare = (
-  payload: {
-    encryptedKey: string;
-    otp?: string;
-    downloadType?: string;
-    replaceIndex?: any;
-    walletName?: string;
-  }
-) => {
-  const { otp, encryptedKey, downloadType, replaceIndex, walletName } = payload
-  return {
-    type: DOWNLOAD_MSHARE_HEALTH,
-    payload: {
-      otp, encryptedKey, downloadType, replaceIndex, walletName
-    },
-  }
-}
-
 export const ErrorReceiving = ( isFailed ) => {
   return {
     type: ERROR_RECEIVING_HEALTH, payload: {
@@ -291,13 +263,6 @@ export const recoverWallet = ( payload: { level: number, answer: string, selecte
   }
 }
 
-export const fetchWalletImage = (  s3Service: S3Service ) => {
-  return {
-    type: FETCH_WALLET_IMAGE_HEALTH, payload: {
-      s3Service
-    }
-  }
-}
 export const updateCloudMShare = ( metaShare, replaceIndex? ) => {
   return {
     type: CLOUD_MSHARE, payload: {
@@ -311,12 +276,6 @@ export const switchS3LoaderKeeper = ( beingLoaded ) => {
     type: S3_LOADING_KEEPER, payload: {
       beingLoaded
     }
-  }
-}
-
-export const generatePDF = () => {
-  return {
-    type: GENERATE_PDF
   }
 }
 
@@ -350,10 +309,10 @@ export const secondaryShareDownloaded = ( metaShare ) => {
   }
 }
 
-export const recoverMmnemonic = ( metaShares, securityAns ) => {
+export const recoverMmnemonic = ( metaShares, securityAns, isPrimary? ) => {
   return {
     type: RECOVER_MNEMONIC_HEALTH, payload: {
-      metaShares, securityAns
+      metaShares, securityAns, isPrimary
     }
   }
 }
@@ -440,21 +399,6 @@ export const emptyShareTransferDetailsForContactChange = ( index ) => {
   return {
     type: EMPTY_SHARE_TRANSFER_DETAILS, payload: {
       index
-    }
-  }
-}
-
-export const removeUnwantedUnderCustodyShares = () => {
-  return {
-    type: REMOVE_UNWANTED_UNDER_CUSTODY
-  }
-}
-
-export const generateSMMetaShares = ( SM? ) => {
-  return {
-    type: GENERATE_SM_META_SHARE,
-    payload: {
-      SM
     }
   }
 }
@@ -631,5 +575,27 @@ export const setupPassword = ( security ) => {
     type: SETUP_PASSWORD, payload:{
       security
     }
+  }
+}
+
+export const generateLevel1Shares = ( security ) => {
+  return {
+    type: GENERATE_LEVEL1_SHARES, payload:{
+      security
+    }
+  }
+}
+
+export const generateLevel2Shares = ( security ) => {
+  return {
+    type: GENERATE_LEVEL2_SHARES, payload:{
+      security
+    }
+  }
+}
+
+export const retrieveMetaShares = ( ) => {
+  return {
+    type: RETRIEVE_METASHRES
   }
 }

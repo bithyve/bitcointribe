@@ -17,20 +17,19 @@ import {
 import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import { insertDBWorker } from './storage'
 import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements, Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setCloudData } from '../actions/cloud'
 import semver from 'semver'
-import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import Relay from '../../bitcoin/utilities/Relay'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 function* initLevelsWorker( { payload } ) {
   try {
     const { level } = payload
     yield put( switchUpgradeLoader( 'initLevels' ) )
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const s3Service: any = yield select( ( state ) => state.health.service )
     const randomIdForSecurityQ = generateRandomString( 8 )
     const SecurityQuestionHealth = {
       shareType: 'securityQuestion',
@@ -58,7 +57,7 @@ function* initLevelsWorker( { payload } ) {
         }
       } )
       // Update Health to reducer
-      yield put( checkMSharesHealth() )
+      // yield put( checkMSharesHealth() )
       yield put( isUpgradeLevelInitializedStatus() )
       if ( level == 2 ) yield put( isLevel2InitializedStatus() )
       if ( level == 3 ) {
@@ -130,7 +129,8 @@ function* autoShareSecondaryWorker( { payload } ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
+    // updateKeeperInfoToMetaShare Got removed
+    // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
@@ -239,7 +239,8 @@ function* autoShareContactKeeperWorker( { payload } ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
+    // updateKeeperInfoToMetaShare Got removed
+    // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
@@ -375,7 +376,7 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
       shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )
     }
     const scannedObj: {type: string, encryptedKey: string; encryptedData: string} = JSON.parse( scannedData )
-    const decryptedData = LevelHealth.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
+    const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
     if( decryptedData == shareId ){
       const shareObj = {
         walletId: walletId,
