@@ -11,7 +11,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Video from 'react-native-video'
 import Colors from '../common/Colors'
-import { initializeDB } from '../store/actions/storage'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
@@ -27,7 +26,6 @@ import {
 } from '../store/actions/notifications'
 
 type LaunchScreenProps = {
-  initializeDB: any;
   navigation: any;
   lastSeen: any;
   databaseInitialized: Boolean;
@@ -96,9 +94,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
       //console.log( 'url', url )
 
       const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
-
-      // initiates the SQL DB
-      if( !this.props.databaseInitialized ) this.props.initializeDB()
 
       // scenario based navigation
       if ( hasCreds ) {
@@ -210,13 +205,11 @@ const styles = StyleSheet.create( {
 
 const mapStateToProps = ( state ) => {
   return {
-    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
     lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
     walletId: idx( state, ( _ ) => _.preferences.walletId )
   }
 }
 
 export default connect( mapStateToProps, {
-  initializeDB,
   getMessages
 } )( Launch )

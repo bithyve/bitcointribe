@@ -11,7 +11,6 @@ import {
 import { processDeepLink } from '../../common/CommonFunctions'
 
 interface IntermediatePropsTypes {
-  initializeDB: any;
   navigation: any;
   lastSeen: any;
   databaseInitialized: Boolean;
@@ -82,9 +81,6 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
         //console.log( 'url', url )
 
         const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
-
-        // initiates the SQL DB
-        if( !this.props.databaseInitialized ) this.props.initializeDB()
 
         // scenario based navigation
         if ( hasCreds ) {

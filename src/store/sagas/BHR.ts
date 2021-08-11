@@ -1,8 +1,6 @@
-import { call, fork, put, select } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import {
   createWatcher,
-  requestTimedout,
-  serviceGeneratorForNewBHR,
 } from '../utils/utilities'
 import * as bip39 from 'bip39'
 import {
@@ -17,13 +15,10 @@ import {
   updatedKeeperInfo,
   walletRecoveryFailed,
   RECOVER_WALLET_USING_ICLOUD,
-  walletImageChecked,
-  ErrorReceiving,
   RECOVER_WALLET_HEALTH,
   CLOUD_MSHARE,
   switchS3LoaderKeeper,
   isLevel3InitializedStatus,
-  pdfGenerated,
   RECOVER_MNEMONIC_HEALTH,
   mnemonicRecoveredHealth,
   GET_PDF_DATA,
@@ -34,8 +29,6 @@ import {
   putKeeperInfo,
   UPDATE_WALLET_IMAGE_HEALTH,
   EMPTY_SHARE_TRANSFER_DETAILS,
-  isSmMetaSharesCreated,
-  UploadSMSuccessfully,
   DELETE_SM_AND_SMSHARES,
   AUTO_SHARE_LEVEL2_KEEPER,
   pdfSuccessfullyCreated,
@@ -49,13 +42,10 @@ import {
   setApprovalStatus,
   DOWNLOAD_SM_SHARE,
   secondaryShareDownloaded,
-  downloadSMShare,
   CREATE_OR_CHANGE_GUARDIAN,
-  createChannelAssets,
   setDownloadedBackupData,
   DOWNLOAD_BACKUP_DATA,
   SETUP_HEALTH_FOR_RESTORE,
-  setupHealth,
   UPDATE_KEEPER_INFO_TO_CHANNEL,
   setIsKeeperInfoUpdated,
   ACCEPT_EC_REQUEST,
@@ -77,10 +67,8 @@ import {
   healthCheckInitialized,
   GENERATE_META_SHARE,
 } from '../actions/BHR'
-import { insertDBWorker } from './storage'
 import { NativeModules, Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
 import {
@@ -89,7 +77,6 @@ import {
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import {
   BackupStreamData,
-  ContactDetails,
   INotification,
   KeeperInfoInterface,
   LevelData,
@@ -106,35 +93,25 @@ import {
   TrustedContactRelationTypes,
   Trusted_Contacts,
   UnecryptedStreamData,
-  VersionHistory,
   Wallet,
-  WalletImage,
   NewWalletImage,
   cloudDataInterface
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
-import { Alert } from 'react-native'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import generatePDFKeeper from '../utils/generatePDFKeeper'
 import { generateRandomString } from '../../common/CommonFunctions'
 import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
-import AccountShell from '../../common/data/models/AccountShell'
-import { remapAccountShells, restoreAccountShells } from '../actions/accounts'
-import PersonalNode from '../../common/data/models/PersonalNode'
-import { personalNodeConfigurationSet } from '../actions/nodeSettings'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import { restoredVersionHistory } from '../actions/versionHistory'
+import { restoreAccountShells } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
-import { initLevels } from '../actions/upgradeToNewBhr'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, restoreContacts, restoreTrustedContacts, syncPermanentChannels } from '../actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, restoreTrustedContacts, syncPermanentChannels } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -142,6 +119,7 @@ import { updateWallet } from '../actions/storage'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import LevelStatus from '../../common/data/enums/LevelStatus'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -451,8 +429,8 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     console.log( 'payload.icloudData', payload.icloudData )
     console.log( 'payload.selectedBackup', payload.selectedBackup )
     console.log( 'payload.answer', payload.answer )
-    const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedString
-    const secondaryMnemonics = BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedString
+    const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedData
+    const secondaryMnemonics = BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedData
     const image: NewWalletImage = icloudData
     yield call( recoverWalletWorker, {
       payload: {
@@ -577,7 +555,7 @@ export function* cloudMetaShareWorker( { payload } ) {
   let updatedRecoveryShares = {
   }
   const updated = false
-  console.log( 'INSIDE ELSE' )
+
   if ( payload.replaceIndex === 0 || payload.replaceIndex ) {
     // replacing stored key w/ scanned from Guardian's help-restore
     updatedRecoveryShares = {
@@ -589,12 +567,12 @@ export function* cloudMetaShareWorker( { payload } ) {
       },
     }
   }
-  console.log( 'updatedRecoveryShares', updatedRecoveryShares )
+
   updatedBackup = {
     ...DECENTRALIZED_BACKUP,
     RECOVERY_SHARES: updatedRecoveryShares,
   }
-  console.log( 'updatedBackup', updatedBackup )
+
   let InsertDBData
   // if(payload.walletImage.SERVICES){
   //   InsertDBData = { DECENTRALIZED_BACKUP: updatedBackup, SERVICES: payload.walletImage.SERVICES}
@@ -604,11 +582,10 @@ export function* cloudMetaShareWorker( { payload } ) {
     DECENTRALIZED_BACKUP: updatedBackup
   }
   // }
-  console.log( 'InsertDBData', InsertDBData )
 
-  yield call( insertDBWorker, {
-    payload: InsertDBData,
-  } )
+  // yield call( insertDBWorker, {
+  //   payload: InsertDBData,
+  // } )
 
   yield put( switchS3LoadingStatus( 'downloadMetaShare' ) )
 }
@@ -1009,7 +986,7 @@ function* confirmPDFSharedWorker( { payload } ) {
       version: string,
       encryptedKey: string,
     } = JSON.parse( scannedData )
-    const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
+    const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedData
     if( decryptedData == shareId ){
       const shareObj = {
         walletId: walletId,
@@ -1076,21 +1053,21 @@ export const updatedKeeperInfoWatcher = createWatcher(
 )
 
 function* emptyShareTransferDetailsForContactChangeWorker( { payload } ) {
-  const { index } = payload
-  const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
-  const shareTransferDetails = {
-    ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-  }
-  delete shareTransferDetails[ index ]
-  const updatedBackup = {
-    ...DECENTRALIZED_BACKUP,
-    SHARES_TRANSFER_DETAILS: shareTransferDetails,
-  }
-  yield call( insertDBWorker, {
-    payload: {
-      DECENTRALIZED_BACKUP: updatedBackup,
-    },
-  } )
+  // const { index } = payload
+  // const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
+  // const shareTransferDetails = {
+  //   ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+  // }
+  // delete shareTransferDetails[ index ]
+  // const updatedBackup = {
+  //   ...DECENTRALIZED_BACKUP,
+  //   SHARES_TRANSFER_DETAILS: shareTransferDetails,
+  // }
+  // yield call( insertDBWorker, {
+  //   payload: {
+  //     DECENTRALIZED_BACKUP: updatedBackup,
+  //   },
+  // } )
 }
 
 export const emptyShareTransferDetailsForContactChangeWatcher = createWatcher(
@@ -1836,7 +1813,7 @@ function* updateKeeperInfoToChannelWorker( ) {
         }
 
         const streamUpdates: UnecryptedStreamData = {
-          streamId: TrustedContacts.getStreamId( walletId ),
+          streamId: TrustedContacts.getStreamId( wallet.walletId ),
           primaryData,
           backupData,
           metaData: {

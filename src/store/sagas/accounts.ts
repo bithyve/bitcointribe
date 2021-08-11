@@ -26,7 +26,6 @@ import {
   setAverageTxFee,
   VALIDATE_TWO_FA,
   twoFAValid,
-  clearAccountSyncCache,
   CREATE_SM_N_RESETTFA_OR_XPRIV,
   resetTwoFA,
   generateSecondaryXpriv,
@@ -43,9 +42,6 @@ import {
 import {
   updateWalletImageHealth
 } from '../actions/BHR'
-import {
-  SECURE_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import {
   Account,
   Accounts,
@@ -66,8 +62,6 @@ import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 import { AccountsState } from '../reducers/accounts'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
@@ -75,7 +69,6 @@ import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperation
 import * as bitcoinJS from 'bitcoinjs-lib'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { updateWallet } from '../actions/storage'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import * as bip39 from 'bip39'
