@@ -25,7 +25,6 @@ import {
   syncPermanentChannels,
   PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
@@ -57,7 +56,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
-  regularAccount: RegularAccount;
   trustedContacts: Trusted_Contacts;
   syncPermanentChannels: any;
   existingPermanentChannelsSynching: any;
@@ -126,9 +124,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       if (
         prevProps.trustedContacts != this.props.trustedContacts
       ) {
-
-        // const { regularAccount } = this.props
-        // const { walletId } = regularAccount.hdWallet.getWalletId()
         this.updateAddressBook()
       }
 
@@ -825,7 +820,6 @@ class FriendsAndFamilyScreen extends PureComponent<
 
 const mapStateToProps = ( state ) => {
   return {
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     existingPermanentChannelsSynching: idx(
       state,

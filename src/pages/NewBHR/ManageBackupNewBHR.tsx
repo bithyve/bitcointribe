@@ -76,7 +76,6 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import ManageBackupCard from './ManageBackupCard'
 import { TrustedContactRelationTypes, UnecryptedStreamData } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
@@ -160,7 +159,6 @@ interface ManageBackupNewBHRPropsTypes {
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
   trustedContacts: Trusted_Contacts;
-  regularAccount: RegularAccount;
   createChannelAssets: any;
   setApprovalStatus: any;
   approvalStatus: boolean;
@@ -1283,7 +1281,6 @@ const mapStateToProps = ( state ) => {
     shieldHealth: idx( state, ( _ ) => _.bhr.shieldHealth ),
     modifyLevelDataStatus: idx( state, ( _ ) => _.bhr.loading.modifyLevelDataStatus ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     approvalStatus: idx( state, ( _ ) => _.bhr.approvalStatus ),
     isKeeperInfoUpdated2: idx( state, ( _ ) => _.bhr.isKeeperInfoUpdated2 ),
     generateMetaShareStatus: idx( state, ( _ ) => _.bhr.loading.generateMetaShareStatus ),

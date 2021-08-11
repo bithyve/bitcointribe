@@ -86,7 +86,6 @@ import {
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetHeader from '../Accounts/BottomSheetHeader'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
@@ -215,7 +214,6 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   swanDeepLinkContent: string | null;
-  regularAccount: RegularAccount;
   database: any;
   setCardData: any;
   cardDataProps: any;
@@ -532,7 +530,6 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.preferences.secondaryDeviceAddressValue
     ),
     releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),

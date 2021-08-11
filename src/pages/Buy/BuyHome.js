@@ -171,7 +171,6 @@ export default BuyMenu
 //     setWalletId
 // } from '../../store/actions/preferences'
 // import S3Service from '../../bitcoin/services/sss/S3Service'
-// import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 // import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 // import TrustedContactRequestContent from './TrustedContactRequestContent'
 // import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
@@ -320,7 +319,6 @@ export default BuyMenu
 //     secondaryDeviceAddressValue: any;
 //     releaseCasesValue: any;
 //     swanDeepLinkContent: string | null;
-//     regularAccount: RegularAccount;
 //     database: any;
 //     setCardData: any;
 //     cardDataProps: any;

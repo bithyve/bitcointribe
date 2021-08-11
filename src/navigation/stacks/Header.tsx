@@ -37,7 +37,6 @@ import { v4 as uuid } from 'uuid'
 import moment from 'moment'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
@@ -186,7 +185,6 @@ interface HomePropsTypes {
   setCurrencyCode: any;
   currencyCode: any;
   setSecondaryDeviceAddress: any;
-  regularAccount: RegularAccount;
   accountShells: AccountShell[];
   messages: any;
   updateMessageStatusInApp: any;

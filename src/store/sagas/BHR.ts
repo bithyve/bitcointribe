@@ -72,10 +72,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
 import {
-  SECURE_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import {
   BackupStreamData,
   INotification,
   KeeperInfoInterface,
@@ -1076,32 +1072,32 @@ export const emptyShareTransferDetailsForContactChangeWatcher = createWatcher(
 )
 
 function* deletePrivateDataWorker() {
-  try {
-    // Transfer: Guardian >>> User
-    // const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
-    const s3ServiceSecure: SecureAccount = yield select(
-      ( state ) => state.accounts[ SECURE_ACCOUNT ].service
-    )
-    // // Delete Sm shares and Primary Mnemonics
-    // s3Service.deletePrivateData()
+  // try {
+  //   // Transfer: Guardian >>> User
+  //   // const s3Service: S3Service = yield select( ( state ) => state.bhr.service )
+  //   // const s3ServiceSecure: SecureAccount = yield select(
+  //   //   ( state ) => state.accounts[ SECURE_ACCOUNT ].service
+  //   // )
+  //   // // Delete Sm shares and Primary Mnemonics
+  //   // s3Service.deletePrivateData()
 
-    // // Delete Sm
-    // s3ServiceSecure.deleteSecondaryMnemonics()
+  //   // // Delete Sm
+  //   // s3ServiceSecure.deleteSecondaryMnemonics()
 
-    // const { SERVICES } = yield select( ( state ) => state.storage.database )
-    // const updatedSERVICES = {
-    //   ...SERVICES,
-    //   SECURE_ACCOUNT: JSON.stringify( s3ServiceSecure ),
-    //   S3_SERVICE: JSON.stringify( s3Service ),
-    // }
-    // yield call( insertDBWorker, {
-    //   payload: {
-    //     SERVICES: updatedSERVICES
-    //   }
-    // } )
-  } catch ( error ) {
-    console.log( 'RECOVERY error', error )
-  }
+  //   // const { SERVICES } = yield select( ( state ) => state.storage.database )
+  //   // const updatedSERVICES = {
+  //   //   ...SERVICES,
+  //   //   SECURE_ACCOUNT: JSON.stringify( s3ServiceSecure ),
+  //   //   S3_SERVICE: JSON.stringify( s3Service ),
+  //   // }
+  //   // yield call( insertDBWorker, {
+  //   //   payload: {
+  //   //     SERVICES: updatedSERVICES
+  //   //   }
+  //   // } )
+  // } catch ( error ) {
+  //   console.log( 'RECOVERY error', error )
+  // }
 }
 
 export const deletePrivateDataWatcher = createWatcher(
