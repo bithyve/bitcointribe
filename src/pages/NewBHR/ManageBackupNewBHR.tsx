@@ -175,7 +175,7 @@ class ManageBackupNewBHR extends Component<
     this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
-    const s3 = dbManager.getS3Services()
+    const s3 = dbManager.getBHR()
     console.log( 's3', typeof s3, s3 )
     this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
     const obj = {

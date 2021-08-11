@@ -142,7 +142,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
   const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
-  const s3 = dbManager.getS3Services()
+  const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
