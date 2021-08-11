@@ -1,8 +1,6 @@
-import { call, fork, put, select } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import {
   createWatcher,
-  requestTimedout,
-  serviceGeneratorForNewBHR,
 } from '../utils/utilities'
 import * as bip39 from 'bip39'
 import {
@@ -17,13 +15,10 @@ import {
   updatedKeeperInfo,
   walletRecoveryFailed,
   RECOVER_WALLET_USING_ICLOUD,
-  walletImageChecked,
-  ErrorReceiving,
   RECOVER_WALLET_HEALTH,
   CLOUD_MSHARE,
   switchS3LoaderKeeper,
   isLevel3InitializedStatus,
-  pdfGenerated,
   RECOVER_MNEMONIC_HEALTH,
   mnemonicRecoveredHealth,
   GET_PDF_DATA,
@@ -34,8 +29,6 @@ import {
   putKeeperInfo,
   UPDATE_WALLET_IMAGE_HEALTH,
   EMPTY_SHARE_TRANSFER_DETAILS,
-  isSmMetaSharesCreated,
-  UploadSMSuccessfully,
   DELETE_SM_AND_SMSHARES,
   AUTO_SHARE_LEVEL2_KEEPER,
   pdfSuccessfullyCreated,
@@ -49,13 +42,10 @@ import {
   setApprovalStatus,
   DOWNLOAD_SM_SHARE,
   secondaryShareDownloaded,
-  downloadSMShare,
   CREATE_OR_CHANGE_GUARDIAN,
-  createChannelAssets,
   setDownloadedBackupData,
   DOWNLOAD_BACKUP_DATA,
   SETUP_HEALTH_FOR_RESTORE,
-  setupHealth,
   UPDATE_KEEPER_INFO_TO_CHANNEL,
   setIsKeeperInfoUpdated,
   ACCEPT_EC_REQUEST,
@@ -80,7 +70,6 @@ import {
 import { insertDBWorker } from './storage'
 import { NativeModules, Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
 import {
@@ -89,7 +78,6 @@ import {
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import {
   BackupStreamData,
-  ContactDetails,
   INotification,
   KeeperInfoInterface,
   LevelData,
@@ -106,30 +94,20 @@ import {
   TrustedContactRelationTypes,
   Trusted_Contacts,
   UnecryptedStreamData,
-  VersionHistory,
   Wallet,
-  WalletImage,
   NewWalletImage,
   cloudDataInterface
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
-import { Alert } from 'react-native'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import generatePDFKeeper from '../utils/generatePDFKeeper'
 import { generateRandomString } from '../../common/CommonFunctions'
 import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
-import AccountShell from '../../common/data/models/AccountShell'
-import { remapAccountShells, restoreAccountShells } from '../actions/accounts'
-import PersonalNode from '../../common/data/models/PersonalNode'
-import { personalNodeConfigurationSet } from '../actions/nodeSettings'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import { restoredVersionHistory } from '../actions/versionHistory'
+import { restoreAccountShells } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
-import { initLevels } from '../actions/upgradeToNewBhr'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
@@ -201,7 +179,7 @@ export const initHealthWatcher = createWatcher(
 function* generateMetaSharesWorker( { payload } ) {
   yield put( switchS3LoaderKeeper( 'generateMetaShareStatus' ) )
   const version = DeviceInfo.getVersion()
-  const { level, SM, isUpgrade } = payload
+  const { level, SM } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMnemonic ? wallet.secondaryMnemonic : ''
 
@@ -233,11 +211,9 @@ function* generateLevel1SharesWorker( { payload } ){
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const existingMetaShares: MetaShare[] = yield select( ( state ) => state.storage.wallet )
   const { shares, smShares } = BHROperations.generateLevel1Shares( wallet.primaryMnemonic, wallet.secondaryMnemonic )
-  const { encryptedPrimarySecrets, keeperShareIDs, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer, smShares )
-  const { metaShares, oldMetaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer, secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
-  console.log( 'generateLevel1SharesWorker metaShares', metaShares )
+  const { encryptedPrimarySecrets, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer, smShares )
+  const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer, secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
-    console.log( 'generateLevel1SharesWorker encryptedSecondarySecrets', encryptedSecondarySecrets )
     dbManager.updateWallet( {
       smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
     } )
@@ -271,7 +247,6 @@ function* generateLevel2SharesWorker( { payload } ){
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   // const walletDB = yield call( dbManager.getWallet )
   const s3 = yield call( dbManager.getS3Services )
-  console.log( 's3', Array.from( s3 ) )
   const existingMetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const existingEncryptedSecondarySecrets: string[] = [ ...s3.encryptedSMSecretsKeeper ]
   const { shares } = BHROperations.generateLevel2Shares( existingMetaShares, wallet.security.answer )
@@ -292,8 +267,6 @@ function* generateLevel2SharesWorker( { payload } ){
         yield put( initLevelTwo( level ) )
       }
     }
-
-    // TODO: => Save metaShares, smMetaShares, oldMetaShares, encryptedSecondarySecrets
   } else {
     throw new Error( 'ERROR' )
   }

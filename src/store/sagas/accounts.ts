@@ -843,8 +843,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const { qrdata, QRModalHeader, accountShell } = payload
     const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    const s3Service = yield select( ( state ) => state.bhr.service )
-    const walletId = s3Service.levelhealth.walletId
+    const walletId = wallet.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contact )
     let secondaryMnemonic
     const sharesArray = [ DECENTRALIZED_BACKUP.SM_SHARE ]
@@ -886,7 +885,7 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-export function* restoreAccountShellsWorker( { payload: restoredAccounts }: {payload: Account[]} ) {
+export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
   }

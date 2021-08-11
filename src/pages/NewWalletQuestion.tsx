@@ -257,7 +257,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       cloudPermissionGranted === true && !isSkipClicked && updateWIStatus === false ){
       dispatch( setCloudData() )
     }
-  }, [ cloudPermissionGranted, levelHealth, updateWIStatus ] )
+  }, [ cloudPermissionGranted, levelHealth, updateWIStatus, cloudBackupStatus ] )
 
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -7,6 +7,8 @@ import { Alert } from 'react-native'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import crypto from 'crypto'
+import { getVersions } from '../utilities'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -106,21 +108,23 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA
 }
 
-export const stateDataToBackup = ( accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) => {
-  // state data to backup
+export const stateDataToBackup = ( accountShells, activePersonalNode, versionHistory, restoreVersions ) => {
+  const versions = getVersions( versionHistory, restoreVersions )
+
   const STATE_DATA = {
   }
+
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if ( trustedContactsInfo && trustedContactsInfo.length )
-    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+  // if ( trustedContactsInfo && trustedContactsInfo.length )
+  //   STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
 
   if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
-  if ( versionHistory && versionHistory.length )
-    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
+  if ( versions && versions.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versions )
 
   return STATE_DATA
 }
@@ -164,8 +168,42 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   }
 }
 
-export const WIEncryption = async ( image, answer ) => {
-  console.log( 'image', image )
+export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer, accountShells,
+  activePersonalNode,
+  versionHistory,
+  restoreVersions, ) => {
+  const acc = {
+  }
+  accounts.forEach( account => {
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      encKey,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update(
+      JSON.stringify( account ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    acc[ account.id ] = {
+      encryptedData: encrypted
+    }
+  } )
+  const channelIds = []
+  contacts.forEach( contact => {
+    channelIds.push( contact.channelKey )
+  } )
+  const STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, restoreVersions )
+  const image : NewWalletImage = {
+    name: walletDB.walletName,
+    walletId : walletDB.walletId,
+    contacts : channelIds,
+    accounts : acc,
+    versionHistory: STATE_DATA.versionHistory,
+    SM_share: walletDB.smShare,
+    details2FA: walletDB.details2FA
+  }
   const key = BHROperations.strechKey( answer )
   return await encrypt( image, key )
 }

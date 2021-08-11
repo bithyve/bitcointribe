@@ -121,7 +121,6 @@ interface ManageBackupNewBHRStateTypes {
 interface ManageBackupNewBHRPropsTypes {
   navigation: any;
   containerStyle: {};
-  updateHealthForCloud: any;
   cloudBackupStatus: CloudBackupStatus;
   levelHealth: LevelHealthInterface[];
   currentLevel: any;
