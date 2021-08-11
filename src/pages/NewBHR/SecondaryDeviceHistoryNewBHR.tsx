@@ -96,7 +96,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
-  const s3 = dbManager.getS3Services()
+  const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const dispatch = useDispatch()
 
