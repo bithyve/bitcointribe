@@ -64,7 +64,6 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import config from '../../bitcoin/HexaConfig'
 import { AccountsState } from '../reducers/accounts'
-import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
@@ -853,7 +852,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
         }
       }
     }
-    const res = yield call( TrustedContacts.retrieveFromStream, {
+    const res = yield call( TrustedContactsOperations.retrieveFromStream, {
       walletId, channelKey, options: {
         retrieveSecondaryData: true,
       }, secondaryChannelKey: qrDataObj.channelKey2
