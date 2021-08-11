@@ -1,5 +1,6 @@
 import { BackupStreamData, ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 import { LevelDataVar } from '../../common/CommonVars/commonVars'
+import LevelStatus from '../../common/data/enums/LevelStatus'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
   HEALTH_CHECK_INITIALIZE,
@@ -32,8 +33,11 @@ import {
   SET_CHANNEL_ASSETS,
   APPROVAL_STATUS,
   DOWNLOADED_BACKUP_DATA,
-  SET_IS_KEEPER_INFO_UPDATED
-} from '../actions/health'
+  SET_IS_KEEPER_INFO_UPDATED,
+  LEVEL_COMPLETION_ERROR,
+  NAVIGATING_HISTORY_PAGE,
+  TYPE_BOTTOMSHEET_OPEN
+} from '../actions/BHR'
 import { SERVICES_ENRICHED } from '../actions/storage'
 
 const initialState: {
@@ -56,6 +60,7 @@ const initialState: {
     updateKIToChStatus: boolean;
     setupPasswordStatus: boolean;
     updateWIStatus: boolean;
+    generateMetaShareStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -97,6 +102,11 @@ const initialState: {
   }[];
   isKeeperInfoUpdated2: boolean;
   isKeeperInfoUpdated3: boolean;
+  navigationObj: any;
+  errorTitle: string;
+  errorInfo: string;
+  status: LevelStatus,
+  isTypeBottomSheetOpen: boolean,
 } = {
   mnemonic: '',
   loading: {
@@ -116,7 +126,8 @@ const initialState: {
     downloadBackupDataStatus: false,
     updateKIToChStatus: false,
     setupPasswordStatus: false,
-    updateWIStatus: false
+    updateWIStatus: false,
+    generateMetaShareStatus: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -152,6 +163,12 @@ const initialState: {
   downloadedBackupData: [],
   isKeeperInfoUpdated2: false,
   isKeeperInfoUpdated3: false,
+  navigationObj: {
+  },
+  errorTitle: null,
+  errorInfo: null,
+  status: LevelStatus.PENDING,
+  isTypeBottomSheetOpen: false,
 }
 
 export default ( state = initialState, action ) => {
@@ -367,6 +384,25 @@ export default ( state = initialState, action ) => {
           isKeeperInfoUpdated3: action.payload.isKeeperInfoUpdated3 ? action.payload.isKeeperInfoUpdated3 : state.isKeeperInfoUpdated3
         }
 
+      case LEVEL_COMPLETION_ERROR:
+        return {
+          ...state,
+          errorTitle: action.payload.errorTitle,
+          errorInfo: action.payload.errorInfo,
+          status: action.payload.status,
+        }
+
+      case NAVIGATING_HISTORY_PAGE:
+        return {
+          ...state,
+          navigationObj: action.payload.navigationObj,
+        }
+
+      case TYPE_BOTTOMSHEET_OPEN:
+        return {
+          ...state,
+          isTypeBottomSheetOpen: action.payload.isTypeBottomSheetOpen,
+        }
   }
   return state
 }

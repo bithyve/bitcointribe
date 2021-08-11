@@ -30,7 +30,7 @@ import {
   setApprovalStatus,
   createOrChangeGuardian,
   downloadSMShare,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
   ChannelAssets,
@@ -93,15 +93,15 @@ const PersonalCopyHistory = ( props ) => {
   const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false :
     props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-  const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
-  const pdfInfo = useSelector( ( state ) => state.health.pdfInfo )
+  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
+  const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
+  const pdfInfo = useSelector( ( state ) => state.bhr.pdfInfo )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
-  const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
-  const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
+  const pdfDataConfirm = useSelector( ( state ) => state.bhr.loading.pdfDataConfirm )
+  const pdfCreatedSuccessfully = useSelector( ( state ) => state.bhr.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const s3 = dbManager.getS3Services()
@@ -112,9 +112,9 @@ const PersonalCopyHistory = ( props ) => {
   const [ Contact, setContact ]:[any, any] = useState( {
   } )
   const index = 5
-  const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
-  const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
-  const createChannelAssetsStatus = useSelector( ( state ) => state.health.loading.createChannelAssetsStatus )
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
+  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
+  const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const [ isConfirm, setIsConfirm ] = useState( false )
 

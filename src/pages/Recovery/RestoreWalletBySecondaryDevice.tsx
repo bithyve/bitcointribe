@@ -25,7 +25,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ErrorReceiving,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import Toast from '../../components/Toast'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
@@ -41,7 +41,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.health.errorReceiving,
+    ( state ) => state.bhr.errorReceiving,
   )
   const { DECENTRALIZED_BACKUP } = useSelector(
     ( state ) => state.storage.database,

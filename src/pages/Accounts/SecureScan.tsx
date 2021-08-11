@@ -28,14 +28,14 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
 import QRCode from '../../components/QRCode'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { ErrorSending } from '../../store/actions/health'
+import { ErrorSending } from '../../store/actions/BHR'
 
 
 const SecureScan = props => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const isErrorSendingFailed = useSelector( state => state.health.errorSending )
+  const isErrorSendingFailed = useSelector( state => state.bhr.errorSending )
   // console.log('isErrorSendingFailed', isErrorSendingFailed);
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
@@ -50,7 +50,7 @@ const SecureScan = props => {
   const wallet: Wallet = useSelector(
     state => state.storage.wallet,
   )
-  const { loading } = useSelector( state => state.health )
+  const { loading } = useSelector( state => state.bhr )
   const [ selectedStatus, setSelectedStatus ] = useState( 'Ugly' ) // for preserving health of this entity
   const [ secondaryQR, setSecondaryQR ] = useState( '' )
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP

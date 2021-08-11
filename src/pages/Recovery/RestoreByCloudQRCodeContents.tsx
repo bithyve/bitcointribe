@@ -29,7 +29,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
   const [ processButtonText, setProcessButtonText ] = useState( 'Okay' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const unableRecoverShareFromQR = useSelector(
-    ( state ) => state.health.unableRecoverShareFromQR,
+    ( state ) => state.bhr.unableRecoverShareFromQR,
   )
   console.log( 'unableRecoverShareFromQR', unableRecoverShareFromQR )
 

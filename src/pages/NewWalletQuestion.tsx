@@ -36,12 +36,12 @@ import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import { initNewBHRFlow } from '../store/actions/health'
+import { initNewBHRFlow } from '../store/actions/BHR'
 import {  setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
-import { updateCloudPermission } from '../store/actions/health'
+import { updateCloudPermission } from '../store/actions/BHR'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
@@ -183,9 +183,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
-  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  const updateWIStatus: boolean = useSelector( ( state ) => state.health.loading.updateWIStatus )
+  const cloudPermissionGranted = useSelector( ( state ) => state.bhr.cloudPermissionGranted )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const updateWIStatus: boolean = useSelector( ( state ) => state.bhr.loading.updateWIStatus )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )

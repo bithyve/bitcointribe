@@ -51,13 +51,13 @@ import {
   generateSMMetaShares,
   getPDFData,
   checkMSharesHealth,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { KeeperInfoInterface, LevelHealthInterface, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { initNewBHRFlow } from '../../store/actions/health'
+import { initNewBHRFlow } from '../../store/actions/BHR'
 import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setCloudDataForLevel, autoUploadSecondaryShare, autoShareContactKeeper, setUpgradeProcessStatus, setAvailableKeeperData, updateLevelToSetup, updateAvailableKeeperData, confirmPDFSharedFromUpgrade } from '../../store/actions/upgradeToNewBhr'
@@ -74,6 +74,7 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import QRModal from '../Accounts/QRModal'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
+import dbManager from '../../storage/realm/dbManager'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -126,7 +127,6 @@ interface UpgradeBackupPropsTypes {
   setCloudData: any;
   overallHealth: any[];
   generateMetaShare: any;
-  metaSharesKeeper: MetaShare[],
   initLevelTwo: any;
   healthCheckInitializedKeeper: boolean;
   setCloudDataForLevel: any;
@@ -174,6 +174,7 @@ class UpgradeBackup extends Component<
   storagePermissionBottomSheet = createRef<BottomSheet>()
   QrBottomSheet = createRef<BottomSheet>();
   ProcessInfoBottomSheet = createRef<BottomSheet>();
+  metaSharesKeeper: MetaShare[];
 
   constructor( props ) {
     super( props )
@@ -187,6 +188,9 @@ class UpgradeBackup extends Component<
     this.storagePermissionBottomSheet
     this.QrBottomSheet
     this.ProcessInfoBottomSheet
+    const s3 = dbManager.getS3Services()
+    console.log( 's3', typeof s3, s3 )
+    this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
 
     this.state = {
       isCloudBackupProcessing: false,
@@ -611,7 +615,7 @@ class UpgradeBackup extends Component<
         this.setState( {
           isGuardianCreationClicked: true
         } )
-        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount, metaSharesKeeper } = this.props
+        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
         const firstName = 'Personal'
         const lastName = 'Device1'
 
@@ -632,10 +636,10 @@ class UpgradeBackup extends Component<
           shareId: shareId,
           name: contactName,
           type: 'device',
-          scheme: metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+          scheme: this.metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
           currentLevel: this.props.levelToSetup,
           createdAt: moment( new Date() ).valueOf(),
-          sharePosition: metaSharesKeeper.findIndex( value => value.shareId == shareId ),
+          sharePosition: this.metaSharesKeeper.findIndex( value => value.shareId == shareId ),
           data: {
             name: contactName, index: 0
           }
@@ -1497,28 +1501,27 @@ const mapStateToProps = ( state ) => {
     },
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
-    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
-    isLevel2Initialized: idx( state, ( _ ) => _.health.isLevel2Initialized ),
-    isLevel3Initialized: idx( state, ( _ ) => _.health.isLevel3Initialized ),
+    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
+    isLevel2Initialized: idx( state, ( _ ) => _.bhr.isLevel2Initialized ),
+    isLevel3Initialized: idx( state, ( _ ) => _.bhr.isLevel3Initialized ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     activePersonalNode: idx( state, ( _ ) => _.nodeSettings.activePersonalNode ),
     isBackupProcessing: idx( state, ( _ ) => _.preferences.isBackupProcessing ) || false,
     versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
-    metaSharesKeeper: idx( state, ( _ ) => _.health.service.levelhealth.metaSharesKeeper ),
-    healthCheckInitializedKeeper: idx( state, ( _ ) => _.health.service.levelhealth.healthCheckInitializedKeeper ),
+    healthCheckInitializedKeeper: idx( state, ( _ ) => _.bhr.service.levelhealth.healthCheckInitializedKeeper ),
     SHARES_TRANSFER_DETAILS:  idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS ),
-    uploadMetaShare: idx( state, ( _ ) => _.health.loading.uploadMetaShare ),
+    uploadMetaShare: idx( state, ( _ ) => _.bhr.loading.uploadMetaShare ),
     updateEphemeralChannelLoader: idx( state, ( _ ) => _.trustedContacts.loading.updateEphemeralChannel ),
-    keeperProcessStatusFlag: idx( state, ( _ ) => _.state.health.keeperProcessStatus ),
-    isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.health.isSmMetaSharesCreatedFlag ),
+    keeperProcessStatusFlag: idx( state, ( _ ) => _.state.bhr.keeperProcessStatus ),
+    isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.bhr.isSmMetaSharesCreatedFlag ),
     trustedContactsInfo: idx( state, ( _ ) => _.trustedContacts.trustedContactsInfo ),
     upgradeProcessStatus: idx( state, ( _ ) => _.upgradeToNewBhr.upgradeProcessStatus ),
     availableKeeperData: idx( state, ( _ ) => _.upgradeToNewBhr.availableKeeperData ),
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
     isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
-    pdfInfo: idx( state, ( _ ) => _.health.pdfInfo ),
+    pdfInfo: idx( state, ( _ ) => _.bhr.pdfInfo ),
     wallet: idx( state, ( _ ) => _.storage.wallet ),
   }
 }

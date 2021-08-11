@@ -47,7 +47,7 @@ import {
   setApprovalStatus,
   downloadSMShare,
   updateKeeperInfoToChannel,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import {
   LevelData,
   LevelHealthInterface,
@@ -65,7 +65,7 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import Loader from '../../components/loader'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
 import debounce from 'lodash.debounce'
-import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/newBHR'
+import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/BHR'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import Header from '../../navigation/stacks/Header'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
@@ -133,7 +133,6 @@ interface ManageBackupNewBHRPropsTypes {
   keeperInfo: any[];
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
-  metaSharesKeeper: MetaShare[];
   syncPermanentChannels: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
@@ -169,6 +168,7 @@ interface ManageBackupNewBHRPropsTypes {
   updateKeeperInfoToChannel: any;
   isKeeperInfoUpdated2: boolean;
   isKeeperInfoUpdated3: boolean;
+  generateMetaShareStatus: boolean;
 }
 
 // const HeaderComponent = React.lazy( () => import( '../../navigation/stacks/Header' ) )
@@ -452,8 +452,7 @@ class ManageBackupNewBHR extends Component<
       // this.loaderBottomSheet.snapTo( 0 )
     }
     if (
-      JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.metaSharesKeeper ) && prevProps.metaSharesKeeper.length == 3 && this.metaSharesKeeper.length == 5
+      prevProps.generateMetaShareStatus !== this.props.generateMetaShareStatus && !this.props.generateMetaShareStatus && this.metaSharesKeeper.length == 5
     ) {
       const obj = {
         id: 2,
@@ -1258,40 +1257,36 @@ Wallet Backup
 
 const mapStateToProps = ( state ) => {
   return {
-    metaSharesKeeper: idx(
-      state,
-      ( _ ) => _.health.service.levelhealth.metaSharesKeeper
-    ),
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
-    isLevel3Initialized: idx( state, ( _ ) => _.health.isLevel3Initialized ),
+    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
+    isLevel3Initialized: idx( state, ( _ ) => _.bhr.isLevel3Initialized ),
     isLevelThreeMetaShareCreated: idx(
       state,
-      ( _ ) => _.health.isLevelThreeMetaShareCreated
+      ( _ ) => _.bhr.isLevelThreeMetaShareCreated
     ),
-    healthLoading: idx( state, ( _ ) => _.health.loading.checkMSharesHealth ),
-    initLoading: idx( state, ( _ ) => _.health.loading.initLoader ),
-    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
+    healthLoading: idx( state, ( _ ) => _.bhr.loading.checkMSharesHealth ),
+    initLoading: idx( state, ( _ ) => _.bhr.loading.initLoader ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
     isNewFCMUpdated: idx( state, ( _ ) => _.keeper.isNewFCMUpdated ),
-    cloudPermissionGranted: idx( state, ( _ ) => _.health.cloudPermissionGranted ),
-    keeperProcessStatusFlag:  idx( state, ( _ ) => _.health.keeperProcessStatus ),
-    isLevelToNotSetupStatus: idx( state, ( _ ) => _.health.isLevelToNotSetupStatus ),
-    status: idx( state, ( _ ) => _.newBHR.status ),
-    errorTitle: idx( state, ( _ ) => _.newBHR.errorTitle ),
-    navigationObj: idx( state, ( _ ) => _.newBHR.navigationObj ),
-    errorInfo: idx( state, ( _ ) => _.newBHR.errorInfo ),
-    isTypeBottomSheetOpen: idx( state, ( _ ) => _.newBHR.isTypeBottomSheetOpen ),
-    levelData: idx( state, ( _ ) => _.health.levelData ),
-    shieldHealth: idx( state, ( _ ) => _.health.shieldHealth ),
-    modifyLevelDataStatus: idx( state, ( _ ) => _.health.loading.modifyLevelDataStatus ),
+    cloudPermissionGranted: idx( state, ( _ ) => _.bhr.cloudPermissionGranted ),
+    keeperProcessStatusFlag:  idx( state, ( _ ) => _.bhr.keeperProcessStatus ),
+    isLevelToNotSetupStatus: idx( state, ( _ ) => _.bhr.isLevelToNotSetupStatus ),
+    status: idx( state, ( _ ) => _.bhr.status ),
+    errorTitle: idx( state, ( _ ) => _.bhr.errorTitle ),
+    navigationObj: idx( state, ( _ ) => _.bhr.navigationObj ),
+    errorInfo: idx( state, ( _ ) => _.bhr.errorInfo ),
+    isTypeBottomSheetOpen: idx( state, ( _ ) => _.bhr.isTypeBottomSheetOpen ),
+    levelData: idx( state, ( _ ) => _.bhr.levelData ),
+    shieldHealth: idx( state, ( _ ) => _.bhr.shieldHealth ),
+    modifyLevelDataStatus: idx( state, ( _ ) => _.bhr.loading.modifyLevelDataStatus ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
-    approvalStatus: idx( state, ( _ ) => _.health.approvalStatus ),
-    isKeeperInfoUpdated2: idx( state, ( _ ) => _.health.isKeeperInfoUpdated2 ),
-    isKeeperInfoUpdated3: idx( state, ( _ ) => _.health.isKeeperInfoUpdated3 ),
+    approvalStatus: idx( state, ( _ ) => _.bhr.approvalStatus ),
+    isKeeperInfoUpdated2: idx( state, ( _ ) => _.bhr.isKeeperInfoUpdated2 ),
+    generateMetaShareStatus: idx( state, ( _ ) => _.bhr.loading.generateMetaShareStatus ),
   }
 }
 

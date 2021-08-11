@@ -8,7 +8,7 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import storageReducer from './reducers/storage'
 import setupAndAuthReducer from './reducers/setupAndAuth'
 import accountsReducer from './reducers/accounts'
-import healthReducer from './reducers/health'
+import bhr from './reducers/BHR'
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
 import sendingReducer from './reducers/sending'
@@ -140,7 +140,8 @@ import {
   setupLevelHealthWatcher,
   generateLevel1SharesWatcher,
   retrieveMetaSharesWatcher,
-} from './sagas/health'
+  onPressKeeperChannelWatcher,
+} from './sagas/BHR'
 
 import {
   cloudWatcher,
@@ -167,8 +168,6 @@ import {
 } from './sagas/upgradeToNewBhr'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
-import newBHR from './reducers/newBHR'
-import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -230,7 +229,7 @@ const rootSaga = function* () {
     restoreTrustedContactsWatcher,
     updateWalletNameToChannelWatcher,
     updateWalletWatcher,
-    // Health
+    // bhr
     initHealthWatcher,
     updateSharesHealthWatcher,
     generateMetaSharesWatcher,
@@ -261,6 +260,8 @@ const rootSaga = function* () {
     setupLevelHealthWatcher,
     generateLevel1SharesWatcher,
     retrieveMetaSharesWatcher,
+    onPressKeeperChannelWatcher,
+    confirmPDFSharedFromUpgradeWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
@@ -304,9 +305,6 @@ const rootSaga = function* () {
     autoShareContactKeeperWatcher,
     updateAvailableKeeperDataWatcher,
 
-    //newBHR
-    onPressKeeperChannelWatcher,
-    confirmPDFSharedFromUpgradeWatcher,
   ]
 
   yield all(
@@ -329,7 +327,7 @@ const rootReducer = combineReducers( {
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
-  health: healthReducer,
+  bhr: bhr,
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
@@ -343,7 +341,6 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
-  newBHR: newBHR
 } )
 
 export default function makeStore() {

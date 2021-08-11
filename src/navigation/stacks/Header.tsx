@@ -65,7 +65,7 @@ import {
   initializeHealthSetup,
   updateCloudPermission,
   acceptExistingContactRequest
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import {
   updateFCMTokens,
   notificationsUpdated,
@@ -1374,7 +1374,7 @@ const styles = StyleSheet.create( {
 
 const mapStateToProps = ( state ) => {
   return {
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
+    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
     notificationList: state.notifications.notifications,
     accountsState: state.accounts,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
@@ -1382,7 +1382,7 @@ const mapStateToProps = ( state ) => {
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     messages: state.notifications.messages,
 

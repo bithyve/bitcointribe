@@ -7,8 +7,8 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
-import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/health'
-import { updateMSharesHealth } from '../../store/actions/health'
+import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/BHR'
+import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
@@ -20,6 +20,7 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import DeviceInfo from 'react-native-device-info'
 import {
   ChannelAssets,
+  DeepLinkEncryptionType,
   KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
@@ -46,6 +47,7 @@ import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
+import { generateDeepLink } from '../../common/CommonFunctions'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -84,16 +86,16 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ Contact, setContact ]: [any, any] = useState( null )
   const [ isChangeClicked, setIsChangeClicked ] = useState( false )
 
-  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.health.keeperInfo )
-  const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
-  const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
-  const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
+  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
+  const keeperProcessStatusFlag = useSelector( ( state ) => state.bhr.keeperProcessStatus )
+  const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
+  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
-  const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-  const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
-  const createChannelAssetsStatus = useSelector( ( state ) => state.health.loading.createChannelAssetsStatus )
+  const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
+  const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const s3 = dbManager.getS3Services()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const dispatch = useDispatch()
@@ -196,20 +198,29 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           break
         }
       }
-
+    console.log( 'USEEEFTEC currentContact', JSON.stringify( currentContact ) )
     if ( currentContact ) {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
+      let encryption_key: string
+      if( currentContact.deepLinkConfig ){
+        const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
+        if( DeepLinkEncryptionType.DEFAULT === encryptionType ) encryption_key = encryptionKey
+      }
 
-      setKeeperQR(
-        JSON.stringify( {
+      if( !encryption_key ){
+        const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( DeepLinkEncryptionType.DEFAULT, encryption_key, currentContact, wallet.walletName )
+        const QRData = JSON.stringify( {
           type: QRCodeTypes.KEEPER_REQUEST,
-          channelKey,
+          encryptedChannelKeys: encryptedChannelKeys,
+          encryptionType,
+          encryptionHint,
           walletName: wallet.walletName,
-          secondaryChannelKey,
           version: appVersion,
-        } ),
-      )
+        } )
+        setKeeperQR( QRData )
+        console.log( 'QRDATA', QRData )
+      }
       if( isGuardianCreationClicked ) {
         const shareObj = {
           walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
@@ -219,6 +230,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           status: 'notAccessible',
           name: Contact && Contact.name ? Contact.name : ''
         }
+        console.log( 'shareObj', shareObj )
         dispatch( updateMSharesHealth( shareObj, isChange ) )
         dispatch( setChannelAssets( {
         } ) )
