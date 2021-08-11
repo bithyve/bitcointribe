@@ -67,7 +67,15 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
         }}
         numberOfLines={1}
       />
-
+      {isAddressInvalid && (
+        <View style={{
+          marginLeft: 'auto', marginRight: widthPercentageToDP( 5 )
+        }}>
+          <Text style={FormStyles.errorText}>
+            Enter correct address
+          </Text>
+        </View>
+      )}
       {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT && (
         <TouchableOpacity
           onPress={() => {
@@ -85,15 +93,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
         </TouchableOpacity>
       )}
 
-      {isAddressInvalid && (
-        <View style={{
-          marginLeft: 'auto'
-        }}>
-          <Text style={FormStyles.errorText}>
-            Enter correct address
-          </Text>
-        </View>
-      )}
+
     </View>
   )
 }
