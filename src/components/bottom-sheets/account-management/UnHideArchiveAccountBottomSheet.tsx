@@ -90,14 +90,14 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Start showing the account in My Portfolio' : 'Restore the account to Home screen'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Start showing the account in My Accounts' : 'Restore the account to Home screen'}
         </Text>
         {renderAccount( accountInfo )}
 
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'You can hide the account again from my Portfolio from account settings' : 'Once confirmed you can use this account like a normal account from My Portfolio'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'You can hide the account again from My Accounts from account settings' : 'Once confirmed you can use this account like a normal account from My Accounts'}
         </Text>
         <View style={styles.footerSectionContainer}>
           <View style={styles.actionButtonContainer}>

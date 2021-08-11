@@ -119,7 +119,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               fontFamily: Fonts.FiraSansMedium,
 
             }}>
-              My Portfolio
+              My Accounts
             </Text>
             <ToggleContainer />
           </View>
