@@ -49,6 +49,21 @@ const TransactionListItemContent: React.FC<Props> = ( {
     }
   }, [ transaction.transactionType ] )
 
+  const getTitle = useMemo( () => {
+    if( transaction.transactionType === TransactionKind.RECEIVE ) {
+      return transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType )
+    } else {
+      let name = ''
+      if( transaction.receivers.length > 1 ) {
+        name = `${transaction.receivers[ 0 ].name} and ${transaction.receivers.length - 1} other`
+      } else {
+        name = transaction.receivers[ 0 ].name ||  transaction.accountType || transaction.accountName
+      }
+      return name
+    }
+
+  }, [ transaction.transactionType ] )
+
   const formattedDateText = useMemo( () => {
     return moment( transaction.date ).format( 'DD MMMM YYYY' )
   }, [ transaction.transactionType ] )
@@ -76,7 +91,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title style={styles.titleText} numberOfLines={1}>
-          {transaction.transactionType === TransactionKind.RECEIVE ? transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType ) : transaction.accountName? transaction.accountName: transaction.accountType}
+          {getTitle}
         </ListItem.Title>
         <ListItem.Subtitle style={styles.subtitleText}>
           {formattedDateText}

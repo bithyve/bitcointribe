@@ -200,15 +200,15 @@ const updateContact = async ( contact ) => {
   }
 }
 
-const updateS3Services = async ( data ) => {
+const updateBHR = async ( data ) => {
   try {
-    const dbRef = db.objects( schema.S3Services )
+    const dbRef = db.objects( schema.BHR )
     if( dbRef && dbRef.length ){
-      let s3 = dbRef[ 0 ]
+      let bhr = dbRef[ 0 ]
       db.write( () => {
-        s3 = data
+        bhr = data
       } )
-    } else db.create( schema.S3Services, data, true )
+    } else db.create( schema.BHR, data, true )
     return true
   } catch ( error ) {
     return false
@@ -222,12 +222,12 @@ const getWallet = () => {
   return wallets[ 0 ]
 }
 
-const getS3Services = () => {
+const getBHR = () => {
   try {
-    const dbRef = db.objects( schema.S3Services )
-    const s3Services = Array.from( dbRef )
-    if( s3Services && s3Services.length > 0 ) {
-      return s3Services[ 0 ]
+    const dbRef = db.objects( schema.BHR )
+    const bhr = Array.from( dbRef )
+    if( bhr && bhr.length > 0 ) {
+      return bhr[ 0 ]
     } else {
       return {
         encryptedSecretsKeeper: [],
@@ -268,6 +268,6 @@ export default {
   updateContact,
   updateWallet,
   getTrustedContacts,
-  getS3Services,
-  updateS3Services,
+  getBHR,
+  updateBHR,
 }
