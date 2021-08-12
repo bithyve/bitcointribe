@@ -14,6 +14,7 @@ export type Props = {
   bitcoinUnit: BitcoinUnit;
   isTestAccount: boolean;
   onViewMorePressed: () => void;
+  accountShellId: string,
   onTransactionItemSelected: ( TransactionDescribing ) => void;
 };
 
@@ -24,6 +25,7 @@ const TransactionsPreviewSection: React.FC<Props> = ( {
   isTestAccount,
   onViewMorePressed,
   onTransactionItemSelected,
+  accountShellId
 }: Props ) => {
   return (
     <View>
@@ -45,6 +47,7 @@ const TransactionsPreviewSection: React.FC<Props> = ( {
         <TransactionsList
           transactions={transactions}
           onTransactionSelected={onTransactionItemSelected}
+          accountShellId={accountShellId}
         />
       </View>
     </View>
@@ -54,6 +57,7 @@ const TransactionsPreviewSection: React.FC<Props> = ( {
 const styles = StyleSheet.create( {
   headerContainer: {
     paddingVertical: 20,
+    paddingHorizontal: 20,
   },
 } )
 

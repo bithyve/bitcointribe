@@ -231,7 +231,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         data: [ null ],
         renderItem: () => {
           return (
-            <View style={styles.viewSectionContainer}>
+            <View style={styles.viewAccountDetailsCard}>
               <AccountDetailsCard
                 accountShell={accountShell}
                 onKnowMorePressed={() => setShowMore( true )}
@@ -255,6 +255,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                 isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
                 onViewMorePressed={navigateToTransactionsList}
                 onTransactionItemSelected={handleTransactionSelection}
+                accountShellId={accountShell.id}
               />
             </View>
           )
@@ -352,12 +353,16 @@ const styles = StyleSheet.create( {
   scrollViewContainer: {
     paddingTop: 20,
     height: '100%',
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
     backgroundColor: Colors.backgroundColor,
   },
 
   viewSectionContainer: {
     marginBottom: 10,
+  },
+
+  viewAccountDetailsCard: {
+    paddingHorizontal: 20,
   },
 
   footerSection: {
