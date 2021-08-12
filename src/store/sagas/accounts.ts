@@ -456,20 +456,20 @@ export const autoSyncShellsWatcher = createWatcher(
 )
 
 function* setup2FADetails( wallet: Wallet ) {
-  const secondaryMnemonic = bip39.generateMnemonic( 256 )
-  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMnemonic )
+  if( !wallet.secondaryMnemonic ) throw new Error( 'Cannot setup 2FA before level-2(secondaryMnemonic missing)' )
+
+  const secondarySeed = bip39.mnemonicToSeedSync( wallet.secondaryMnemonic )
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
   const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+  const secondaryXpub = AccountUtilities.generateExtendedKey( wallet.secondaryMnemonic, false, network, rootDerivationPath )
 
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
   const updatedWallet = {
     ...wallet,
-    secondaryMnemonic,
     secondaryWalletId,
     details2FA: {
       secondaryXpub,

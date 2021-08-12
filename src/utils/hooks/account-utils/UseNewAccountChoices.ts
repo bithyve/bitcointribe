@@ -68,7 +68,8 @@ export default function useNewAccountChoices() {
       } ),
       new SavingsSubAccountInfo( {
         defaultTitle: 'Savings Account',
-        defaultDescription: 'User Savings Account'
+        defaultDescription: 'User Savings Account',
+        visibility: ( wallet.secondaryMnemonic || wallet.details2FA )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN
       } ),
       new DonationSubAccountInfo( {
         defaultTitle: 'Donation Account',
