@@ -2,7 +2,7 @@ import { NavigationActions, StackActions } from 'react-navigation'
 
 
 export const goHomeAction = NavigationActions.navigate( {
-  routeName: 'Landing',
+  routeName: 'Home',
 } )
 
 
@@ -13,7 +13,7 @@ export const resetToHomeAction = ( params = {
     index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Landing',
+        routeName: 'Home',
         params,
       } ),
     ],
