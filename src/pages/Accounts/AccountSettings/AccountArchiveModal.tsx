@@ -1,10 +1,9 @@
 import React, {  } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import Colors from '../../../common/Colors'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 export type Props = {

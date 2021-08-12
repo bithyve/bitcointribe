@@ -28,7 +28,7 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
 import HomeStack from './stacks/home/HomeStack'
 import FriendsAndFamily from './stacks/F&F/F&FStack'
 import Colors from '../common/Colors'
-
+import Intermediate from '../pages/Intermediate'
 
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
@@ -343,10 +343,13 @@ const HomeNavigator = createStackNavigator(
       // navigationOptions: {
       //   gesturesEnabled: false,
       // },
+
     },
+    // Intermediate,
+    // Login,
   }, {
     defaultNavigationOptions: ( { navigation } ) => {
-      if ( ( navigation.state.routes[ 0 ].routes.length == 1 ) &&
+      if ( ( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
       ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
       ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
       ( navigation.state.routes[ 3 ].routes.length == 1 )

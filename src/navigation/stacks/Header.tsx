@@ -462,12 +462,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             } )
             // sss files removed
             // this.props.updateLastSeen( new Date() )
-            this.props.navigation.dispatch( StackActions.reset( {
-              index: 0,
-              actions: [ NavigationActions.navigate( {
-                routeName: 'Intermediate'
-              } ) ],
-            } ) )
+            // this.props.navigation.dispatch( [ NavigationActions.navigate( {
+            //   routeName: 'Bottomtab',
+            // } ),
+            // NavigationActions.navigate( {
+            //   routeName: 'Intermediate',
+            // } ) ]
+            // )
           }
         }
       )
