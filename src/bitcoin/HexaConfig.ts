@@ -129,7 +129,7 @@ class HexaConfig {
   public ACCOUNT_INSTANCES = {
     [ AccountType.TEST_ACCOUNT ]: {
       series: 0,
-      upperBound: 5,
+      upperBound: 1,
     },
     [ AccountType.CHECKING_ACCOUNT ]: {
       series: 0,
