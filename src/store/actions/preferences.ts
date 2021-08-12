@@ -21,6 +21,7 @@ export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED'
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS'
 export const IS_PERMISSION_SET = 'IS_PERMISSION_SET'
 export const SET_WALLET_ID = 'SET_WALLET_ID'
+export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -160,6 +161,15 @@ export const updateApplicationStatus = ( data ) => {
     type: UPDATE_APPLICATION_STATUS,
     payload: {
       status: data
+    },
+  }
+}
+
+export const updateLastSeen = ( data ) => {
+  return {
+    type: UPDATE_LAST_SEEN,
+    payload: {
+      lastSeen: data
     },
   }
 }
