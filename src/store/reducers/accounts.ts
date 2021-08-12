@@ -39,8 +39,8 @@ import {
   NEW_ACCOUNT_SHELLS_ADDED,
   UPDATE_ACCOUNT_SHELLS,
   UPDATE_ACCOUNTS,
-  MARK_READ_TRANSACTION,
-  MARK_ACCOUNT_CHECKED,
+  READ_TRANSACTION,
+  ACCOUNT_CHECKED,
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -262,24 +262,20 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             ...action.payload.accounts,
           },
         }
-      case MARK_READ_TRANSACTION:
-        const { txId, shellId } = action.payload
-        const currentShells = state.accountShells
-        const shellToUpdate = currentShells.findIndex( s => s.id === shellId )
-        const txToUpdate = currentShells[ shellToUpdate ].primarySubAccount.transactions.findIndex( t => t.txid === txId )
-        currentShells[ shellToUpdate ].primarySubAccount.transactions[ txToUpdate ].isNew = false
+      case READ_TRANSACTION: {
+        const { accountShells, accounts } = action.payload
         return {
           ...state,
-          accountShells: currentShells
+          accountShells: accountShells,
+          accounts: accounts,
         }
-      case MARK_ACCOUNT_CHECKED: {
-        const { shellId } = action.payload
-        const currentShells = state.accountShells
-        const shellToUpdate = currentShells.findIndex( s => s.id === shellId )
-        currentShells[ shellToUpdate ].primarySubAccount.hasNewTxn = false
+      }
+      case ACCOUNT_CHECKED: {
+        const { accountShells, accounts } = action.payload
         return {
           ...state,
-          accountShells: currentShells
+          accountShells: accountShells,
+          accounts: accounts,
         }
       }
       case UPDATE_ACCOUNT_SHELLS:

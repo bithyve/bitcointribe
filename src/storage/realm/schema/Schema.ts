@@ -44,6 +44,9 @@ export const AccountSchema: ObjectSchema = {
     accountDescription: {
       type: 'string', optional: true
     },
+    hasNewTxn: {
+      type: 'bool', default: false
+    },
     accountVisibility: {
       type: 'string', default: 'DEFAULT',
     },

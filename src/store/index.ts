@@ -51,7 +51,9 @@ import {
   validateTwoFAWatcher,
   createSmNResetTFAOrXPrivWatcher,
   updateAccountSettingsWatcher,
-  restoreAccountShellsWatcher
+  restoreAccountShellsWatcher,
+  accountCheckWatcher,
+  txnReadWatcher,
 } from './sagas/accounts'
 
 import {
@@ -178,6 +180,8 @@ const rootSaga = function* () {
     refreshAccountShellsWatcher,
     addNewAccountShellsWatcher,
     restoreAccountShellsWatcher,
+    accountCheckWatcher,
+    txnReadWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
     autoSyncShellsWatcher,

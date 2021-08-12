@@ -177,6 +177,35 @@ const updateAccount = async ( accountId, account ) => {
   }
 }
 
+
+const updateTransaction = async ( txId: string, params: object ) => {
+  try {
+    const txRef = db.objects( schema.Transaction ).filtered( `txid = "${txId}"` )
+    if( txRef.length > 0 ) {
+      db.write( ()=> {
+        for ( const [ key, value ] of Object.entries( params ) ) {
+          txRef[ 0 ][ key ] = value
+        }
+      } )
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+const markAccountChecked = async ( accountId: string ) => {
+  try {
+    const acccountRef = db.objects( schema.Account ).filtered( `id = "${accountId}"` )
+    if( acccountRef.length > 0 ) {
+      db.write( ()=> {
+        acccountRef[ 0 ].hasNewTxn = false
+      } )
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
 const updateContact = async ( contact ) => {
   try {
     const data = {
@@ -270,4 +299,6 @@ export default {
   getTrustedContacts,
   getBHR,
   updateBHR,
+  markAccountChecked,
+  updateTransaction,
 }

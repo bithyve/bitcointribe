@@ -52,7 +52,10 @@ export const FETCH_RECEIVE_ADDRESS = 'FETCH_RECEIVE_ADDRESS'
 export const FETCH_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_RECEIVE_ADDRESS_SUCCEEDED'
 export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
 export const MARK_READ_TRANSACTION = 'MARK_READ_TRANSACTION'
+export const READ_TRANSACTION = 'READ_TRANSACTION'
+
 export const MARK_ACCOUNT_CHECKED = 'MARK_ACCOUNT_CHECKED'
+export const ACCOUNT_CHECKED = 'ACCOUNT_CHECKED'
 
 export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
 export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
@@ -73,6 +76,26 @@ export const setAllAccountsData = ( accounts ) => {
     payload: {
       accounts
     }
+  }
+}
+
+export const accountChecked = ( accountShells: AccountShell [], accounts: Accounts ) => {
+  return {
+    type: ACCOUNT_CHECKED,
+    payload: {
+      accountShells,
+      accounts,
+    },
+  }
+}
+
+export const readTxn = ( accountShells: AccountShell [], accounts: Accounts ) => {
+  return {
+    type: READ_TRANSACTION,
+    payload: {
+      accountShells,
+      accounts,
+    },
   }
 }
 
