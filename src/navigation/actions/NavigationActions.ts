@@ -8,15 +8,9 @@ export const goHomeAction = NavigationActions.navigate( {
 
 export const resetToHomeAction = ( params = {
 } ) => {
-  return StackActions.reset( {
-    key: null,
-    index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Home',
-        params,
-      } ),
-    ],
+  return  NavigationActions.navigate( {
+    routeName: 'Home',
+    params,
   } )
 }
 
