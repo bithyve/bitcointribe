@@ -28,7 +28,6 @@ import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { syncPermanentChannels } from '../../store/actions/trustedContacts'
 import {
   generateMetaShare,
-  checkMSharesHealth,
   initLevelTwo,
   deletePrivateData,
   autoShareToLevel2Keepers,
@@ -69,6 +68,8 @@ import ModalContainer from '../../components/home/ModalContainer'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import dbManager from '../../storage/realm/dbManager'
+import realm from '../../storage/realm/realm'
+import schema from '../../storage/realm/schema/Schema'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -99,7 +100,8 @@ interface ManageBackupNewBHRStateTypes {
   approvePrimaryKeeper: boolean;
   loaderModal: boolean;
   knwowMoreModal: boolean;
-  metaSharesKeeper: MetaShare[]
+  metaSharesKeeper: MetaShare[];
+  onKeeperButtonClick: boolean;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -108,9 +110,7 @@ interface ManageBackupNewBHRPropsTypes {
   cloudBackupStatus: CloudBackupStatus;
   levelHealth: LevelHealthInterface[];
   currentLevel: any;
-  healthLoading: any;
   generateMetaShare: any;
-  checkMSharesHealth: any;
   isLevel3Initialized: Boolean;
   initLevelTwo: any;
   keeperInfo: any[];
@@ -210,12 +210,20 @@ class ManageBackupNewBHR extends Component<
       approvePrimaryKeeper: false,
       loaderModal: false,
       knwowMoreModal: false,
-      metaSharesKeeper: [ ...s3.metaSharesKeeper ]
+      metaSharesKeeper: [ ...s3.metaSharesKeeper  ],
+      onKeeperButtonClick: false
     }
   }
 
   componentDidMount = async () => {
     InteractionManager.runAfterInteractions( async() => {
+      realm.objects( schema.BHR ).addListener( obj => {
+        if( obj.length > 0 ) {
+          this.setState( {
+            metaSharesKeeper: obj[ 0 ].metaSharesKeeper
+          } )
+        }
+      } )
       this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
@@ -310,38 +318,8 @@ class ManageBackupNewBHR extends Component<
     isEnabled: !this.state.isEnabled
   } );
 
-  // modifyLevelData = () => {
-  //   const { levelHealth, currentLevel, keeperInfo } = this.props
-  //   const levelHealthObject = [ ...levelHealth ]
-  //   const levelData = modifyLevelStatus(
-  //     this.state.levelData,
-  //     levelHealthObject,
-  //     currentLevel,
-  //     keeperInfo,
-  //     this.updateLevelDataToReducer
-  //   )
-  //   this.setState( {
-  //     levelData: levelData.levelData,
-  //     isError: levelData.isError,
-  //   } )
-  //   //this.setSelectedCards()
-  // };
-
-  // setSelectedCards = () => {
-  //   const { levelData } = this.state
-  //   for ( let a = 0; a < levelData.length; a++ ) {
-  //     if ( levelData[ a ].status == 'notSetup' ) {
-  //       this.setState( {
-  //         selectedId: levelData[ a ].id
-  //       } )
-  //       break
-  //     }
-  //   }
-  // };
-
   componentDidUpdate = ( prevProps, prevState ) => {
     const {
-      healthLoading,
       cloudBackupStatus,
       levelHealth
     } = this.props
@@ -354,7 +332,6 @@ class ManageBackupNewBHR extends Component<
       } )
     }
     if (
-      prevProps.healthLoading !== this.props.healthLoading ||
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
@@ -400,11 +377,9 @@ class ManageBackupNewBHR extends Component<
         loaderModal: false
       } )
     }
-    console.log( 'this.state.metaSharesKeeper.length', this.state.metaSharesKeeper.length )
-    console.log( 'prevProps.initLoading', prevProps.initLoading )
-    console.log( 'this.props.initLoading', this.props.initLoading )
+
     if (
-      prevProps.initLoading !== this.props.initLoading && this.state.metaSharesKeeper.length == 3
+      prevState.metaSharesKeeper != this.state.metaSharesKeeper && this.state.metaSharesKeeper.length == 3 && this.state.onKeeperButtonClick
     ) {
       const obj = {
         id: 2,
@@ -436,7 +411,7 @@ class ManageBackupNewBHR extends Component<
       // this.loaderBottomSheet.snapTo( 0 )
     }
     if (
-      prevProps.generateMetaShareStatus !== this.props.generateMetaShareStatus && !this.props.generateMetaShareStatus && this.state.metaSharesKeeper.length == 5
+      prevState.metaSharesKeeper != this.state.metaSharesKeeper && this.state.metaSharesKeeper.length == 5 && this.state.onKeeperButtonClick
     ) {
       const obj = {
         id: 2,
@@ -609,14 +584,14 @@ class ManageBackupNewBHR extends Component<
 
   onPressKeeperButton = ( value, number ) => {
     this.setState( {
-      selectedLevelId: value.id
+      selectedLevelId: value.id,
+      onKeeperButtonClick: true
     } )
     this.props.onPressKeeper( value, number )
   };
 
   onRefresh = async () => {
     this.props.modifyLevelData( )
-    // this.props.checkMSharesHealth()
     this.props.setHealthStatus()
     this.props.syncPermanentChannels( {
       permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
@@ -1250,7 +1225,6 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.bhr.isLevelThreeMetaShareCreated
     ),
-    healthLoading: idx( state, ( _ ) => _.bhr.loading.checkMSharesHealth ),
     initLoading: idx( state, ( _ ) => _.bhr.loading.initLoader ),
     keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
@@ -1276,7 +1250,6 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     generateMetaShare,
-    checkMSharesHealth,
     initLevelTwo,
     syncPermanentChannels,
     setCloudData,

@@ -59,7 +59,8 @@ import {
   navigateToHistoryPage,
   generateMetaShare,
   setIsKeeperTypeBottomSheetOpen,
-  ON_PRESS_KEEPER
+  ON_PRESS_KEEPER,
+  retrieveMetaShares
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -227,7 +228,7 @@ function* generateLevel1SharesWorker( { payload } ){
       }
     }
   } else {
-    throw new Error( 'Error' )
+    throw new Error( 'Error generateLevel1SharesWorker' )
   }
 
 }
@@ -264,7 +265,7 @@ function* generateLevel2SharesWorker( { payload } ){
       }
     }
   } else {
-    throw new Error( 'ERROR' )
+    throw new Error( 'ERROR generateLevel1SharesWorker' )
   }
 }
 
@@ -516,7 +517,8 @@ function* recoverWalletWorker( { payload } ) {
     yield put( restoreTrustedContacts( {
       walletId: wallet.walletId, channelKeys: contactsChannelKeys
     } ) )
-
+    // restore Metashres
+    if( level > 1 ) yield put( retrieveMetaShares() )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
     console.log( err )
@@ -1401,23 +1403,27 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = data
     const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-    const contactInfo = {
-      channelKey,
+    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+    if( existingContact ){
+      const existingContactDetails = contacts[ channelKey ].contactDetails
+      const contactInfo = {
+        contactDetails: existingContactDetails,
+        channelKey,
+      }
+      const channelUpdate =  {
+        contactInfo
+      }
+      const payload = {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+        channelUpdates: [ channelUpdate ],
+      }
+      yield call( syncPermanentChannelsWorker, {
+        payload
+      } )
     }
-    const channelUpdate =  {
-      contactInfo
-    }
-    const payload = {
-      permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-      channelUpdates: [ channelUpdate ],
-    }
-    yield call( syncPermanentChannelsWorker, {
-      payload
-    } )
     const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
-    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const walletId = wallet.walletId
     const { walletName } = yield select( ( state ) => state.storage.wallet )
     if( MetaShares && MetaShares.length ) {
@@ -2063,9 +2069,9 @@ function* retrieveMetaSharesWorker( ) {
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    // TODO: => get MetaShares and Add to DB
     const Rk: MetaShare[] = []
     const metaShares: MetaShare[] = []
+    const encryptedPrimarySecrets: string[] = []
     let keepers:KeeperInfoInterface[] = []
     if ( currentLevel === 2 ) keepers = keeperInfo.filter( word => word.scheme == '2of3' )
     if ( currentLevel === 3 ) keepers = keeperInfo.filter( word => word.scheme == '3of5' )
@@ -2089,8 +2095,14 @@ function* retrieveMetaSharesWorker( ) {
     for ( let i = 0; i < keepers.length; i++ ) {
       const element = keepers[ i ]
       metaShares[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId )
+      encryptedPrimarySecrets[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId ) ? Rk.find( value=>value.shareId == element.shareId ).encryptedShare.pmShare : ''
     }
-    // TODO: => store metaShares to DB and reducer
+    dbManager.updateBHR( {
+      encryptedSecretsKeeper: encryptedPrimarySecrets,
+      metaSharesKeeper: metaShares,
+      encryptedSMSecretsKeeper: [],
+      oldMetaSharesKeeper: []
+    } )
 
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
   } catch ( error ) {

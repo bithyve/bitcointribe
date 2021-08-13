@@ -869,7 +869,6 @@ export interface cloudDataInterface {
   shares?: any;
   secondaryShare?: string;
   seed?: string;
-  regularAccount?: any;
 }
 
 export interface MultiSigAccount extends Account {
