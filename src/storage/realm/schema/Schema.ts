@@ -32,6 +32,9 @@ const EncryptedShare = 'EncryptedShare'
 const Meta = 'Meta'
 const KeeperInfo = 'KeeperInfo'
 const Receiver = 'Receiver'
+const SenderInfo = 'SenderInfo'
+const RecipientInfo = 'RecipientInfo'
+const Recipient = 'Recipient'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -113,6 +116,39 @@ export const AccountSchema: ObjectSchema = {
   },
 }
 
+export const SenderInfoSchema: ObjectSchema = {
+  name: SenderInfo,
+  properties: {
+    name: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const RecipientSchema: ObjectSchema = {
+  name: Recipient,
+  properties: {
+    name: {
+      type: 'string', optional: true
+    },
+    amount: {
+      type: 'int', optional: true
+    },
+  },
+}
+
+export const RecipientInfoSchema: ObjectSchema = {
+  name: RecipientInfo,
+  properties: {
+    txid: {
+      type: 'string', optional: true
+    },
+    recipient: {
+      type: 'list', objectType: Recipient, default: []
+    },
+  },
+}
+
 export const ActiveAddressAssigneeSchema: ObjectSchema = {
   name: ActiveAddressAssignee,
   properties: {
@@ -122,6 +158,12 @@ export const ActiveAddressAssigneeSchema: ObjectSchema = {
     type: {
       type: 'string', optional: true
     },
+    senderInfo: {
+      type: SenderInfo, optional: true
+    },
+    recipientInfo: {
+      type: 'list', objectType: RecipientInfo, default: []
+    }
   },
 }
 
@@ -144,10 +186,10 @@ export const ActiveAddressesSchema: ObjectSchema = {
   name: ActiveAddresses,
   properties: {
     external: {
-      type: ActiveAddress, optional: true
+      type: 'list', objectType: ActiveAddress, default: []
     },
     internal: {
-      type: ActiveAddress, optional: true
+      type: 'list', objectType: ActiveAddress, default: []
     },
   },
 }
