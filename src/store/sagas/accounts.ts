@@ -30,6 +30,8 @@ import {
   resetTwoFA,
   generateSecondaryXpriv,
   SYNC_ACCOUNTS,
+  MARK_ACCOUNT_CHECKED,
+  MARK_READ_TRANSACTION,
   updateAccountShells,
   getTestcoins,
   refreshAccountShells,
@@ -38,6 +40,8 @@ import {
   accountSettingsUpdateFailed,
   updateAccounts,
   RESTORE_ACCOUNT_SHELLS,
+  readTxn,
+  accountChecked,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -195,6 +199,45 @@ function* syncAccountsWorker( { payload }: {payload: {
     }
   }
 }
+
+function* accountCheckWoker( { payload } ) {
+  const { shellId } = payload
+  const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
+  const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
+  const shellToUpdate = accountShells.findIndex( s => s.id === shellId )
+  accountShells[ shellToUpdate ].primarySubAccount.hasNewTxn = false
+  const accId = accountShells[ shellToUpdate ].primarySubAccount.id
+  accounts[ accId ].hasNewTxn = false
+  yield put( accountChecked( accountShells, accounts ) )
+  yield call( dbManager.markAccountChecked, accId )
+}
+
+export const accountCheckWatcher = createWatcher(
+  accountCheckWoker,
+  MARK_ACCOUNT_CHECKED
+)
+
+function* txnReadWoker( { payload } ) {
+  const { shellId, txId } = payload
+  const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
+  const shellToUpdate = accountShells.findIndex( s => s.id === shellId )
+  const shellTxIndex = accountShells[ shellToUpdate ].primarySubAccount.transactions.findIndex( tx => tx.txid === txId )
+  accountShells[ shellToUpdate ].primarySubAccount.transactions[ shellTxIndex ].isNew = false
+  const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
+  const accId = accountShells[ shellToUpdate ].primarySubAccount.id
+  accounts[ accId ].hasNewTxn = false
+  const accTxIndex = accounts[ accId ].transactions.findIndex( tx => tx.txid === txId )
+  accounts[ accId ].transactions[ accTxIndex ].isNew = false
+  yield put( readTxn( accountShells, accounts ) )
+  yield call( dbManager.updateTransaction, txId, {
+    isNew: false
+  } )
+}
+
+export const txnReadWatcher = createWatcher(
+  txnReadWoker,
+  MARK_READ_TRANSACTION
+)
 
 export const syncAccountsWatcher = createWatcher(
   syncAccountsWorker,
@@ -456,20 +499,20 @@ export const autoSyncShellsWatcher = createWatcher(
 )
 
 function* setup2FADetails( wallet: Wallet ) {
-  const secondaryMnemonic = bip39.generateMnemonic( 256 )
-  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMnemonic )
+  if( !wallet.secondaryMnemonic ) throw new Error( 'Cannot setup 2FA before level-2(secondaryMnemonic missing)' )
+
+  const secondarySeed = bip39.mnemonicToSeedSync( wallet.secondaryMnemonic )
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
   const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+  const secondaryXpub = AccountUtilities.generateExtendedKey( wallet.secondaryMnemonic, false, network, rootDerivationPath )
 
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
   const updatedWallet = {
     ...wallet,
-    secondaryMnemonic,
     secondaryWalletId,
     details2FA: {
       secondaryXpub,

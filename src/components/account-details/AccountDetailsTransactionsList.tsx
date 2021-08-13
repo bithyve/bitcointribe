@@ -12,11 +12,13 @@ const keyExtractor = ( item: TransactionDescribing ) => item.txid
 export type Props = {
   transactions: TransactionDescribing[];
   onTransactionSelected: ( transaction: TransactionDescribing ) => void;
+  accountShellId: string,
 };
 
 const AccountDetailsTransactionsList: React.FC<Props> = ( {
   transactions,
   onTransactionSelected,
+  accountShellId,
 }: Props ) => {
 
   /**
@@ -38,7 +40,7 @@ const AccountDetailsTransactionsList: React.FC<Props> = ( {
       <TouchableOpacity
         onPress={() => transactionSelectionHandler( transaction )}
       >
-        <TransactionsListItem transaction={transaction} />
+        <TransactionsListItem accountShellId={accountShellId} transaction={transaction} />
       </TouchableOpacity>
     )
   }

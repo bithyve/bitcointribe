@@ -108,7 +108,6 @@ function* cloudWorker( { payload } ) {
         walletName: wallet.walletName,
         questionId: wallet.security.questionId,
         question: wallet.security.questionId === '0' ? wallet.security.question: '',
-        regularAccount: '',
         keeperData: JSON.stringify( keeperInfo ),
         bhXpub,
       }
@@ -295,12 +294,12 @@ export const getCloudBackupRecoveryWatcher = createWatcher(
 function* checkCloudBackupWorker ( { payload } ) {
   try {
     const { data, share } = payload
-    console.log( 'CloudDataBackup STARTED' )
+    console.log( 'CloudDataBackup STARTED', data )
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
       console.log( 'backedJson checkCloudBackupWorker', backedJson )
-      const json = JSON.parse( backedJson )
-      if( json.status ){
+      const json = backedJson ? JSON.parse( backedJson ) : null
+      if( backedJson && json && json.status ){
         return json
       }
       if ( backedJson ) {

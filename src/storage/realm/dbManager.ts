@@ -63,35 +63,12 @@ const updateWallet = async ( newWalletProps ) => {
 }
 
 const createAccount = async ( account ) => {
-  console.log( account )
   try {
     const data = {
       ...account,
     }
     if( account.activeAddresses ) {
-      const aa = {
-        internal: {
-        },
-        external: {
-        }
-      }
-      if( Object.keys( account.activeAddresses.external ).length > 0 ) {
-        for ( const [ key, value ] of Object.entries( account.activeAddresses.external ) ) {
-          aa.external.address = key
-          aa.external ={
-            ...value, ...aa
-          }
-        }
-      }
-      if( Object.keys( account.activeAddresses.internal ).length > 0 ) {
-        for ( const [ key, value ] of Object.entries( account.activeAddresses.external ) ) {
-          aa.internal.address = key
-          aa.internal ={
-            ...value, ...aa
-          }
-        }
-      }
-      data.activeAddresses = aa
+      data.activeAddresses = getActiveAddresses( account.activeAddresses )
     }
     if( data.txIdMap ){
       if( Object.keys( data.txIdMap ).length === 0 ) {
@@ -122,29 +99,7 @@ const updateAccount = async ( accountId, account ) => {
       ...account,
     }
     if( account.activeAddresses ) {
-      const aa = {
-        internal: {
-        },
-        external: {
-        }
-      }
-      if( Object.keys( account.activeAddresses.external ).length > 0 ) {
-        for ( const [ key, value ] of Object.entries( account.activeAddresses.external ) ) {
-          aa.external.address = key
-          aa.external ={
-            ...aa, ...value
-          }
-        }
-      }
-      if( Object.keys( account.activeAddresses.internal ).length > 0 ) {
-        for ( const [ key, value ] of Object.entries( account.activeAddresses.internal ) ) {
-          aa.internal.address = key
-          aa.internal ={
-            ...aa, ...value
-          }
-        }
-      }
-      data.activeAddresses = aa
+      data.activeAddresses = getActiveAddresses( account.activeAddresses )
     }
     if( data.txIdMap ){
       if( Object.keys( data.txIdMap ).length === 0 ) {
@@ -173,6 +128,86 @@ const updateAccount = async ( accountId, account ) => {
     acccountRef = data
     db.create( schema.Account, acccountRef, true )  }
   catch ( error ) {
+    console.log( error )
+  }
+}
+
+const getActiveAddresses = ( activeAddresses ) => {
+  try {
+    const aa = {
+      internal: [],
+      external: []
+    }
+    if( Object.keys( activeAddresses.external ).length > 0 ) {
+      aa.external = getActiveAddress( activeAddresses.external )
+    }
+    if( Object.keys( activeAddresses.internal ).length > 0 ) {
+      aa.internal = getActiveAddress( activeAddresses.internal )
+    }
+    return aa
+  } catch ( error ) {
+    return []
+  }
+}
+
+const getActiveAddress = ( address ) => {
+  try {
+    const addresses = []
+    for ( const [ key, value ] of Object.entries( address ) ) {
+      const obj = {
+        address: key,
+        index: value.index,
+        assignee: {
+          type: value.assignee.type,
+          id: value.assignee.id,
+        },
+      }
+      if( value.assignee.senderInfo ) {
+        obj.assignee.senderInfo = value.assignee.senderInfo
+      }
+      if( value.assignee.recipientInfo ) {
+        const recipientInfo = []
+        for ( const [ txid, recipient ] of Object.entries( value.assignee.recipientInfo ) ) {
+          recipientInfo.push( {
+            txid,
+            recipient,
+          } )
+        }
+        obj.assignee.recipientInfo = recipientInfo
+      }
+      addresses.push( obj )
+    }
+    return addresses
+  } catch ( error ) {
+    return []
+  }
+}
+
+
+const updateTransaction = async ( txId: string, params: object ) => {
+  try {
+    const txRef = db.objects( schema.Transaction ).filtered( `txid = "${txId}"` )
+    if( txRef.length > 0 ) {
+      db.write( ()=> {
+        for ( const [ key, value ] of Object.entries( params ) ) {
+          txRef[ 0 ][ key ] = value
+        }
+      } )
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+const markAccountChecked = async ( accountId: string ) => {
+  try {
+    const acccountRef = db.objects( schema.Account ).filtered( `id = "${accountId}"` )
+    if( acccountRef.length > 0 ) {
+      db.write( ()=> {
+        acccountRef[ 0 ].hasNewTxn = false
+      } )
+    }
+  } catch ( error ) {
     console.log( error )
   }
 }
@@ -270,4 +305,6 @@ export default {
   getTrustedContacts,
   getBHR,
   updateBHR,
+  markAccountChecked,
+  updateTransaction,
 }

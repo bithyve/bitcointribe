@@ -5,12 +5,13 @@ import TransactionsFlatListItemContent from '../transactions/TransactionsFlatLis
 
 export type Props = {
   transaction: TransactionDescribing;
+  accountShellId: string
 };
 
-const AccountDetailsTransactionsListItem: React.FC<Props> = ( { transaction, }: Props ) => {
+const AccountDetailsTransactionsListItem: React.FC<Props> = ( { transaction, accountShellId }: Props ) => {
   return (
     <ListItem bottomDivider pad={4}>
-      <TransactionsFlatListItemContent transaction={transaction} />
+      <TransactionsFlatListItemContent accountShellId={accountShellId} transaction={transaction} />
       <ListItem.Chevron />
     </ListItem>
   )

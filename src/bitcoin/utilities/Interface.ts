@@ -1,9 +1,4 @@
 import { ImageSourcePropType } from 'react-native'
-import {
-  DecentralizedBackup,
-  ServicesJSON,
-} from '../../common/interfaces/Interfaces'
-import { networks } from 'bitcoinjs-lib'
 import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
@@ -619,17 +614,6 @@ export interface Trusted_Contacts {
   [channelKey: string]: TrustedContact
 }
 
-export interface WalletImage {
-  DECENTRALIZED_BACKUP?: DecentralizedBackup;
-  SERVICES?: ServicesJSON;
-  ASYNC_DATA?: {
-    [identifier: string]: string;
-  };
-  STATE_DATA?: {
-    [identifier: string]: string;
-  };
-}
-
 export interface NewWalletImage {
   walletId: string;
   name: string;
@@ -885,7 +869,6 @@ export interface cloudDataInterface {
   shares?: any;
   secondaryShare?: string;
   seed?: string;
-  regularAccount?: any;
 }
 
 export interface MultiSigAccount extends Account {
