@@ -131,12 +131,24 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         Object.keys( trustedContacts ).forEach( channelKey => {
           const contact: TrustedContact = trustedContacts[ channelKey ]
           if( contact.isActive ){
+
+            let fullySyncSkippedContact = false
+            if( !contact.contactDetails.contactName ){
+            // sync skipped contact if the request has been approved and the wallet name has not been fetched yet
+              const instreamId = contact.streamId
+              if( instreamId ) {
+                const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+                const walletName = idx( instream, ( _ ) => _.primaryData.walletName )
+                if( !walletName ) fullySyncSkippedContact = true
+              } else fullySyncSkippedContact = true
+            }
+
             if( metaSync || contact.hasNewData || hardSync )
               channelSyncUpdates.push( {
                 channelKey: channelKey,
                 streamId,
                 contact,
-                metaSync
+                metaSync: fullySyncSkippedContact? false: metaSync
               } )
           }
         } )
