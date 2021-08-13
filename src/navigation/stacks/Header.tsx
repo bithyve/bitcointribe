@@ -105,6 +105,9 @@ import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
 import { setShowAllAccount } from '../../store/actions/accounts'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
+import {
+  updateLastSeen
+} from '../../store/actions/preferences'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -236,6 +239,7 @@ interface HomePropsTypes {
   getMessages: any;
   syncPermanentChannels: any;
   updateStartRegistration: any;
+  updateLastSeen: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -461,13 +465,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               value: false,
             } )
             // sss files removed
-            // this.props.updateLastSeen( new Date() )
+            this.props.updateLastSeen( new Date() )
             // this.props.navigation.dispatch( [ NavigationActions.navigate( {
             //   routeName: 'Bottomtab',
             // } ),
-            // NavigationActions.navigate( {
-            //   routeName: 'Intermediate',
-            // } ) ]
+            NavigationActions.navigate( {
+              routeName: 'Intermediate',
+            } )
+          // ]
             // )
           }
         }
@@ -1418,7 +1423,8 @@ export default withNavigationFocus(
     updateMessageStatus,
     getMessages,
     syncPermanentChannels,
-    updateStartRegistration
+    updateStartRegistration,
+    updateLastSeen
   } )( Home )
 )
 
