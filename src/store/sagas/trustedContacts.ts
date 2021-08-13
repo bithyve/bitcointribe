@@ -131,12 +131,24 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         Object.keys( trustedContacts ).forEach( channelKey => {
           const contact: TrustedContact = trustedContacts[ channelKey ]
           if( contact.isActive ){
+
+            let fullySyncSkippedContact = false
+            if( !contact.contactDetails.contactName ){
+            // sync skipped contact if the request has been approved and the wallet name has not been fetched yet
+              const instreamId = contact.streamId
+              if( instreamId ) {
+                const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+                const walletName = idx( instream, ( _ ) => _.primaryData.walletName )
+                if( !walletName ) fullySyncSkippedContact = true
+              } else fullySyncSkippedContact = true
+            }
+
             if( metaSync || contact.hasNewData || hardSync )
               channelSyncUpdates.push( {
                 channelKey: channelKey,
                 streamId,
                 contact,
-                metaSync
+                metaSync: fullySyncSkippedContact? false: metaSync
               } )
           }
         } )
@@ -184,11 +196,25 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
           const instream = useStreamFromContact( temporaryContact, walletId, true )
           const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+          const nameAssociatedByContact: string = idx( instream, ( _ ) => _.primaryData.contactDetails.contactName )
+
           if( fcmToken ){
+            let notifType, notifBody
+            switch( temporaryContact.relationType ){
+                case TrustedContactRelationTypes.KEEPER:
+                  notifType = notificationType.FNF_KEEPER_REQUEST_REJECTED
+                  notifBody = `F&F keeper request rejected by ${nameAssociatedByContact || wallet.walletName}`
+                  break
+
+                default:
+                  notifType = notificationType.FNF_REQUEST_REJECTED
+                  notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
+            }
+
             const notification: INotification = {
-              notificationType: notificationType.FNF_KEEPER_REQUEST_REJECTED,
+              notificationType: notifType,
               title: 'Friends and Family notification',
-              body: `F&F keeper request rejected by ${temporaryContact.contactDetails.contactName}`,
+              body: notifBody,
               data: {
               },
               tag: notificationTag.IMP,
@@ -209,9 +235,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         return
       }
 
-      console.log( {
-        updatedContacts
-      } )
       yield put( updateTrustedContacts( updatedContacts ) )
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
         yield call( dbManager.updateContact, value )
@@ -228,10 +251,21 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const relationType: TrustedContactRelationTypes = idx( instream, ( _ ) => _.primaryData.relationType )
 
         if( contactsFCM && contactsWalletId ){
+          let notifType, notifBody
+          switch( contact.relationType ){
+              case TrustedContactRelationTypes.KEEPER:
+                notifType = notificationType.FNF_KEEPER_REQUEST_ACCEPTED
+                notifBody = `F&F keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
+                break
+
+              default:
+                notifType = notificationType.FNF_REQUEST_ACCEPTED
+                notifBody = `F&F request accepted by ${nameAssociatedByContact || wallet.walletName}`
+          }
           const notification: INotification = {
-            notificationType: notificationType.FNF_KEEPER_REQUEST_ACCEPTED,
+            notificationType: notifType,
             title: 'Friends and Family notification',
-            body: `F&F keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`,
+            body: notifBody,
             data: {
             },
             tag: notificationTag.IMP,
