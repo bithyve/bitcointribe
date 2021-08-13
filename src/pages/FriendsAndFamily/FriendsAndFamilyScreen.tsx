@@ -553,7 +553,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             </Text>
             <View style={{
               width: '95%',
-              height: '54%',
+              // height: '54%',
               backgroundColor: Colors.white,
               shadowOpacity: 0.06,
               shadowOffset: {
@@ -564,8 +564,8 @@ class FriendsAndFamilyScreen extends PureComponent<
               alignSelf: 'center',
               borderRadius: wp( 2 ),
               marginTop: hp( 3 ),
-              // marginBottom: hp( 1 ),
-              // paddingVertical: hp( 2.2 ),
+              marginBottom: hp( 1 ),
+              paddingVertical: hp( 5 ),
               paddingHorizontal: wp( 4.5 )
             }}>
               <View style={[ styles.subInfo, {
