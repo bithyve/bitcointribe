@@ -184,11 +184,25 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
           const instream = useStreamFromContact( temporaryContact, walletId, true )
           const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+          const nameAssociatedByContact: string = idx( instream, ( _ ) => _.primaryData.contactDetails.contactName )
+
           if( fcmToken ){
+            let notifType, notifBody
+            switch( temporaryContact.relationType ){
+                case TrustedContactRelationTypes.KEEPER:
+                  notifType = notificationType.FNF_KEEPER_REQUEST_REJECTED
+                  notifBody = `F&F keeper request rejected by ${nameAssociatedByContact || wallet.walletName}`
+                  break
+
+                default:
+                  notifType = notificationType.FNF_REQUEST_REJECTED
+                  notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
+            }
+
             const notification: INotification = {
-              notificationType: notificationType.FNF_KEEPER_REQUEST_REJECTED,
+              notificationType: notifType,
               title: 'Friends and Family notification',
-              body: `F&F keeper request rejected by ${temporaryContact.contactDetails.contactName}`,
+              body: notifBody,
               data: {
               },
               tag: notificationTag.IMP,
@@ -209,9 +223,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         return
       }
 
-      console.log( {
-        updatedContacts
-      } )
       yield put( updateTrustedContacts( updatedContacts ) )
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
         yield call( dbManager.updateContact, value )
@@ -228,10 +239,21 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const relationType: TrustedContactRelationTypes = idx( instream, ( _ ) => _.primaryData.relationType )
 
         if( contactsFCM && contactsWalletId ){
+          let notifType, notifBody
+          switch( contact.relationType ){
+              case TrustedContactRelationTypes.KEEPER:
+                notifType = notificationType.FNF_KEEPER_REQUEST_ACCEPTED
+                notifBody = `F&F keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
+                break
+
+              default:
+                notifType = notificationType.FNF_REQUEST_ACCEPTED
+                notifBody = `F&F request accepted by ${nameAssociatedByContact || wallet.walletName}`
+          }
           const notification: INotification = {
-            notificationType: notificationType.FNF_KEEPER_REQUEST_ACCEPTED,
+            notificationType: notifType,
             title: 'Friends and Family notification',
-            body: `F&F keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`,
+            body: notifBody,
             data: {
             },
             tag: notificationTag.IMP,
