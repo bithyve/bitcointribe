@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Image } from 'react-native'
 import { ListItem, Icon } from 'react-native-elements'
 import moment from 'moment'
 import Colors from '../../common/Colors'
@@ -12,18 +12,28 @@ import TransactionDescribing from '../../common/data/models/Transactions/Interfa
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 import { AccountType } from '../../bitcoin/utilities/Interface'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
 export type Props = {
   transaction: TransactionDescribing;
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind | null;
+  accountShellId: string,
 };
 
 const TransactionListItemContent: React.FC<Props> = ( {
   transaction,
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
+  accountShellId,
 }: Props ) => {
+
+  const primarySubAccount = usePrimarySubAccountForShell(
+    useAccountShellForID( accountShellId )
+  )
+
   const transactionKindIconName = useMemo( () => {
     switch ( transaction.transactionType ) {
         case TransactionKind.RECEIVE:
@@ -65,7 +75,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
   }, [ transaction.transactionType ] )
 
   const formattedDateText = useMemo( () => {
-    return moment( transaction.date ).format( 'DD MMMM YYYY' )
+    return moment( transaction.date ).format( 'DD/MM/YYYY • hh:MMa' )
   }, [ transaction.transactionType ] )
 
   const confirmationsText = useMemo( () => {
@@ -76,19 +86,29 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
   return (
     <>
-      {
-        transaction.isNew &&(
-          <View style={styles.dot}/>
-        )
-      }
-      <Icon
+
+      {/* <Icon
         style={styles.transactionKindIcon}
         name={transactionKindIconName}
         type={'font-awesome'}
         color={transactionKindIconColor}
         size={13}
-      />
+      /> */}
 
+      <View style={styles.containerImg}>
+        <Image
+          source={getAvatarForSubAccount( primarySubAccount )}
+          style={styles.avatarImage}
+          resizeMode="contain"
+        />
+
+        {
+          transaction.isNew &&(
+            <View style={styles.dot}/>
+          )
+        }
+
+      </View>
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title style={styles.titleText} numberOfLines={1}>
           {getTitle}
@@ -128,6 +148,34 @@ const styles = StyleSheet.create( {
 
   titleSection: {
     flex: 1,
+  },
+
+  containerImg: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 35,
+    width: 35,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'white',
+    marginRight: 10,
+    backgroundColor: '#F4F4F4',
+  },
+
+  avatarImage: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+  },
+
+  dot: {
+    height: 9,
+    width: 9,
+    backgroundColor: 'tomato',
+    borderRadius: 5,
+    position: 'absolute',
+    top: 0,
+    right: 0,
   },
 
   titleText: {
@@ -172,13 +220,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 17 ),
   },
 
-  dot: {
-    height: 7,
-    width: 7,
-    backgroundColor: 'tomato',
-    borderRadius: 5,
-    marginRight: 5,
-  },
 } )
 
 export default TransactionListItemContent

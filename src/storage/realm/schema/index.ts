@@ -30,6 +30,9 @@ import {
   S3MetaShareSchema,
   BHRSchemaSchema,
   ReceiverSchema,
+  SenderInfoSchema,
+  RecipientInfoSchema,
+  RecipientSchema,
 } from './Schema'
 
 export default
@@ -65,4 +68,7 @@ export default
   S3MetaShareSchema,
   BHRSchemaSchema,
   ReceiverSchema,
+  SenderInfoSchema,
+  RecipientInfoSchema,
+  RecipientSchema,
 ]
