@@ -96,7 +96,7 @@ const loaderMessages = [
   },
   {
     heading: 'Generating Recovery Keys',
-    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+    text: 'Recovery Keys help you recover your Hexa wallet in case your phone is lost',
     subText: '',
   },
   {
@@ -827,9 +827,9 @@ class RestoreWithICloud extends Component<
     const { navigation } = this.props
     return (
       <RestoreFromICloud
-        title={`Restore from ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
+        title={`Recover from ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText={
-          'Clicking on Restore would source your Recovery Key from iCloud'
+          'Clicking on Recover would source your Recovery Key from iCloud'
         }
         cardInfo={'Restoring Wallet from'}
         cardTitle={selectedBackup.walletName}
@@ -838,7 +838,7 @@ class RestoreWithICloud extends Component<
             ? `${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'} backup at Level ${selectedBackup.levelStatus}`
             : ''}`
         }
-        proceedButtonText={'Restore'}
+        proceedButtonText={'Recover'}
         backButtonText={'Back'}
         modalRef={this.RestoreFromICloud}
         onPressProceed={() => {
@@ -1134,7 +1134,7 @@ class RestoreWithICloud extends Component<
           <ContactListForRestore
             title={'Select Contact'}
             subText={
-              'Select contact to send a Wallet Restore request link'
+              'Select contact to send a Wallet Recover request link'
             }
             contactList={contactList}
             modalRef={this.ContactListForRestore}

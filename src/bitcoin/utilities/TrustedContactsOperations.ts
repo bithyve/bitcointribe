@@ -512,7 +512,7 @@ export default class TrustedContactsOperations {
        const permanentChannels: {
         [channelAddress: string]: Streams;
         } = res.data.permanentChannels
-       if( !Object.keys( permanentChannels ).length ) throw new Error( 'Unable to restore trusted contacts: no permanent channels found' )
+       if( !Object.keys( permanentChannels ).length ) throw new Error( 'Unable to recover trusted contacts: no permanent channels found' )
 
        const restoredContacts: Trusted_Contacts = {
        }

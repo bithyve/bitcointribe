@@ -216,7 +216,7 @@ export default function NewOwnQuestions( props ) {
         setTimeout( () => {
           setMessage( 'Generating Recovery Keys' )
           setSubTextMessage(
-            'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+            'Recovery Keys help you recover your Hexa wallet in case your phone is lost',
           )
         }, 3000 )
       }, 3000 )

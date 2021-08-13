@@ -758,7 +758,9 @@ function* updateAccountSettingsWorker( { payload }: {
       }
     } ) )
     yield call( dbManager.updateAccount, account.id, account )
-    yield put( accountSettingsUpdated() )
+    if( visibility === AccountVisibility.DEFAULT ) {
+      yield put( accountSettingsUpdated() )
+    }
 
   } catch ( error ) {
     yield put( accountSettingsUpdateFailed( {

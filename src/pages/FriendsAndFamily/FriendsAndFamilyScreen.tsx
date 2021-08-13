@@ -299,207 +299,207 @@ class FriendsAndFamilyScreen extends PureComponent<
   renderAddContactAddressBookHeader = () => {
     return <ModalHeader />
   };
-  // renderAddFnFModal = () => {
-  //   const { activeIndex } = this.state
-  //   return(
-  //     <View style={{
-  //       ...styles.modalContentContainer,
-  //     }}>
-  //       <TouchableOpacity
-  //         activeOpacity={1}
-  //         onPress={() => {this.setState( {
-  //           addFnF: false
-  //         } )}}
-  //         style={styles.closeButton}
-  //       >
-  //         <FontAwesome name="close" color={Colors.white} size={19} style={{
-  //           // marginTop: hp( 0.5 )
-  //         }} />
-  //       </TouchableOpacity>
-  //       <Text style={styles.title}>Add Friends & Family</Text>
-  //       <Text style={styles.subTitle}>Add a new contact, or invite a ward Lorem ipsum dolor sit amet, consectetur adipiscing elit</Text>
-  //       <TouchableOpacity
-  //         onPress={() => this.setState( {
-  //           activeIndex: 0
-  //         } )}
-  //         style={[ styles.cardView, {
-  //           backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1
-  //         } ]}>
-  //         <View style={styles.cardSubView}>
-  //           <View style={{
-  //             width: 18,
-  //             height: 18,
-  //             borderRadius: 9,
-  //             // borderWidth: 0.3,
-  //             // borderColor: Colors.borderColor,
-  //             backgroundColor: Colors.white,
-  //             justifyContent: 'center',
-  //             alignItems: 'center',
-  //             elevation: 10,
-  //             // shadowColor: Colors.gray,
-  //             shadowOpacity: 0.1,
-  //             shadowOffset: {
-  //               width: 1, height: 1
-  //             },
-  //           }}>
-  //             {activeIndex === 0 &&
-  //                   <Image
-  //                     style={{
-  //                       width: '100%', height: '100%'
-  //                     }}
-  //                     source={require( '../../assets/images/icons/checkmark.png' )}
-  //                   />
-  //             }
-  //           </View>
-  //           {activeIndex === 0 ?
-  //             <Image
-  //               style={styles.icon}
-  //               source={require( '../../assets/images/icons/phone-bookFnF.png' )}
-  //             />
-  //             :
-  //             <Image
-  //               style={styles.icon}
-  //               source={require( '../../assets/images/icons/phone-book_white.png' )}
-  //             />
-  //           }
+  renderAddFnFModal = () => {
+    const { activeIndex } = this.state
+    return(
+      <View style={{
+        ...styles.modalContentContainer,
+      }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {this.setState( {
+            addFnF: false
+          } )}}
+          style={styles.closeButton}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} style={{
+            // marginTop: hp( 0.5 )
+          }} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Add Friends & Family</Text>
+        <Text style={styles.subTitle}>Add a new contact, or invite a ward Lorem ipsum dolor sit amet, consectetur adipiscing elit</Text>
+        <TouchableOpacity
+          onPress={() => this.setState( {
+            activeIndex: 0
+          } )}
+          style={[ styles.cardView, {
+            backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1
+          } ]}>
+          <View style={styles.cardSubView}>
+            <View style={{
+              width: 18,
+              height: 18,
+              borderRadius: 9,
+              // borderWidth: 0.3,
+              // borderColor: Colors.borderColor,
+              backgroundColor: Colors.white,
+              justifyContent: 'center',
+              alignItems: 'center',
+              elevation: 10,
+              // shadowColor: Colors.gray,
+              shadowOpacity: 0.1,
+              shadowOffset: {
+                width: 1, height: 1
+              },
+            }}>
+              {activeIndex === 0 &&
+                    <Image
+                      style={{
+                        width: '100%', height: '100%'
+                      }}
+                      source={require( '../../assets/images/icons/checkmark.png' )}
+                    />
+              }
+            </View>
+            {activeIndex === 0 ?
+              <Image
+                style={styles.icon}
+                source={require( '../../assets/images/icons/phone-bookFnF.png' )}
+              />
+              :
+              <Image
+                style={styles.icon}
+                source={require( '../../assets/images/icons/phone-book_white.png' )}
+              />
+            }
 
-  //           <View style={{
-  //             // width: '70%',
-  //             flex: 1,
-  //           }} >
-  //             <Text style={{
-  //               fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.black
-  //             }}>
-  //                  Add Contacts
-  //             </Text>
-  //             <Text style={[ styles.cardSubText, {
-  //               color: activeIndex === 0 ? Colors.white : Colors.textColorGrey,
-  //             } ]}>
-  //                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-  //             </Text>
-  //           </View>
-  //         </View>
-  //         {/* {isSelected && ( */}
-
-
-  //         {/* )} */}
-  //       </TouchableOpacity>
-  //       <TouchableOpacity
-  //         onPress={() => this.setState( {
-  //           activeIndex: 1
-  //         } )}
-  //         style={[ styles.cardView, {
-  //           backgroundColor: activeIndex === 1 ?  Colors.lightBlue: Colors.backgroundColor1,
-  //           marginTop: 0
-  //         } ]}>
-  //         <View style={styles.cardSubView}>
-  //           <View style={styles.imageView}>
-  //             {activeIndex === 1 &&
-  //                   <Image
-  //                     style={{
-  //                       width: '100%', height: '100%'
-  //                     }}
-  //                     source={require( '../../assets/images/icons/checkmark.png' )}
-  //                   />
-  //             }
-  //           </View>
-  //           <Image
-  //             style={styles.icon}
-  //             source={require( '../../assets/images/icons/icon_f&F_white.png' )}
-  //           />
-  //           <View style={{
-  //             // width: '70%',
-  //             flex: 1
-  //           }} >
-
-  //             <Text style={{
-  //               fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.black
-  //             }}>
-  //                   Add a Ward
-  //             </Text>
-  //             <Text style={[ styles.cardSubText, {
-  //               color: activeIndex === 1 ? Colors.white : Colors.textColorGrey,
-  //             } ]}>
-  //                   Need text to be replaced
-  //             </Text>
-  //           </View>
-  //         </View>
-  //       </TouchableOpacity>
-
-  //       <TouchableOpacity
-  //         onPress={() => this.setState( {
-  //           activeIndex: 2
-  //         } )}
-  //         style={{
-  //           marginTop: hp( 3 ),
-  //           width: '95%',  height: hp( '12%' ),
-  //           alignSelf: 'center', justifyContent: 'center',
-  //           borderRadius: wp( '4' ),
-  //           // marginVertical: hp( '3%' )
-  //         }}>
-  //         <View style={{
-  //           flexDirection:'row',
-  //           // alignItems: 'center',
-  //           alignItems: 'center',
-  //           justifyContent: 'center',
-  //           marginHorizontal: wp( '5%' ),
-  //         }}>
-  //           <View style={styles.imageView}>
-  //             {activeIndex === 2 &&
-  //                   <Image
-  //                     style={{
-  //                       width: '100%', height: '100%'
-  //                     }}
-  //                     source={require( '../../assets/images/icons/checkmark.png' )}
-  //                   />
-  //             }
-  //           </View>
-
-  //           <Text style={{
-  //             fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
-  //             marginHorizontal: wp( 3 ),
-  //             width: '95%', flex: 1
-  //           }}>
-  //                   Gift Sats when sending invite Gift Sats when sending invite Gift Sats when sending invite
-  //           </Text>
-  //         </View>
-  //         {/* {isSelected && ( */}
+            <View style={{
+              // width: '70%',
+              flex: 1,
+            }} >
+              <Text style={{
+                fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.black
+              }}>
+                   Add Contacts
+              </Text>
+              <Text style={[ styles.cardSubText, {
+                color: activeIndex === 0 ? Colors.white : Colors.textColorGrey,
+              } ]}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+              </Text>
+            </View>
+          </View>
+          {/* {isSelected && ( */}
 
 
-  //         {/* )} */}
-  //       </TouchableOpacity>
-  //       {this.setButtonVisible()}
-  //     </View>
-  //   )
-  // }
+          {/* )} */}
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => this.setState( {
+            activeIndex: 1
+          } )}
+          style={[ styles.cardView, {
+            backgroundColor: activeIndex === 1 ?  Colors.lightBlue: Colors.backgroundColor1,
+            marginTop: 0
+          } ]}>
+          <View style={styles.cardSubView}>
+            <View style={styles.imageView}>
+              {activeIndex === 1 &&
+                    <Image
+                      style={{
+                        width: '100%', height: '100%'
+                      }}
+                      source={require( '../../assets/images/icons/checkmark.png' )}
+                    />
+              }
+            </View>
+            <Image
+              style={styles.icon}
+              source={require( '../../assets/images/icons/icon_f&F_white.png' )}
+            />
+            <View style={{
+              // width: '70%',
+              flex: 1
+            }} >
 
-  // setButtonVisible = () => {
-  //   return (
-  //     <TouchableOpacity
-  //       onPress={async () => {
-  //         if ( this.state.activeIndex === 0 ) {
-  //           this.setState( {
-  //             isLoadContacts: true,
-  //             addFnF: false
-  //           }, () => {
-  //             this.props.navigation.navigate( 'AddContact' )
-  //           } )
-  //         } else {
-  //           // showEncryptionPswd( false )
-  //         }
-  //       }}
-  //       style={{
-  //         ...styles.buttonView, elevation: 5
-  //       }}
-  //     >
-  //       {/* {!loading.initializing ? ( */}
-  //       <Text style={styles.buttonText}>Proceed</Text>
-  //       {/* ) : (
-  //         <ActivityIndicator size="small" />
-  //       )} */}
-  //     </TouchableOpacity>
-  //   )
-  // }
+              <Text style={{
+                fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.black
+              }}>
+                    Add a Ward
+              </Text>
+              <Text style={[ styles.cardSubText, {
+                color: activeIndex === 1 ? Colors.white : Colors.textColorGrey,
+              } ]}>
+                    Need text to be replaced
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => this.setState( {
+            activeIndex: 2
+          } )}
+          style={{
+            marginTop: hp( 3 ),
+            width: '95%',  height: hp( '12%' ),
+            alignSelf: 'center', justifyContent: 'center',
+            borderRadius: wp( '4' ),
+            // marginVertical: hp( '3%' )
+          }}>
+          <View style={{
+            flexDirection:'row',
+            // alignItems: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginHorizontal: wp( '5%' ),
+          }}>
+            <View style={styles.imageView}>
+              {activeIndex === 2 &&
+                    <Image
+                      style={{
+                        width: '100%', height: '100%'
+                      }}
+                      source={require( '../../assets/images/icons/checkmark.png' )}
+                    />
+              }
+            </View>
+
+            <Text style={{
+              fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
+              marginHorizontal: wp( 3 ),
+              width: '95%', flex: 1
+            }}>
+                    Gift Sats when sending invite Gift Sats when sending invite Gift Sats when sending invite
+            </Text>
+          </View>
+          {/* {isSelected && ( */}
+
+
+          {/* )} */}
+        </TouchableOpacity>
+        {this.setButtonVisible()}
+      </View>
+    )
+  }
+
+  setButtonVisible = () => {
+    return (
+      <TouchableOpacity
+        onPress={async () => {
+          if ( this.state.activeIndex === 0 ) {
+            this.setState( {
+              isLoadContacts: true,
+              addFnF: false
+            }, () => {
+              this.props.navigation.navigate( 'AddContact' )
+            } )
+          } else {
+            // showEncryptionPswd( false )
+          }
+        }}
+        style={{
+          ...styles.buttonView, elevation: 5
+        }}
+      >
+        {/* {!loading.initializing ? ( */}
+        <Text style={styles.buttonText}>Proceed</Text>
+        {/* ) : (
+          <ActivityIndicator size="small" />
+        )} */}
+      </TouchableOpacity>
+    )
+  }
 
   render() {
     const { syncPermanentChannels, navigation } = this.props
@@ -518,9 +518,9 @@ class FriendsAndFamilyScreen extends PureComponent<
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         {/* <Header fromScreen={'F&F'} /> */}
         {/* {addFnF && */}
-        {/* <ModalContainer visible={addFnF} closeBottomSheet={() => {}}>
+        <ModalContainer visible={addFnF} closeBottomSheet={() => {}}>
           {this.renderAddFnFModal()}
-        </ModalContainer> */}
+        </ModalContainer>
         {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
@@ -553,6 +553,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             </Text>
             <View style={{
               width: '95%',
+              height: '54%',
               backgroundColor: Colors.white,
               shadowOpacity: 0.06,
               shadowOffset: {
@@ -564,11 +565,11 @@ class FriendsAndFamilyScreen extends PureComponent<
               borderRadius: wp( 2 ),
               marginTop: hp( 3 ),
               // marginBottom: hp( 1 ),
-              paddingVertical: hp( 2.2 ),
+              // paddingVertical: hp( 2.2 ),
               paddingHorizontal: wp( 4.5 )
             }}>
               <View style={[ styles.subInfo, {
-                marginBottom: hp( 3 )
+                // marginBottom: hp( 3 )
               } ]}>
                 <View style={{
                   flex: 1
@@ -593,8 +594,10 @@ class FriendsAndFamilyScreen extends PureComponent<
                   onPress={() => {
                     this.setState( {
                       isLoadContacts: true,
+                      addFnF: true
                     }, () => {
-                      navigation.navigate( 'AddContact' )
+                      // navigation.navigate( 'AddContact' )
+
                     } )
                   }}
                   style={{
@@ -614,7 +617,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.subInfo}>
+              {/* <View style={styles.subInfo}>
                 <View style={{
                   flex: 1
                 }}>
@@ -647,21 +650,23 @@ class FriendsAndFamilyScreen extends PureComponent<
                     ...styles.selectedContactsView,
                   }}
                 >
-                  {/* <Text style={[ styles.contactText, {
+                */}
+              {/* <Text style={[ styles.contactText, {
                     fontSize: RFValue( 20 ), padding: wp( 0 )
                   } ]}>+</Text> */}
-                  {/* <Image
+              {/* <Image
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/Holidays_Gift.png' )}
                   /> */}
-                  <FontAwesome name="gift" color={Colors.white} size={19} style={{
+
+              {/* <FontAwesome name="gift" color={Colors.white} size={19} style={{
                     marginLeft: hp( 0.5 )
                   }} />
                   <View>
                     <Text style={styles.contactText}>Gift Sats</Text>
                   </View>
                 </TouchableOpacity>
-              </View>
+              </View>  */}
 
             </View>
 
