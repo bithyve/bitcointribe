@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, ImageBackground, StatusBar, ImageSourcePropType, Switch } from 'react-native'
+import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
@@ -12,7 +12,6 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { useSelector, useDispatch } from 'react-redux'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { ScrollView } from 'react-native-gesture-handler'
 
 export type Props = {

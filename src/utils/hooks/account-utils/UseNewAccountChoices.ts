@@ -9,10 +9,26 @@ import WatchOnlyImportedWalletSubAccountInfo from '../../../common/data/models/S
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useActiveAccountShells from '../state-selectors/accounts/UseActiveAccountShells'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
-import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { AccountType, Wallet } from '../../../bitcoin/utilities/Interface'
 import TestSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
 import useWallet from '../state-selectors/UseWallet'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import config from '../../../bitcoin/HexaConfig'
+
+const isEnabled = ( accountType: AccountType, wallet: Wallet ) => {
+  switch ( accountType ) {
+      case AccountType.SAVINGS_ACCOUNT:
+        if( !wallet.secondaryMnemonic && !wallet.details2FA )
+          return false
+        break
+  }
+
+  // check whether the account type has exceeded the maximum number of instances allowed
+  const instanceNumber = wallet.accounts[ accountType ]?.length || 0
+  const { upperBound } = config.ACCOUNT_INSTANCES[ accountType ]
+  if( instanceNumber > ( upperBound - 1 ) ) return false
+  else return true
+}
 
 type Choices = {
   hexaAccounts: SubAccountDescribing[];
@@ -64,33 +80,27 @@ export default function useNewAccountChoices() {
     const hexaAccounts = [
       new CheckingSubAccountInfo( {
         defaultTitle: 'Checking Account',
-        defaultDescription: 'User Checking Account'
+        defaultDescription: 'User Checking Account',
+        visibility: isEnabled( AccountType.CHECKING_ACCOUNT, wallet )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN,
       } ),
       new SavingsSubAccountInfo( {
         defaultTitle: 'Savings Account',
-        defaultDescription: 'User Savings Account'
+        defaultDescription: 'User Savings Account',
+        visibility: isEnabled( AccountType.SAVINGS_ACCOUNT, wallet )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN
       } ),
       new DonationSubAccountInfo( {
         defaultTitle: 'Donation Account',
         defaultDescription: 'Receive bitcoin donations',
         doneeName: '',
         causeName: '',
+        visibility: isEnabled( AccountType.DONATION_ACCOUNT, wallet )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN,
       } ),
       new TestSubAccountInfo( {
         defaultTitle: 'Test Account',
         defaultDescription: 'Learn Bitcoin',
-        visibility: wallet.accounts[ AccountType.TEST_ACCOUNT ] ? AccountVisibility.HIDDEN : AccountVisibility.DEFAULT
+        visibility: isEnabled( AccountType.TEST_ACCOUNT, wallet )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN,
       } ),
     ]
-
-    // Add test account option only if there is no existing test account
-    // if( !wallet.accounts[ AccountType.TEST_ACCOUNT ] ) hexaAccounts = [
-    //   new TestSubAccountInfo( {
-    //     defaultTitle: 'Test Account',
-    //     defaultDescription: 'Learn Bitcoin'
-    //   } ),
-    //   ...hexaAccounts
-    // ]
 
     const serviceAccounts = [
       // new ExternalServiceSubAccountInfo( {

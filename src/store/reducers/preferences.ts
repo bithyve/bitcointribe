@@ -14,6 +14,7 @@ import {
   SET_WALLET_ID,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
   IS_PERMISSION_SET,
+  UPDATE_LAST_SEEN,
 } from '../actions/preferences'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import ip, { chain } from 'icepick'
@@ -120,6 +121,12 @@ export default ( state = initialState, { type, payload } ) => {
           ...state,
           applicationStatus: payload.status,
         }
+
+      case UPDATE_LAST_SEEN:
+        return Object.assign( {
+        }, state, {
+          lastSeen: payload.lastSeen
+        } )
 
       case CARD_DATA:
         return {
