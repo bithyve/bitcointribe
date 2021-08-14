@@ -420,7 +420,7 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     console.log( 'payload.selectedBackup', payload.selectedBackup )
     console.log( 'payload.answer', payload.answer )
     const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedData
-    const secondaryMnemonics = BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedData
+    const secondaryMnemonics = selectedBackup.secondaryShare ? BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedData : ''
     const image: NewWalletImage = icloudData
     yield call( recoverWalletWorker, {
       payload: {
@@ -1413,12 +1413,12 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
       const channelUpdate =  {
         contactInfo
       }
-      const payload = {
+      const payloadForSync = {
         permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
         channelUpdates: [ channelUpdate ],
       }
       yield call( syncPermanentChannelsWorker, {
-        payload
+        payload: payloadForSync
       } )
     }
     const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )

@@ -21,6 +21,7 @@ import UpdateApp from '../../../pages/UpdateApp'
 import SendRequest from '../../../pages/Contacts/SendRequest'
 import VoucherScanner from '../../../pages/FastBitcoin/VoucherScanner'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Receive from '../../../pages/Accounts/Receive'
 import PairNewWallet from '../../../pages/FastBitcoin/PairNewWallet'
@@ -165,6 +166,7 @@ const HomeStack = createStackNavigator(
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
+    QrAndLink,
     ContactDetails,
     Receive,
     PairNewWallet,

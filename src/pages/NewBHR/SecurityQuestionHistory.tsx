@@ -84,7 +84,7 @@ const SecurityQuestionHistory = ( props ) => {
   const currentLevel: Number = useSelector(
     ( state ) => state.bhr.currentLevel,
   )
-  const wallet: Wallet = useSelector( ( state ) => state.bhr.wallet )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const next = props.navigation.getParam( 'next' )
   const dispatch = useDispatch()
 

@@ -18,6 +18,7 @@ import TabNavigator from '../../TabNavigator'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import Launch from '../../../pages/Launch'
@@ -61,6 +62,12 @@ const FriendsAndFamily = createStackNavigator(
     },
     AddContactSendRequest: {
       screen: AddContactSendRequest,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    QrAndLink: {
+      screen: QrAndLink,
       navigationOptions: {
         header: null,
       },
