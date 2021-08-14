@@ -50,6 +50,7 @@ export default function ErrorModalContents( props ) {
               style={{
                 ...styles.modalInfoText,
                 marginBottom: hp( '1%' ),
+                color: Colors.lightTextColor,
                 marginTop: 'auto',
               }}
             >
@@ -65,6 +66,7 @@ export default function ErrorModalContents( props ) {
                 ...styles.modalInfoText,
                 marginBottom: hp( '1%' ),
                 marginTop: 'auto',
+                color: Colors.lightTextColor,
               }}
             >
               {props.otherText}

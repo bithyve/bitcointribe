@@ -169,6 +169,7 @@ interface HomeStateTypes {
 }
 
 interface HomePropsTypes {
+  showContent: boolean;
   navigation: any;
   notificationList: any;
   exchangeRates?: any[];
@@ -906,12 +907,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  handleBottomSheetPositionChange = ( newIndex: number ) => {
-    if ( newIndex === 0 ) {
-      this.onBottomSheetClosed()
-    }
-  };
-
   openBottomSheet = (
     kind: BottomSheetKind,
     snapIndex?: number | null,
@@ -1303,6 +1298,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       walletName,
       currentLevel,
     } = this.props
+    if ( !this.props.showContent ) {
+      return (
+        <ModalContainer
+          visible={this.state.currentBottomSheetKind != null}
+          closeBottomSheet={() => {}}
+        >
+          {this.renderBottomSheetContent()}
+        </ModalContainer>
+      )
+    }
     return (
       // <ImageBackground
       //   source={require( '../../assets/images/home-bg.png' )}

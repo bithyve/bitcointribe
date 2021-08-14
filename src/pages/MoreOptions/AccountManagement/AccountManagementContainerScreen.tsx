@@ -35,6 +35,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const dispatch = useDispatch()
   const originalAccountShells = useActiveAccountShells()
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
+  // const [ tempValue, setTempValue ] = useState( false )
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const [ orderedAccountShells, setOrderedAccountShells ] = useState( originalAccountShells )
   const [ hiddenAccountShells, setHiddenAccountShells ] = useState( [] )
@@ -43,7 +44,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ hasChangedOrder, setHasChangedOrder ] = useState( false )
   const [ selectedAccount, setSelectedAccount ] = useState( null )
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
-  const [ restorerchiveModal, showRestoreArchiveModal ] = useState( false )
+  const [ successModel, showSuccessModel ] = useState( false )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
   } )
@@ -105,9 +106,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [ hasChangedOrder ] )
 
   useEffect( () => {
-    if( hasAccountSettingsUpdateSucceeded === true && selectedAccount ){
+    if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
       dispatch( resetAccountUpdateFlag() )
-      showSuccessAccountBottomSheet( selectedAccount )
+      setTimeout( () => {
+        showSuccessModel( true )
+      }, 100 )
+
     }
   }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
 
@@ -130,19 +134,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           if( primarySubAccount && ( primarySubAccount.visibility == AccountVisibility.ARCHIVED || primarySubAccount.visibility == AccountVisibility.HIDDEN ) )
             setAccountVisibility( primarySubAccount.visibility )
           changeVisisbility( accounShell, AccountVisibility.DEFAULT )
-          const resetAction = StackActions.reset( {
-            index: 0,
-            actions: [
-              NavigationActions.navigate( {
-                routeName: 'Landing'
-              } )
-            ],
-          } )
 
-          navigation.dispatch( resetAction )
-          navigation.navigate( 'AccountDetails', {
-            accountShellID: accounShell.id,
-          } )
           showUnHideArchiveModal( false )
         }
         }
@@ -155,17 +147,31 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     )
   }, [ primarySubAccount ] )
 
-  const showSuccessAccountBottomSheet = useCallback( ( primarySubAccount ) => {
+  const showSuccessAccountBottomSheet = useCallback( ( ) => {
     return(
       <UnHideRestoreAccountSuccessBottomSheet
-        onProceed={()=>{
-          dismissBottomSheet()}
+        onProceed={( accounShell )=>{
+          const resetAction = StackActions.reset( {
+            index: 0,
+            actions: [
+              NavigationActions.navigate( {
+                routeName: 'Landing'
+              } )
+            ],
+          } )
+
+          navigation.dispatch( resetAction )
+          navigation.navigate( 'AccountDetails', {
+            accountShellID: primarySubAccount.accountShellID,
+          } )
         }
+        }
+        onClose={() => showSuccessModel( false )}
         accountInfo={primarySubAccount}
         accountVisibility={accountVisibility}
       />
     )
-  }, [ accountVisibility ] )
+  }, [ accountVisibility, primarySubAccount ] )
 
   const changeVisisbility = ( accountShell, visibility ) => {
 
@@ -275,6 +281,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     <View style={styles.rootContainer}>
       <ModalContainer visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
         {showUnHideArchiveAccountBottomSheet()}
+      </ModalContainer>
+      <ModalContainer visible={successModel} closeBottomSheet={() => {}} >
+        {showSuccessAccountBottomSheet()}
       </ModalContainer>
       <ScrollView>
         {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList

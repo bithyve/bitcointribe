@@ -11,11 +11,13 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+// import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
-  onProceed: () => void;
+  onProceed: ( accountInfo ) => void;
   accountInfo: any;
   accountVisibility: String;
+  onClose: () => void;
 };
 
 const renderAccount = ( accountInfo, accountVisibility ) => {
@@ -75,11 +77,25 @@ const renderAccount = ( accountInfo, accountVisibility ) => {
 const UnHideRestoreAccountSuccessBottomSheet: React.FC<Props> = ( {
   onProceed,
   accountInfo,
-  accountVisibility
+  accountVisibility,
+  onClose
 }: Props ) => {
   return (
     <View style={styles.rootContainer}>
-
+      {/* <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => onClose()}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity> */}
       <View style={styles.mainContentContainer}>
         <Text style={BottomSheetStyles.confirmationMessageHeading}>
           {accountVisibility === AccountVisibility.HIDDEN ? 'Account Successfully Unhidden' : 'Account Successfully Restored'}
@@ -100,7 +116,7 @@ const UnHideRestoreAccountSuccessBottomSheet: React.FC<Props> = ( {
       <View style={styles.footerSectionContainer}>
         <View style={styles.actionButtonContainer}>
           <TouchableOpacity
-            onPress={onProceed}
+            onPress={() => onProceed( accountInfo )}
             style={ButtonStyles.primaryActionButton}
           >
             <Text style={ButtonStyles.actionButtonText}>{'View Account'}</Text>
@@ -119,14 +135,14 @@ const UnHideRestoreAccountSuccessBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: Colors.white,
   },
 
   mainContentContainer: {
     padding: 30,
     paddingBottom: 20,
-    flex: 1,
+    // flex: 1,
   },
 
   footerSectionContainer: {

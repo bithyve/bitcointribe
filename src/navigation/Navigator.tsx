@@ -349,21 +349,26 @@ const HomeNavigator = createStackNavigator(
     // Login,
   }, {
     defaultNavigationOptions: ( { navigation } ) => {
-      if ( ( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
-      ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
-      ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
-      ( navigation.state.routes[ 3 ].routes.length == 1 )
-      ) {
-        return {
-          header: () => {
-            return <Header />
-          },
-        }
-      } else {
-        return {
-          header: null
-        }
+      // if ( ( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
+      // ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
+      // ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
+      // ( navigation.state.routes[ 3 ].routes.length == 1 )
+      // ) {
+      return {
+        header: () => {
+          return <Header showContent={( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
+            ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
+            ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
+            ( navigation.state.routes[ 3 ].routes.length == 1 )
+          }
+          />
+        },
       }
+      // } else {
+      //   return {
+      //     header: null
+      //   }
+      // }
     },
   }
 )

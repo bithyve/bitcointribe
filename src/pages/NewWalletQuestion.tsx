@@ -75,7 +75,7 @@ const loaderMessages = [
   },
   {
     heading: 'Generating Recovery Keys',
-    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+    text: 'Recovery Keys help you recover your Hexa wallet in case your phone is lost',
     subText: '',
   },
   {
