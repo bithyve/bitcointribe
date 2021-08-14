@@ -253,7 +253,24 @@ export default function SendViaQR( props ) {
                         )}
                       </View>
                     </View>
-                    {getImageIcon( Contact )}
+                    <View
+                      style={{
+                        position: 'absolute',
+                        marginLeft: 15,
+                        marginRight: 15,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        elevation: 10,
+                        shadowColor: Colors.borderColor,
+                        shadowOpacity: 10,
+                        shadowOffset: {
+                          width: 2, height: 2
+                        },
+                        borderRadius: wp( '17%' ) / 2,
+                      }}
+                    >
+                      {getImageIcon( Contact )}
+                    </View>
                   </View>
                 </View>
               )}
@@ -536,12 +553,6 @@ const styles = StyleSheet.create( {
     width: wp( '17%' ),
     height: wp( '17%' ),
     borderColor: 'red',
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 2, height: 2
-    },
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',

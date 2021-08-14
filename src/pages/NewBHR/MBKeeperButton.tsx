@@ -18,7 +18,7 @@ function MBKeeperButton( props ) {
         <View style={styles.imageBackground}>
           {chosenContact.avatarImageSource ? <Image
             source={{
-              uri: chosenContact.avatarImageSource
+              uri: chosenContact.avatarImageSource.uri ? chosenContact.avatarImageSource.uri : chosenContact.avatarImageSource
             }}
             style={styles.contactImage}
           /> : <Text

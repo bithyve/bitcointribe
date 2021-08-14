@@ -367,11 +367,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.updateMessageStatus( statusValue )
     this.props.updateMessageStatusInApp( message.notificationId )
     switch ( message.type ) {
-        case NotificationType.FNF_REQUEST:
-        case NotificationType.FNF_REQUEST_ACCEPTED:
-        case NotificationType.FNF_REQUEST_REJECTED:
         case NotificationType.FNF_KEEPER_REQUEST:
-          console.log( 'FNF_KEEPER_REQUEST message', message )
           this.setState( {
             trustedContactRequest: {
               ...message.additionalInfo,
@@ -384,6 +380,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.openBottomSheet( BottomSheetKind.TRUSTED_CONTACT_REQUEST )
           } )
           break
+        case NotificationType.FNF_REQUEST:
+        case NotificationType.FNF_REQUEST_ACCEPTED:
+        case NotificationType.FNF_REQUEST_REJECTED:
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
         case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
         case NotificationType.CONTACT:
