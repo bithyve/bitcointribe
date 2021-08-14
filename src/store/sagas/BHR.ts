@@ -1413,12 +1413,12 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
       const channelUpdate =  {
         contactInfo
       }
-      const payload = {
+      const payloadForSync = {
         permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
         channelUpdates: [ channelUpdate ],
       }
       yield call( syncPermanentChannelsWorker, {
-        payload
+        payload: payloadForSync
       } )
     }
     const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
