@@ -1299,7 +1299,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currentLevel,
     } = this.props
     if ( !this.props.showContent ) {
-      return null
+      return (
+        <ModalContainer
+          visible={this.state.currentBottomSheetKind != null}
+          closeBottomSheet={() => {}}
+        >
+          {this.renderBottomSheetContent()}
+        </ModalContainer>
+      )
     }
     return (
       // <ImageBackground
