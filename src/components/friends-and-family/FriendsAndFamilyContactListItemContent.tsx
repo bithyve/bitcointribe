@@ -115,8 +115,9 @@ const styles = StyleSheet.create( {
   },
 
   avatarImage: {
-    ...ImageStyles.thumbnailImageMedium,
-    borderRadius: widthPercentageToDP( 12 )/2,
+    width: widthPercentageToDP( 13 ),
+    height: widthPercentageToDP( 13 ),
+    borderRadius: widthPercentageToDP( 13 )/2,
   },
 
   listItemTitle: {

@@ -110,14 +110,11 @@ const AccountDetailsCard: React.FC<Props> = ( {
         primarySubAccount.kind === SubAccountKind.SERVICE &&
       ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
     ) {
-      const swanAccountActive = false
-      if( !swanAccountActive ){
-        dispatch( clearSwanCache() )
-        dispatch( updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED ) )
-      }
-      else {
-        dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
-      }
+      dispatch( clearSwanCache() )
+      dispatch( updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED ) )
+      // else {
+      //   dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
+      // }
       setTimeout( () => {
         showSwanModal( true )
       }, 600 )

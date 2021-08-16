@@ -98,7 +98,7 @@ import {
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
 import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo, updateStartRegistration } from '../../store/actions/SwanIntegration'
+import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
@@ -237,7 +237,6 @@ interface HomePropsTypes {
   initLoader: boolean;
   getMessages: any;
   syncPermanentChannels: any;
-  updateStartRegistration: any;
   updateLastSeen: any;
 }
 
@@ -1106,7 +1105,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 swanDeepLinkContent={this.state.swanDeepLinkContent}
                 onClickSetting={() => {
                   this.closeBottomSheet()
-                  this.props.updateStartRegistration()
                 }}
                 // onPress={this.closeBottomSheet}
                 onPress={this.onBackPress}
@@ -1422,7 +1420,6 @@ export default withNavigationFocus(
     updateMessageStatus,
     getMessages,
     syncPermanentChannels,
-    updateStartRegistration,
     updateLastSeen
   } )( Home )
 )
