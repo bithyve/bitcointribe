@@ -799,7 +799,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             proceedButtonText={'Confirm & Proceed'}
           />
         </ModalContainer> */}
-        <BottomSheet
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
           ref={this.helpBottomSheetRef}
@@ -816,7 +816,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               isShowingKnowMoreSheet: false
             } )
           }}
-        />
+        /> */}
       </View>
     /* feature/2.0 */
     )
