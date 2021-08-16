@@ -130,7 +130,6 @@ export interface Transactions {
 }
 
 export interface MetaShare {
-  encryptedSecret?: string;
   encryptedShare?: {
     pmShare: string;
     smShare: string;
