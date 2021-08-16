@@ -523,9 +523,6 @@ export const EncryptedShareSchema: ObjectSchema = {
 export const MetaShareSchema: ObjectSchema = {
   name: MetaShare,
   properties: {
-    encryptedSecret: {
-      type: 'string', optional: true
-    },
     encryptedShare: {
       type: EncryptedShare, optional: true
     },

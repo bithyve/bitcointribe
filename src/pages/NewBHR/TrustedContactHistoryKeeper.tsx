@@ -733,7 +733,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         saveInTransitHistory()
       }
     }
-  }, [ chosenContact, trustedContacts ] )
+  }, [ chosenContact, trustedContacts, showQrCode ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )

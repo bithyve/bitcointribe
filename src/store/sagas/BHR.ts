@@ -458,9 +458,9 @@ function* recoverWalletWorker( { payload } ) {
       for ( let i = 0; i < shares.length; i++ ) {
         const element = shares[ i ]
         pmShares.push( element.backupData.primaryMnemonicShard.encryptedShare.pmShare )
-        smShares.push( element.secondaryData.secondaryMnemonicShard )
+        if( element.secondaryData.secondaryMnemonicShard ) smShares.push( element.secondaryData.secondaryMnemonicShard )
       }
-      secondaryMnemonics = BHROperations.getMnemonics( smShares, answer ).mnemonic
+      secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
       primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
     }
 
@@ -1324,15 +1324,17 @@ function* createChannelAssetsWorker( { payload } ) {
       if( secondaryShareDownloadedVar ) {
         secondaryShare = secondaryShareDownloadedVar
       }
+      const primaryMnemonicShardTemp = {
+        shareId: MetaShares.find( value=>value.shareId==shareId ).shareId,
+        meta: MetaShares.find( value=>value.shareId==shareId ).meta,
+        encryptedShare: {
+          pmShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.pmShare,
+          smShare: '',
+          bhXpub: '',
+        }
+      }
       const channelAssets: ChannelAssets = {
-        primaryMnemonicShard: {
-          ...MetaShares.find( value=>value.shareId==shareId ),
-          encryptedShare: {
-            pmShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.pmShare,
-            smShare: '',
-            bhXpub: '',
-          }
-        },
+        primaryMnemonicShard: primaryMnemonicShardTemp,
         secondaryMnemonicShard: secondaryShare,
         keeperInfo: keeperInfo,
         bhXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
@@ -1619,7 +1621,7 @@ function* downloadBackupDataWorker( { payload } ) {
         },
         secondaryChannelKey: qrDataObj.secondaryChannelKey
       } )
-      console.log( 'res', res )
+
       downloadedBackupData.push( res )
     }
     yield put( setDownloadedBackupData( downloadedBackupData ) )
@@ -2075,8 +2077,10 @@ function* retrieveMetaSharesWorker( ) {
     let keepers:KeeperInfoInterface[] = []
     if ( currentLevel === 2 ) keepers = keeperInfo.filter( word => word.scheme == '2of3' )
     if ( currentLevel === 3 ) keepers = keeperInfo.filter( word => word.scheme == '3of5' )
-
+    console.log( 'RETRIEVE_METASHRES keeperInfo', keeperInfo )
+    console.log( 'RETRIEVE_METASHRES keepers', keepers )
     let channelKey
+    console.log( 'RETRIEVE_METASHRES contacts', contacts )
     if( contacts ){
       for( const ck of Object.keys( contacts ) ){
         channelKey=ck
@@ -2086,17 +2090,22 @@ function* retrieveMetaSharesWorker( ) {
               retrieveBackupData: true,
             }
           } )
+          console.log( 'RETRIEVE_METASHRES res', res )
           if( res.backupData && res.backupData.primaryMnemonicShard ){
             Rk.push( res.backupData.primaryMnemonicShard )
           }
         }
       }
     }
+    console.log( 'RETRIEVE_METASHRES Rk', Rk )
     for ( let i = 0; i < keepers.length; i++ ) {
       const element = keepers[ i ]
+      console.log( 'RETRIEVE_METASHRES element', element )
       metaShares[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId )
       encryptedPrimarySecrets[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId ) ? Rk.find( value=>value.shareId == element.shareId ).encryptedShare.pmShare : ''
     }
+    console.log( 'RETRIEVE_METASHRES metaShares', metaShares )
+    console.log( 'RETRIEVE_METASHRES metaShares', encryptedPrimarySecrets )
     dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -2107,7 +2116,7 @@ function* retrieveMetaSharesWorker( ) {
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'RETRIEVE_METASHRES channel', error )
   }
 }
 
