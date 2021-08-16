@@ -51,6 +51,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
 
   useEffect( ()=>{
     if( ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) && hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
+      onPress()
       openLink( swanAuthenticationUrl )
     }
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
@@ -120,7 +121,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         default:
           swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get an initial $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to the Swan Bitcoin platform to complete registration'
           swanTitle = 'Stack Sats\nwith Swan'
-          showNote = false
+          showNote = true
     }
     return (
       <>
