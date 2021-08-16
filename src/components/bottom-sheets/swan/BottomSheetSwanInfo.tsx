@@ -36,6 +36,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get an initial $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\nBy proceeding you understand that you will be taken to the Swan Bitcoin platform to complete registration.'
   let swanTitle = 'Stack Sats\n with Swan'
+  let  showNote = true
   let accountName = ''
   let accountDescription = ''
   function handleProceedButtonPress() {
@@ -50,6 +51,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
 
   useEffect( ()=>{
     if( ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) && hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
+      onPress()
       openLink( swanAuthenticationUrl )
     }
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
@@ -93,21 +95,25 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         case SwanAccountCreationStatus.ERROR:
           swanMessage = 'We had a problem communicating with Swan.\n\n'
           swanTitle = 'Something went wrong'
+          showNote = false
           break
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
           swanTitle = 'Hexa Wallet is communicating with Swan...'
           swanMessage = 'Hexa Wallet is creating a Swan account to store your bitcoin purchased from Swan. This account will be linked to your Swan withdrawal wallet'
+          showNote = false
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
           swanMessage = 'Sats in your Swan withdrawal wallet will be transfered to Hexa Wallet.\nSwan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
           swanTitle = 'Successfully linked Hexa Wallet to your Swan Account'
           accountName = 'Swan Bitcoin'
           accountDescription = 'Stack sats with Swan'
+          showNote = false
           break
         case SwanAccountCreationStatus.ACCOUNT_CREATED:
           swanMessage = 'Swan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
           swanTitle = 'Hexa Wallet and your Swan Account are linked'
+          showNote = false
           // TODO: uncomment once able to access current-swan acc
           // accountName = currentSwanSubAccount.defaultTitle
           // accountDescription = currentSwanSubAccount.defaultDescription
@@ -115,6 +121,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         default:
           swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get an initial $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to the Swan Bitcoin platform to complete registration'
           swanTitle = 'Stack Sats\nwith Swan'
+          showNote = true
     }
     return (
       <>
@@ -140,13 +147,16 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             ...styles.modalInfoText,
 
           }}>{swanMessage}</Text>
-          <BottomInfoBox
-            backgroundColor={Colors.white}
-            title={'Note'}
-            infoText={
-              'Please register with Swan Bitcoin to use this account'
-            }
-          />
+          {showNote &&
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={
+                'Please register with Swan Bitcoin to use this account'
+              }
+            />
+          }
+
           {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
           ||
           swanAccountCreationStatus == SwanAccountCreationStatus.ACCOUNT_CREATED ) ? renderAccount() : null}
@@ -275,7 +285,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.white,
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,

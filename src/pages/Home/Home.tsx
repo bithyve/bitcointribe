@@ -73,7 +73,7 @@ import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheet
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
 import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo, updateStartRegistration } from '../../store/actions/SwanIntegration'
+import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
@@ -209,7 +209,6 @@ interface HomePropsTypes {
   initLoader: boolean;
   getMessages: any;
   syncPermanentChannels: any;
-  updateStartRegistration: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -380,7 +379,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 swanDeepLinkContent={this.state.swanDeepLinkContent}
                 onClickSetting={() => {
                   this.closeBottomSheet()
-                  this.props.updateStartRegistration()
                 }}
                 // onPress={this.closeBottomSheet}
                 onPress={this.onBackPress}
@@ -542,7 +540,6 @@ export default withNavigationFocus(
     updateMessageStatus,
     getMessages,
     syncPermanentChannels,
-    updateStartRegistration
   } )( Home )
 )
 

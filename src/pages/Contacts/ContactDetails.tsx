@@ -117,6 +117,8 @@ interface ContactDetailsStateTypes {
   reshareModal: boolean;
   showQRCode: boolean;
   edit: boolean;
+  sendViaQRModel: boolean;
+  exitKeyModel: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -126,8 +128,6 @@ class ContactDetails extends PureComponent<
   ReshareBottomSheet: any;
   shareBottomSheet: any;
   SendViaLinkBottomSheet: any;
-  SendViaQRBottomSheet: any;
-  ExitKeyQRBottomSheet: any;
   ErrorBottomSheet: any;
   contact: ContactRecipientDescribing;
   contactsType: any;
@@ -138,8 +138,6 @@ class ContactDetails extends PureComponent<
     this.ReshareBottomSheet = createRef()
     this.shareBottomSheet = createRef()
     this.SendViaLinkBottomSheet = createRef()
-    this.SendViaQRBottomSheet = createRef()
-    this.ExitKeyQRBottomSheet = createRef()
     this.ErrorBottomSheet = createRef()
     this.state = {
       Loading: true,
@@ -188,7 +186,9 @@ class ContactDetails extends PureComponent<
       ],
       qrModalTitle: '',
       reshareModal: false,
-      edit: false
+      edit: false,
+      sendViaQRModel: false,
+      exitKeyModel: false
     }
 
     this.contact = this.props.navigation.state.params.contact
@@ -502,9 +502,10 @@ class ContactDetails extends PureComponent<
     }
     console.log( 'Secondarey QR', qrString )
     this.setState( {
-      trustedQR: qrString
-    } );
-    ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
+      trustedQR: qrString,
+      sendViaQRModel: true
+    } )
+
   };
 
   createDeepLink = ( contact ) => {
@@ -623,26 +624,20 @@ class ContactDetails extends PureComponent<
         QR={this.state.trustedQR}
         contactEmail={''}
         onPressBack={() => {
-          if ( this.SendViaQRBottomSheet.current )
-            ( this.SendViaQRBottomSheet as any ).current.snapTo( 0 )
+          if ( !this.state.sendViaQRModel )
+            this.setState( {
+              sendViaQRModel: false
+            } )
         }}
         onPressDone={() => {
-          ( this.SendViaQRBottomSheet as any ).current.snapTo( 0 )
+          this.setState( {
+            sendViaQRModel: false
+          } )
         }}
       />
     )
   };
 
-  renderSendViaQRHeader = () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   if (this.SendViaQRBottomSheet.current)
-      //     (this.SendViaQRBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  };
 
   renderExitKeyQRContents = () => {
     return (
@@ -654,22 +649,16 @@ class ContactDetails extends PureComponent<
         QR={this.state.encryptedExitKey}
         contactEmail={''}
         onPressBack={() => {
-          if ( this.ExitKeyQRBottomSheet.current )
-            ( this.ExitKeyQRBottomSheet as any ).current.snapTo( 0 )
+          if ( !this.state.exitKeyModel )
+            this.setState( {
+              exitKeyModel: false
+            } )
         }}
         onPressDone={() => {
-          ( this.ExitKeyQRBottomSheet as any ).current.snapTo( 0 )
+          this.setState( {
+            exitKeyModel: false
+          } )
         }}
-      />
-    )
-  };
-  renderExitKeyQRHeader = () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   if (this.ExitKeyQRBottomSheet.current)
-      //     (this.ExitKeyQRBottomSheet as any).current.snapTo(0);
-      // }}
       />
     )
   };
@@ -738,7 +727,9 @@ class ContactDetails extends PureComponent<
       isSendDisabled,
       trustedContactHistory,
       reshareModal,
-      edit
+      edit,
+      sendViaQRModel,
+      exitKeyModel
     } = this.state
     return (
       <View style={{
@@ -1017,7 +1008,9 @@ class ContactDetails extends PureComponent<
                   disabled={encryptedExitKey ? false : true}
                   onPress={() => {
                     if ( encryptedExitKey ) {
-                      ( this.ExitKeyQRBottomSheet as any ).current.snapTo( 1 )
+                      this.setState( {
+                        exitKeyModel: true
+                      } )
                     }
                   }}
                 >
@@ -1092,32 +1085,12 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderSendViaLinkContents}
           renderHeader={this.renderSendViaLinkHeader}
         />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.SendViaQRBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '83%' )
-              : hp( '85%' ),
-          ]}
-          renderContent={this.renderSendViaQRContents}
-          renderHeader={this.renderSendViaQRHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.ExitKeyQRBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '83%' )
-              : hp( '85%' ),
-          ]}
-          renderContent={this.renderExitKeyQRContents}
-          renderHeader={this.renderExitKeyQRHeader}
-        />
+        <ModalContainer visible={sendViaQRModel} closeBottomSheet={() => {}}>
+          {this.renderSendViaQRContents()}
+        </ModalContainer>
+        <ModalContainer visible={exitKeyModel} closeBottomSheet={() => {}}>
+          {this.renderExitKeyQRContents()}
+        </ModalContainer>
         <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
           edit: false
         } )}>

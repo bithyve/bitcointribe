@@ -182,9 +182,7 @@ export default function SendViaQR( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView contentContainerStyle={{
-        flex: 1
-      }}>
+      <ScrollView>
         <View
           style={{
             marginLeft: 20,
@@ -418,7 +416,7 @@ export default function SendViaQR( props ) {
 
       {!props.isFromReceive ? (
         <View style={{
-          marginTop: 'auto'
+          marginTop: hp( 2 )
         }}>
           <BottomInfoBox
             title={props.noteHeader ? props.noteHeader : 'Note'}
@@ -436,9 +434,9 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: hp( 2 )
   },
   modalContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
