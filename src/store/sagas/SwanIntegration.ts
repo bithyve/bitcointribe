@@ -51,26 +51,16 @@ export const fetchSwanAuthenticationUrlWatcher = createWatcher(
 export function* fetchSwanAuthenticationUrlWorker( { payload } ) {
   yield put( fetchSwanAuthenticationUrlInitiated() )
   const { code_challenge, code_verifier, nonce, state } = yield call( generatePKCEParameters )
-  //   const swanAuthenticationUrl = `\
-  // ${swan_auth_url}?\
-  // client_id=${Config.SWAN_CLIENT_ID}\
-  // &redirect_uri=${redirect_uri}\
-  // &response_type=code\
-  // &scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal\
-  // &state=${state}\
-  // &code_challenge=${code_challenge}\
-  // &code_challenge_method=S256\
-  // &response_mode=query\
-  // `
-  const swanAuthenticationUrl = `https://dev-app.swanbitcoin.com/login?
-  uid=9XtD4QRzKYLqAgDFnyTKY&
-  returnTo=http://dev-api.swanbitcoin.com/oidc/auth/9XtD4QRzKYLqAgDFnyTKY&
-  client_id=hexa-dev&
-  code_challenge=7tTtm8L_6vUxkqG0ewv9eyYJyGwcjk-ABt8B5dfiSxM&
-  code_challenge_method=S256&
-  redirect_uri=https://dev-relay.bithyve.com/deepLink/dev/swan/&
-  response_mode=query&response_type=code&
-  scope=openid v1 write:vendor_wallet read:vendor_wallet write:automatic_withdrawal read:automatic_withdrawal&state=22405830144-J0s
+  const swanAuthenticationUrl = `\
+${swan_auth_url}?\
+client_id=${Config.SWAN_CLIENT_ID}\
+&redirect_uri=${redirect_uri}\
+&response_type=code\
+&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal\
+&state=${state}\
+&code_challenge=${code_challenge}\
+&code_challenge_method=S256\
+&response_mode=query\
 `
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state

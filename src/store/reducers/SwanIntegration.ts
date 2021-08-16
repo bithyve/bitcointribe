@@ -10,7 +10,6 @@ import {
   REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED,
   CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED,
   CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED,
-  UPDATE_START_REGISTRATION,
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
@@ -201,11 +200,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           hasCreateWithdrawalWalletOnSwanSucceeded: true,
           hasCreateWithdrawalWalletOnSwanCompleted: true,
           swanWalletId: action.payload.data.swanWalletId,
-          startRegistration: false
-        }
-      case UPDATE_START_REGISTRATION:
-        return {
-          ...state,
           startRegistration: false
         }
 

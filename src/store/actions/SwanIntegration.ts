@@ -32,7 +32,6 @@ export const ADD_SWAN_METADATA_COMPLETED = 'ADD_SWAN_METADATA_COMPLETED'
 
 export const CREATE_TEMP_SWAN_ACCOUNT_INFO = 'CREATE_TEMP_SWAN_ACCOUNT_INFO'
 export const TEMP_SWAN_ACCOUNT_INFO_SAVED = 'TEMP_SWAN_ACCOUNT_INFO_SAVED'
-export const UPDATE_START_REGISTRATION = 'UPDATE_START_REGISTRATION'
 
 export enum SwanActionKind {
   UPDATE_SWAN_STATUS,
@@ -61,11 +60,6 @@ export const updateSwanStatus = ( data ) => {
 export const clearSwanCache = ( ) => {
   return {
     type: CLEAR_SWAN_CACHE,
-  }
-}
-export const updateStartRegistration = ( ) => {
-  return {
-    type: UPDATE_START_REGISTRATION,
   }
 }
 
