@@ -934,6 +934,32 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
     accounts [ account.id ] = account
   }
 
+  // update redux store & database
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  let presentAccounts = {
+  }
+  Object.values( ( accounts as Accounts ) ).forEach( account => {
+    if( presentAccounts[ account.type ] ) presentAccounts[ account.type ].push( account.id )
+    else presentAccounts = {
+      ...presentAccounts,
+      [ account.type ]: [ account.id ]
+    }
+  } )
+  const updatedWallet: Wallet = {
+    ...wallet,
+    accounts: presentAccounts,
+  }
+
+  yield put( updateWallet( updatedWallet ) )
+  yield put( newAccountShellsAdded( {
+    accountShells: newAccountShells,
+    accounts,
+  } ) )
+  yield call( dbManager.createAccounts, accounts )
+  yield call( dbManager.updateWallet, {
+    accounts: presentAccounts
+  } )
+
   // restore account's balance and transactions
   const shellsToSync: AccountShell[] = []
   const donationShellsToSync: AccountShell[] = []
@@ -976,33 +1002,6 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
     } catch( err ){
       console.log( `Sync via xpub agent failed w/ the following err: ${err}` )
     }
-
-
-  // update redux store & database
-  const wallet: Wallet = yield select( state => state.storage.wallet )
-  let presentAccounts = {
-  }
-  Object.values( ( accounts as Accounts ) ).forEach( account => {
-    if( presentAccounts[ account.type ] ) presentAccounts[ account.type ].push( account.id )
-    else presentAccounts = {
-      ...presentAccounts,
-      [ account.type ]: [ account.id ]
-    }
-  } )
-  const updatedWallet: Wallet = {
-    ...wallet,
-    accounts: presentAccounts,
-  }
-
-  yield put( updateWallet( updatedWallet ) )
-  yield put( newAccountShellsAdded( {
-    accountShells: newAccountShells,
-    accounts,
-  } ) )
-  yield call( dbManager.createAccounts, accounts )
-  yield call( dbManager.updateWallet, {
-    accounts: presentAccounts
-  } )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(
