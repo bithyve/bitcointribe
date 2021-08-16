@@ -42,6 +42,7 @@ import {
   RESTORE_ACCOUNT_SHELLS,
   readTxn,
   accountChecked,
+  autoSyncShells,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -441,7 +442,8 @@ export const refreshAccountShellsWatcher = createWatcher(
   REFRESH_ACCOUNT_SHELLS
 )
 
-function* autoSyncShellsWorker( ) {
+function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, hardRefresh?: boolean }} ) {
+  const { syncAll, hardRefresh } = payload
   const shells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells
   )
@@ -449,7 +451,7 @@ function* autoSyncShellsWorker( ) {
   const shellsToSync: AccountShell[] = []
   const donationShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
-    if( shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+    if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
           // skip test account auto-sync
@@ -469,7 +471,7 @@ function* autoSyncShellsWorker( ) {
     payload: {
       shells: shellsToSync,
       options: {
-        hardRefresh: false
+        hardRefresh
       }
     }
   } )
@@ -961,47 +963,9 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   } )
 
   // restore account's balance and transactions
-  const shellsToSync: AccountShell[] = []
-  const donationShellsToSync: AccountShell[] = []
-  for ( const shell of newAccountShells ) {
-    switch( shell.primarySubAccount.type ){
-        case AccountType.TEST_ACCOUNT:
-          // skip test account auto-sync
-          break
-
-        case AccountType.DONATION_ACCOUNT:
-          donationShellsToSync.push( shell )
-          break
-
-        default:
-          shellsToSync.push( shell )
-    }
-  }
-
-  if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
-    payload: {
-      shells: shellsToSync,
-      options: {
-        hardRefresh: true,
-      }
-    }
-  } )
-
-  if( donationShellsToSync.length )
-    try{
-      for( const donationAcc of donationShellsToSync ) {
-        yield call( refreshAccountShellsWorker, {
-          payload: {
-            shells: [ donationAcc ],
-            options: {
-              syncDonationAccount: true
-            }
-          }
-        } )
-      }
-    } catch( err ){
-      console.log( `Sync via xpub agent failed w/ the following err: ${err}` )
-    }
+  const syncAll = true
+  const hardRefresh = true
+  yield put( autoSyncShells( syncAll, hardRefresh ) )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(
