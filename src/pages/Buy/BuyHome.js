@@ -151,7 +151,6 @@ export default BuyMenu
 // import { v4 as uuid } from 'uuid'
 // import {
 //     addTransferDetails,
-//     autoSyncShells,
 //     addNewAccountShell,
 //     fetchFeeAndExchangeRates
 // } from '../../store/actions/accounts'
@@ -296,7 +295,6 @@ export default BuyMenu
 //     levelHealth: LevelHealthInterface[];
 //     currentLevel: number;
 //     keeperInfo: any[];
-//     autoSyncShells: any;
 //     clearWyreCache: any;
 //     clearRampCache: any;
 //     clearSwanCache: any;
@@ -825,8 +823,6 @@ export default BuyMenu
 //             this.onAppStateChange
 //         )
 //         requestAnimationFrame(() => {
-//             // This will sync balances and transactions for all account shells
-//             // this.props.autoSyncShells()
 //             // Keeping autoSynn disabled
 //             setWalletId(data.walletId)
 //             credsAuthenticated(false)
@@ -1918,7 +1914,6 @@ export default BuyMenu
 //         initializeTrustedContact,
 //         rejectTrustedContact,
 //         initializeHealthSetup,
-//         autoSyncShells,
 //         clearWyreCache,
 //         clearRampCache,
 //         clearSwanCache,
