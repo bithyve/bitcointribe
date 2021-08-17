@@ -263,14 +263,24 @@ export const updateHealthForCloudWatcher = createWatcher(
 
 function* getCloudBackupRecoveryWorker () {
   try {
+    yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
     if ( Platform.OS == 'ios' ) {
-      const backedJson = yield call( iCloud.downloadBackup )
-      if( backedJson === 'failure' ) {
-        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-        return false
+      const backed = yield call( iCloud.downloadBackup )
+      const backedJson = backed !== '' ?  JSON.parse( backed ) : {
       }
-      if ( backedJson ) {
-        yield put( setCloudDataRecovery( backedJson ) )
+      if( backedJson.errorCode ) {
+        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( backedJson.errorCode )}` : 'GoogleDrive backup failed'
+        yield put( setCloudErrorMessage( message ) )
+        // if( backedJson === 'failure' ) {
+        //   yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+        //   return false
+        // }
+
+      } else {
+        if ( backed ) {
+          yield put( setCloudDataRecovery( backed ) )
+        }
       }
     } else {
       const checkDataIsBackedup = true
