@@ -817,15 +817,19 @@ export interface Wallet {
   walletName: string,
   security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
-  secondaryMnemonic?: string,
+  secondaryXpub?: string,
   secondaryWalletId?: string,
   details2FA? : {
-    secondaryXpub: string,
     bithyveXpub: string,
     twoFAKey: string,
   }
   accounts: {
     [accountType: string]: string[] // array of accountIds
+  },
+  primaryDeviceDetails?: {
+    [channelId: string]: {
+      secondaryMnemonic: string,
+    }
   },
   version: string
 }
