@@ -83,7 +83,6 @@ import {
 } from '../../common/CommonFunctions/index'
 import {
   addTransferDetails,
-  autoSyncShells,
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
@@ -196,7 +195,6 @@ interface HomePropsTypes {
   initializeHealthSetup: any;
   overallHealth: any;
   keeperInfo: any[];
-  autoSyncShells: any;
   clearWyreCache: any;
   clearRampCache: any;
   clearSwanCache: any;
@@ -634,8 +632,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.onAppStateChange
     )
     requestAnimationFrame( () => {
-      // This will sync balances and transactions for all account shells
-      // this.props.autoSyncShells()
       // Keeping autoSync disabled
       credsAuthenticated( false )
       //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
@@ -1399,7 +1395,6 @@ export default withNavigationFocus(
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
-    autoSyncShells,
     clearWyreCache,
     clearRampCache,
     clearSwanCache,

@@ -48,7 +48,6 @@ import {
 } from '../../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
-  autoSyncShells,
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
@@ -160,7 +159,6 @@ interface HomePropsTypes {
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
   keeperInfo: any[];
-  autoSyncShells: any;
   clearWyreCache: any;
   clearRampCache: any;
   clearSwanCache: any;
@@ -517,7 +515,6 @@ export default withNavigationFocus(
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
-    autoSyncShells,
     clearWyreCache,
     clearRampCache,
     clearSwanCache,

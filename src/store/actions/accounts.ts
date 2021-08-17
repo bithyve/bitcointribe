@@ -199,9 +199,12 @@ export const clearAccountSyncCache = () => {
 
 // This is called once per login to automatically sync balances and
 // transactions of all shells
-export const autoSyncShells = () => {
+export const autoSyncShells = ( syncAll?: boolean, hardRefresh?: boolean, ) => {
   return {
-    type: AUTO_SYNC_SHELLS
+    type: AUTO_SYNC_SHELLS,
+    payload: {
+      syncAll, hardRefresh,
+    },
   }
 }
 

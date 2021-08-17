@@ -166,7 +166,6 @@ interface RestoreWithICloudPropsTypes {
   SERVICES: any;
   calculateExchangeRate: any;
   initializeHealthSetup: any;
-  DECENTRALIZED_BACKUP: any;
   recoverWallet: any;
   updateCloudMShare: any;
   walletRecoveryFailed: boolean;
@@ -359,17 +358,17 @@ class RestoreWithICloud extends Component<
       } )
     }
 
-    if (
-      !this.state.isLinkCreated &&
-      this.state.contactList.length &&
-      this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ] &&
-      this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ].META_SHARE
-    ) {
-      this.setState( {
-        isLinkCreated: true
-      } )
-      this.onCreatLink()
-    }
+    // if (
+    //   !this.state.isLinkCreated &&
+    //   this.state.contactList.length &&
+    //   this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ] &&
+    //   this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ].META_SHARE
+    // ) {
+    //   this.setState( {
+    //     isLinkCreated: true
+    //   } )
+    //   this.onCreatLink()
+    // }
 
     if ( prevProps.downloadedBackupData.length == 0 && prevProps.downloadedBackupData != this.props.downloadedBackupData && this.props.downloadedBackupData.length == 1 ) {
       if ( this.props.keeperInfo.length == 0 ) {
@@ -632,143 +631,143 @@ class RestoreWithICloud extends Component<
   };
 
   onCreatLink = () => {
-    const { database } = this.props
-    const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP
-    if ( this.state.contactList.length && this.state.contactList.length == 1 ) {
-      if (
-        ( RECOVERY_SHARES[ 1 ] && !RECOVERY_SHARES[ 1 ].REQUEST_DETAILS ) ||
-        !RECOVERY_SHARES[ 1 ]
-      ) {
-        // Removed sss file
-        // requestShare( 1 )
-      }
-    } else if (
-      this.state.contactList.length &&
-      this.state.contactList.length == 2
-    ) {
-      if (
-        ( RECOVERY_SHARES[ 1 ] && !RECOVERY_SHARES[ 1 ].REQUEST_DETAILS ) ||
-        !RECOVERY_SHARES[ 1 ]
-      ) {
-        // Removed sss file
-        // requestShare( 1 )
-      }
-      if (
-        ( RECOVERY_SHARES[ 2 ] && !RECOVERY_SHARES[ 2 ].REQUEST_DETAILS ) ||
-        !RECOVERY_SHARES[ 2 ]
-      ) {
-        // Removed sss file
-        // requestShare( 2 )
-      }
-    }
+    // const { database } = this.props
+    // const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP
+    // if ( this.state.contactList.length && this.state.contactList.length == 1 ) {
+    //   if (
+    //     ( RECOVERY_SHARES[ 1 ] && !RECOVERY_SHARES[ 1 ].REQUEST_DETAILS ) ||
+    //     !RECOVERY_SHARES[ 1 ]
+    //   ) {
+    //     // Removed sss file
+    //     // requestShare( 1 )
+    //   }
+    // } else if (
+    //   this.state.contactList.length &&
+    //   this.state.contactList.length == 2
+    // ) {
+    //   if (
+    //     ( RECOVERY_SHARES[ 1 ] && !RECOVERY_SHARES[ 1 ].REQUEST_DETAILS ) ||
+    //     !RECOVERY_SHARES[ 1 ]
+    //   ) {
+    //     // Removed sss file
+    //     // requestShare( 1 )
+    //   }
+    //   if (
+    //     ( RECOVERY_SHARES[ 2 ] && !RECOVERY_SHARES[ 2 ].REQUEST_DETAILS ) ||
+    //     !RECOVERY_SHARES[ 2 ]
+    //   ) {
+    //     // Removed sss file
+    //     // requestShare( 2 )
+    //   }
+    // }
   };
 
   createLink = ( selectedContact, index ) => {
-    const { database } = this.props
-    const requester = this.state.walletName //database.WALLET_SETUP.walletName
-    const { REQUEST_DETAILS } = database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[
-      index == 0 ? 1 : 2
-    ]
-    const appVersion = DeviceInfo.getVersion()
-    if (
-      selectedContact.data.phoneNumbers &&
-      selectedContact.data.phoneNumbers.length
-    ) {
-      let number = selectedContact.data.phoneNumbers.length
-        ? selectedContact.data.phoneNumbers[ 0 ].number
-        : ''
-      number = number.slice( number.length - 10 ) // last 10 digits only
-      const numHintType = 'num'
-      const numHint = number[ 0 ] + number.slice( number.length - 2 )
-      const numberEncKey = TrustedContactsOperations.encryptData(
-        // using TCs encryption mech
-        REQUEST_DETAILS.KEY,
-        number
-      ).encryptedData
-      const numberDL =
-        `https://hexawallet.io/${config.APP_STAGE}/rk` +
-        `/${requester}` +
-        `/${numberEncKey}` +
-        `/${numHintType}` +
-        `/${numHint}` +
-        `/v${appVersion}`
-      this.setState( {
-        linkToRequest: numberDL
-      } )
-    } else if (
-      selectedContact.data.emails &&
-      selectedContact.data.emails.length
-    ) {
-      const email = selectedContact.data.emails.length
-        ? selectedContact.data.emails[ 0 ].email
-        : ''
-      const Email = email.replace( '.com', '' )
-      const emailHintType = 'eml'
-      const emailHint = email[ 0 ] + Email.slice( Email.length - 2 )
-      const emailEncPubKey = TrustedContactsOperations.encryptData(
-        REQUEST_DETAILS.KEY,
-        email
-      ).encryptedData
-      const emailDL =
-        `https://hexawallet.io/${config.APP_STAGE}/rk` +
-        `/${requester}` +
-        `/${emailEncPubKey}` +
-        `/${emailHintType}` +
-        `/${emailHint}` +
-        `/v${appVersion}`
-      this.setState( {
-        linkToRequest: emailDL
-      } )
-    } else {
-      const otp = BHROperations.generateOTP( parseInt( config.SSS_OTP_LENGTH, 10 ) )
-      const otpHintType = 'otp'
-      const otpHint = 'xxx'
-      const otpEncPubKey = TrustedContactsOperations.encryptData(
-        REQUEST_DETAILS.KEY,
-        otp
-      ).encryptedData
-      const otpDL =
-        `https://hexawallet.io/${config.APP_STAGE}/rk` +
-        `/${requester}` +
-        `/${otpEncPubKey}` +
-        `/${otpHintType}` +
-        `/${otpHint}` +
-        `/v${appVersion}`
-      this.setState( {
-        linkToRequest: otpDL, isOtpType: true, otp: otp
-      } )
-    }
+    // const { database } = this.props
+    // const requester = this.state.walletName //database.WALLET_SETUP.walletName
+    // const { REQUEST_DETAILS } = database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[
+    //   index == 0 ? 1 : 2
+    // ]
+    // const appVersion = DeviceInfo.getVersion()
+    // if (
+    //   selectedContact.data.phoneNumbers &&
+    //   selectedContact.data.phoneNumbers.length
+    // ) {
+    //   let number = selectedContact.data.phoneNumbers.length
+    //     ? selectedContact.data.phoneNumbers[ 0 ].number
+    //     : ''
+    //   number = number.slice( number.length - 10 ) // last 10 digits only
+    //   const numHintType = 'num'
+    //   const numHint = number[ 0 ] + number.slice( number.length - 2 )
+    //   const numberEncKey = TrustedContactsOperations.encryptData(
+    //     // using TCs encryption mech
+    //     REQUEST_DETAILS.KEY,
+    //     number
+    //   ).encryptedData
+    //   const numberDL =
+    //     `https://hexawallet.io/${config.APP_STAGE}/rk` +
+    //     `/${requester}` +
+    //     `/${numberEncKey}` +
+    //     `/${numHintType}` +
+    //     `/${numHint}` +
+    //     `/v${appVersion}`
+    //   this.setState( {
+    //     linkToRequest: numberDL
+    //   } )
+    // } else if (
+    //   selectedContact.data.emails &&
+    //   selectedContact.data.emails.length
+    // ) {
+    //   const email = selectedContact.data.emails.length
+    //     ? selectedContact.data.emails[ 0 ].email
+    //     : ''
+    //   const Email = email.replace( '.com', '' )
+    //   const emailHintType = 'eml'
+    //   const emailHint = email[ 0 ] + Email.slice( Email.length - 2 )
+    //   const emailEncPubKey = TrustedContactsOperations.encryptData(
+    //     REQUEST_DETAILS.KEY,
+    //     email
+    //   ).encryptedData
+    //   const emailDL =
+    //     `https://hexawallet.io/${config.APP_STAGE}/rk` +
+    //     `/${requester}` +
+    //     `/${emailEncPubKey}` +
+    //     `/${emailHintType}` +
+    //     `/${emailHint}` +
+    //     `/v${appVersion}`
+    //   this.setState( {
+    //     linkToRequest: emailDL
+    //   } )
+    // } else {
+    //   const otp = BHROperations.generateOTP( parseInt( config.SSS_OTP_LENGTH, 10 ) )
+    //   const otpHintType = 'otp'
+    //   const otpHint = 'xxx'
+    //   const otpEncPubKey = TrustedContactsOperations.encryptData(
+    //     REQUEST_DETAILS.KEY,
+    //     otp
+    //   ).encryptedData
+    //   const otpDL =
+    //     `https://hexawallet.io/${config.APP_STAGE}/rk` +
+    //     `/${requester}` +
+    //     `/${otpEncPubKey}` +
+    //     `/${otpHintType}` +
+    //     `/${otpHint}` +
+    //     `/v${appVersion}`
+    //   this.setState( {
+    //     linkToRequest: otpDL, isOtpType: true, otp: otp
+    //   } )
+    // }
   };
 
   downloadSecret = () => {
-    this.setState( {
-      refreshControlLoader: true
-    } )
-    const { database } = this.props
-    const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP
-    if ( RECOVERY_SHARES ) {
-      for ( let shareIndex = 0; shareIndex < Object.keys( RECOVERY_SHARES ).length; shareIndex++ ) {
-        if (
-          RECOVERY_SHARES[ shareIndex ] &&
-          !RECOVERY_SHARES[ shareIndex ].META_SHARE && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS.KEY
-        ) {
-          const { KEY } = RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS
-          // Removed this method
-          // this.props.downloadMShare( {
-          //   encryptedKey: KEY,
-          //   downloadType: 'recovery',
-          //   replaceIndex: shareIndex,
-          // } )
-        }
-      }
-      this.setState( {
-        refreshControlLoader: false
-      } )
-    }
+    // this.setState( {
+    //   refreshControlLoader: true
+    // } )
+    // const { database } = this.props
+    // const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP
+    // if ( RECOVERY_SHARES ) {
+    //   for ( let shareIndex = 0; shareIndex < Object.keys( RECOVERY_SHARES ).length; shareIndex++ ) {
+    //     if (
+    //       RECOVERY_SHARES[ shareIndex ] &&
+    //       !RECOVERY_SHARES[ shareIndex ].META_SHARE && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS.KEY
+    //     ) {
+    //       const { KEY } = RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS
+    //       // Removed this method
+    //       // this.props.downloadMShare( {
+    //       //   encryptedKey: KEY,
+    //       //   downloadType: 'recovery',
+    //       //   replaceIndex: shareIndex,
+    //       // } )
+    //     }
+    //   }
+    //   this.setState( {
+    //     refreshControlLoader: false
+    //   } )
+    // }
   };
 
   onRefresh = () => {
-    this.downloadSecret()
+    // this.downloadSecret()
   };
 
   setLoaderMessages = () => {
@@ -832,9 +831,9 @@ class RestoreWithICloud extends Component<
           'Clicking on Recover would source your Recovery Key from iCloud'
         }
         cardInfo={'Restoring Wallet from'}
-        cardTitle={selectedBackup.walletName}
+        cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
         levelStatus={
-          `${selectedBackup.levelStatus
+          `${selectedBackup &&selectedBackup.levelStatus
             ? `${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'} backup at Level ${selectedBackup.levelStatus}`
             : ''}`
         }
@@ -1377,9 +1376,6 @@ const mapStateToProps = ( state ) => {
     walletImageChecked: idx( state, ( _ ) => _.bhr.walletImageChecked ),
     SERVICES: idx( state, ( _ ) => _.storage.database.SERVICES ),
     walletRecoveryFailed: idx( state, ( _ ) => _.bhr.walletRecoveryFailed ),
-    DECENTRALIZED_BACKUP:
-      idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP ) || {
-      },
     errorReceiving:
       idx( state, ( _ ) => _.bhr.errorReceiving ) || {
       },
