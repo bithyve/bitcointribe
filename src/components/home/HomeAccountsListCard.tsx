@@ -34,7 +34,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
 
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo( () => {
     return secondarySubAccounts
-      .map( subAccount => getAvatarForSubAccount( subAccount ) )
+      .map( subAccount => getAvatarForSubAccount( subAccount, false ) )
   }, [ secondarySubAccounts ] )
 
   return (
@@ -45,7 +45,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
       />
       <Image
         style={styles.headerAccountImage}
-        source={getAvatarForSubAccount( primarySubAccount )}
+        source={getAvatarForSubAccount( primarySubAccount, false )}
       />
       {
         accountShell.primarySubAccount.hasNewTxn && (
@@ -174,9 +174,10 @@ const styles = StyleSheet.create( {
   },
 
   headerAccountImage: {
-    width: widthPercentageToDP( 9 ),
-    height: widthPercentageToDP( 9 ),
-    marginTop: 0,
+    width: widthPercentageToDP( 7 ),
+    height: widthPercentageToDP( 7 ),
+    marginLeft: heightPercentageToDP( 0.5 ),
+    marginTop:heightPercentageToDP( 0.5 ),
     resizeMode: 'contain'
   },
 
