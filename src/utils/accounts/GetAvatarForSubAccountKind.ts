@@ -5,13 +5,14 @@ import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interf
 import getAvatarForServiceAccountKind from './GetAvatarForServiceAccountKind'
 
 export default function getAvatarForSubAccount(
-  subAccount: SubAccountDescribing
+  subAccount: SubAccountDescribing,
+  active?: boolean
 ): ImageSourcePropType {
   switch ( subAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
-        return require( '../../assets/images/addaccount/test.png' )
+        return active ? require( '../../assets/images/addaccount/test_white.png' ) : require( '../../assets/images/addaccount/test.png' )
       case SubAccountKind.REGULAR_ACCOUNT:
-        return require( '../../assets/images/icons/icon_regular.png' )
+        return active ? require( '../../assets/images/addaccount/checking_white.png' ) : require( '../../assets/images/addaccount/checking.png' )
       case SubAccountKind.SECURE_ACCOUNT:
         return require( '../../assets/images/addaccount/savings.png' )
       case SubAccountKind.TRUSTED_CONTACTS:

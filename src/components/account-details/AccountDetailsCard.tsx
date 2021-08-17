@@ -139,7 +139,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           marginBottom: 8,
         }}>
           <Image
-            source={getAvatarForSubAccount( primarySubAccount )}
+            source={getAvatarForSubAccount( primarySubAccount, true )}
             style={styles.accountKindBadgeImage}
           />
 
@@ -299,8 +299,8 @@ const styles = StyleSheet.create( {
   },
 
   accountKindBadgeImage: {
-    width: 58,
-    height: 58,
+    width: 54,
+    height: 54,
     resizeMode: 'contain',
   },
 
