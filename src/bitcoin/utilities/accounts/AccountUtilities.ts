@@ -868,19 +868,17 @@ export default class AccountUtilities {
   }
 
   // 2FA-account specific utilities
-  static registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
+  static setupTwoFA = async ( walletID: string ): Promise<{
     setupData: {
-      qrData: string;
       secret: string;
       bhXpub: string;
     };
   }> => {
     let res: AxiosResponse
     try {
-      res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
+      res = await SIGNING_AXIOS.post( 'setup2FA', {
         HEXA_ID: config.HEXA_ID,
         walletID,
-        secondaryID,
       } )
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -888,7 +886,7 @@ export default class AccountUtilities {
     }
 
     const { setupSuccessful, setupData } = res.data
-    if ( !setupSuccessful ) throw new Error( 'Secure account setup failed' )
+    if ( !setupSuccessful ) throw new Error( '2FA setup failed' )
     return {
       setupData
     }
@@ -919,12 +917,10 @@ export default class AccountUtilities {
 
   static resetTwoFA = async (
     walletID: string,
-    secondaryID: string,
     secondaryMnemonic: string,
     secondaryXpub: string,
     network: bitcoinJS.networks.Network
   ): Promise<{
-    qrData: any;
     secret: any;
   }> => {
     const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
@@ -933,18 +929,17 @@ export default class AccountUtilities {
 
     let res: AxiosResponse
     try {
-      res = await SIGNING_AXIOS.post( 'resetTwoFA', {
+      res = await SIGNING_AXIOS.post( 'resetTwoFAv2', {
         HEXA_ID: config.HEXA_ID,
         walletID: walletID,
-        secondaryID,
       } )
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )
     }
-    const { qrData, secret } = res.data
+    const { secret } = res.data
     return {
-      qrData, secret
+      secret
     }
   };
 
