@@ -64,7 +64,7 @@ function* updateWalletWorker( { payload } ) {
     walletName,
   } )
   yield call( dbManager.getWallet )
-  yield put( updateWalletImageHealth() )
+  // yield put( updateWalletImageHealth() )
   yield put ( updateWalletNameToChannel() )
 }
 
