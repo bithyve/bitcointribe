@@ -311,6 +311,7 @@ export default function AddContactSendRequest( props ) {
         isOTPType={isOTPType}
         contactText={'Trusted Contact'}
         contact={Contact}
+
         renderTimer={renderTimer}
         onPressContinue={() => onContinueWithTimer()}
       />
@@ -331,7 +332,7 @@ export default function AddContactSendRequest( props ) {
         onPressOk={() => {
           setRenderTimer( false )
           setShareOtpWithTrustedContactModel( false )
-          props.navigation.goBack()
+          props.navigation.popToTop()
         }}
         onPressBack={() => {
           setShareOtpWithTrustedContactModel( false )
@@ -515,7 +516,11 @@ export default function AddContactSendRequest( props ) {
         <ModalContainer visible={secure2FAModal} closeBottomSheet={() => {}} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}
-            onConfirm={( type ) => { setIsOTPType( false ); setEncryptLinkWith( type ); setSecure2FAModal( false )
+            onConfirm={( type ) => {
+              if( type === DeepLinkEncryptionType.OTP ) {
+                setIsOTPType( true )
+              }
+              setEncryptLinkWith( type ); setSecure2FAModal( false )
             }}
             Contact={contactInfo}
           />

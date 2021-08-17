@@ -121,7 +121,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
 
         <Image
           style={styles.image}
-          source={getAvatarForSubAccount( subAccountInfo )}
+          source={getAvatarForSubAccount( subAccountInfo, isSelected )}
         />
 
         <View style={descriptionTextContainerStyle}>

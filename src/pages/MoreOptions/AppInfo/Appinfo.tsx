@@ -33,6 +33,9 @@ import EnterPasscodeScreen from './EnterPasscodeScreen'
 import EditWalletName from './EditWalletName'
 import EditWalletSuccess from './EditWalletSuccess'
 import { updateWalletName } from '../../../store/actions/trustedContacts'
+import { LevelHealthInterface } from '../../../bitcoin/utilities/Interface'
+import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
+import { setCloudData } from '../../../store/actions/cloud'
 interface MenuOption {
     title: string;
     subtitle: string;
@@ -48,6 +51,12 @@ const AppInfo = ( props ) => {
   const [ securityPin, showSecurityPin ] = useState( false )
   const [ editName, showEditName ] = useState( false )
   const [ success, setSuccess ] = useState( false )
+  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
+
+  const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
+
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  let currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const walletName = useSelector(
     ( state ) => state.storage.wallet?.walletName,
   )
@@ -135,6 +144,31 @@ const AppInfo = ( props ) => {
     )
   }, [] )
 
+  const updateCloudData = () => {
+    // console.log( 'cloudBackupStatus', cloudBackupStatus, currentLevel )
+    if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
+    let share = levelHealth[ 0 ].levelInfo[ 1 ]
+    if( levelHealth[ 0 ] && !levelHealth[ 1 ] ){
+      share = levelHealth[ 0 ].levelInfo[ 1 ]
+    } else if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
+      if( levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 ){
+        share = levelHealth[ 1 ].levelInfo[ 1 ]
+        currentLevel = 2
+      } else if( levelHealth[ 1 ].levelInfo.length == 6 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 ){
+        share = levelHealth[ 1 ].levelInfo[ 1 ]
+        currentLevel = 3
+      }
+    }
+    // console.log( 'CLOUD updateCloudData share', share )
+    if( levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+      dispatch( setCloudData(
+        keeperInfo,
+        currentLevel === 0 ? currentLevel + 1 : currentLevel,
+        share
+      ) )
+    }
+  }
+
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -160,6 +194,10 @@ const AppInfo = ( props ) => {
             dispatch( updateWalletName( newName ) )
             showEditName( false )
             setSuccess( true )
+            setTimeout( () => {
+              updateCloudData()
+            }, 100 )
+
           }}
         />
       </ModalContainer>

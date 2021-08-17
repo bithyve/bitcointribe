@@ -803,6 +803,7 @@ function* updateAccountSettingsWorker( { payload }: {
       }
     } ) )
     yield call( dbManager.updateAccount, account.id, account )
+    yield put( updateWalletImageHealth() )
     if( visibility === AccountVisibility.DEFAULT ) {
       yield put( accountSettingsUpdated() )
     }
@@ -931,7 +932,8 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
 
   // restore account shells for respective accountss
   for ( const account of restoredAccounts ){
-    const accountShell = yield call( generateShellFromAccount, account )
+    const accountShell: AccountShell = yield call( generateShellFromAccount, account )
+    accountShell.primarySubAccount.visibility = account.accountVisibility
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
   }
