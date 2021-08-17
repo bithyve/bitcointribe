@@ -78,7 +78,7 @@ const createAccount = async ( account ) => {
         for ( const [ key, value ] of Object.entries( data.txIdMap ) ) {
           map.push( {
             id: key,
-            txIds: value
+            txIds: value.txIds
           } )
         }
         data.txIdMap = map
@@ -109,7 +109,7 @@ const updateAccount = async ( accountId, account ) => {
         for ( const [ key, value ] of Object.entries( data.txIdMap ) ) {
           map.push( {
             id: key,
-            txIds: value
+            txIds: value.txIds
           } )
         }
         data.txIdMap = map
