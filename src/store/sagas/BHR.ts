@@ -107,8 +107,8 @@ import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, restoreTrustedContacts, syncPermanentChannels } from '../actions/trustedContacts'
-import { syncPermanentChannelsWorker } from './trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { syncPermanentChannelsWorker, restoreTrustedContactsWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWallet } from '../actions/storage'
@@ -116,6 +116,7 @@ import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import LevelStatus from '../../common/data/enums/LevelStatus'
+import secrets from 'secrets.js-grempe'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -502,9 +503,16 @@ function* recoverWalletWorker( { payload } ) {
       version: DeviceInfo.getVersion(),
       secondaryMnemonic: secondaryMnemonics,
     }
+    // restore Contacts
+    yield call( restoreTrustedContactsWorker, {
+      payload: {
+        walletId: wallet.walletId, channelKeys: contactsChannelKeys
+      }
+    } )
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
     yield call( dbManager.createWallet, wallet )
+
     // restore Accounts
     yield put( restoreAccountShells( acc ) )
     // restore health
@@ -513,12 +521,9 @@ function* recoverWalletWorker( { payload } ) {
         level: level, keeperInfo: JSON.parse( selectedBackup.keeperData )
       }
     } )
-    // restore Contacts
-    yield put( restoreTrustedContacts( {
-      walletId: wallet.walletId, channelKeys: contactsChannelKeys
-    } ) )
+
     // restore Metashres
-    if( level > 1 ) yield put( retrieveMetaShares() )
+    if( level > 1 ) yield put( retrieveMetaShares( shares ) )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
     console.log( err )
@@ -1606,6 +1611,7 @@ function* downloadBackupDataWorker( { payload } ) {
       primaryData?: PrimaryStreamData;
       backupData?: BackupStreamData;
       secondaryData?: SecondaryStreamData;
+      isCloud?: boolean;
     }[] = [ ...yield select( ( state ) => state.bhr.downloadedBackupData ) ]
     if( backupData ) {
       downloadedBackupData.push( backupData )
@@ -2064,8 +2070,13 @@ export const setupLevelHealthWatcher = createWatcher(
   SETUP_LEVEL_HEALTH
 )
 
-function* retrieveMetaSharesWorker( ) {
+function* retrieveMetaSharesWorker( { payload } ) {
   try {
+    const { shares }: {shares: {primaryData?: PrimaryStreamData;
+      backupData?: BackupStreamData;
+      secondaryData?: SecondaryStreamData;
+      isCloud?: boolean;
+    }[]} = payload
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
     const currentLevel: number = yield select( ( state ) => state.bhr.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
@@ -2077,10 +2088,8 @@ function* retrieveMetaSharesWorker( ) {
     let keepers:KeeperInfoInterface[] = []
     if ( currentLevel === 2 ) keepers = keeperInfo.filter( word => word.scheme == '2of3' )
     if ( currentLevel === 3 ) keepers = keeperInfo.filter( word => word.scheme == '3of5' )
-    console.log( 'RETRIEVE_METASHRES keeperInfo', keeperInfo )
-    console.log( 'RETRIEVE_METASHRES keepers', keepers )
     let channelKey
-    console.log( 'RETRIEVE_METASHRES contacts', contacts )
+    // Contact or Device type
     if( contacts ){
       for( const ck of Object.keys( contacts ) ){
         channelKey=ck
@@ -2090,22 +2099,51 @@ function* retrieveMetaSharesWorker( ) {
               retrieveBackupData: true,
             }
           } )
-          console.log( 'RETRIEVE_METASHRES res', res )
           if( res.backupData && res.backupData.primaryMnemonicShard ){
             Rk.push( res.backupData.primaryMnemonicShard )
           }
         }
       }
     }
-    console.log( 'RETRIEVE_METASHRES Rk', Rk )
+    // PDF type
+    if( keepers.find( value=>value.type=='pdf' ) ){
+      channelKey = keepers.find( value=>value.type=='pdf' ).channelKey
+      const res = yield call( TrustedContactsOperations.retrieveFromStream, {
+        walletId: wallet.walletId, channelKey, options: {
+          retrieveBackupData: true,
+        }
+      } )
+      if( res.backupData && res.backupData.primaryMnemonicShard ){
+        Rk.push( res.backupData.primaryMnemonicShard )
+      }
+    }
+    const encryptedSecrets = []
     for ( let i = 0; i < keepers.length; i++ ) {
       const element = keepers[ i ]
-      console.log( 'RETRIEVE_METASHRES element', element )
-      metaShares[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId )
-      encryptedPrimarySecrets[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId ) ? Rk.find( value=>value.shareId == element.shareId ).encryptedShare.pmShare : ''
+      if( Rk.find( value=>value.shareId == element.shareId ) && element.sharePosition ){
+        metaShares[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId )
+        encryptedPrimarySecrets[ element.sharePosition ] = Rk.find( value=>value.shareId == element.shareId ) ? Rk.find( value=>value.shareId == element.shareId ).encryptedShare.pmShare : ''
+        encryptedSecrets.push( Rk.find( value=>value.shareId == element.shareId ) ? Rk.find( value=>value.shareId == element.shareId ).encryptedShare.pmShare : '' )
+      }
     }
-    console.log( 'RETRIEVE_METASHRES metaShares', metaShares )
-    console.log( 'RETRIEVE_METASHRES metaShares', encryptedPrimarySecrets )
+    // Set Metashare of cloud if not found then create new share
+    if( shares.length && shares.find( values=>values.isCloud == true ) ) {
+      metaShares[ 0 ] = shares.length && shares.find( values=>values.isCloud == true ).backupData.primaryMnemonicShard
+      encryptedPrimarySecrets[ 0 ] = shares.length && shares.find( values=>values.isCloud == true ).backupData.primaryMnemonicShard.encryptedShare.pmShare
+    } else {
+      const secretsArr = BHROperations.decryptSecrets( encryptedSecrets, wallet.security.answer ).decryptedSecrets
+      const temp = [ secrets.newShare( parseInt( secretsArr[ 0 ].charAt( 0 ) ), secretsArr ) ]
+      metaShares[ 0 ] = {
+        shareId: keepers.find( value=>value.sharePosition == 0 ).shareId,
+        meta: {
+          ...Rk[ 0 ].meta, index: 0
+        },
+        encryptedShare: {
+          pmShare: BHROperations.encryptShares( temp, wallet.security.answer ).encryptedPrimarySecrets[ 0 ],
+          smShare:'', bhXpub:''
+        }
+      }
+    }
     dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -2116,7 +2154,7 @@ function* retrieveMetaSharesWorker( ) {
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
-    console.log( 'RETRIEVE_METASHRES channel', error )
+    console.log( 'RETRIEVE_METASHRES error', error )
   }
 }
 

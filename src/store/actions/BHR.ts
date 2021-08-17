@@ -594,9 +594,11 @@ export const generateLevel2Shares = ( security ) => {
   }
 }
 
-export const retrieveMetaShares = ( ) => {
+export const retrieveMetaShares = ( shares ) => {
   return {
-    type: RETRIEVE_METASHRES
+    type: RETRIEVE_METASHRES, payload: {
+      shares
+    }
   }
 }
 

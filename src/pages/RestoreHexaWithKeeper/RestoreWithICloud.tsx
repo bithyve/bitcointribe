@@ -185,6 +185,7 @@ interface RestoreWithICloudPropsTypes {
     primaryData?: PrimaryStreamData;
     backupData?: BackupStreamData;
     secondaryData?: SecondaryStreamData;
+    isCloud?: boolean;
   }[];
   putKeeperInfo: any;
   keeperInfo: KeeperInfoInterface[];
@@ -531,9 +532,7 @@ class RestoreWithICloud extends Component<
         this.setKeeperInfoList( selectedBackup.levelStatus, KeeperData, selectedBackup.dateTime )
       }
       if (
-        decryptedCloudDataJson &&
-        selectedBackup.shares &&
-        selectedBackup.keeperData
+        decryptedCloudDataJson && ( selectedBackup.levelStatus == 2 || selectedBackup.levelStatus == 3 )
       ) {
         this.setState( {
           cloudBackup: true
@@ -546,6 +545,7 @@ class RestoreWithICloud extends Component<
           primaryData?: PrimaryStreamData;
           backupData?: BackupStreamData;
           secondaryData?: SecondaryStreamData;
+          isCloud?: boolean;
         } = {
           backupData, secondaryData
         }
@@ -553,6 +553,7 @@ class RestoreWithICloud extends Component<
         downloadedBackupDataTmp.backupData.keeperInfo = KeeperData
         downloadedBackupDataTmp.secondaryData.secondaryMnemonicShard = selectedBackup.secondaryShare
         downloadedBackupDataTmp.secondaryData.bhXpub = selectedBackup.bhXpub
+        downloadedBackupDataTmp.isCloud = true
 
         this.props.downloadBackupData( {
           backupData: downloadedBackupDataTmp
@@ -566,7 +567,7 @@ class RestoreWithICloud extends Component<
         this.setState( {
           securityQuestionModal: false
         } )
-      } else if ( decryptedCloudDataJson && !selectedBackup.shares ) {
+      } else if ( decryptedCloudDataJson && selectedBackup.levelStatus == 1 ) {
         this.showLoaderModal()
         recoverWalletUsingIcloud( decryptedCloudDataJson, answer, selectedBackup )
       } else {

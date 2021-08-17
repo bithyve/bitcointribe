@@ -99,6 +99,7 @@ const initialState: {
     primaryData?: PrimaryStreamData;
     backupData?: BackupStreamData;
     secondaryData?: SecondaryStreamData;
+    isCloud?: boolean;
   }[];
   isKeeperInfoUpdated2: boolean;
   isKeeperInfoUpdated3: boolean;
