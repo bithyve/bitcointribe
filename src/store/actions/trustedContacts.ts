@@ -174,14 +174,4 @@ export const updateWalletName = ( walletName: string ) => {
     }
   }
 }
-export const restoreContacts = ( channelSyncUpdates: {
-  channelKey: string;
-  streamId: string;
-}[] ) => {
-  return {
-    type: RESTORE_CONTACTS,
-    payload: {
-      channelSyncUpdates
-    }
-  }
-}
+
