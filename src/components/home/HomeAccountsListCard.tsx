@@ -170,7 +170,8 @@ const styles = StyleSheet.create( {
     borderRadius: 5,
     backgroundColor: 'tomato',
     position: 'absolute',
-    left: widthPercentageToDP( 8 ),
+    left: widthPercentageToDP( 11 ),
+    top: widthPercentageToDP( 2 ),
   },
 
   headerAccountImage: {
