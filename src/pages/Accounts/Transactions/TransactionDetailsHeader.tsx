@@ -51,10 +51,14 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
       return transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType )
     } else {
       let name = ''
-      if( transaction.receivers && transaction.receivers.length > 1 ) {
-        name = `${transaction.receivers[ 0 ].name} and ${transaction.receivers.length  -1} other`
+      if( transaction.receivers ) {
+        if( transaction.receivers.length > 1 ) {
+          name = `${transaction.receivers[ 0 ].name} and ${transaction.receivers.length  -1} other`
+        } else {
+          name = transaction.receivers[ 0 ].name ||  transaction.accountType || transaction.accountName
+        }
       } else {
-        name = transaction.receivers[ 0 ].name ||  transaction.accountType || transaction.accountName
+        name = transaction.accountName? transaction.accountName: transaction.accountType
       }
       return name
     }
