@@ -595,7 +595,7 @@ export const removeTrustedContactWatcher = createWatcher(
 )
 
 
-function* restoreTrustedContactsWorker( { payload }: { payload: { walletId: string, channelKeys: string[] }} ) {
+export function* restoreTrustedContactsWorker( { payload }: { payload: { walletId: string, channelKeys: string[] }} ) {
   const { walletId, channelKeys } = payload
   // const { }
   const restoredTrustedContacts: Trusted_Contacts = yield call( TrustedContactsOperations.restoreTrustedContacts, {

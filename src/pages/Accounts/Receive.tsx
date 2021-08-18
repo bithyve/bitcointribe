@@ -261,7 +261,7 @@ export default function Receive( props ) {
                 <View
                   style={styles.text}
                 >
-                  <Text style={styles.titleText}>{'Enter amount to receive'}</Text>
+                  <Text style={styles.titleText}>{amount ? amount : 'Enter amount to receive'}</Text>
                 </View>
 
                 <View style={{
