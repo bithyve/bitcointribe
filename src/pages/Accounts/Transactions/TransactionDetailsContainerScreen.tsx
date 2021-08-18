@@ -174,7 +174,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
   },
   textHeader: {
