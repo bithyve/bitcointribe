@@ -383,8 +383,9 @@ function* updateHealthLevel2Worker( { payload } ) {
     levelInfo[ 0 ] = SecurityQuestionHealth
     for ( let i = 1; i < metaShares.length; i++ ) {
       const element = metaShares[ i ]
+      const shareType = i == 1 ? 'primaryKeeper' : ''
       const obj = {
-        shareType: '',
+        shareType,
         updatedAt: 0,
         status: 'notSetup',
         shareId: element.shareId,
@@ -2033,7 +2034,7 @@ function* setupLevelHealthWorker( { payload } ) {
               ...levelInfo[ 1 ], shareId: element.shareId
             }
             if( element.sharePosition == 1 ) levelInfo[ 2 ] = {
-              ...obj, shareId: element.shareId, name: element.name, shareType: element.type
+              ...obj, shareId: element.shareId, name: element.name, shareType: 'primaryKeeper'
             }
             if( element.sharePosition == 2 ) levelInfo[ 3 ] = {
               ...obj, shareId: element.shareId, name: element.name, shareType: element.type
@@ -2209,7 +2210,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
       id: value.id,
       selectedKeeper: {
         ...keeper,
-        name: keeper.name,
+        name: keeper.shareType == 'primaryKeeper' ? 'Personal Device1' : keeper.name,
         shareType: keeper.shareType,
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? metaSharesKeeper[ 1 ] ? metaSharesKeeper[ 1 ].shareId: '' : metaSharesKeeper[ 4 ] ? metaSharesKeeper[ 4 ].shareId : ''
       },
@@ -2225,8 +2226,6 @@ function* onPressKeeperChannelWorker( { payload } ) {
           value.id == 2 && metaSharesKeeper.length != 3
         ) {
           yield put( generateMetaShare( value.id ) )
-        } else if( keeper.shareType == '' || keeper.status == 'notSetup' ){
-          yield put( setIsKeeperTypeBottomSheetOpen( true ) )
         } else {
           yield put( navigateToHistoryPage( obj ) )
         }
