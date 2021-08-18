@@ -587,6 +587,7 @@ export type Streams = {
 export enum TrustedContactRelationTypes {
   CONTACT = 'CONTACT',
   KEEPER  = 'KEEPER',
+  PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   WARD = 'WARD',
   KEEPER_WARD = 'KEEPER_WARD'
 }
@@ -770,6 +771,7 @@ export interface LevelData {
 export enum QRCodeTypes {
   CONTACT_REQUEST = 'CONTACT_REQUEST',
   KEEPER_REQUEST = 'KEEPER_REQUEST',
+  PRIMARY_KEEPER_REQUEST = 'PRIMARY_KEEPER_REQUEST',
   RECOVERY_REQUEST = 'RECOVERY_REQUEST',
   EXISTING_CONTACT = 'EXISTING_CONTACT'
 }
@@ -925,6 +927,7 @@ export interface Accounts {
 export enum DeepLinkKind {
   CONTACT = 'CONTACT',
   KEEPER = 'KEEPER',
+  PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER'
 }
 

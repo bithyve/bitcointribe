@@ -981,6 +981,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
             channelKey: trustedContactRequest.channelKey,
             contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+            isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
           } )
           // TODO: navigate post approval (from within saga)
           navigation.navigate( 'Home' )

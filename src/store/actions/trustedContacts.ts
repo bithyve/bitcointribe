@@ -65,6 +65,7 @@ export const initializeTrustedContact = (
     contact,
     flowKind,
     isKeeper,
+    isPrimaryKeeper,
     channelKey,
     contactsSecondaryChannelKey,
     shareId,
@@ -72,6 +73,7 @@ export const initializeTrustedContact = (
       contact: any,
       flowKind: InitTrustedContactFlowKind,
       isKeeper?: boolean,
+      isPrimaryKeeper?: boolean,
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
       shareId?: string
@@ -83,6 +85,7 @@ export const initializeTrustedContact = (
       contact,
       flowKind,
       isKeeper,
+      isPrimaryKeeper,
       channelKey,
       contactsSecondaryChannelKey,
       shareId,

@@ -27,6 +27,7 @@ import {
   MetaShare,
   QRCodeTypes,
   TrustedContact,
+  TrustedContactRelationTypes,
   Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
@@ -180,7 +181,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( createOrChangeGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, isPrimaryKeeper
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
@@ -199,9 +200,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           break
         }
       }
-    console.log( 'USEEEFTEC currentContact', JSON.stringify( currentContact ) )
+
     if ( currentContact ) {
-      const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
       let encryption_key: string
       if( currentContact.deepLinkConfig ){
@@ -210,9 +210,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       }
 
       if( !encryption_key ){
-        const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( DeepLinkEncryptionType.DEFAULT, encryption_key, currentContact, wallet.walletName )
+        const { encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( DeepLinkEncryptionType.DEFAULT, encryption_key, currentContact, wallet.walletName )
         const QRData = JSON.stringify( {
-          type: QRCodeTypes.KEEPER_REQUEST,
+          type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
           encryptedChannelKeys: encryptedChannelKeys,
           encryptionType,
           encryptionHint,
@@ -220,7 +220,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           version: appVersion,
         } )
         setKeeperQR( QRData )
-        console.log( 'QRDATA', QRData )
       }
       if( isGuardianCreationClicked ) {
         const shareObj = {
@@ -231,7 +230,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           status: 'notAccessible',
           name: Contact && Contact.name ? Contact.name : ''
         }
-        console.log( 'shareObj', shareObj )
+
         dispatch( updateMSharesHealth( shareObj, isChange ) )
         dispatch( setChannelAssets( {
         } ) )

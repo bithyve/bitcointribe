@@ -280,7 +280,7 @@ export default class TrustedContactsOperations {
         [ TrustedContactRelationTypes.CONTACT ].includes( relationshipType )
       )
         delete contact.contactsSecondaryChannelKey
-      if ( relationshipType === TrustedContactRelationTypes.KEEPER )
+      if ( [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( relationshipType ) )
         contact.relationType = TrustedContactRelationTypes.WARD
       else if ( relationshipType === TrustedContactRelationTypes.WARD )
         contact.relationType = TrustedContactRelationTypes.KEEPER

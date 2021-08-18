@@ -502,7 +502,6 @@ function* recoverWalletWorker( { payload } ) {
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: DeviceInfo.getVersion(),
-      secondaryMnemonic: secondaryMnemonics,
     }
     // restore Contacts
     yield call( restoreTrustedContactsWorker, {
@@ -1408,7 +1407,7 @@ export const downloadSMShareWatcher = createWatcher(
 
 function* createOrChangeGuardianWorker( { payload: data } ) {
   try {
-    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = data
+    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact, isPrimaryKeeper } = data
     const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
@@ -1507,6 +1506,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           contact: contact,
           flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
           isKeeper: true,
+          isPrimaryKeeper,
           channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
           shareId: shareId
         } ) )

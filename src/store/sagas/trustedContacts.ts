@@ -48,7 +48,7 @@ import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth } from '../actions/BHR'
-import { getNextFreeAddressWorker } from './accounts'
+import { getNextFreeAddressWorker, setup2FADetails } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { updateWalletNameToChannel } from '../actions/trustedContacts'
 import { updateWallet } from '../actions/storage'
@@ -354,13 +354,13 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {
-  const { contact, flowKind, isKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
-  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  let wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { walletId } = wallet
 
   const contactInfo: ContactInfo = {
@@ -375,7 +375,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   }
   contactInfo.channelKey = contactInfo.channelKey?  contactInfo.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) // channel-key is available during init at approvers end
 
-  if( isKeeper ) {
+  if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT && isKeeper ) {
     const channelAssets: ChannelAssets = yield select(
       ( state ) => state.bhr.channelAssets,
     )
@@ -413,10 +413,15 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     [ AccountType.CHECKING_ACCOUNT ]: checkingReceivingAddress,
   }
 
+  let relationType = TrustedContactRelationTypes.CONTACT
+  if( isPrimaryKeeper ) relationType = TrustedContactRelationTypes.PRIMARY_KEEPER
+  if( isKeeper ) relationType = TrustedContactRelationTypes.KEEPER
+  else if( contactInfo.contactsSecondaryChannelKey ) relationType = TrustedContactRelationTypes.WARD
+
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
     walletName: wallet.walletName,
-    relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : contactInfo.contactsSecondaryChannelKey ? TrustedContactRelationTypes.WARD : TrustedContactRelationTypes.CONTACT,
+    relationType,
     FCM,
     paymentAddresses,
     contactDetails: contactInfo.contactDetails
@@ -425,14 +430,19 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   let secondaryData: SecondaryStreamData
   let backupData: BackupStreamData
   const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
-  if( contactInfo.isKeeper && channelAssets ){
-    const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard, bhXpub } = channelAssets
+  if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT && contactInfo.isKeeper && channelAssets ){
+    const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard } = channelAssets
     backupData = {
       primaryMnemonicShard,
       keeperInfo,
     }
+
+    // setup 2FA during primary keeper setup
+    if( isPrimaryKeeper && !idx( wallet, ( _ ) => _.details2FA.bithyveXpub ) ) wallet = yield call( setup2FADetails, wallet )
+
     secondaryData = {
       secondaryMnemonicShard,
+      bhXpub: wallet.details2FA.bithyveXpub,
     }
     const secondaryChannelKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     contactInfo.secondaryChannelKey = secondaryChannelKey

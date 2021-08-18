@@ -500,7 +500,7 @@ export const autoSyncShellsWatcher = createWatcher(
   AUTO_SYNC_SHELLS
 )
 
-function* setup2FADetails( wallet: Wallet ) {
+export function* setup2FADetails( wallet: Wallet ) {
   const { setupData } = yield call( AccountUtilities.setupTwoFA, wallet.walletId )
   // const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
   // const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
@@ -605,7 +605,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
 }
 
 export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails ) {
-  let wallet: Wallet = yield select( state => state.storage.wallet )
+  const wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primaryMnemonic, accounts } = wallet
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
@@ -639,8 +639,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return checkingAccount
 
       case AccountType.SAVINGS_ACCOUNT:
-        if( !wallet.secondaryXpub ) throw new Error( 'Fail to create savings account; secondary xpub missing' )
-        if( !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
+        if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
         const savingsInstanceCount = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
         const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
@@ -658,10 +657,8 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return savingsAccount
 
       case AccountType.DONATION_ACCOUNT:
-        if( is2FAEnabled ){
-          if( !wallet.secondaryXpub ) throw new Error( 'Fail to create savings account; secondary xpub missing' )
-          if( !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
-        }
+        if( is2FAEnabled )
+          if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
         const donationInstanceCount = ( accounts[ accountType ] )?.length | 0
         const donationAccount: DonationAccount = yield call( generateDonationAccount, {
