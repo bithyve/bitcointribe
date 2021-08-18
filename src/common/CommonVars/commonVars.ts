@@ -58,7 +58,9 @@ export const LevelDataVar = [
     status: 'notSetup',
     keeper1ButtonText: 'Share Recovery Key 1',
     keeper2ButtonText: 'Share Recovery Key 2',
-    keeper1: obj,
+    keeper1: {
+      ...obj, shareType: 'primaryKeeper'
+    },
     keeper2: obj,
     note:'',
     info:'Double Backup',
