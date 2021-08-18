@@ -45,7 +45,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
       />
       <Image
         style={styles.headerAccountImage}
-        source={getAvatarForSubAccount( primarySubAccount, false )}
+        source={getAvatarForSubAccount( primarySubAccount, false, true )}
       />
       {
         accountShell.primarySubAccount.hasNewTxn && (
@@ -174,8 +174,8 @@ const styles = StyleSheet.create( {
   },
 
   headerAccountImage: {
-    width: widthPercentageToDP( 7 ),
-    height: widthPercentageToDP( 7 ),
+    width: widthPercentageToDP( 13 ),
+    height: widthPercentageToDP( 13 ),
     marginLeft: heightPercentageToDP( 0.5 ),
     marginTop:heightPercentageToDP( 0.5 ),
     resizeMode: 'contain'
