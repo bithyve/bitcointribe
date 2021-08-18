@@ -534,7 +534,11 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
-  contactDetails?: ContactDetails
+  contactDetails?: ContactDetails,
+  secondarySetupData? :{
+    secondaryXpub: string
+    secondaryShards: string[]
+  }
 }
 
 export interface SecondaryStreamData {
@@ -827,11 +831,6 @@ export interface Wallet {
   }
   accounts: {
     [accountType: string]: string[] // array of accountIds
-  },
-  primaryDeviceDetails?: {
-    [channelId: string]: {
-      secondaryMnemonic: string,
-    }
   },
   version: string
 }

@@ -502,11 +502,6 @@ export const autoSyncShellsWatcher = createWatcher(
 
 export function* setup2FADetails( wallet: Wallet ) {
   const { setupData } = yield call( AccountUtilities.setupTwoFA, wallet.walletId )
-  // const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-  // const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  // const secondaryXpub = AccountUtilities.generateExtendedKey( wallet.secondaryMnemonic, false, network, rootDerivationPath )
-  // const secondaryWalletId = crypto.createHash( 'sha256' ).update( wallet.secondaryXpub ).digest( 'hex' )
-
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
   const updatedWallet = {
@@ -963,6 +958,11 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   const syncAll = true
   const hardRefresh = true
   yield put( autoSyncShells( syncAll, hardRefresh ) )
+  yield call( autoSyncShellsWorker, {
+    payload: {
+      syncAll, hardRefresh
+    }
+  } )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(

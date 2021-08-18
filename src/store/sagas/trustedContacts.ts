@@ -35,6 +35,7 @@ import {
   Accounts,
   AccountType,
   ActiveAddressAssignee,
+  NetworkType,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -52,6 +53,26 @@ import { getNextFreeAddressWorker, setup2FADetails } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { updateWalletNameToChannel } from '../actions/trustedContacts'
 import { updateWallet } from '../actions/storage'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import * as bip39 from 'bip39'
+import * as bitcoinJS from 'bitcoinjs-lib'
+import secrets from 'secrets.js-grempe'
+
+function* generateSecondaryAssets(){
+  const secondaryMnemonic = bip39.generateMnemonic( 256 )
+  const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
+  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+  const secondaryShards = secrets.share(
+    BHROperations.stringToHex( secondaryMnemonic ),
+    config.SSS_LEVEL1_TOTAL,
+    config.SSS_LEVEL1_THRESHOLD,
+  )
+  return {
+    secondaryXpub, secondaryShards
+  }
+}
 
 function* updateWalletWorker( { payload } ) {
   const { walletName }: { walletName: string } = payload
@@ -418,6 +439,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   if( isKeeper ) relationType = TrustedContactRelationTypes.KEEPER
   else if( contactInfo.contactsSecondaryChannelKey ) relationType = TrustedContactRelationTypes.WARD
 
+  // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
     walletName: wallet.walletName,
@@ -427,6 +449,16 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     contactDetails: contactInfo.contactDetails
   }
 
+  if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && isPrimaryKeeper ){
+    // generate secondary assets(mnemonic & shards) for the primary ward
+    const { secondaryXpub, secondaryShards } = yield call( generateSecondaryAssets )
+    primaryData.secondarySetupData = {
+      secondaryXpub,
+      secondaryShards: secondaryShards
+    }
+  }
+
+  // prepare secondary and backup data
   let secondaryData: SecondaryStreamData
   let backupData: BackupStreamData
   const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
