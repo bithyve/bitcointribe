@@ -77,6 +77,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
+  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
+
   const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
@@ -158,7 +160,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.name ? Contact.name : '',
-        type: 'device',
+        type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
@@ -225,7 +227,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
           shareId: selectedKeeper.shareId,
           reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
-          shareType: 'device',
+          shareType: isPrimaryKeeper ? 'primaryKeeper' : 'device',
           status: 'notAccessible',
           name: Contact && Contact.name ? Contact.name : ''
         }

@@ -384,8 +384,8 @@ class ManageBackupNewBHR extends Component<
       const obj = {
         id: 2,
         selectedKeeper: {
-          shareType: '',
-          name: '',
+          shareType: 'primaryKeeper',
+          name: 'Personal Device1',
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
@@ -401,9 +401,7 @@ class ManageBackupNewBHR extends Component<
         showLoader: false,
         selectedLevelId: 2
       }, () => {
-        this.setState( {
-          listModal: true
-        } )
+        this.goToHistory( obj )
       } )
       this.props.setIsKeeperTypeBottomSheetOpen( false )
       // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
@@ -455,11 +453,13 @@ class ManageBackupNewBHR extends Component<
       this.setState( {
         selectedKeeper: this.props.navigationObj.selectedKeeper, selectedLevelId: this.props.navigationObj.id
       } )
-      // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
-      this.setState( {
-        listModal: true
-      } )
-      this.goToHistory( this.props.navigationObj )
+      if( this.props.navigationObj.selectedKeeper.shareType && this.props.navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
+        this.goToHistory( this.props.navigationObj )
+      } else {
+        this.setState( {
+          listModal: true
+        } )
+      }
     }
 
     if( prevProps.isTypeBottomSheetOpen !== this.props.isTypeBottomSheetOpen && this.props.isTypeBottomSheetOpen === true ){
@@ -517,7 +517,7 @@ class ManageBackupNewBHR extends Component<
   }
 
   goToHistory = ( value ) => {
-    const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
+    const { id, selectedKeeper, isSetup, isChangeKeeperAllow } = value
     this.setState( {
       showLoader: false
     } )
@@ -528,7 +528,7 @@ class ManageBackupNewBHR extends Component<
     }
     let index = 1
     let count = 0
-    if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
+    if ( selectedKeeper.shareType == 'primaryKeeper' || selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
       for ( let i = 0; i < this.props.levelData.length; i++ ) {
         const element = this.props.levelData[ i ]
         if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
@@ -552,6 +552,7 @@ class ManageBackupNewBHR extends Component<
         else if ( count == 2 && isSetup ) index = 4
         else index = 0
       }
+      if( selectedKeeper.shareType == 'primaryKeeper' ) index = 0
     }
     // ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
     this.setState( {
@@ -559,10 +560,10 @@ class ManageBackupNewBHR extends Component<
       showQRModal: false,
       approvePrimaryKeeper: false
     } )
-    if ( selectedKeeper.shareType == 'device' ) {
+    if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
-        isPrimaryKeeper: isPrimaryKeeper,
+        isPrimaryKeeper: selectedKeeper.shareType == 'primaryKeeper' ? true : false,
         isChangeKeeperAllow,
         index: index > -1 ? index : 0,
       } )

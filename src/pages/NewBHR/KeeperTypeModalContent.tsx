@@ -99,14 +99,14 @@ export default function KeeperTypeModalContents( props ) {
         if (
           props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'device' &&
+          ( element2.shareType == 'device' || element2.shareType == 'primaryDevice' ) &&
           props.keeper.shareId != element2.shareId
         ) {
           deviceCount++
         } else if (
           !props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'device'
+          ( element2.shareType == 'device' || element2.shareType == 'primaryDevice' )
         ) {
           deviceCount++
         }
