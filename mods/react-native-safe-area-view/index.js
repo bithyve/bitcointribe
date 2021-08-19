@@ -25,7 +25,7 @@ const IPHONE12_Mini = 780
 const IPADPRO11_WIDTH = 834
 const IPADPRO11_HEIGHT = 1194
 const IPADPRO129_HEIGHT = 1024
-const IPADPRO129_WIDTH = 13
+const IPADPRO129_WIDTH = 1366
 
 const getResolvedDimensions = () => {
   const { width, height } = Dimensions.get( 'window' )
