@@ -54,6 +54,7 @@ interface HomePropsTypes {
   openBottomSheet: any;
   swanDeepLinkContent: string | null;
   markAccountChecked: any;
+  exchangeRates?: any[];
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -97,33 +98,35 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { currencyCode } = this.state
     const {
       currentLevel,
-      containerView
+      containerView,
+      exchangeRates
     } = this.props
 
     return (
       <View style={containerView}>
+
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp( 3 ),
+          marginHorizontal: wp( 4 ),
+          // alignItems: 'center',
+          // backgroundColor: 'red'
+        }}>
+          <Text style={{
+            color: Colors.blue,
+            fontSize: RFValue( 16 ),
+            marginTop: hp( 1 ),
+            fontFamily: Fonts.FiraSansMedium,
+
+          }}>
+              My Accounts
+          </Text>
+          <ToggleContainer />
+        </View>
         <ScrollView style={{
           flex: 1
         }}>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingVertical: wp( 4 ),
-            paddingHorizontal: wp( 4 ),
-            alignItems: 'center'
-          }}>
-            <Text style={{
-              color: Colors.blue,
-              fontSize: RFValue( 16 ),
-              marginLeft: 2,
-              fontFamily: Fonts.FiraSansMedium,
-
-            }}>
-              My Accounts
-            </Text>
-            <ToggleContainer />
-          </View>
-
           {/* <View style={{
             backgroundColor: 'white',
             marginHorizontal: wp( 4 ),
@@ -162,8 +165,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               padding: hp( '1.5%' ),
               flexDirection: 'row',
             }}
-            amount={1000}
-            incramount={'10'}
+            amount={exchangeRates[ 'USD' ].last.toFixed( 2 )}
+            incramount={''}
             percentIncr={'5%'}
             asset={'../../assets/images/HomePageIcons/graph.png'}
             openBottomSheet={( type ) => this.props.openBottomSheet( type )} />
@@ -178,6 +181,7 @@ const mapStateToProps = ( state ) => {
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     startRegistration: idx( state, ( _ ) => _.swanIntegration.startRegistration ),
+    exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
   }
 }
 

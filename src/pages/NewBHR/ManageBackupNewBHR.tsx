@@ -839,6 +839,18 @@ class ManageBackupNewBHR extends Component<
             />
             </TouchableOpacity>*/}
           {/* </View> */}
+
+          <Text style={{
+            color: Colors.blue,
+            fontSize: RFValue( 16 ),
+            // marginLeft: 2,
+            fontFamily: Fonts.FiraSansMedium,
+            marginTop: hp( 4 ),
+            marginHorizontal: wp( 4 ),
+            paddingBottom: hp( 1 )
+          }}>
+            Security & Privacy
+          </Text>
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -850,19 +862,8 @@ class ManageBackupNewBHR extends Component<
               flex: 1
             }}
           >
-            <Text style={{
-              color: Colors.blue,
-              fontSize: RFValue( 16 ),
-              marginLeft: 2,
-              fontFamily: Fonts.FiraSansMedium,
-              marginTop: hp( 2 ),
-              paddingLeft: wp( 6 ),
-              paddingBottom: wp( 4 ),
-            }}>
-            Security & Privacy
-            </Text>
             <View style={{
-              flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp( 6 ), alignItems: 'center'
+              flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp( 4 ), alignItems: 'center', paddingTop: wp( 3 ),
             }}>
               <View style={{
                 // width: '60%'
@@ -1047,12 +1048,12 @@ Wallet Backup
                 flexDirection: 'row', justifyContent:'space-between'
               }}>
                 <Text style={styles.pageTitle}>I am the Keeper of</Text>
-                <TouchableOpacity>
+                {/* <TouchableOpacity>
                   <Image
                     style={styles.moreImage}
                     source={require( '../../assets/images/icons/icon_more.png' )}
                   />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <Text style={styles.pageInfoText}>
                Contacts whose wallets I can help restore
