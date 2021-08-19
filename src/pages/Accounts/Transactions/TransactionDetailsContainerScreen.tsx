@@ -120,7 +120,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
                   <View key={index} style={styles.containerRec}>
                     <Text style={[ ListStyles.listItemSubtitle, {
                       flex: 1
-                    } ]}>{`${rec.name}`}</Text>
+                    } ]}>{`${rec.name ? rec.name : transaction.recipientAddresses[ index ]}`}</Text>
                     <LabeledBalanceDisplay
                       balance={rec.amount}
                       isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
