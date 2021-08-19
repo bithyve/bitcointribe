@@ -91,7 +91,7 @@ function* updateWalletWorker( { payload } ) {
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
-export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
+export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -114,9 +114,9 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
   }[] = []
   let flowKind: InitTrustedContactFlowKind // todo
   let contactIdentifier: string
+  let synchingPrimaryKeeperChannelKey: string
 
   const { permanentChannelsSyncKind, channelUpdates, metaSync, hardSync } = payload
-
   switch( permanentChannelsSyncKind ){
       case PermanentChannelsSyncKind.SUPPLIED_CONTACTS:
         if( !channelUpdates.length ) throw new Error( 'Sync permanent channels failed: supplied channel updates missing' )
@@ -153,15 +153,29 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           const contact: TrustedContact = trustedContacts[ channelKey ]
           if( contact.isActive ){
 
-            let fullySyncSkippedContact = false
+            let fullySyncContact = false
             if( !contact.contactDetails.contactName ){
             // sync skipped contact if the request has been approved and the wallet name has not been fetched yet
               const instreamId = contact.streamId
               if( instreamId ) {
                 const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
                 const walletName = idx( instream, ( _ ) => _.primaryData.walletName )
-                if( !walletName ) fullySyncSkippedContact = true
-              } else fullySyncSkippedContact = true
+                if( !walletName ) fullySyncContact = true
+              } else fullySyncContact = true
+            } else if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) {
+            // sync primary keeper if the contact has been approved
+              const instreamId = contact.streamId
+              if( instreamId ) {
+                const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+                const primaryData = idx( instream, ( _ ) => _.primaryData )
+                if( !primaryData ) {
+                  fullySyncContact = true
+                  synchingPrimaryKeeperChannelKey = channelKey
+                }
+              } else {
+                fullySyncContact = true
+                synchingPrimaryKeeperChannelKey = channelKey
+              }
             }
 
             if( metaSync || contact.hasNewData || hardSync )
@@ -169,7 +183,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
                 channelKey: channelKey,
                 streamId,
                 contact,
-                metaSync: fullySyncSkippedContact? false: metaSync
+                metaSync: fullySyncContact? false: metaSync
               } )
           }
         } )
@@ -211,47 +225,44 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
     )
 
     if ( updated ) {
-      const { skipDatabaseUpdate }  = payload
-      if( skipDatabaseUpdate ){
-        if( flowKind === InitTrustedContactFlowKind.REJECT_TRUSTED_CONTACT ){
-          const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
-          const instream = useStreamFromContact( temporaryContact, walletId, true )
-          const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
-          const nameAssociatedByContact: string = idx( instream, ( _ ) => _.primaryData.contactDetails.contactName )
+      if( flowKind === InitTrustedContactFlowKind.REJECT_TRUSTED_CONTACT ){
+        const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
+        const instream = useStreamFromContact( temporaryContact, walletId, true )
+        const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+        const nameAssociatedByContact: string = idx( instream, ( _ ) => _.primaryData.contactDetails.contactName )
 
-          if( fcmToken ){
-            let notifType, notifBody
-            switch( temporaryContact.relationType ){
-                case TrustedContactRelationTypes.KEEPER:
-                  notifType = notificationType.FNF_KEEPER_REQUEST_REJECTED
-                  notifBody = `F&F keeper request rejected by ${nameAssociatedByContact || wallet.walletName}`
-                  break
+        if( fcmToken ){
+          let notifType, notifBody
+          switch( temporaryContact.relationType ){
+              case TrustedContactRelationTypes.KEEPER:
+                notifType = notificationType.FNF_KEEPER_REQUEST_REJECTED
+                notifBody = `F&F keeper request rejected by ${nameAssociatedByContact || wallet.walletName}`
+                break
 
-                default:
-                  notifType = notificationType.FNF_REQUEST_REJECTED
-                  notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
-            }
-
-            const notification: INotification = {
-              notificationType: notifType,
-              title: 'Friends and Family notification',
-              body: notifBody,
-              data: {
-              },
-              tag: notificationTag.IMP,
-            }
-            const notifReceivers = []
-            notifReceivers.push( {
-              walletId: walletId, //instream.primaryData.walletID,
-              FCMs: [ fcmToken ],
-            } )
-            if( notifReceivers.length )
-              yield call(
-                Relay.sendNotifications,
-                notifReceivers,
-                notification,
-              )
+              default:
+                notifType = notificationType.FNF_REQUEST_REJECTED
+                notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
           }
+
+          const notification: INotification = {
+            notificationType: notifType,
+            title: 'Friends and Family notification',
+            body: notifBody,
+            data: {
+            },
+            tag: notificationTag.IMP,
+          }
+          const notifReceivers = []
+          notifReceivers.push( {
+            walletId: walletId, //instream.primaryData.walletID,
+            FCMs: [ fcmToken ],
+          } )
+          if( notifReceivers.length )
+            yield call(
+              Relay.sendNotifications,
+              notifReceivers,
+              notification,
+            )
         }
         return
       }
@@ -262,7 +273,27 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
       }
       yield put( updateWalletImageHealth() )
 
-      if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
+      // update secondary setup data on inital primary keeper sync
+      if( synchingPrimaryKeeperChannelKey && !wallet.secondaryXpub ){
+        const primaryKeeper =  updatedContacts[ synchingPrimaryKeeperChannelKey ]
+        const instream = useStreamFromContact( primaryKeeper, walletId, true )
+        const secondarySetupData = idx( instream, ( _ ) => _.primaryData.secondarySetupData )
+        if( secondarySetupData ){
+          // TODO: store secondary shards(secondarySetupData.secondaryShards) in BHR
+          const secondaryXpub = secondarySetupData.secondaryXpub
+          yield put( updateWallet(
+            {
+              ...wallet,
+              secondaryXpub,
+            }
+          ) )
+          yield call( dbManager.updateWallet, {
+            secondaryXpub,
+          } )
+        }
+      }
+
+      if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
         const instream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
         const contactsFCM: string = idx( instream, ( _ ) => _.primaryData.FCM )
@@ -435,9 +466,12 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   }
 
   let relationType = TrustedContactRelationTypes.CONTACT
-  if( isPrimaryKeeper ) relationType = TrustedContactRelationTypes.PRIMARY_KEEPER
-  if( isKeeper ) relationType = TrustedContactRelationTypes.KEEPER
-  else if( contactInfo.contactsSecondaryChannelKey ) relationType = TrustedContactRelationTypes.WARD
+  if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ) {
+    if( isPrimaryKeeper ) relationType = TrustedContactRelationTypes.PRIMARY_KEEPER
+    else if( isKeeper ) relationType = TrustedContactRelationTypes.KEEPER
+  } else if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ) {
+    if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
+  }
 
   // prepare primary data
   const primaryData: PrimaryStreamData = {
@@ -540,7 +574,6 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
   yield put( syncPermanentChannels( {
     permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
     channelUpdates: [ channelUpdate ],
-    skipDatabaseUpdate: true
   } ) )
 }
 

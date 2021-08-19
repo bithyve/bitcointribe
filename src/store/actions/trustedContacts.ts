@@ -28,7 +28,6 @@ export const syncPermanentChannels = (
     channelUpdates, // out-stream updates for the channels
     metaSync,   // sync only meta-data for the channels
     hardSync, // sync channel irrespective of the new-data flag status
-    skipDatabaseUpdate, // skip database update
   }:
   {
     permanentChannelsSyncKind: PermanentChannelsSyncKind,
@@ -38,7 +37,6 @@ export const syncPermanentChannels = (
   }[],
   metaSync?: boolean,
   hardSync?: boolean,
-  skipDatabaseUpdate?: boolean
 }
 ) => {
   return {
@@ -48,7 +46,6 @@ export const syncPermanentChannels = (
       channelUpdates,
       metaSync,
       hardSync,
-      skipDatabaseUpdate
     },
   }
 }
