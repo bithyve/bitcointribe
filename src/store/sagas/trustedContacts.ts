@@ -122,9 +122,11 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         if( !channelUpdates.length ) throw new Error( 'Sync permanent channels failed: supplied channel updates missing' )
         for( const { contactInfo, streamUpdates } of channelUpdates ){
           const contact = trustedContacts[ contactInfo.channelKey ]
-          if( contact )
+          if( contact ) {
             if( !contact.isActive || ( !streamUpdates && !contact.hasNewData && !hardSync ) )
               continue
+            if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) synchingPrimaryKeeperChannelKey = contactInfo.channelKey
+          }
 
           channelSyncUpdates.push( {
             contactDetails: contactInfo.contactDetails,
