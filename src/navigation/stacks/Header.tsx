@@ -945,57 +945,65 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   onTrustedContactRequestAccepted = ( key ) => {
-    this.closeBottomSheet()
-    const { navigation } = this.props
-    const { trustedContactRequest } = this.state
+    try {
+      this.closeBottomSheet()
+      const { navigation } = this.props
+      const { trustedContactRequest } = this.state
 
-    let channelKeys: string[]
-    try{
-      switch( trustedContactRequest.encryptionType ){
-          case DeepLinkEncryptionType.DEFAULT:
-            channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
-            break
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
 
-          case DeepLinkEncryptionType.NUMBER:
-          case DeepLinkEncryptionType.EMAIL:
-          case DeepLinkEncryptionType.OTP:
-            const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
-            channelKeys = decryptedKeys.split( '-' )
-            break
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
       }
 
-      trustedContactRequest.channelKey = channelKeys[ 0 ]
-      trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
-    } catch( err ){
-      Toast( 'Invalid key' )
-      return
-    }
-
-    if( trustedContactRequest.isExistingContact ){
-      this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
-    } else {
-      navigation.navigate( 'ContactsListForAssociateContact', {
-        postAssociation: ( contact ) => {
-          this.props.initializeTrustedContact( {
-            contact,
-            flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
-            channelKey: trustedContactRequest.channelKey,
-            contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
-            isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
-          } )
-          // TODO: navigate post approval (from within saga)
-          navigation.navigate( 'Home' )
-        }
-      } )
+      if( trustedContactRequest.isExistingContact ){
+        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
+      } else {
+        navigation.navigate( 'ContactsListForAssociateContact', {
+          postAssociation: ( contact ) => {
+            this.props.initializeTrustedContact( {
+              contact,
+              flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+              channelKey: trustedContactRequest.channelKey,
+              contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+              isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
+            } )
+            // TODO: navigate post approval (from within saga)
+            navigation.navigate( 'Home' )
+          }
+        } )
+      }
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
     }
   };
 
   onTrustedContactRejected = () => {
-    this.closeBottomSheet()
-    const { trustedContactRequest } = this.state
-    this.props.rejectTrustedContact( {
-      channelKey: trustedContactRequest.channelKey,
-    } )
+    try {
+      this.closeBottomSheet()
+      const { trustedContactRequest } = this.state
+      this.props.rejectTrustedContact( {
+        channelKey: trustedContactRequest.channelKey,
+      } )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
   };
 
   onPhoneNumberChange = () => {};
