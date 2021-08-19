@@ -167,8 +167,8 @@ const styles = StyleSheet.create( {
     borderRadius: 7/2,
     backgroundColor: 'tomato',
     position: 'absolute',
-    left: widthPercentageToDP( 8 ),
-    top: heightPercentageToDP( 0.9 )
+    left: widthPercentageToDP( 11 ),
+    top: widthPercentageToDP( 2 ),
   },
 
   headerAccountImage: {

@@ -658,13 +658,31 @@ function* updateWalletImageWorker() {
   const acc = {
   }
   accounts.forEach( account => {
+    const data = account.toJSON()
+    const txns = []
+    account.transactions.forEach( tx => {
+      txns.push( {
+        receivers: tx.receivers,
+        sender: tx.sender,
+        txid: tx.txid,
+        notes: tx.notes,
+        tags: tx.tags,
+        amount: tx.amount,
+        accountType: tx.accountType,
+        address: tx.address,
+        isNew: tx.isNew,
+        type: tx.type
+      } )
+    } )
+    data.transactions = txns
+    console.log( data )
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
       BHROperations.cipherSpec.iv,
     )
     let encrypted = cipher.update(
-      JSON.stringify( account ),
+      JSON.stringify( data ),
       'utf8',
       'hex',
     )
