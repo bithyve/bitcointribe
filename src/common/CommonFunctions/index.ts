@@ -430,6 +430,7 @@ export const processFriendsAndFamilyQR = ( qrData: string ) => {
     let trustedContactRequest
     switch ( scannedData.type ) {
         case QRCodeTypes.CONTACT_REQUEST:
+        case QRCodeTypes.PRIMARY_KEEPER_REQUEST:
         case QRCodeTypes.KEEPER_REQUEST:
           trustedContactRequest = {
             walletName: scannedData.walletName,
