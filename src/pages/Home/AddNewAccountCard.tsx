@@ -35,7 +35,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
-              fontWeight: '600',
+              fontWeight: '500',
             }}
           >
             Add New

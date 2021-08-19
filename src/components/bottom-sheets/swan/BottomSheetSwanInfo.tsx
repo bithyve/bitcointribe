@@ -34,7 +34,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const dispatch = useDispatch()
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-  let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get an initial $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\nBy proceeding you understand that you will be taken to the Swan Bitcoin platform to complete registration.'
+  let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to Swan Bitcoin to complete registration'
   let swanTitle = 'Stack Sats\n with Swan'
   let  showNote = true
   let accountName = ''
@@ -119,7 +119,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           // accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get an initial $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to the Swan Bitcoin platform to complete registration'
+          swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to Swan Bitcoin to complete registration'
           swanTitle = 'Stack Sats\nwith Swan'
           showNote = true
     }
