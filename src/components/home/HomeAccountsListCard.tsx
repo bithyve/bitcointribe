@@ -164,10 +164,11 @@ const styles = StyleSheet.create( {
   dot: {
     height: 7,
     width: 7,
-    borderRadius: 5,
+    borderRadius: 7/2,
     backgroundColor: 'tomato',
     position: 'absolute',
     left: widthPercentageToDP( 8 ),
+    top: heightPercentageToDP( 0.9 )
   },
 
   headerAccountImage: {
