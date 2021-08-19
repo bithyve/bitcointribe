@@ -67,18 +67,15 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         {primarySubAccount.isTFAEnabled && (
           <Text style={styles.tfaIndicatorText}>2FA</Text>
         )}
-        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration &&
-        <Text style={styles.tfaIndicatorText}>Claim $10</Text>
-        }
 
-        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && !startRegistration &&
+        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration &&
         <View style={{
           backgroundColor: Colors.lightBlue, borderRadius: widthPercentageToDP( '1%' )
         }}>
           <Text style={{
             margin: heightPercentageToDP( 0.5 ), color: Colors.white, fontSize: RFValue( 10 ),
           }}>
-            Sats Back
+            Register
           </Text>
         </View>
         }
@@ -176,7 +173,7 @@ const styles = StyleSheet.create( {
   headerAccountImage: {
     width: widthPercentageToDP( 13 ),
     height: widthPercentageToDP( 13 ),
-    marginLeft: heightPercentageToDP( 0.5 ),
+    // marginLeft: heightPercentageToDP( 0.5 ),
     marginTop:heightPercentageToDP( 0.5 ),
     resizeMode: 'contain'
   },

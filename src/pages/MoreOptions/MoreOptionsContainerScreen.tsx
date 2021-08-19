@@ -135,19 +135,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
       <View style={styles.accountCardsSectionContainer}>
-        <ScrollView>
-          <Text style={{
-            color: Colors.blue,
-            fontSize: RFValue( 16 ),
-            marginLeft: 2,
-            fontFamily: Fonts.FiraSansMedium,
-            paddingTop: widthPercentageToDP( 8 ),
-            paddingLeft: widthPercentageToDP( 8 ),
-            paddingBottom: heightPercentageToDP( 3 )
-          }}>
+
+        <Text style={{
+          color: Colors.blue,
+          fontSize: RFValue( 16 ),
+          // marginLeft: 2,
+          fontFamily: Fonts.FiraSansMedium,
+          paddingTop: heightPercentageToDP( 4 ),
+          paddingLeft: widthPercentageToDP( 4 ),
+          paddingBottom: heightPercentageToDP( 1 )
+        }}>
             Settings & More
-          </Text>
-          {/* <View style={{
+        </Text>
+        {/* <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
           }}>
             <Image
@@ -177,6 +177,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               isOn={prefersBitcoin}
             />
           </View> */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingVertical: heightPercentageToDP( 3 ),
+          }}>
           <FlatList
             data={menuOptions}
             keyExtractor={listItemKeyExtractor}
@@ -256,7 +261,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               backgroundColor: Colors.white,
               paddingVertical: heightPercentageToDP( 2 ),
               paddingHorizontal: widthPercentageToDP( 5 ),
-              marginTop: heightPercentageToDP( '10%' ),
+              marginTop: heightPercentageToDP( '7%' ),
               alignItems: 'center'
             }}
           >
@@ -409,11 +414,11 @@ const styles = StyleSheet.create( {
   addModalView: {
     backgroundColor: Colors.white,
     paddingVertical: 4,
-    paddingHorizontal: 18,
+    paddingHorizontal: widthPercentageToDP( 5 ),
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-between',
-    width: '90%',
+    width: '95%',
     alignSelf: 'center',
     borderRadius: widthPercentageToDP( '2' ),
 

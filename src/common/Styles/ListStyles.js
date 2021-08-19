@@ -41,7 +41,7 @@ const ListStyles = StyleSheet.create( {
 
   listItemSubtitle: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
   },
