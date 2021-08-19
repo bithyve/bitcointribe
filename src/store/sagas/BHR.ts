@@ -177,21 +177,12 @@ function* generateMetaSharesWorker( { payload } ) {
   yield put( switchS3LoaderKeeper( 'generateMetaShareStatus' ) )
   const version = DeviceInfo.getVersion()
   const { level, SM } = payload
-  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMnemonic ? wallet.secondaryMnemonic : ''
-
-  const secureAssets = {
-    secondaryMnemonic: secondaryMnemonic,
-    twoFASecret: '',
-    secondaryXpub: '',
-    bhXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
-  }
 
   const res = yield call(
     level == 2 ? generateLevel1SharesWorker : generateLevel2SharesWorker,
     {
       payload: {
-        level, secureAssets, version
+        level, version
       }
     }
   )
@@ -204,20 +195,20 @@ export const generateMetaSharesWatcher = createWatcher(
 )
 
 function* generateLevel1SharesWorker( { payload } ){
-  const { level, secureAssets, version } = payload
+  const { level, version } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const existingMetaShares: MetaShare[] = yield select( ( state ) => state.storage.wallet )
-  const { shares, smShares } = BHROperations.generateLevel1Shares( wallet.primaryMnemonic, wallet.secondaryMnemonic )
-  const { encryptedPrimarySecrets, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer, smShares )
-  const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer, secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
+  const { shares } = BHROperations.generateLevel1Shares( wallet.primaryMnemonic )
+  const { encryptedPrimarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
+  const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, existingMetaShares, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
-    dbManager.updateWallet( {
-      smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
-    } )
+    // dbManager.updateWallet( {
+    //   smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
+    // } )
     dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
-      encryptedSMSecretsKeeper: encryptedSecondarySecrets,
+      encryptedSMSecretsKeeper: [],
       oldMetaSharesKeeper: []
     } )
     if ( level == 2 ) {
@@ -240,21 +231,19 @@ export const generateLevel1SharesWatcher = createWatcher(
 )
 
 function* generateLevel2SharesWorker( { payload } ){
-  const { level, secureAssets, version } = payload
+  const { level, version } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-  // const walletDB = yield call( dbManager.getWallet )
   const s3 = yield call( dbManager.getBHR )
   console.log( 's3', Array.from( s3 ) )
   const existingMetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-  const existingEncryptedSecondarySecrets: string[] = [ ...s3.encryptedSMSecretsKeeper ]
   const { shares } = BHROperations.generateLevel2Shares( existingMetaShares, wallet.security.answer )
-  const { encryptedPrimarySecrets, encryptedSecondarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
-  const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, encryptedSecondarySecrets, existingMetaShares, wallet.security.answer,  secureAssets.bhXpub, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
+  const { encryptedPrimarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
+  const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, existingMetaShares, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
     dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
-      encryptedSMSecretsKeeper: existingEncryptedSecondarySecrets,
+      encryptedSMSecretsKeeper: [],
       oldMetaSharesKeeper: existingMetaShares
     } )
     if ( level == 3 ) {

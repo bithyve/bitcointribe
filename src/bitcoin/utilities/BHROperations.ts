@@ -498,8 +498,8 @@ export default class BHROperations {
     return temp.slice( 0, 8 )
   };
 
-  static generateLevel1Shares = ( primaryMnemonic: string, secondaryMnemonic: string ): {
-    shares: string[]; smShares?: string[];
+  static generateLevel1Shares = ( primaryMnemonic: string ): {
+    shares: string[];
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
     const shares = secrets.share(
@@ -507,21 +507,13 @@ export default class BHROperations {
       config.SSS_LEVEL1_TOTAL,
       config.SSS_LEVEL1_THRESHOLD,
     )
-    let smShares
-    if( secondaryMnemonic ){
-      smShares = secrets.share(
-        BHROperations.stringToHex( secondaryMnemonic ),
-        config.SSS_LEVEL1_TOTAL,
-        config.SSS_LEVEL1_THRESHOLD,
-      )
-    }
 
     for ( let itr = 0; itr < shares.length; itr++ ) {
       const checksum = BHROperations.calculateChecksum( shares[ itr ] )
       shares[ itr ] = shares[ itr ] + checksum
     }
     return {
-      shares, smShares
+      shares
     }
   };
 
@@ -623,10 +615,7 @@ export default class BHROperations {
   static createMetaSharesKeeper = (
     walletId: string,
     encryptedPrimarySecrets: string[],
-    encryptedSecondarySecrets: string[],
     exisitngKeeperMetaShares: MetaShare[],
-    answer: string,
-    bhXpub: string,
     tag: string,
     questionId: string,
     version: string,
@@ -646,8 +635,6 @@ export default class BHROperations {
       minute: '2-digit',
     } )
 
-    const { encryptedData: encryptedXpub } = BHROperations.encryptWithAnswer( bhXpub, answer )
-
     let keeperMetaShares = []
     let metaShare: MetaShare
     for ( let index = 0; index < encryptedPrimarySecrets.length; index++ ) {
@@ -656,8 +643,6 @@ export default class BHROperations {
         shareId: BHROperations.getShareId( element ),
         encryptedShare: {
           pmShare: element,
-          smShare: encryptedSecondarySecrets.length ? encryptedSecondarySecrets[ 1 ] : '',
-          bhXpub: encryptedXpub
         },
         meta: {
           version: version ? version : '0',
@@ -776,11 +761,9 @@ export default class BHROperations {
   static encryptShares = (
     primarySecrets: string[],
     answer: string,
-    secondarySecrets?: string[],
   ): {
     encryptedPrimarySecrets: string[];
     keeperShareIDs: string[];
-    encryptedSecondarySecrets: string[];
   } => {
     const key = BHROperations.getDerivedKey( answer )
     const shareIDs = []
@@ -796,25 +779,9 @@ export default class BHROperations {
       encryptedPrimarySecrets.push( encrypted )
       shareIDs.push( BHROperations.getShareId( encrypted ) )
     }
-
-    const encryptedSecondarySecrets = []
-    if( secondarySecrets ){
-      for ( const secret of secondarySecrets ) {
-        const cipher = crypto.createCipheriv(
-          BHROperations.cipherSpec.algorithm,
-          key,
-          BHROperations.cipherSpec.iv,
-        )
-        let encrypted = cipher.update( secret, 'utf8', 'hex' )
-        encrypted += cipher.final( 'hex' )
-        encryptedSecondarySecrets.push( encrypted )
-      }
-    }
-
     return {
       encryptedPrimarySecrets,
       keeperShareIDs: shareIDs,
-      encryptedSecondarySecrets,
     }
   };
 

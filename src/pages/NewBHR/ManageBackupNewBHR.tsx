@@ -93,7 +93,7 @@ interface ManageBackupNewBHRStateTypes {
   showLoader: boolean;
   knowMoreType: string;
   keeping: any[];
-  listModal: boolean;
+  keeperTypeModal: boolean;
   errorModal: boolean;
   showQRModal: boolean;
   isLevel3Started: boolean;
@@ -203,7 +203,7 @@ class ManageBackupNewBHR extends Component<
       showLoader: false,
       knowMoreType: 'manageBackup',
       keeping: [],
-      listModal: false,
+      keeperTypeModal: false,
       errorModal: false,
       showQRModal: false,
       isLevel3Started: false,
@@ -457,7 +457,7 @@ class ManageBackupNewBHR extends Component<
         this.goToHistory( this.props.navigationObj )
       } else {
         this.setState( {
-          listModal: true
+          keeperTypeModal: true
         } )
       }
     }
@@ -467,7 +467,7 @@ class ManageBackupNewBHR extends Component<
         showLoader: false
       }, () => {
         this.setState( {
-          listModal: true
+          keeperTypeModal: true
         } )
       } )
       this.props.setIsKeeperTypeBottomSheetOpen( false )
@@ -556,7 +556,7 @@ class ManageBackupNewBHR extends Component<
     }
     // ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
     this.setState( {
-      listModal: false,
+      keeperTypeModal: false,
       showQRModal: false,
       approvePrimaryKeeper: false
     } )
@@ -638,7 +638,7 @@ class ManageBackupNewBHR extends Component<
 
     // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
     this.setState( {
-      listModal: false
+      keeperTypeModal: false
     } )
   };
 
@@ -789,7 +789,7 @@ class ManageBackupNewBHR extends Component<
       keeping,
       selectedKeeperName,
       selectedKeeperType,
-      listModal,
+      keeperTypeModal,
       errorModal,
       showQRModal,
       approvePrimaryKeeper,
@@ -1077,7 +1077,7 @@ Wallet Backup
             </View>
           </ScrollView>
           {this.state.showLoader ? <Loader isLoading={true}/> : null}
-          <ModalContainer visible={listModal} closeBottomSheet={() => {}}>
+          <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
               subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
@@ -1095,24 +1095,8 @@ Wallet Backup
                   this.state.metaSharesKeeper.length != 5
                   ) {
                     this.props.generateMetaShare( selectedLevelId )
-                  } else if( selectedLevelId == 3 ) {
-                    this.sendApprovalRequestToPK( )
                   } else {
-                    const obj = {
-                      id: selectedLevelId,
-                      selectedKeeper: {
-                        ...selectedKeeper, name: name, shareType: type,
-                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
-                      },
-                      isSetup: true,
-                    }
-                    this.goToHistory( obj )
-                    this.props.setIsKeeperTypeBottomSheetOpen( false )
-                    /** other than ThirdLevel first position */
-                    // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
-                    this.setState( {
-                      listModal: false
-                    } )
+                    this.sendApprovalRequestToPK( )
                   }
                 } catch( err ){
                   console.log( 'err', err )
@@ -1120,9 +1104,8 @@ Wallet Backup
               }}
               onPressBack={() =>{
                 this.props.setIsKeeperTypeBottomSheetOpen( false )
-                // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
                 this.setState( {
-                  listModal: false
+                  keeperTypeModal: false
                 } )
               }
               }

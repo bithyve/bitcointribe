@@ -132,8 +132,6 @@ export interface Transactions {
 export interface MetaShare {
   encryptedShare?: {
     pmShare: string;
-    smShare: string;
-    bhXpub: string;
   };
   shareId: string;
   meta: {

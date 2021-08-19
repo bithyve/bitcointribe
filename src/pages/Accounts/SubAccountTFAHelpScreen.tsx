@@ -60,9 +60,6 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const [
     ServerNotRespondingBottomSheet,
   ] = useState( React.createRef<BottomSheet>() )
-  const [
-    SecurityQuestionBottomSheet,
-  ] = useState( React.createRef<BottomSheet>() )
 
   const accountsState: AccountsState = useAccountsState()
   const sourceAccountShell = useAccountShellForID( navigation.getParam( 'accountShellID' ) )
@@ -129,17 +126,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     setTimeout( () => {
       setQrBottomSheetsFlag( false )
     }, 2 )
-    if( qrData.includes( '{' ) ) {
-      if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
-      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, sourceAccountShell ) )
-    } else {
-      if ( actionType === 'Reset 2FA' ) {
-        if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
-        dispatch( resetTwoFA( qrData ) )
-      } else if ( actionType === 'Sweep Funds' ) {
-        dispatch( generateSecondaryXpriv( sourceAccountShell, qrData ) )
-      }
-    }
+    if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
+    dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, sourceAccountShell ) )
   }
 
   const renderQrContent = useCallback( () => {
@@ -250,36 +238,6 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     )
   }, [] )
 
-  const renderSecurityQuestionContent = useCallback( () => {
-    return (
-      <SecurityQuestion
-        onFocus={() => {
-          if ( Platform.OS == 'ios' )
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 2 )
-        }}
-        onBlur={() => {
-          if ( Platform.OS == 'ios' )
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
-        }}
-        onPressConfirm={() => {
-          getQrCodeData( wallet.secondaryMnemonic, 'Reset 2FA' );
-          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
-          Keyboard.dismiss()
-        }}
-      />
-    )
-  }, [] )
-
-  const renderSecurityQuestionHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
-
   return (
     <SafeAreaView style={{
       flex: 1
@@ -320,17 +278,11 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }}>
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              if( wallet.secondaryMnemonic ) {
-                if ( SecurityQuestionBottomSheet.current ) {
-                  ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
-                }
-              } else {
-                setTimeout( () => {
-                  setQRModalHeader( 'Reset 2FA' )
-                }, 2 )
-                if ( QrBottomSheet.current ) {
-                  ( QrBottomSheet as any ).current.snapTo( 1 )
-                }
+              setTimeout( () => {
+                setQRModalHeader( 'Reset 2FA' )
+              }, 2 )
+              if ( QrBottomSheet.current ) {
+                ( QrBottomSheet as any ).current.snapTo( 1 )
               }
             }}
             style={{
@@ -472,13 +424,6 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         ]}
         renderContent={renderServerNotRespondingContent}
         renderHeader={renderServerNotRespondingHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SecurityQuestionBottomSheet as any}
-        snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
-        renderContent={renderSecurityQuestionContent}
-        renderHeader={renderSecurityQuestionHeader}
       />
     </SafeAreaView>
   )
