@@ -165,7 +165,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               padding: hp( '1.5%' ),
               flexDirection: 'row',
             }}
-            amount={exchangeRates[ 'USD' ].last.toFixed( 2 )}
+            amount={exchangeRates ? exchangeRates[ 'USD' ].last.toFixed( 2 ) : ''}
             incramount={''}
             percentIncr={'5%'}
             asset={'../../assets/images/HomePageIcons/graph.png'}
