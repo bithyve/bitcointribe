@@ -449,9 +449,7 @@ export default class TrustedContactsOperations {
         encryptedBackupData?: string;
         secondaryEncryptedData?: string;
       } = res.data.streamData
-       console.log( {
-         streamData,
-       } )
+
        const unencryptedStreamData: {
         primaryData?: PrimaryStreamData;
         backupData?: BackupStreamData;
@@ -482,6 +480,38 @@ export default class TrustedContactsOperations {
           ).data
 
        return unencryptedStreamData
+     } catch ( err ) {
+       if ( err.response ) throw new Error( err.response.data.err )
+       if ( err.code ) throw new Error( err.code )
+       throw new Error( err.message )
+     }
+   };
+
+   static updateStream = async ( {
+     channelKey,
+     streamUpdates,
+   }: {
+   channelKey: string;
+   streamUpdates: StreamData,
+  } ): Promise<{
+   updated: boolean;
+  }> => {
+     try {
+       const permanentChannelAddress = crypto
+         .createHash( 'sha256' )
+         .update( channelKey )
+         .digest( 'hex' )
+
+       const res: AxiosResponse = await BH_AXIOS.post( 'updateStream', {
+         HEXA_ID,
+         permanentChannelAddress,
+         streamUpdates
+       } )
+
+       const { updated } = res.data
+       return {
+         updated
+       }
      } catch ( err ) {
        if ( err.response ) throw new Error( err.response.data.err )
        if ( err.code ) throw new Error( err.code )

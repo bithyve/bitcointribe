@@ -533,10 +533,13 @@ export interface PrimaryStreamData {
     [accountType: string]: string
   },
   contactDetails?: ContactDetails,
+
+  // primary keeper exclusives
   secondarySetupData? :{
     secondaryXpub: string
     secondaryShardWI: string
-  }
+  },
+  bhXpub?: string,
 }
 
 export interface SecondaryStreamData {

@@ -132,7 +132,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
             contactDetails: contactInfo.contactDetails,
             channelKey: contactInfo.channelKey,
             contact,
-            streamId: streamId,
+            streamId: streamUpdates.streamId,
             secondaryChannelKey: contactInfo.secondaryChannelKey,
             unEncryptedOutstreamUpdates: streamUpdates,
             contactsSecondaryChannelKey: contactInfo.contactsSecondaryChannelKey,
@@ -487,6 +487,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     contactDetails: contactInfo.contactDetails
   }
 
+  let wardsSecondaryShards: string[]
   if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && isPrimaryKeeper ){
     // generate secondary assets(mnemonic & shards) for the primary ward
     const { secondaryXpub, secondaryShards } = yield call( generateSecondaryAssets )
@@ -494,6 +495,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       secondaryXpub,
       secondaryShardWI: secondaryShards[ 0 ]
     }
+    wardsSecondaryShards = secondaryShards
   }
 
   // prepare secondary and backup data
@@ -507,13 +509,17 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       keeperInfo,
     }
 
-    // setup 2FA during primary keeper setup
-    if( isPrimaryKeeper && !idx( wallet, ( _ ) => _.details2FA.bithyveXpub ) ) wallet = yield call( setup2FADetails, wallet )
-
-    secondaryData = {
-      secondaryMnemonicShard,
-      bhXpub: wallet.details2FA.bithyveXpub,
+    if( isPrimaryKeeper && !idx( wallet, ( _ ) => _.details2FA.bithyveXpub ) ) {
+      // setup 2FA during primary keeper setup(1st keeper)
+      // secondaryData is uploaded by the primary keeper device
+      wallet = yield call( setup2FADetails, wallet )
+      primaryData.bhXpub = wallet.details2FA.bithyveXpub
     }
+    else
+      secondaryData = {
+        secondaryMnemonicShard,
+        bhXpub: wallet.details2FA.bithyveXpub,
+      }
     const secondaryChannelKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     contactInfo.secondaryChannelKey = secondaryChannelKey
   }
@@ -536,10 +542,39 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const channelUpdate =  {
     contactInfo, streamUpdates
   }
-  yield put( syncPermanentChannels( {
-    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-    channelUpdates: [ channelUpdate ],
-  } ) )
+  yield call( syncPermanentChannelsWorker, {
+    payload: {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      channelUpdates: [ channelUpdate ]
+    }
+  } )
+
+  if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && isPrimaryKeeper && contactsSecondaryChannelKey ){
+    // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
+    const contacts: Trusted_Contacts = yield select(
+      ( state ) => state.trustedContacts.contacts,
+    )
+    const primaryWard = contacts[ channelKey ]
+    const instreamId = primaryWard.streamId
+    const instream: UnecryptedStreamData = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+    const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )
+
+    const instreamSecondaryData: SecondaryStreamData = {
+      secondaryMnemonicShard: wardsSecondaryShards[ 1 ],
+      bhXpub
+    }
+    const instreamUpdates = {
+      streamId: instreamId,
+      secondaryEncryptedData: TrustedContactsOperations.encryptData(
+        primaryWard.contactsSecondaryChannelKey,
+        instreamSecondaryData
+      ).encryptedData
+    }
+
+    yield call( TrustedContactsOperations.updateStream, {
+      channelKey, streamUpdates: instreamUpdates
+    } )
+  }
 }
 
 export const initializeTrustedContactWatcher = createWatcher(
