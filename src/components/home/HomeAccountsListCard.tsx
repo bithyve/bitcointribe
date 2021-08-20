@@ -47,11 +47,11 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         style={styles.headerAccountImage}
         source={getAvatarForSubAccount( primarySubAccount, false, true )}
       />
-      {/* {
-        accountShell.primarySubAccount.hasNewTxn && ( */}
-      <View style={styles.dot}/>
-      {/* )
-      } */}
+      {
+        accountShell.primarySubAccount.hasNewTxn && (
+          <View style={styles.dot}/>
+        )
+      }
       <View style={styles.headerBadgeContainer}>
 
         {/*
