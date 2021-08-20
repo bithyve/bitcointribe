@@ -96,7 +96,7 @@ const HomeHeader = ( {
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError } = getMessageToShow()
     return <View style={{
-      flexDirection: 'row', alignItems: 'center'
+      flexDirection: 'row', alignItems: 'center', marginTop: hp( 0.45 )
     }}>
       <View style={{
         backgroundColor: isError ? Colors.red : Colors.green,
@@ -293,7 +293,7 @@ const HomeHeader = ( {
                     : 0}
               </Text>
               <Text style={styles.homeHeaderAmountUnitText}>
-                {prefersBitcoin ? 'sats' : fiatCurrencyCode.toLocaleLowerCase()}
+                {prefersBitcoin ? 'sats' : fiatCurrencyCode}
               </Text>
             </View>
           </View>

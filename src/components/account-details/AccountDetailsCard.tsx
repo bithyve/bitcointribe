@@ -30,6 +30,7 @@ import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreati
 import { useDispatch } from 'react-redux'
 import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
 import { withNavigation } from 'react-navigation'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   accountShell: AccountShell;
@@ -139,7 +140,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           marginBottom: 8,
         }}>
           <Image
-            source={getAvatarForSubAccount( primarySubAccount, true )}
+            source={getAvatarForSubAccount( primarySubAccount, false, true )}
             style={styles.accountKindBadgeImage}
           />
 
@@ -299,8 +300,8 @@ const styles = StyleSheet.create( {
   },
 
   accountKindBadgeImage: {
-    width: 54,
-    height: 54,
+    width: widthPercentageToDP( 16 ),
+    height: widthPercentageToDP( 16 ),
     resizeMode: 'contain',
   },
 

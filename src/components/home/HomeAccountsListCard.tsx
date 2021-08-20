@@ -137,8 +137,8 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    width: widthPercentageToDP( 42.6 ),
-    height: heightPercentageToDP( 19.8 ),
+    width: widthPercentageToDP( 43 ),
+    height: heightPercentageToDP( 21 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,
@@ -162,13 +162,13 @@ const styles = StyleSheet.create( {
   },
 
   dot: {
-    height: 7,
-    width: 7,
-    borderRadius: 7/2,
+    height: 8,
+    width: 8,
+    borderRadius: 8/2,
     backgroundColor: 'tomato',
     position: 'absolute',
-    left: widthPercentageToDP( 11 ),
-    top: widthPercentageToDP( 2 ),
+    left: widthPercentageToDP( 9 ),
+    top: heightPercentageToDP( 0.9 ),
   },
 
   headerAccountImage: {

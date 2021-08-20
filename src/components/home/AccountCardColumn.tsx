@@ -70,12 +70,12 @@ const AccountCardColumn: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    marginRight: widthPercentageToDP( 4 ),
+    marginRight: widthPercentageToDP( 4.5 ),
     paddingTop: heightPercentageToDP( 2 )
   },
 
   cardContainer: {
-    marginBottom: 9,
+    marginBottom: heightPercentageToDP( 2 ),
   },
 } )
 
