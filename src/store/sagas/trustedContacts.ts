@@ -273,7 +273,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
         yield call( dbManager.updateContact, value )
       }
-      yield put( updateWalletImageHealth() )
 
       // update secondary setup data on inital primary keeper sync
       if( synchingPrimaryKeeperChannelKey && !wallet.secondaryXpub ){
@@ -291,9 +290,11 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           ) )
           yield call( dbManager.updateWallet, {
             secondaryXpub,
+            smShare: secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
           } )
         }
       }
+      yield put( updateWalletImageHealth() )
 
       if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
