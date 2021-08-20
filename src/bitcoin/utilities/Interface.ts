@@ -826,8 +826,8 @@ export interface Wallet {
   primaryMnemonic: string,
   secondaryXpub?: string,
   details2FA? : {
-    bithyveXpub: string,
-    twoFAKey: string,
+    bithyveXpub?: string,
+    twoFAKey?: string,
   }
   accounts: {
     [accountType: string]: string[] // array of accountIds

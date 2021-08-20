@@ -43,6 +43,7 @@ import {
   readTxn,
   accountChecked,
   autoSyncShells,
+  setResetTwoFALoader,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -899,12 +900,12 @@ export const mergeAccountShellsWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
     const { qrdata, QRModalHeader, accountShell } = payload
-    const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
+    const walletDB = yield call( dbManager.getWallet )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const walletId = wallet.walletId
-    const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contact )
+    const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     let secondaryMnemonic
-    const sharesArray = [ DECENTRALIZED_BACKUP.SM_SHARE ]
+    const sharesArray = [ walletDB.smShare ]
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
@@ -920,11 +921,10 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const res = yield call( TrustedContactsOperations.retrieveFromStream, {
       walletId, channelKey, options: {
         retrieveSecondaryData: true,
-      }, secondaryChannelKey: qrDataObj.channelKey2
+      }, secondaryChannelKey: qrDataObj.secondaryChannelKey
     } )
-    const shard: string = res.data.secondaryData.secondaryMnemonicShard
+    const shard: string = res.secondaryData.secondaryMnemonicShard
     sharesArray.push( shard )
-
     if( sharesArray.length>1 ){
       secondaryMnemonic = BHROperations.getMnemonics( sharesArray, wallet.security.answer )
     }
@@ -934,7 +934,8 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
       yield put( generateSecondaryXpriv( accountShell, secondaryMnemonic.mnemonic ) )
     }
   } catch ( error ) {
-    console.log( 'error', error )
+    yield put( setResetTwoFALoader( false ) )
+    console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }
 

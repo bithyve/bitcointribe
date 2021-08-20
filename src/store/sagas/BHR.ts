@@ -2189,6 +2189,9 @@ function* onPressKeeperChannelWorker( { payload } ) {
     if( currentLevel === 0 && value.id === 1 && levelHealth[ 0 ].levelInfo[ 0 ].status=='notSetup' ){
       yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
       return
+    } else if( currentLevel === 1 && value.id === 2 && number == 2 && levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt==0 ){
+      yield put( setLevelCompletionError( 'Please complete Primary Keeper', 'It seems you have not completed primary keeper setup. Please complete primary keeper setup to proceed', LevelStatus.FAILED ) )
+      return
     }
     else if( currentLevel === 0 && ( value.id === 2 || value.id === 3 ) ){
       yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )

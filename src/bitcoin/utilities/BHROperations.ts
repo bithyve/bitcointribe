@@ -786,9 +786,9 @@ export default class BHROperations {
   };
 
   public static getMnemonics = ( secretsArray: string[], answer: string, isPrimary?: boolean ) => {
-    const { decryptedSecrets } = BHROperations.decryptSecrets( secretsArray, answer )
-    const shareArr = isPrimary ? [] : decryptedSecrets
+    const shareArr = isPrimary ? [] : secretsArray
     if( isPrimary ){
+      const { decryptedSecrets } = BHROperations.decryptSecrets( secretsArray, answer )
       for ( const secret of decryptedSecrets ) {
         if ( BHROperations.validShare( secret ) ) {
           shareArr.push( secret.slice( 0, secret.length - 8 ) )
@@ -798,8 +798,9 @@ export default class BHROperations {
       }
     }
     const recoveredMnemonicHex = secrets.combine( shareArr )
+    const hex = BHROperations.hexToString( recoveredMnemonicHex )
     return {
-      mnemonic: BHROperations.hexToString( recoveredMnemonicHex )
+      mnemonic: hex
     }
   }
 

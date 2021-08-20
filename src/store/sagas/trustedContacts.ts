@@ -280,7 +280,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const instream = useStreamFromContact( primaryKeeper, walletId, true )
         const secondarySetupData = idx( instream, ( _ ) => _.primaryData.secondarySetupData )
         if( secondarySetupData ){
-          // TODO: store secondary shards(secondarySetupData.secondaryShardWI) in the WI
           const secondaryXpub = secondarySetupData.secondaryXpub
           yield put( updateWallet(
             {
