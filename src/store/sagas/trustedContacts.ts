@@ -281,7 +281,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const instream = useStreamFromContact( primaryKeeper, walletId, true )
         const secondarySetupData = idx( instream, ( _ ) => _.primaryData.secondarySetupData )
         if( secondarySetupData ){
-          // TODO: store secondary shards(secondarySetupData.secondaryShards) in BHR
+          // TODO: store secondary shards(secondarySetupData.secondaryShardWI) in the WI
           const secondaryXpub = secondarySetupData.secondaryXpub
           yield put( updateWallet(
             {
@@ -372,29 +372,31 @@ function* updateWalletNameToAllChannel() {
   const { walletName } = yield select( ( state ) => state.storage.wallet )
   const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
   Object.keys( contacts ).forEach( channelKey => {
-    const contactInfo = {
-      channelKey,
-    }
-    const primaryData: PrimaryStreamData = {
-      walletName,
-    }
-    const streamUpdates: UnecryptedStreamData = {
-      streamId: TrustedContactsOperations.getStreamId( walletId ),
-      primaryData,
-      metaData: {
-        flags:{
-          active: true,
-          newData: true,
-          lastSeen: Date.now(),
-        },
-        version: DeviceInfo.getVersion()
+    const contact: TrustedContact = contacts[ channelKey ]
+    if( contact.isActive ){
+      const contactInfo = {
+        channelKey,
       }
+      const primaryData: PrimaryStreamData = {
+        walletName,
+      }
+      const streamUpdates: UnecryptedStreamData = {
+        streamId: TrustedContactsOperations.getStreamId( walletId ),
+        primaryData,
+        metaData: {
+          flags:{
+            active: true,
+            newData: true,
+            lastSeen: Date.now(),
+          },
+          version: DeviceInfo.getVersion()
+        }
+      }
+      const channelUpdate =  {
+        contactInfo, streamUpdates
+      }
+      channelUpdates.push( channelUpdate )
     }
-    // initiate permanent channel
-    const channelUpdate =  {
-      contactInfo, streamUpdates
-    }
-    channelUpdates.push( channelUpdate )
   } )
 
   yield put( syncPermanentChannels( {
@@ -490,7 +492,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     const { secondaryXpub, secondaryShards } = yield call( generateSecondaryAssets )
     primaryData.secondarySetupData = {
       secondaryXpub,
-      secondaryShards: secondaryShards
+      secondaryShardWI: secondaryShards[ 0 ]
     }
   }
 

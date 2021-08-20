@@ -535,7 +535,7 @@ export interface PrimaryStreamData {
   contactDetails?: ContactDetails,
   secondarySetupData? :{
     secondaryXpub: string
-    secondaryShards: string[]
+    secondaryShardWI: string
   }
 }
 
