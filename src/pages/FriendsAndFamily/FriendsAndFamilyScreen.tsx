@@ -518,9 +518,9 @@ class FriendsAndFamilyScreen extends PureComponent<
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         {/* <Header fromScreen={'F&F'} /> */}
         {/* {addFnF && */}
-        <ModalContainer visible={addFnF} closeBottomSheet={() => {}}>
+        {/* <ModalContainer visible={addFnF} closeBottomSheet={() => {}}>
           {this.renderAddFnFModal()}
-        </ModalContainer>
+        </ModalContainer> */}
         {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
@@ -528,6 +528,32 @@ class FriendsAndFamilyScreen extends PureComponent<
               <ActivityIndicator color={Colors.white} size='large'/>
             </ModalContainer>
           }
+
+          {/* <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingVertical: wp( 4 ),
+              paddingHorizontal: wp( 4 ),
+              alignItems: 'center'
+            }}>
+              <Text style={{
+                color: Colors.blue,
+                fontSize: RFValue( 16 ),
+                marginLeft: 2,
+                fontFamily: Fonts.FiraSansMedium,
+
+              }}>
+              My Accounts
+              </Text>
+              <ToggleContainer />
+            </View> */}
+          <Text
+            style={[ styles.pageTitle, {
+              marginTop: hp( 4 ),
+            } ]}
+          >
+              Friends & Family
+          </Text>
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -544,13 +570,6 @@ class FriendsAndFamilyScreen extends PureComponent<
               flex: 1
             }}
           >
-            <Text
-              style={[ styles.pageTitle, {
-                marginTop: hp( 2 )
-              } ]}
-            >
-              Friends & Family
-            </Text>
             <View style={{
               width: '95%',
               // height: '54%',
@@ -565,7 +584,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               borderRadius: wp( 2 ),
               marginTop: hp( 3 ),
               marginBottom: hp( 1 ),
-              paddingVertical: hp( 5 ),
+              paddingVertical: hp( 4 ),
               paddingHorizontal: wp( 4.5 )
             }}>
               <View style={[ styles.subInfo, {
@@ -578,7 +597,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                     fontSize: RFValue( 13 ),
                     marginHorizontal: wp ( 0 ),
                   } ]}>
-                Add Friends & Family
+                Add a Contact
                   </Text>
                   <Text style={{
                     color: Colors.textColorGrey,
@@ -587,16 +606,16 @@ class FriendsAndFamilyScreen extends PureComponent<
                     marginTop: 3,
                     width: '100%',
                   }}>
-        Or invite someone as a Bitcoin Sherpa
+        You can choose from your phones address book
                   </Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => {
                     this.setState( {
                       isLoadContacts: true,
-                      addFnF: true
+                      // addFnF: true
                     }, () => {
-                      // navigation.navigate( 'AddContact' )
+                      navigation.navigate( 'AddContact' )
 
                     } )
                   }}
@@ -780,7 +799,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             otherContacts.length == 0 && (
                 // feature/2.0
                 <BottomInfoBox
-                  title={'Note'}
+                  title={''}
                   infoText={
                     'All your contacts appear here when added to Hexa wallet'
                   }
@@ -984,7 +1003,7 @@ const styles = StyleSheet.create( {
     // fontFamily: Fonts.FiraSansRegular,
     fontFamily: Fonts.FiraSansMedium,
     alignItems: 'center',
-    marginHorizontal: wp ( 6 ),
+    marginHorizontal: wp ( 4 ),
   },
   subInfo: {
     flexDirection: 'row',

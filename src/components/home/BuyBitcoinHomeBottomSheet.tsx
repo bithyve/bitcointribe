@@ -96,17 +96,17 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
       >
         <ListItem
           containerStyle={menuItem.disabled ? ListStyles.disabledContainer : [ ListStyles.container, {
-            marginHorizontal: 0,
+            // marginHorizontal: 10,
             shadowOpacity: 0.1,
             shadowOffset: {
               width: 3, height: 5
             },
             shadowRadius: 5,
             elevation: 2,
-            width: widthPercentageToDP( 95 ),
+            width: widthPercentageToDP( 90 ),
             marginBottom: heightPercentageToDP( 1 ),
             borderTopRightRadius: widthPercentageToDP( 1 ),
-            borderBottomRightRadius: widthPercentageToDP( 1 )
+            borderBottomRightRadius: widthPercentageToDP( 1 ),
           } ]}
         // bottomDivider
         >

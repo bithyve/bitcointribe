@@ -52,6 +52,7 @@ import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
 import SecurityStack from './stacks/security/Security&Privacy'
 import BuyStack from './stacks/buy/BuyStack'
 import Header from './stacks/Header'
+import IconWithBadge from './stacks/security/IconWithBadge'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -241,20 +242,7 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return (
-            <View style={{
-              // marginVertical: hp( '2%' )
-            }}>
-              {focused ?
-                <Security />
-                :
-                <SecurityInactive />
-              }
-              {focused ?
-                <View style={styles.activeStyle}/>
-                :
-                <View style={styles.inactiveStyle}/>
-              }
-            </View>
+            <IconWithBadge focused={focused} />
           )
         }
       },

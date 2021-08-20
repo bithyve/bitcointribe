@@ -74,6 +74,9 @@ export const AccountSchema: ObjectSchema = {
     xpub: {
       type: 'string', optional: true
     },
+    xpriv: {
+      type: 'string', optional: true
+    },
     xpubs: {
       type: XPUB, optional: true
     },

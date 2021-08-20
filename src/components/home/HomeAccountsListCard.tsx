@@ -67,18 +67,15 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         {primarySubAccount.isTFAEnabled && (
           <Text style={styles.tfaIndicatorText}>2FA</Text>
         )}
-        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration &&
-        <Text style={styles.tfaIndicatorText}>Claim $10</Text>
-        }
 
-        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && !startRegistration &&
+        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration &&
         <View style={{
           backgroundColor: Colors.lightBlue, borderRadius: widthPercentageToDP( '1%' )
         }}>
           <Text style={{
             margin: heightPercentageToDP( 0.5 ), color: Colors.white, fontSize: RFValue( 10 ),
           }}>
-            Sats Back
+            Register
           </Text>
         </View>
         }
@@ -140,8 +137,8 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    width: widthPercentageToDP( 42.6 ),
-    height: heightPercentageToDP( 19.8 ),
+    width: widthPercentageToDP( 43 ),
+    height: heightPercentageToDP( 21 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,
@@ -165,18 +162,19 @@ const styles = StyleSheet.create( {
   },
 
   dot: {
-    height: 7,
-    width: 7,
-    borderRadius: 5,
+    height: 8,
+    width: 8,
+    borderRadius: 8/2,
     backgroundColor: 'tomato',
     position: 'absolute',
-    left: widthPercentageToDP( 8 ),
+    left: widthPercentageToDP( 9 ),
+    top: heightPercentageToDP( 0.9 ),
   },
 
   headerAccountImage: {
     width: widthPercentageToDP( 13 ),
     height: widthPercentageToDP( 13 ),
-    marginLeft: heightPercentageToDP( 0.5 ),
+    // marginLeft: heightPercentageToDP( 0.5 ),
     marginTop:heightPercentageToDP( 0.5 ),
     resizeMode: 'contain'
   },

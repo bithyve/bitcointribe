@@ -15,6 +15,9 @@ import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
+import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -44,25 +47,42 @@ export enum BottomSheetKind {
     CLOUD_ERROR,
   }
 
+export const materialIconCurrencyCodes = [
+  'BRL',
+  'BDT',
+  'CNY',
+  'JPY',
+  'GBP',
+  'KRW',
+  'KZT',
+  'RUB',
+  'TRY',
+  'INR',
+  'ILS',
+  'MNT',
+  'NGN',
+  'PHP',
+  'EUR',
+  'USD',
+]
+
 const HomeBuyCard = ( {
   cardContainer,
   amount,
   incramount,
   percentIncr,
   asset,
-  openBottomSheet
-//   netBalance,
-//   getCurrencyImageByRegion,
-//   exchangeRates,
-//   CurrencyCode,
+  openBottomSheet,
+  //   netBalance,
+  //   getCurrencyImageByRegion,
+  //   exchangeRates,
+  currencyCode,
 } ) => {
 //   const currencyKind: CurrencyKind = useCurrencyKind()
-
+  const fiatCurrencyCode = useCurrencyCode()
   //   const prefersBitcoin = useMemo( () => {
   //     return currencyKind === CurrencyKind.BITCOIN
   //   }, [ currencyKind ] )
-
-
   return (
     <View
       style={cardContainer}
@@ -75,14 +95,36 @@ const HomeBuyCard = ( {
           fontFamily: Fonts.FiraSansRegular,
           alignSelf: 'flex-start'
         }}>
-              BTC to USD today
+              BTC to {fiatCurrencyCode} today
         </Text>
         <View style={{
           flexDirection: 'row', marginTop: hp( '1' ), alignSelf: 'flex-start'
         }}>
-          <Text>$</Text>
-          <Text> {amount}</Text>
-          <Text> {incramount}</Text>
+          {materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
+          // setCurrencyCodeToImage(
+          //   getCurrencyImageName( CurrencyCode ),
+          //   'light'
+          // )
+            <MaterialCurrencyCodeIcon
+              currencyCode={fiatCurrencyCode}
+              color={Colors.blue}
+              size={wp( '3.5%' )}
+              style={{
+                width: 20,
+                // height: 18,
+                // resizeMode: 'contain',
+                marginTop: hp( 0.3 )
+              }}
+            />
+          ) : currencyCode.includes( currencyCode ) && (
+            <Text style={{
+              marginTop: hp( 0.5 )
+            }}>
+              {setCurrencyCodeToImage( getCurrencyImageName( currencyCode ), Colors.blue )}
+            </Text>
+          )}
+          <Text>{amount}</Text>
+          <Text>{incramount}</Text>
         </View>
       </View>
       <Button
@@ -92,17 +134,18 @@ const HomeBuyCard = ( {
           <Image
             source={require( '../../assets/images/icons/recurring_buy.png' )}
             style={{
-              width: wp( 5.7 ),
-              height: wp( 5.7 ),
+              width: wp( 6 ),
+              height: wp( 6 ),
               resizeMode: 'contain'
             }}
           />
         }
         buttonStyle={{
           ...ButtonStyles.floatingActionButton,
-          borderRadius: wp( 10 ),
-          alignSelf:'flex-end',
-          // minHeight: hp( 4 )
+          borderRadius: wp( 3 ),
+          // alignSelf:'flex-end',
+          // minHeight: hp( 4 ),
+          paddingVertical: 12,
         }}
         titleStyle={{
           ...ButtonStyles.floatingActionButtonText,
@@ -115,5 +158,14 @@ const HomeBuyCard = ( {
     </View>
   )
 }
+const styles = StyleSheet.create( {
+  cardBitCoinImage: {
+    width: wp( '3.5%' ),
+    height: wp( '3.5%' ),
+    marginRight: 5,
+    resizeMode: 'contain',
+    marginBottom: wp( '0.7%' ),
+  },
+} )
 
 export default HomeBuyCard
