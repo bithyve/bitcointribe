@@ -408,10 +408,7 @@ export const WalletSchema: ObjectSchema = {
     primaryMnemonic: {
       type: 'string', optional: true,
     },
-    secondaryMnemonic: {
-      type: 'string', optional: true,
-    },
-    secondaryWalletId: {
+    secondaryXpub: {
       type: 'string', optional: true,
     },
     smShare: {

@@ -98,11 +98,10 @@ function* cloudWorker( { payload } ) {
       // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
       const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
-      const secondaryMnemonics = wallet.secondaryMnemonic ? BHROperations.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedData : ''
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
-        secondaryShare: walletDB.smShare ? walletDB.smShare : secondaryMnemonics,
+        secondaryShare: walletDB.smShare ? walletDB.smShare : '',
         encryptedCloudDataJson: encryptedCloudDataJson,
         seed: shares ? '' : encryptedData,
         walletName: wallet.walletName,

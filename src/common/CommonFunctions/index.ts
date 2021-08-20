@@ -341,6 +341,10 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
         deepLinkKind = DeepLinkKind.KEEPER
         break
 
+      case TrustedContactRelationTypes.PRIMARY_KEEPER:
+        deepLinkKind = DeepLinkKind.PRIMARY_KEEPER
+        break
+
       case TrustedContactRelationTypes.KEEPER_WARD:
         deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
         break
@@ -364,42 +368,48 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
 }
 
 export const processDeepLink = async ( deepLink: string ) =>{
-  const splits = deepLink.split( '/' )
+  try {
+    const splits = deepLink.split( '/' )
 
-  if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
-    if ( splits[ 3 ] !== config.APP_STAGE ) {
-      Alert.alert(
-        'Invalid deeplink',
-        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[ 3 ]
-        }`,
-      )
-    } else {
-      const version = splits.pop().slice( 1 )
-      const encryptionMetaSplits = splits[ 7 ].split( '-' )
-      const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
-      const encryptionHint = encryptionMetaSplits[ 1 ]
+    if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
+      if ( splits[ 3 ] !== config.APP_STAGE ) {
+        Alert.alert(
+          'Invalid deeplink',
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[ 3 ]
+          }`,
+        )
+      } else {
+        const version = splits.pop().slice( 1 )
+        const encryptionMetaSplits = splits[ 7 ].split( '-' )
+        const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
+        const encryptionHint = encryptionMetaSplits[ 1 ]
 
-      const trustedContactRequest = {
-        walletName: splits[ 5 ],
-        encryptedChannelKeys: splits[ 6 ],
-        encryptionType,
-        encryptionHint,
-        isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-        isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-        isQR: false,
-        version,
+        const trustedContactRequest = {
+          walletName: splits[ 5 ],
+          encryptedChannelKeys: splits[ 6 ],
+          encryptionType,
+          encryptionHint,
+          isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
+          isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
+          isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+          isQR: false,
+          version,
+        }
+        return {
+          trustedContactRequest
+        }
       }
+    } else if ( splits.includes( 'swan' ) )
       return {
-        trustedContactRequest
+        swanRequest: {
+          deepLink
+        }
       }
-    }
-  } else if ( splits.includes( 'swan' ) )
-    return {
-      swanRequest: {
-        deepLink
-      }
-    }
+  }
+  catch ( error ) {
+    Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
+  }
 }
 
 export const processFriendsAndFamilyQR = ( qrData: string ) => {
@@ -420,13 +430,15 @@ export const processFriendsAndFamilyQR = ( qrData: string ) => {
     let trustedContactRequest
     switch ( scannedData.type ) {
         case QRCodeTypes.CONTACT_REQUEST:
+        case QRCodeTypes.PRIMARY_KEEPER_REQUEST:
         case QRCodeTypes.KEEPER_REQUEST:
           trustedContactRequest = {
             walletName: scannedData.walletName,
             encryptedChannelKeys: scannedData.encryptedChannelKeys,
             encryptionType: scannedData.encryptionType,
             encryptionHint: scannedData.encryptionHint,
-            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
             isExistingContact: false,
             isQR: true,
             version: scannedData.version,
@@ -450,7 +462,6 @@ export const processFriendsAndFamilyQR = ( qrData: string ) => {
 
     return trustedContactRequest
   } catch ( err ) {
-    console.log( err )
-    Toast( 'Invalid QR code' )
+    Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
   }
 }

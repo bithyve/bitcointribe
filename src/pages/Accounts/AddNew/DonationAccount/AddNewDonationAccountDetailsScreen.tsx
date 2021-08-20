@@ -154,7 +154,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
               style={styles.tfaSelectionField}
               onPress={() => setIsTFAEnabled( !isTFAEnabled )}
               activeOpacity={1}
-              disabled={( !wallet.secondaryMnemonic && !wallet.details2FA )}
+              disabled={( !wallet.secondaryXpub && !wallet.details2FA )}
             >
               <View style={styles.tfaSelectionFieldContentContainer}>
                 <Text style={{
