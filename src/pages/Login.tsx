@@ -87,6 +87,15 @@ const getRandomMessage = () => {
 }
 
 export default function Login( props ) {
+  const subPoints = [
+    'Setting up multi-accounts',
+    'Fetching test sats & balances',
+    'Generating shares for back-up',
+    'Getting the latest details'
+  ]
+  const [ bottomTextMessage, setBottomTextMessage ] = useState(
+    'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  )
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
@@ -339,6 +348,8 @@ export default function Login( props ) {
         messageText={subTextMessage1}
         messageText2={subTextMessage2}
         showGif={false}
+        // subPoints={subPoints}
+        // bottomText={bottomTextMessage}
       />
     )
   }, [ message, subTextMessage1, subTextMessage2 ] )

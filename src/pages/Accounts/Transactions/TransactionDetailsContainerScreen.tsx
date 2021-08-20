@@ -109,6 +109,39 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
           />
         </View>
 
+        {
+          ( transaction.receivers &&
+            transaction.receivers.length > 1
+          ) && (
+            <View style={styles.lineItem}>
+              <Text style={ListStyles.listItemTitleTransaction}>Recipients</Text>
+              {
+                transaction.receivers.map( ( rec, index ) => (
+                  <View key={index} style={styles.containerRec}>
+                    <Text style={[ ListStyles.listItemSubtitle, {
+                      flex: 1
+                    } ]}>{`${rec.name ? rec.name : transaction.recipientAddresses[ index ]}`}</Text>
+                    <LabeledBalanceDisplay
+                      balance={rec.amount}
+                      isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
+                      unitTextStyle={{
+                        ...ListStyles.listItemSubtitle, marginBottom: 3
+                      }}
+                      amountTextStyle={{
+                        ...ListStyles.listItemSubtitle, marginBottom: -3, marginLeft: -2
+                      }}
+                      currencyImageStyle={{
+                        marginBottom: -3
+                      }}
+                    />
+                  </View>
+                ) )
+              }
+
+            </View>
+          )
+        }
+
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitleTransaction}>Transaction ID</Text>
           <Text style={ListStyles.listItemSubtitle} onPress={() =>
@@ -141,7 +174,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
   },
   textHeader: {
@@ -164,6 +197,11 @@ const styles = StyleSheet.create( {
     paddingHorizontal: 10,
     elevation: 4,
     borderRadius: 8,
+  },
+
+  containerRec: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 } )
 

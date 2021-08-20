@@ -1,4 +1,4 @@
-import { call, put, select } from 'redux-saga/effects'
+import { call, delay, put, select } from 'redux-saga/effects'
 import { createWatcher } from '../utils/utilities'
 import {
   GET_TESTCOINS,
@@ -240,6 +240,33 @@ export const txnReadWatcher = createWatcher(
   MARK_READ_TRANSACTION
 )
 
+function* syncTxAfterRestore( restoredAccounts: Account[] ) {
+  const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
+  const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
+  restoredAccounts.forEach( resAcc => {
+    const shellIndex = accountShells.findIndex( shell => shell.primarySubAccount.id === resAcc.id )
+    const shell = accountShells[ shellIndex ]
+    resAcc.transactions.forEach( transaction => {
+      const shellTxIndex = shell.primarySubAccount.transactions.findIndex( shellTx => shellTx.txid === transaction.txid )
+      const accTxIndex = accounts[ shell.primarySubAccount.id ].transactions.findIndex( accTx => accTx.txid === transaction.txid )
+      if( shellTxIndex !== -1 ) {
+        const data = {
+          ...shell.primarySubAccount.transactions[ shellTxIndex ],
+          receivers: transaction.receivers ? transaction.receivers : [],
+          sender: transaction.sender ? transaction.sender : '',
+          notes: transaction.notes ? transaction.notes : '',
+          tags: transaction.tags ? transaction.tags : [],
+          isNew: transaction.isNew,
+          type: transaction.type,
+        }
+        accountShells[ shellIndex ].primarySubAccount.transactions[ shellTxIndex ] = data
+        accounts[ shell.primarySubAccount.id ].transactions[ accTxIndex ] = data
+      }
+    } )
+  } )
+  yield put( readTxn( accountShells, accounts ) )
+}
+
 export const syncAccountsWatcher = createWatcher(
   syncAccountsWorker,
   SYNC_ACCOUNTS
@@ -432,6 +459,7 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
     yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
   }
+  yield put( updateWalletImageHealth() )
 
   // update F&F channels if any new txs found on an assigned address
   if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
@@ -916,6 +944,8 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
 )
 
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
+  console.log( 'restoredAccounts', restoredAccounts )
+
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
   }
@@ -957,12 +987,12 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account's balance and transactions
   const syncAll = true
   const hardRefresh = true
-  yield put( autoSyncShells( syncAll, hardRefresh ) )
   yield call( autoSyncShellsWorker, {
     payload: {
       syncAll, hardRefresh
     }
   } )
+  yield call( syncTxAfterRestore, restoredAccounts )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(

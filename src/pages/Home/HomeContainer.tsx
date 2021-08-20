@@ -44,16 +44,17 @@ interface HomeStateTypes {
 }
 
 interface HomePropsTypes {
+  currencyCode: string;
   navigation: any;
   containerView: StyleProp<ViewStyle>;
   currentLevel: number;
   startRegistration: boolean;
   isFocused: boolean;
-  currencyCode: any;
   setShowAllAccount: any;
   openBottomSheet: any;
   swanDeepLinkContent: string | null;
   markAccountChecked: any;
+  exchangeRates?: any[];
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -63,11 +64,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   constructor( props ) {
     super( props )
     this.props.setShowAllAccount( false )
-
-    this.state = {
-      // notificationData: [],
-      currencyCode: 'USD',
-    }
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -94,36 +90,38 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   render() {
-    const { currencyCode } = this.state
     const {
       currentLevel,
-      containerView
+      containerView,
+      exchangeRates,
+      currencyCode
     } = this.props
 
     return (
       <View style={containerView}>
+
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp( 3 ),
+          marginHorizontal: wp( 4 ),
+          // alignItems: 'center',
+          // backgroundColor: 'red'
+        }}>
+          <Text style={{
+            color: Colors.blue,
+            fontSize: RFValue( 16 ),
+            marginTop: hp( 1 ),
+            fontFamily: Fonts.FiraSansMedium,
+
+          }}>
+              My Accounts
+          </Text>
+          <ToggleContainer />
+        </View>
         <ScrollView style={{
           flex: 1
         }}>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingVertical: wp( 4 ),
-            paddingHorizontal: wp( 4 ),
-            alignItems: 'center'
-          }}>
-            <Text style={{
-              color: Colors.blue,
-              fontSize: RFValue( 16 ),
-              marginLeft: 2,
-              fontFamily: Fonts.FiraSansMedium,
-
-            }}>
-              My Accounts
-            </Text>
-            <ToggleContainer />
-          </View>
-
           {/* <View style={{
             backgroundColor: 'white',
             marginHorizontal: wp( 4 ),
@@ -154,19 +152,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             cardContainer={{
               backgroundColor: 'white',
               marginHorizontal: wp( 4 ),
-              height: hp( '9%' ),
+              height: hp( '11%' ),
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: hp( 1 ),
               borderRadius: wp( 2 ),
-              padding: hp( '1.5%' ),
+              padding: hp( '1.4%' ),
               flexDirection: 'row',
             }}
-            amount={1000}
-            incramount={'10'}
+            amount={exchangeRates ? exchangeRates[ currencyCode ]?.last.toFixed( 2 ) : ''}
+            incramount={''}
             percentIncr={'5%'}
             asset={'../../assets/images/HomePageIcons/graph.png'}
-            openBottomSheet={( type ) => this.props.openBottomSheet( type )} />
+            openBottomSheet={( type ) => this.props.openBottomSheet( type )}
+            currencyCode={currencyCode}
+          />
         </ScrollView>
       </View>
     )
@@ -178,6 +178,7 @@ const mapStateToProps = ( state ) => {
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     startRegistration: idx( state, ( _ ) => _.swanIntegration.startRegistration ),
+    exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
   }
 }
 

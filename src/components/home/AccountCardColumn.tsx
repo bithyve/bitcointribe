@@ -9,7 +9,7 @@ import AddNewAccountCard from '../../pages/Home/AddNewAccountCard'
 import HomeAccountsListCard from './HomeAccountsListCard'
 import AccountShell from '../../common/data/models/AccountShell'
 import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   cardData: AccountShell[];
@@ -70,11 +70,12 @@ const AccountCardColumn: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    marginRight: widthPercentageToDP( 4 ),
+    marginRight: widthPercentageToDP( 4.5 ),
+    paddingTop: heightPercentageToDP( 2 )
   },
 
   cardContainer: {
-    marginBottom: 9,
+    marginBottom: heightPercentageToDP( 2 ),
   },
 } )
 

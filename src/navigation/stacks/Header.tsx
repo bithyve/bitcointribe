@@ -345,7 +345,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
         this.currentNotificationId = ''
       } else {
-        const message = messages.find( message => message.status === 'unread' )
+        const message = messages.find( message => message.additionalInfo === null )
         if( message ){
           this.handleNotificationBottomSheetSelection( message )
         }
@@ -1346,7 +1346,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <HomeHeader
             onPressNotifications={this.onPressNotifications}
             navigateToQRScreen={this.navigateToQRScreen}
-            notificationData={notificationData}
+            notificationData={this.props.messages}
             walletName={walletName}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
             netBalance={netBalance}

@@ -811,6 +811,7 @@ class ContactDetails extends PureComponent<
                         : 'Resend Request'}
                   </Text>
                 </TouchableOpacity>
+                {this.contact.lastSeenActive &&
                 <TouchableOpacity
                   disabled={isSendDisabled}
                   onPress={() => {
@@ -833,6 +834,7 @@ class ContactDetails extends PureComponent<
                     Edit
                   </Text>
                 </TouchableOpacity>
+                }
               </View>
             </View>
           </View>
