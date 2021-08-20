@@ -59,38 +59,13 @@ const CloudBackupHistory = ( props ) => {
   const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const [ errorMsg, setErrorMsg ] = useState( '' )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
-
-  const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
-
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
-  let currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
-
-  const next = props.navigation.getParam( 'next' )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const dispatch = useDispatch()
 
   const updateCloudData = () => {
     console.log( 'cloudBackupStatus', cloudBackupStatus, currentLevel )
     if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
-    let share = levelHealth[ 0 ].levelInfo[ 1 ]
-    if( levelHealth[ 0 ] && !levelHealth[ 1 ] ){
-      share = levelHealth[ 0 ].levelInfo[ 1 ]
-    } else if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
-      if( levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 ){
-        share = levelHealth[ 1 ].levelInfo[ 1 ]
-        currentLevel = 2
-      } else if( levelHealth[ 1 ].levelInfo.length == 6 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 ){
-        share = levelHealth[ 1 ].levelInfo[ 1 ]
-        currentLevel = 3
-      }
-    }
-    console.log( 'CLOUD updateCloudData share', share )
-    if( levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
-      dispatch( setCloudData(
-        keeperInfo,
-        currentLevel === 0 ? currentLevel + 1 : currentLevel,
-        share
-      ) )
-    }
+    dispatch( updateCloudData() )
   }
 
   const sortedHistory = ( history ) => {
