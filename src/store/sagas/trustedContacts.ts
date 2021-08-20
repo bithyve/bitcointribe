@@ -1,4 +1,4 @@
-import { call, put, select } from 'redux-saga/effects'
+import { call, put, delay, select } from 'redux-saga/effects'
 import {
   REMOVE_TRUSTED_CONTACT,
   WALLET_CHECK_IN,
@@ -551,12 +551,13 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && isPrimaryKeeper && contactsSecondaryChannelKey ){
     // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
+    yield delay( 1000 ) // delaying to make sure the primary ward's instream is updated in the reducer
     const contacts: Trusted_Contacts = yield select(
       ( state ) => state.trustedContacts.contacts,
     )
     const primaryWard = contacts[ channelKey ]
     const instreamId = primaryWard.streamId
-    const instream: UnecryptedStreamData = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+    const instream: UnecryptedStreamData = idx( primaryWard, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
     const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )
 
     const instreamSecondaryData: SecondaryStreamData = {
