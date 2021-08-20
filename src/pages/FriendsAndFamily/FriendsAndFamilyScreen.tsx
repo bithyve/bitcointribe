@@ -552,7 +552,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               marginTop: hp( 4 ),
             } ]}
           >
-              Friends & Familyyy
+              Friends & Family
           </Text>
           <ScrollView
             refreshControl={

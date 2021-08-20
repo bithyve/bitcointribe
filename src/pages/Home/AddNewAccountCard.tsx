@@ -50,8 +50,8 @@ const AddNewAccountCard: React.FC<Props> = ( {
 const styles = StyleSheet.create( {
   cardContainer: {
     backgroundColor: Colors.white,
-    width: widthPercentageToDP( 42.6 ),
-    height: heightPercentageToDP( 20.1 ),
+    width: widthPercentageToDP( 43 ),
+    height: heightPercentageToDP( 21 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
   },
