@@ -459,6 +459,7 @@ class ManageBackupNewBHR extends Component<
         this.setState( {
           keeperTypeModal: true
         } )
+        this.goToHistory( this.props.navigationObj )
       }
     }
 
@@ -665,7 +666,7 @@ class ManageBackupNewBHR extends Component<
           } )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Aa","channelId":"235e93417c8c4fcc99f37c5f99a259a619db14d6019b9d1e5b62becb78de0740","streamId":"1763f468d","secondaryChannelKey":"TMxy31wVg8lVdFStOtoL70r6","version":"1.7.5"}'
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Xc","channelId":"6fbe6882fcfac24061934b0bd98f0ed7b8abe177f75cc3ee34ad3740db6c8964","streamId":"10c56b924","secondaryChannelKey":"GDCCPXJf9wLJtlsnafCOnOeW","version":"1.9.5","walletId":"676629048a41478617b590ef1c18aec7d9caa83d288ecbe64a03c529f343eaf0"}'
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
           this.setState( {
