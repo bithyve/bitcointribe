@@ -98,7 +98,7 @@ const HomeBuyCard = ( {
               BTC to {fiatCurrencyCode} today
         </Text>
         <View style={{
-          flexDirection: 'row', marginTop: hp( '1' ), alignSelf: 'flex-start'
+          flexDirection: 'row', marginTop: hp( '1' ), alignItems: 'center'
         }}>
           {materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
           // setCurrencyCodeToImage(
@@ -110,10 +110,7 @@ const HomeBuyCard = ( {
               color={Colors.blue}
               size={wp( '3.5%' )}
               style={{
-                width: 20,
-                // height: 18,
-                // resizeMode: 'contain',
-                marginTop: hp( 0.3 )
+                width: wp( 4 )
               }}
             />
           ) : currencyCode.includes( currencyCode ) && (
@@ -123,7 +120,7 @@ const HomeBuyCard = ( {
               {setCurrencyCodeToImage( getCurrencyImageName( currencyCode ), Colors.blue )}
             </Text>
           )}
-          <Text>{amount}</Text>
+          <Text>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>
       </View>
@@ -141,15 +138,12 @@ const HomeBuyCard = ( {
           />
         }
         buttonStyle={{
-          ...ButtonStyles.floatingActionButton,
           borderRadius: wp( 3 ),
-          // alignSelf:'flex-end',
-          // minHeight: hp( 4 ),
-          paddingVertical: 12,
+          paddingVertical: wp( 2.8 ),
         }}
         titleStyle={{
           ...ButtonStyles.floatingActionButtonText,
-          marginLeft: 8,
+          marginLeft: wp( 1 ),
         }}
         onPress={() =>
           openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )

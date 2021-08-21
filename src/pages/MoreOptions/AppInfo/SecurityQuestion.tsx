@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   Platform,
+  TouchableOpacity
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -18,7 +19,7 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
+import { ScrollView } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import BottomInfoBox from '../../../components/BottomInfoBox'
@@ -35,6 +36,8 @@ function SecurityQuestion( props ) {
     ( state ) => state.storage.wallet,
   )
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
+  const [ showNote, setShowNote ] = useState( true )
+  const [ height, setHeight ] = useState( 12 )
   const securityQuestion = security.question
   const securityAnswer = security.answer
   const [ showAnswer, setShowAnswer ] = useState( false )
@@ -83,7 +86,9 @@ function SecurityQuestion( props ) {
       resetScrollToCoords={{
         x: 0, y: 0
       }}
-      scrollEnabled
+      onKeyboardDidShow={() => setHeight( 0 )}
+      onKeyboardDidHide={() => setHeight( 12 )}
+      scrollEnabled={false}
       style={{
         ...styles.modalContentContainer
       }}>
@@ -150,7 +155,9 @@ function SecurityQuestion( props ) {
                 onChangeText={( text ) => {
                   setAnswer( text )
                 }}
+                onFocus={() => setShowNote( false )}
                 onBlur={() => {
+                  setShowNote( true )
                   if ( validateAllowedCharacters( answer ) == false ) {
                     setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
                   }
@@ -196,11 +203,14 @@ function SecurityQuestion( props ) {
             )}
           </ScrollView>
         </View>
-        <View style={styles.statusIndicatorView}>
+        <View style={[ styles.statusIndicatorView, {
+          marginTop: `${height}%`
+        } ]}>
           <View style={styles.statusIndicatorActiveView} />
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
         </View>
+        {showNote &&
         <BottomInfoBox
           // backgroundColor={Colors.white}
           title={'Note'}
@@ -208,13 +218,15 @@ function SecurityQuestion( props ) {
             'Your Friends & Family will be notified of this change, so they may update their saved details.'
           }
         />
+        }
         <View
           style={{
             paddingLeft: wp( '6%' ),
             paddingRight: wp( '6%' ),
             height: hp( '9%' ),
             justifyContent: 'center',
-            flexDirection: 'row'
+            flexDirection: 'row',
+            // marginBottom: hp( 4 )
           }}
         >
           <AppBottomSheetTouchableWrapper
@@ -277,7 +289,6 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
     marginHorizontal: wp( '6%' ),
     marginBottom: hp( 2 ),
-    marginTop: hp( 12 )
   },
   statusIndicatorActiveView: {
     height: 5,

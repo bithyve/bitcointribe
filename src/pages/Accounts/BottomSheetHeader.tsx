@@ -4,13 +4,14 @@ import Fonts from '../../common/Fonts'
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 
 const BottomSheetHeader = ( { title, onPress } ) => {
   if ( !title )  { return null }
   return (
     <View style={{
-      backgroundColor: Colors.white
+      backgroundColor: Colors.white,
+      paddingBottom: heightPercentageToDP( 3 )
     }}>
       <TouchableOpacity
         activeOpacity={1}

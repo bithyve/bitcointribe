@@ -1077,7 +1077,7 @@ Wallet Backup
               </View>
             </View>
           </ScrollView>
-          {this.state.showLoader ? <Loader isLoading={true}/> : null}
+          {/* {this.state.showLoader ? <Loader isLoading={true}/> : null} */}
           <ModalContainer visible={listModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
@@ -1204,9 +1204,9 @@ Wallet Backup
           <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
             {this.renderQrContent()}
           </ModalContainer>
-          <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
+          {/* <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
             {this.renderLoaderModalContent()}
-          </ModalContainer>
+          </ModalContainer> */}
           <ModalContainer visible={knwowMoreModal} closeBottomSheet={() => {}} >
             {this.renderKnowMoreModalContent()}
           </ModalContainer>

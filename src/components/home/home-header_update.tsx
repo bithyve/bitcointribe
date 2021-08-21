@@ -269,7 +269,7 @@ const HomeHeader = ( {
                   style={{
                     width: 20,
                     height: 18,
-                    resizeMode: 'contain',
+                    // resizeMode: 'contain',
                     marginTop: 0
                   }}
                 />

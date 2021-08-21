@@ -472,7 +472,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled
+        scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
@@ -695,6 +695,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               onChangeText={( text ) => {
                 setHint( text )
               }}
+              onFocus={() => setShowNote( false )}
+              onBlur={() => setShowNote( true )}
             />
             {/* {hintText ? (
               <TouchableWithoutFeedback
@@ -749,6 +751,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
         </View> : null}
+        {showNote &&
         <View style={{
           marginTop: showNote ? hp( '0%' ) :'auto',
           marginBottom: hp( 1 )
@@ -762,6 +765,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           />
           }
         </View>
+        }
       </KeyboardAwareScrollView>
       // </ScrollView>
     )
@@ -774,7 +778,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled
+        scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
@@ -1114,6 +1118,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
           </View> : null}
+          {showNote &&
           <View style={{
             marginTop: showNote ? hp( '0%' ) : hp( '2%' ),
             marginBottom: hp( 1 )
@@ -1127,6 +1132,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             />
             }
           </View>
+          }
         </View>
       </KeyboardAwareScrollView>
     )

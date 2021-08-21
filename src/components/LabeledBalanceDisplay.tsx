@@ -77,7 +77,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
   const formattedUnitText = isTestAccount ?
     displayNameForBitcoinUnit( bitcoinUnit )
     : useFormattedUnitText( {
-      bitcoinUnit, currencyKind 
+      bitcoinUnit, currencyKind
     } )
 
   const bitcoinIconSource = useMemo( () => {
@@ -138,10 +138,10 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
 
   return (
     <View style={{
-      ...defaultStyles.rootContainer, ...containerStyle 
+      ...defaultStyles.rootContainer, ...containerStyle
     }}>
       <View style={{
-        marginRight: iconSpacing 
+        marginRight: iconSpacing
       }}>
         <BalanceCurrencyIcon />
       </View>
@@ -170,7 +170,7 @@ const defaultStyles = StyleSheet.create( {
   currencyImage: {
     width: 14,
     height: 14,
-    resizeMode: 'contain',
+    // resizeMode: 'contain',
   },
 
   amountText: {
@@ -185,4 +185,4 @@ const defaultStyles = StyleSheet.create( {
 } )
 
 export default LabeledBalanceDisplay
-                                                                                 
+
