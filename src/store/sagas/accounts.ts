@@ -43,6 +43,7 @@ import {
   readTxn,
   accountChecked,
   autoSyncShells,
+  setResetTwoFALoader,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -281,7 +282,7 @@ function* generateSecondaryXprivWorker( { payload }: { payload: { accountShell: 
 
   const { secondaryXpriv } = yield call( AccountUtilities.generateSecondaryXpriv,
     secondaryMnemonic,
-    wallet.details2FA.secondaryXpub,
+    wallet.secondaryXpub,
     network,
   )
 
@@ -366,7 +367,7 @@ function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string 
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { secondaryMnemonic } = payload
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  const { secret: twoFAKey } = yield call( AccountUtilities.resetTwoFA, wallet.walletId, wallet.secondaryWalletId, secondaryMnemonic, wallet.details2FA.secondaryXpub, network )
+  const { secret: twoFAKey } = yield call( AccountUtilities.resetTwoFA, wallet.walletId, secondaryMnemonic, wallet.secondaryXpub, network )
 
   if( twoFAKey ){
     const details2FA = {
@@ -528,24 +529,13 @@ export const autoSyncShellsWatcher = createWatcher(
   AUTO_SYNC_SHELLS
 )
 
-function* setup2FADetails( wallet: Wallet ) {
-  if( !wallet.secondaryMnemonic ) throw new Error( 'Cannot setup 2FA before level-2(secondaryMnemonic missing)' )
-
-  const secondarySeed = bip39.mnemonicToSeedSync( wallet.secondaryMnemonic )
-  const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
-
-  const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
-  const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  const secondaryXpub = AccountUtilities.generateExtendedKey( wallet.secondaryMnemonic, false, network, rootDerivationPath )
-
+export function* setup2FADetails( wallet: Wallet ) {
+  const { setupData } = yield call( AccountUtilities.setupTwoFA, wallet.walletId )
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
   const updatedWallet = {
     ...wallet,
-    secondaryWalletId,
     details2FA: {
-      secondaryXpub,
       bithyveXpub,
       twoFAKey
     }
@@ -639,7 +629,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
 }
 
 export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails ) {
-  let wallet: Wallet = yield select( state => state.storage.wallet )
+  const wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primaryMnemonic, accounts } = wallet
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
@@ -673,7 +663,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return checkingAccount
 
       case AccountType.SAVINGS_ACCOUNT:
-        if( !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
+        if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
         const savingsInstanceCount = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
         const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
@@ -684,14 +674,15 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           accountDescription: accountDescription? accountDescription: 'MultiSig Wallet',
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
-          secondaryXpub: wallet.details2FA.secondaryXpub,
+          secondaryXpub: wallet.secondaryXpub,
           bithyveXpub: wallet.details2FA.bithyveXpub,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return savingsAccount
 
       case AccountType.DONATION_ACCOUNT:
-        if( is2FAEnabled && !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
+        if( is2FAEnabled )
+          if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
         const donationInstanceCount = ( accounts[ accountType ] )?.length | 0
         const donationAccount: DonationAccount = yield call( generateDonationAccount, {
@@ -704,7 +695,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
           is2FA: is2FAEnabled,
-          secondaryXpub: is2FAEnabled? wallet.details2FA.secondaryXpub: null,
+          secondaryXpub: is2FAEnabled? wallet.secondaryXpub: null,
           bithyveXpub:  is2FAEnabled? wallet.details2FA.bithyveXpub: null,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
@@ -909,12 +900,12 @@ export const mergeAccountShellsWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
     const { qrdata, QRModalHeader, accountShell } = payload
-    const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
+    const walletDB = yield call( dbManager.getWallet )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const walletId = wallet.walletId
-    const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contact )
+    const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     let secondaryMnemonic
-    const sharesArray = [ DECENTRALIZED_BACKUP.SM_SHARE ]
+    const sharesArray = [ walletDB.smShare ]
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
@@ -930,11 +921,10 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const res = yield call( TrustedContactsOperations.retrieveFromStream, {
       walletId, channelKey, options: {
         retrieveSecondaryData: true,
-      }, secondaryChannelKey: qrDataObj.channelKey2
+      }, secondaryChannelKey: qrDataObj.secondaryChannelKey
     } )
-    const shard: string = res.data.secondaryData.secondaryMnemonicShard
+    const shard: string = res.secondaryData.secondaryMnemonicShard
     sharesArray.push( shard )
-
     if( sharesArray.length>1 ){
       secondaryMnemonic = BHROperations.getMnemonics( sharesArray, wallet.security.answer )
     }
@@ -944,7 +934,8 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
       yield put( generateSecondaryXpriv( accountShell, secondaryMnemonic.mnemonic ) )
     }
   } catch ( error ) {
-    console.log( 'error', error )
+    yield put( setResetTwoFALoader( false ) )
+    console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }
 

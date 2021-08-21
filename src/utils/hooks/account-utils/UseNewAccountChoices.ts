@@ -18,7 +18,7 @@ import config from '../../../bitcoin/HexaConfig'
 const isEnabled = ( accountType: AccountType, wallet: Wallet ) => {
   switch ( accountType ) {
       case AccountType.SAVINGS_ACCOUNT:
-        if( !wallet.secondaryMnemonic && !wallet.details2FA )
+        if( !wallet.secondaryXpub && !wallet.details2FA )
           return false
         break
   }

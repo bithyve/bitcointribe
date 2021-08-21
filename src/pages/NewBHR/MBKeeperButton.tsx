@@ -101,10 +101,10 @@ function MBKeeperButton( props ) {
               tintColor: value.status == 'notSetup' ? Colors.deepBlue : Colors.secondaryBackgroundColor
             }}
           />
-          :keeper.status == 'accessible' && keeper.shareType == 'device' ? (
+          :keeper.status == 'accessible' && ( keeper.shareType == 'device' || keeper.shareType == 'primaryKeeper' ) ? (
             <Image
               source={
-                keeper.shareType == 'device'
+                ( keeper.shareType == 'device' || keeper.shareType == 'primaryKeeper' )
                   ? require( '../../assets/images/icons/icon_ipad_blue.png' )
                   : require( '../../assets/images/icons/pexels-photo.png' )
               }

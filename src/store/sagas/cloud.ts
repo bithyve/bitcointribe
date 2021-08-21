@@ -98,11 +98,10 @@ function* cloudWorker( { payload } ) {
       // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
       const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
-      const secondaryMnemonics = wallet.secondaryMnemonic ? BHROperations.encryptWithAnswer( wallet.secondaryMnemonic, wallet.security.answer ).encryptedData : ''
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
-        secondaryShare: walletDB.smShare ? walletDB.smShare : secondaryMnemonics,
+        secondaryShare: walletDB.smShare ? walletDB.smShare : '',
         encryptedCloudDataJson: encryptedCloudDataJson,
         seed: shares ? '' : encryptedData,
         walletName: wallet.walletName,
@@ -759,36 +758,27 @@ function* updateCloudBackupWorker( ) {
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       const levelHealth = yield select( ( state ) => state.bhr.levelHealth )
-      const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
+      let currentLevel = yield select( ( state ) => state.bhr.currentLevel )
       const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
-      const s3 = yield call( dbManager.getBHR )
-      const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-      let secretShare = {
+      let share = levelHealth[ 0 ].levelInfo[ 1 ]
+      if( levelHealth[ 0 ] && !levelHealth[ 1 ] ){
+        share = levelHealth[ 0 ].levelInfo[ 1 ]
+      } else if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
+        if( levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 ){
+          share = levelHealth[ 1 ].levelInfo[ 1 ]
+          currentLevel = 2
+        } else if( levelHealth[ 1 ].levelInfo.length == 6 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 ){
+          share = levelHealth[ 1 ].levelInfo[ 1 ]
+          currentLevel = 3
+        }
       }
-      if ( levelHealth.length > 0 ) {
-        const levelInfo = getLevelInfo( levelHealth, currentLevel )
-        if ( levelInfo ) {
-          if (
-            levelInfo[ 2 ] &&
-            levelInfo[ 3 ] &&
-            levelInfo[ 2 ].status == 'accessible' &&
-            levelInfo[ 3 ].status == 'accessible'
-          ) {
-            for ( let i = 0; i < MetaShares.length; i++ ) {
-              const element = MetaShares[ i ]
-              if ( levelInfo[ 1 ].shareId == element.shareId ) {
-                secretShare = element
-                break
-              }
-            }
+      if( levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+        yield call( cloudWorker, {
+          payload: {
+            kpInfo: keeperInfo, level: currentLevel === 0 ? currentLevel + 1 : currentLevel, share
           }
-        }
+        } )
       }
-      yield call( cloudWorker, {
-        payload: {
-          kpInfo: keeperInfo, level: currentLevel == 3 ? 3 : currentLevel + 1, share: secretShare
-        }
-      } )
     }
   }
   catch ( error ) {

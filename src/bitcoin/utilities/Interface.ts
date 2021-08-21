@@ -132,8 +132,6 @@ export interface Transactions {
 export interface MetaShare {
   encryptedShare?: {
     pmShare: string;
-    smShare: string;
-    bhXpub: string;
   };
   shareId: string;
   meta: {
@@ -534,7 +532,14 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
-  contactDetails?: ContactDetails
+  contactDetails?: ContactDetails,
+
+  // primary keeper exclusives
+  secondarySetupData? :{
+    secondaryXpub: string
+    secondaryShardWI: string
+  },
+  bhXpub?: string,
 }
 
 export interface SecondaryStreamData {
@@ -587,6 +592,7 @@ export type Streams = {
 export enum TrustedContactRelationTypes {
   CONTACT = 'CONTACT',
   KEEPER  = 'KEEPER',
+  PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   WARD = 'WARD',
   KEEPER_WARD = 'KEEPER_WARD'
 }
@@ -770,6 +776,7 @@ export interface LevelData {
 export enum QRCodeTypes {
   CONTACT_REQUEST = 'CONTACT_REQUEST',
   KEEPER_REQUEST = 'KEEPER_REQUEST',
+  PRIMARY_KEEPER_REQUEST = 'PRIMARY_KEEPER_REQUEST',
   RECOVERY_REQUEST = 'RECOVERY_REQUEST',
   EXISTING_CONTACT = 'EXISTING_CONTACT'
 }
@@ -817,12 +824,10 @@ export interface Wallet {
   walletName: string,
   security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
-  secondaryMnemonic?: string,
-  secondaryWalletId?: string,
+  secondaryXpub?: string,
   details2FA? : {
-    secondaryXpub: string,
-    bithyveXpub: string,
-    twoFAKey: string,
+    bithyveXpub?: string,
+    twoFAKey?: string,
   }
   accounts: {
     [accountType: string]: string[] // array of accountIds
@@ -921,6 +926,7 @@ export interface Accounts {
 export enum DeepLinkKind {
   CONTACT = 'CONTACT',
   KEEPER = 'KEEPER',
+  PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER'
 }
 
