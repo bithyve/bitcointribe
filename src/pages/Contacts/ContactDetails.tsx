@@ -51,6 +51,7 @@ import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFr
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import EditContactScreen from './EditContact'
+import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -500,7 +501,6 @@ class ContactDetails extends PureComponent<
         walletId: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletID
       } )
     }
-    console.log( 'Secondarey QR', qrString )
     this.setState( {
       trustedQR: qrString,
       sendViaQRModel: true
@@ -769,6 +769,26 @@ class ContactDetails extends PureComponent<
                 >
                   {this.contact.displayedName}
                 </Text>
+                <View style={{
+                  flexDirection: 'row'
+                }}>
+                  <Text>Last seen </Text>
+                  {Number.isFinite( this.contact.lastSeenActive ) ? (
+
+                    <Text style={{
+                      fontFamily: Fonts.FiraSansMediumItalic
+                    }}>
+                      {agoTextForLastSeen( this.contact.lastSeenActive )}
+                    </Text>
+                  ) : (
+                    <Text style={{
+                      fontFamily: Fonts.FiraSansMediumItalic
+                    }}>
+                      Unknown
+                    </Text>
+                  )}
+                </View>
+
                 {/* {this.contact.connectedVia ? (
                   <Text style={styles.phoneText}>
                     {this.contact.usesOTP
@@ -884,6 +904,23 @@ class ContactDetails extends PureComponent<
               <ScrollView style={{
                 flex: 1
               }}>
+                <View style={[ styles.selectOptionContainer, {
+                  height: hp( 6 ), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+                } ]}>
+                  <View style={{
+                    flexDirection: 'row', alignItems: 'center'
+                  }}>
+                    <Image
+                      source={require( '../../assets/images/icons/icon_wallet_setting.png' )}
+                      style={{
+                        width: 32, height: 32, resizeMode: 'contain'
+                      }}
+                    />
+                    <Text style={styles.headerTitleText}>Wallet Name</Text>
+                  </View>
+
+                  <Text>Wallet Name</Text>
+                </View>
                 {this.sortedHistory( trustedContactHistory ).map( ( value ) => {
                   if ( SelectedOption == value.id ) {
                     return (
@@ -1214,6 +1251,14 @@ export default connect( mapStateToProps, {
 } )( ContactDetails )
 
 const styles = StyleSheet.create( {
+  headerTitleText: {
+    color: Colors.blue,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 14 ),
+    // marginBottom: wp( '1%' ),
+    alignSelf: 'center',
+    marginHorizontal: wp( 2 )
+  },
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.backgroundColor,
