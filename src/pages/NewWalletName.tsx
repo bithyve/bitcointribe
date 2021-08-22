@@ -53,6 +53,7 @@ export default function NewWalletName( props ) {
   // const [ intervalRef, setIntervalRef ] = useState( null )
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
+  const [ note, showNote ] = useState( true )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
@@ -181,7 +182,9 @@ export default function NewWalletName( props ) {
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <ScrollView>
+          <View style={{
+            flex: 1
+          }} >
             <HeaderTitle
               firstLineTitle={'Step 1\nPlease name your wallet'}
               secondLineTitle={'New Wallet creation'}
@@ -205,6 +208,7 @@ export default function NewWalletName( props ) {
               }}
               onFocus={() => {
                 setInputStyle( styles.inputBoxFocused )
+                showNote( false )
               }}
               onBlur={() => {
                 setInputStyle( styles.inputBox )
@@ -222,55 +226,57 @@ export default function NewWalletName( props ) {
               }}>
                   Numbers or special characters are not supported</Text>
             </View>
-          </ScrollView>
-
-          <View style={styles.bottomButtonView}>
-            {walletName.trim() != '' ? (
-              <View
-                style={{
-                  elevation: 10,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 15, height: 15
-                  },
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    Keyboard.dismiss()
-                    props.navigation.navigate( 'NewWalletQuestion', {
-                      walletName,
-                    } )
-                    // setIsCloudPermissionRender( true )
-                    // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
-                  }}
-                  style={styles.buttonView}
-                >
-                  <Text style={styles.buttonText}>Next</Text>
-                </TouchableOpacity>
-              </View>
-            ) : null}
-            <View style={styles.statusIndicatorView}>
-              <View style={styles.statusIndicatorActiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
-            </View>
           </View>
-
-          {walletName.trim() == '' ? (
-            <View style={{
-              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
-            }}>
-              <BottomInfoBox
-                title={'Note: '}
-                infoText={
-                  'We do not store this, it is only for your and your contacts’ eyes'
-                }
-              />
+        </KeyboardAvoidingView>
+        <View style={styles.bottomButtonView}>
+          {walletName.trim() != '' ? (
+            <View
+              style={{
+                elevation: 10,
+                shadowColor: Colors.shadowBlue,
+                shadowOpacity: 1,
+                shadowOffset: {
+                  width: 15, height: 15
+                },
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss()
+                  props.navigation.navigate( 'NewWalletQuestion', {
+                    walletName,
+                  } )
+                  // setIsCloudPermissionRender( true )
+                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+                }}
+                style={styles.buttonView}
+              >
+                <Text style={styles.buttonText}>Next</Text>
+              </TouchableOpacity>
             </View>
           ) : null}
-        </KeyboardAvoidingView>
+
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+          </View>
+        </View>
+
+        {/* {walletName.trim() == '' ? ( */}
+        {note ? (
+          <View style={{
+            marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
+          }}>
+            <BottomInfoBox
+              title={'Note: '}
+              infoText={
+                'We do not store this, it is only for your and your contacts’ eyes'
+              }
+            />
+          </View>
+        ) : null}
+
       </View>
       {/* <BottomSheetBackground
         isVisible={bottomSheetState === BottomSheetState.Open}

@@ -800,7 +800,8 @@ class ManageBackupNewBHR extends Component<
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
       <View style={{
-        backgroundColor: Colors.blue
+        backgroundColor: Colors.blue,
+        flex: 1
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         {/* <Suspense fallback={
@@ -1043,19 +1044,20 @@ Wallet Backup
               marginTop: wp( '5%' ), backgroundColor: Colors.white, height: '100%',
               borderTopLeftRadius: wp( 4 ),
               borderTopRightRadius: wp( 4 ),
-              paddingLeft: wp ( '6%' )
+              paddingLeft: wp ( '6%' ),
+              paddingBottom: hp( 3 )
             }}>
-              <View style={{
-                flexDirection: 'row', justifyContent:'space-between'
-              }}>
-                <Text style={styles.pageTitle}>I am the Keeper of</Text>
-                {/* <TouchableOpacity>
+              {/* <View style={{
+                paddingBottom: hp( 3 )
+              }}> */}
+              <Text style={styles.pageTitle}>I am the Keeper of</Text>
+              {/* <TouchableOpacity>
                   <Image
                     style={styles.moreImage}
                     source={require( '../../assets/images/icons/icon_more.png' )}
                   />
                 </TouchableOpacity> */}
-              </View>
+              {/* </View> */}
               <Text style={styles.pageInfoText}>
                Contacts whose wallets I can help restore
               </Text>
@@ -1078,7 +1080,7 @@ Wallet Backup
               </View>
             </View>
           </ScrollView>
-          {this.state.showLoader ? <Loader isLoading={true}/> : null}
+          {/* {this.state.showLoader ? <Loader isLoading={true}/> : null} */}
           <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
@@ -1188,9 +1190,9 @@ Wallet Backup
           <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
             {this.renderQrContent()}
           </ModalContainer>
-          <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
+          {/* <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
             {this.renderLoaderModalContent()}
-          </ModalContainer>
+          </ModalContainer> */}
           <ModalContainer visible={knwowMoreModal} closeBottomSheet={() => {}} >
             {this.renderKnowMoreModalContent()}
           </ModalContainer>

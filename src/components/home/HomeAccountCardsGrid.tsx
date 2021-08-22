@@ -206,6 +206,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       keyExtractor={keyExtractor}
       renderItem={( { item, index }: RenderItemProps ) => {
         return <AccountCardColumn
+          index={index}
           cardData={item}
           currentLevel={currentLevel}
           // prependsAddButton={typeof item === 'string'}

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   Platform,
+  TouchableOpacity,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -18,7 +19,6 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -82,7 +82,7 @@ function SecurityQuestion( props ) {
       resetScrollToCoords={{
         x: 0, y: 0
       }}
-      scrollEnabled
+      scrollEnabled={false}
       style={{
         ...styles.modalContentContainer
       }}>
@@ -103,7 +103,7 @@ function SecurityQuestion( props ) {
       <View style={styles.modalContentContainer}>
         <View>
           <View style={{
-            flexDirection: 'row', padding: wp( '7%' )
+            paddingHorizontal: wp( '7%' )
           }}>
             <View style={{
               flex: 1, justifyContent: 'center'
@@ -119,7 +119,7 @@ function SecurityQuestion( props ) {
               </Text>
             </View>
           </View>
-          <ScrollView style={{
+          <View style={{
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
           }}>
             <View style={styles.dropdownBox}>
@@ -194,7 +194,7 @@ function SecurityQuestion( props ) {
                 </Text>
               </View>
             )}
-          </ScrollView>
+          </View>
         </View>
         <View
           style={{

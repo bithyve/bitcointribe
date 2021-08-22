@@ -120,7 +120,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <ToggleContainer />
         </View>
         <ScrollView style={{
-          flex: 1
+          paddingBottom: 10
         }}>
           {/* <View style={{
             backgroundColor: 'white',
@@ -155,7 +155,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               height: hp( '11%' ),
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: hp( 1 ),
+              marginBottom: hp( 5 ),
               borderRadius: wp( 2 ),
               padding: hp( '1.4%' ),
               flexDirection: 'row',

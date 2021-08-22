@@ -52,14 +52,14 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false,
     hasButton: false,
   },
-  {
-    title: 'GetBittr',
-    subtitle: 'Buy any amount',
-    kind: '',
-    imageSource: require( '../../assets/images/icons/icon_getbitter.png' ),
-    disabled: false,
-    hasButton: false,
-  },
+  // {
+  //   title: 'GetBittr',
+  //   subtitle: 'Buy any amount',
+  //   kind: '',
+  //   imageSource: require( '../../assets/images/icons/icon_getbitter.png' ),
+  //   disabled: false,
+  //   hasButton: false,
+  // },
   // {
   //   title: 'Swan Bitcoin',
   //   subtitle: 'Stack sats with Swan Bitcoin',
@@ -104,7 +104,8 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
             shadowRadius: 5,
             elevation: 2,
             width: widthPercentageToDP( 90 ),
-            marginBottom: heightPercentageToDP( 1 ),
+            // marginTop: heightPercentageToDP( 2 ),
+            marginBottom: heightPercentageToDP( 3 ),
             borderTopRightRadius: widthPercentageToDP( 1 ),
             borderBottomRightRadius: widthPercentageToDP( 1 ),
           } ]}
@@ -176,6 +177,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
         data={menuItems}
         keyExtractor={listItemKeyExtractor}
         renderItem={renderItem}
+        scrollEnabled={false}
       />
     </View>
 

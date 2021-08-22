@@ -12,6 +12,7 @@ import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
+  index: number;
   cardData: AccountShell[];
   prependsAddButton: boolean;
   onAccountCardSelected: ( accountShell: AccountShell ) => void;
@@ -21,6 +22,7 @@ export type Props = {
 };
 
 const AccountCardColumn: React.FC<Props> = ( {
+  index,
   cardData,
   prependsAddButton,
   onAccountCardSelected,
@@ -29,7 +31,7 @@ const AccountCardColumn: React.FC<Props> = ( {
   currentLevel
 }: Props ) => {
   return (
-    <View style={styles.rootContainer}>
+    <View style={styles.rootContainer} key={index}>
 
       {cardData.map( ( accountShell ) => {
         const disabled = false
