@@ -27,7 +27,7 @@ export default function LoaderModal( props ) {
         // Removed the showGif condition from here as we are not using the animated gif loader anymore
         // The animated gif loader file size can impact performance
         <View style={{
-          marginLeft: wp( '8%' ), marginRight: wp( '8%' ), marginTop: wp( '8%' )
+          marginLeft: wp( '8%' ), marginRight: wp( '30%' ), marginTop: wp( '8%' ),
         }}>
           <Text style={{
             color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.54
