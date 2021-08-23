@@ -21,15 +21,12 @@ import HistoryPageComponent from './HistoryPageComponent'
 import ModalHeader from '../../components/ModalHeader'
 import { updateCloudPermission } from '../../store/actions/BHR'
 import DeviceInfo from 'react-native-device-info'
-import {
-  checkMSharesHealth,
-} from '../../store/actions/BHR'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { getLevelInfo } from '../../common/CommonFunctions'
-import { setCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
+import { updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
@@ -61,12 +58,6 @@ const CloudBackupHistory = ( props ) => {
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const dispatch = useDispatch()
-
-  const updateCloudData = () => {
-    console.log( 'cloudBackupStatus', cloudBackupStatus, currentLevel )
-    if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
-    dispatch( updateCloudData() )
-  }
 
   const sortedHistory = ( history ) => {
     if( !history ) return
@@ -140,7 +131,7 @@ const CloudBackupHistory = ( props ) => {
         setConfirmationModal( false )
         console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
-        updateCloudData()
+        dispatch( updateCloudData() )
       }}
       onPressIgnore={( flag )=> {
         // if ( ( bottomSheetRef as any ).current )
@@ -181,7 +172,6 @@ const CloudBackupHistory = ( props ) => {
         isIgnoreButton={false}
         onPressProceed={() => {
           ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
-          dispatch( checkMSharesHealth() )
           props.navigation.goBack()
         }}
         isBottomImage={true}

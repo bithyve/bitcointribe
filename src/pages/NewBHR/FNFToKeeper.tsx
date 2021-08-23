@@ -157,7 +157,7 @@ const FNFToKeeper = ( props ) => {
               }}
               style={styles.addContactBtn}>
               <Image
-                source={require( '../../assets/images/icons/icon_add_blue.png' )}
+                source={require( '../../assets/images/icons/addressbook.png' )}
                 style={styles.plusIcon}
               />
               <Text style={{
@@ -165,8 +165,17 @@ const FNFToKeeper = ( props ) => {
                 color: Colors.gray2,
                 fontFamily: Fonts.FiraSansMedium,
                 fontSize: RFValue( 14 )
-              }}>Choose from contacts</Text>
+              }}>Choose from Phonebook</Text>
             </TouchableOpacity>
+            <Text style={{
+              marginHorizontal: wp( 2 ),
+              color: Colors.blue,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 16 ),
+              marginLeft: wp( 4 ),
+              marginBottom: wp( 2 ),
+              marginTop: wp( 2 )
+            }}>Existing Contacts: </Text>
             {( contacts.length && contacts.map( ( item, index ) => {
               // if ( !item.contactDetails.contactName ) {
               //   return
@@ -208,7 +217,7 @@ const styles = StyleSheet.create( {
   },
   plusIcon: {
     height: wp( 12 ),
-    width: wp( 12 )
+    width: wp( 10 )
   },
   listItem: {
     flexDirection: 'row',
