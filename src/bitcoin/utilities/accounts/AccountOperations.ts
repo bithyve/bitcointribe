@@ -295,7 +295,9 @@ export default class AccountOperations {
     account.transactions = transactions
     account.newTransactions = newTransactions
     account.lastSynched = lastSynched
-    //account.hasNewTxn = hasNewTxn
+    if( ( account as MultiSigAccount ).is2FA ) account.receivingAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeAddressIndex, false ).address
+    else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
+
     return {
       synchedAccount: account
     }

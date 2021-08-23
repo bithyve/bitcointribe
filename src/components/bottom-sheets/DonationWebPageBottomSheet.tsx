@@ -16,6 +16,7 @@ import config from '../../bitcoin/HexaConfig'
 import CopyThisText from '../CopyThisText'
 import { ScrollView } from 'react-native-gesture-handler'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
 
 export default function DonationWebPageBottomSheet( props ) {
   return (
@@ -86,11 +87,11 @@ export default function DonationWebPageBottomSheet( props ) {
         >
           <CopyThisText
             text={
-              `https://hexawallet.io/${config.APP_STAGE === 'app'
-                ? 'donate'
-                : config.APP_STAGE === 'sta'
-                  ? 'donate-stage'
-                  : 'donate-test'
+              `https://hexawallet.io/${config.APP_STAGE === APP_STAGE.PRODUCTION
+                ? 'donation'
+                : config.APP_STAGE === APP_STAGE.STAGING
+                  ? 'donation-stage'
+                  : 'donation-test'
               }/?donationid=` + props.account.id.slice( 0, 15 )
             }
           />
@@ -112,11 +113,11 @@ export default function DonationWebPageBottomSheet( props ) {
           }}
         >
           <CopyThisText
-            text={`<iframe src="https://hexawallet.io/${config.APP_STAGE === 'app'
-              ? 'donate'
-              : config.APP_STAGE === 'sta'
-                ? 'donate-stage'
-                : 'donate-test'
+            text={`<iframe src="https://hexawallet.io/${config.APP_STAGE === APP_STAGE.PRODUCTION
+              ? 'donation'
+              : config.APP_STAGE === APP_STAGE.STAGING
+                ? 'donation-stage'
+                : 'donation-test'
             }/?donationid=${props.account.id.slice( 0, 15 )
             }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
           />
