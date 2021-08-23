@@ -155,12 +155,14 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           resizeMode="contain"
         />
 
-        <ListItem.Content style={ListStyles.listItemContentContainer}>
+        <ListItem.Content style={[ ListStyles.listItemContentContainer, {
+          paddingVertical: 10,
+        } ]}>
           <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
           <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
         </ListItem.Content>
 
-        <ListItem.Chevron />
+        <ListItem.Chevron size={22}/>
       </ListItem>
     )
   }

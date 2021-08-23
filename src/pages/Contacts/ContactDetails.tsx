@@ -770,20 +770,20 @@ class ContactDetails extends PureComponent<
                   {this.contact.displayedName}
                 </Text>
                 <View style={{
-                  flexDirection: 'row'
+                  flexDirection: 'row', marginLeft: 10, alignItems: 'flex-end'
                 }}>
-                  <Text>Last seen </Text>
+                  <Text style={styles.lastSeenText}>Last seen </Text>
                   {Number.isFinite( this.contact.lastSeenActive ) ? (
-
                     <Text style={{
                       fontFamily: Fonts.FiraSansMediumItalic
                     }}>
                       {agoTextForLastSeen( this.contact.lastSeenActive )}
                     </Text>
                   ) : (
-                    <Text style={{
-                      fontFamily: Fonts.FiraSansMediumItalic
-                    }}>
+                    <Text style={[ styles.lastSeenText, {
+                      fontFamily: Fonts.FiraSansMediumItalic,
+                      // fontSize: RFValue( 9 )
+                    } ]}>
                       Unknown
                     </Text>
                   )}
@@ -844,12 +844,6 @@ class ContactDetails extends PureComponent<
                     marginTop: 10
                   } ]}
                 >
-                  {this.contact.lastSeenActive ? (
-                    <Image
-                      source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                      style={styles.bitcoinIconStyle}
-                    />
-                  ) : null}
                   <Text style={styles.sendTextStyle}>
                     Edit
                   </Text>
@@ -904,6 +898,7 @@ class ContactDetails extends PureComponent<
               <ScrollView style={{
                 flex: 1
               }}>
+                {this.contact.walletName &&
                 <View style={[ styles.selectOptionContainer, {
                   height: hp( 6 ), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
                 } ]}>
@@ -919,8 +914,9 @@ class ContactDetails extends PureComponent<
                     <Text style={styles.headerTitleText}>Wallet Name</Text>
                   </View>
 
-                  <Text>Wallet Name</Text>
+                  <Text>{this.contact.walletName}</Text>
                 </View>
+                }
                 {this.sortedHistory( trustedContactHistory ).map( ( value ) => {
                   if ( SelectedOption == value.id ) {
                     return (
@@ -1251,6 +1247,12 @@ export default connect( mapStateToProps, {
 } )( ContactDetails )
 
 const styles = StyleSheet.create( {
+  lastSeenText: {
+    // marginBottom: 3,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.textColorGrey,
+  },
   headerTitleText: {
     color: Colors.blue,
     fontFamily: Fonts.FiraSansRegular,

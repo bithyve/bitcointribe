@@ -136,7 +136,7 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
     }}>
       <TouchableOpacity
         activeOpacity={1}
-        onPress={() => closeModal()}
+        onPress={() => closeModal( '' )}
         style={{
           width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
           alignSelf: 'flex-end',
@@ -222,7 +222,6 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
             }}
             disabled={name.length === 0}
             onPress={() => {
-              closeModal()
               editContact()
               // navigation.navigate( 'AddContactSendRequest', {
               //   SelectedContact: [ contact ],

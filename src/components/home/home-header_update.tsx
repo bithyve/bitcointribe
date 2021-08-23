@@ -245,7 +245,7 @@ const HomeHeader = ( {
             <View
               style={{
                 flexDirection: 'row',
-                alignItems: 'flex-end',
+                alignItems: 'baseline',
               // marginBottom: wp('3%'),
               }}
             >
@@ -253,7 +253,7 @@ const HomeHeader = ( {
                 <Image
                   style={{
                     ...CommonStyles.homepageAmountImage,
-                    marginBottom: wp( '1.4%' ),
+                    alignItems: 'baseline',
                   }}
                   source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                 />
@@ -267,17 +267,15 @@ const HomeHeader = ( {
                   color={Colors.white}
                   size={wp( '3.5%' )}
                   style={{
-                    width: 20,
-                    height: 18,
-                    // resizeMode: 'contain',
-                    marginTop: 0
+                    width: wp( '3.5%' ),
+                    height: wp( '3.5%' ),
                   }}
                 />
               ) : (
                 <Image
                   style={{
                     ...styles.cardBitCoinImage,
-                    marginBottom: wp( '1.5%' ),
+                    // marginBottom: wp( '1.5%' ),
                   }}
                   source={getCurrencyImageByRegion( fiatCurrencyCode, 'light' )}
                 />
@@ -447,7 +445,7 @@ const styles = StyleSheet.create( {
     height: wp( '3.5%' ),
     marginRight: 5,
     resizeMode: 'contain',
-    marginBottom: wp( '0.7%' ),
+    // marginBottom: wp( '0.7%' ),
   },
   manageBackupMessageView: {
     marginLeft: wp( '2%' ),
@@ -478,8 +476,8 @@ const styles = StyleSheet.create( {
   },
   homeHeaderAmountUnitText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 9 ),
-    marginBottom: 3,
+    fontSize: RFValue( 10 ),
+    // marginBottom: 3,
     color: Colors.white,
   },
 } )
