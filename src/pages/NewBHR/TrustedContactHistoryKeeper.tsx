@@ -135,6 +135,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       ? props.navigation.state.params.selectedKeeper.data
       : null,
   )
+  const [ shareType, setShareType ] = useState( props.navigation.getParam( 'selectedKeeper' ).shareType )
   const [ showQrCode, setShowQrCode ] = useState( false )
   const [ showFNFList, setShowFNFList ] = useState( false )
 
@@ -164,21 +165,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         : false
     )
     setOldChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+    setShareType( props.navigation.getParam( 'selectedKeeper' ).shareType ? props.navigation.getParam( 'selectedKeeper' ).shareType : 'contact' )
   }, [ props.navigation.state.params ] )
-
-  useEffect( () => {
-    const contacts: Trusted_Contacts = trustedContacts
-    const c = []
-    for( const channelKey of Object.keys( contacts ) ){
-      const contact = contacts[ channelKey ]
-      if( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) {
-        c.push( {
-          ...contact, channelKey
-        } )
-      }
-    }
-    setContacts( c )
-  }, [] )
 
   useEffect( () => {
     if ( isChange ) {
@@ -186,11 +174,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setLoadContacts( true )
       }, 2 )
       // setTrustedContactModal( true )
-      if( selectedKeeper.shareType === 'existingContact' ){
+      if( shareType === 'existingContact' ){
         props.navigation.navigate( 'FNFToKeeper', {
           ...props.navigation.state.params,
           selectContact:selectContact
-        } ) }
+        } )
+        setShowQrCode( true )
+      }
       else {
         props.navigation.navigate( 'TrustedContactNewBHR', {
           LoadContacts: true,
@@ -216,12 +206,23 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( () => {
     ( async () => {
+      const contacts: Trusted_Contacts = trustedContacts
+      const existingContactsArr = []
+      for( const channelKey of Object.keys( contacts ) ){
+        const contact = contacts[ channelKey ]
+        if( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) {
+          existingContactsArr.push( {
+            ...contact, channelKey
+          } )
+        }
+      }
+      setContacts( existingContactsArr )
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
         setTimeout( () => {
           setLoadContacts( true )
         }, 2 )
         // setTrustedContactModal( true )
-        if( selectedKeeper.shareType === 'existingContact' ){
+        if( existingContactsArr.length ){
           props.navigation.navigate( 'FNFToKeeper', {
             ...props.navigation.state.params,
             selectContact:selectContact
@@ -460,11 +461,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setChangeContact( true )
           }, 2 )
 
-          if( selectedKeeper.shareType === 'existingContact' ){
+          if( shareType === 'existingContact' ){
             props.navigation.navigate( 'FNFToKeeper', {
               ...props.navigation.state.params,
               selectContact: selectContact
             } )
+            setShowQrCode( true )
           }
           else {
             props.navigation.navigate( 'TrustedContactNewBHR', {
@@ -565,15 +567,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
       const Contact = props.navigation.getParam( 'isChangeKeeperType' ) || isChangeKeeper ? payload.chosenContactTmp : ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload && payload.chosenContactTmp ? payload.chosenContactTmp : chosenContact : chosenContact
       setChosenContact( Contact )
-      if( selectedKeeper.shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
+      if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKeyTemp )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
-        type: selectedKeeper.shareType ? selectedKeeper.shareType : 'contact',
+        type: shareType,
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
@@ -595,7 +597,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       console.log( 'USEEFFECT chosenContact', chosenContact )
       console.log( 'USEEFFECT channelKey', channelKey )
       dispatch( createOrChangeGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: selectedKeeper.shareType == 'existingContact' ? true : false
+        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
       } ) )
     }
   }, [ chosenContact, createChannelAssetsStatus, channelAssets ] )
@@ -632,7 +634,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   // }, [] )
 
   useEffect( () => {
-    if( selectedKeeper.shareType == 'existingContact' && !isGuardianCreationClicked && ( ( chosenContact && Object.keys( chosenContact ).length ) || chosenContact != null ) ) {
+    if( shareType == 'existingContact' && !isGuardianCreationClicked && ( ( chosenContact && Object.keys( chosenContact ).length ) || chosenContact != null ) ) {
       createGuardian( )
       // setShowQrCode( true )
       // props.navigation.navigate( 'AddContactSendRequest', {
@@ -702,7 +704,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
       setTrustedLink( deepLink )
       const QRData = JSON.stringify( {
-        type: selectedKeeper.shareType == 'existingContact' ? QRCodeTypes.EXISTING_CONTACT : QRCodeTypes.KEEPER_REQUEST,
+        type: shareType == 'existingContact' ? QRCodeTypes.EXISTING_CONTACT : QRCodeTypes.KEEPER_REQUEST,
         encryptedChannelKeys: encryptedChannelKeys,
         encryptionType,
         encryptionHint,
@@ -723,7 +725,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
           shareId: selectedKeeper.shareId,
           reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
-          shareType: selectedKeeper.shareType ? selectedKeeper.shareType : 'contact',
+          shareType: shareType,
           status: 'notAccessible',
           name: chosenContact && chosenContact.name ? chosenContact.name : ''
         }
@@ -808,6 +810,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       dispatch( setApprovalStatus( true ) )
     }
   }, [ channelAssets ] )
+
   useEffect( () => {
     if ( isNavigation ) {
       props.navigation.navigate( 'TrustedContactNewBHR', {
@@ -835,9 +838,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const selectContact = ( type, choosenContact ) => {
     if ( type === 'AddContact' ) {
       setNavigation( true )
+      setShareType( 'contact' )
     } else if ( type === 'ExistingContact' ) {
       setChannelKey( choosenContact.channelKey )
       setChosenContact( choosenContact )
+      setShareType( 'existingContact' )
     }
   }
 
@@ -875,15 +880,17 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressConfirm={() => {
             setTimeout( () => {
               setLoadContacts( true )
+              setShowQrCode( true )
             }, 2 )
             // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
             // setTrustedContactModal( true )
             setNavigation( false )
-            if ( selectedKeeper.shareType === 'existingContact' ) {
+            if ( contacts.length ) {
               props.navigation.navigate( 'FNFToKeeper', {
                 ...props.navigation.state.params,
                 selectContact: selectContact
               } )
+              setShowQrCode( true )
             }
             else {
               props.navigation.navigate( 'TrustedContactNewBHR', {

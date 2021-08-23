@@ -348,6 +348,9 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
       case TrustedContactRelationTypes.KEEPER_WARD:
         deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
         break
+
+      case TrustedContactRelationTypes.EXISTING_CONTACT:
+        deepLinkKind = DeepLinkKind.EXISTING_CONTACT
   }
 
   const appType = config.APP_STAGE
@@ -392,7 +395,7 @@ export const processDeepLink = async ( deepLink: string ) =>{
           encryptionHint,
           isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
           isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
-          isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+          isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
           isQR: false,
           version,
         }

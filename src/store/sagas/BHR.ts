@@ -1451,7 +1451,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           contactDetails: contacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
-          relationType: TrustedContactRelationTypes.KEEPER,
+          relationType: TrustedContactRelationTypes.EXISTING_CONTACT,
         }
         const secondaryData: SecondaryStreamData = {
           secondaryMnemonicShard: channelAssets.secondaryMnemonicShard,

@@ -39,6 +39,7 @@ import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {
   AccountType,
+  KeeperInfoInterface,
   QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet,
 } from '../../bitcoin/utilities/Interface'
 import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
@@ -100,6 +101,7 @@ interface ContactDetailsPropTypes {
   hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
   newBHRFlowStarted : any;
+  keeperInfo: KeeperInfoInterface[];
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -133,6 +135,7 @@ class ContactDetails extends PureComponent<
   contact: ContactRecipientDescribing;
   contactsType: any;
   setIsSendDisabledListener: any;
+  isExistingContact: boolean;
 
   constructor( props ) {
     super( props )
@@ -140,6 +143,7 @@ class ContactDetails extends PureComponent<
     this.shareBottomSheet = createRef()
     this.SendViaLinkBottomSheet = createRef()
     this.ErrorBottomSheet = createRef()
+    this.isExistingContact = false
     this.state = {
       Loading: true,
       key: '',
@@ -194,6 +198,9 @@ class ContactDetails extends PureComponent<
 
     this.contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
+    if( this.contactsType == 'My Keepers' ){
+      this.isExistingContact = this.contact.channelKey && this.props.keeperInfo.find( value=>value.channelKey == this.contact.channelKey ) ? true : false
+    }
   }
 
   componentDidMount() {
@@ -326,6 +333,7 @@ class ContactDetails extends PureComponent<
         showDone:true,
         isKeeper: payload && payload.isKeeper ? payload.isKeeper : false,
         isPrimary: payload && payload.isPrimary ? payload.isPrimary : false,
+        existingContact: this.isExistingContact
       }
       this.props.navigation.navigate( 'AddContactSendRequest', navigationParams )
     }
@@ -1233,6 +1241,7 @@ const mapStateToProps = ( state ) => {
     ),
     hasSMUploadedSuccessfully: idx( state, ( _ ) => _.bhr.hasSMUploadedSuccessfully ),
     newBHRFlowStarted: idx( state, ( _ ) => _.bhr.newBHRFlowStarted ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
   }
 }
 export default connect( mapStateToProps, {
