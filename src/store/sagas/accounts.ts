@@ -95,6 +95,8 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
+  if( account.type === AccountType.DONATION_ACCOUNT ) return account.receivingAddress
+
   const { updatedAccount, receivingAddress } = AccountOperations.getNextFreeExternalAddress( account, requester )
   dispatch( updateAccounts( {
     accounts: {
@@ -107,6 +109,8 @@ export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAc
 
 // to be used by sagas(w/o dispatch)
 export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
+  if( account.type === AccountType.DONATION_ACCOUNT ) return account.receivingAddress
+
   const { updatedAccount, receivingAddress } = yield call( AccountOperations.getNextFreeExternalAddress, account, requester )
   yield put( updateAccounts( {
     accounts: {
