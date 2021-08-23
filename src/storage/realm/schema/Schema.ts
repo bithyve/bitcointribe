@@ -438,7 +438,6 @@ export const Details2FASchema: ObjectSchema = {
   name: Details2FA,
   properties: {
     bithyveXpub: 'string',
-    secondaryXpub: 'string',
     twoFAKey: 'string',
   },
 }
