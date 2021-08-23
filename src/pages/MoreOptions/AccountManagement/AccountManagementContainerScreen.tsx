@@ -1,5 +1,5 @@
 import React, { useState, useMemo, createRef, useCallback, useEffect } from 'react'
-import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Platform, ScrollView } from 'react-native'
+import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform, ScrollView, StatusBar } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
@@ -11,6 +11,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -25,7 +26,10 @@ import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-s
 import ModalContainer from '../../../components/home/ModalContainer'
 import { resetStackToAccountDetails, resetToHomeAction } from '../../../navigation/actions/NavigationActions'
 import { NavigationActions, StackActions } from 'react-navigation'
-
+import { color } from 'react-native-reanimated'
+import CommonStyles from '../../../common/Styles/Styles'
+import HeaderTitle from '../../../components/HeaderTitle'
+import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 
 export type Props = {
   navigation: any;
@@ -214,12 +218,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         containerStyle={{
           marginLeft: wp( '4%' ),
           marginRight: wp( '4%' ),
+          backgroundColor: Colors.backgroundColor
         }}
-        bottomDivider
       >
         <Image
-          source={getAvatarForSubAccount( primarySubAccount )}
-          style={ImageStyles.thumbnailImageMedium}
+          source={getAvatarForSubAccount( primarySubAccount, false, true )}
+          style={ImageStyles.thumbnailImageLarge}
           resizeMode="contain"
         />
 
@@ -241,7 +245,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         </ListItem.Content>
         {primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ? <TouchableOpacity
           style={{
-            backgroundColor: Colors.backgroundColor,
+            backgroundColor: Colors.lightBlue,
             marginLeft: 'auto',
             borderRadius: 5,
             justifyContent: 'center',
@@ -265,9 +269,10 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         >
           <Text
             style={{
-              color: Colors.textColorGrey,
+              color: Colors.white,
               fontSize: RFValue( 12 ),
               marginLeft: 'auto',
+              fontWeight: '700'
             }}
           >
             {primarySubAccount.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}
@@ -278,7 +283,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <ModalContainer visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
         {showUnHideArchiveAccountBottomSheet()}
       </ModalContainer>
@@ -286,6 +292,43 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         {showSuccessAccountBottomSheet()}
       </ModalContainer>
       <ScrollView>
+        <View style={[ CommonStyles.headerContainer, {
+          backgroundColor: Colors.backgroundColor
+        } ]}>
+          <TouchableOpacity
+            style={CommonStyles.headerLeftIconContainer}
+            onPress={() => {
+              navigation.pop()
+            }}
+          >
+            <View style={CommonStyles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          backgroundColor: Colors.backgroundColor,
+          marginRight: wp( '4%' ),
+        }}>
+          <HeaderTitle
+            firstLineTitle={'Account Management'}
+            secondLineTitle={'Lorem Ipsum dolor amet cons'}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
+          <NavHeaderSettingsButton
+            onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+          />
+        </View>
+
         {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
           accountShells={orderedAccountShells}
           onDragEnded={handleDragEnd}
@@ -293,7 +336,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
         {getnewOrderedAccountShell && <View>
           <View style={{
-            marginBottom: 15
+            marginBottom: 15, backgroundColor: Colors.backgroundColor
           }}>
             <View style={{
               height: 'auto'
@@ -318,7 +361,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         </View>}
 
         {getHiddenAccountShell && hiddenAccountShells.length > 0 ? <View style={{
-          marginTop: wp( '2%' ),
+          marginTop: wp( '2%' ), backgroundColor: Colors.backgroundColor
         }}>
           <View style={{
             width: '100%',
@@ -371,13 +414,14 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           />
         )}
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
+    backgroundColor: Colors.backgroundColor
   },
 
   proceedButtonContainer: {
@@ -388,11 +432,13 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
   },
   pageInfoText: {
-    marginLeft: 30,
+    paddingLeft: 30,
     color: Colors.textColorGrey,
     fontSize: RFValue( 14 ),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
+    backgroundColor: Colors.white,
+    paddingVertical: hp( 0.5 )
   },
 } )
 
