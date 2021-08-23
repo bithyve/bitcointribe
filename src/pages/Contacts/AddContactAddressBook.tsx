@@ -7,7 +7,8 @@ import {
   Platform,
   PermissionsAndroid,
   Linking,
-  SafeAreaView
+  SafeAreaView,
+  TouchableOpacity
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useSelector, useDispatch } from 'react-redux'
@@ -21,6 +22,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { FlatList } from 'react-native-gesture-handler'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import CommonStyles from '../../common/Styles/Styles'
 import RadioButton from '../../components/RadioButton'
 import * as ExpoContacts from 'expo-contacts'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
@@ -33,6 +35,7 @@ import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { v4 as uuid } from 'uuid'
 import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { editTrustedContact } from '../../store/actions/trustedContacts'
+import HeaderTitle from '../../components/HeaderTitle'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -328,8 +331,34 @@ export default function AddContactAddressBook( props ) {
   return (
     <View style={styles.modalContentContainer}>
       <SafeAreaView />
-      <View style={styles.modalHeaderTitleView}>
-        <View style={{
+      {/* <View style={styles.modalHeaderTitleView}> */}
+      <View style={[ CommonStyles.headerContainer, {
+        backgroundColor: Colors.white
+      } ]}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.blue}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={props.modalTitle ? props.modalTitle : 'Associate a contact'}
+        secondLineTitle={'Select a contact from your phone\'s address book'}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      {/* <View style={{
           flexDirection: 'row'
         }}>
           <AppBottomSheetTouchableWrapper
@@ -374,15 +403,10 @@ export default function AddContactAddressBook( props ) {
             >
               Skip
             </Text>
-            {/* <FontAwesome
-              name="plus"
-              color={Colors.white}
-              size={10}
-              style={{ marginLeft: 5 }}
-            /> */}
           </AppBottomSheetTouchableWrapper>
-        </View>
-      </View>
+        </View> */}
+
+      {/* </View> */}
 
       <View style={{
         flex : 1
@@ -509,24 +533,47 @@ export default function AddContactAddressBook( props ) {
               />
             ) : null}
           </View>
-          {selectedContacts.length >= 1 && (
-            <View
+          {/* {selectedContacts.length >= 1 && ( */}
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: hp( 5 ),
+              width: wp( '50%' ),
+              // alignSelf: 'center',
+              flexDirection: 'row',
+              // alignItems: 'flex-start',
+            }}
+          >
+            <AppBottomSheetTouchableWrapper
+              disabled={isTC || selectedContacts.length == 0}
+              onPress={() => onPressContinue()}
+              style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
+                backgroundColor: Colors.lightBlue
+              } ]}
+            >
+              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            </AppBottomSheetTouchableWrapper>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => onSkipContinue()}
               style={{
-                position: 'absolute',
-                bottom: 0,
-                width: wp( '50%' ),
-                alignSelf: 'center',
+                // height: wp( '8%' ),
+                marginTop: hp( 1.8 ),
+                width: wp( '25%' ),
+                alignSelf: 'flex-start',
+                paddingLeft: wp( '8%' ),
               }}
             >
-              <AppBottomSheetTouchableWrapper
-                disabled={isTC}
-                onPress={() => onPressContinue()}
-                style={styles.bottomButtonView}
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                }}
               >
-                <Text style={styles.buttonText}>Confirm & Proceed</Text>
-              </AppBottomSheetTouchableWrapper>
-            </View>
-          )}
+                {'Skip'}
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>
+          {/* )} */}
           <ModalContainer visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
               title={'Error while accessing your contacts '}
@@ -573,9 +620,14 @@ export default function AddContactAddressBook( props ) {
 }
 
 const styles = StyleSheet.create( {
+  proceedButtonText: {
+    color: Colors.blue,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium
+  },
   modalContentContainer: {
     height: '100%',
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.white,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -608,7 +660,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
   },
   bottomButtonView: {
-    height: 50,
+    height: hp( '6%' ),
     width: wp( '50%' ),
     backgroundColor: Colors.blue,
     borderRadius: 10,

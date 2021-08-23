@@ -314,7 +314,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           flexDirection: 'row',
           justifyContent: 'space-between',
           backgroundColor: Colors.backgroundColor,
-          marginRight: wp( '4%' ),
+          marginRight: wp( '3%' ),
+          alignItems: 'flex-start'
         }}>
           <HeaderTitle
             firstLineTitle={'Account Management'}
