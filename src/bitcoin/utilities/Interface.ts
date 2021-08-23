@@ -594,7 +594,8 @@ export enum TrustedContactRelationTypes {
   KEEPER  = 'KEEPER',
   PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   WARD = 'WARD',
-  KEEPER_WARD = 'KEEPER_WARD'
+  KEEPER_WARD = 'KEEPER_WARD',
+  EXISTING_CONTACT = 'EXISTING_CONTACT'
 }
 
 export interface TrustedContact {
@@ -927,7 +928,8 @@ export enum DeepLinkKind {
   CONTACT = 'CONTACT',
   KEEPER = 'KEEPER',
   PRIMARY_KEEPER = 'PRIMARY_KEEPER',
-  RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER'
+  RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
+  EXISTING_CONTACT = 'EXISTING_CONTACT'
 }
 
 export enum DeepLinkEncryptionType {
