@@ -34,6 +34,7 @@ import {
   credentialStorageWatcher,
   credentialsAuthWatcher,
   changeAuthCredWatcher,
+  applicationUpdateWatcher,
 } from './sagas/setupAndAuth'
 
 import {
@@ -168,6 +169,7 @@ const rootSaga = function* () {
     credentialStorageWatcher,
     credentialsAuthWatcher,
     changeAuthCredWatcher,
+    applicationUpdateWatcher,
 
     // accounts watchers
     syncAccountsWatcher,

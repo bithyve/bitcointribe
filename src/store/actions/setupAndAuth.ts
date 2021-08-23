@@ -96,6 +96,7 @@ export const WALLET_SETUP_FAILED = 'WALLET_SETUP_FAILED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
 export const PIN_CHANGED_FAILED = 'PIN_CHANGED_FAILED'
+export const UPDATE_APPLICATION = 'UPDATE_APPLICATION'
 
 export const credsStored = () => {
   return {
@@ -167,6 +168,15 @@ export const validatePin = ( passcode ) => {
     }
     return {
       error, key
+    }
+  }
+}
+
+export const updateApplication = ( newVersion: string, previousVersion: string ) => {
+  return {
+    type: UPDATE_APPLICATION,
+    payload: {
+      newVersion, previousVersion
     }
   }
 }

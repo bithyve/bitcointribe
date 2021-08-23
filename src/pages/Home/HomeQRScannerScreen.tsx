@@ -158,14 +158,19 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               onPress={() => { navigation.navigate( 'ReceiveQR' )}}
             />
           </View>
-          <TouchableOpacity onPress={()=>{
-            const qrScannedData = {
-              data: '{"type":"KEEPER_REQUEST","channelKey":"nBeLSFNLxhRmuq4JWNQTBWgv","walletName":"Scas","secondaryChannelKey":"HcB1rVJrYMss0QjlyDD1KRPA","version":"1.9.0"}'
-            }
-            handleBarcodeRecognized( qrScannedData )
-          }} >
-            <Text>Continue</Text>
-          </TouchableOpacity>
+          {
+            __DEV__ && (
+              <TouchableOpacity onPress={()=>{
+                const qrScannedData = {
+                  data: '{"type":"KEEPER_REQUEST","channelKey":"nBeLSFNLxhRmuq4JWNQTBWgv","walletName":"Scas","secondaryChannelKey":"HcB1rVJrYMss0QjlyDD1KRPA","version":"1.9.0"}'
+                }
+                handleBarcodeRecognized( qrScannedData )
+              }} >
+                <Text>Continue</Text>
+              </TouchableOpacity>
+            )
+          }
+
           <View style={{
             marginTop: 'auto'
           }}>

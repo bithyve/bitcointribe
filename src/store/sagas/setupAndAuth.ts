@@ -19,17 +19,21 @@ import {
   initializeRecoveryCompleted,
   completedWalletSetup,
   WALLET_SETUP_COMPLETION,
+  updateApplication,
+  UPDATE_APPLICATION,
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
 import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
 import { newAccountShellCreationCompleted } from '../actions/accounts'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 
 
 
@@ -112,9 +116,6 @@ function* credentialsAuthWorker( { payload } ) {
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
-    console.log( {
-      err
-    } )
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
     return
@@ -127,6 +128,12 @@ function* credentialsAuthWorker( { payload } ) {
     yield put( credsAuthenticated( true ) )
     // t.stop()
     yield put( keyFetched( key ) )
+
+    // check if the app has been upgraded
+    const wallet: Wallet = yield select( state => state.storage.wallet )
+    const storedVersion = wallet.version
+    const currentVersion = DeviceInfo.getVersion()
+    if( currentVersion !== storedVersion ) yield put( updateApplication( currentVersion, storedVersion ) )
 
     // initialize configuration file
     const { activePersonalNode } = yield select( state => state.nodeSettings )
@@ -174,4 +181,50 @@ function* changeAuthCredWorker( { payload } ) {
 export const changeAuthCredWatcher = createWatcher(
   changeAuthCredWorker,
   CHANGE_AUTH_CRED,
+)
+
+
+function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, previousVersion: string }} ) {
+  const { newVersion } = payload
+
+  // update wallet version
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  yield put( updateWallet( {
+    ...wallet,
+    version: newVersion
+  } ) )
+  yield call( dbManager.updateWallet, {
+    version: newVersion
+  } )
+
+  // update permanent channels w/ new version
+  const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+  const streamUpdates: UnecryptedStreamData = {
+    streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+    metaData: {
+      version: newVersion
+    }
+  }
+  const channelUpdates = []
+  for( const channelKey of Object.keys( trustedContacts ) ){
+    if( !trustedContacts[ channelKey ].isActive ) continue
+    const contactInfo: ContactInfo = {
+      channelKey
+    }
+    const channelUpdate =  {
+      contactInfo, streamUpdates
+    }
+    channelUpdates.push( channelUpdate )
+  }
+
+  yield put( syncPermanentChannels( {
+    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+    channelUpdates,
+    metaSync: true
+  } ) )
+}
+
+export const applicationUpdateWatcher = createWatcher(
+  applicationUpdateWorker,
+  UPDATE_APPLICATION,
 )

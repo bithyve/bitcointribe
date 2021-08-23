@@ -68,10 +68,10 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <View style={{
           flexDirection: 'row'
         }}>
-          <Text style={styles.headerText}>Please edit the </Text>
-          <Text style={{
+          <Text style={styles.headerText}>You can set the Name and Description to reflect the account's purpose. </Text>
+          {/* <Text style={{
             ...styles.headerText, fontStyle: 'italic'
-          }}>Name and Description</Text>
+          }}>Name and Description</Text> */}
         </View>
       </View>
 

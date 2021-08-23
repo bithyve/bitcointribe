@@ -215,7 +215,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode title="Recovery Key" value={secondaryQR} size={hp( '27%' )} />
+              <QRCode title="Recovery key" value={secondaryQR} size={hp( '27%' )} />
             )}
           </View>
 

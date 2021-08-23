@@ -308,7 +308,7 @@ class ContactDetails extends PureComponent<
     )
   };
 
-  onPressResendRequest = () => {
+  onPressResendRequest = ( payload?: {isKeeper?: boolean, isPrimary?: boolean } ) => {
     if ( this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER ) {
       this.createDeepLink( this.contact )
       setTimeout( () => {
@@ -318,13 +318,16 @@ class ContactDetails extends PureComponent<
         } )
       }, 2 )
     } else {
-      this.props.navigation.navigate( 'AddContactSendRequest', {
+      const navigationParams = {
         SelectedContact: [ this.contact ],
         headerText:'Add a contact',
         subHeaderText:'Send a Friends and Family request',
         contactText:'Adding to Friends and Family:',
         showDone:true,
-      } )
+        isKeeper: payload && payload.isKeeper ? payload.isKeeper : false,
+        isPrimary: payload && payload.isPrimary ? payload.isPrimary : false,
+      }
+      this.props.navigation.navigate( 'AddContactSendRequest', navigationParams )
     }
   };
 
@@ -808,12 +811,9 @@ class ContactDetails extends PureComponent<
                     this.setState( {
                       isSendDisabled: true,
                     } )
-
-                    this.contact.lastSeenActive
-                      ? this.onPressSend()
-                      : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName )
-                        ? this.onPressResendRequest()
-                        : null
+                    this.contact.lastSeenActive ? this.onPressSend() : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName ) ? this.onPressResendRequest() : this.onPressResendRequest( {
+                      isKeeper: true, isPrimary: this.contact.displayedName == 'Personal Device1' ? true : false
+                    } )
                   }}
                   style={styles.resendContainer}
                 >
