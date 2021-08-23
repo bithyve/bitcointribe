@@ -43,7 +43,7 @@ function titleForSectionSubHeader( kind: SectionKind ) {
       case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
         return 'Bitcoin is for everyone, share an account'
       case SectionKind.IMPORT_WALLET:
-        return 'Have your sats somewhere else? Import it in Hexa'
+        return 'Have your sats somewhere else? Import them to Hexa'
   }
 }
 

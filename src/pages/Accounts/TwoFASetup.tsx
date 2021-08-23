@@ -63,7 +63,7 @@ const TwoFASetup = props => {
         </View>
       </View>
       <View style={NavStyles.modalContentView}>
-        <QRCode title="2FA Key" value={authenticator.keyuri( 'hexawallet.io', 'HEXA', twoFAKey )} size={hp( '27%' )} />
+        <QRCode title="2FA key" value={authenticator.keyuri( 'hexawallet.io', 'HEXA', twoFAKey )} size={hp( '27%' )} />
         <CopyThisText text={twoFAKey} />
       </View>
       <View style={{

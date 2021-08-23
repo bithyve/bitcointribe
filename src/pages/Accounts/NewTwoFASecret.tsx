@@ -80,7 +80,7 @@ const NewTwoFASecret = props => {
                 <ActivityIndicator size="large" />
               </View>
             ) : (
-              <QRCode title="Two FA Key" value={receivingAddress} size={hp( '27%' )} />
+              <QRCode title="Two FA key" value={receivingAddress} size={hp( '27%' )} />
             )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
           </View>

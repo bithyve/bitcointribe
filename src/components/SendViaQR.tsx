@@ -384,8 +384,8 @@ export default function SendViaQR( props ) {
             ) : (
               <QRCode
                 title={serviceType && serviceType == TEST_ACCOUNT
-                  ? 'Testnet Address'
-                  : 'Bitcoin Address'} value={props.QR} size={hp( '27%' )} />
+                  ? 'Testnet address'
+                  : 'Bitcoin address'} value={props.QR} size={hp( '27%' )} />
             )}
           </View>
           {/* <AppBottomSheetTouchableWrapper

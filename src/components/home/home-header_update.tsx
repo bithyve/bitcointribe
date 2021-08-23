@@ -154,11 +154,11 @@ const HomeHeader = ( {
         }
       } else if( currentLevel === 1 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade the backup to Level 2', messageTwo: '', isError: false
+          isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade backup to Level 2', messageTwo: '', isError: false
         }
       } else if( currentLevel === 2 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade the backup to Level 3', messageTwo: '', isError: false
+          isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade backup to Level 3', messageTwo: '', isError: false
         }
       } else if( currentLevel == 3 ){
         return {
@@ -168,7 +168,7 @@ const HomeHeader = ( {
     }
     if( currentLevel === 1 ){
       return {
-        isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade the backup to Level 2', messageTwo: '', isError: false
+        isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade backup to Level 2', messageTwo: '', isError: false
       }
     } else {
       return {
