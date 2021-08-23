@@ -20,6 +20,7 @@ import {
   completedWalletSetup,
   WALLET_SETUP_COMPLETION,
   updateApplication,
+  UPDATE_APPLICATION,
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
@@ -217,7 +218,7 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   }
 
   yield put( syncPermanentChannels( {
-    permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
     channelUpdates,
     metaSync: true
   } ) )
@@ -225,5 +226,5 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
 
 export const applicationUpdateWatcher = createWatcher(
   applicationUpdateWorker,
-  CHANGE_AUTH_CRED,
+  UPDATE_APPLICATION,
 )
