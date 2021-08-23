@@ -87,10 +87,10 @@ export default function DonationWebPageBottomSheet( props ) {
           <CopyThisText
             text={
               `https://hexawallet.io/${config.APP_STAGE === 'app'
-                ? 'donate'
+                ? 'donation'
                 : config.APP_STAGE === 'sta'
-                  ? 'donate-stage'
-                  : 'donate-test'
+                  ? 'donation-stage'
+                  : 'donation-test'
               }/?donationid=` + props.account.id.slice( 0, 15 )
             }
           />
