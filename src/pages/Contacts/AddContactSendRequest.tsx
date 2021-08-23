@@ -88,6 +88,10 @@ export default function AddContactSendRequest( props ) {
     ? props.navigation.getParam( 'isKeeper' )
     : false
 
+  const isPrimary = props.navigation.getParam( 'isPrimary' )
+    ? props.navigation.getParam( 'isPrimary' )
+    : false
+
   const existingContact = props.navigation.getParam( 'existingContact' )
     ? props.navigation.getParam( 'existingContact' )
     : false
@@ -209,7 +213,7 @@ export default function AddContactSendRequest( props ) {
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
       JSON.stringify( {
-        type: existingContact ? QRCodeTypes.EXISTING_CONTACT : isKeeper ? QRCodeTypes.KEEPER_REQUEST : QRCodeTypes.CONTACT_REQUEST,
+        type: existingContact ? QRCodeTypes.EXISTING_CONTACT : isPrimary ? QRCodeTypes.PRIMARY_KEEPER_REQUEST : isKeeper ? QRCodeTypes.KEEPER_REQUEST : QRCodeTypes.CONTACT_REQUEST,
         encryptedChannelKeys: encryptedChannelKeys,
         encryptionType,
         encryptionHint,
