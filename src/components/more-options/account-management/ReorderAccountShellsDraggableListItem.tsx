@@ -30,7 +30,7 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
       onLongPress={onLongPress}
       containerStyle={{
         opacity: isActive ? 0.6 : 1,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.backgroundColor,
         borderBottomWidth: isActive ? 10 : 0,
         borderTopWidth: isActive ? 10 : 0,
         borderRightWidth: isActive ? 0 : 0,
@@ -39,8 +39,8 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
       }}
     >
       <Image
-        source={getAvatarForSubAccount( primarySubAccount )}
-        style={ImageStyles.thumbnailImageMedium}
+        source={getAvatarForSubAccount( primarySubAccount, false, true )}
+        style={ImageStyles.thumbnailImageLarge}
         resizeMode="contain"
       />
 

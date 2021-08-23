@@ -328,7 +328,7 @@ const ReceivingAddress = ( props ) => {
                 <ActivityIndicator size="large" />
               </View>
             ) : (
-              <QRCode title={serviceType === TEST_ACCOUNT ? 'Testnet Address' : 'Bitcoin Address'} value={receivingAddress} size={hp( '27%' )} />
+              <QRCode title={serviceType === TEST_ACCOUNT ? 'Testnet address' : 'Bitcoin address'} value={receivingAddress} size={hp( '27%' )} />
             )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
             <TouchableOpacity

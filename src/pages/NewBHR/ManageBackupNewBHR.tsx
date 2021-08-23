@@ -879,7 +879,7 @@ class ManageBackupNewBHR extends Component<
                 }}>
 Wallet Backup
                 </Text>
-                <Text style={styles.headerMessageText}>{currentLevel === 1 ? 'Cloud Backup complete, \nyou can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
+                <Text style={styles.headerMessageText}>{currentLevel === 1 ? 'Cloud Backup complete, \nyou can upgrade backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
               </View>
               {/* <View style={{
                 justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
@@ -959,7 +959,7 @@ Wallet Backup
                   </Text>
                   <Text style={{
                     color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular,
-                  }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
+                  }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
                 </View>
                 {/* <View style={{
                 justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),

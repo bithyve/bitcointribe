@@ -111,7 +111,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       // },
       {
         title: 'Account Visibility',
-        subtitle: 'Configure for different privacy-sensitive contexts',
+        subtitle: 'Configure for different visibility settings',
         screenName: 'EditVisibility',
         screenParams: {
           accountShellID: accountShell.id,

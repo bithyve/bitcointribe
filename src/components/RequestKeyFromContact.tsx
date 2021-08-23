@@ -142,7 +142,7 @@ export default function RequestKeyFromContact( props ) {
             <ActivityIndicator size="large" color={Colors.babyGray} />
           ) : (
             <QRCode
-              title="F&F Request"
+              title="F&F request"
               value={props.QR}
               size={hp( '27%' )} />
           )}

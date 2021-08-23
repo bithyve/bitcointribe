@@ -140,7 +140,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           marginBottom: 8,
         }}>
           <Image
-            source={getAvatarForSubAccount( primarySubAccount, false, true )}
+            source={getAvatarForSubAccount( primarySubAccount, false, false, true )}
             style={styles.accountKindBadgeImage}
           />
 

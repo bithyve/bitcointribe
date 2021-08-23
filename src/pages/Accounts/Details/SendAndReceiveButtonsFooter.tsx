@@ -104,7 +104,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
         subtitle={`Tran Fee: ~${
           averageTxFees ? averageTxFees[ network ].low.averageTxFee : 0
         } (${isTestAccount ? 't-sats' : transactionFeeUnitText})`}
-        imageSource={require( '../../../assets/images/icons/icon_send.png' )}
+        imageSource={require( '../../../assets/images/icons/icon_send_blue.png' )}
       />
       <FooterButton
         onPress={onReceivePressed}

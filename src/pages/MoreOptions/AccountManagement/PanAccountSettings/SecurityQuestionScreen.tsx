@@ -175,7 +175,8 @@ export default function SecurityQuestionScreen( props ) {
               setConfirm()
               if ( answer.trim() == securityAnswer.trim() ) {
                 dispatch( setShowAllAccount( true ) )
-                props.navigation.popToTop( 2 )
+                // props.navigation.popToTop( 3 )
+                props.navigation.navigate( 'AccountManagementRoot' )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }

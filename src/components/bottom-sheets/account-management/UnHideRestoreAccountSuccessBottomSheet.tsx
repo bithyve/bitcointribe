@@ -29,12 +29,12 @@ const renderAccount = ( accountInfo, accountVisibility ) => {
       padding: 10,
       backgroundColor: Colors.backgroundColor1,
     }}>
-      <View style={styles.avatarImage}>
+      <View>
         <Image
-          source={getAvatarForSubAccount( accountInfo )}
+          source={getAvatarForSubAccount( accountInfo, false, true )}
           style={{
-            width: 45,
-            height: 45,
+            width: 54,
+            height: 54,
           }}
           resizeMode="contain"
         />

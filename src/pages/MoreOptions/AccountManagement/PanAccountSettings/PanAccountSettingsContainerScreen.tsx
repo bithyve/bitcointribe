@@ -24,7 +24,7 @@ const PanAccountSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   const menuOptions: MenuOption[] = [
     {
       title: 'Show All Accounts',
-      subtitle: 'Include Hidden, Duress, and Archived accounts in your display',
+      subtitle: 'Include Hidden and Archived accounts in your display',
       imageSource: require( '../../../../assets/images/icons/account-visibility/icon_visible.png' ),
       screenName: 'EnterPasscode',
     },
