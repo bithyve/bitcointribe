@@ -92,7 +92,7 @@ export default function TrustedContactRequest( props ) {
             placeholderTextColor={Colors.borderColor}
             placeholder={`${props.hint.charAt( 0 )}XXXX@XXX${props.hint.substring(
               1,
-            )}.com`}
+            )}`}
             onChangeText={( text ) => {
               setEmailId( text )
             }}
@@ -285,7 +285,7 @@ export default function TrustedContactRequest( props ) {
       } else if (
         text.length >= 3 &&
         text.charAt( 0 ) +
-          text.replace( '.com', '' ).slice( text.replace( '.com', '' ).length - 2 ) !=
+          text.slice( text.length - 2 ) !=
           props.hint
       ) {
         setWrongInputError( 'Incorrect Email, try again' )
