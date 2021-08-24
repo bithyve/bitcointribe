@@ -19,6 +19,9 @@ import { useSelector } from 'react-redux'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import { RadioButton } from 'react-native-paper/lib/typescript/components/RadioButton/RadioButton'
+import LastSeenActiveIndicator from '../../components/LastSeenActiveIndicator'
+import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
+import idx from 'idx'
 
 const FNFToKeeper = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
@@ -71,41 +74,98 @@ const FNFToKeeper = ( props ) => {
     contactsType: string;
   }
   ) => {
+    const instreamId = contactDescription.streamId
+    let lastSeenActive
+    if( instreamId ) {
+      const instream = idx( contactDescription, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+      lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
+    }
+
     return <TouchableOpacity style={styles.listItem} onPress={() => {
       const obj = {
         name: contactDescription.contactDetails.contactName,
         imageAvailable: contactDescription.contactDetails.imageAvailable ? true : false,
         image: contactDescription.contactDetails.imageAvailable,
         id: contactDescription.contactDetails.id,
-        channelKey: contactDescription.channelKey
+        channelKey: contactDescription.channelKey,
+        isExisting: true
       }
       props.navigation.state.params.selectContact( 'ExistingContact', obj )
       props.navigation.goBack()
     }}
     >
       <View style={{
-        backgroundColor: contactDescription.contactDetails.id === selectedItem ? Colors.blue : Colors.backgroundColor,
-        width: wp( '5.5%' ), height: wp( '5.5%' ), borderRadius: wp( '5.5/2%' ),
-        alignItems: 'center', marginRight: wp( 2 ),
-        justifyContent: 'center'
-      }}>{contactDescription.contactDetails.id === selectedItem &&
+        justifyContent:'center'
+      }}>
+        <View style={{
+          backgroundColor: contactDescription.contactDetails.id === selectedItem ? Colors.blue : Colors.backgroundColor,
+          width: wp( '5.5%' ), height: wp( '5.5%' ), borderRadius: wp( '5.5/2%' ),
+          alignItems: 'center', marginRight: wp( 2 ),
+          justifyContent: 'center',
+        }}>{contactDescription.contactDetails.id === selectedItem &&
         <Image
           source={require( '../../assets/images/icons/check_white.png' )}
           style={{
             width: wp( '3.5%' ), height: wp( '3.5%' ),
           }}
           resizeMode={'contain'}
-        />
-        }
-
+        />}
+        </View>
       </View>
+      <View style={styles.avatarContainer}>
+        <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} />
 
-      <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} />
-      <Text style={{
-        textAlign: 'center', marginLeft: wp( 2 ),
-      }}>{firstNamePieceText( contactDescription.contactDetails )}
-        <Text style={styles.secondNamePieceText}>{secondNamePieceText( contactDescription.contactDetails )}</Text>
-      </Text>
+        <LastSeenActiveIndicator
+          style={{
+            position: 'absolute',
+            right: -2,
+            top: -2,
+            elevation: 2,
+            zIndex: 2,
+          }}
+          timeSinceActive={lastSeenActive}
+        />
+      </View>
+      <View style={{
+        flexDirection:'column', alignItems:'flex-start',
+        justifyContent:'center'
+      }}>
+        <View style={{
+          flexDirection:'row',
+        }}>
+          <Text style={{
+            color: Colors.gray2,
+            fontFamily: Fonts.FiraSansRegular
+          }}>Last seen </Text>
+          {Number.isFinite( lastSeenActive ) ? (
+            <Text style={{
+              color: Colors.gray2,
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>
+              {agoTextForLastSeen( lastSeenActive )}
+            </Text>
+          ) : (
+            <Text style={{
+              color: Colors.gray2,
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>Unknown</Text>
+          )}
+        </View>
+        <View style={{
+          alignItems: 'flex-start'
+        }}>
+          <Text style={{
+            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+          }}>{firstNamePieceText( contactDescription.contactDetails )}
+            <Text style={{
+              ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansMedium
+            }}>{secondNamePieceText( contactDescription.contactDetails )}</Text>
+          </Text>
+          <Text style={{
+            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+          }}>Trusted Contact</Text>
+        </View>
+      </View>
     </TouchableOpacity>
 
   }, [] )
@@ -143,7 +203,7 @@ const FNFToKeeper = ( props ) => {
           <View>
             <HeaderTitle
               firstLineTitle={'Backup Recovery Key'}
-              secondLineTitle={'Select contacts from your address book,\nor add a new contact'}
+              secondLineTitle={'Select an exerting contact or\nadd from the address book'}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -156,16 +216,20 @@ const FNFToKeeper = ( props ) => {
                 props.navigation.goBack()
               }}
               style={styles.addContactBtn}>
-              <Image
-                source={require( '../../assets/images/icons/addressbook.png' )}
-                style={styles.plusIcon}
-              />
+              <View style={{
+                paddingLeft: wp( 5 )
+              }}>
+                <Image
+                  source={require( '../../assets/images/icons/addressbookWhite.png' )}
+                  style={styles.plusIcon}
+                />
+              </View>
               <Text style={{
                 marginHorizontal: wp( 2 ),
                 color: Colors.gray2,
                 fontFamily: Fonts.FiraSansMedium,
                 fontSize: RFValue( 14 )
-              }}>Choose from Phonebook</Text>
+              }}>Choose from address book</Text>
             </TouchableOpacity>
             <Text style={{
               marginHorizontal: wp( 2 ),
@@ -216,12 +280,12 @@ const styles = StyleSheet.create( {
     marginVertical: hp( 1 )
   },
   plusIcon: {
-    height: wp( 12 ),
-    width: wp( 10 )
+    height: wp( 9 ),
+    width: wp( 8 ),
+    resizeMode: 'contain'
   },
   listItem: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginHorizontal: wp( 4 ),
     marginVertical: hp( 0.5 ),
     backgroundColor: Colors.backgroundColor1,
@@ -236,6 +300,12 @@ const styles = StyleSheet.create( {
     ...ImageStyles.thumbnailImageLarge,
     borderRadius: wp( 14 ) / 2,
     marginHorizontal: wp( 1 )
+  },
+  avatarContainer: {
+    ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
+    marginRight: 16,
   },
 } )
 

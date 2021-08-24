@@ -6,7 +6,6 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
-  Platform,
   AsyncStorage,
   Keyboard,
   TouchableOpacity,
@@ -17,12 +16,6 @@ import {
 } from 'react-native-responsive-screen'
 import { useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
-import {
-  ContactRecipientDescribing,
-} from '../../common/data/models/interfaces/RecipientDescribing'
-import { ListItem } from 'react-native-elements'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -58,22 +51,17 @@ import {
   DeepLinkEncryptionType
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
-import { isEmpty } from '../../common/CommonFunctions/index'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import QRModal from '../Accounts/QRModal'
-import { StackActions } from 'react-navigation'
 import ApproveSetup from './ApproveSetup'
 import semver from 'semver'
-import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -111,8 +99,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
   const [ OTP, setOTP ] = useState( '' )
   const [ renderTimer, setRenderTimer ] = useState( false )
-  const [ showTrustedContactModal, setTrustedContactModal ] = useState( false )
-  const [ LoadContacts, setLoadContacts ] = useState( false )
   const [ isOTPType, setIsOTPType ] = useState( false )
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
@@ -170,9 +156,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( () => {
     if ( isChange ) {
-      setTimeout( () => {
-        setLoadContacts( true )
-      }, 2 )
       // setTrustedContactModal( true )
       if( shareType === 'existingContact' ){
         props.navigation.navigate( 'FNFToKeeper', {
@@ -190,14 +173,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
               chosenContactTmp: getContacts( selectedContacts )
             } )
             setShowQrCode( true )
-            // props.navigation.navigate( 'AddContactSendRequest', {
-            //   SelectedContact: [ selectedContacts ],
-            //   headerText:`Send Recovery Key${'\n'}to contact`,
-            //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-            //   contactText:'Sharing Recovery Key with:',
-            //   isKeeper: true,
-            //   existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
-            // } )
           }
         } )
       }
@@ -218,15 +193,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
       }
       setContacts( existingContactsArr )
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
-        setTimeout( () => {
-          setLoadContacts( true )
-        }, 2 )
         // setTrustedContactModal( true )
         if( existingContactsArr.length ){
           props.navigation.navigate( 'FNFToKeeper', {
             ...props.navigation.state.params,
             selectContact:selectContact
-          } ) }
+          } )
+          setShowQrCode( true )
+        }
         else {
           props.navigation.navigate( 'TrustedContactNewBHR', {
             LoadContacts: true,
@@ -236,14 +210,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
                 chosenContactTmp: getContacts( selectedContacts )
               } )
               setShowQrCode( true )
-              // props.navigation.navigate( 'AddContactSendRequest', {
-              //   SelectedContact: [ selectedContacts ],
-              //   headerText:`Send Recovery Key${'\n'}to contact`,
-              //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-              //   contactText:'Sharing Recovery Key with:',
-              //   isKeeper: true,
-              //   existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
-              // } )
             }
           } )
         }
@@ -432,15 +398,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     createGuardian( {
       chosenContactTmp: getContacts( chosenContact )
     } )
-    // setShowQrCode( true )
-    // props.navigation.navigate( 'AddContactSendRequest', {
-    //   SelectedContact: [ chosenContact ],
-    //   headerText:`Send Recovery Key${'\n'}to contact`,
-    //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-    //   contactText:'Sharing Recovery Key with:',
-    //   isKeeper: true,
-    //   existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
-    // } )
   }, [ selectedTitle, chosenContact, getContacts ] )
 
   const renderChangeContent = useCallback( () => {
@@ -457,7 +414,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         isIgnoreButton={true}
         onPressProceed={() => {
           setTimeout( () => {
-            setLoadContacts( true )
             setChangeContact( true )
           }, 2 )
 
@@ -477,14 +433,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
                   chosenContactTmp: getContacts( selectedContacts ), isChangeTemp: true
                 } )
                 setShowQrCode( true )
-                // props.navigation.navigate( 'AddContactSendRequest', {
-                //   SelectedContact: [ selectedContacts ],
-                //   headerText:`Send Recovery Key${'\n'}to contact`,
-                //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-                //   contactText:'Sharing Recovery Key with:',
-                //   isKeeper: true,
-                //   existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
-                // } )
               }
             } )
           }
@@ -602,50 +550,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ chosenContact, createChannelAssetsStatus, channelAssets ] )
 
-  // useEffect( () => {
-  //   // const focusListener = props.navigation.addListener( 'didFocus', ( params ) => {
-  //   //   // getMessageToShow()
-  //   //   console.log( 'choosenContact >>>>>>>', params.state.params )
-  //   //   if( params.state.params[ 'choosenContact' ] ) {
-  //   //     setChosenContact( props.navigation.state.params[ 'choosenContact' ] )
-  //   //   }
-  //   //   if ( params.state.params[ 'addNewContact' ] ) {
-  //   //     props.navigation.navigate( 'TrustedContactNewBHR', {
-  //   //       LoadContacts: true,
-  //   //       onPressContinue:async ( selectedContacts ) => {
-  //   //         Keyboard.dismiss()
-  //   //         createGuardian( {
-  //   //           chosenContactTmp: getContacts( selectedContacts )
-  //   //         } )
-  //   //         // setShowQrCode( true )
-  //   //         props.navigation.navigate( 'AddContactSendRequest', {
-  //   //           SelectedContact: [ selectedContacts ],
-  //   //           headerText:`Send Recovery Key${'\n'}to contact`,
-  //   //           subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-  //   //           contactText:'Sharing Recovery Key with:',
-  //   //         } )
-  //   //       }
-  //   //     } )
-  //   //   }
-  //   // } )
-  //   return () => {
-  //     focusListener.remove()
-  //   }
-  // }, [] )
-
   useEffect( () => {
     if( shareType == 'existingContact' && !isGuardianCreationClicked && ( ( chosenContact && Object.keys( chosenContact ).length ) || chosenContact != null ) ) {
       createGuardian( )
       // setShowQrCode( true )
-      // props.navigation.navigate( 'AddContactSendRequest', {
-      //   SelectedContact: [ chosenContact ],
-      //   headerText:`Send Recovery Key${'\n'}to contact`,
-      //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-      //   contactText:'Sharing Recovery Key with:',
-      //   // showDone:true,
-      //   isKeeper: true,
-      //   existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
-      // } )
     }
   }, [ chosenContact ] )
 
@@ -713,7 +621,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       } )
       setTrustedQR( QRData )
       console.log( 'QR DATA', QRData )
-      if( showQrCode ){
+      if( showQrCode && ( deepLink.includes( 'EXISTING_CONTACT' ) || deepLink.includes( 'KEEPER' ) ) ){
         props.navigation.navigate( 'QrAndLink', {
           otp: encryptionHint,
           trustedLink: deepLink,
@@ -820,15 +728,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           createGuardian( {
             chosenContactTmp: getContacts( selectedContacts )
           } )
-          // setShowQrCode( true )
-          // props.navigation.navigate( 'AddContactSendRequest', {
-          //   SelectedContact: [ selectedContacts ],
-          //   headerText:`Send Recovery Key${'\n'}to contact`,
-          //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-          //   contactText:'Sharing Recovery Key with:',
-          //   isKeeper: true,
-          //   existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
-          // } )
+          setShowQrCode( true )
         }
       } )
     }
@@ -879,7 +779,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
           onPressConfirm={() => {
             setTimeout( () => {
-              setLoadContacts( true )
               setShowQrCode( true )
             }, 2 )
             // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
@@ -901,14 +800,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
                     chosenContactTmp: getContacts( selectedContacts )
                   } )
                   setShowQrCode( true )
-                  // props.navigation.navigate( 'AddContactSendRequest', {
-                  //   SelectedContact: [ selectedContacts ],
-                  //   headerText:`Send Recovery Key${'\n'}to contact`,
-                  //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-                  //   contactText:'Sharing Recovery Key with:',
-                  //   isKeeper: true,
-                  //   existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
-                  // } )
                 }
               } )
             }
