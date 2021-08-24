@@ -164,7 +164,8 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
 const defaultStyles = StyleSheet.create( {
   rootContainer: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    // alignItems: 'baseline',
+    alignItems: 'center'
   },
 
   currencyImage: {
@@ -177,12 +178,12 @@ const defaultStyles = StyleSheet.create( {
     fontFamily: Fonts.OpenSans,
     fontSize: RFValue( 17 ),
     marginRight: 3,
-    alignItems: 'baseline',
+    // alignItems: 'baseline',
   },
 
   unitText: {
     fontFamily: Fonts.FiraSansRegular,
-    alignItems: 'baseline',
+    // alignItems: 'baseline',
   },
 } )
 

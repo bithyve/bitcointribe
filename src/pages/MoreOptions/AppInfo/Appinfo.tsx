@@ -35,7 +35,7 @@ import EditWalletSuccess from './EditWalletSuccess'
 import { updateWalletName } from '../../../store/actions/trustedContacts'
 import { LevelHealthInterface } from '../../../bitcoin/utilities/Interface'
 import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
-import { setCloudData } from '../../../store/actions/cloud'
+import { updateCloudData } from '../../../store/actions/cloud'
 interface MenuOption {
     title: string;
     subtitle: string;
@@ -73,7 +73,7 @@ const AppInfo = ( props ) => {
     {
       title: 'Wallet Name',
       imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
-      subtitle: 'Lorem Ipsum dolor amet cons',
+      subtitle: 'You can edit your wallet\'s name here',
       onOptionPressed: () => showModal()
     },
     {
@@ -144,9 +144,9 @@ const AppInfo = ( props ) => {
     )
   }, [] )
 
-  const updateCloudData = () => {
+  const updateCloud = () => {
     // console.log( 'cloudBackupStatus', cloudBackupStatus, currentLevel )
-    if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
+    // if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
     dispatch( updateCloudData() )
   }
 
@@ -176,8 +176,8 @@ const AppInfo = ( props ) => {
             showEditName( false )
             setSuccess( true )
             setTimeout( () => {
-              updateCloudData()
-            }, 100 )
+              updateCloud()
+            }, 200 )
 
           }}
         />
@@ -212,7 +212,7 @@ const AppInfo = ( props ) => {
       </View>
       <HeaderTitle
         firstLineTitle={'App Info'}
-        secondLineTitle={'Lorem Ipsum dolor amet cons'}
+        secondLineTitle={'Details of your wallet'}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}

@@ -327,6 +327,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           />
           <NavHeaderSettingsButton
             onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+            accManagement={true}
           />
         </View>
 

@@ -6,11 +6,13 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 export type Props = {
   onPress: () => void;
   containerStyle?: Record<string, unknown>;
+  accManagement?: boolean
 };
 
 const NavHeaderSettingsButton: React.FC<Props> = ( {
   onPress,
   containerStyle,
+  accManagement
 }: Props ) => {
   return (
     <TouchableOpacity
@@ -23,7 +25,7 @@ const NavHeaderSettingsButton: React.FC<Props> = ( {
       }}
     >
       <Image
-        source={require( '../../assets/images/icons/icon_settings_blue.png' )}
+        source={accManagement ? require( '../../assets/images/icons/icon_settings_blue.png' ) : require( '../../assets/images/icons/icon_settings.png' )}
         style={{
           width: 22, height: 22,
           marginTop: heightPercentageToDP( 0.5 )

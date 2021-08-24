@@ -407,7 +407,7 @@ export default function AddContactSendRequest( props ) {
             icon={true}
             title={'Secure with 2FA'}
             infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ei'
+              '2 Factor Authentication gives you an additional layer of security and implementing it is highly recommended.'
             }
             backgroundColor={Colors.white}
           />

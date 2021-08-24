@@ -39,6 +39,7 @@ export default function SendConfirmationContent( props ) {
           ...styles.successModalHeaderView,
           marginRight: wp( '8%' ),
           marginLeft: wp( '8%' ),
+          marginTop: hp( 2 )
         }}
       >
         <Text style={styles.modalTitleText}>{props.title}</Text>

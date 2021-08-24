@@ -86,7 +86,8 @@ export default function EnterPasscodeScreen( props ) {
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
-          }}>Lorem Ipsum dolor amet cons</Text>
+            paddingRight: wp( 10 )
+          }}>The new name would appear on your Home Screen</Text>
         </View>
         <View style={{
           marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 3 )
