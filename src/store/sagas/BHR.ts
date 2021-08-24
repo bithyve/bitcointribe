@@ -1417,15 +1417,15 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact, isPrimaryKeeper } = data
     const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     if( existingContact ){
       const existingContactDetails = contacts[ channelKey ].contactDetails
-      const contactInfo = {
-        contactDetails: existingContactDetails,
-        channelKey,
-      }
       const channelUpdate =  {
-        contactInfo
+        contactInfo: {
+          contactDetails: existingContactDetails,
+          channelKey,
+        }
       }
       const payloadForSync = {
         permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
@@ -1436,7 +1436,6 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
       } )
     }
     const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
-    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const walletId = wallet.walletId
     const { walletName } = yield select( ( state ) => state.storage.wallet )
