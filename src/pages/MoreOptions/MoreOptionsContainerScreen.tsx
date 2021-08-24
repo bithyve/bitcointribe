@@ -245,7 +245,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           />
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://HexaWallet.io' )
+              Linking.openURL( 'https://hexawallet.io/faq/' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
@@ -261,7 +261,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               backgroundColor: Colors.white,
               paddingVertical: heightPercentageToDP( 2 ),
               paddingHorizontal: widthPercentageToDP( 5 ),
-              marginTop: heightPercentageToDP( '7%' ),
+              marginTop: heightPercentageToDP( '3%' ),
               alignItems: 'center'
             }}
           >
