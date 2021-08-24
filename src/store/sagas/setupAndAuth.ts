@@ -222,6 +222,7 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
     channelUpdates,
     metaSync: true
   } ) )
+  yield put( updateWalletImageHealth() )
 }
 
 export const applicationUpdateWatcher = createWatcher(
