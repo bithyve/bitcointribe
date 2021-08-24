@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { StyleSheet, View, Image } from 'react-native'
+import { StyleSheet, View, Image, Text } from 'react-native'
 import { ListItem, Icon } from 'react-native-elements'
 import moment from 'moment'
 import Colors from '../../common/Colors'
@@ -82,6 +82,22 @@ const TransactionListItemContent: React.FC<Props> = ( {
     return moment( transaction.date ).format( 'DD/MM/YYYY • hh:MMa' )
   }, [ transaction.transactionType ] )
 
+  const getReceiversCount = useMemo( () => {
+    if( transaction.transactionType === TransactionKind.SEND ) {
+      if( transaction.receivers ) {
+        if( transaction.receivers.length > 1 ) {
+          return `+${transaction.receivers.length}`
+        } else {
+          return ''
+        }
+      } else {
+        return ''
+      }
+    } else {
+      return ''
+    }
+  }, [ transaction.receivers ] )
+
   const confirmationsText = useMemo( () => {
     return transaction.confirmations > 6 ?
       '6+'
@@ -111,6 +127,14 @@ const TransactionListItemContent: React.FC<Props> = ( {
             <View style={styles.dot}/>
           )
         }
+
+        {
+          getReceiversCount !== '' &&(
+            <View style={styles.containerCount}>
+              <Text style={styles.textCount}>{getReceiversCount}</Text>
+            </View>          )
+        }
+
 
       </View>
       <ListItem.Content style={styles.titleSection}>
@@ -180,6 +204,24 @@ const styles = StyleSheet.create( {
     position: 'absolute',
     top: 0,
     right: 0,
+  },
+
+  textCount: {
+    color: 'gray',
+    fontSize: 10,
+  },
+
+  containerCount: {
+    height: 20,
+    width: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    position: 'absolute',
+    bottom: 0,
+    right: -2,
+    justifyContent: 'center',
+    elevation: 1,
+    alignItems: 'center',
   },
 
   titleText: {

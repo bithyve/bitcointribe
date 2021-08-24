@@ -54,7 +54,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
       let name = ''
       if( transaction.receivers ) {
         if( transaction.receivers.length > 1 ) {
-          name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length  -1} other`
+          name = `${transaction.receivers.length} Recipients`
         } else {
           name = transaction.receivers[ 0 ].name ||  transaction.accountType || transaction.accountName
         }

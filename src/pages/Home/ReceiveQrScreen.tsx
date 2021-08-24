@@ -55,8 +55,12 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   useEffect( () => {
     if ( allAccounts ) {
-      setAccounts( allAccounts )
-      setSelectedAccount( allAccounts[ 0 ] )
+      const acc = []
+      for ( const [ key, value ] of Object.entries( allAccounts ) ) {
+        acc.push( value )
+      }
+      setAccounts( acc )
+      setSelectedAccount( acc[ 0 ] )
     }
   }, [ allAccounts ] )
 
@@ -73,6 +77,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         amount: parseInt( amount ) / SATOSHIS_IN_BTC,
       } ).paymentURI
     }
+    console.log( receiveAt )
     setReceivingAddress( receiveAt )
   }, [ amount, selectedAccount ] )
 
@@ -151,12 +156,12 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                       style={{
                         ...styles.dropDownElement,
                       }}>
-                        <View style={styles.imageView}>
+                        {/* <View style={styles.imageView}>
                           <Image source={value.accountImage} style={{
                             width: wp( '8%' ), height: wp( '8%' )
                           }} />
 
-                        </View>
+                        </View> */}
                         <View style={{
                           marginLeft: wp( '2%' ), alignSelf: 'center',
                         }}>
@@ -190,11 +195,11 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               marginRight: 20,
               marginBottom: 20,
             }}>
-            <View style={styles.imageView}>
+            {/* <View style={styles.imageView}>
               <Image source={selectedAccount && selectedAccount.accountImage} style={{
                 width: wp( '9%' ), height: wp( '9%' )
               }} />
-            </View>
+            </View> */}
             <View style={{
               marginLeft: wp( '2%' ), alignSelf: 'center',
             }}>
