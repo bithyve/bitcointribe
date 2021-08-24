@@ -98,7 +98,7 @@ const menuOptions: MenuOption[] = [
   {
     title: 'App Info',
     imageSource: require( '../../assets/images/icons/icon_info.png' ),
-    subtitle: 'Lorem Ipsum dolor amet cons',
+    subtitle: 'Find details of your wallet within',
     screenName: 'AppInfo',
   },
 ]

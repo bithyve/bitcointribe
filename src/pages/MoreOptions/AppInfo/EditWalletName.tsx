@@ -128,7 +128,8 @@ export default function EditWalletName( props ) {
           <Text style={{
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
-          }}>Lorem Ipsum dolor amet cons</Text>
+            paddingRight: wp( 10 )
+          }}>The new name would appear on your Home Screen</Text>
         </View>
         <View style={{
           marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 5 )
@@ -206,7 +207,8 @@ export default function EditWalletName( props ) {
             paddingRight: 15,
             marginTop: 10,
             borderColor: answerError ? Colors.red : Colors.borderColor,
-            backgroundColor: Colors.white
+            backgroundColor: Colors.white,
+            width: wp( 80 )
           }}
         >
           <TextInput
