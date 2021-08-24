@@ -132,7 +132,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
             contactDetails: contactInfo.contactDetails,
             channelKey: contactInfo.channelKey,
             contact,
-            streamId: streamUpdates.streamId,
+            streamId: streamUpdates? streamUpdates.streamId: streamId,
             secondaryChannelKey: contactInfo.secondaryChannelKey,
             unEncryptedOutstreamUpdates: streamUpdates,
             contactsSecondaryChannelKey: contactInfo.contactsSecondaryChannelKey,
