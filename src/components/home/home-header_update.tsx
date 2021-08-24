@@ -245,15 +245,17 @@ const HomeHeader = ( {
             <View
               style={{
                 flexDirection: 'row',
-                alignItems: 'baseline',
-              // marginBottom: wp('3%'),
+                // alignItems: 'baseline',
+                // marginBottom: wp('3%'),
+                alignItems: 'center',
               }}
             >
               {prefersBitcoin ? (
                 <Image
                   style={{
                     ...CommonStyles.homepageAmountImage,
-                    alignItems: 'baseline',
+                    // alignItems: 'baseline',
+                    marginTop: hp( 0.2 )
                   }}
                   source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                 />
@@ -479,5 +481,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     // marginBottom: 3,
     color: Colors.white,
+    marginTop: hp( 0.7 )
   },
 } )

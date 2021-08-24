@@ -81,5 +81,6 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
+    paddingRight: widthPercentageToDP( 2 )
   },
 } )
