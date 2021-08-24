@@ -490,6 +490,9 @@ export default function AddContactAddressBook( props ) {
                 data={filterContactData}
                 extraData={radioOnOff}
                 showsVerticalScrollIndicator={false}
+                contentInset={{
+                  right: 0, top: 0, left: 0, bottom: hp( 24 )
+                }}
                 renderItem={( { item, index } ) => {
                   let selected = false
                   if (
@@ -661,7 +664,7 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     height: hp( '6%' ),
-    width: wp( '50%' ),
+    width: wp( '45%' ),
     backgroundColor: Colors.blue,
     borderRadius: 10,
     justifyContent: 'center',
@@ -673,6 +676,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     marginBottom: 20,
+    marginLeft: wp( 9 ),
   },
   selectedContactView: {
     width: wp( '42%' ),

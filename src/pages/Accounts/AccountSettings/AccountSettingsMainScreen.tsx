@@ -12,6 +12,7 @@ import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateAccountSettings } from '../../../store/actions/accounts'
 import ModalContainer from '../../../components/home/ModalContainer'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
@@ -148,6 +149,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       <ListItem
         bottomDivider
         onPress={() => { handleListItemPress( listItem ) }}
+        disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
         <Image
           source={listItem.imageSource}

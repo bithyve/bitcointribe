@@ -58,7 +58,8 @@ export default function EditWalletSuccess( props ) {
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
-          }}>Lorem Ipsum dolor amet cons</Text>
+            paddingRight: wp( 10 )
+          }}>The new name would appear on your Home Screen</Text>
         </View>
       </View>
       <View

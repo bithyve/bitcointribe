@@ -114,7 +114,7 @@ function SecurityQuestion( props ) {
             <Text style={styles.modalTitleText}>Edit Wallet Name</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>Lorem Ipsum dolor amet cons</Text>
+            }}>You can edit your wallet's name here</Text>
           </View>
           <View style={{
             marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 3 ), alignItems: 'center'

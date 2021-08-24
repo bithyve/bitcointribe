@@ -13,6 +13,7 @@ import moment from 'moment'
 import TransactionKind from '../../../common/data/enums/TransactionKind'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   transaction: TransactionDescribing;
@@ -53,7 +54,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
       let name = ''
       if( transaction.receivers ) {
         if( transaction.receivers.length > 1 ) {
-          name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length  -1} other`
+          name = `${transaction.receivers.length} Recipients`
         } else {
           name = transaction.receivers[ 0 ].name ||  transaction.accountType || transaction.accountName
         }
@@ -68,7 +69,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
     <View style={styles.rootContainer}>
       <View style={styles.contentContainer}>
         <Image
-          source={getAvatarForSubAccount( primarySubAccount )}
+          source={getAvatarForSubAccount( primarySubAccount, false, true )}
           style={styles.avatarImage}
           resizeMode="contain"
         />
@@ -132,9 +133,11 @@ const styles = StyleSheet.create( {
   },
 
   avatarImage: {
-    ...ImageStyles.thumbnailImageMedium,
+    // ...ImageStyles.thumbnailImageMedium,
+    width: widthPercentageToDP( 12 ),
+    height: widthPercentageToDP( 12 ),
     marginRight: 14,
-    borderRadius: 9999,
+    // borderRadius: 9999,
   },
 } )
 
