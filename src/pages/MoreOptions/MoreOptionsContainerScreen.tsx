@@ -251,19 +251,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   alert( 'Make sure Telegram installed on your device' )
                 } )
             }}
-            // style={styles.addModalView}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              width: '90%',
-              alignSelf: 'center',
-              borderRadius: widthPercentageToDP( '2' ),
-              backgroundColor: Colors.white,
-              paddingVertical: heightPercentageToDP( 2 ),
-              paddingHorizontal: widthPercentageToDP( 5 ),
-              marginTop: heightPercentageToDP( '3%' ),
-              alignItems: 'center'
-            }}
+            style={[ styles.otherCards, styles.extraHeight ]}
           >
             <Image
               source={require( '../../assets/images/icons/question_active.png' )}
@@ -300,19 +288,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   alert( 'Make sure Telegram installed on your device' )
                 } )
             }}
-            // style={styles.addModalView}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              width: '90%',
-              alignSelf: 'center',
-              borderRadius: widthPercentageToDP( '2' ),
-              backgroundColor: Colors.white,
-              paddingVertical: heightPercentageToDP( 2 ),
-              paddingHorizontal: widthPercentageToDP( 4 ),
-              marginTop: heightPercentageToDP( '1%' ),
-              alignItems: 'center'
-            }}
+            style={styles.otherCards}
           >
             <Image
               source={require( '../../assets/images/icons/icon_telegram.png' )}
@@ -410,7 +386,21 @@ const styles = StyleSheet.create( {
     height: 2,
     backgroundColor: Colors.backgroundColor,
   },
-
+  otherCards: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '95%',
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+    backgroundColor: Colors.white,
+    paddingVertical: heightPercentageToDP( 2 ),
+    paddingHorizontal: widthPercentageToDP( 4 ),
+    marginTop: heightPercentageToDP( '1%' ),
+    alignItems: 'center'
+  },
+  extraHeight: {
+    marginTop: heightPercentageToDP( '3%' ),
+  },
   addModalView: {
     backgroundColor: Colors.white,
     paddingVertical: 4,
@@ -421,7 +411,6 @@ const styles = StyleSheet.create( {
     width: '95%',
     alignSelf: 'center',
     borderRadius: widthPercentageToDP( '2' ),
-
     marginBottom: heightPercentageToDP( '1' )
   },
 
