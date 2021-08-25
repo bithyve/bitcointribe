@@ -114,7 +114,7 @@ function SecurityQuestion( props ) {
             <Text style={styles.modalTitleText}>Edit Wallet Name</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>You can edit your wallet's name here</Text>
+            }}>Change your wallet's name</Text>
           </View>
           <View style={{
             marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 3 ), alignItems: 'center'
@@ -210,7 +210,7 @@ function SecurityQuestion( props ) {
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
         </View>
-        {showNote &&
+        {/* {showNote &&
         <BottomInfoBox
           // backgroundColor={Colors.white}
           title={'Note'}
@@ -218,7 +218,7 @@ function SecurityQuestion( props ) {
             'Your Friends & Family will be notified of this change, so they may update their saved details.'
           }
         />
-        }
+        } */}
         <View
           style={{
             paddingLeft: wp( '6%' ),
@@ -256,7 +256,7 @@ function SecurityQuestion( props ) {
               {!errorText ? 'Confirm' : 'Try Again'}
             </Text>
           </AppBottomSheetTouchableWrapper>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => {}}
             style={{
               height: wp( '15%' ),
@@ -274,7 +274,7 @@ function SecurityQuestion( props ) {
             >
               {'Need Help?'}
             </Text>
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
         </View>
       </View>
     </KeyboardAwareScrollView>
@@ -331,11 +331,11 @@ const styles = StyleSheet.create( {
     color: Colors.black,
   },
   dropdownBox: {
-    marginTop: hp( '2%' ),
+    marginTop: hp( '1%' ),
     height: 50,
-    paddingLeft: 15,
+    // paddingLeft: 10,
     paddingRight: 15,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   questionConfirmButton: {
     height: wp( '13%' ),

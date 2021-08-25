@@ -61,12 +61,12 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
     {
       title: 'Edit Name',
       imageSource: require( '../../assets/images/icons/icon_phonebook.png' ),
-      subtitle: 'Show all account on the Home Screen',
+      subtitle: 'Enter a name to store against the contact',
     },
     {
       title: 'Associate a Contact',
       imageSource: require( '../../assets/images/icons/icon_phonebook.png' ),
-      subtitle: 'Connect Hexa wallet to your own Bitcoin node',
+      subtitle: 'You can choose a contact from your address book',
       onOptionPressed: () => {
         setIsLoadContacts( true )
         navigation.navigate( 'AddContact', {
@@ -248,7 +248,7 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
       </View>
       <Text style={[ styles.addModalInfoText, {
         margin: hp( 4 ), marginTop: hp( 6 )
-      } ]}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt</Text>
+      } ]}>The contact name associated here helps you easily recognise your Friends & Family. It is not stored or communicated to anyone else.</Text>
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}

@@ -175,14 +175,14 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         >
               Checking Account
         </ListItem.Title>
-        <ListItem.Subtitle
+        {/* <ListItem.Subtitle
           style={[ ListStyles.infoHeaderSubtitleText, {
             alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
           } ]}
           numberOfLines={1}
         >
               Lorem ipsum dolor amet
-        </ListItem.Subtitle>
+        </ListItem.Subtitle> */}
       </ListItem.Content>
     </View>
 
@@ -212,14 +212,14 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         >
           {rampReceiveAddress}
         </ListItem.Title>
-        <ListItem.Subtitle
+        {/* <ListItem.Subtitle
           style={[ ListStyles.infoHeaderSubtitleText, {
             alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
           } ]}
           numberOfLines={1}
         >
               Lorem ipsum dolor amet
-        </ListItem.Subtitle>
+        </ListItem.Subtitle> */}
       </ListItem.Content>
     </View>
 

@@ -101,7 +101,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
       <View style={styles.containerImg}>
         <Image
-          source={getAvatarForSubAccount( primarySubAccount )}
+          source={getAvatarForSubAccount( primarySubAccount, false, true )}
           style={styles.avatarImage}
           resizeMode="contain"
         />
@@ -159,17 +159,13 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     height: 35,
     width: 35,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: 'white',
     marginRight: 10,
-    backgroundColor: '#F4F4F4',
   },
 
   avatarImage: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
+    height: 45,
+    width: 45,
+    // borderRadius: 10,
   },
 
   dot: {

@@ -15,6 +15,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import idx from 'idx'
 import * as ExpoContacts from 'expo-contacts'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 export default function Secure2FA( props ) {
 
@@ -46,13 +47,13 @@ export default function Secure2FA( props ) {
         <View style={{
           marginLeft: wp( 6 ),
         }}>
-          <Text style={styles.modalTitleText}>Secure with 2FA</Text>
+          <Text style={styles.modalTitleText}>Select the second factor</Text>
           <Text style={{
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
             marginRight: wp( 11 )
-          }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor</Text>
+          }}>Select one of the below to add as a second factor to your link/QR</Text>
         </View>
         {phoneNumbers && phoneNumbers[ 0 ].number &&
         <CardWithRadioBtn
@@ -77,15 +78,17 @@ export default function Secure2FA( props ) {
         <CardWithRadioBtn
           icon={''}
           mainText={'Confirm with OTP'}
-          subText={'Lorem ipsum dolor sit amet'}
+          subText={'An alphanumeric code will be generated'}
           isSelected={activeType === DeepLinkEncryptionType.OTP}
           setActiveIndex={setActiveType}
           index={DeepLinkEncryptionType.OTP}
         />
       </View>
-      <Text style={styles.bottomNoteInfoText}>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ei
-      </Text>
+      <BottomInfoBox
+        title={'Note'}
+        infoText={'If the communication channel is not encrypted / secure, the second factor sent through a different channel improves the security guarantees'}
+        // backgroundColor={Colors.white}
+      />
       <View style={{
         marginTop: 'auto', marginBottom: hp( 2 )
       }}>
@@ -156,7 +159,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
-    letterSpacing: 0.6,
+    letterSpacing: 0.5,
     lineHeight: 18
   },
   keyPadRow: {

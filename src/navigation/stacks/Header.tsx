@@ -456,6 +456,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           //this.scheduleNotification()
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
+            if( nextAppState === 'background' ) {
+              this.closeBottomSheet()
+            }
             console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',

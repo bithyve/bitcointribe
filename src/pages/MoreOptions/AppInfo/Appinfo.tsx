@@ -73,19 +73,19 @@ const AppInfo = ( props ) => {
     {
       title: 'Wallet Name',
       imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
-      subtitle: 'You can edit your wallet\'s name here',
+      subtitle: 'Edit your wallet name here',
       onOptionPressed: () => showModal()
     },
     {
       title: 'Wallet ID',
       imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
-      subtitle: 'Lorem Ipsum dolor amet cons',
+      subtitle: 'Your Wallet ID is unique to your Hexa App',
       screenName: '',
     },
     {
       title: 'Version History',
       imageSource: require( '../../../assets/images/icons/icon_versionhistory_tilt.png' ),
-      subtitle: 'App version progression',
+      subtitle: 'View apps current version and its history',
       screenName: 'VersionHistory',
     },
   ]
@@ -212,7 +212,7 @@ const AppInfo = ( props ) => {
       </View>
       <HeaderTitle
         firstLineTitle={'App Info'}
-        secondLineTitle={'Details of your wallet'}
+        secondLineTitle={'Hexa app version number and details'}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}

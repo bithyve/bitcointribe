@@ -98,7 +98,7 @@ const menuOptions: MenuOption[] = [
   {
     title: 'App Info',
     imageSource: require( '../../assets/images/icons/icon_info.png' ),
-    subtitle: 'Find details of your wallet within',
+    subtitle: 'Hexa app version number and details',
     screenName: 'AppInfo',
   },
 ]

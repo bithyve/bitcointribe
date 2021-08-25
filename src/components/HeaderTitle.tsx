@@ -25,9 +25,17 @@ export default function HeaderTitle( props ) {
     <View style={{
       flexDirection: 'row', alignItems: 'center'
     }}>
-      <Text style={CommonStyles.subHeaderTitles} >
-        {props.secondLineTitle}
+      <Text style={[ CommonStyles.subHeaderTitles, {
+        fontWeight: '500'
+      } ]} >
+        {props.secondLineBoldTitle}
+        <Text style={[ CommonStyles.subHeaderTitles, {
+          fontWeight: 'normal'
+        } ]} >
+          {props.secondLineTitle}
+        </Text>
       </Text>
+
     </View>
     {props.isKnowMoreButton &&
                 <KnowMoreButton onpress={() => props.onPressKnowMore} containerStyle={{

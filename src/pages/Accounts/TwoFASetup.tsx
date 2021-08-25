@@ -22,6 +22,7 @@ import { authenticator } from 'otplib'
 
 const TwoFASetup = props => {
   const twoFASetup = props.navigation.getParam( 'twoFASetup' )
+  // const [ twoFAValidationModal, showTwoFAValidationModal ] = useState( false )
   const { twoFAKey } = twoFASetup
 
   return (
@@ -76,6 +77,7 @@ const TwoFASetup = props => {
             onPress={
               () => {
                 props.navigation.navigate( 'TwoFAValidation' )
+                // showTwoFAValidationModal( true )
               }
             }
             style={{

@@ -87,7 +87,7 @@ export default function EnterPasscodeScreen( props ) {
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
             paddingRight: wp( 10 )
-          }}>The new name would appear on your Home Screen</Text>
+          }}>Change your wallet's name</Text>
         </View>
         <View style={{
           marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 3 )
@@ -264,15 +264,6 @@ export default function EnterPasscodeScreen( props ) {
         <View style={styles.statusIndicatorActiveView} />
         <View style={styles.statusIndicatorInactiveView} />
       </View>
-      {pin.length !== 4 &&
-      <BottomInfoBox
-        // backgroundColor={Colors.white}
-        title={'Note'}
-        infoText={
-          'Your Friends & Family will be notified of this change, so they may update their saved details.'
-        }
-      />
-      }
       <View style={{
       }}>
         <View style={styles.keyPadRow}>

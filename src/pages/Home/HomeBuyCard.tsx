@@ -127,19 +127,20 @@ const HomeBuyCard = ( {
       <Button
         raised
         title="Buy BTC"
-        icon={
-          <Image
-            source={require( '../../assets/images/icons/recurring_buy.png' )}
-            style={{
-              width: wp( 6 ),
-              height: wp( 6 ),
-              resizeMode: 'contain'
-            }}
-          />
-        }
+        // icon={
+        //   <Image
+        //     source={require( '../../assets/images/icons/recurring_buy.png' )}
+        //     style={{
+        //       width: wp( 6 ),
+        //       height: wp( 6 ),
+        //       resizeMode: 'contain'
+        //     }}
+        //   />
+        // }
         buttonStyle={{
           borderRadius: wp( 3 ),
-          paddingVertical: wp( 2.8 ),
+          paddingVertical: wp( 2.5 ),
+          backgroundColor: Colors.blue
         }}
         titleStyle={{
           ...ButtonStyles.floatingActionButtonText,

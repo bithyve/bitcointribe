@@ -79,7 +79,7 @@ export default function EditWalletName( props ) {
         >
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
-        <AppBottomSheetTouchableWrapper
+        {/* <AppBottomSheetTouchableWrapper
           onPress={() => {}}
           style={{
             height: wp( '15%' ),
@@ -97,7 +97,7 @@ export default function EditWalletName( props ) {
           >
             {'Need Help?'}
           </Text>
-        </AppBottomSheetTouchableWrapper>
+        </AppBottomSheetTouchableWrapper> */}
       </View>
     )
   }
@@ -129,7 +129,7 @@ export default function EditWalletName( props ) {
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             paddingRight: wp( 10 )
-          }}>The new name would appear on your Home Screen</Text>
+          }}>Change your wallet's name</Text>
         </View>
         <View style={{
           marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 5 )
@@ -278,7 +278,7 @@ export default function EditWalletName( props ) {
         // backgroundColor={Colors.white}
         title={'Note'}
         infoText={
-          'Your Friends & Family will be notified of this change, so they may update their saved details.'
+          'The wallets name will get updated automatically across your Friends & Family network'
         }
       />
       {setButtonVisible()}
@@ -358,7 +358,7 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
     marginHorizontal: wp( '6%' ),
     marginBottom: hp( 2 ),
-    marginTop: hp( 11 )
+    marginTop: hp( 3 )
   },
   statusIndicatorActiveView: {
     height: 5,

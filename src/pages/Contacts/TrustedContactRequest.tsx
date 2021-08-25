@@ -200,6 +200,7 @@ export default function TrustedContactRequest( props ) {
                   if ( value && i == 5 ) {
                     onPressNumber( value, 5 )
                     this.textInput6.focus()
+
                   }
                 }}
                 onKeyPress={( e ) => {
@@ -229,20 +230,22 @@ export default function TrustedContactRequest( props ) {
                   }
                 }}
                 onFocus={() => {
-                  if ( Platform.OS == 'ios' ) {
-                    props.bottomSheetRef.current?.expand()
-                  }
+                  // if ( Platform.OS == 'ios' ) {
+                  props.bottomSheetRef.current?.expand()
+                  setIsDisabled( true )
+                  // }
                 }}
                 onBlur={() => {
-                  if ( Platform.OS == 'ios' ) {
-                    if (
-                      ( passcodeArray.length == 0 ||
+                  // if ( Platform.OS == 'ios' ) {
+                  if (
+                    ( passcodeArray.length == 0 ||
                         passcodeArray.length == 6 ) &&
                       i == 5
-                    ) {
-                      props.bottomSheetRef.current?.snapTo( 1 )
-                    }
+                  ) {
+                    props.bottomSheetRef.current?.snapTo( 1 )
+                    setIsDisabled( false )
                   }
+                  // }
                 }}
                 autoCorrect={false}
                 autoCompleteType="off"

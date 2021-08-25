@@ -68,42 +68,42 @@ const loaderMessages = [
     subText: '',
   },
   {
-    heading: 'Filling Test Account with test sats',
+    heading: 'Test Account',
     text:
-      'Preloaded Test Account is the best place to start your Bitcoin journey',
+      'If you\'re a new user, the best place to start exploring the wallet is the Test Account',
     subText: '',
   },
   {
-    heading: 'Generating Recovery Keys',
-    text: 'Recovery Keys help you recover your Hexa wallet in case your phone is lost',
+    heading: 'Free Sats!',
+    text: 'Register with Swan Bitcoin to get $10 USD worth of free sats',
     subText: '',
   },
   {
     heading: 'Manage Backup',
     text:
-      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
+      'Make sure to backup your wallet to secure your sats. The first level of backup is done automatically once you allow it',
     subText: '',
   },
   {
-    heading: 'Swan Bitcoin',
-    text: 'Register with Swan Bitcoin to get $10',
+    heading: 'Backup Levels',
+    text: 'Hexa has three levels of backup. Upgrade your backup when you want to secure more sats',
     subText: '',
   },
-  {
-    heading: 'Level 1 - Automated Cloud Backup',
-    text: 'Allow Hexa to automatically backup your wallet to your cloud storage. It ensures you can easily recover your wallet in case your phone gets lost',
-    subText: '',
-  },
-  {
-    heading: 'Level 2 - Double Backup',
-    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
-    subText: '',
-  },
-  {
-    heading: 'Level 3 - Multi-key Backup',
-    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
-    subText: '',
-  }
+  // {
+  //   heading: 'Level 1 - Automated Cloud Backup',
+  //   text: 'Allow Hexa to automatically backup your wallet to your cloud storage. It ensures you can easily recover your wallet in case your phone gets lost',
+  //   subText: '',
+  // },
+  // {
+  //   heading: 'Level 2 - Double Backup',
+  //   text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
+  //   subText: '',
+  // },
+  // {
+  //   heading: 'Level 3 - Multi-key Backup',
+  //   text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
+  //   subText: '',
+  // }
 ]
 
 const getNextMessage = () => {
@@ -120,15 +120,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ subTextMessage, setSubTextMessage ] = useState(
     'Your friend will be prompted to enter the same while accepting the Recovery Share',
   )
-  const [ bottomTextMessage, setBottomTextMessage ] = useState(
-    'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
-  )
-  const subPoints = [
-    'Setting up multi-accounts',
-    'Fetching test sats & balances',
-    'Generating shares for back-up',
-    'Getting the latest details'
-  ]
+  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
+  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  // )
+  // const subPoints = [
+  //   'Setting up multi-accounts',
+  //   'Fetching test sats & balances',
+  //   'Generating shares for back-up',
+  //   'Getting the latest details'
+  // ]
   const [ Elevation, setElevation ] = useState( 10 )
   const [ height, setHeight ] = useState( 72 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
@@ -262,7 +262,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
     setLoaderModal( true )
-    // setLoaderMessages()
+    setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
@@ -397,41 +397,41 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     )
   }
 
-  // const setLoaderMessages = () => {
-  //   setTimeout( () => {
-  //     const newMessage = getNextMessage()
-  //     setMessage( newMessage.heading )
-  //     setSubTextMessage( newMessage.text )
-  //     setTimeout( () => {
-  //       const newMessage = getNextMessage()
-  //       setMessage( newMessage.heading )
-  //       setSubTextMessage( newMessage.text )
-  //       setTimeout( () => {
-  //         const newMessage = getNextMessage()
-  //         setMessage( newMessage.heading )
-  //         setSubTextMessage( newMessage.text )
-  //         setTimeout( () => {
-  //           const newMessage = getNextMessage()
-  //           setMessage( newMessage.heading )
-  //           setSubTextMessage( newMessage.text )
-  //           setTimeout( () => {
-  //             const newMessage = getNextMessage()
-  //             setMessage( newMessage.heading )
-  //             setSubTextMessage( newMessage.text )
-  //             setTimeout( () => {
-  //               const newMessage = getNextMessage()
-  //               setMessage( newMessage.heading )
-  //               setSubTextMessage( newMessage.text )
-  //             }, LOADER_MESSAGE_TIME )
-  //           }, LOADER_MESSAGE_TIME )
-  //         }, LOADER_MESSAGE_TIME )
-  //       }, LOADER_MESSAGE_TIME )
-  //     }, LOADER_MESSAGE_TIME )
-  //   }, LOADER_MESSAGE_TIME )
-  // }
+  const setLoaderMessages = () => {
+    setTimeout( () => {
+      const newMessage = getNextMessage()
+      setMessage( newMessage.heading )
+      setSubTextMessage( newMessage.text )
+      setTimeout( () => {
+        const newMessage = getNextMessage()
+        setMessage( newMessage.heading )
+        setSubTextMessage( newMessage.text )
+        setTimeout( () => {
+          const newMessage = getNextMessage()
+          setMessage( newMessage.heading )
+          setSubTextMessage( newMessage.text )
+          setTimeout( () => {
+            const newMessage = getNextMessage()
+            setMessage( newMessage.heading )
+            setSubTextMessage( newMessage.text )
+            setTimeout( () => {
+              const newMessage = getNextMessage()
+              setMessage( newMessage.heading )
+              setSubTextMessage( newMessage.text )
+              setTimeout( () => {
+                const newMessage = getNextMessage()
+                setMessage( newMessage.heading )
+                setSubTextMessage( newMessage.text )
+              }, LOADER_MESSAGE_TIME )
+            }, LOADER_MESSAGE_TIME )
+          }, LOADER_MESSAGE_TIME )
+        }, LOADER_MESSAGE_TIME )
+      }, LOADER_MESSAGE_TIME )
+    }, LOADER_MESSAGE_TIME )
+  }
 
   const renderLoaderModalContent = useCallback( () => {
-    return <LoaderModal headerText={message} messageText={subTextMessage} bottomText={bottomTextMessage} subPoints={subPoints} />
+    return <LoaderModal headerText={message} messageText={subTextMessage} />
   }, [ message, subTextMessage ] )
 
   const renderLoaderModalHeader = () => {
@@ -1245,8 +1245,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Step 2\nChoose an encryption option'}
-              secondLineTitle={'New wallet creation'}
+              firstLineTitle={'Step 2\nCreate initial cloud backup'}
+              secondLineBoldTitle={'New Wallet '}
+              secondLineTitle={'creation'}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -1263,7 +1264,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
               mainText={'Use your own encryption password'}
-              subText={'Create a password'}
+              subText={'Create a password. Make sure to remember it'}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
@@ -1275,7 +1276,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
       <View style={styles.statusIndicatorView}>
         <View style={styles.statusIndicatorInactiveView} />
-        <View style={styles.statusIndicatorInactiveView} />
+        {/* <View style={styles.statusIndicatorInactiveView} /> */}
         <View style={styles.statusIndicatorActiveView} />
       </View>
       {showNote && !visibleButton ? (
