@@ -399,10 +399,13 @@ export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
 function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { token } = payload
-  const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
-
-  if ( valid ) yield put( twoFAValid( true ) )
-  else yield put( twoFAValid( false ) )
+  try {
+    const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
+    if ( valid ) yield put( twoFAValid( true ) )
+    else yield put( twoFAValid( false ) )
+  } catch ( error ) {
+    yield put( twoFAValid( false ) )
+  }
 }
 
 export const validateTwoFAWatcher = createWatcher(
