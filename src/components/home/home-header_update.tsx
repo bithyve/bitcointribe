@@ -134,45 +134,21 @@ const HomeHeader = ( {
   }, [] )
 
   const getMessageToShow = () => {
-    if( levelData ){
-      for ( let i = 0; i < levelData.length; i++ ) {
-        const element = levelData[ i ]
-        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
-          return {
-            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.', isError: true
-          }
-        }
-        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
-          return {
-            isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: ' needs your attention.', isError: true
-          }
-        }
-      }
-      if( currentLevel == 0 ){
-        return {
-          isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: '', isError: true
-        }
-      } else if( currentLevel === 1 ){
-        return {
-          isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade backup to Level 2', messageTwo: '', isError: false
-        }
-      } else if( currentLevel === 2 ){
-        return {
-          isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade backup to Level 3', messageTwo: '', isError: false
-        }
-      } else if( currentLevel == 3 ){
-        return {
-          isFirstMessageBold: true, messageOne: 'Multi-key backup complete', messageTwo: '', isError: false
-        }
-      }
-    }
-    if( currentLevel === 1 ){
-      return {
-        isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade backup to Level 2', messageTwo: '', isError: false
-      }
-    } else {
+    if( currentLevel == 0 ){
       return {
         isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: '', isError: true
+      }
+    } else if( currentLevel === 1 ){
+      return {
+        isFirstMessageBold: false, messageOne: 'Level 1 Cloud Backup is complete', messageTwo: '', isError: false
+      }
+    } else if( currentLevel === 2 ){
+      return {
+        isFirstMessageBold: false, messageOne: 'Level 2 Double Backup is complete', messageTwo: '', isError: false
+      }
+    } else if( currentLevel == 3 ){
+      return {
+        isFirstMessageBold: true, messageOne: 'Level 3 Multi-key Backup is complete', messageTwo: '', isError: false
       }
     }
   }

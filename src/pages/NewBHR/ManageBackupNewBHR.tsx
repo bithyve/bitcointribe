@@ -781,6 +781,30 @@ class ManageBackupNewBHR extends Component<
     } )
   }
 
+  getHeaderMessage = () => {
+    const { levelData, currentLevel } = this.props
+    if( levelData ){
+      for ( let i = 0; i < levelData.length; i++ ) {
+        const element = levelData[ i ]
+        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
+          return element.keeper1.name+' needs your attention.'
+        }
+        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
+          return  element.keeper2.name+' needs your attention.'
+        }
+      }
+    }
+    if( currentLevel == 0 ){
+      return 'Cloud backup incomplete, please complete Level 1'
+    } else if( currentLevel === 1 ){
+      return 'Cloud backup complete, upgrade backup to Level 2'
+    } else if( currentLevel === 2 ){
+      return 'Double backup complete, upgrade backup to Level 3'
+    } else if( currentLevel == 3 ){
+      return 'Multi-Key backup complete'
+    }
+  }
+
   render() {
     const {
       selectedLevelId,
@@ -876,10 +900,8 @@ class ManageBackupNewBHR extends Component<
                   fontSize: RFValue( 12 ),
                   // marginLeft: 2,
                   fontFamily: Fonts.FiraSansRegular
-                }}>
-Wallet Backup
-                </Text>
-                <Text style={styles.headerMessageText}>{currentLevel === 1 ? 'Cloud Backup complete, \nyou can upgrade backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
+                }}>Wallet Backup</Text>
+                <Text style={styles.headerMessageText}>{this.getHeaderMessage()}</Text>
               </View>
               {/* <View style={{
                 justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),

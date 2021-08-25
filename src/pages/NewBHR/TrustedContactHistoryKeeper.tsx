@@ -157,25 +157,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   useEffect( () => {
     if ( isChange ) {
       // setTrustedContactModal( true )
-      if( shareType === 'existingContact' ){
-        props.navigation.navigate( 'FNFToKeeper', {
-          ...props.navigation.state.params,
-          selectContact:selectContact
-        } )
-        setShowQrCode( true )
-      }
-      else {
-        props.navigation.navigate( 'TrustedContactNewBHR', {
-          LoadContacts: true,
-          onPressContinue:async ( selectedContacts ) => {
-            Keyboard.dismiss()
-            createGuardian( {
-              chosenContactTmp: getContacts( selectedContacts )
-            } )
-            setShowQrCode( true )
-          }
-        } )
-      }
+      props.navigation.navigate( 'FNFToKeeper', {
+        ...props.navigation.state.params,
+        onPressContinue
+      } )
+      setShowQrCode( true )
     }
   }, [ isChange ] )
 
@@ -194,26 +180,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
       setContacts( existingContactsArr )
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
         // setTrustedContactModal( true )
-        if( existingContactsArr.length ){
-          props.navigation.navigate( 'FNFToKeeper', {
-            ...props.navigation.state.params,
-            selectContact:selectContact
-          } )
-          setShowQrCode( true )
-        }
-        else {
-          props.navigation.navigate( 'TrustedContactNewBHR', {
-            LoadContacts: true,
-            onPressContinue:async ( selectedContacts ) => {
-              Keyboard.dismiss()
-              createGuardian( {
-                chosenContactTmp: getContacts( selectedContacts )
-              } )
-              setShowQrCode( true )
-            }
-          } )
-        }
-
+        props.navigation.navigate( 'FNFToKeeper', {
+          ...props.navigation.state.params,
+          onPressContinue
+        } )
+        setShowQrCode( true )
       }
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
@@ -417,25 +388,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setChangeContact( true )
           }, 2 )
 
-          if( shareType === 'existingContact' ){
-            props.navigation.navigate( 'FNFToKeeper', {
-              ...props.navigation.state.params,
-              selectContact: selectContact
-            } )
-            setShowQrCode( true )
-          }
-          else {
-            props.navigation.navigate( 'TrustedContactNewBHR', {
-              LoadContacts: true,
-              onPressContinue:async ( selectedContacts ) => {
-                Keyboard.dismiss()
-                createGuardian( {
-                  chosenContactTmp: getContacts( selectedContacts ), isChangeTemp: true
-                } )
-                setShowQrCode( true )
-              }
-            } )
-          }
+          props.navigation.navigate( 'FNFToKeeper', {
+            ...props.navigation.state.params,
+            onPressContinue
+          } )
+          setShowQrCode( true )
+
           setChangeModal( false )
         }}
         onPressIgnore={() => {
@@ -723,27 +681,19 @@ const TrustedContactHistoryKeeper = ( props ) => {
     if ( isNavigation ) {
       props.navigation.navigate( 'TrustedContactNewBHR', {
         LoadContacts: true,
-        onPressContinue:async ( selectedContacts ) => {
-          Keyboard.dismiss()
-          createGuardian( {
-            chosenContactTmp: getContacts( selectedContacts )
-          } )
-          setShowQrCode( true )
-        }
+        onPressContinue: onPressContinue
       } )
     }
 
   }, [ isNavigation ] )
 
-  const selectContact = ( type, choosenContact ) => {
-    if ( type === 'AddContact' ) {
-      setNavigation( true )
-      setShareType( 'contact' )
-    } else if ( type === 'ExistingContact' ) {
-      setChannelKey( choosenContact.channelKey )
-      setChosenContact( choosenContact )
-      setShareType( 'existingContact' )
-    }
+  const onPressContinue = ( selectedContacts ) => {
+    Keyboard.dismiss()
+    selectedContacts.length && selectedContacts[ 0 ].isExisting ? setShareType( 'existingContact' ) : setShareType( 'contact' )
+    createGuardian( {
+      chosenContactTmp: getContacts( selectedContacts )
+    } )
+    setShowQrCode( true )
   }
 
   return (
@@ -784,25 +734,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
             // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
             // setTrustedContactModal( true )
             setNavigation( false )
-            if ( contacts.length ) {
-              props.navigation.navigate( 'FNFToKeeper', {
-                ...props.navigation.state.params,
-                selectContact: selectContact
-              } )
-              setShowQrCode( true )
-            }
-            else {
-              props.navigation.navigate( 'TrustedContactNewBHR', {
-                LoadContacts: true,
-                onPressContinue:async ( selectedContacts ) => {
-                  Keyboard.dismiss()
-                  createGuardian( {
-                    chosenContactTmp: getContacts( selectedContacts )
-                  } )
-                  setShowQrCode( true )
-                }
-              } )
-            }
+            props.navigation.navigate( 'FNFToKeeper', {
+              ...props.navigation.state.params,
+              onPressContinue
+            } )
+            setShowQrCode( true )
           }}
           onPressReshare={() => {
             setReshareModal( true )

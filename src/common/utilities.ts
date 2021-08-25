@@ -176,29 +176,6 @@ export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
       levelData[ i ].status = 'bad'
     }
 
-    // Not SETUP
-    if( levelData[ i ].status == 'notSetup' ) {
-      levelData[ i ].note= 'Setup level to '+( i+1 )
-    }
-    if( levelData[ i ].status == 'bad' ) {
-      levelData[ i ].note= 'Backup needs your attention'
-    }
-    if( levelData[ i ].status == 'good' ) {
-      levelData[ i ].note= 'Backup Level 1 is secure, \nupgrade to Backup Level 2'
-    }
-    // BOTH ACCESSIBLE
-    if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' && currentLevel == 2 ){
-      levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, \nupgrade to Backup Level 3' : 'Level is complete'
-    }
-    // ONLY ONE ACCESSIBLE
-    if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ||
-    ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
-      let name1 = ''; let name2 = ''
-      if( element.keeper1.status == 'notAccessible' ) name1 = element.keeper1.name
-      if( element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name
-      const name = name1 && name2 ? name1 + ' & ' + name2 : name1 && !name2 ? name1 : name2
-      levelData[ i ].note = name + ' need your attention.'
-    }
     const displayName1 = element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.displayedName ? element.keeper1.data.displayedName : ''
     const displayName2 = element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.displayedName ? element.keeper2.data.displayedName : ''
     levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name
