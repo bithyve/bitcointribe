@@ -48,19 +48,19 @@ import Relay from '../bitcoin/utilities/Relay'
 const LOADER_MESSAGE_TIME = 2000
 const loaderMessages = [
   {
+    heading: 'Savings Account',
+    text: 'The Savings Account unlocks once your backup is at Level 2. Also, setup your 2FA code on an authenticator app',
+    subText: '',
+  },
+  {
     heading: 'Non-custodial buys',
-    text: 'Get sats directly in your wallet with compatible exchanges vouchers',
+    text:
+      'Get sats directly in your wallet from compatible exchanges',
     subText: '',
   },
   {
     heading: 'Friends & Family',
-    text:
-      'Add contacts to Hexa and send sats w/o asking for address every time',
-    subText: '',
-  },
-  {
-    heading: 'Hexa Savings Account',
-    text: 'Don’t forget to set up your 2FA code on an authenticator app',
+    text: 'Add contacts to Hexa and send sats w/o asking for their wallet address every time',
     subText: '',
   },
   {
@@ -74,28 +74,28 @@ const loaderMessages = [
     text: '1 bitcoin = 100 million satoshis or sats',
     subText: 'Hexa uses sats to make using bitcoin easier',
   },
-  {
-    heading: 'Hexa Test Account',
-    text: 'Test Account comes preloaded with test-sats',
-    subText: 'Best place to start if you are new to Bitcoin',
-  },
+  // {
+  //   heading: 'Hexa Test Account',
+  //   text: 'Test Account comes preloaded with test-sats',
+  //   subText: 'Best place to start if you are new to Bitcoin',
+  // },
 ]
 
 const getRandomMessage = () => {
-  const randomIndex = Math.floor( Math.random() * 6 )
+  const randomIndex = Math.floor( Math.random() * 5 )
   return loaderMessages[ randomIndex ]
 }
 
 export default function Login( props ) {
-  const subPoints = [
-    'Setting up multi-accounts',
-    'Fetching test sats & balances',
-    'Generating shares for back-up',
-    'Getting the latest details'
-  ]
-  const [ bottomTextMessage, setBottomTextMessage ] = useState(
-    'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
-  )
+  // const subPoints = [
+  //   'Setting up multi-accounts',
+  //   'Fetching test sats & balances',
+  //   'Generating shares for back-up',
+  //   'Getting the latest details'
+  // ]
+  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
+  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  // )
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )

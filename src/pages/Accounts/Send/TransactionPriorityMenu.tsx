@@ -27,6 +27,7 @@ import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormatted
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import { TxPriority } from '../../../bitcoin/utilities/Interface'
 import AccountShell from '../../../common/data/models/AccountShell'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 export type Props = {
   accountShell: AccountShell;
@@ -41,6 +42,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
+  const [ customPriorityModel, showCustomPriorityModel ] = useState( false )
   const availableTransactionPriorities = useAvailableTransactionPriorities()
   const [ transactionPriorities, setTransactionPriorities ] = useState( availableTransactionPriorities )
   const transactionFeeInfo = useTransactionFeeInfoForSending()
@@ -63,7 +65,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
   }
 
   const showCustomPriorityBottomSheet = useCallback( () => {
-    presentBottomSheet(
+    return(
       <CustomPriorityContent
         title={'Custom Priority'}
         info={'Enter the fee rate in sats per byte.'}
@@ -73,17 +75,14 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
         isCancel={true}
         onPressOk={( amount, customEstimatedBlock ) => {
           Keyboard.dismiss()
+          showCustomPriorityModel( false )
           handleCustomFee( amount, customEstimatedBlock )
         }}
         onPressCancel={() => {
           Keyboard.dismiss()
-          dismissBottomSheet()
+          showCustomPriorityModel( false )
         }}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '44%' ],
-      },
+      />
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
@@ -193,7 +192,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
         <TouchableOpacity
           style={styles.customPriorityGroupBox}
-          onPress={showCustomPriorityBottomSheet}
+          onPress={() => showCustomPriorityModel( true )}
         >
           <View
             style={{
@@ -223,6 +222,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
           </View>
         </TouchableOpacity>
       </View>
+      <ModalContainer visible={customPriorityModel} closeBottomSheet={() => {}} >
+        {showCustomPriorityBottomSheet()}
+      </ModalContainer>
     </View>
   )
 }

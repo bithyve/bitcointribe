@@ -35,7 +35,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to Swan Bitcoin to complete registration'
-  let swanTitle = 'Stack Sats\n with Swan'
+  let swanTitle = 'Stack Sats with\n Swan Bitcoin'
   let  showNote = true
   let accountName = ''
   let accountDescription = ''
@@ -99,13 +99,13 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           break
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
-          swanTitle = 'Hexa Wallet is communicating with Swan...'
-          swanMessage = 'Hexa Wallet is creating a Swan account to store your bitcoin purchased from Swan. This account will be linked to your Swan withdrawal wallet'
+          swanTitle = 'Your Hexa Wallet is communicating with Swan Bitcoin...'
+          swanMessage = 'This account is being linked with your profile on Swan Bitcoin'
           showNote = false
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          swanMessage = 'Sats in your Swan withdrawal wallet will be transfered to Hexa Wallet.\nSwan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
-          swanTitle = 'Successfully linked Hexa Wallet to your Swan Account'
+          swanMessage = 'Your Hexa Wallet is now successfully linked to your Swan Bitcoin account. Sats will be transferred to Hexa as soon as you accumulate 1 million sats or 0.01 btc'
+          swanTitle = 'Successfully linked'
           accountName = 'Swan Bitcoin'
           accountDescription = 'Stack sats with Swan'
           showNote = false
@@ -119,7 +119,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           // accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to Swan Bitcoin to complete registration'
+          swanMessage = 'This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches auto-withdrawal limit of 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.'
           swanTitle = 'Stack Sats\nwith Swan'
           showNote = true
     }
@@ -209,7 +209,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>{'Buy Bitcoin'}</Text>
+        <Text style={styles.proceedButtonText}>{'Sign Me Up'}</Text>
       </AppBottomSheetTouchableWrapper>
       <AppBottomSheetTouchableWrapper
         onPress={() => {onPress()}}

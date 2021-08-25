@@ -624,7 +624,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                   }}
                 >
                   <Text style={[ styles.contactText, {
-                    fontSize: RFValue( 20 ), padding: wp( 0 )
+                    fontSize: RFValue( 24 ),
                   } ]}>+</Text>
                   {/* <Image
                     style={styles.addGrayImage}
@@ -966,7 +966,7 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     // marginLeft: 10,
-    marginHorizontal: wp ( 1 ),
+    // marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
@@ -990,12 +990,13 @@ const styles = StyleSheet.create( {
     // paddingTop: 15,
     // borderBottomWidth: 1,
     // borderColor: Colors.borderColor,
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.blue,
     borderRadius: wp ( 2 ),
     // width: wp( 22 )
-    padding: wp( 1 ),
+    // padding: wp( 1 ),
     width: wp( 24 ),
-    height: hp( 4 )
+    height: hp( 4.5 ),
+    paddingHorizontal: wp( 1 )
   },
   pageTitle: {
     color: Colors.blue,

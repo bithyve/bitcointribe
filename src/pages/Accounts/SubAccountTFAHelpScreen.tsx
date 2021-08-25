@@ -43,6 +43,7 @@ import SecurityQuestion from '../../pages/NewBHR/SecurityQuestion'
 import Loader from '../../components/loader'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export type Props = {
   navigation: any;
@@ -50,6 +51,7 @@ export type Props = {
 
 const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ qrModal, showQRModel ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ QRModalHeader, setQRModalHeader ] = useState( '' )
   const [
@@ -60,7 +62,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const [
     ServerNotRespondingBottomSheet,
   ] = useState( React.createRef<BottomSheet>() )
-
+  const [ serverNotRespondingModal, showServerNotRespondingModal ] = useState( false )
   const accountsState: AccountsState = useAccountsState()
   const sourceAccountShell = useAccountShellForID( navigation.getParam( 'accountShellID' ) )
   const dispatch = useDispatch()
@@ -141,18 +143,18 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={( qrData ) => {
           if ( QRModalHeader == 'Sweep Funds' ) {
-            QrBottomSheet.current?.snapTo( 0 )
+            showQRModel( false )
           }
           getQrCodeData( qrData )
         }}
         onBackPress={() => {
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          showQRModel( false )
         }}
         onPressContinue={async() => {
           const qrData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           if ( qrData ) {
             if ( QRModalHeader == 'Sweep Funds' ) {
-              ( QrBottomSheet as any ).current.snapTo( 0 )
+              showQRModel( false )
             }
             getQrCodeData( qrData )
           }
@@ -167,8 +169,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         onPressHeader={() => {
           setTimeout( () => {
             setQrBottomSheetsFlag( false )
-          }, 2 );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          }, 2 )
+          showQRModel( false )
         }}
       />
     )
@@ -213,7 +215,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
-          ( ServerNotRespondingBottomSheet as any ).current.snapTo( 0 )
+          showServerNotRespondingModal( false )
         }}
         isIgnoreButton={true}
         cancelButtonText={'Sweep Funds'}
@@ -221,8 +223,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
           setTimeout( () => {
             setQRModalHeader( 'Sweep Funds' )
           }, 2 )
-          if ( QrBottomSheet.current ) ( QrBottomSheet as any ).current.snapTo( 1 );
-          ( ServerNotRespondingBottomSheet as any ).current.snapTo( 0 )
+
+          if ( !qrModal ) showQRModel( true )
+          showServerNotRespondingModal( false )
         }}
       />
     )
@@ -232,7 +235,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          ( ServerNotRespondingBottomSheet as any ).current.snapTo( 0 )
+          showServerNotRespondingModal( false )
         }}
       />
     )
@@ -281,8 +284,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
               setTimeout( () => {
                 setQRModalHeader( 'Reset 2FA' )
               }, 2 )
-              if ( QrBottomSheet.current ) {
-                ( QrBottomSheet as any ).current.snapTo( 1 )
+              if ( !qrModal ) {
+                showQRModel( true )
               }
             }}
             style={{
@@ -328,7 +331,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
 
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              ( ServerNotRespondingBottomSheet as any ).current.snapTo( 1 )
+              showServerNotRespondingModal( true )
             }}
             style={{
               ...styles.selectedContactsView, marginBottom: hp( '3%' )
@@ -391,8 +394,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
           setQrBottomSheetsFlag( true )
         }}
         onCloseEnd={() => {
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          setQrBottomSheetsFlag( false )
+          showQRModel( false )
         }}
         onCloseStart={() => {}}
         enabledInnerScrolling={true}
@@ -404,6 +407,12 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
       />
+      {
+        <ModalContainer visible={qrModal} closeBottomSheet={() => {}}>
+          {renderQrContent()}
+        </ModalContainer>
+      }
+
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ResetTwoFASuccessBottomSheet}
@@ -415,7 +424,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         renderHeader={renderErrorModalHeader}
       />
 
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={ServerNotRespondingBottomSheet}
         snapPoints={[
@@ -424,7 +433,10 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         ]}
         renderContent={renderServerNotRespondingContent}
         renderHeader={renderServerNotRespondingHeader}
-      />
+      /> */}
+      <ModalContainer visible={serverNotRespondingModal} closeBottomSheet={() => {}}>
+        {renderServerNotRespondingContent()}
+      </ModalContainer>
     </SafeAreaView>
   )
 }

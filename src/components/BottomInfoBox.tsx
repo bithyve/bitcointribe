@@ -33,7 +33,7 @@ export default function BottomInfoBox( props ) {
         >
           {props.title}
         </Text>
-        <Text style={styles.bottomNoteInfoText}>
+        <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding ] : styles.bottomNoteInfoText}>
           {props.infoText}
           {props.linkText ? (
             <Text
@@ -65,8 +65,8 @@ export default function BottomInfoBox( props ) {
       {props.icon &&
       <Image source={require( '../assets/images/icons/icon_arrow.png' )}
         style={{
-          width: widthPercentageToDP( '2.5%' ),
-          height: widthPercentageToDP( '2.5%' ),
+          width: widthPercentageToDP( '3.6%' ),
+          height: widthPercentageToDP( '3.6%' ),
           alignSelf: 'center',
           marginLeft: 'auto',
           resizeMode: 'contain'
@@ -81,6 +81,10 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    paddingRight: widthPercentageToDP( 2 )
+    letterSpacing: 0.4,
+    lineHeight: 18
   },
+  extraPadding:{
+    paddingRight: widthPercentageToDP( 4.5 )
+  }
 } )

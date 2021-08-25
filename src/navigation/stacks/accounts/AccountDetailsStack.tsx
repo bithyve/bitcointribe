@@ -9,6 +9,7 @@ import SubAccountSettingsStack from './SubAccountSettingsStack'
 import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
 import SendStack from '../send/SendStack'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
+// import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
 
 
 const AccountDetailsStack = createStackNavigator(
@@ -50,6 +51,13 @@ const AccountDetailsStack = createStackNavigator(
         header: null,
       },
     },
+    // TwoFASetup: {
+    //   screen: TwoFASetup,
+    //   navigationOptions: {
+    //     gesturesEnabled: false,
+    //     header: null
+    //   },
+    // },
   },
   {
     // mode: 'modal',
