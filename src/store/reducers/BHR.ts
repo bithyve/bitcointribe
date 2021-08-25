@@ -36,9 +36,9 @@ import {
   SET_IS_KEEPER_INFO_UPDATED,
   LEVEL_COMPLETION_ERROR,
   NAVIGATING_HISTORY_PAGE,
-  TYPE_BOTTOMSHEET_OPEN
+  TYPE_BOTTOMSHEET_OPEN,
+  ALLOW_SECURE_ACCOUNT
 } from '../actions/BHR'
-import { SERVICES_ENRICHED } from '../actions/storage'
 
 const initialState: {
   mnemonic: string;
@@ -108,6 +108,7 @@ const initialState: {
   errorInfo: string;
   status: LevelStatus,
   isTypeBottomSheetOpen: boolean,
+  AllowSecureAccount: boolean;
 } = {
   mnemonic: '',
   loading: {
@@ -170,6 +171,7 @@ const initialState: {
   errorInfo: null,
   status: LevelStatus.PENDING,
   isTypeBottomSheetOpen: false,
+  AllowSecureAccount: false
 }
 
 export default ( state = initialState, action ) => {
@@ -404,6 +406,14 @@ export default ( state = initialState, action ) => {
           ...state,
           isTypeBottomSheetOpen: action.payload.isTypeBottomSheetOpen,
         }
+
+      case ALLOW_SECURE_ACCOUNT:
+        return {
+          ...state,
+          AllowSecureAccount: action.payload.flag,
+        }
+
+
   }
   return state
 }
