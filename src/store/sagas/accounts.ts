@@ -713,7 +713,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         switch( accountType ){
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
-              defaultAccountDescription = 'Withdrawal Wallet'
+              defaultAccountDescription = 'Auto-withdraw wallet'
               break
 
             case AccountType.DEPOSIT_ACCOUNT:
