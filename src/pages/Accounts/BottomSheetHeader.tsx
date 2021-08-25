@@ -10,7 +10,7 @@ const BottomSheetHeader = ( { title, onPress } ) => {
   if ( !title )  { return null }
   return (
     <View style={{
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.backgroundColor,
       paddingBottom: heightPercentageToDP( 3 )
     }}>
       <TouchableOpacity
@@ -31,9 +31,6 @@ const BottomSheetHeader = ( { title, onPress } ) => {
       <Text style={styles.modalInfoText}>
         Many ways to stack sats directly in Hexa
       </Text>
-      <View style={{
-        borderWidth: 0.5, borderColor: '#E3E3E3', marginHorizontal: 16, marginTop: 9,  alignSelf: 'center', width: wp( '93%' )
-      }} />
     </View>
   )
 }

@@ -922,7 +922,7 @@ class ContactDetails extends PureComponent<
                     <Text style={styles.headerTitleText}>Wallet Name</Text>
                   </View>
 
-                  <Text>{this.contact.walletName}</Text>
+                  <Text style={styles.headerTitleText}>{this.contact.walletName}</Text>
                 </View>
                 }
                 {this.sortedHistory( trustedContactHistory ).map( ( value ) => {

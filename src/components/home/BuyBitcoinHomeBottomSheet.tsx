@@ -5,7 +5,6 @@ import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import Colors from '../../common/Colors'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -29,23 +28,23 @@ export type BuyBitcoinBottomSheetMenuItem = {
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   {
-    title: Platform.OS == 'ios' ? 'Ramp Bitcoin' : 'Ramp Bitcoin',
+    title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
     subtitle: 'Low fee for those big buys',
     kind: BuyMenuItemKind.RAMP,
-    imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
+    imageSource: require( '../../assets/images/accIcons/ramp.png' ),
     disabled: false,
     hasButton: true,
   },
   {
-    title: 'Wyre Bitcoin',
+    title: 'Buy with Wyre',
     subtitle: 'Buy any amount',
     kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+    imageSource: require( '../../assets/images/accIcons/wyre.png' ),
     disabled: false,
     hasButton: false,
   },
   {
-    title: Platform.OS == 'ios' ? 'FastBitcoins' : 'FastBitcoins',
+    title: Platform.OS == 'ios' ? 'Buy with FastBitcoins' : 'Buy with FastBitcoins',
     subtitle: 'Scan FastBitcoin vouchers',
     kind: BuyMenuItemKind.FAST_BITCOINS,
     imageSource: require( '../../assets/images/icons/fastbitcoins.png' ),
@@ -97,59 +96,32 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
         <ListItem
           containerStyle={menuItem.disabled ? ListStyles.disabledContainer : [ ListStyles.container, {
             // marginHorizontal: 10,
-            shadowOpacity: 0.1,
-            shadowOffset: {
-              width: 3, height: 5
-            },
-            shadowRadius: 5,
-            elevation: 2,
+            // shadowOpacity: 0.1,
+            // shadowOffset: {
+            //   width: 3, height: 5
+            // },
+            // shadowRadius: 5,
+            // elevation: 2,
             width: widthPercentageToDP( 90 ),
-            // marginTop: heightPercentageToDP( 2 ),
-            marginBottom: heightPercentageToDP( 3 ),
-            borderTopRightRadius: widthPercentageToDP( 1 ),
-            borderBottomRightRadius: widthPercentageToDP( 1 ),
+            marginTop: heightPercentageToDP( 1.5 ),
+            // marginBottom: heightPercentageToDP( 3 ),
+            borderRadius: widthPercentageToDP( 2 ),
+            height: heightPercentageToDP( 11 ),
+
           } ]}
         // bottomDivider
         >
-          <View style={{
-            width: widthPercentageToDP( '13%' ),
-            height: widthPercentageToDP( '13%' ),
-            borderColor: 'red',
-            elevation: 10,
-            shadowColor: Colors.borderColor,
-            shadowOpacity: 10,
-            shadowOffset: {
-              width: 2, height: 2
-            },
-            backgroundColor: Colors.white,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: widthPercentageToDP( '13%' ) / 2,
-            margin: 5
-          }}>
-
-
-            <View style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: Colors.backgroundColor,
-              width: widthPercentageToDP( '11%' ),
-              height: widthPercentageToDP( '11%' ),
-              borderRadius: widthPercentageToDP( '11%' ) / 2,
-            }}>
-              <Image
-                source={menuItem.imageSource}
-                style={ImageStyles.thumbnailImageSmall}
-                resizeMode="contain"
-              />
-            </View>
-          </View>
+          <Image
+            source={menuItem.imageSource}
+            style={ImageStyles.thumbnailImageLarge}
+            resizeMode="contain"
+          />
 
           <ListItem.Content style={ListStyles.listItemContentContainer}>
             <ListItem.Title style={menuItem.disabled ? ListStyles.disabledListItemTitle : ListStyles.listItemTitle}>{menuItem.title}</ListItem.Title>
             <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{menuItem.subtitle}</ListItem.Subtitle>
           </ListItem.Content>
-          {menuItem.hasButton &&
+          {/* {menuItem.hasButton &&
           <TouchableOpacity style={{
             backgroundColor: Colors.lightBlue, borderRadius: widthPercentageToDP( '1%' )
           }}>
@@ -159,7 +131,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
               Sats Back
             </Text>
           </TouchableOpacity>
-          }
+          } */}
           <ListItem.Chevron />
         </ListItem>
 
@@ -170,16 +142,19 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
 
   return (
     <View style={{
-      backgroundColor: Colors.white
+      backgroundColor: Colors.backgroundColor
     }}>
-      <FlatList
-      // style={styles.rootContainer}
-        data={menuItems}
-        keyExtractor={listItemKeyExtractor}
-        renderItem={renderItem}
-        scrollEnabled={false}
-      />
-    </View>
+      <View style={{
+        height: heightPercentageToDP( 63 )
+      }}>
+        <FlatList
+          // style={styles.rootContainer}
+          data={menuItems}
+          keyExtractor={listItemKeyExtractor}
+          renderItem={renderItem}
+          scrollEnabled={false}
+        />
+      </View></View>
 
   )
 }
