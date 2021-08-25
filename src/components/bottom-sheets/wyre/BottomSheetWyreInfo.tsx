@@ -88,30 +88,34 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={onPress}
-      style={{
-        width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-        alignSelf: 'flex-end',
-        backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-        marginTop: wp( 3 ), marginRight: wp( 3 )
-      }}
-    >
-      <FontAwesome name="close" color={Colors.white} size={19} style={{
-      // marginTop: hp( 0.5 )
-      }} />
-    </TouchableOpacity>
-    {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
-    <View style={styles.successModalHeaderView}>
-      <Text style={styles.modalTitleText}>{wyreTitle}</Text>
-      <Text style={{
-        ...styles.modalInfoText,
-        marginTop: wp( 1.5 ),
-        marginBottom: wp( 5 ),
-      }}>{wyreMessage}</Text>
-    </View>
-    {/* <TouchableOpacity
+    <View style={{
+      height: hp( 75 )
+    }}>
+
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={onPress}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+          // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity>
+      {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
+      <View style={styles.successModalHeaderView}>
+        <Text style={styles.modalTitleText}>{wyreTitle}</Text>
+        <Text style={{
+          ...styles.modalInfoText,
+          marginTop: wp( 1.5 ),
+          marginBottom: wp( 5 ),
+        }}>{wyreMessage}</Text>
+      </View>
+      {/* <TouchableOpacity
       onPress={() => showDropdown( true )}
       style={styles.containerStyle}>
       <View style={styles.headerImageView}>
@@ -148,106 +152,107 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         showDropdown( false ) }}
       dropdownBoxList={dropdownBoxList} />
     ) : null} */}
-    <View style={styles.containerStyle}>
-      <View style={styles.headerImageView}>
-        <View style={styles.headerImageInitials}>
-          <Image
-            source={require( '../../../assets/images/icons/wyre_notext_small.png' )}
-            style={styles.headerImage}
-            resizeMode="contain"
-          />
+      <View style={styles.containerStyle}>
+        <View style={styles.headerImageView}>
+          <View style={styles.headerImageInitials}>
+            <Image
+              source={require( '../../../assets/images/icons/wyre_notext_small.png' )}
+              style={styles.headerImage}
+              resizeMode="contain"
+            />
+          </View>
         </View>
-      </View>
-      <ListItem.Content style={{
-        flex: 1,
-      }}>
-        <ListItem.Subtitle
-          style={ListStyles.infoHeaderSubtitleText}
-          numberOfLines={1}
-        >
-            Bitcoin will be transferred to
-        </ListItem.Subtitle>
-
-        <ListItem.Title
-          style={styles.destinationTitleText}
-          numberOfLines={1}
-        >
-            Wyre Account
-        </ListItem.Title>
-      </ListItem.Content>
-    </View>
-
-    <View style={styles.containerStyle}>
-      <View style={styles.headerImageView}>
-        <View style={styles.headerImageInitials}>
-          <Image
-            source={require( '../../../assets/images/icons/icon_address_type.png' )}
-            style={styles.headerImage}
-            resizeMode="contain"
-          />
-        </View>
-      </View>
-      <ListItem.Content style={{
-        flex: 1
-      }}>
-        <ListItem.Subtitle
-          style={ListStyles.infoHeaderSubtitleText}
-          numberOfLines={1}
-        >
-            Bitcoin will be transferred to
-        </ListItem.Subtitle>
-
-        <ListItem.Title
-          style={styles.destinationTitleText}
-          numberOfLines={1}
-        >
-          {wyreReceiveAddress}
-        </ListItem.Title>
-      </ListItem.Content>
-    </View>
-
-    <View style={{
-      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start',
-    }} >
-      <AppBottomSheetTouchableWrapper
-        disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
-        onPress={wyreFromBuyMenu ? handleProceedButtonPress : onClickSetting}
-        style={{
-          ...styles.successModalButtonView
-        }}
-      >
-        <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoins' : 'OK'}</Text>
-
-      </AppBottomSheetTouchableWrapper>
-    </View>
-    {wyreFromBuyMenu
-      ? <View style={{
-        alignSelf: 'flex-end',
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignContent: 'center',
-        marginTop: hp( '1.5' ),
-        marginRight: wp( '5%' ),
-        marginBottom: hp( '2%' )
-      }}>
-        <Text style={{
-          fontStyle: 'italic',
-          fontSize: RFValue( 11 ),
-          color: Colors.textColorGrey
+        <ListItem.Content style={{
+          flex: 1,
         }}>
-              Powered by
-        </Text>
-        <Image
-          source={require( '../../../assets/images/icons/wyre_logo_large.png' )}
-          style={{
-            marginLeft: 5,
-            width: 62,
-            height: 27,
-          }}
-        />
+          <ListItem.Subtitle
+            style={ListStyles.infoHeaderSubtitleText}
+            numberOfLines={1}
+          >
+            Bitcoin will be transferred to
+          </ListItem.Subtitle>
+
+          <ListItem.Title
+            style={styles.destinationTitleText}
+            numberOfLines={1}
+          >
+            Wyre Account
+          </ListItem.Title>
+        </ListItem.Content>
       </View>
-      : null
-    }
+
+      <View style={styles.containerStyle}>
+        <View style={styles.headerImageView}>
+          <View style={styles.headerImageInitials}>
+            <Image
+              source={require( '../../../assets/images/icons/icon_address_type.png' )}
+              style={styles.headerImage}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+        <ListItem.Content style={{
+          flex: 1
+        }}>
+          <ListItem.Subtitle
+            style={ListStyles.infoHeaderSubtitleText}
+            numberOfLines={1}
+          >
+            Bitcoin will be transferred to
+          </ListItem.Subtitle>
+
+          <ListItem.Title
+            style={styles.destinationTitleText}
+            numberOfLines={1}
+          >
+            {wyreReceiveAddress}
+          </ListItem.Title>
+        </ListItem.Content>
+      </View>
+
+      <View style={{
+        flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start',
+      }} >
+        <AppBottomSheetTouchableWrapper
+          disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
+          onPress={wyreFromBuyMenu ? handleProceedButtonPress : onClickSetting}
+          style={{
+            ...styles.successModalButtonView
+          }}
+        >
+          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoins' : 'OK'}</Text>
+
+        </AppBottomSheetTouchableWrapper>
+      </View>
+      {wyreFromBuyMenu
+        ? <View style={{
+          alignSelf: 'flex-end',
+          flexDirection: 'row',
+          alignItems: 'center',
+          alignContent: 'center',
+          marginTop: hp( '1.5' ),
+          marginRight: wp( '5%' ),
+          marginBottom: hp( '2%' )
+        }}>
+          <Text style={{
+            fontStyle: 'italic',
+            fontSize: RFValue( 11 ),
+            color: Colors.textColorGrey
+          }}>
+              Powered by
+          </Text>
+          <Image
+            source={require( '../../../assets/images/icons/wyre_logo_large.png' )}
+            style={{
+              marginLeft: 5,
+              width: 62,
+              height: 27,
+            }}
+          />
+        </View>
+        : null
+      }
+    </View>
   </View>
   )
 }

@@ -88,30 +88,33 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   return ( <View style={{
     ...styles.modalContentContainer,
   }}>
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={onPress}
-      style={{
-        width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-        alignSelf: 'flex-end',
-        backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-        marginTop: wp( 3 ), marginRight: wp( 3 )
-      }}
-    >
-      <FontAwesome name="close" color={Colors.white} size={19} style={{
+    <View style={{
+      height: hp( 75 )
+    }}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={onPress}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
         // marginTop: hp( 0.5 )
-      }} />
-    </TouchableOpacity>
-    <View style={styles.successModalHeaderView}>
+        }} />
+      </TouchableOpacity>
+      <View style={styles.successModalHeaderView}>
 
-      <Text style={styles.modalTitleText}>{rampTitle}</Text>
-      <Text style={{
-        ...styles.modalInfoText,
-        marginTop: wp( 1.5 ),
-        marginBottom: wp( 3 ),
-      }}>{rampMessage}</Text>
-    </View>
-    {/* <TouchableOpacity
+        <Text style={styles.modalTitleText}>{rampTitle}</Text>
+        <Text style={{
+          ...styles.modalInfoText,
+          marginTop: wp( 1.5 ),
+          marginBottom: wp( 3 ),
+        }}>{rampMessage}</Text>
+      </View>
+      {/* <TouchableOpacity
       onPress={() => showDropdown( true )}
       style={styles.containerStyle}>
       <View style={styles.headerImageView}>
@@ -148,123 +151,124 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         showDropdown( false ) }}
       dropdownBoxList={dropdownBoxList} />
     ) : null} */}
-    <View style={styles.containerStyle}>
-      <View style={styles.headerImageView}>
-        <View style={styles.headerImageInitials}>
-          <Image
-            source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
-            style={styles.headerImage}
-            resizeMode="contain"
-          />
+      <View style={styles.containerStyle}>
+        <View style={styles.headerImageView}>
+          <View style={styles.headerImageInitials}>
+            <Image
+              source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
+              style={styles.headerImage}
+              resizeMode="contain"
+            />
+          </View>
         </View>
-      </View>
 
-      <ListItem.Content style={{
-        height: wp( '14%' )
-      }}>
-        <ListItem.Subtitle
-          style={ListStyles.infoHeaderSubtitleText}
-          numberOfLines={1}
-        >
-              Bitcoin will be transferred to
-        </ListItem.Subtitle>
-
-        <ListItem.Title
-          style={styles.destinationTitleText}
-          numberOfLines={1}
-        >
-              Checking Account
-        </ListItem.Title>
-        {/* <ListItem.Subtitle
-          style={[ ListStyles.infoHeaderSubtitleText, {
-            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
-          } ]}
-          numberOfLines={1}
-        >
-              Lorem ipsum dolor amet
-        </ListItem.Subtitle> */}
-      </ListItem.Content>
-    </View>
-
-    <View style={styles.containerStyle}>
-      <View style={styles.headerImageView}>
-        <View style={styles.headerImageInitials}>
-          <Image
-            source={require( '../../../assets/images/icons/icon_address_type.png' )}
-            style={styles.headerImage}
-            resizeMode="contain"
-          />
-        </View>
-      </View>
-      <ListItem.Content style={{
-        height: wp( '14%' )
-      }}>
-        <ListItem.Subtitle
-          style={ListStyles.infoHeaderSubtitleText}
-          numberOfLines={1}
-        >
-              Bitcoin will be transferred to
-        </ListItem.Subtitle>
-
-        <ListItem.Title
-          style={styles.destinationTitleText}
-          numberOfLines={1}
-        >
-          {rampReceiveAddress}
-        </ListItem.Title>
-        {/* <ListItem.Subtitle
-          style={[ ListStyles.infoHeaderSubtitleText, {
-            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
-          } ]}
-          numberOfLines={1}
-        >
-              Lorem ipsum dolor amet
-        </ListItem.Subtitle> */}
-      </ListItem.Content>
-    </View>
-
-    <View style={{
-      flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto'
-    }} >
-      <AppBottomSheetTouchableWrapper
-        disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
-        onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
-        style={{
-          ...styles.successModalButtonView
-        }}
-      >
-        <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
-
-      </AppBottomSheetTouchableWrapper>
-    </View>
-    {rampFromBuyMenu
-      ? <View style={{
-        alignSelf: 'flex-end',
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignContent: 'center',
-        marginTop: hp( '1.5' ),
-        marginRight: wp( '6%' ),
-        marginBottom: hp( '2%' )
-      }}>
-        <Text style={{
-          fontStyle: 'italic',
-          fontSize: RFValue( 11 ),
-          color: Colors.textColorGrey
+        <ListItem.Content style={{
+          height: wp( '14%' )
         }}>
-        Powered by
-        </Text>
-        <Image
-          source={require( '../../../assets/images/icons/ramp_logo_large.png' )}
-          style={{
-            marginLeft: 5,
-            width: 62,
-            height: 27,
-          }}
-        />
+          <ListItem.Subtitle
+            style={ListStyles.infoHeaderSubtitleText}
+            numberOfLines={1}
+          >
+              Bitcoin will be transferred to
+          </ListItem.Subtitle>
+
+          <ListItem.Title
+            style={styles.destinationTitleText}
+            numberOfLines={1}
+          >
+              Checking Account
+          </ListItem.Title>
+          {/* <ListItem.Subtitle
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
+          } ]}
+          numberOfLines={1}
+        >
+              Lorem ipsum dolor amet
+        </ListItem.Subtitle> */}
+        </ListItem.Content>
       </View>
-      : null
-    }
+
+      <View style={styles.containerStyle}>
+        <View style={styles.headerImageView}>
+          <View style={styles.headerImageInitials}>
+            <Image
+              source={require( '../../../assets/images/icons/icon_address_type.png' )}
+              style={styles.headerImage}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+        <ListItem.Content style={{
+          height: wp( '14%' )
+        }}>
+          <ListItem.Subtitle
+            style={ListStyles.infoHeaderSubtitleText}
+            numberOfLines={1}
+          >
+              Bitcoin will be transferred to
+          </ListItem.Subtitle>
+
+          <ListItem.Title
+            style={styles.destinationTitleText}
+            numberOfLines={1}
+          >
+            {rampReceiveAddress}
+          </ListItem.Title>
+          {/* <ListItem.Subtitle
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
+          } ]}
+          numberOfLines={1}
+        >
+              Lorem ipsum dolor amet
+        </ListItem.Subtitle> */}
+        </ListItem.Content>
+      </View>
+
+      <View style={{
+        flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto'
+      }} >
+        <AppBottomSheetTouchableWrapper
+          disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
+          onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
+          style={{
+            ...styles.successModalButtonView
+          }}
+        >
+          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
+
+        </AppBottomSheetTouchableWrapper>
+      </View>
+      {rampFromBuyMenu
+        ? <View style={{
+          alignSelf: 'flex-end',
+          flexDirection: 'row',
+          alignItems: 'center',
+          alignContent: 'center',
+          marginTop: hp( '1.5' ),
+          marginRight: wp( '6%' ),
+          marginBottom: hp( '2%' )
+        }}>
+          <Text style={{
+            fontStyle: 'italic',
+            fontSize: RFValue( 11 ),
+            color: Colors.textColorGrey
+          }}>
+        Powered by
+          </Text>
+          <Image
+            source={require( '../../../assets/images/icons/ramp_logo_large.png' )}
+            style={{
+              marginLeft: 5,
+              width: 62,
+              height: 27,
+            }}
+          />
+        </View>
+        : null
+      }
+    </View>
   </View>
   )
 }
