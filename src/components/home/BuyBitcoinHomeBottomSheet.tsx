@@ -36,7 +36,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     hasButton: true,
   },
   {
-    title: 'Wyre Bitcoin',
+    title: 'Buy with Wyre',
     subtitle: 'Buy any amount',
     kind: BuyMenuItemKind.WYRE,
     imageSource: require( '../../assets/images/accIcons/wyre.png' ),
@@ -44,7 +44,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     hasButton: false,
   },
   {
-    title: Platform.OS == 'ios' ? 'FastBitcoins' : 'FastBitcoins',
+    title: Platform.OS == 'ios' ? 'Buy with FastBitcoins' : 'Buy with FastBitcoins',
     subtitle: 'Scan FastBitcoin vouchers',
     kind: BuyMenuItemKind.FAST_BITCOINS,
     imageSource: require( '../../assets/images/icons/fastbitcoins.png' ),
