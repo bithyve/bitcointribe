@@ -30,9 +30,9 @@ const WalletInitializationScreen = props => {
         <View style={{
           ...styles.viewSetupWallet, paddingTop: wp( '10%' )
         }}>
-          <Text style={styles.headerTitleText}>New Hexa Wallet</Text>
+          <Text style={styles.headerTitleText}>New Wallet</Text>
           <Text style={styles.headerInfoText}>
-            If this is your first time using Hexa on this device
+            The app creates a new wallet for you with accounts you can start using right away.
           </Text>
           <TouchableOpacity
             onPress={() => props.navigation.navigate( 'NewWalletName' )}
@@ -63,9 +63,9 @@ const WalletInitializationScreen = props => {
         <View style={{
           ...styles.viewSetupWallet, paddingTop: wp( '10%' )
         }}>
-          <Text style={styles.headerTitleText}>Recover Wallet</Text>
+          <Text style={styles.headerTitleText}>Existing Wallet</Text>
           <Text style={styles.headerInfoText}>
-            If you would like to recover an existing Hexa Wallet
+            If you previously had a Hexa wallet you can recover it Leave the Terms and Condition thing at the bottom.
           </Text>
           <TouchableOpacity
             onPress={async () => {

@@ -606,6 +606,7 @@ export const ON_PRESS_KEEPER = 'ON_PRESS_KEEPER'
 export const LEVEL_COMPLETION_ERROR= 'LEVEL_COMPLETION_ERROR'
 export const NAVIGATING_HISTORY_PAGE = 'NAVIGATING_HISTORY_PAGE'
 export const TYPE_BOTTOMSHEET_OPEN = 'TYPE_BOTTOMSHEET_OPEN'
+export const ALLOW_SECURE_ACCOUNT = 'ALLOW_SECURE_ACCOUNT'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -641,6 +642,15 @@ export const setIsKeeperTypeBottomSheetOpen = ( isTypeBottomSheetOpen ) => {
     type: TYPE_BOTTOMSHEET_OPEN,
     payload: {
       isTypeBottomSheetOpen
+    }
+  }
+}
+
+export const setAllowSecureAccount = ( flag ) => {
+  return {
+    type: ALLOW_SECURE_ACCOUNT,
+    payload: {
+      flag
     }
   }
 }

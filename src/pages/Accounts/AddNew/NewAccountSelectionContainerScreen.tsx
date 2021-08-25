@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, SectionList, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native'
 import NewAccountOptionsSection from './NewAccountOptionsSection'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
@@ -17,6 +17,10 @@ import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import NavStyles from '../../../common/Styles/NavStyles'
 import ButtonBlue from '../../../components/ButtonBlue'
+import { useSelector } from 'react-redux'
+import ModalContainer from '../../../components/home/ModalContainer'
+import ErrorModalContents from '../../../components/ErrorModalContents'
+import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -75,6 +79,11 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   const [ selectedChoice, setSelectedChoice ] = useState<SubAccountDescribing>(
     null,
   )
+  const [ secureAccountAlert, setSecureAccountAlert ] = useState( false )
+  const [ secureAccountKnowMore, setSecureAccountKnowMore ] = useState( false )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
 
   const canProceed = useMemo( () => {
     return selectedChoice !== null
@@ -117,7 +126,9 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   }
 
   function handleChoiceSelection( choice: SubAccountDescribing ) {
-    setSelectedChoice( choice )
+    if( choice.type == 'SAVINGS_ACCOUNT' && !AllowSecureAccount ) {
+      setSecureAccountAlert( true )
+    } else setSelectedChoice( choice )
   }
 
   const ListFooter: React.FC = () => {
@@ -129,6 +140,37 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           buttonDisable={canProceed === false}
         />
       </View>
+    )
+  }
+
+  const renderSecureAccountAlertContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        title={'Complete Level 2'}
+        info={'You can only add a Savings Account when you have completed Level 2'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          setSecureAccountAlert( false )
+        }}
+        onPressIgnore={() => {
+          setSecureAccountKnowMore( true )
+          setSecureAccountAlert( false )
+        }}
+        proceedButtonText={'Ok'}
+        cancelButtonText={'Learn More'}
+        isBottomImage={true}
+        bottomImage={require( '../../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }, [ secureAccountAlert ] )
+
+  const renderSecureAccountKnowMoreContent = () => {
+    return (
+      <SavingAccountAlertBeforeLevel2
+        titleClicked={()=>setSecureAccountKnowMore( false )}
+        containerStyle={{
+        }}
+      />
     )
   }
 
@@ -238,6 +280,12 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         ></SectionList>
         {<ListFooter />}
       </View>
+      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {setSecureAccountAlert( false )}} >
+        {renderSecureAccountAlertContent()}
+      </ModalContainer>
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {setSecureAccountKnowMore( false )}} >
+        {renderSecureAccountKnowMoreContent()}
+      </ModalContainer>
     </SafeAreaView>
   )
 }

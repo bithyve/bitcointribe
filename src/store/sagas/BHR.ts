@@ -60,7 +60,8 @@ import {
   generateMetaShare,
   setIsKeeperTypeBottomSheetOpen,
   ON_PRESS_KEEPER,
-  retrieveMetaShares
+  retrieveMetaShares,
+  setAllowSecureAccount
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -310,6 +311,8 @@ function* updateSharesHealthWorker( { payload } ) {
         'updateSharesHealthWatcher'
       )
     )
+    // Secure Account
+    if( currentLevel == 2 ) yield put( setAllowSecureAccount( true ) )
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )

@@ -49,7 +49,7 @@ export const LevelDataVar = [
     keeper2ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive',
     keeper1: obj,
     keeper2: obj,
-    note:'',
+    note:'Manage Level 1 backup/ recovery keys',
     info:'Automated Cloud Backup',
     id: 1,
   },
@@ -62,7 +62,7 @@ export const LevelDataVar = [
       ...obj, shareType: 'primaryKeeper'
     },
     keeper2: obj,
-    note:'',
+    note:'Manage Level 2 backup/ recovery keys',
     info:'Double Backup',
     id: 2,
   },
@@ -73,8 +73,8 @@ export const LevelDataVar = [
     keeper2ButtonText: 'Share Recovery Key 2',
     keeper1: obj,
     keeper2: obj,
-    note:'',
-    info:'Multi Key Backup',
+    note:'Manage Level 3 backup/ recovery keys',
+    info:'Multi-Key Backup',
     id: 3,
   },
 ]
