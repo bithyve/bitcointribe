@@ -50,6 +50,7 @@ export default function AddContactSendRequest( props ) {
   const [ SendViaLinkBottomSheet ] = useState(
     React.createRef(),
   )
+  const [ encryptionKey, setEncryptKey ] = useState( '' )
   const [ SendViaQRBottomSheet ] = useState(
     React.createRef(),
   )
@@ -179,7 +180,6 @@ export default function AddContactSendRequest( props ) {
       const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
       if( encryptLinkWith === encryptionType ) encryption_key = encryptionKey
     }
-
     if( !encryption_key )
       switch( encryptLinkWith ){
           case DeepLinkEncryptionType.NUMBER:
@@ -188,6 +188,7 @@ export default function AddContactSendRequest( props ) {
             if( phoneNumber ){
               const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
               encryption_key = number.slice( number.length - 10 ) // last 10 digits only
+              setEncryptKey( encryption_key )
             } else { Toast( 'F&F contact number missing' ); return }
             break
 
@@ -195,6 +196,7 @@ export default function AddContactSendRequest( props ) {
             const email = idx( contactInfo, ( _ ) => _.emails[ 0 ].email )
             if( email ){
               encryption_key = email // last 10 digits only
+              setEncryptKey( encryption_key )
             } else { Toast( 'F&F contact email missing' ); return }
             break
 
@@ -202,6 +204,7 @@ export default function AddContactSendRequest( props ) {
             // openTimer()
             encryption_key = TrustedContactsOperations.generateKey( 6 )
             setOTP( encryption_key )
+            setEncryptKey( encryption_key )
             setIsOTPType( true )
             // setShareOtpWithTrustedContactModel( true )
             // setEncryptLinkWith( DeepLinkEncryptionType.DEFAULT )
@@ -392,7 +395,7 @@ export default function AddContactSendRequest( props ) {
               setRenderTimer( true )
             }, 2 )
             if ( isOTPType ) {
-              setShareOtpWithTrustedContactModel( true )
+              // setShareOtpWithTrustedContactModel( true )
             } else {
               openTimer()
             }
@@ -405,9 +408,16 @@ export default function AddContactSendRequest( props ) {
           }}>
           <BottomInfoBox
             icon={true}
-            title={'Secure with 2FA'}
-            infoText={
-              '2 Factor Authentication gives you an additional layer of security and implementing it is highly recommended.'
+            title={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'Secure with additional factor' :
+              `Secure with contacts ${encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'number' : encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email' : 'OTP' }`
+            }
+            infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'You can optionally add a second factor when you are sending the link/ QR through an unencrypted channel'
+              :
+              encryptLinkWith === DeepLinkEncryptionType.NUMBER ? `Your contact will have to verify their phone number '${encryptionKey}' to accept the request`
+                :
+                encryptLinkWith === DeepLinkEncryptionType.EMAIL ? `Your contact will have to verify their email '${encryptionKey}' to accept the request`
+                  :
+                  `Your contact will have to confirm the OTP '${encryptionKey}' to accept the request`
             }
             backgroundColor={Colors.white}
           />

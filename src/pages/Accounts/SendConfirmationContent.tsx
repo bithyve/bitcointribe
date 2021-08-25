@@ -39,7 +39,7 @@ export default function SendConfirmationContent( props ) {
           ...styles.successModalHeaderView,
           marginRight: wp( '8%' ),
           marginLeft: wp( '8%' ),
-          marginTop: hp( 2 )
+          marginTop: hp( 3 )
         }}
       >
         <Text style={styles.modalTitleText}>{props.title}</Text>
@@ -77,7 +77,7 @@ export default function SendConfirmationContent( props ) {
         style={{
           // flex: 1,
           flexDirection: 'row',
-          // marginTop: 'auto',
+          marginTop: hp( 9 ),
           alignItems: 'center',
           // backgroundColor: 'red'
         }}

@@ -69,7 +69,7 @@ export default function CustomPriorityContent( props ) {
 
   return (
     <View style={{
-      height: '100%', backgroundColor: Colors.white
+      backgroundColor: Colors.white
     }}>
       <View
         style={{
@@ -209,7 +209,7 @@ export default function CustomPriorityContent( props ) {
 const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginBottom: hp( '1%' ),
-    marginTop: hp( '1%' ),
+    marginTop: hp( '3%' ),
   },
   modalTitleText: {
     color: Colors.blue,

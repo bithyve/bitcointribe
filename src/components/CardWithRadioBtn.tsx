@@ -75,7 +75,7 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
             {mainText}
           </Text>
           <Text style={{
-            fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: isSelected ? Colors.white : Colors.textColorGrey
+            fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: isSelected ? Colors.white : Colors.textColorGrey, width: wp( 65 )
           }}>
             {subText}
           </Text>

@@ -187,7 +187,8 @@ export default function NewWalletName( props ) {
           }} >
             <HeaderTitle
               firstLineTitle={'Step 1\nPlease name your wallet'}
-              secondLineTitle={'New Wallet creation'}
+              secondLineBoldTitle={'New Wallet '}
+              secondLineTitle={'creation'}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -195,7 +196,7 @@ export default function NewWalletName( props ) {
             />
             <TextInput
               style={inputStyle}
-              placeholder={'Enter display name'}
+              placeholder={'Wallet name'}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               keyboardType={
@@ -259,7 +260,7 @@ export default function NewWalletName( props ) {
           <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorActiveView} />
             <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorInactiveView} />
+            {/* <View style={styles.statusIndicatorInactiveView} /> */}
           </View>
         </View>
 
