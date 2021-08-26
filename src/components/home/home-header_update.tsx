@@ -35,7 +35,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import MaterialCurrencyCodeIcon, {
@@ -73,10 +73,7 @@ const HomeHeader = ( {
   currentLevel,
 } ) => {
   const fiatCurrencyCode = useCurrencyCode()
-  const levelHealth: LevelHealthInterface[] = useSelector(
-    ( state ) => state.bhr.levelHealth
-  )
-  const levelData = useSelector(
+  const levelData: LevelData[] = useSelector(
     ( state ) => state.bhr.levelData
   )
   const dispatch = useDispatch()
@@ -134,6 +131,11 @@ const HomeHeader = ( {
   }, [] )
 
   const getMessageToShow = () => {
+    if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 ) {
+      return {
+        isFirstMessageBold: false, messageOne: 'Initialising Cloud Backup', messageTwo: '', isError: true
+      }
+    }
     if( currentLevel == 0 ){
       return {
         isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: '', isError: true
