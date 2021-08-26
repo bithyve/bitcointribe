@@ -1286,29 +1286,32 @@ function* setHealthStatusWorker( ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS
-    const shareArray = []
-    if( currentLevel && levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo ){
-      const element = levelHealth[ 0 ]
-      for ( let i = 0; i < element.levelInfo.length; i++ ) {
-        const element2 = element.levelInfo[ i ]
-        if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
-          const delta = Math.abs( Date.now() - element2.updatedAt )
-          const minutes = Math.round( delta / ( 60 * 1000 ) )
-          if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
-            levelHealth[ 0 ].levelInfo[ i ].status = 'notAccessible'
-            shareArray.push( {
-              walletId: wallet.walletId,
-              shareId: element2.shareId,
-              reshareVersion: element2.reshareVersion,
-              status: 'notAccessible',
-            } )
+    let shareArray
+    if( currentLevel ){
+      for ( let j = 0; j < levelHealth.length; j++ ) {
+        const element = levelHealth[ j ]
+        for ( let i = 0; i < element.levelInfo.length; i++ ) {
+          const element2 = element.levelInfo[ i ]
+          if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
+            const delta = Math.abs( Date.now() - element2.updatedAt )
+            const minutes = Math.round( delta / ( 60 * 1000 ) )
+            if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
+              levelHealth[ j ].levelInfo[ i ].status = 'notAccessible'
+              shareArray =  {
+                walletId: wallet.walletId,
+                shareId: element2.shareId,
+                reshareVersion: element2.reshareVersion,
+                status: 'notAccessible',
+              }
+              yield call( updateSharesHealthWorker, {
+                payload: {
+                  shares: shareArray, isNeedToUpdateCurrentLevel: true
+                }
+              } )
+            }
           }
         }
       }
-    }
-
-    if( shareArray.length ){
-      yield put( updateMSharesHealth( shareArray, true ) )
     }
     yield put( switchS3LoaderKeeper( 'healthExpiryStatus' ) )
   } catch ( error ) {

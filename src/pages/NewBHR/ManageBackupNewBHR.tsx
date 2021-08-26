@@ -593,12 +593,29 @@ class ManageBackupNewBHR extends Component<
   };
 
   onRefresh = async () => {
+    const contacts: Trusted_Contacts = this.props.trustedContacts
+    const channelUpdates = []
+    // Contact or Device type
+    if( contacts ){
+      for( const ck of Object.keys( contacts ) ){
+        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
+          // initiate permanent channel
+          const channelUpdate =  {
+            contactInfo: {
+              channelKey: ck,
+            }
+          }
+          channelUpdates.push( channelUpdate )
+        }
+      }
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+        channelUpdates: channelUpdates,
+        metaSync: true
+      } )
+    }
     this.props.modifyLevelData( )
     this.props.setHealthStatus()
-    this.props.syncPermanentChannels( {
-      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-      metaSync: true
-    } )
     this.autoCloudUpload()
   };
 
@@ -642,7 +659,7 @@ class ManageBackupNewBHR extends Component<
   renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -662,7 +679,7 @@ class ManageBackupNewBHR extends Component<
           } )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Xc","channelId":"6fbe6882fcfac24061934b0bd98f0ed7b8abe177f75cc3ee34ad3740db6c8964","streamId":"10c56b924","secondaryChannelKey":"GDCCPXJf9wLJtlsnafCOnOeW","version":"1.9.5","walletId":"676629048a41478617b590ef1c18aec7d9caa83d288ecbe64a03c529f343eaf0"}'
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asafd","channelId":"ce77f9e12e79c10b703e423ff2d5642b949ad9addc32feef549c1a76c54cfaf1","streamId":"f4a5edbbd","secondaryChannelKey":"3HnBqIVwlaam5IUAUTMSfr36","version":"1.9.5","walletId":"5d0b3ea87b54ba82626f5cc0a2696d7c5aaf223c2b08ab8b1661d707de9c5128"}'
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
           this.setState( {

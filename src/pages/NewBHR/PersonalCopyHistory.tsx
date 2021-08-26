@@ -503,7 +503,7 @@ const PersonalCopyHistory = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={'Open your PDF copy and scan the first QR for approval.'}
@@ -532,7 +532,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Scas","channelId":"236d6eb91d0f0837fc751bbd1b1e5c81094442d818c0ef976d7d501eda3d121a","streamId":"e9a6b3880","channelKey":"avNYpA15zG6xh24jOraFHjJw","secondaryChannelKey":"129fd4D5Gz9R6szzTAJTpPnh","version":"1.9.0","walletId":"de6a159f6a77b88748f0620cad45f614b66f46652d9318b253d66dfe847ab459","encryptedKey":"95ad66a7354de9920e93bf47f77aa82030b51a6c56605ddb8290dbc4617fedb5a83b4827460677dcb7c6c7f62df441f30526752ce8e9ac4863ffc588eb8732c5e7e9e68c3fb83135aff214b9b816c540"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Shivani","channelId":"a7684345255def374b2994578ee7fb8afb1b93307784fb7b6d579abd5a7cea83","streamId":"da9bca0b5","channelKey":"MejswyO3a4oX1Xe2neCQJqg2","secondaryChannelKey":"O8m1SBsJJ6GqVlHVE3EoD5Us","version":"1.9.5","walletId":"b7dcd593347f05717fa6903329002ae3d4da7db884e8f4ceb40444738c721f11","encryptedKey":"625c90757f83a0c0563a9205603b19f5fabac786776057ac8bddb7fe4ce98011ae0456d76a30214c4d34bdceedd0bc4c5c8de6156805c80c99bcc2c85d154ac7858cff64aadc69bbec02f0def7dbb412"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
