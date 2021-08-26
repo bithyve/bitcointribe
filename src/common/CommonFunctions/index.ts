@@ -373,8 +373,7 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
 export const processDeepLink = async ( deepLink: string ) =>{
   try {
     const splits = deepLink.split( '/' )
-
-    if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
+    if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
       if ( splits[ 3 ] !== config.APP_STAGE ) {
         Alert.alert(
           'Invalid deeplink',
@@ -393,7 +392,7 @@ export const processDeepLink = async ( deepLink: string ) =>{
           encryptedChannelKeys: splits[ 6 ],
           encryptionType,
           encryptionHint,
-          isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
+          isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
           isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
           isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
           isQR: false,
@@ -440,7 +439,7 @@ export const processFriendsAndFamilyQR = ( qrData: string ) => {
             encryptedChannelKeys: scannedData.encryptedChannelKeys,
             encryptionType: scannedData.encryptionType,
             encryptionHint: scannedData.encryptionHint,
-            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
+            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST || scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
             isPrimaryKeeper: scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
             isExistingContact: false,
             isQR: true,
