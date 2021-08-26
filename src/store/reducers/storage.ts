@@ -4,13 +4,16 @@ import {
   UPDATE_WALLET,
 } from '../actions/storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import { COMPLETED_WALLET_SETUP } from '../actions/setupAndAuth'
 
 const initialState: {
   wallet: Wallet;
   key: String;
+  walletExists: boolean,
 } = {
   wallet: null,
   key: '',
+  walletExists: false
 }
 
 export default ( state = initialState, action ) => {
@@ -22,6 +25,11 @@ export default ( state = initialState, action ) => {
 
       case KEY_FETCHED:
         return chain( state ).setIn( [ 'key' ], action.payload.key ).value()
+
+      case COMPLETED_WALLET_SETUP:
+        return chain( state )
+          .setIn( [ 'walletExists' ], true )
+          .value()
 
   }
   return state

@@ -71,7 +71,6 @@ function* setupWalletWorker( { payload } ) {
   yield put( newAccountShellCreationCompleted() )
   yield put( completedWalletSetup( ) )
   yield call( dbManager.createWallet, wallet )
-  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
 }
 
