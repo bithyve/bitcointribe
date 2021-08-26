@@ -596,10 +596,6 @@ class ManageBackupNewBHR extends Component<
     this.props.modifyLevelData( )
     this.props.setHealthStatus()
     this.props.syncPermanentChannels( {
-      permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-      metaSync: true
-    } )
-    this.props.syncPermanentChannels( {
       permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
       metaSync: true
     } )
