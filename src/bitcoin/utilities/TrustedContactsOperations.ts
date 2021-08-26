@@ -203,9 +203,17 @@ export default class TrustedContactsOperations {
       else if ( backupData === null ) outstreamUpdates.encryptedBackupData = null
 
       if ( metaData ) {
+        const newFlags = idx( metaData, ( _ ) => _.flags ) || {
+        }
+        const updatedFlags = {
+          ...unencryptedOutstream.metaData.flags,
+          ...newFlags,
+        }
+
         unencryptedOutstream.metaData = {
           ...unencryptedOutstream.metaData,
           ...metaData,
+          flags: updatedFlags,
         }
         outstream.metaData = unencryptedOutstream.metaData
         outstreamUpdates.metaData = unencryptedOutstream.metaData
@@ -345,14 +353,35 @@ export default class TrustedContactsOperations {
         if ( !contact.isActive ) continue // skip non-active contacts
         if( contactsSecondaryChannelKey ) contact.contactsSecondaryChannelKey = contactsSecondaryChannelKey // execution case: when a contact is upgraded to a keeper
 
-        let outstreamUpdates: StreamData
-        if ( unEncryptedOutstreamUpdates )
-          outstreamUpdates = TrustedContactsOperations.cacheOutstream(
-            contact,
-            channelKey,
-            unEncryptedOutstreamUpdates,
-            secondaryChannelKey
-          )
+        // auto-update last seen(if flags aren't already present)
+        if ( !unEncryptedOutstreamUpdates || !idx( unEncryptedOutstreamUpdates, _ => _.metaData.flags ) ){
+          if( !unEncryptedOutstreamUpdates ) unEncryptedOutstreamUpdates = {
+            streamId,
+            metaData: {
+              flags: {
+                lastSeen: Date.now()
+              }
+            }
+          }
+          else if( !idx( unEncryptedOutstreamUpdates, _ => _.metaData.flags ) ) {
+            unEncryptedOutstreamUpdates = {
+              ...unEncryptedOutstreamUpdates,
+              metaData: {
+                ...unEncryptedOutstreamUpdates?.metaData,
+                flags: {
+                  lastSeen: Date.now()
+                }
+              }
+            }
+          }
+        }
+
+        const outstreamUpdates: StreamData = TrustedContactsOperations.cacheOutstream(
+          contact,
+          channelKey,
+          unEncryptedOutstreamUpdates,
+          secondaryChannelKey
+        )
 
         channelMapping[ contact.permanentChannelAddress ] = {
           contact,

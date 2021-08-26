@@ -559,9 +559,9 @@ export interface UnecryptedStreamData {
   backupData?: BackupStreamData | null, // in/out-stream backupData = null
   metaData?: {
     flags?: {
-      active: boolean,
+      active?: boolean,
       lastSeen: number,
-      newData: boolean,
+      newData?: boolean,
     },
     version?: string
   }
@@ -577,9 +577,9 @@ export interface StreamData {
   encryptedBackupData?: string, // not stored in the app
   metaData?: {
     flags?: {
-      active: boolean,
+      active?: boolean,
       lastSeen: number,
-      newData: boolean,
+      newData?: boolean,
     },
     version?: string
   }
