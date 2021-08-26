@@ -16,6 +16,7 @@ interface IntermediatePropsTypes {
   databaseInitialized: Boolean;
   getMessages: any;
   walletId: any;
+  walletExists: Boolean;
 }
 
 interface IntermediateStateTypes {
@@ -52,11 +53,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
     handleAppStateChange = async ( nextAppState ) => {
       // no need to trigger login screen if accounts are not synced yet
       // which means user hasn't logged in yet
-      const walletExists = await AsyncStorage.getItem( 'walletExists' )
-      //const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
-      if ( !walletExists ) {
-        return
-      }
+      if ( !this.props.walletExists ) return
     };
 
     handleDeepLinkEvent = async ( { url } ) => {
@@ -197,7 +194,8 @@ const mapStateToProps = ( state ) => {
   return {
     databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
     lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
-    walletId: idx( state, ( _ ) => _.preferences.walletId )
+    walletId: idx( state, ( _ ) => _.preferences.walletId ),
+    walletExists: idx( state, ( _ ) => _.storage.walletExists )
   }
 }
 

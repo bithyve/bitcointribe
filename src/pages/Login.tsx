@@ -183,6 +183,7 @@ export default function Login( props ) {
   const { isAuthenticated, authenticationFailed } = useSelector(
     ( state ) => state.setupAndAuth,
   )
+  const { walletExists } = useSelector( ( state ) => state.storage )
 
   useEffect( () => {
     if ( JailMonkey.isJailBroken() ) {
@@ -255,42 +256,41 @@ export default function Login( props ) {
 
       bootStrapNotifications()
 
-      AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
-        if ( exists ) {
-          dispatch( autoSyncShells() )
+      if ( walletExists ) {
+        dispatch( autoSyncShells() )
 
-          setTimeout( () => {
-            // if ( loaderBottomSheet.current ) {
-            //   loaderBottomSheet.current.snapTo( 0 )
-            // }
-            setloaderModal( false )
-            //console.log( 'requestName**', requestName )
-            //console.log( 'creationFlag**', creationFlag )
+        setTimeout( () => {
+          // if ( loaderBottomSheet.current ) {
+          //   loaderBottomSheet.current.snapTo( 0 )
+          // }
+          setloaderModal( false )
+          //console.log( 'requestName**', requestName )
+          //console.log( 'creationFlag**', creationFlag )
 
-            if( !creationFlag ) {
-              props.navigation.navigate( 'Home', {
-                screen: 'Home',
-              }
-              )
-            } else if( requestName ){
-              props.navigation.navigate( 'Home', {
-                screen: 'Home',
-                params: {
-                  custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-                  recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-                  trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                  userKey: requestName && requestName.userKey ? requestName.userKey : null,
-                  swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
-                }
-              } )
+          if( !creationFlag ) {
+            props.navigation.navigate( 'Home', {
+              screen: 'Home',
             }
-          }, LOADER_MESSAGE_TIME )
-        } else {
-          props.navigation.replace( 'WalletInitialization' )
-        }
-      } )
+            )
+          } else if( requestName ){
+            props.navigation.navigate( 'Home', {
+              screen: 'Home',
+              params: {
+                custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+                recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+                trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+                userKey: requestName && requestName.userKey ? requestName.userKey : null,
+                swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+              }
+            } )
+          }
+        }, LOADER_MESSAGE_TIME )
+      } else {
+        props.navigation.replace( 'WalletInitialization' )
+      }
+
     }
-  }, [ isAuthenticated, requestName ] )
+  }, [ isAuthenticated, walletExists, requestName ] )
 
   const bootStrapNotifications = async () => {
     dispatch( setIsPermissionGiven( true ) )

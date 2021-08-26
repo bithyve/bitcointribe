@@ -217,7 +217,7 @@ export default class TrustedContactsOperations {
         }
         outstream.metaData = unencryptedOutstream.metaData
         outstreamUpdates.metaData = unencryptedOutstream.metaData
-        contact.isActive = idx( metaData, ( _ ) => _.flags.active )
+        if( updatedFlags.active !== undefined ) contact.isActive = updatedFlags.active
       }
     }
     return outstreamUpdates
