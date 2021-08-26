@@ -151,7 +151,6 @@ interface HomePropsTypes {
   initializeTrustedContact: any;
   accountsState: AccountsState;
   cloudPermissionGranted: any;
-
   wallet: Wallet;
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
@@ -212,6 +211,7 @@ interface HomePropsTypes {
   initLoader: boolean;
   getMessages: any;
   syncPermanentChannels: any;
+  updateWIStatus: boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -275,6 +275,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
+    if( this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.currentLevel == 0 ) {
+      this.props.setCloudData()
+    }
     requestAnimationFrame( () => {
       this.setUpFocusListener()
     } )
@@ -588,6 +591,7 @@ const mapStateToProps = ( state ) => {
     fetchStarted: idx( state, ( _ ) => _.notifications.fetchStarted ),
     messages: state.notifications.messages,
     initLoader: idx( state, ( _ ) => _.bhr.loading.initLoader ),
+    updateWIStatus: idx( state, ( _ ) => _.bhr.loading.updateWIStatus ),
   }
 }
 

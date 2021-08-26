@@ -221,7 +221,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     //     walletName,
     //   } )
     // }
-    if( walletSetupCompleted && ( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.FAILED || isSkipClicked ) && ( cloudPermissionGranted === true || cloudPermissionGranted === false ) ) {
+    if( walletSetupCompleted ) {
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
@@ -252,12 +252,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     } )
   }
 
-  useEffect( ()=>{
-    if( levelHealth.length && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true && !isSkipClicked && updateWIStatus === false ){
-      dispatch( setCloudData() )
-    }
-  }, [ cloudPermissionGranted, levelHealth, updateWIStatus, cloudBackupStatus ] )
+  // useEffect( ()=>{
+  //   if( levelHealth.length && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+  //     cloudPermissionGranted === true && !isSkipClicked && updateWIStatus === false ){
+  //     dispatch( setCloudData() )
+  //   }
+  // }, [ cloudPermissionGranted, levelHealth, updateWIStatus, cloudBackupStatus ] )
 
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
