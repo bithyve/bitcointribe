@@ -43,6 +43,7 @@ import LoaderModal from '../../components/LoaderModal'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
 import { walletCheckIn } from '../../store/actions/trustedContacts'
 import { setVersion } from '../../store/actions/versionHistory'
+import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 
 export default function RestoreSelectedContactsList( props ) {
   const [ SecondaryDeviceRS, setSecondaryDeviceRS ] = useState( null )
@@ -306,7 +307,7 @@ export default function RestoreSelectedContactsList( props ) {
   useEffect( () => {
     ( async () => {
       if ( SERVICES && walletImageChecked ) {
-        AsyncStorage.setItem( 'walletExists', 'true' )
+        dispatch( completedWalletSetup() )
         AsyncStorage.setItem( 'walletRecovered', 'true' )
 
         dispatch( walletCheckIn() )

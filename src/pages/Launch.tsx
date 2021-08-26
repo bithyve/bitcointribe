@@ -31,6 +31,7 @@ type LaunchScreenProps = {
   databaseInitialized: Boolean;
   getMessages: any;
   walletId: any;
+  walletExists: Boolean,
 }
 
 type LaunchScreenState = { }
@@ -73,15 +74,10 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
   };
 
-
-  handleAppStateChange = async ( nextAppState ) => {
+  handleAppStateChange = ( nextAppState ) => {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
-    const walletExists = await AsyncStorage.getItem( 'walletExists' )
-    //const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
-    if ( !walletExists ) {
-      return
-    }
+    if ( !this.props.walletExists ) return
   };
 
   postSplashScreenActions = async () => {
@@ -206,7 +202,8 @@ const styles = StyleSheet.create( {
 const mapStateToProps = ( state ) => {
   return {
     lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
-    walletId: idx( state, ( _ ) => _.preferences.walletId )
+    walletId: idx( state, ( _ ) => _.preferences.walletId ),
+    walletExists: idx( state, ( _ ) => _.storage.walletExists )
   }
 }
 

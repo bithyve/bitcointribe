@@ -72,7 +72,7 @@ import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setVersion } from '../../store/actions/versionHistory'
 import QuestionList from '../../common/QuestionList'
 import SecurityQuestion from './SecurityQuestion'
-import { initializeRecovery } from '../../store/actions/setupAndAuth'
+import { completedWalletSetup, initializeRecovery } from '../../store/actions/setupAndAuth'
 import ModalContainer from '../../components/home/ModalContainer'
 
 import semver from 'semver'
@@ -179,6 +179,7 @@ interface RestoreWithICloudPropsTypes {
   clearCloudCache: any;
   initNewBHRFlow: any;
   walletCheckIn: any;
+  completedWalletSetup: any;
   setVersion: any;
   initializeRecovery: any;
   setCloudBackupStatus: any;
@@ -293,6 +294,7 @@ class RestoreWithICloud extends Component<
       walletRecoveryFailed,
       cloudData,
       walletCheckIn,
+      completedWalletSetup,
       initNewBHRFlow,
       setVersion,
       cloudBackupStatus
@@ -320,7 +322,7 @@ class RestoreWithICloud extends Component<
       this.props.setCloudBackupStatus( CloudBackupStatus.PENDING )
     }
     if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
-      await AsyncStorage.setItem( 'walletExists', 'true' )
+      completedWalletSetup()
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
       setVersion( 'Restored' )
       initNewBHRFlow( true )
@@ -334,7 +336,7 @@ class RestoreWithICloud extends Component<
     }
 
     if( prevProps.wallet != this.props.wallet ){
-      await AsyncStorage.setItem( 'walletExists', 'true' )
+      completedWalletSetup()
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
       setVersion( 'Restored' )
       initNewBHRFlow( true )
@@ -1431,6 +1433,7 @@ export default withNavigationFocus(
     clearCloudCache,
     initNewBHRFlow,
     walletCheckIn,
+    completedWalletSetup,
     setVersion,
     initializeRecovery,
     setCloudBackupStatus,
