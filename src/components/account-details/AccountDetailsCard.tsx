@@ -355,3 +355,7 @@ const styles = StyleSheet.create( {
 } )
 
 export default withNavigation( AccountDetailsCard )
+
+export {
+  shadowColorForAccountKind
+}

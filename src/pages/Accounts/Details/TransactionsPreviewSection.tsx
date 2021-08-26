@@ -16,6 +16,7 @@ export type Props = {
   onViewMorePressed: () => void;
   accountShellId: string,
   onTransactionItemSelected: ( TransactionDescribing ) => void;
+  kind: SubAccountKind
 };
 
 const TransactionsPreviewSection: React.FC<Props> = ( {
@@ -25,7 +26,8 @@ const TransactionsPreviewSection: React.FC<Props> = ( {
   isTestAccount,
   onViewMorePressed,
   onTransactionItemSelected,
-  accountShellId
+  accountShellId,
+  kind
 }: Props ) => {
   return (
     <View>
@@ -35,6 +37,7 @@ const TransactionsPreviewSection: React.FC<Props> = ( {
           bitcoinUnit={bitcoinUnit}
           isTestAccount={isTestAccount}
           onViewMorePressed={onViewMorePressed}
+          kind={kind}
         />
       </View>
 
