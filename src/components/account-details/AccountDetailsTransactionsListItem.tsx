@@ -10,9 +10,11 @@ export type Props = {
 
 const AccountDetailsTransactionsListItem: React.FC<Props> = ( { transaction, accountShellId }: Props ) => {
   return (
-    <ListItem bottomDivider pad={4}>
+    <ListItem containerStyle={{
+      backgroundColor: '#f5f5f5'
+    }} bottomDivider pad={2}>
       <TransactionsFlatListItemContent accountShellId={accountShellId} transaction={transaction} />
-      <ListItem.Chevron />
+      <ListItem.Chevron size={28}/>
     </ListItem>
   )
 }
