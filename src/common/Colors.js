@@ -13,6 +13,7 @@ const Colors = {
   white: '#ffffff',
   offWhite: '#F5F5F5',
   red: '#FF7761',
+  tomatoRed: '#FF7861',
   homepageButtonColor: '#2C85C1',
   yellow: '#F7C910',
   shadowYellow: '#fff2cc',
