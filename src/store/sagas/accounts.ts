@@ -561,6 +561,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         primarySubAccount = new TestSubAccountInfo( {
           id: account.id,
           xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
           instanceNumber: account.instanceNum,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
@@ -571,6 +572,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         primarySubAccount = new CheckingSubAccountInfo( {
           id: account.id,
           xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
           instanceNumber: account.instanceNum,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
@@ -581,6 +583,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         primarySubAccount = new SavingsSubAccountInfo( {
           id: account.id,
           xPub: null,
+          isUsable: account.isUsable,
           instanceNumber: account.instanceNum,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
@@ -591,6 +594,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         primarySubAccount = new DonationSubAccountInfo( {
           id: account.id,
           xPub: ( account as DonationAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
           instanceNumber: account.instanceNum,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
@@ -617,6 +621,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         primarySubAccount = new ExternalServiceSubAccountInfo( {
           id: account.id,
           xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
           instanceNumber: account.instanceNum,
           type: account.type,
           customDisplayName: account.accountName,
@@ -670,7 +675,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return checkingAccount
 
       case AccountType.SAVINGS_ACCOUNT:
-        if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
+        // if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
         const savingsInstanceCount = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
         const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
@@ -682,7 +687,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.secondaryXpub,
-          bithyveXpub: wallet.details2FA.bithyveXpub,
+          bithyveXpub: wallet.details2FA?.bithyveXpub,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return savingsAccount
@@ -703,7 +708,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
           is2FA: is2FAEnabled,
           secondaryXpub: is2FAEnabled? wallet.secondaryXpub: null,
-          bithyveXpub:  is2FAEnabled? wallet.details2FA.bithyveXpub: null,
+          bithyveXpub:  is2FAEnabled? wallet.details2FA?.bithyveXpub: null,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         const { setupSuccessful } = yield call( AccountUtilities.setupDonationAccount, donationAccount )
