@@ -68,7 +68,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
         if( transaction.receivers.length > 1 ) {
           name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length - 1} other`
         } else {
-          name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name : null ||  transaction.accountType || transaction.accountName
+          name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ] : '' ||  transaction.accountType || transaction.accountName
         }
       } else {
         name =  transaction.accountName? transaction.accountName: transaction.accountType
