@@ -59,11 +59,7 @@ function renderSectionHeader( { section } ) {
       <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
         {titleForSectionHeader( kind )}
       </Text>
-      <Text style={[ styles.listSectionHeading, {
-        color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
-        marginBottom: hp( 1 ),
-
-      } ]}>
+      <Text style={styles.listSubSectionHeading}>
         {titleForSectionSubHeader( kind )}
       </Text>
     </>
@@ -176,7 +172,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 
   return (
     <SafeAreaView style={styles.rootContainer}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={NavStyles.modalContainer}>
         <TouchableOpacity
           onPress={() => {
@@ -205,7 +201,8 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
               fontFamily: Fonts.FiraSansRegular,
               fontSize: RFValue( 25 ),
               marginLeft: wp( '5%' ),
-              marginTop: hp( '2%' )
+              marginTop: hp( '2%' ),
+              letterSpacing: 0.01
             }}
           >
                 Add Accounts
@@ -293,11 +290,22 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
+    backgroundColor: Colors.backgroundColor
   },
 
   listSectionHeading: {
-    fontSize: RFValue( 14 ),
+    fontSize: RFValue( 13 ),
     paddingHorizontal: wp( 6 ),
+    letterSpacing: 0.01,
+  },
+  listSubSectionHeading: {
+    paddingHorizontal: wp( 6 ),
+    letterSpacing: 0.06,
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    marginBottom: hp( 1 ),
+
   },
 
   viewSectionContainer: {

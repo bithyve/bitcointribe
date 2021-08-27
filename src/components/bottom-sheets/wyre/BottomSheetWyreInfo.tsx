@@ -75,7 +75,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   // eslint-disable-next-line quotes
   let wyreMessage = `Wyre enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin.`
 
-  let wyreTitle = 'Buy bitcoin with Wyre'
+  let wyreTitle = 'Buy Bitcoin\nwith Wyre'
 
   if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'fail' )>=0 ) {
     wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment method'
@@ -89,7 +89,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
     ...styles.modalContentContainer
   }}>
     <View style={{
-      height: hp( 75 )
+      height: hp( 74 )
     }}>
 
       <TouchableOpacity
@@ -108,11 +108,9 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       </TouchableOpacity>
       {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
       <View style={styles.successModalHeaderView}>
-        <Text style={styles.modalTitleText}>{wyreTitle}</Text>
+        <Text style={ListStyles.modalTitle}>{wyreTitle}</Text>
         <Text style={{
-          ...styles.modalInfoText,
-          marginTop: wp( 1.5 ),
-          marginBottom: wp( 5 ),
+          ...styles.modalInfoText
         }}>{wyreMessage}</Text>
       </View>
       {/* <TouchableOpacity
@@ -220,7 +218,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoins' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoin' : 'OK'}</Text>
 
         </AppBottomSheetTouchableWrapper>
       </View>
@@ -262,11 +260,11 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     marginLeft: wp( '3%' ),
     // alignSelf: 'center',
-    width: wp( '90%' ),
+    width: wp( '85%' ),
     height: hp( '11%' ),
     backgroundColor: Colors.white,
     alignItems: 'center',
-    marginBottom: wp( 2 ),
+    marginBottom: hp ( 2 ),
     borderRadius: wp( 2 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
@@ -276,8 +274,8 @@ const styles = StyleSheet.create( {
     // },
   },
   headerImageView: {
-    width: wp( '15%' ),
-    height: wp( '15%' ),
+    width: wp( '17%' ),
+    height: wp( '17%' ),
     borderColor: 'red',
     elevation: 10,
     shadowColor: Colors.borderColor,
@@ -288,7 +286,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: wp( '15%' ) / 2,
+    borderRadius: wp( '17%' ) / 2,
     margin: 5
   },
   headerImage: {
@@ -300,9 +298,9 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.backgroundColor,
-    width: wp( '13%' ),
-    height: wp( '13%' ),
-    borderRadius: wp( '13%' ) / 2,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    borderRadius: wp( '15%' ) / 2,
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor1,
@@ -317,11 +315,12 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
+    alignContent: 'center',
+    marginVertical: hp( 0.3 ),
+    letterSpacing: RFValue( 0.01 )
   },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
-    marginLeft: wp( '3%' ),
-    // marginTop: hp( '1%' )
   },
   modalTitleText: {
     color: Colors.blue,
@@ -331,22 +330,22 @@ const styles = StyleSheet.create( {
     marginLeft: 10
   },
   modalInfoText: {
-    marginLeft: wp( '3%' ),
-    marginRight: wp( '6%' ),
-    color: Colors.textColorGrey,
+    marginLeft: wp( '7%' ),
+    marginRight: wp( '11%' ),
+    color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
-    letterSpacing: 0.6,
-    lineHeight: 18
+    letterSpacing: RFValue( 0.6 ),
+    lineHeight: RFValue( 18 ),
+    marginTop: wp( 1.5 ),
+    marginBottom: wp( 3 )
   },
   successModalButtonView: {
     minHeight: 50,
     minWidth: 110,
-    paddingHorizontal: wp( 4 ),
-    paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '36%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
@@ -359,7 +358,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
     marginLeft: wp( '6%' ),
-    marginTop: hp( 2 )
+    // marginTop: hp( 2 )
   },
   successModalImage: {
     width: wp( '25%' ),
