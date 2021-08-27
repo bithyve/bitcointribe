@@ -153,9 +153,9 @@ export default function NewWalletName( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={{
         flex: 1
       }}>
@@ -218,7 +218,7 @@ export default function NewWalletName( props ) {
               autoCompleteType="off"
             />
             <View style={{
-              marginRight: 20,
+              marginRight: wp( 6 )
             }}>
               <Text style={{
                 fontSize: RFValue( 10 ),
@@ -228,51 +228,52 @@ export default function NewWalletName( props ) {
                   Numbers or special characters are not supported</Text>
             </View>
           </View>
-        </KeyboardAvoidingView>
-        <View style={styles.bottomButtonView}>
-          {walletName.trim() != '' ? (
-            <View
-              style={{
-                elevation: 10,
-                shadowColor: Colors.shadowBlue,
-                shadowOpacity: 1,
-                shadowOffset: {
-                  width: 15, height: 15
-                },
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss()
-                  props.navigation.navigate( 'NewWalletQuestion', {
-                    walletName,
-                  } )
-                  // setIsCloudPermissionRender( true )
-                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
-                }}
-                style={styles.buttonView}
-              >
-                <Text style={styles.buttonText}>Next</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
-
+          {/* </KeyboardAvoidingView> */}
           <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorActiveView} />
             <View style={styles.statusIndicatorInactiveView} />
             {/* <View style={styles.statusIndicatorInactiveView} /> */}
           </View>
-        </View>
+          <View style={styles.bottomButtonView}>
+            {walletName.trim() != '' ? (
+              <View
+                style={{
+                  elevation: 10,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: {
+                    width: 15, height: 15
+                  },
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    Keyboard.dismiss()
+                    props.navigation.navigate( 'NewWalletQuestion', {
+                      walletName,
+                    } )
+                  // setIsCloudPermissionRender( true )
+                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+                  }}
+                  style={styles.buttonView}
+                >
+                  <Text style={styles.buttonText}>Next</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
 
+
+          </View>
+        </KeyboardAvoidingView>
         {/* {walletName.trim() == '' ? ( */}
         {note ? (
           <View style={{
             marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
           }}>
             <BottomInfoBox
-              title={'Note: '}
+              title={'Note:'}
               infoText={
-                'We do not store this, it is only for your and your contacts’ eyes'
+                'Wallet name is used in the messages you send to your Friends & Family contacts'
               }
             />
           </View>
@@ -305,10 +306,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   inputBox: {
-    borderColor: Colors.borderColor,
-    borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: hp( '5%' ),
+    marginTop: hp( '1%' ),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -316,13 +315,12 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 20,
+    marginBottom: hp( 1 ),
+    backgroundColor: Colors.backgroundColor1,
   },
   inputBoxFocused: {
-    borderColor: Colors.borderColor,
-    borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: hp( '5%' ),
+    marginTop: hp( '1%' ),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -335,9 +333,9 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 2, height: 2
     },
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor1,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 20,
+    marginBottom: hp( 1 ),
   },
   bottomNoteText: {
     color: Colors.blue,
@@ -352,7 +350,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     height: wp( '13%' ),
-    width: wp( '35%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -365,15 +363,15 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flexDirection: 'row',
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
-    paddingTop: 30,
+    paddingHorizontal: hp( 6 ),
+    paddingBottom: DeviceInfo.hasNotch() ? hp( 4 ) : hp( 3 ),
+    // paddin: hp( 9 ),
     alignItems: 'center',
   },
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
+    paddingHorizontal: hp( 3 )
   },
   statusIndicatorActiveView: {
     height: 5,

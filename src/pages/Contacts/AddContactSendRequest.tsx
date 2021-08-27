@@ -409,7 +409,7 @@ export default function AddContactSendRequest( props ) {
           <BottomInfoBox
             icon={true}
             title={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'Secure with additional factor' :
-              `Secure with contacts ${encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'number' : encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email' : 'OTP' }`
+              `Secure with contacts ${encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number' : encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email' : 'OTP' }`
             }
             infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'You can optionally add a second factor when you are sending the link/ QR through an unencrypted channel'
               :
@@ -536,7 +536,7 @@ export default function AddContactSendRequest( props ) {
               }
               setEncryptLinkWith( type ); setSecure2FAModal( false )
             }}
-            Contact={contactInfo}
+            Contact={Contact}
           />
         </ModalContainer>
         <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >

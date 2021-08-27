@@ -21,8 +21,8 @@ export default function Secure2FA( props ) {
 
   const [ activeType, setActiveType ] = useState( DeepLinkEncryptionType.NUMBER )
   // const [ contactData, setContactData ] = useState( null )
-  const [ phoneNumbers, setPhoneumber ] = useState( props.Contact.phoneNumbers )
-  const [ emails, setEmails ] = useState( props.Contact.emails )
+  const [ phoneNumbers, setPhoneumber ] = useState( props.Contact.phoneNumbers ? props.Contact.phoneNumbers : [] )
+  const [ emails, setEmails ] = useState( props.Contact.emails ? props.Contact.emails : [] )
   return (
     <SafeAreaView style={{
       backgroundColor: Colors.backgroundColor
@@ -55,26 +55,26 @@ export default function Secure2FA( props ) {
             marginRight: wp( 11 )
           }}>Select one of the below to add as a second factor to your link/QR</Text>
         </View>
-        {phoneNumbers && phoneNumbers[ 0 ].number &&
-        <CardWithRadioBtn
-          icon={''}
-          mainText={'Confirm phone number'}
-          subText={phoneNumbers[ 0 ].number}
-          isSelected={activeType === DeepLinkEncryptionType.NUMBER}
-          setActiveIndex={setActiveType}
-          index={DeepLinkEncryptionType.NUMBER}
-        />
-        }
-        {emails && emails[ 0 ].email &&
-        <CardWithRadioBtn
-          icon={''}
-          mainText={'Confirm email address'}
-          subText={emails[ 0 ].email}
-          isSelected={activeType === DeepLinkEncryptionType.EMAIL}
-          setActiveIndex={setActiveType}
-          index={DeepLinkEncryptionType.EMAIL}
-        />
-        }
+        {phoneNumbers && phoneNumbers.length && phoneNumbers[ 0 ].number ?
+          <CardWithRadioBtn
+            icon={''}
+            mainText={'Confirm phone number'}
+            subText={phoneNumbers[ 0 ].number}
+            isSelected={activeType === DeepLinkEncryptionType.NUMBER}
+            setActiveIndex={setActiveType}
+            index={DeepLinkEncryptionType.NUMBER}
+          />
+          : null}
+        {emails && emails.length && emails[ 0 ].email ?
+          <CardWithRadioBtn
+            icon={''}
+            mainText={'Confirm email address'}
+            subText={emails[ 0 ].email}
+            isSelected={activeType === DeepLinkEncryptionType.EMAIL}
+            setActiveIndex={setActiveType}
+            index={DeepLinkEncryptionType.EMAIL}
+          />
+          : null }
         <CardWithRadioBtn
           icon={''}
           mainText={'Confirm with OTP'}

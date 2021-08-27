@@ -381,7 +381,7 @@ export default function Login( props ) {
         <View style={{
           marginLeft: 'auto'
         }}>
-          <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
+          <Text style={styles.errorText}>Incorrect Passcode, Try Again!</Text>
         </View>
       )
     }
@@ -828,7 +828,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp( '6%' ),
+    marginTop: hp( '15%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
@@ -852,9 +852,10 @@ const styles = StyleSheet.create( {
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.red,
-    fontSize: RFValue( 11 ),
+    color: Colors.tomatoRed,
+    fontSize: RFValue( 10 ),
     fontStyle: 'italic',
+    letterSpacing: 0.5
   },
   headerTitleText: {
     color: Colors.blue,

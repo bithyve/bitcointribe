@@ -58,7 +58,7 @@ function* setupWalletWorker( { payload } ) {
 
   // prepare default accounts for the wallet
   const accountsInfo: newAccountsInfo[] = [];
-  [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT ].forEach( ( accountType ) => {
+  [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ].forEach( ( accountType ) => {
     const accountInfo: newAccountsInfo = {
       accountType
     }
@@ -69,9 +69,9 @@ function* setupWalletWorker( { payload } ) {
     payload: accountsInfo
   } )
   yield put( newAccountShellCreationCompleted() )
-  yield put( completedWalletSetup( ) )
   yield call( dbManager.createWallet, wallet )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
+  yield put( completedWalletSetup( ) )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )

@@ -176,7 +176,7 @@ let styles = StyleSheet.create( {
     paddingLeft: wp( '3%' ),
     paddingRight: wp( '3%' ),
     height: wp( '16%' ),
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor1,
     borderRadius: 10,
     marginLeft: wp( '5%' ),
     marginRight: wp( '5%' ),

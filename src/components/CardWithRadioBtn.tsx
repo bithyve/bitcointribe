@@ -69,13 +69,18 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
           marginLeft: wp( '4%' )
         }}>
           <Text style={{
-            fontSize: RFValue( 13 ), fontFamily: isSelected ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: isSelected ? Colors.white : Colors.blue,
-            marginBottom: hp( 0.5 )
+            fontSize: RFValue( 13 ),
+            fontFamily: isSelected ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
+            color: isSelected ? Colors.backgroundColor1 : Colors.blue,
+            marginBottom: hp( 0.5 ), letterSpacing: 0.01
           }}>
             {mainText}
           </Text>
           <Text style={{
-            fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: isSelected ? Colors.white : Colors.textColorGrey, width: wp( 65 )
+            fontSize: RFValue( 11 ),
+            fontFamily: Fonts.FiraSansRegular,
+            color: isSelected ? Colors.backgroundColor1 : Colors.textColorGrey,
+            width: wp( 65 )
           }}>
             {subText}
           </Text>
