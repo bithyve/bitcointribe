@@ -232,18 +232,21 @@ export default class AccountUtilities {
   }
 
   static signingEssentialsForMultiSig = ( account: MultiSigAccount, address: string ) => {
-    const { xpubs, xprivs, networkType } = account
+    const { networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
 
     const closingExtIndex = account.nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
     for ( let itr = 0; itr <= closingExtIndex; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, false )
+      const multiSig = AccountUtilities.createMultiSig( {
+        primary: account.xpub,
+        ...( account as MultiSigAccount ).xpubs
+      }, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, false ),
-          secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, false, true )
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( account.xpriv, network, itr, false ),
+          secondaryPriv: account.xprivs.secondary
+            ? AccountUtilities.generateChildFromExtendedKey( account.xprivs.secondary, network, itr, false, true )
             : null,
           childIndex: itr,
         }
@@ -252,13 +255,16 @@ export default class AccountUtilities {
 
     const closingIntIndex = account.nextFreeChangeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT_INTERNAL : config.GAP_LIMIT )
     for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, true )
+      const multiSig = AccountUtilities.createMultiSig( {
+        primary: account.xpub,
+        ...( account as MultiSigAccount ).xpubs
+      }, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, true ),
-          secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, true, true )
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( account.xpriv, network, itr, true ),
+          secondaryPriv: account.xprivs.secondary
+            ? AccountUtilities.generateChildFromExtendedKey( account.xprivs.secondary, network, itr, true, true )
             : null,
           childIndex: itr,
           internal: true
@@ -339,7 +345,10 @@ export default class AccountUtilities {
         let changeAddress: string
 
         if( ( account as MultiSigAccount ).is2FA )
-          changeAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, nextFreeChangeAddressIndex, true ).address
+          changeAddress = AccountUtilities.createMultiSig( {
+            primary: account.xpub,
+            ...( account as MultiSigAccount ).xpubs
+          }, 2, network, nextFreeChangeAddressIndex, true ).address
         else
           changeAddress = AccountUtilities.getAddressByIndex(
             account.xpub,

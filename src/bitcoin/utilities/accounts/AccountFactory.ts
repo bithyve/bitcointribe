@@ -34,6 +34,7 @@ export function generateAccount(
 
   const account: Account = {
     id,
+    isUsable: true,
     walletId,
     type,
     instanceNum,
@@ -102,35 +103,42 @@ export function generateMultiSigAccount(
   // Note: only primary-xpubs differs b/w different multi-sig account instance(secondary and bh-xpubs stay constant)
 
   const network = AccountUtilities.getNetworkByType( networkType )
+  const primaryXpub = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath )
+  const primaryXpriv = AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
+
   const xpubs: {
-    primary: string,
     secondary: string,
     bithyve: string,
   } = {
-    primary: AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath ),
     secondary: secondaryXpub,
     bithyve: bithyveXpub,
   }
   const xprivs: {
-    primary: string,
     secondary?: string,
   } = {
-    primary: AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
   }
 
-  const id = crypto.createHash( 'sha256' ).update( xpubs.primary + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
-  const initialRecevingAddress = AccountUtilities.createMultiSig( xpubs, 2, network, 0, false ).address
+  let initialRecevingAddress = ''
+  let id = ''
+  if( secondaryXpub ){
+    id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
+    initialRecevingAddress = AccountUtilities.createMultiSig( {
+      primary: primaryXpub,
+      ...xpubs,
+    }, 2, network, 0, false ).address
+  }
 
   const account: MultiSigAccount = {
     id,
+    isUsable: id? true : false,
     walletId,
     type,
     instanceNum,
     networkType,
     derivationPath,
     is2FA: true,
-    xpub: null,
-    xpriv: null,
+    xpub: primaryXpub,
+    xpriv: primaryXpriv,
     xpubs,
     xprivs,
     accountName,
