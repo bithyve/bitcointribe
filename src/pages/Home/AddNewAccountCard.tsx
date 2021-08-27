@@ -54,6 +54,12 @@ const styles = StyleSheet.create( {
     height: heightPercentageToDP( 21 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    elevation: 6
   },
 } )
 

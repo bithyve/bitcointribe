@@ -138,8 +138,9 @@ const HomeBuyCard = ( {
         //   />
         // }
         buttonStyle={{
-          borderRadius: wp( 3 ),
-          paddingVertical: wp( 2.5 ),
+          borderRadius: wp( 1.5 ),
+          paddingVertical: wp( 2 ),
+          paddingHorizontal: wp( 3 ),
           backgroundColor: Colors.blue
         }}
         titleStyle={{

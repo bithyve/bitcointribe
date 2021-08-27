@@ -196,7 +196,7 @@ export default function NewWalletName( props ) {
             />
             <TextInput
               style={inputStyle}
-              placeholder={'Wallet name'}
+              placeholder={'Enter wallet name'}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               keyboardType={

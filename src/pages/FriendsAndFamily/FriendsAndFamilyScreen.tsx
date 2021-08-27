@@ -567,7 +567,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               />
             }
             style={{
-              flex: 1
+              flex: 1,
             }}
           >
             <View style={{
@@ -606,7 +606,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                     marginTop: 3,
                     width: '100%',
                   }}>
-        You can choose from your phones address book
+                    {'You can choose from your phone\'s\naddress book'}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -799,9 +799,13 @@ class FriendsAndFamilyScreen extends PureComponent<
             otherContacts.length == 0 && (
                 // feature/2.0
                 <BottomInfoBox
+                  containerStyle={{
+                    // alignItems: 'flex-end'
+                    marginTop: hp( 22 )
+                  }}
                   title={''}
                   infoText={
-                    'All your contacts appear here when added to Hexa wallet'
+                    'Your contacts appear here when\nadded to Hexa wallet'
                   }
                 />
               )}
