@@ -95,8 +95,8 @@ export function generateMultiSigAccount(
     accountDescription: string,
     mnemonic: string,
     derivationPath: string,
-    secondaryXpub: string,
-    bithyveXpub: string,
+    secondaryXpub?: string,
+    bithyveXpub?: string,
     networkType: NetworkType,
   }
 ): MultiSigAccount {
@@ -120,17 +120,19 @@ export function generateMultiSigAccount(
 
   let initialRecevingAddress = ''
   let id = ''
+  let isUsable = false
   if( secondaryXpub ){
     id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
     initialRecevingAddress = AccountUtilities.createMultiSig( {
       primary: primaryXpub,
       ...xpubs,
     }, 2, network, 0, false ).address
+    isUsable = true
   }
 
   const account: MultiSigAccount = {
     id,
-    isUsable: id? true : false,
+    isUsable,
     walletId,
     type,
     instanceNum,
@@ -243,6 +245,28 @@ export function generateDonationAccount(
   }
 
   return donationAccount
+}
+
+export const upgradeAccountToMultiSig = ( {
+  account,
+  secondaryXpub,
+  bithyveXpub,
+}: {
+  account: Account,
+  secondaryXpub: string,
+  bithyveXpub: string,
+} ): MultiSigAccount => {
+  account.id = crypto.createHash( 'sha256' ).update( account.xpub + secondaryXpub + bithyveXpub ).digest( 'hex' )
+  account.isUsable = true;
+  ( account as MultiSigAccount ).xpubs = {
+    secondary: secondaryXpub,
+    bithyve: bithyveXpub,
+  };
+  ( account as MultiSigAccount ).is2FA = true;
+  ( account as MultiSigAccount ).xprivs = {
+  }
+
+  return ( account as MultiSigAccount )
 }
 
 
