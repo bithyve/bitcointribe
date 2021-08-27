@@ -197,13 +197,18 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        setHeight( 85 )
+        if ( Platform.OS === 'android' ) {
+          setHeight( 85 )
+        }
       }
     )
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
         setHeight( 72 )
+        if ( Platform.OS === 'android' ) {
+          setHeight( 72 )
+        }
       }
     )
 
@@ -510,7 +515,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: pswdError ? Colors.red : Colors.borderColor,
+              borderColor: pswdError ? Colors.red : Colors.backgroundColor1,
               marginTop: 10,
               backgroundColor: Colors.white
             }}
@@ -670,7 +675,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: Colors.borderColor,
+              borderColor: Colors.backgroundColor1,
               marginVertical: 10,
               backgroundColor: Colors.white
             }}
@@ -898,7 +903,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingRight: 15,
-                  borderColor: answerError ? Colors.red : Colors.borderColor,
+                  borderColor: answerError ? Colors.red : Colors.backgroundColor1,
                   backgroundColor: Colors.white
                 }}
               >
@@ -971,7 +976,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   alignItems: 'center',
                   paddingRight: 15,
                   marginTop: 10,
-                  borderColor: answerError ? Colors.red : Colors.borderColor,
+                  borderColor: answerError ? Colors.red : Colors.backgroundColor1,
                   backgroundColor: Colors.white
                 }}
               >
@@ -1295,8 +1300,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         </View>
       ) : null}
       <View style={{
-        alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '9%' ),
-        flexDirection: 'row'
+        alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '4%' ),
+        flexDirection: 'row', marginTop: hp( 2 )
       }}>
         <ButtonBlue
           buttonText="Confirm & Proceed"
@@ -1312,6 +1317,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}
         >
           <Text style={{
+            fontSize: RFValue( 13 ),
             color: Colors.blue,
             fontFamily: Fonts.FiraSansMedium,
             alignSelf: 'center',
@@ -1322,10 +1328,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
       </ModalContainer> */}
-      <ModalContainer visible={securityQue} closeBottomSheet={() => {showSecurityQue( false ) }} >
+      <ModalContainer visible={securityQue} closeBottomSheet={() => {}} >
         {renderSecurityQuestion()}
       </ModalContainer>
-      <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {showEncryptionPswd( false ) }} >
+      <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {}} >
         {renderEncryptionPswd()}
       </ModalContainer>
       <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
@@ -1348,7 +1354,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 const styles = StyleSheet.create( {
   dropdownBox: {
     flexDirection: 'row',
-    borderColor: Colors.borderColor,
+    borderColor: Colors.backgroundColor1,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1362,7 +1368,7 @@ const styles = StyleSheet.create( {
   },
   dropdownBoxOpened: {
     flexDirection: 'row',
-    borderColor: Colors.borderColor,
+    borderColor: Colors.backgroundColor1,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1487,7 +1493,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     marginRight: wp( 5 ),
     alignSelf: 'flex-end',
-    width: wp( '72%' ),
+    width: wp( '63%' ),
     textAlign: 'right'
   }
 } )

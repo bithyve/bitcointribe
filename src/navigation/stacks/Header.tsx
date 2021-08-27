@@ -1239,9 +1239,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.CLOUD_ERROR:
           return (
             <ErrorModalContents
-              title={'Automated Cloud Backup Error'}
-              info={'We could not backup your wallet on the cloud. This may be due to: \n1) A network issue\n2) Inadequate space in your cloud storage\n3) A bug on our part'}
-              note={'Please try again in some time. In case the error persists, please reach out to us on: \nTwitter: @HexaWallet\nTelegram: https://t.me/HexaWallet\nEmail: hello@bithyve.com'}
+              title={'Automated Cloud\nBackup Error'}
+              info={'We could not backup your wallet\non the cloud. This may be due to:'}
+              errPoints={[ 'A network issue', 'Inadequate space in your cloud storage', 'A bug on our part' ]}
+              note={'Please try again in some time.\nIn case the error persists,\nplease reach out to us on:'}
+              links={[ {
+                link: 'hello@bithyve.com',
+                icon: require( '../../assets/images/socialicon/twitter.png' )
+              }, {
+                link: '@HexaWallet',
+                icon: require( '../../assets/images/socialicon/twitter.png' )
+              }, {
+                link: 'https://t.me/HexaWallet',
+                icon: require( '../../assets/images/socialicon/twitter.png' )
+              }
+              ]}
               onPressProceed={()=>{
                 if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
                   this.props.setCloudData()
@@ -1252,6 +1264,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.props.updateCloudPermission( false )
                 this.closeBottomSheet()
               }}
+              closeModal={() => this.closeBottomSheet()}
               proceedButtonText={'Try Again'}
               cancelButtonText={'Skip'}
               isIgnoreButton={true}
@@ -1380,7 +1393,6 @@ const styles = StyleSheet.create( {
     height: widthPercentageToDP( '25%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
-    marginBottom: heightPercentageToDP( '-3%' ),
   }
 } )
 
