@@ -12,7 +12,7 @@ export default function useSendableAccountShells( currentAccountShell: AccountSh
 
     const sendableAccountShells = []
     accountsState.accountShells.forEach( ( accountShell ) => {
-      if( accountShell.primarySubAccount.kind !== SubAccountKind.TEST_ACCOUNT )
+      if( accountShell.primarySubAccount.isUsable && accountShell.primarySubAccount.kind !== SubAccountKind.TEST_ACCOUNT )
         if( accountShell.id !== currentAccountShell.id )
           sendableAccountShells.push( accountShell )
     } )

@@ -838,13 +838,14 @@ export interface Wallet {
 
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
+  isUsable: boolean,                    // true if account is usable
   walletId: string,                     // wallet's id
   type: AccountType,                    // type of account
   instanceNum: number,                  // instance number of the aforementioned type
-  networkType: NetworkType,                 // testnet/mainnet
+  networkType: NetworkType,             // testnet/mainnet
   derivationPath: string,               // derivation path of the extended keys belonging to this account
-  xpub: string | null,                  // account's xpub (null for multi-sig accounts)
-  xpriv: string | null,                 // account's xpriv (null for multi-sig accounts)
+  xpub: string | null,                  // account's xpub (primary for multi-sig accounts)
+  xpriv: string | null,                 // account's xpriv (primary for multi-sig accounts)
   accountName: string,                  // name of the account
   accountDescription: string,           // description of the account
   accountVisibility: AccountVisibility, // visibility of the account
@@ -862,29 +863,13 @@ export interface Account {
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
   hasNewTxn?: boolean                   // indicates new txns
 }
-
-export interface cloudDataInterface {
-  levelStatus: number;
-  encryptedCloudDataJson: string;
-  walletName: string;
-  questionId: string;
-  question: string;
-  keeperData: string;
-  bhXpub?: string;
-  shares?: any;
-  secondaryShare?: string;
-  seed?: string;
-}
-
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
-  xpubs: {                              // xpub set for multi-sig
-    primary: string,
+  xpubs: {                              // additional xpubs for multi-sig
     secondary: string,
     bithyve: string,
   }
-  xprivs: {                             // xpirv set for multi-sig
-    primary: string,
+  xprivs: {                             // additional xpirvs for multi-sig
     secondary?: string,
   }
 }
@@ -896,13 +881,11 @@ export interface DonationAccount extends Account {
   };
   disableAccount: boolean;
   is2FA: boolean,                       // is2FA enabled
-  xpubs?: {                              // xpub set for multi-sig
-    primary: string,
+  xpubs?: {                             // additional xpubs for multi-sig
     secondary: string,
     bithyve: string,
   }
-  xprivs?: {                             // xpirv set for multi-sig
-    primary: string,
+  xprivs?: {                            // additional xpirvs for multi-sig
     secondary?: string,
   }
 }
@@ -937,4 +920,17 @@ export enum DeepLinkEncryptionType {
   NUMBER = 'NUM',
   EMAIL = 'EMAIL',
   OTP = 'OTP'
+}
+
+export interface cloudDataInterface {
+  levelStatus: number;
+  encryptedCloudDataJson: string;
+  walletName: string;
+  questionId: string;
+  question: string;
+  keeperData: string;
+  bhXpub?: string;
+  shares?: any;
+  secondaryShare?: string;
+  seed?: string;
 }

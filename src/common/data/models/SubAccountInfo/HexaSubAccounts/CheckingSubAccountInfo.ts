@@ -18,6 +18,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 export default class CheckingSubAccountInfo
 implements HexaSubAccountDescribing {
   id: string;
+  isUsable: boolean;
   xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
@@ -43,6 +44,7 @@ implements HexaSubAccountDescribing {
   constructor( {
     id = uuid(),
     xPub = null,
+    isUsable,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Checking Account',
@@ -57,6 +59,7 @@ implements HexaSubAccountDescribing {
   }: ConstructorProps ) {
     this.id = id
     this.xPub = xPub
+    this.isUsable = isUsable,
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle
