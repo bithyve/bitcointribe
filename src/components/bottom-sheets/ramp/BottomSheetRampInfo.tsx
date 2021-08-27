@@ -75,7 +75,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   // eslint-disable-next-line quotes
   let rampMessage = 'Ramp enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin.'
 
-  let rampTitle = 'Buy bitcoin with Ramp'
+  let rampTitle = 'Buy bitcoin\nwith Ramp'
 
   if( rampFromDeepLink && rampDeepLinkContent ) {
     rampMessage = rampDeepLinkContent.search( 'fail' )>=0
@@ -89,7 +89,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
     ...styles.modalContentContainer,
   }}>
     <View style={{
-      height: hp( 75 )
+      height: hp( 74 )
     }}>
       <TouchableOpacity
         activeOpacity={1}
@@ -105,15 +105,10 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         // marginTop: hp( 0.5 )
         }} />
       </TouchableOpacity>
-      <View style={styles.successModalHeaderView}>
-
-        <Text style={styles.modalTitleText}>{rampTitle}</Text>
-        <Text style={{
-          ...styles.modalInfoText,
-          marginTop: wp( 1.5 ),
-          marginBottom: wp( 3 ),
-        }}>{rampMessage}</Text>
-      </View>
+      <Text style={ListStyles.modalTitle}>{rampTitle}</Text>
+      <Text style={{
+        ...styles.modalInfoText
+      }}>{rampMessage}</Text>
       {/* <TouchableOpacity
       onPress={() => showDropdown( true )}
       style={styles.containerStyle}>
@@ -203,7 +198,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           height: wp( '14%' )
         }}>
           <ListItem.Subtitle
-            style={ListStyles.infoHeaderSubtitleText}
+            style={ListStyles.listItemSubtitle}
             numberOfLines={1}
           >
               Bitcoin will be transferred to
@@ -236,7 +231,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy Bitcoin' : 'OK'}</Text>
 
         </AppBottomSheetTouchableWrapper>
       </View>
@@ -278,11 +273,11 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     marginLeft: wp( '3%' ),
     // alignSelf: 'center',
-    width: wp( '90%' ),
+    width: wp( '85%' ),
     height: hp( '11%' ),
     backgroundColor: Colors.white,
     alignItems: 'center',
-    marginBottom: wp( 4 ),
+    marginBottom: hp( 3 ),
     borderRadius: wp( 2 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
@@ -292,11 +287,11 @@ const styles = StyleSheet.create( {
     // },
   },
   headerImageView: {
-    width: wp( '15%' ),
-    height: wp( '15%' ),
+    width: wp( '17%' ),
+    height: wp( '17%' ),
     borderColor: 'red',
     elevation: 10,
-    shadowColor: Colors.borderColor,
+    shadowColor: Colors.bgColor,
     shadowOpacity: 10,
     shadowOffset: {
       width: 2, height: 2
@@ -304,7 +299,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: wp( '15%' ) / 2,
+    borderRadius: wp( '17%' ) / 2,
     margin: 5
   },
   headerImage: {
@@ -316,12 +311,12 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.backgroundColor,
-    width: wp( '13%' ),
-    height: wp( '13%' ),
-    borderRadius: wp( '13%' ) / 2,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    borderRadius: wp( '15%' ) / 2,
   },
   modalContentContainer: {
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.bgColor,
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
@@ -334,34 +329,35 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     color: Colors.black,
     alignContent: 'center',
-    marginVertical: hp( 0.3 )
+    marginVertical: hp( 0.3 ),
+    letterSpacing: RFValue( 0.01 )
   },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
-    marginLeft: wp( '3%' ),
+    // marginLeft: wp( '6%' ),
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
     width: wp( 30 ),
-    marginLeft: 10
+    marginLeft: 10,
   },
   modalInfoText: {
-    marginLeft: wp( '3%' ),
-    marginRight: wp( 4 ),
-    color: Colors.textColorGrey,
+    marginLeft: wp( '7%' ),
+    marginRight: wp( '12%' ),
+    color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
-    letterSpacing: 0.6,
-    lineHeight: 18
+    letterSpacing: RFValue( 0.6 ),
+    lineHeight: RFValue( 18 ),
+    marginTop: wp( 1.5 ),
+    marginBottom: wp( 3 )
   },
   successModalButtonView: {
-    paddingHorizontal: wp( 4 ),
-    paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '36%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,

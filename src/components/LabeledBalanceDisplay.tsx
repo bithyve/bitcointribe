@@ -156,7 +156,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
         {formattedBalanceText}
       </Text>
 
-      <Text style={unitTextStyles}>{formattedUnitText}</Text>
+      <Text style={unitTextStyles}>{` ${formattedUnitText}`}</Text>
     </View>
   )
 }
