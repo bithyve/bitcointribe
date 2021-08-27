@@ -93,18 +93,18 @@ const HomeHeader = ( {
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError } = getMessageToShow()
     return <View style={{
-      flexDirection: 'row', alignItems: 'center', marginTop: hp( 0.45 )
+      flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
     }}>
       <View style={{
         backgroundColor: isError ? Colors.red : Colors.green,
-        width: wp( '5.5%' ), height: wp( '5.5%' ), borderRadius: wp( '5.5/2%' ),
+        width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ),
         alignItems:'center',
         justifyContent: 'center'
       }}>
         <Image
           source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
           style={{
-            width: wp( '3.5%' ), height: wp( '3.5%' ),
+            width: wp( '2.7%' ), height: wp( '2.7%' ),
           }}
           resizeMode={'contain'}
         />
@@ -160,61 +160,13 @@ const HomeHeader = ( {
       ...styles.headerViewContainer, flex: 1
     }}>
       <View style={{
-        flexDirection: 'row'
+        flexDirection: 'row', alignItems: 'center'
       }}>
-        {/* <<<<<<< Updated upstream */}
-        {/* <CurrencyKindToggleSwitch
-          fiatCurrencyCode={CurrencyCode}
-          onpress={() => {
-            dispatch(
-              currencyKindSet(
-                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-              )
-            )
-          }}
-          isOn={prefersBitcoin}
-          disabled={exchangeRates && exchangeRates[ CurrencyCode ] ? false : true}
-        />
-        <TouchableOpacity
-          onPress={onPressNotifications}
-          style={{
-            height: wp( '10%' ),
-            width: wp( '10%' ),
-            justifyContent: 'center',
-            marginLeft: 'auto',
-          }}
-        >
-          <ImageBackground
-            source={require( '../../assets/images/icons/icon_notification.png' )}
-            style={{
-              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
-            }}
-            resizeMode={'contain'}
-          >
-            {notificationData.findIndex( ( value ) => value.status === 'unread' ) > -1 ? (
-              <View
-                style={{
-                  backgroundColor: Colors.red,
-                  height: wp( '2.5%' ),
-                  width: wp( '2.5%' ),
-                  borderRadius: wp( '2.5%' ) / 2,
-                  alignSelf: 'flex-end',
-                }}
-              />
-            ) : null}
-          </ImageBackground>
-        </TouchableOpacity>
-      </View> */}
         <View style={{
           flex: 1, justifyContent: 'center', alignItems: 'flex-start'
-          // =======
-        // <View style={{
-        // flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start'
-          // >>>>>>> Stashed changes
         }}>
           <View
             style={{
-              marginBottom: hp( '1.8%' ),
               justifyContent: 'center',
               alignItems: 'flex-start',
             }}
@@ -223,8 +175,6 @@ const HomeHeader = ( {
             <View
               style={{
                 flexDirection: 'row',
-                // alignItems: 'baseline',
-                // marginBottom: wp('3%'),
                 alignItems: 'center',
               }}
             >
@@ -232,16 +182,11 @@ const HomeHeader = ( {
                 <Image
                   style={{
                     ...CommonStyles.homepageAmountImage,
-                    // alignItems: 'baseline',
                     marginTop: hp( 0.2 )
                   }}
                   source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                 />
               ) : materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
-                // setCurrencyCodeToImage(
-                //   getCurrencyImageName( CurrencyCode ),
-                //   'light'
-                // )
                 <MaterialCurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
                   color={Colors.white}
@@ -255,7 +200,6 @@ const HomeHeader = ( {
                 <Image
                   style={{
                     ...styles.cardBitCoinImage,
-                    // marginBottom: wp( '1.5%' ),
                   }}
                   source={getCurrencyImageByRegion( fiatCurrencyCode, 'light' )}
                 />
@@ -276,17 +220,6 @@ const HomeHeader = ( {
             </View>
           </View>
         </View>
-        {/* <CurrencyKindToggleSwitch
-          fiatCurrencyCode={CurrencyCode}
-          onpress={() => {
-            dispatch(
-              currencyKindSet(
-                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-              )
-            )
-          }}
-          isOn={prefersBitcoin}
-        /> */}
         <TouchableOpacity
           onPress={navigateToQRScreen}
           style={{
@@ -294,7 +227,6 @@ const HomeHeader = ( {
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
-            // marginTop: hp( 1 )
           }}
         >
           <ImageBackground
@@ -348,59 +280,6 @@ const HomeHeader = ( {
           </ImageBackground>
         </TouchableOpacity>
       </View>
-
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginTop: 'auto',
-        }}
-      >
-        <ImageBackground
-          source={require( '../../assets/images/icons/Keeper_shield_white.png' )}
-          style={{
-            width: wp( '15%' ),
-            height: wp( '20%' ),
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.blue,
-              fontFamily: Fonts.FiraSansMedium,
-              fontSize: RFValue( 18 ),
-            }}
-          >
-            {currentLevel ? currentLevel : ''}
-          </Text>
-        </ImageBackground>
-        <TouchableOpacity
-          onPress={() => {
-            console.log( 'newBHRFlowStarted', newBHRFlowStarted )
-            // if( upgradeProcessStatus == KeeperProcessStatus.IN_PROGRESS ){
-            //   navigation.navigate( 'UpgradeBackup' )
-            // } else {
-            if ( newBHRFlowStarted === true ) {
-              navigation.navigate( 'ManageBackupNewBHR' )
-            } else {
-              navigation.navigate( 'UpgradeBackup' )
-            }
-            //}
-          }}
-          style={styles.manageBackupMessageView}
-        >
-          {getMessage()}
-          <AntDesign
-            style={{
-              marginLeft: 'auto'
-            }}
-            name={'arrowright'}
-            color={Colors.white}
-            size={17}
-          />
-        </TouchableOpacity>
-      </View> */}
       {getMessage()}
     </View>
   )
@@ -410,15 +289,16 @@ export default HomeHeader
 
 const styles = StyleSheet.create( {
   headerViewContainer: {
-    marginTop: hp( '2%' ),
-    marginLeft: 20,
-    marginRight: 20,
+    marginTop: hp( '3.6%' ),
+    marginLeft: wp( 5 ),
+    marginRight: wp( 5 )
   },
   headerTitleText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 25 ),
-    marginBottom: wp( '1.8%' ),
+    marginBottom: wp( '1%' ),
+    letterSpacing: RFValue( 0.01 )
   },
   cardBitCoinImage: {
     width: wp( '3.5%' ),

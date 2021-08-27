@@ -1105,7 +1105,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-                // onPress={this.closeBottomSheet}
+                onPress={this.closeBottomSheet}
               />
             </>
           )

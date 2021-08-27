@@ -145,6 +145,12 @@ const styles = StyleSheet.create( {
     paddingVertical: widthPercentageToDP( 2.5 ),
     backgroundColor: Colors.white,
     justifyContent: 'space-between',
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    elevation: 6
   },
 
   headerSectionContainer: {

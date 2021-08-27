@@ -30,6 +30,8 @@ const Colors = {
   riptide: '#77E3B5',
   kashmirBlue: '#546D92',
   gold: '#E9BB35',
+  bgColor: '#F8F8F8',
+  shadowColor: '#8686860D',
 
   // Grayscale
   gray1: '#d0d0d0',
