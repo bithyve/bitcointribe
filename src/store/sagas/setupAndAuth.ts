@@ -69,9 +69,9 @@ function* setupWalletWorker( { payload } ) {
     payload: accountsInfo
   } )
   yield put( newAccountShellCreationCompleted() )
-  yield put( completedWalletSetup( ) )
   yield call( dbManager.createWallet, wallet )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
+  yield put( completedWalletSetup( ) )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
