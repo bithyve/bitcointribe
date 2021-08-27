@@ -82,7 +82,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ConfirmModal, setConfirmModal ] = useState( false )
   const [ ChangeModal, setChangeModal ] = useState( false )
   const [ shareOtpWithTrustedContactModal, setShareOtpWithTrustedContactModal ] = useState( false )
-
+  const [ SecondaryDeviceMessageModal, setSecondaryDeviceMessageModal ] = useState( false )
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ changeContact, setChangeContact ] = useState( false )
@@ -108,8 +108,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const [ isNavigation, setNavigation ] = useState( false )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
-  )
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
   const [ selectedTitle, setSelectedTitle ] = useState( props.navigation.getParam( 'selectedTitle' ) )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
@@ -144,7 +143,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-    setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
+    setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
         ? props.navigation.getParam( 'isChangeKeeperType' )
@@ -696,6 +695,22 @@ const TrustedContactHistoryKeeper = ( props ) => {
     setShowQrCode( true )
   }
 
+  const renderSecondaryDeviceMessageContents = useCallback( () => {
+    return (
+      <ErrorModalContents
+        modalRef={SecondaryDeviceMessageModal}
+        title={'Keeper Device'}
+        note={
+          'For confirming your Recovery Key on the Keeper Device, simply open the app on that device and log in'
+        }
+        proceedButtonText={'Ok, got it'}
+        onPressProceed={() => setSecondaryDeviceMessageModal( false )}
+        onPressIgnore={() => setSecondaryDeviceMessageModal( false )}
+        isBottomImage={false}
+      />
+    )
+  }, [] )
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -723,22 +738,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
           type={'contact'}
           IsReshare={isReshare}
           data={sortedHistory( trustedContactHistory )}
-          confirmButtonText={'Share Now'}
+          confirmButtonText={props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressChange={() => {
             setKeeperTypeModal( true )
           }}
           onPressConfirm={() => {
-            setTimeout( () => {
+            if( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
+              setTimeout( () => {
+                setShowQrCode( true )
+              }, 2 )
+              // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
+              // setTrustedContactModal( true )
+              setNavigation( false )
+              props.navigation.navigate( 'FNFToKeeper', {
+                ...props.navigation.state.params,
+                onPressContinue
+              } )
               setShowQrCode( true )
-            }, 2 )
-            // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
-            // setTrustedContactModal( true )
-            setNavigation( false )
-            props.navigation.navigate( 'FNFToKeeper', {
-              ...props.navigation.state.params,
-              onPressContinue
-            } )
-            setShowQrCode( true )
+            } else {
+              setSecondaryDeviceMessageModal( true )
+            }
           }}
           onPressReshare={() => {
             setReshareModal( true )
@@ -749,6 +768,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
           changeButtonText={'Change'}
         />
       </View>
+      <ModalContainer visible={SecondaryDeviceMessageModal} closeBottomSheet={()=>setSecondaryDeviceMessageModal( false )} >
+        {renderSecondaryDeviceMessageContents()}
+      </ModalContainer>
       <ModalContainer visible={shareOtpWithTrustedContactModal} closeBottomSheet={() => setShareOtpWithTrustedContactModal( false )}>
         {renderShareOtpWithTrustedContactContent()}
       </ModalContainer>

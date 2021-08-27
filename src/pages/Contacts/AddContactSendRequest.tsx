@@ -536,7 +536,7 @@ export default function AddContactSendRequest( props ) {
               }
               setEncryptLinkWith( type ); setSecure2FAModal( false )
             }}
-            Contact={contactInfo}
+            Contact={Contact}
           />
         </ModalContainer>
         <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
