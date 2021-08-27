@@ -95,6 +95,7 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
+  if( !account.isUsable ) return ''
   if( account.type === AccountType.DONATION_ACCOUNT ) return account.receivingAddress
 
   const { updatedAccount, receivingAddress } = AccountOperations.getNextFreeExternalAddress( account, requester )
@@ -109,6 +110,7 @@ export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAc
 
 // to be used by sagas(w/o dispatch)
 export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
+  if( !account.isUsable ) return ''
   if( account.type === AccountType.DONATION_ACCOUNT ) return account.receivingAddress
 
   const { updatedAccount, receivingAddress } = yield call( AccountOperations.getNextFreeExternalAddress, account, requester )
@@ -488,6 +490,8 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   const donationShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+      if( !shell.primarySubAccount.isUsable ) continue
+
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
           // skip test account auto-sync

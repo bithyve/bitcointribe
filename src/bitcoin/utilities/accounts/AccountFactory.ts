@@ -119,10 +119,9 @@ export function generateMultiSigAccount(
   }
 
   let initialRecevingAddress = ''
-  let id = ''
+  const id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
   let isUsable = false
   if( secondaryXpub ){
-    id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
     initialRecevingAddress = AccountUtilities.createMultiSig( {
       primary: primaryXpub,
       ...xpubs,
@@ -265,6 +264,13 @@ export const upgradeAccountToMultiSig = ( {
   ( account as MultiSigAccount ).is2FA = true;
   ( account as MultiSigAccount ).xprivs = {
   }
+
+  const network = AccountUtilities.getNetworkByType( account.networkType )
+  account.receivingAddress = AccountUtilities.createMultiSig( {
+    primary: account.xpub,
+    secondary: secondaryXpub,
+    bithyve: bithyveXpub,
+  }, 2, network, 0, false ).address
 
   return ( account as MultiSigAccount )
 }
