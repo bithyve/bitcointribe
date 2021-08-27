@@ -110,10 +110,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}>
           <Text style={{
             color: Colors.blue,
-            fontSize: RFValue( 16 ),
+            fontSize: RFValue( 18 ),
             marginTop: hp( 1 ),
             fontFamily: Fonts.FiraSansMedium,
-
+            letterSpacing: 0.54
           }}>
               My Accounts
           </Text>
@@ -122,27 +122,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <ScrollView style={{
           paddingBottom: 10
         }}>
-          {/* <View style={{
-            backgroundColor: 'white',
-            marginHorizontal: wp( 4 ),
-            height: hp( '15%' ),
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: hp( 1 ),
-            borderRadius: wp( 2 ),
-            padding: hp( '1.5%' )
-          }}>
-            <Image source={require( '../../assets/images/HomePageIcons/graph.png' )} style={{
-              marginBottom: 'auto',
-              width: '100%', height: '100%', flex: 1, resizeMode: 'contain'
-            }} />
-          </View> */}
           <HomeAccountCardsList
-            // containerStyle={containerView}
             contentContainerStyle={{
-              // paddingTop: 4,
               paddingLeft: 14,
-              // backgroundColor: 'red'
             }}
             currentLevel={currentLevel}
             onAddNewSelected={this.navigateToAddNewAccountScreen}

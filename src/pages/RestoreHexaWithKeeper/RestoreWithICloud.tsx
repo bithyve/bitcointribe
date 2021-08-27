@@ -83,11 +83,11 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 const LOADER_MESSAGE_TIME = 2000
 let messageIndex = 0
 const loaderMessages = [
-  {
-    heading: 'Manage Backup',
-    text: 'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
-    subText: '',
-  },
+  // {
+  //   heading: 'Manage Backup',
+  //   text: 'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
+  //   subText: '',
+  // },
   {
     heading: 'Level 1 - Automated Cloud Backup',
     text:
@@ -255,7 +255,7 @@ class RestoreWithICloud extends Component<
       isLinkCreated: false,
       walletName: '',
       loaderMessage: {
-        heading: 'Creating your wallet', text: 'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
+        heading: 'Manage Backup', text: 'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup'
       },
       question: '',
       answer: '',
@@ -603,7 +603,6 @@ class RestoreWithICloud extends Component<
       } else {
         // ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
         this.setState( {
-          errorModal: true,
           errorModal: true,
           errorModalTitle: 'Error receiving Recovery Key',
           errorModalInfo: 'There was an error while receiving your Recovery Key, please try again',

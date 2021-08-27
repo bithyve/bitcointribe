@@ -62,11 +62,11 @@ const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 let messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
 const loaderMessages = [
-  {
-    heading: 'Bootstrapping Accounts',
-    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-    subText: '',
-  },
+  // {
+  //   heading: 'Bootstrapping Accounts',
+  //   text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
+  //   subText: '',
+  // },
   {
     heading: 'Test Account',
     text:
@@ -116,9 +116,9 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
-  const [ message, setMessage ] = useState( 'Creating and initializing\nyour wallet' )
+  const [ message, setMessage ] = useState( 'Bootstrapping Accounts' )
   const [ subTextMessage, setSubTextMessage ] = useState(
-    'Your friend will be prompted to enter the same while accepting the Recovery Share',
+    'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
   )
   // const [ bottomTextMessage, setBottomTextMessage ] = useState(
   //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',

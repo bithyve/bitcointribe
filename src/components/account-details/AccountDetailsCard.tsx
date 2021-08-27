@@ -309,6 +309,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
+    letterSpacing: 0.01
   },
 
   title2Text: {

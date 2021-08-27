@@ -70,6 +70,7 @@ import ImageStyles from '../../common/Styles/ImageStyles'
 import dbManager from '../../storage/realm/dbManager'
 import realm from '../../storage/realm/realm'
 import schema from '../../storage/realm/schema/Schema'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -1086,7 +1087,7 @@ Wallet Backup
               <View style={{
                 marginBottom: 15
               }}>
-                {keeping.length > 0 &&
+                {keeping.length > 0 ?
                   <View style={{
                     height: 'auto', alignItems: 'flex-start', flexDirection: 'row'
                   }}>
@@ -1098,6 +1099,16 @@ Wallet Backup
                       } )
                     } ) }
                   </View>
+                  :
+                  <BottomInfoBox
+                    containerStyle={{
+                      // paddingLeft: wp ( '6%' ),
+                      marginLeft: wp( 0 ),
+                      marginTop: hp( 2.5 )
+                    }}
+                    title=""
+                    infoText="Add a Contact to send them sats without having to scan an address"
+                  />
                 }
               </View>
             </View>

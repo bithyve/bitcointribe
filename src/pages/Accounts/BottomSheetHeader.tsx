@@ -5,14 +5,12 @@ import { TouchableOpacity, Text, StyleSheet, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { heightPercentageToDP, widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import ListStyles from '../../common/Styles/ListStyles'
 
 const BottomSheetHeader = ( { title, onPress } ) => {
   if ( !title )  { return null }
   return (
-    <View style={{
-      backgroundColor: Colors.backgroundColor,
-      paddingBottom: heightPercentageToDP( 3 )
-    }}>
+    <View style={styles.headerContainer}>
       <TouchableOpacity
         activeOpacity={1}
         onPress={onPress}
@@ -27,7 +25,7 @@ const BottomSheetHeader = ( { title, onPress } ) => {
         // marginTop: hp( 0.5 )
         }} />
       </TouchableOpacity>
-      <Text style={styles.titleText}>{title}</Text>
+      <Text style={ListStyles.modalTitle}>{title}</Text>
       <Text style={styles.modalInfoText}>
         Many ways to stack sats directly in Hexa
       </Text>
@@ -37,26 +35,17 @@ const BottomSheetHeader = ( { title, onPress } ) => {
 
 const styles = StyleSheet.create( {
   headerContainer: {
-    backgroundColor: Colors.white,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-    paddingBottom: 5,
-    paddingHorizontal: 15,
-
+    backgroundColor: Colors.bgColor,
+    paddingBottom: heightPercentageToDP( 4 )
   },
   modalInfoText: {
-    marginLeft: wp( '5%' ),
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    marginLeft: wp( '7%' ),
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
-  },
-  titleText: {
-    marginLeft: wp( '5%' ),
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: RFValue( 0.6 ),
+    lineHeight: RFValue( 18 )
   },
 } )
 
