@@ -34,6 +34,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const dispatch = useDispatch()
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
+  const [ isConfirm, setIsConfirm ] = useState( false )
   let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to Swan Bitcoin to complete registration'
   let swanTitle = 'Stack Sats with\n Swan Bitcoin'
   let  showNote = true
@@ -123,6 +124,9 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           swanTitle = 'Stack Sats\nwith Swan'
           showNote = true
     }
+    if( isConfirm ) {
+      swanMessage = 'By proceeding you understand that you will be taken to Swan Bitcoin to complete the process.\n\nPlease check the available payment methods along with Terms and Conditions for using Swan Bitcoin as per your jurisdiction.'
+    }
     return (
       <>
         {/* <TouchableOpacity
@@ -204,7 +208,13 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     }} >
       <AppBottomSheetTouchableWrapper
         disabled={hasButtonBeenPressed? true : false}
-        onPress={handleProceedButtonPress}
+        onPress={()=> {
+          if( isConfirm ) {
+            handleProceedButtonPress()
+          } else {
+            setIsConfirm( true )
+          }
+        }}
         style={{
           ...styles.successModalButtonView
         }}

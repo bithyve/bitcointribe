@@ -256,6 +256,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                 onViewMorePressed={navigateToTransactionsList}
                 onTransactionItemSelected={handleTransactionSelection}
                 accountShellId={accountShell.id}
+                kind={primarySubAccount.kind}
               />
             </View>
           )

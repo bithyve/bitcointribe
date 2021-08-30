@@ -68,7 +68,8 @@ const TransactionListItemContent: React.FC<Props> = ( {
         if( transaction.receivers.length > 1 ) {
           name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length - 1} other`
         } else {
-          name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name : null ||  transaction.accountType || transaction.accountName
+          name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name :
+            transaction.recipientAddresses ? transaction.recipientAddresses[ 0 ] : transaction.accountType || transaction.accountName : '' ||  transaction.accountType || transaction.accountName
         }
       } else {
         name =  transaction.accountName? transaction.accountName: transaction.accountType
@@ -181,14 +182,19 @@ const styles = StyleSheet.create( {
   containerImg: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: 35,
-    width: 35,
+    height: 40,
+    width: 40,
     marginRight: 10,
+    backgroundColor: '#F4F4F4',
+    padding: 2,
+    borderRadius: 30,
+    borderColor: 'white',
+    borderWidth: 2,
   },
 
   avatarImage: {
-    height: 45,
-    width: 45,
+    height: 35,
+    width: 35,
     // borderRadius: 10,
   },
 
@@ -221,9 +227,10 @@ const styles = StyleSheet.create( {
   },
 
   titleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 12 ),
+    color: Colors.greyTextColor,
+    fontSize: RFValue( 13 ),
     marginBottom: 2,
+    fontWeight: 'bold',
   },
 
   subtitleText: {
