@@ -36,10 +36,11 @@ import {
   AccountType,
   ActiveAddressAssignee,
   NetworkType,
+  Account,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
-import {  exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import {  exchangeRatesCalculated, setAverageTxFee, updateAccountShells } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
@@ -58,6 +59,7 @@ import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
+import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -287,6 +289,27 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               secondaryXpub,
             }
           ) )
+
+          const savingsAccounts = wallet.accounts[ AccountType.SAVINGS_ACCOUNT ]
+          if( savingsAccounts ){
+            // upgrade default savings account
+            const account: Accounts = yield select( state => state.accounts.accounts )
+            let savingsAccount = account[ savingsAccounts[ 0 ] ]
+            if( !savingsAccount.isUsable ){
+              savingsAccount = yield call( upgradeAccountToMultiSig, {
+                account: savingsAccount,
+                secondaryXpub,
+                bithyveXpub: wallet.details2FA.bithyveXpub
+              } )
+            }
+            yield put( updateAccountShells( {
+              accounts: {
+                [ savingsAccount.id ]: savingsAccount
+              }
+            } ) )
+            yield call( dbManager.updateAccount, savingsAccount.id, savingsAccount )
+          }
+
           yield call( dbManager.updateWallet, {
             secondaryXpub,
             smShare: secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''

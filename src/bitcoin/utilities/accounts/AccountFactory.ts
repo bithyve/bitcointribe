@@ -255,7 +255,6 @@ export const upgradeAccountToMultiSig = ( {
   secondaryXpub: string,
   bithyveXpub: string,
 } ): MultiSigAccount => {
-  account.id = crypto.createHash( 'sha256' ).update( account.xpub + secondaryXpub + bithyveXpub ).digest( 'hex' )
   account.isUsable = true;
   ( account as MultiSigAccount ).xpubs = {
     secondary: secondaryXpub,
