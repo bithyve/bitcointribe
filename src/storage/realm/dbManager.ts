@@ -239,15 +239,17 @@ const updateBHR = async ( data ) => {
   try {
     const dbRef = db.objects( schema.BHR )
     if( dbRef && dbRef.length ){
-      let bhr = dbRef[ 0 ]
       db.write( () => {
-        bhr = data
+        dbRef[ 0 ][ 'encryptedSMSecretsKeeper' ] = data.encryptedSMSecretsKeeper
+        dbRef[ 0 ][ 'encryptedSecretsKeeper' ] = data.encryptedSecretsKeeper
+        dbRef[ 0 ][ 'metaSharesKeeper' ] = data.metaSharesKeeper
+        dbRef[ 0 ][ 'oldMetaSharesKeeper' ] = data.oldMetaSharesKeeper
       } )
     } else db.create( schema.BHR, data, true )
     return true
   } catch ( error ) {
+    console.log( 'updateBHR', error )
     return false
-    console.log( error )
   }
 }
 

@@ -418,10 +418,9 @@ class ManageBackupNewBHR extends Component<
           shareType: this.state.selectedKeeperType,
           name: this.state.selectedKeeperName,
           reshareVersion: 0,
-          status: 'notAccessible',
+          status: 'notSetup',
           updatedAt: 0,
-          shareId: this.state.metaSharesKeeper[ 3 ]
-            .shareId,
+          shareId: this.state.metaSharesKeeper[ 3 ].shareId,
           data: {
           },
         },
