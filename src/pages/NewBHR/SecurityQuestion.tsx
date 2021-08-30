@@ -6,6 +6,7 @@ import {
   TextInput,
   Platform,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -125,8 +126,18 @@ function SecurityQuestion( props ) {
             <View style={styles.dropdownBox}>
               <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
             </View>
-            <View style={{
-            }}>
+            <KeyboardAwareScrollView
+              resetScrollToCoords={{
+                x: 0, y: 0
+              }}
+              scrollEnabled={false}
+              // style={styles.rootContainer}
+              style={{
+                flex: 1
+                // height: `${height}%`
+
+              }}
+            >
               <TextInput
                 style={{
                   ...styles.inputBox,
@@ -172,7 +183,7 @@ function SecurityQuestion( props ) {
                   {errorText}
                 </Text>
               ) : null}
-            </View>
+            </KeyboardAwareScrollView>
             {showAnswer && (
               <View
                 style={{
