@@ -23,10 +23,10 @@ export default function HeaderTitle( props ) {
       </Text>
     </View>
     <View style={{
-      flexDirection: 'row', alignItems: 'center'
+      flexDirection: 'row', alignItems: 'center',
     }}>
       <Text style={[ CommonStyles.subHeaderTitles, {
-        fontWeight: '500'
+        fontWeight: '500', width: wp( 75 )
       } ]} >
         {props.secondLineBoldTitle}
         <Text style={[ CommonStyles.subHeaderTitles, {
