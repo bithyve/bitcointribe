@@ -319,7 +319,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         }}>
           <HeaderTitle
             firstLineTitle={'Account Management'}
-            secondLineTitle={'Lorem Ipsum dolor amet cons'}
+            secondLineTitle={'Rearrange, archive and reinstate accounts from here'}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
