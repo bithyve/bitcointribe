@@ -130,6 +130,7 @@ export default class AccountShell {
    */
   static updatePrimarySubAccountDetails(
     shell: AccountShell,
+    isUsable: boolean,
     newbalance: Balances,
     newTransactions: TransactionDescribing[],
     accountDetails?: {
@@ -140,6 +141,7 @@ export default class AccountShell {
       hasNewTxn: boolean
     }
   ) {
+    shell.primarySubAccount.isUsable = isUsable
     shell.primarySubAccount.balances = newbalance
     shell.primarySubAccount.transactions = newTransactions
     if( accountDetails ){
