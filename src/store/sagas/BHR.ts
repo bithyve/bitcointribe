@@ -1493,7 +1493,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const notification: INotification = {
           notificationType: notificationType.FNF_KEEPER_REQUEST,
-          title: 'Friends and Family Request',
+          title: 'Friends & Family Request',
           body: `You have new keeper request ${temporaryContact.contactDetails.contactName}`,
           data: {
             walletName: walletName,

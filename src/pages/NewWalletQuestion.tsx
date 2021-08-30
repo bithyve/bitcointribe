@@ -62,11 +62,6 @@ const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 let messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
 const loaderMessages = [
-  // {
-  //   heading: 'Bootstrapping Accounts',
-  //   text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-  //   subText: '',
-  // },
   {
     heading: 'Test Account',
     text:
@@ -89,21 +84,6 @@ const loaderMessages = [
     text: 'Hexa has three levels of backup. Upgrade your backup when you want to secure more sats',
     subText: '',
   },
-  // {
-  //   heading: 'Level 1 - Automated Cloud Backup',
-  //   text: 'Allow Hexa to automatically backup your wallet to your cloud storage. It ensures you can easily recover your wallet in case your phone gets lost',
-  //   subText: '',
-  // },
-  // {
-  //   heading: 'Level 2 - Double Backup',
-  //   text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
-  //   subText: '',
-  // },
-  // {
-  //   heading: 'Level 3 - Multi-key Backup',
-  //   text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
-  //   subText: '',
-  // }
 ]
 
 const getNextMessage = () => {

@@ -287,7 +287,7 @@ class FriendsAndFamilyScreen extends PureComponent<
           this.handleContactSelection( contactDescription, index, contactsType )
         }
         containerStyle={{
-          backgroundColor: Colors.backgroundColor,
+          backgroundColor: Colors.backgroundColor1,
           paddingHorizontal: wp( 3 )
         }}
       >
@@ -571,12 +571,12 @@ class FriendsAndFamilyScreen extends PureComponent<
             }}
           >
             <View style={{
-              width: '95%',
+              width: '90%',
               // height: '54%',
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.gray7,
               shadowOpacity: 0.06,
               shadowOffset: {
-                width: 3, height: 2
+                width: 10, height: 10
               },
               // shadowRadius: 5,
               elevation: 2,
@@ -801,7 +801,8 @@ class FriendsAndFamilyScreen extends PureComponent<
                 <BottomInfoBox
                   containerStyle={{
                     // alignItems: 'flex-end'
-                    marginTop: hp( 22 )
+                    backgroundColor: Colors.gray7,
+                    // marginTop: hp( 22 )
                   }}
                   title={''}
                   infoText={
@@ -999,12 +1000,13 @@ const styles = StyleSheet.create( {
     // width: wp( 22 )
     // padding: wp( 1 ),
     width: wp( 24 ),
-    height: hp( 4.5 ),
+    height: hp( 4 ),
     paddingHorizontal: wp( 1 )
   },
   pageTitle: {
     color: Colors.blue,
-    fontSize: RFValue( 16 ),
+    fontSize: RFValue( 18 ),
+    letterSpacing: 0.54,
     // fontFamily: Fonts.FiraSansRegular,
     fontFamily: Fonts.FiraSansMedium,
     alignItems: 'center',
@@ -1081,7 +1083,7 @@ function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<Naviga
   return {
     ...defaultStackScreenNavigationOptions,
 
-    title: 'Friends and Family',
+    title: 'Friends & Family',
 
     headerRight: () => {
       return (

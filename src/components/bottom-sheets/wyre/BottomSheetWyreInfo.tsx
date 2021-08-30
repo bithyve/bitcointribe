@@ -89,7 +89,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
     ...styles.modalContentContainer
   }}>
     <View style={{
-      height: hp( 74 )
+      // height: hp( 74 )
     }}>
 
       <TouchableOpacity

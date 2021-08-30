@@ -226,8 +226,8 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
               // navigation.navigate( 'AddContactSendRequest', {
               //   SelectedContact: [ contact ],
               //   headerText:'Add a contact  ',
-              //   subHeaderText:'Send a Friends and Family request',
-              //   contactText:'Adding to Friends and Family:',
+              //   subHeaderText:'Send a Friends & Family request',
+              //   contactText:'Adding to Friends & Family:',
               //   showDone:true,
               //   fromEdit: 'fromEdit'
               // } )

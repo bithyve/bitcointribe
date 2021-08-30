@@ -1068,7 +1068,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation.navigate( 'ManageBackupNewBHR' )
       return
     }
-    if ( item.title == 'Friends and Family' ) {
+    if ( item.title == 'Friends & Family' ) {
       navigation.navigate( 'AddressBookContents' )
       return
     } else if ( item.title == 'Wallet Settings' ) {
@@ -1195,8 +1195,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   navigation.navigate( 'AddContactSendRequest', {
                     SelectedContact: selectedContact,
                     headerText:'Add a contact  ',
-                    subHeaderText:'Send a Friends and Family request',
-                    contactText:'Adding to Friends and Family:',
+                    subHeaderText:'Send a Friends & Family request',
+                    contactText:'Adding to Friends & Family:',
                     showDone:true,
                   } )
                 }
@@ -1215,8 +1215,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 navigation.navigate( 'AddContactSendRequest', {
                   SelectedContact: [ contactDummy ],
                   headerText:'Add a contact  ',
-                  subHeaderText:'Send a Friends and Family request',
-                  contactText:'Adding to Friends and Family:',
+                  subHeaderText:'Send a Friends & Family request',
+                  contactText:'Adding to Friends & Family:',
                   showDone:true,
                 } )
               }}

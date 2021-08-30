@@ -48,7 +48,7 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
                 // marginTop: wp( '5%' ),
               }}
             >
-            Store some sats here, but not all. The sats here are your everyday sats - great for spending online or sending to your friends and family
+            Store some sats here, but not all. The sats here are your everyday sats - great for spending online or sending to your friends & family
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
