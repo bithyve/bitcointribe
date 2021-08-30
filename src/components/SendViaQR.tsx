@@ -421,7 +421,7 @@ export default function SendViaQR( props ) {
           <BottomInfoBox
             title={props.noteHeader ? props.noteHeader : 'Note'}
             infoText={
-              props.noteText ? props.noteText : 'Use the scanner of your friends app to scan the QR and proceed with the Friends and Family request'
+              props.noteText ? props.noteText : 'Use the scanner of your friends app to scan the QR and proceed with the Friends & Family request'
             }
           />
         </View>

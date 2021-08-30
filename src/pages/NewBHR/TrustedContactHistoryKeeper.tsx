@@ -217,7 +217,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
               ? selectedContacts[ 0 ].firstName
               : !selectedContacts[ 0 ].firstName && selectedContacts[ 0 ].lastName
                 ? selectedContacts[ 0 ].lastName
-                : 'Friends and Family',
+                : 'Friends & Family',
         )
       }
       return selectedContacts[ 0 ]

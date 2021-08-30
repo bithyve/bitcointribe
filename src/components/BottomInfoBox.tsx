@@ -81,7 +81,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    letterSpacing: 0.4,
+    letterSpacing: 0.6,
     lineHeight: 18
   },
   extraPadding:{

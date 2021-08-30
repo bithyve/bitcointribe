@@ -300,8 +300,8 @@ export default function AddContactAddressBook( props ) {
         props.navigation.navigate( 'AddContactSendRequest', {
           SelectedContact: selectedContacts,
           headerText:'Add a contact  ',
-          subHeaderText:'Send a Friends and Family request',
-          contactText:'Adding to Friends and Family:',
+          subHeaderText:'Send a Friends & Family request',
+          contactText:'Adding to Friends & Family:',
           showDone:true,
         } )
       }
@@ -322,8 +322,8 @@ export default function AddContactAddressBook( props ) {
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: [ skippedContact ],
       headerText:'Add a contact  ',
-      subHeaderText:'Send a Friends and Family request',
-      contactText:'Adding to Friends and Family:',
+      subHeaderText:'Send a Friends & Family request',
+      contactText:'Adding to Friends & Family:',
       showDone:true,
     } )
   }

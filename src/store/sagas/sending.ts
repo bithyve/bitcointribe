@@ -428,7 +428,7 @@ function* sendTxNotificationWorker() {
 
   const notification: INotification = {
     notificationType: notificationType.contact,
-    title: 'Friends and Family notification',
+    title: 'Friends & Family notification',
     body: `You have a new transaction from ${walletName}`,
     data: {
     },

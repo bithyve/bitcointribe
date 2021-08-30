@@ -324,7 +324,7 @@ export default function TrustedContactRequest( props ) {
                 <Text style={styles.modalTitleText}>
                   {props.isGuardian
                     ? 'Backup Request'
-                    : 'Friends and Family Request'}
+                    : 'Friends & Family Request'}
                 </Text>
               ) : (
                 <Text style={styles.modalTitleText}>Recovery Key Request</Text>
@@ -333,7 +333,7 @@ export default function TrustedContactRequest( props ) {
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
                 {props.inputType
-                  ? 'Accept the request to add your contact to Friends and Family'
+                  ? 'Accept the request to add your contact to Friends & Family'
                   : 'You have a request for securing the Recovery Key'}
               </Text>
             </View>

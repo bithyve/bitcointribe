@@ -59,7 +59,7 @@ const MoreOptionsStack = createStackNavigator(
     FriendsAndFamily: {
       screen: FriendsAndFamilyScreen,
       navigationOptions: {
-        title: 'Friends and Family',
+        title: 'Friends & Family',
       },
     },
     NodeSettings: {

@@ -54,7 +54,7 @@ const menuOptions: MenuOption[] = [
   leaving the option here so that it can be enabled in a future release.
 
   {
-    title: 'Friends and Family',
+    title: 'Friends & Family',
     imageSource: require( '../../assets/images/icons/addressbook.png' ),
     subtitle: 'View and manage your contacts',
     screenName: 'FriendsAndFamily',
@@ -138,7 +138,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
         <Text style={{
           color: Colors.blue,
-          fontSize: RFValue( 16 ),
+          fontSize: RFValue( 18 ),
+          letterSpacing: 0.54,
           // marginLeft: 2,
           fontFamily: Fonts.FiraSansMedium,
           paddingTop: heightPercentageToDP( 4 ),
@@ -364,7 +365,7 @@ const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
     height: heightPercentageToDP( '70.83%' ),
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
@@ -389,29 +390,43 @@ const styles = StyleSheet.create( {
   otherCards: {
     flex: 1,
     flexDirection: 'row',
-    width: '95%',
+    width: '90%',
     alignSelf: 'center',
     borderRadius: widthPercentageToDP( '2' ),
     backgroundColor: Colors.white,
     paddingVertical: heightPercentageToDP( 2 ),
     paddingHorizontal: widthPercentageToDP( 4 ),
     marginTop: heightPercentageToDP( '1%' ),
-    alignItems: 'center'
+    alignItems: 'center',
+    shadowOpacity: 0.1,
+    shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
   },
   extraHeight: {
     marginTop: heightPercentageToDP( '3%' ),
   },
   addModalView: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.gray7,
     paddingVertical: 4,
     paddingHorizontal: widthPercentageToDP( 5 ),
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-between',
-    width: '95%',
+    width: '90%',
     alignSelf: 'center',
     borderRadius: widthPercentageToDP( '2' ),
-    marginBottom: heightPercentageToDP( '1' )
+    marginBottom: heightPercentageToDP( '1' ),
+    shadowOpacity: 0.6,
+    shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 5,
   },
 
   addModalTitleText: {

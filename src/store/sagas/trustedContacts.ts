@@ -248,7 +248,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
 
           const notification: INotification = {
             notificationType: notifType,
-            title: 'Friends and Family notification',
+            title: 'Friends & Family notification',
             body: notifBody,
             data: {
             },
@@ -318,7 +318,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           }
           const notification: INotification = {
             notificationType: notifType,
-            title: 'Friends and Family notification',
+            title: 'Friends & Family notification',
             body: notifBody,
             data: {
             },
@@ -339,7 +339,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         if( relationType === TrustedContactRelationTypes.KEEPER )
           Toast( 'You have been successfully added as a Keeper' )
         else if ( relationType === TrustedContactRelationTypes.CONTACT )
-          Toast( 'Contact successfully added to Friends and Family' )
+          Toast( 'Contact successfully added to Friends & Family' )
       }
 
       if( [ PermanentChannelsSyncKind.EXISTING_CONTACTS,  PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelsSyncKind ) )
@@ -691,7 +691,7 @@ function* removeTrustedContactWorker( { payload }: { payload: { channelKey: stri
   ]
   const notification: INotification = {
     notificationType: notificationType.contact,
-    title: 'Friends and Family notification',
+    title: 'Friends & Family notification',
     body: `F&F removed by ${walletName}`,
     data: {
     },

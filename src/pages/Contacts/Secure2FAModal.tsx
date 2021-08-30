@@ -21,8 +21,8 @@ export default function Secure2FA( props ) {
 
   const [ activeType, setActiveType ] = useState( DeepLinkEncryptionType.NUMBER )
   // const [ contactData, setContactData ] = useState( null )
-  const [ phoneNumbers, setPhoneumber ] = useState( props.Contact.phoneNumbers ? props.Contact.phoneNumbers : [] )
-  const [ emails, setEmails ] = useState( props.Contact.emails ? props.Contact.emails : [] )
+  const [ phoneNumbers ] = useState( props.Contact?.phoneNumbers ? props.Contact.phoneNumbers : [] )
+  const [ emails ] = useState( props.Contact?.emails ? props.Contact.emails : [] )
   return (
     <SafeAreaView style={{
       backgroundColor: Colors.backgroundColor
@@ -47,12 +47,12 @@ export default function Secure2FA( props ) {
         <View style={{
           marginLeft: wp( 6 ),
         }}>
-          <Text style={styles.modalTitleText}>Select the second factor</Text>
+          <Text style={styles.modalTitleText}>{'Select the\nsecond factor'}</Text>
           <Text style={{
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
-            marginRight: wp( 11 )
+            marginRight: wp( 13 )
           }}>Select one of the below to add as a second factor to your link/QR</Text>
         </View>
         {phoneNumbers && phoneNumbers.length && phoneNumbers[ 0 ].number ?
@@ -90,7 +90,7 @@ export default function Secure2FA( props ) {
         // backgroundColor={Colors.white}
       />
       <View style={{
-        marginTop: 'auto', marginBottom: hp( 2 )
+        marginTop: 0, marginBottom: hp( 2 )
       }}>
         <TouchableOpacity
           onPress={() => {
@@ -151,6 +151,7 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.54
     // width: wp( 30 ),
   },
   modalInfoText: {
@@ -159,7 +160,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
     lineHeight: 18
   },
   keyPadRow: {
@@ -187,7 +188,6 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginLeft: wp( 6 ),
-    marginTop: hp( '3%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',

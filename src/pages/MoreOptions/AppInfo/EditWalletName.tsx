@@ -104,7 +104,7 @@ export default function EditWalletName( props ) {
 
   return (
     <SafeAreaView style={{
-      backgroundColor: Colors.backgroundColor
+      backgroundColor: Colors.bgColor
     }}>
       <TouchableOpacity
         activeOpacity={1}
@@ -141,9 +141,10 @@ export default function EditWalletName( props ) {
             ...answerInputStyle,
             flexDirection: 'row',
             alignItems: 'center',
-            borderColor: answerError ? Colors.red : Colors.borderColor,
+            borderColor: answerError ? Colors.red : Colors.white,
             backgroundColor: Colors.white,
-            width: wp( 80 )
+            width: wp( 80 ),
+
           }}
         >
           <TextInput
@@ -206,7 +207,7 @@ export default function EditWalletName( props ) {
             alignItems: 'center',
             paddingRight: 15,
             marginTop: 10,
-            borderColor: answerError ? Colors.red : Colors.borderColor,
+            borderColor: answerError ? Colors.red : Colors.white,
             backgroundColor: Colors.white,
             width: wp( 80 )
           }}
@@ -275,7 +276,7 @@ export default function EditWalletName( props ) {
         <View style={styles.statusIndicatorActiveView} />
       </View>
       <BottomInfoBox
-        // backgroundColor={Colors.white}
+        backgroundColor={Colors.bgColor}
         title={'Note'}
         infoText={
           'The wallets name will get updated automatically across your Friends & Family network'
@@ -339,9 +340,9 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2
+      width: 10, height: 10
     },
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor1,
   },
   modalInputBox: {
     flex: 1,
