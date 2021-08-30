@@ -93,7 +93,7 @@ function* updateWalletWorker( { payload } ) {
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
-export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean }} ) {
+export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, updateWI?: boolean, }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -118,7 +118,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
   let contactIdentifier: string
   let synchingPrimaryKeeperChannelKey: string
 
-  const { permanentChannelsSyncKind, channelUpdates, metaSync, hardSync } = payload
+  const { permanentChannelsSyncKind, channelUpdates, metaSync, hardSync, updateWI } = payload
   switch( permanentChannelsSyncKind ){
       case PermanentChannelsSyncKind.SUPPLIED_CONTACTS:
         if( !channelUpdates.length ) throw new Error( 'Sync permanent channels failed: supplied channel updates missing' )
@@ -316,7 +316,9 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           } )
         }
       }
-      yield put( updateWalletImageHealth() )
+      if( updateWI ) {
+        yield put( updateWalletImageHealth() )
+      }
 
       if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
@@ -568,7 +570,8 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   yield call( syncPermanentChannelsWorker, {
     payload: {
       permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-      channelUpdates: [ channelUpdate ]
+      channelUpdates: [ channelUpdate ],
+      updateWI: true
     }
   } )
 
