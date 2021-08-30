@@ -206,7 +206,7 @@ function* generateLevel1SharesWorker( { payload } ){
     // dbManager.updateWallet( {
     //   smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
     // } )
-    dbManager.updateBHR( {
+    yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
       encryptedSMSecretsKeeper: [],
@@ -241,7 +241,7 @@ function* generateLevel2SharesWorker( { payload } ){
   const { encryptedPrimarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
   const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, existingMetaShares, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
-    dbManager.updateBHR( {
+    yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
       encryptedSMSecretsKeeper: [],
