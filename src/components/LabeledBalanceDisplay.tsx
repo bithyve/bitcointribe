@@ -21,6 +21,10 @@ import { Satoshis } from '../common/data/enums/UnitAliases'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../common/data/enums/BitcoinUnit'
 import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin'
 import { UsNumberFormat } from '../common/utilities'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 export type Props = {
   balance: Satoshis;
@@ -109,12 +113,13 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
   const BalanceCurrencyIcon = () => {
     const style = {
       ...defaultStyles.currencyImage,
-      marginRight: iconSpacing,
       ...currencyImageStyle,
     }
 
     if ( prefersBitcoin || isTestAccount ) {
-      return <Image style={style} source={bitcoinIconSource} />
+      return <Image style={{
+        ...style, marginLeft: wp( 1 )
+      }} source={bitcoinIconSource} />
     }
 
     if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
@@ -122,8 +127,9 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
         <MaterialCurrencyCodeIcon
           currencyCode={fiatCurrencyCode}
           color={textColor}
-          size={style.width}
-          style={style}
+          size={RFValue( 16 )}
+          style={{
+          }}
         />
       )
     } else {
@@ -141,7 +147,8 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       ...defaultStyles.rootContainer, ...containerStyle
     }}>
       <View style={{
-        marginRight: iconSpacing
+        marginRight: 4,
+        marginLeft: ( prefersBitcoin || isTestAccount ) ? -wp( 1 ) : [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode  ) ? 0 : -wp( 1 )
       }}>
         <BalanceCurrencyIcon />
       </View>
@@ -149,8 +156,8 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       <Text
         style={{
           ...defaultStyles.amountText,
-          color: textColor,
           ...amountTextStyle,
+          color: Colors.black,
         }}
       >
         {formattedBalanceText}
@@ -169,9 +176,9 @@ const defaultStyles = StyleSheet.create( {
   },
 
   currencyImage: {
-    width: 14,
-    height: 14,
-    // resizeMode: 'contain',
+    width: wp( 3 ),
+    height: wp( 4 ),
+    resizeMode: 'contain',
   },
 
   amountText: {

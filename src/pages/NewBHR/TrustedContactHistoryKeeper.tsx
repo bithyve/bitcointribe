@@ -747,8 +747,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
               setTimeout( () => {
                 setShowQrCode( true )
               }, 2 )
-              // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
-              // setTrustedContactModal( true )
               setNavigation( false )
               props.navigation.navigate( 'FNFToKeeper', {
                 ...props.navigation.state.params,

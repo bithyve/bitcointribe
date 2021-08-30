@@ -60,7 +60,7 @@ export default function AccountSelectionModalContents( props ) {
       </View>
       <View>
         {accountData.map( ( item, index )=>{
-          return <View style={{
+          return <View key={index} style={{
             flexDirection: 'row', alignItems:'center', marginLeft: wp( '2%' ), marginTop: index==0 ? wp( '4%' ) : wp( '2%' ), marginBottom: index==1 ? wp( '4%' ) : wp( '2%' )
           }}>
             <View style={{
