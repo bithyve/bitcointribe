@@ -640,7 +640,6 @@ const asyncDataToBackup = async () => {
 }
 
 function* updateWalletImageWorker() {
-  //console.log( 'Update Wallet Image' )
   yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
   const wallet = yield call( dbManager.getWallet )
   const contacts = yield call( dbManager.getTrustedContacts )
@@ -667,7 +666,8 @@ function* updateWalletImageWorker() {
         type: tx.type
       } )
     } )
-    data.transactions = txns
+    data.transactions = []
+    data.transactionsMeta = txns
     console.log( data )
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
