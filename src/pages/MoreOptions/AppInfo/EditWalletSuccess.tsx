@@ -22,7 +22,7 @@ export default function EditWalletSuccess( props ) {
   )
   return (
     <SafeAreaView style={{
-      backgroundColor: Colors.backgroundColor
+      backgroundColor: Colors.bgColor
     }}>
       <View style={{
         marginTop: 'auto', right: 0, bottom: 0, position: 'absolute'
@@ -58,7 +58,7 @@ export default function EditWalletSuccess( props ) {
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
-            paddingRight: wp( 10 )
+            paddingRight: wp( 12 )
           }}>The new name would appear on your Home Screen</Text>
         </View>
       </View>
@@ -83,7 +83,7 @@ export default function EditWalletSuccess( props ) {
         // backgroundColor={Colors.white}
         // title={'Note'}
         infoText={
-          'Your Friends & Family will be notified of this change, so they may update their saved details.'
+          'All your Friends & Family will see this wallet name going forward'
         }
       />
       <View style={{
@@ -123,7 +123,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium,
   },
   addModalView: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.gray7,
     paddingVertical: 4,
     paddingHorizontal: 18,
     flexDirection: 'row',

@@ -99,7 +99,7 @@ const ReceivingAddress = ( props ) => {
         topButtonText={'Receiving bitcoin'}
         image={require( '../../assets/images/icons/receive.png' )}
         helperInfo={
-          'For receiving bitcoin, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoin or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoin/ sats from  "Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
+          'For receiving bitcoin, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoin or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoin/ sats from  "Friends & Family”, the app does all this for you and you don’t need to send a new address every time'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -357,7 +357,7 @@ const ReceivingAddress = ( props ) => {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Add sender to Friends and Family
+                Add sender to Friends & Family
               </Text>
               <View
                 style={{

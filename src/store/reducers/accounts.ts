@@ -294,6 +294,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           }
           AccountShell.updatePrimarySubAccountDetails(
             shell,
+            account.isUsable,
             account.balances,
             account.transactions,
             accountDetails

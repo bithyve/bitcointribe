@@ -36,10 +36,11 @@ import {
   AccountType,
   ActiveAddressAssignee,
   NetworkType,
+  Account,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
-import {  exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import {  exchangeRatesCalculated, setAverageTxFee, updateAccountShells } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
@@ -58,6 +59,7 @@ import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
+import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -248,7 +250,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
 
           const notification: INotification = {
             notificationType: notifType,
-            title: 'Friends and Family notification',
+            title: 'Friends & Family notification',
             body: notifBody,
             data: {
             },
@@ -293,9 +295,8 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           } )
         }
       }
-      if( updateWI ) {
-        yield put( updateWalletImageHealth() )
-      }
+
+      if( updateWI ) yield put( updateWalletImageHealth() )
 
       if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
@@ -320,7 +321,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           }
           const notification: INotification = {
             notificationType: notifType,
-            title: 'Friends and Family notification',
+            title: 'Friends & Family notification',
             body: notifBody,
             data: {
             },
@@ -341,7 +342,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         if( relationType === TrustedContactRelationTypes.KEEPER )
           Toast( 'You have been successfully added as a Keeper' )
         else if ( relationType === TrustedContactRelationTypes.CONTACT )
-          Toast( 'Contact successfully added to Friends and Family' )
+          Toast( 'Contact successfully added to Friends & Family' )
       }
 
       if( [ PermanentChannelsSyncKind.EXISTING_CONTACTS,  PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelsSyncKind ) )
@@ -694,7 +695,7 @@ function* removeTrustedContactWorker( { payload }: { payload: { channelKey: stri
   ]
   const notification: INotification = {
     notificationType: notificationType.contact,
-    title: 'Friends and Family notification',
+    title: 'Friends & Family notification',
     body: `F&F removed by ${walletName}`,
     data: {
     },

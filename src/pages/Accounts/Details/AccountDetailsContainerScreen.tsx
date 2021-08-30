@@ -6,7 +6,7 @@ import {
   RefreshControl,
   SectionList,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader'
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard'
 import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter'
@@ -43,6 +43,9 @@ import Colors from '../../../common/Colors'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { RootSiblingParent } from 'react-native-root-siblings'
+import ErrorModalContents from '../../../components/ErrorModalContents'
+import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -81,10 +84,21 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     return primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT
   }, [ primarySubAccount.kind ] )
 
+  const [ secureAccountAlert, setSecureAccountAlert ] = useState( false )
+  const [ secureAccountKnowMore, setSecureAccountKnowMore ] = useState( false )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
+
+  useEffect( ()=>{
+    if( !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ){
+      setSecureAccountAlert( true )
+    }
+  }, [] )
 
   function handleTransactionSelection( transaction: TransactionDescribing ) {
     navigation.navigate( 'TransactionDetails', {
@@ -208,6 +222,38 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           navigateToDonationAccountWebViewSettings( account )
         }}
         closeModal={() => showWebView( false )}
+      />
+    )
+  }
+
+  const renderSecureAccountAlertContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        title={'Complete Level 2'}
+        info={'You can only add a Savings Account when you have completed Level 2'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          setSecureAccountAlert( false )
+          navigation.pop()
+        }}
+        onPressIgnore={() => {
+          setSecureAccountKnowMore( true )
+          setSecureAccountAlert( false )
+        }}
+        proceedButtonText={'Ok'}
+        cancelButtonText={'Learn More'}
+        isBottomImage={true}
+        bottomImage={require( '../../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }, [ secureAccountAlert ] )
+
+  const renderSecureAccountKnowMoreContent = () => {
+    return (
+      <SavingAccountAlertBeforeLevel2
+        titleClicked={()=>{setSecureAccountKnowMore( false );  navigation.pop() }}
+        containerStyle={{
+        }}
       />
     )
   }
@@ -341,6 +387,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         <RootSiblingParent>
           {showDonationWebViewSheet()}
         </RootSiblingParent>
+      </ModalContainer>
+      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {}} >
+        {renderSecureAccountAlertContent()}
+      </ModalContainer>
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {}} >
+        {renderSecureAccountKnowMoreContent()}
       </ModalContainer>
     </>
   )

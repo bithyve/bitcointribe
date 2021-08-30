@@ -328,8 +328,8 @@ class ContactDetails extends PureComponent<
       const navigationParams = {
         SelectedContact: [ this.contact ],
         headerText:'Add a contact',
-        subHeaderText:'Send a Friends and Family request',
-        contactText:'Adding to Friends and Family:',
+        subHeaderText:'Send a Friends & Family request',
+        contactText:'Adding to Friends & Family:',
         showDone:true,
         isKeeper: payload && payload.isKeeper ? payload.isKeeper : false,
         isPrimary: payload && payload.isPrimary ? payload.isPrimary : false,
@@ -484,7 +484,7 @@ class ContactDetails extends PureComponent<
       contacts.relationType == TrustedContactRelationTypes.WARD )
     ) {
       Alert.alert(
-        'Recover request failed',
+        'Recovery request failed',
         'You are not a keeper of the selected contact'
       )
       return

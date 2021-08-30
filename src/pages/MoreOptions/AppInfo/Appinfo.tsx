@@ -235,7 +235,7 @@ const AppInfo = ( props ) => {
                 <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
               </View>
               <View style={{
-                justifyContent: 'flex-start', marginVertical: 20,
+                justifyContent: 'flex-start', marginVertical: 9,
                 marginHorizontal: 10, flexDirection: 'row',
               }}>
                 <Image
@@ -267,13 +267,14 @@ const styles = StyleSheet.create( {
   headerTitleText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 15 ),
+    fontSize: RFValue( 16 ),
     // marginBottom: wp( '1%' ),
     alignSelf: 'center',
-    marginHorizontal: wp( 2 )
+    marginHorizontal: wp( 2 ),
+    letterSpacing: 0.48
   },
   addModalView: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor1,
     paddingVertical: 4,
     paddingHorizontal: 18,
     flexDirection: 'row',
@@ -282,13 +283,21 @@ const styles = StyleSheet.create( {
     width: '90%',
     alignSelf: 'center',
     borderRadius: wp( '2' ),
-    marginBottom: hp( '1' )
+    marginBottom: hp( '1' ),
+    shadowOpacity: 0.16,
+    shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 5,
   },
 
   addModalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.01
   },
 
   addModalInfoText: {

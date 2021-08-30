@@ -130,7 +130,7 @@ export default function QrAndLink( props ) {
           isModal={false}
           // headerText={'Request Recovery Secret from trusted contact'}
           // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
-          contactText={'Adding to Friends and Family:'}
+          contactText={'Adding to Friends & Family:'}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}

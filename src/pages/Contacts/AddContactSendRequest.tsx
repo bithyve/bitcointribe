@@ -294,7 +294,7 @@ export default function AddContactSendRequest( props ) {
     return (
       <SendViaQR
         isFromReceive={true}
-        headerText={'Friends and Family Request'}
+        headerText={'Friends & Family Request'}
         subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
         contactText={contactText}
         contact={Contact}
@@ -379,7 +379,7 @@ export default function AddContactSendRequest( props ) {
           isModal={false}
           // headerText={'Request Recovery Secret from trusted contact'}
           // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
-          contactText={'Adding to Friends and Family:'}
+          contactText={'Adding to Friends & Family:'}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
@@ -429,7 +429,7 @@ export default function AddContactSendRequest( props ) {
             marginBottom: hp( '1%' )
           }}>
             <BottomInfoBox
-              title={'Friends and Family request'}
+              title={'Friends & Family request'}
               infoText={
                 'Your contact will have to accept your request for you to add them'
               }
@@ -536,7 +536,7 @@ export default function AddContactSendRequest( props ) {
               }
               setEncryptLinkWith( type ); setSecure2FAModal( false )
             }}
-            Contact={Contact}
+            Contact={contactInfo}
           />
         </ModalContainer>
         <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >

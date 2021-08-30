@@ -89,7 +89,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
     ...styles.modalContentContainer,
   }}>
     <View style={{
-      height: hp( 74 )
+      // height: hp( 74 )
     }}>
       <TouchableOpacity
         activeOpacity={1}

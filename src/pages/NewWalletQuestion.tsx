@@ -62,11 +62,6 @@ const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 let messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
 const loaderMessages = [
-  // {
-  //   heading: 'Bootstrapping Accounts',
-  //   text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-  //   subText: '',
-  // },
   {
     heading: 'Test Account',
     text:
@@ -89,21 +84,6 @@ const loaderMessages = [
     text: 'Hexa has three levels of backup. Upgrade your backup when you want to secure more sats',
     subText: '',
   },
-  // {
-  //   heading: 'Level 1 - Automated Cloud Backup',
-  //   text: 'Allow Hexa to automatically backup your wallet to your cloud storage. It ensures you can easily recover your wallet in case your phone gets lost',
-  //   subText: '',
-  // },
-  // {
-  //   heading: 'Level 2 - Double Backup',
-  //   text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
-  //   subText: '',
-  // },
-  // {
-  //   heading: 'Level 3 - Multi-key Backup',
-  //   text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
-  //   subText: '',
-  // }
 ]
 
 const getNextMessage = () => {
@@ -130,7 +110,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   //   'Getting the latest details'
   // ]
   const [ Elevation, setElevation ] = useState( 10 )
-  const [ height, setHeight ] = useState( 72 )
+  // const [ height, setHeight ] = useState( 72 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
@@ -193,30 +173,30 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
 
 
-  useEffect( ()=>{
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        if ( Platform.OS === 'android' ) {
-          setHeight( 85 )
-        }
-      }
-    )
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setHeight( 72 )
-        if ( Platform.OS === 'android' ) {
-          setHeight( 72 )
-        }
-      }
-    )
+  // useEffect( ()=>{
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     'keyboardDidShow',
+  //     () => {
+  //       if ( Platform.OS === 'android' ) {
+  //         setHeight( 85 )
+  //       }
+  //     }
+  //   )
+  //   const keyboardDidHideListener = Keyboard.addListener(
+  //     'keyboardDidHide',
+  //     () => {
+  //       setHeight( 72 )
+  //       if ( Platform.OS === 'android' ) {
+  //         setHeight( 72 )
+  //       }
+  //     }
+  //   )
 
-    return () => {
-      keyboardDidHideListener.remove()
-      keyboardDidShowListener.remove()
-    }
-  }, [] )
+  //   return () => {
+  //     keyboardDidHideListener.remove()
+  //     keyboardDidShowListener.remove()
+  //   }
+  // }, [] )
 
   useEffect( () => {
     // if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
@@ -472,7 +452,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const renderEncryptionPswd = () => {
     return(
-      // <ScrollView >
       <KeyboardAwareScrollView
         resetScrollToCoords={{
           x: 0, y: 0
@@ -481,12 +460,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
-
         }}
       >
         <View style={{
-          flex: 1
+          height: hp( '72%' )
         }}>
           <TouchableOpacity
             activeOpacity={1}
@@ -722,57 +699,57 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               </TouchableWithoutFeedback>
             ) : null} */}
           </View>
-        </View>
-        <View
-          style={{
-            marginLeft: 20,
-            marginRight: 20,
-            flexDirection: 'row',
-          }}
-        >
-          <Text
+
+          <View
             style={{
-              color: Colors.red,
-              fontFamily: Fonts.FiraSansMediumItalic,
-              fontSize: RFValue( 10 ),
-              marginLeft: 'auto',
+              marginLeft: 20,
+              marginRight: 20,
+              flexDirection: 'row',
             }}
           >
-            {pswdError}
-          </Text>
-        </View>
-        {showNote ? <View style={{
-          ...styles.bottomButtonView,
-        }}>
-          {(
-            pswd.trim() === confirmPswd.trim() &&
+            <Text
+              style={{
+                color: Colors.red,
+                fontFamily: Fonts.FiraSansMediumItalic,
+                fontSize: RFValue( 10 ),
+                marginLeft: 'auto',
+              }}
+            >
+              {pswdError}
+            </Text>
+          </View>
+          {showNote ? <View style={{
+            ...styles.bottomButtonView,
+          }}>
+            {(
+              pswd.trim() === confirmPswd.trim() &&
             confirmPswd.trim() &&
             pswd.trim() && pswdError.length === 0 && hintText.length > 0
-          ) && (
-            setButtonVisible()
-          ) || null}
-          {/* <View style={styles.statusIndicatorView}>
+            ) && (
+              setButtonVisible()
+            ) || null}
+            {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
-        </View> : null}
-        {showNote &&
+          </View> : null}
+          {showNote &&
         <View style={{
-          marginTop: showNote ? hp( '0%' ) :'auto',
+          marginTop: showNote ? hp( '0%' ) :hp( '2%' ),
           marginBottom: hp( 1 )
         }}>
-          {pswd.length === 0 && confirmPswd.length === 0 &&
+          {/* {pswd.length === 0 && confirmPswd.length === 0 && */}
           <BottomInfoBox
             title={'Note'}
             infoText={'Make sure you remember the encryption password and keep it safe'}
             italicText={''}
             backgroundColor={Colors.white}
           />
+          {/* } */}
+        </View>
           }
         </View>
-        }
       </KeyboardAwareScrollView>
-      // </ScrollView>
     )
   }
 
@@ -792,7 +769,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         }}
       >
         <View style={{
-          height: hp( 72 )
+          height: hp( '72%' ),
         }}>
           <TouchableOpacity
             activeOpacity={1}

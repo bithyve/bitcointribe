@@ -33,7 +33,7 @@ const Colors = {
   gold: '#E9BB35',
   bgColor: '#F8F8F8',
   shadowColor: '#8686860D',
-
+  darkGray: '#00000065',
   // Grayscale
   gray1: '#d0d0d0',
   gray2: '#A3A3A3',
@@ -41,6 +41,7 @@ const Colors = {
   gray4: '#6C6C6C',
   gray5: '#3A3A3C',
   gray6: '#2F2F2F',
+  gray7: '#FCFCFC',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',

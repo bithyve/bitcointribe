@@ -217,7 +217,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
               ? selectedContacts[ 0 ].firstName
               : !selectedContacts[ 0 ].firstName && selectedContacts[ 0 ].lastName
                 ? selectedContacts[ 0 ].lastName
-                : 'Friends and Family',
+                : 'Friends & Family',
         )
       }
       return selectedContacts[ 0 ]
@@ -747,8 +747,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
               setTimeout( () => {
                 setShowQrCode( true )
               }, 2 )
-              // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
-              // setTrustedContactModal( true )
               setNavigation( false )
               props.navigation.navigate( 'FNFToKeeper', {
                 ...props.navigation.state.params,

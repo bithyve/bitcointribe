@@ -177,7 +177,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             <BottomInfoBox
               style
               title="What can you scan?"
-              infoText="Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request, or a recover request"
+              infoText="Scan a bitcoin address, a Hexa Friends & Family request, a Hexa Keeper request, or a recovery request"
             />
           </View>
         </KeyboardAwareScrollView>

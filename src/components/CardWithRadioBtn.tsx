@@ -41,7 +41,7 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
           backgroundColor: Colors.white,
           justifyContent: 'center',
           alignItems: 'center',
-          elevation: 10,
+          elevation: 6,
           // shadowColor: Colors.gray,
           shadowOpacity: 0.1,
           shadowOffset: {
