@@ -88,7 +88,6 @@ export default function CloudPermissionModalContents( props ) {
               ...styles.modalInfoText,
               marginTop: wp( '1.5%' ),
               marginBottom: hp( '3%' ),
-              color: Colors.lightTextColor,
             }}
           >
             {props.info}
@@ -199,8 +198,11 @@ const styles = StyleSheet.create( {
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    opacity: 1,
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    marginRight: wp( 10 )
   },
   successModalAmountView: {
     justifyContent: 'center',

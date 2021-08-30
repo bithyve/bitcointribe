@@ -37,7 +37,7 @@ export default function NoInternetModalContents( props ) {
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginBottom: 5
         }}>
-          <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
+          <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
           <Text style={{
             ...styles.modalInfoText,
           }}>fetching your balance and transactions</Text>
@@ -45,13 +45,13 @@ export default function NoInternetModalContents( props ) {
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginBottom: 5
         }}>
-          <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
+          <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
           <Text style={styles.modalInfoText}>sending sats</Text>
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginBottom: 5
         }}>
-          <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
+          <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
           <Text style={styles.modalInfoText}>contact requests
           </Text>
         </View>
@@ -101,11 +101,14 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
+    letterSpacing: 0.54
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    opacity: 1
   },
   successModalAmountView: {
     // flex: 2,
@@ -144,7 +147,7 @@ const styles = StyleSheet.create( {
   },
   successModalButtonView: {
     height: wp( '13%' ),
-    width: wp( '35%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,

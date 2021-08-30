@@ -30,8 +30,7 @@ export type BuyBitcoinBottomSheetMenuItem = {
   imageSource: ImageSourcePropType;
   disabled: boolean;
   hasButton: boolean;
-  feesLink: string;
-  supportedRegions: string;
+  link: string;
 }
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
@@ -42,8 +41,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     imageSource: require( '../../assets/images/accIcons/ramp.png' ),
     disabled: false,
     hasButton: true,
-    feesLink: 'https://support.ramp.network/en/article/what-are-your-fees-1atf5lv/',
-    supportedRegions: 'https://support.ramp.network/en/article/what-countries-do-you-support-1ua7sn1/'
+    link: 'https://support.ramp.network/en/',
   },
   {
     title: 'Buy with Wyre',
@@ -52,8 +50,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     imageSource: require( '../../assets/images/accIcons/wyre.png' ),
     disabled: false,
     hasButton: false,
-    feesLink: 'https://support.sendwyre.com/hc/en-us',
-    supportedRegions: 'https://support.sendwyre.com/hc/en-us/articles/360055233754-Geographic-Restrictions-'
+    link: 'https://support.sendwyre.com/hc/en-us',
   },
   {
     title: Platform.OS == 'ios' ? 'Buy with FastBitcoins' : 'Buy with FastBitcoins',
@@ -62,8 +59,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     imageSource: require( '../../assets/images/icons/fastbitcoins.png' ),
     disabled: false,
     hasButton: false,
-    feesLink: 'https://fastbitcoins.com/help',
-    supportedRegions: 'https://fastbitcoins.com/help'
+    link: 'https://fastbitcoins.com/help',
   },
   // {
   //   title: 'GetBittr',
@@ -133,7 +129,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
         <TouchableOpacity style={styles.linkContainer}
           onPress={() => {
             onPress()
-            Linking.openURL( menuItem.feesLink )
+            Linking.openURL( menuItem.link )
           }
           }
         >

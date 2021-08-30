@@ -145,11 +145,14 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }
 
   const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
+    if ( listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT ) {
+      return null
+    }
     return (
       <ListItem
         bottomDivider
         onPress={() => { handleListItemPress( listItem ) }}
-        disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
+        // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
         <Image
           source={listItem.imageSource}

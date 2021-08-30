@@ -787,12 +787,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
+          // height: `${height}%`
 
         }}
       >
         <View style={{
-          flex: 1
+          height: hp( 72 )
         }}>
           <TouchableOpacity
             activeOpacity={1}
