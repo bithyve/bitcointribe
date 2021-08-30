@@ -289,36 +289,14 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               secondaryXpub,
             }
           ) )
-
-          const savingsAccounts = wallet.accounts[ AccountType.SAVINGS_ACCOUNT ]
-          if( savingsAccounts ){
-            // upgrade default savings account
-            const account: Accounts = yield select( state => state.accounts.accounts )
-            let savingsAccount = account[ savingsAccounts[ 0 ] ]
-            if( !savingsAccount.isUsable ){
-              savingsAccount = yield call( upgradeAccountToMultiSig, {
-                account: savingsAccount,
-                secondaryXpub,
-                bithyveXpub: wallet.details2FA.bithyveXpub
-              } )
-            }
-            yield put( updateAccountShells( {
-              accounts: {
-                [ savingsAccount.id ]: savingsAccount
-              }
-            } ) )
-            yield call( dbManager.updateAccount, savingsAccount.id, savingsAccount )
-          }
-
           yield call( dbManager.updateWallet, {
             secondaryXpub,
             smShare: secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
           } )
         }
       }
-      if( updateWI ) {
-        yield put( updateWalletImageHealth() )
-      }
+
+      if( updateWI ) yield put( updateWalletImageHealth() )
 
       if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
