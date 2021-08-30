@@ -595,12 +595,12 @@ export default function AddContactAddressBook( props ) {
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           </ModalContainer>
-          <ModalContainer visible={permissionModal} closeBottomSheet={() => { setModal( false ) }}>
+          <ModalContainer visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
               title={'Why do we need access\nto your address book?'}
-              info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-              otherText={'We neither store this data nor pass it to anyone else. This is for your convenience only'}
+              info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\n\nIt is a good way to remember who the contacts are with their name and image'}
+              otherText={'\n\n\n\n\nWe neither store this data nor pass it to anyone else. This is for your convenience only'}
               proceedButtonText={'Continue'}
               isIgnoreButton={false}
               onPressProceed={() => {

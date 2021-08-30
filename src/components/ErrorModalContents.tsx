@@ -16,8 +16,9 @@ export default function ErrorModalContents( props ) {
       ...styles.modalContentContainer,
     }}>
       <View style={{
-        height: hp( 74 )
+        height: props.small ? hp( 74 ) : 'auto'
       }}>
+        {props.closeModal &&
         <AppBottomSheetTouchableWrapper
           onPress={() => props.closeModal()}
           style={{
@@ -31,8 +32,10 @@ export default function ErrorModalContents( props ) {
             // marginTop: hp( 0.5 )
           }} />
         </AppBottomSheetTouchableWrapper>
-
-        <View style={styles.successModalHeaderView}>
+        }
+        <View style={[ styles.successModalHeaderView, {
+          marginTop: props.closeModal ? wp( '1%' ) : wp( '8%' )
+        } ]}>
           <Text
             style={{
               color: props.headerTextColor
@@ -40,6 +43,7 @@ export default function ErrorModalContents( props ) {
                 : Colors.blue,
               fontSize: RFValue( 18 ),
               fontFamily: Fonts.FiraSansRegular,
+              letterSpacing: 0.54
               // width: wp( 65 )
             }}
           >
@@ -51,7 +55,7 @@ export default function ErrorModalContents( props ) {
               style={{
                 ...styles.modalInfoText,
                 marginTop: wp( '1.5%' ),
-                marginRight: wp( 10 )
+                marginRight: wp( 13 )
               }}
             >
               {props.info}
@@ -130,7 +134,7 @@ export default function ErrorModalContents( props ) {
                 ...styles.modalInfoText,
                 marginBottom: hp( '1%' ),
                 marginTop: 'auto',
-                color: Colors.lightTextColor,
+                marginRight: wp( 10 )
               }}
             >
               {props.otherText}
@@ -229,7 +233,7 @@ const styles = StyleSheet.create( {
   },
   successModalAmountView: {
     justifyContent: 'center',
-    marginRight: wp( '8%' ),
+    marginRight: wp( '12%' ),
     marginLeft: wp( '8%' ),
     marginTop: hp( '2%' ),
   },

@@ -410,6 +410,7 @@ export default function Login( props ) {
         }}
         isBottomImage={true}
         bottomImage={require( '../assets/images/icons/errorImage.png' )}
+        type={'small'}
       />
     )
   }, [ JailBrokenTitle ] )
