@@ -42,6 +42,7 @@ import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../MaterialCurrencyCodeIcon'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -90,25 +91,42 @@ const HomeHeader = ( {
     ( state ) => state.upgradeToNewBhr.upgradeProcessStatus
   )
 
+  const cloudBackupStatus = useSelector(
+    ( state ) => state.cloud.cloudBackupStatus
+  )
+
   const getMessage = () => {
-    const { messageOne, messageTwo, isFirstMessageBold, isError } = getMessageToShow()
+    const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
     return <View style={{
       flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
     }}>
-      <View style={{
-        backgroundColor: isError ? Colors.red : Colors.green,
-        width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ),
-        alignItems:'center',
-        justifyContent: 'center'
-      }}>
-        <Image
-          source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
-          style={{
-            width: wp( '2.7%' ), height: wp( '2.7%' ),
-          }}
-          resizeMode={'contain'}
-        />
-      </View>
+      { isInit ?
+        <View style={{
+          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ), backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'
+        }}>
+          <Image
+            source={require( '../../assets/images/icons/icon_account_sync_in_progress.gif' )}
+            style={{
+              width: wp( '4.0%' ), height: wp( '4.0%' ), borderRadius: wp( '5.5/2%' ),
+            }}
+            resizeMode={'contain'}
+          />
+        </View>
+        : <View style={{
+          backgroundColor: isError ? Colors.red : Colors.green,
+          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ),
+          alignItems:'center',
+          justifyContent: 'center'
+        }}>
+          <Image
+            source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+            style={{
+              width: wp( '2.7%' ), height: wp( '2.7%' ),
+            }}
+            resizeMode={'contain'}
+          />
+        </View>
+      }
       {isFirstMessageBold ? <Text style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
       }}><Text style={{
@@ -131,9 +149,9 @@ const HomeHeader = ( {
   }, [] )
 
   const getMessageToShow = () => {
-    if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 ) {
+    if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
       return {
-        isFirstMessageBold: false, messageOne: 'Initialising Cloud Backup', messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: 'Initialising Cloud Backup', messageTwo: '', isError: false, isInit: true
       }
     }
     if( currentLevel == 0 ){
@@ -190,10 +208,9 @@ const HomeHeader = ( {
                 <MaterialCurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
                   color={Colors.white}
-                  size={wp( '3.5%' )}
+                  size={RFValue( 16 )}
                   style={{
-                    width: wp( '3.5%' ),
-                    height: wp( '3.5%' ),
+                    marginRight: wp( 1 ), marginLeft:  [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode  ) ? 0 : -wp( 1 )
                   }}
                 />
               ) : (
