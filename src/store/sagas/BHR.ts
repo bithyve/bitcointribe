@@ -496,11 +496,13 @@ function* recoverWalletWorker( { payload } ) {
       version: DeviceInfo.getVersion(),
     }
     // restore Contacts
-    yield call( restoreTrustedContactsWorker, {
-      payload: {
-        walletId: wallet.walletId, channelKeys: contactsChannelKeys
-      }
-    } )
+    if( contactsChannelKeys.length > 0 ) {
+      yield call( restoreTrustedContactsWorker, {
+        payload: {
+          walletId: wallet.walletId, channelKeys: contactsChannelKeys
+        }
+      } )
+    }
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
     yield call( dbManager.createWallet, wallet )
