@@ -29,7 +29,7 @@ export default function AddressBookHelpContents( props ) {
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
-        <Text style={styles.headerText}>Friends and Family</Text>
+        <Text style={styles.headerText}>Friends & Family</Text>
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
@@ -48,7 +48,7 @@ export default function AddressBookHelpContents( props ) {
               marginTop: wp( '5%' ),
             }}
           >
-            Friends and Family are people who you trust and end up paying regularly. When sending sats to people on your Friends and Family, you are not required to ask them for a QR code when sending - saving lots of time!
+            Friends & Family are people who you trust and end up paying regularly. When sending sats to people on your Friends & Family, you are not required to ask them for a QR code when sending - saving lots of time!
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -63,7 +63,7 @@ export default function AddressBookHelpContents( props ) {
               ...styles.infoText,
             }}
           >
-            Picking someone to be Friends and Family creates a secure channel between you and them. This means you can pay them - and they can pay you - whenever you want, securely!
+            Picking someone to be Friends & Family creates a secure channel between you and them. This means you can pay them - and they can pay you - whenever you want, securely!
           </Text>
           <AppBottomSheetTouchableWrapper style={{
             alignItems: 'center'
@@ -91,7 +91,7 @@ export default function AddressBookHelpContents( props ) {
               marginTop: wp( '10%' ),
             }}
           >
-            We send your Friends and Family your extended public key for your wallet. An extended public key can be used by someone else to generate new addresses on your behalf.
+            We send your Friends & Family your extended public key for your wallet. An extended public key can be used by someone else to generate new addresses on your behalf.
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'

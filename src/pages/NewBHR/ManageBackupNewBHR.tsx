@@ -881,7 +881,8 @@ class ManageBackupNewBHR extends Component<
 
           <Text style={{
             color: Colors.blue,
-            fontSize: RFValue( 16 ),
+            fontSize: RFValue( 18 ),
+            letterSpacing: 0.54,
             // marginLeft: 2,
             fontFamily: Fonts.FiraSansMedium,
             marginTop: hp( 4 ),
@@ -1116,10 +1117,11 @@ Wallet Backup
                     containerStyle={{
                       // paddingLeft: wp ( '6%' ),
                       marginLeft: wp( 0 ),
-                      marginTop: hp( 2.5 )
+                      marginTop: hp( 2.5 ),
+                      backgroundColor: Colors.gray7
                     }}
                     title=""
-                    infoText="Add a Contact to send them sats without having to scan an address"
+                    infoText="When you have Friends & Family who you can help with wallet recovery, they will be listed here"
                   />
                 }
               </View>

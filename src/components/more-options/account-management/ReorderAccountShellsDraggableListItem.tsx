@@ -60,10 +60,10 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
         </ListItem.Subtitle>
       </ListItem.Content>
 
-      <Image
+      {/* <Image
         source={require( '../../../assets/images/icons/icon_rearrange.png' )}
         style={ImageStyles.reorderItemIconImage}
-      />
+      /> */}
     </ListItem>
   )
 }

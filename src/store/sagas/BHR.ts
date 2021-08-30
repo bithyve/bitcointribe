@@ -93,7 +93,9 @@ import {
   UnecryptedStreamData,
   Wallet,
   NewWalletImage,
-  cloudDataInterface
+  cloudDataInterface,
+  Accounts,
+  AccountType
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -103,7 +105,7 @@ import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
-import { restoreAccountShells } from '../actions/accounts'
+import { restoreAccountShells, updateAccountShells } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
@@ -118,6 +120,7 @@ import { setWalletId } from '../actions/preferences'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import secrets from 'secrets.js-grempe'
+import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -311,8 +314,34 @@ function* updateSharesHealthWorker( { payload } ) {
         'updateSharesHealthWatcher'
       )
     )
-    // Secure Account
-    if( currentLevel == 2 ) yield put( setAllowSecureAccount( true ) )
+
+    // savings account activation
+    if( currentLevel == 2 ){
+      yield put( setAllowSecureAccount( true ) )
+
+      const wallet: Wallet = yield select( state => state.storage.wallet )
+      if( wallet.secondaryXpub ){
+        const savingsAccounts = wallet.accounts[ AccountType.SAVINGS_ACCOUNT ]
+        if( savingsAccounts ){
+          // upgrade default savings account
+          const account: Accounts = yield select( state => state.accounts.accounts )
+          let savingsAccount = account[ savingsAccounts[ 0 ] ]
+          if( !savingsAccount.isUsable ){
+            savingsAccount = yield call( upgradeAccountToMultiSig, {
+              account: savingsAccount,
+              secondaryXpub: wallet.secondaryXpub,
+              bithyveXpub: wallet.details2FA.bithyveXpub
+            } )
+          }
+          yield put( updateAccountShells( {
+            accounts: {
+              [ savingsAccount.id ]: savingsAccount
+            }
+          } ) )
+          yield call( dbManager.updateAccount, savingsAccount.id, savingsAccount )
+        }
+      }
+    }
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
@@ -496,11 +525,13 @@ function* recoverWalletWorker( { payload } ) {
       version: DeviceInfo.getVersion(),
     }
     // restore Contacts
-    yield call( restoreTrustedContactsWorker, {
-      payload: {
-        walletId: wallet.walletId, channelKeys: contactsChannelKeys
-      }
-    } )
+    if( contactsChannelKeys.length > 0 ) {
+      yield call( restoreTrustedContactsWorker, {
+        payload: {
+          walletId: wallet.walletId, channelKeys: contactsChannelKeys
+        }
+      } )
+    }
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
     yield call( dbManager.createWallet, wallet )
@@ -1493,7 +1524,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const notification: INotification = {
           notificationType: notificationType.FNF_KEEPER_REQUEST,
-          title: 'Friends and Family Request',
+          title: 'Friends & Family Request',
           body: `You have new keeper request ${temporaryContact.contactDetails.contactName}`,
           data: {
             walletName: walletName,

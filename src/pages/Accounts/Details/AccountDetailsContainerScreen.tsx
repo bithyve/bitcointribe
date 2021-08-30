@@ -45,6 +45,7 @@ import ModalContainer from '../../../components/home/ModalContainer'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import ErrorModalContents from '../../../components/ErrorModalContents'
 import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -94,7 +95,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   } = useBottomSheetModal()
 
   useEffect( ()=>{
-    if( !AllowSecureAccount && primarySubAccount.type == 'SAVINGS_ACCOUNT' ){
+    if( !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ){
       setSecureAccountAlert( true )
     }
   }, [] )

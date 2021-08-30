@@ -745,6 +745,8 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, serviceInstanceCount ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
+        if( accountType === AccountType.SWAN_ACCOUNT ) serviceAccount.isUsable = false
+
         return serviceAccount
   }
 }

@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux'
 import ModalContainer from '../../../components/home/ModalContainer'
 import ErrorModalContents from '../../../components/ErrorModalContents'
 import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -122,7 +123,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   }
 
   function handleChoiceSelection( choice: SubAccountDescribing ) {
-    if( choice.type == 'SAVINGS_ACCOUNT' && !AllowSecureAccount ) {
+    if( choice.type == AccountType.SAVINGS_ACCOUNT && !AllowSecureAccount ) {
       setSecureAccountAlert( true )
     } else setSelectedChoice( choice )
   }

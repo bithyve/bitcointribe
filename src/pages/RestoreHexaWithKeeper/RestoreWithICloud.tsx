@@ -1166,7 +1166,7 @@ class RestoreWithICloud extends Component<
           <ContactListForRestore
             title={'Select Contact'}
             subText={
-              'Select contact to send a Wallet Recover request link'
+              'Select contact to send a Wallet Recovery request link'
             }
             contactList={contactList}
             modalRef={this.ContactListForRestore}
