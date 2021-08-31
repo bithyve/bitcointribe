@@ -687,7 +687,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.SAVINGS_ACCOUNT,
           instanceNum: savingsInstanceCount,
           accountName: accountName? accountName: 'Savings Account',
-          accountDescription: accountDescription? accountDescription: 'MultiSig Wallet',
+          accountDescription: accountDescription? accountDescription: 'Level up to use\nthis account',
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.secondaryXpub,
@@ -725,7 +725,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         switch( accountType ){
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
-              defaultAccountDescription = 'Auto-withdraw wallet'
+              defaultAccountDescription = 'Register to use\nthis account'
               break
 
             case AccountType.DEPOSIT_ACCOUNT:
