@@ -9,7 +9,6 @@ import BitcoinUnit, { displayNameForBitcoinUnit } from '../../../common/data/enu
 import { UsNumberFormat } from '../../../common/utilities'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
-import { shadowColorForAccountKind } from '../../../components/account-details/AccountDetailsCard'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 
 export type Props = {
@@ -42,9 +41,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
     <View style={styles.rootContainer}>
 
       <Text style={{
-        ...ListStyles.listItemTitle, marginBottom: 12, color: shadowColorForAccountKind( {
-          kind
-        } )
+        ...ListStyles.listItemTitle, marginBottom: 12,
       }}>
         Available to spend: {formattedBalanceText} {formattedUnitText}
       </Text>
