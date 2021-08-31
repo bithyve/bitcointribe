@@ -74,7 +74,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
-  const [ approvePrimaryKeeperModal, setApprovePrimaryKeeperModal ] = useState( false )
   const [ qrModal, setQRModal ] = useState( false )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
@@ -643,10 +642,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          // setApprovePrimaryKeeperModal( true )
           dispatch( setApprovalStatus( false ) )
           dispatch( downloadSMShare( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
@@ -655,9 +652,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         onPressContinue={async() => {
           const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
           dispatch( setApprovalStatus( false ) )
-          // setApprovePrimaryKeeperModal( true )
           dispatch( downloadSMShare( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
         }}
       />
     )
@@ -665,8 +660,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( ()=>{
     if( approvalStatus && isChangeClicked ){
-      setApprovePrimaryKeeperModal( true )
       setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
     }
   }, [ approvalStatus ] )
 
@@ -915,15 +910,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           selectedLevelId={selectedLevelId}
           keeper={selectedKeeper}
         />
-      </ModalContainer>
-      <ModalContainer visible={approvePrimaryKeeperModal} closeBottomSheet={()=>{setApprovePrimaryKeeperModal( false )}} >
-        {<ApproveSetup
-          isContinueDisabled={false}
-          onPressContinue={() => {
-            onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-            setApprovePrimaryKeeperModal( false )
-          }}
-        />}
       </ModalContainer>
       <ModalContainer visible={qrModal} closeBottomSheet={() => {setQRModal( false )}} >
         {renderQrContent()}
