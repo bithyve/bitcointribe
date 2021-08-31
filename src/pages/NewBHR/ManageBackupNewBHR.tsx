@@ -98,7 +98,6 @@ interface ManageBackupNewBHRStateTypes {
   errorModal: boolean;
   showQRModal: boolean;
   isLevel3Started: boolean;
-  approvePrimaryKeeper: boolean;
   loaderModal: boolean;
   knwowMoreModal: boolean;
   metaSharesKeeper: MetaShare[];
@@ -208,7 +207,6 @@ class ManageBackupNewBHR extends Component<
       errorModal: false,
       showQRModal: false,
       isLevel3Started: false,
-      approvePrimaryKeeper: false,
       loaderModal: false,
       knwowMoreModal: false,
       metaSharesKeeper: [ ...s3.metaSharesKeeper  ],
@@ -237,10 +235,10 @@ class ManageBackupNewBHR extends Component<
           await this.onRefresh()
           this.props.modifyLevelData()
         }
-      // updates the new FCM token to channels post recovery
-      // if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
-      //   this.props.updateNewFcm()
-      // }
+        // updates the new FCM token to channels post recovery
+        // if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
+        //   this.props.updateNewFcm()
+        // }
       } )
       this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
         this.updateAddressBook( )
@@ -491,9 +489,21 @@ class ManageBackupNewBHR extends Component<
         showQRModal: false
       },
       () => {
-        this.setState( {
-          approvePrimaryKeeper: true
-        } )
+        const {
+          selectedKeeper,
+          selectedLevelId,
+          selectedKeeperType,
+          selectedKeeperName,
+        } = this.state
+        const obj = {
+          id: selectedLevelId,
+          selectedKeeper: {
+            ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+            shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
+          },
+          isSetup: true,
+        }
+        this.goToHistory( obj )
       } )
     }
 
@@ -559,7 +569,6 @@ class ManageBackupNewBHR extends Component<
     this.setState( {
       keeperTypeModal: false,
       showQRModal: false,
-      approvePrimaryKeeper: false
     } )
     if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
@@ -669,9 +678,6 @@ class ManageBackupNewBHR extends Component<
         onQrScan={async( qrScannedData ) => {
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
-          this.setState( {
-            showQRModal: false
-          } )
         }}
         onBackPress={() => {
           this.setState( {
@@ -682,9 +688,6 @@ class ManageBackupNewBHR extends Component<
           const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asafd","channelId":"ce77f9e12e79c10b703e423ff2d5642b949ad9addc32feef549c1a76c54cfaf1","streamId":"f4a5edbbd","secondaryChannelKey":"3HnBqIVwlaam5IUAUTMSfr36","version":"1.9.5","walletId":"5d0b3ea87b54ba82626f5cc0a2696d7c5aaf223c2b08ab8b1661d707de9c5128"}'
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
-          this.setState( {
-            showQRModal: false
-          } )
         }}
       />
     )
@@ -830,7 +833,6 @@ class ManageBackupNewBHR extends Component<
       keeperTypeModal,
       errorModal,
       showQRModal,
-      approvePrimaryKeeper,
       loaderModal,
       knwowMoreModal
     } = this.state
@@ -1209,31 +1211,6 @@ Wallet Backup
             />}
             renderHeader={()=><ModalHeader onPressHeader={() => ( this.ErrorBottomSheet as any ).snapTo( 0 )} />}
           /> */}
-          <ModalContainer visible={approvePrimaryKeeper} closeBottomSheet={() => {}}>
-            <ApproveSetup
-              isContinueDisabled={false}
-              onPressContinue={() => {
-                this.setState( {
-                  approvePrimaryKeeper: false
-                } )
-                const {
-                  selectedKeeper,
-                  selectedLevelId,
-                  selectedKeeperType,
-                  selectedKeeperName,
-                } = this.state
-                const obj = {
-                  id: selectedLevelId,
-                  selectedKeeper: {
-                    ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
-                  },
-                  isSetup: true,
-                }
-                this.goToHistory( obj )
-              }}
-            />
-          </ModalContainer>
           <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
             {this.renderQrContent()}
           </ModalContainer>

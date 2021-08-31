@@ -56,7 +56,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ChangeBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ showQr, setShowQr ] = useState( false )
   const [ secondaryDeviceMessageBottomSheet ] = useState( React.createRef<BottomSheet>() )
-  const [ approvePrimaryKeeperModal, setApprovePrimaryKeeperModal ] = useState( false )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ qrModal, setQRModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
@@ -421,7 +420,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -431,9 +430,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
           dispatch( setApprovalStatus( false ) )
-          // setApprovePrimaryKeeperModal( true )
           dispatch( downloadSMShare( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
@@ -442,9 +439,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         onPressContinue={async() => {
           const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"erds","channelId":"28cc7e44b3ca629fe98450412f750d29fcf93d2de5057e841a665e8e73e98cfb","streamId":"b83dea121","secondaryChannelKey":"FLPy5dqRHTFCGqhZibhW9SLH","version":"1.8.0","walletId":"23887039bd673cfaa6fdc5ab9786aa130e010e9bbbc6731890361240ed83a55a"}'
           dispatch( setApprovalStatus( false ) )
-          // setApprovePrimaryKeeperModal( true )
           dispatch( downloadSMShare( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
         }}
       />
     )
@@ -481,8 +476,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   useEffect( ()=>{
     if( approvalStatus && isChangeClicked ){
       console.log( 'APPROVe SD' )
-      setApprovePrimaryKeeperModal( true )
       setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
     }
   }, [ approvalStatus ] )
 
@@ -621,15 +616,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           onPressBack={() => setKeeperTypeModal( false )}
           selectedLevelId={selectedLevelId}
         />
-      </ModalContainer>
-      <ModalContainer visible={approvePrimaryKeeperModal} closeBottomSheet={()=>{setApprovePrimaryKeeperModal( false )}} >
-        {<ApproveSetup
-          isContinueDisabled={false}
-          onPressContinue={() => {
-            onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-            setApprovePrimaryKeeperModal( false )
-          }}
-        />}
       </ModalContainer>
     </View>
   )
