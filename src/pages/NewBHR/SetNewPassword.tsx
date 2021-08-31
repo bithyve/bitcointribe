@@ -1223,6 +1223,7 @@ const styles = StyleSheet.create( {
   helpText: {
     fontSize: RFValue( 12 ),
     color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansItalic,
     marginRight: wp( 5 ),
     alignSelf: 'flex-end',
     width: wp( '72%' ),

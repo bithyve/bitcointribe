@@ -1118,7 +1118,7 @@ Wallet Backup
                       // paddingLeft: wp ( '6%' ),
                       marginLeft: wp( 0 ),
                       marginTop: hp( 2.5 ),
-                      backgroundColor: Colors.gray7
+                      backgroundColor: Colors.white
                     }}
                     title=""
                     infoText="When you have Friends & Family who you can help with wallet recovery, they will be listed here"
@@ -1334,7 +1334,8 @@ const styles = StyleSheet.create( {
   pageInfoText: {
     // paddingLeft: wp ( '4%' ),
     color: Colors.textColorGrey,
-    fontSize: RFValue( 10 ),
+    letterSpacing: 0.5,
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
   },
