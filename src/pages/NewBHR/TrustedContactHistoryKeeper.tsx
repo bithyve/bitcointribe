@@ -69,6 +69,7 @@ import dbManager from '../../storage/realm/dbManager'
 import idx from 'idx'
 import Toast from '../../components/Toast'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Loader from '../../components/loader'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
@@ -96,6 +97,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ConfirmBottomSheet, setConfirmBottomSheet ] = useState(
     React.createRef(),
   )
+  const [ showLoader, setShowLoader ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
   const [ renderTimer, setRenderTimer ] = useState( false )
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -472,6 +474,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const Contact = props.navigation.getParam( 'isChangeKeeperType' ) || isChangeKeeper ? payload.chosenContactTmp : ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload && payload.chosenContactTmp ? payload.chosenContactTmp : chosenContact : chosenContact
       setChosenContact( Contact )
       if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
+      setShowLoader( true )
       setIsGuardianCreationClicked( true )
       const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKeyTemp )
@@ -578,6 +581,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       setTrustedQR( QRData )
       console.log( 'QR DATA', QRData )
       if( showQrCode && ( deepLink.includes( 'EXISTING_CONTACT' ) || deepLink.includes( 'KEEPER' ) ) ){
+        setShowLoader( false )
         props.navigation.navigate( 'QrAndLink', {
           otp: encryptionHint,
           trustedLink: deepLink,
@@ -914,6 +918,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       <ModalContainer visible={qrModal} closeBottomSheet={() => {setQRModal( false )}} >
         {renderQrContent()}
       </ModalContainer>
+      {showLoader ? <Loader /> : null}
     </View>
   )
 }
