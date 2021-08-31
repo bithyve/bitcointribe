@@ -646,7 +646,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
 
 export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails ) {
   const wallet: Wallet = yield select( state => state.storage.wallet )
-  const { walletId, primaryMnemonic, accounts } = wallet
+  const { walletId, primarySeed, accounts } = wallet
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
   switch ( accountType ) {
@@ -658,7 +658,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           instanceNum: testInstanceCount,
           accountName: accountName? accountName: 'Test Account',
           accountDescription: 'Testnet Wallet',
-          mnemonic: primaryMnemonic,
+          primarySeed,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.TESTNET, AccountType.TEST_ACCOUNT, testInstanceCount ),
           networkType: NetworkType.TESTNET,
         } )
@@ -672,7 +672,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           instanceNum: checkingInstanceCount,
           accountName: accountName? accountName: 'Checking Account',
           accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet',
-          mnemonic: primaryMnemonic,
+          primarySeed,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstanceCount ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
@@ -688,7 +688,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           instanceNum: savingsInstanceCount,
           accountName: accountName? accountName: 'Savings Account',
           accountDescription: accountDescription? accountDescription: 'Level up to use\nthis account',
-          mnemonic: primaryMnemonic,
+          primarySeed,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.secondaryXpub,
           bithyveXpub: wallet.details2FA?.bithyveXpub,
@@ -708,7 +708,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           accountName: accountName? accountName: 'Donation Account',
           accountDescription: accountDescription? accountDescription: 'Receive Donations',
           donee: doneeName? doneeName: wallet.walletName,
-          mnemonic: primaryMnemonic,
+          primarySeed,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
           is2FA: is2FAEnabled,
           secondaryXpub: is2FAEnabled? wallet.secondaryXpub: null,
@@ -741,7 +741,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           instanceNum: serviceInstanceCount,
           accountName: accountName? accountName: defaultAccountName,
           accountDescription: accountDescription? accountDescription: defaultAccountDescription,
-          mnemonic: primaryMnemonic,
+          primarySeed,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, serviceInstanceCount ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
