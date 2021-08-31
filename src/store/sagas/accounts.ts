@@ -247,30 +247,63 @@ export const txnReadWatcher = createWatcher(
   MARK_READ_TRANSACTION
 )
 
-function* syncTxAfterRestore( restoredAccounts: Account[] ) {
+function* syncTxAfterRestore( restoredAccounts ) {
   const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
   const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
-  restoredAccounts.forEach( resAcc => {
+  for ( const [ key, shell ] of Object.entries( accountShells ) ) {
+    const resAccIndex = restoredAccounts.findIndex( acc => acc.id === shell.primarySubAccount.id )
+    if( resAccIndex !== -1 ) {
+      const resAcc = restoredAccounts[ resAccIndex ]
+      shell.primarySubAccount.transactions.forEach( ( tx, i ) => {
+        const txIndex = resAcc.transactionsMeta.findIndex( t => t.txid === tx.txid )
+        const transaction = resAcc.transactionsMeta[ txIndex ]
+        const shellTxIndex = shell.primarySubAccount.transactions.findIndex( shellTx => shellTx.txid === transaction.txid )
+        const shellIndex = accountShells.findIndex( shell => shell.primarySubAccount.id === resAcc.id )
+        if( !tx.accountName ) {
+          if( txIndex !== -1 ) {
+            const data = {
+              ...tx,
+              receivers: transaction.receivers ? transaction.receivers : [],
+              sender: transaction.sender ? transaction.sender : '',
+              notes: transaction.notes ? transaction.notes : '',
+              tags: transaction.tags ? transaction.tags : [],
+              isNew: transaction.isNew,
+              type: transaction.type,
+            }
+            const accTxIndex = accounts[ shell.primarySubAccount.id ].transactions.findIndex( accTx => accTx.txid === transaction.txid )
+            accounts[ shell.primarySubAccount.id ].transactions[ accTxIndex ] = data
+            accountShells[ shellIndex ].primarySubAccount.transactions[ shellTxIndex ] = data
+          }
+        } else {
+          accountShells[ shellIndex ].primarySubAccount.transactions.splice( i, 1 )
+        }
+      } )
+    }
+  }
+
+  /*restoredAccounts.forEach( resAcc => {
     const shellIndex = accountShells.findIndex( shell => shell.primarySubAccount.id === resAcc.id )
     const shell = accountShells[ shellIndex ]
     resAcc.transactions.forEach( transaction => {
-      const shellTxIndex = shell.primarySubAccount.transactions.findIndex( shellTx => shellTx.txid === transaction.txid )
-      const accTxIndex = accounts[ shell.primarySubAccount.id ].transactions.findIndex( accTx => accTx.txid === transaction.txid )
-      if( shellTxIndex !== -1 ) {
-        const data = {
-          ...shell.primarySubAccount.transactions[ shellTxIndex ],
-          receivers: transaction.receivers ? transaction.receivers : [],
-          sender: transaction.sender ? transaction.sender : '',
-          notes: transaction.notes ? transaction.notes : '',
-          tags: transaction.tags ? transaction.tags : [],
-          isNew: transaction.isNew,
-          type: transaction.type,
+      if( !transaction.accountName ) {
+        const shellTxIndex = shell.primarySubAccount.transactions.findIndex( shellTx => shellTx.txid === transaction.txid )
+        const accTxIndex = accounts[ shell.primarySubAccount.id ].transactions.findIndex( accTx => accTx.txid === transaction.txid )
+        if( shellTxIndex !== -1 ) {
+          const data = {
+            ...shell.primarySubAccount.transactions[ shellTxIndex ],
+            receivers: transaction.receivers ? transaction.receivers : [],
+            sender: transaction.sender ? transaction.sender : '',
+            notes: transaction.notes ? transaction.notes : '',
+            tags: transaction.tags ? transaction.tags : [],
+            isNew: transaction.isNew,
+            type: transaction.type,
+          }
+          accountShells[ shellIndex ].primarySubAccount.transactions[ shellTxIndex ] = data
+          accounts[ shell.primarySubAccount.id ].transactions[ accTxIndex ] = data
         }
-        accountShells[ shellIndex ].primarySubAccount.transactions[ shellTxIndex ] = data
-        accounts[ shell.primarySubAccount.id ].transactions[ accTxIndex ] = data
       }
     } )
-  } )
+  } )*/
   yield put( readTxn( accountShells, accounts ) )
 }
 
@@ -964,7 +997,6 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
 
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   console.log( 'restoredAccounts', restoredAccounts )
-
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
   }
