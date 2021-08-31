@@ -1,9 +1,19 @@
 import { NavigationActions, StackActions } from 'react-navigation'
 
 
-export const goHomeAction = NavigationActions.navigate( {
-  routeName: 'Home',
-} )
+
+export const goHomeAction = ( ) => {
+  const resetAction = StackActions.reset( {
+    index: 0,
+    actions: [
+      NavigationActions.navigate( {
+        routeName: 'Landing'
+      } )
+    ],
+  } )
+
+  return resetAction
+}
 
 
 export const resetToHomeAction = ( params = {

@@ -778,7 +778,7 @@ class ContactDetails extends PureComponent<
                   ellipsizeMode="clip"
                   numberOfLines={1}
                 >
-                  {this.contact.displayedName}
+                  {`${this.contact.displayedName.length > 13 ? this.contact.displayedName.substr( 0, 11 )+'...' : this.contact.displayedName}`}
                 </Text>
                 <View style={{
                   flexDirection: 'row', marginLeft: 10, alignItems: 'flex-end'

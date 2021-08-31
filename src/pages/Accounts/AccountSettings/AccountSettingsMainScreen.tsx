@@ -181,7 +181,11 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           setCheckAccountModal( false )
         }}
         onBack={() => setCheckAccountModal( false )}
-        onViewAccount={() => setCheckAccountModal( false )}
+        onViewAccount={() => {
+          setCheckAccountModal( false )
+          navigation.pop()
+        }
+        }
         account={primarySubAccount}
       />
     )

@@ -48,7 +48,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         source={getAvatarForSubAccount( primarySubAccount, false, true )}
       />
       {
-        accountShell.primarySubAccount.hasNewTxn && (
+        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration ) && (
           <View style={styles.dot}/>
         )
       }
@@ -67,18 +67,6 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         {primarySubAccount.isTFAEnabled && (
           <Text style={styles.tfaIndicatorText}>2FA</Text>
         )}
-
-        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration &&
-        <View style={{
-          backgroundColor: Colors.lightBlue, borderRadius: widthPercentageToDP( '1%' )
-        }}>
-          <Text style={{
-            margin: heightPercentageToDP( 0.5 ), color: Colors.white, fontSize: RFValue( 10 ),
-          }}>
-            Register
-          </Text>
-        </View>
-        }
       </View>
     </View>
   )
@@ -88,7 +76,7 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
   const totalBalance = AccountShell.getTotalBalance( accountShell )
-
+  // const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   const balanceTextStyle = useMemo( () => {
     return {
       color: accountsState.accountsSynched ? Colors.black : Colors.textColorGrey,
@@ -108,14 +96,24 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
       <Text style={styles.subtitleText} numberOfLines={3}>
         {primarySubAccount.customDescription ?? primarySubAccount.defaultDescription}
       </Text>
+      {
+        ( primarySubAccount.type == AccountType.SWAN_ACCOUNT
+        ||
+        primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ) && !primarySubAccount.isUsable
+          ?
+          <View style={{
+            height: heightPercentageToDP( 3 )
+          }} />
+          :
+          <LabeledBalanceDisplay
+            balance={totalBalance}
+            bitcoinUnit={accountShell.unit}
+            containerStyle={styles.balanceRow}
+            amountTextStyle={balanceTextStyle}
+            isTestAccount={isTestAccount}
+          />
+      }
 
-      <LabeledBalanceDisplay
-        balance={totalBalance}
-        bitcoinUnit={accountShell.unit}
-        containerStyle={styles.balanceRow}
-        amountTextStyle={balanceTextStyle}
-        isTestAccount={isTestAccount}
-      />
     </View>
   )
 }
