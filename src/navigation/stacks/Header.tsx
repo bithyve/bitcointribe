@@ -1408,7 +1408,7 @@ const mapStateToProps = ( state ) => {
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     messages: state.notifications.messages,
-
+    existingFCMToken: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
   }
 }
 
