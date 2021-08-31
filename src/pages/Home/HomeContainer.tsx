@@ -141,6 +141,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               borderRadius: wp( 2 ),
               padding: hp( '1.4%' ),
               flexDirection: 'row',
+              shadowColor: Colors.shadowColor,
+              shadowOpacity: 1,
+              shadowOffset: {
+                width: 10, height: 10
+              },
+              elevation: 6
             }}
             amount={exchangeRates ? exchangeRates[ currencyCode ]?.last.toFixed( 2 ) : ''}
             incramount={''}

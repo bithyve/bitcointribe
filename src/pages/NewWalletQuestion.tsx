@@ -119,6 +119,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     question: '',
   } )
   const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
+  const [ hintInputStyle, setHintInputStyle ] = useState( styles.inputBox )
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
     styles.inputBox,
@@ -488,11 +489,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }} >Use your own{'\n'}encryption password</Text>
           <View
             style={{
-              ...answerInputStyle,
+              ...pswdInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: pswdError ? Colors.red : Colors.backgroundColor1,
+              borderColor: pswdError ? Colors.red : Colors.white,
               marginTop: 10,
               backgroundColor: Colors.white
             }}
@@ -562,11 +563,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View>
           <View
             style={{
-              ...answerInputStyle,
+              ...confirmPswdInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: pswdError ? Colors.red : Colors.borderColor,
+              borderColor: pswdError ? Colors.red : Colors.white,
               marginTop: 10,
               backgroundColor: Colors.white
             }}
@@ -648,7 +649,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           )}
           <View
             style={{
-              ...answerInputStyle,
+              ...hintInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
@@ -677,8 +678,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               onChangeText={( text ) => {
                 setHint( text )
               }}
-              onFocus={() => setShowNote( false )}
-              onBlur={() => setShowNote( true )}
+              onFocus={() => {
+                setShowNote( false )
+                setHintInputStyle( styles.inputBoxFocused )
+              }}
+              onBlur={() => {
+                setShowNote( true )
+                setHintInputStyle( styles.inputBox )
+              }
+              }
             />
             {/* {hintText ? (
               <TouchableWithoutFeedback
@@ -763,7 +771,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
-          backgroundColor: Colors.backgroundColor,
+          backgroundColor: Colors.bgColor,
           // height: `${height}%`
 
         }}
@@ -880,7 +888,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingRight: 15,
-                  borderColor: answerError ? Colors.red : Colors.backgroundColor1,
+                  borderColor: answerError ? Colors.red : Colors.white,
                   backgroundColor: Colors.white
                 }}
               >
@@ -953,7 +961,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   alignItems: 'center',
                   paddingRight: 15,
                   marginTop: 10,
-                  borderColor: answerError ? Colors.red : Colors.backgroundColor1,
+                  borderColor: answerError ? Colors.red : Colors.white,
                   backgroundColor: Colors.white
                 }}
               >
@@ -1331,7 +1339,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 const styles = StyleSheet.create( {
   dropdownBox: {
     flexDirection: 'row',
-    borderColor: Colors.backgroundColor1,
+    borderColor: Colors.white,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1345,7 +1353,7 @@ const styles = StyleSheet.create( {
   },
   dropdownBoxOpened: {
     flexDirection: 'row',
-    borderColor: Colors.backgroundColor1,
+    borderColor: Colors.white,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1427,7 +1435,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2
+      width: 10, height: 10
     },
     backgroundColor: Colors.white,
   },
@@ -1466,11 +1474,13 @@ const styles = StyleSheet.create( {
   },
 
   helpText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansItalic,
     marginRight: wp( 5 ),
     alignSelf: 'flex-end',
-    width: wp( '63%' ),
-    textAlign: 'right'
+    width: wp( '54%' ),
+    textAlign: 'right',
+    marginTop: hp( 0.5 )
   }
 } )

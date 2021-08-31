@@ -7,6 +7,7 @@ import Colors from '../../../common/Colors'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 export type Props = {
   accountShell: AccountShell;
@@ -46,14 +47,18 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
 
       <ListItem.Content>
         <ListItem.Title
-          style={ListStyles.listItemTitle}
+          style={[ ListStyles.listItemTitle, {
+            fontSize: RFValue( 12 )
+          } ]}
           numberOfLines={1}
         >
           {primarySubAccount.customDisplayName || primarySubAccount.defaultTitle}
         </ListItem.Title>
 
         <ListItem.Subtitle
-          style={ListStyles.listItemSubtitle}
+          style={[ ListStyles.listItemSubtitle, {
+            fontSize: RFValue( 10 )
+          } ]}
           numberOfLines={2}
         >
           {primarySubAccount.customDescription || primarySubAccount.defaultDescription}

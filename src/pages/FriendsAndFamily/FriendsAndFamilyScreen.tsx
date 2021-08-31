@@ -578,7 +578,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               shadowOffset: {
                 width: 10, height: 10
               },
-              // shadowRadius: 5,
+              shadowRadius: 10,
               elevation: 2,
               alignSelf: 'center',
               borderRadius: wp( 2 ),
@@ -959,6 +959,7 @@ const styles = StyleSheet.create( {
     height: hp( '70.83%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
+    opacity: 1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,

@@ -23,6 +23,7 @@ export default function BottomInfoBox( props ) {
       }}
     >
       <View>
+        {props.title !== '' &&
         <Text
           style={{
             color: props.titleColor ? props.titleColor : Colors.blue,
@@ -33,6 +34,7 @@ export default function BottomInfoBox( props ) {
         >
           {props.title}
         </Text>
+        }
         <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding ] : styles.bottomNoteInfoText}>
           {props.infoText}
           {props.linkText ? (

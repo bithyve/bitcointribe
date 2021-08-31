@@ -396,14 +396,14 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
     paddingVertical: heightPercentageToDP( 2 ),
     paddingHorizontal: widthPercentageToDP( 4 ),
-    marginTop: heightPercentageToDP( '1%' ),
+    marginTop: heightPercentageToDP( '1.2%' ),
     alignItems: 'center',
-    shadowOpacity: 0.1,
-    shadowColor: Colors.shadowColor,
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
     shadowOffset: {
       width: 10, height: 10
     },
-    shadowRadius: 6,
+    // shadowRadius: 6,
     elevation: 6,
   },
   extraHeight: {
@@ -419,9 +419,9 @@ const styles = StyleSheet.create( {
     width: '90%',
     alignSelf: 'center',
     borderRadius: widthPercentageToDP( '2' ),
-    marginBottom: heightPercentageToDP( '1' ),
-    shadowOpacity: 0.6,
-    shadowColor: Colors.shadowColor,
+    marginBottom: heightPercentageToDP( '1.2' ),
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
     shadowOffset: {
       width: 10, height: 10
     },
