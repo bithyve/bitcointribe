@@ -144,8 +144,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium,
   },
   notificationElement: {
-    paddingLeft: wp( '4%' ),
-    paddingRight: wp( '4%' ),
+    marginHorizontal: wp( '4%' ),
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderColor,
     paddingBottom: wp( '4%' ),
