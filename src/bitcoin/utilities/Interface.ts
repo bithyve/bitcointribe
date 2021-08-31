@@ -636,6 +636,7 @@ export interface NewWalletImage {
   contacts:string[];
   versionHistory: string;
   SM_share: string,
+  primarySeed?: string,
 }
 
 export interface EncryptedImage {

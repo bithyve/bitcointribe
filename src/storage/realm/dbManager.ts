@@ -28,6 +28,9 @@ const createWallet = async ( wallet ) => {
       data.version = wallet.version
     }
   }
+  if( wallet.primarySeed ) {
+    data.primarySeed = wallet.primarySeed
+  }
   try {
     db.create( schema.Wallet, data, true )
     return true

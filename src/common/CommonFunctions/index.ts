@@ -202,7 +202,8 @@ export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer
     accounts : acc,
     versionHistory: STATE_DATA.versionHistory,
     SM_share: walletDB.smShare,
-    details2FA: walletDB.details2FA
+    details2FA: walletDB.details2FA,
+    primarySeed: walletDB.primarySeed,
   }
   const key = BHROperations.strechKey( answer )
   return await encrypt( image, key )
