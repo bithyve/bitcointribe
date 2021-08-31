@@ -408,6 +408,9 @@ export const WalletSchema: ObjectSchema = {
     primaryMnemonic: {
       type: 'string', optional: true,
     },
+    primarySeed: {
+      type: 'string', optional: true,
+    },
     secondaryXpub: {
       type: 'string', optional: true,
     },

@@ -523,6 +523,7 @@ function* recoverWalletWorker( { payload } ) {
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: DeviceInfo.getVersion(),
+      primarySeed: image.primarySeed
     }
     // restore Contacts
     if( contactsChannelKeys.length > 0 ) {
@@ -697,7 +698,6 @@ function* updateWalletImageWorker() {
       } )
     } )
     data.transactions = txns
-    console.log( data )
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
@@ -725,7 +725,8 @@ function* updateWalletImageWorker() {
     accounts : acc,
     versionHistory: STATE_DATA.versionHistory,
     SM_share: wallet.smShare,
-    details2FA: wallet.details2FA
+    details2FA: wallet.details2FA,
+    primarySeed: wallet.primarySeed
   }
 
   const res = yield call( Relay.updateWalletImage, image )
