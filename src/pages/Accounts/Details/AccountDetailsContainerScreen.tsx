@@ -362,7 +362,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <>
+    <View style={{
+      backgroundColor: Colors.backgroundColor, flex: 1
+    }}>
+
+
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
@@ -394,7 +398,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {}} >
         {renderSecureAccountKnowMoreContent()}
       </ModalContainer>
-    </>
+    </View>
   )
 }
 
@@ -405,7 +409,7 @@ const styles = StyleSheet.create( {
 
   scrollViewContainer: {
     paddingTop: 20,
-    height: '100%',
+    // height: '100%',
     paddingHorizontal: 0,
     backgroundColor: Colors.backgroundColor,
   },
