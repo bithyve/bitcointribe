@@ -135,16 +135,17 @@ const styles = StyleSheet.create( {
     paddingRight: 10,
     paddingBottom: hp( '2%' ),
     // paddingTop: hp( '2%' ),
-    marginLeft: wp( '4%' ),
-    marginRight: wp( '4%' ),
+    // marginLeft: wp( '4%' ),
+    // marginRight: wp( '4%' ),
   },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
+    marginHorizontal: wp( 4 )
   },
   notificationElement: {
-    marginHorizontal: wp( '4%' ),
+    paddingHorizontal: wp( '4%' ),
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderColor,
     paddingBottom: wp( '4%' ),
