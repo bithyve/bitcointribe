@@ -48,6 +48,7 @@ function* setupWalletWorker( { payload } ) {
     walletName,
     security,
     primaryMnemonic,
+    primarySeed: primarySeed.toString( 'hex' ),
     accounts: {
     },
     version: DeviceInfo.getVersion()

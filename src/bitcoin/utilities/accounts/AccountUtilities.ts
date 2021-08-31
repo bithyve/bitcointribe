@@ -143,6 +143,18 @@ export default class AccountUtilities {
     return xKey
   };
 
+  static generateExtendedKeyPairFromSeed = ( seed: string, network: bitcoinJS.networks.Network, derivationPath: string ) => {
+    const root = bip32.fromSeed( Buffer.from( seed, 'hex' ), network )
+    const raw_xPriv = root.derivePath( derivationPath )
+    const raw_xPub = raw_xPriv.neutered()
+
+    const xpriv = raw_xPriv.toBase58()
+    const xpub = raw_xPub.toBase58()
+    return {
+      xpriv, xpub
+    }
+  };
+
   static generateChildFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean, shouldNotDerive?: boolean ) => {
     const xKey = bip32.fromBase58( extendedKey, network )
     let childXKey

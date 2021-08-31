@@ -10,7 +10,7 @@ export function generateAccount(
     instanceNum,
     accountName,
     accountDescription,
-    mnemonic,
+    primarySeed,
     derivationPath,
     networkType
   }: {
@@ -19,15 +19,14 @@ export function generateAccount(
     instanceNum: number,
     accountName: string,
     accountDescription: string,
-    mnemonic: string,
+    primarySeed: string,
     derivationPath: string,
     networkType: NetworkType,
   }
 ): Account {
 
   const network = AccountUtilities.getNetworkByType( networkType )
-  const xpub = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath )
-  const xpriv = AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
+  const { xpriv, xpub } = AccountUtilities.generateExtendedKeyPairFromSeed( primarySeed, network, derivationPath )
 
   const id = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
   const initialRecevingAddress = AccountUtilities.getAddressByIndex( xpub, false, 0, network )
@@ -82,7 +81,7 @@ export function generateMultiSigAccount(
     instanceNum,
     accountName,
     accountDescription,
-    mnemonic,
+    primarySeed,
     derivationPath,
     secondaryXpub,
     bithyveXpub,
@@ -93,7 +92,7 @@ export function generateMultiSigAccount(
     instanceNum: number,
     accountName: string,
     accountDescription: string,
-    mnemonic: string,
+    primarySeed: string,
     derivationPath: string,
     secondaryXpub?: string,
     bithyveXpub?: string,
@@ -103,8 +102,7 @@ export function generateMultiSigAccount(
   // Note: only primary-xpubs differs b/w different multi-sig account instance(secondary and bh-xpubs stay constant)
 
   const network = AccountUtilities.getNetworkByType( networkType )
-  const primaryXpub = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath )
-  const primaryXpriv = AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
+  const { xpriv: primaryXpriv, xpub: primaryXpub } = AccountUtilities.generateExtendedKeyPairFromSeed( primarySeed, network, derivationPath )
 
   const xpubs: {
     secondary: string,
@@ -183,7 +181,7 @@ export function generateDonationAccount(
     accountName,
     accountDescription,
     donee,
-    mnemonic,
+    primarySeed,
     derivationPath,
     is2FA,
     secondaryXpub,
@@ -196,7 +194,7 @@ export function generateDonationAccount(
     accountName: string,
     accountDescription: string,
     donee: string,
-    mnemonic: string,
+    primarySeed: string,
     derivationPath: string,
     is2FA?: boolean,
     secondaryXpub?: string,
@@ -212,7 +210,7 @@ export function generateDonationAccount(
     instanceNum,
     accountName,
     accountDescription,
-    mnemonic,
+    primarySeed,
     derivationPath,
     secondaryXpub,
     bithyveXpub,
@@ -226,7 +224,7 @@ export function generateDonationAccount(
         instanceNum,
         accountName,
         accountDescription,
-        mnemonic,
+        primarySeed,
         derivationPath,
         networkType,
       } ),
