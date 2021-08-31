@@ -1,9 +1,8 @@
 import React, {  } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import Colors from '../../../common/Colors'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { ListItem } from 'react-native-elements'
 import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
@@ -12,9 +11,10 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import useAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountShell'
 
 export type Props = {
-  onProceed: () => void;
+  onProceed: ( accountShell ) => void;
   onBack: () => void;
   accountInfo: any;
 };
@@ -28,12 +28,12 @@ const renderAccount = ( accountInfo ) => {
       padding: 10,
       backgroundColor: Colors.backgroundColor1,
     }}>
-      <View style={styles.avatarImage}>
+      <View>
         <Image
-          source={getAvatarForSubAccount( accountInfo )}
+          source={getAvatarForSubAccount( accountInfo, false, true )}
           style={{
-            width: 45,
-            height: 45,
+            width: 54,
+            height: 54,
           }}
           resizeMode="contain"
         />
@@ -78,6 +78,8 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
   onBack,
   accountInfo
 }: Props ) => {
+  const accountShell = useAccountShell( accountInfo.accountShellID )
+
   return (
     <View style={styles.rootContainer}>
 
@@ -88,19 +90,19 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Start showing the account in My Portfolio' : 'Restore the account to Home screen'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Start showing the account in My Accounts' : 'Restore the account to Home screen'}
         </Text>
         {renderAccount( accountInfo )}
 
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'You can hide the account again from my Portfolio from account settings' : 'Once confirmed you can use this account like a normal account from My Portfolio'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'You can hide the account again from My Accounts from account settings' : 'Once confirmed you can use this account like a normal account from My Accounts'}
         </Text>
         <View style={styles.footerSectionContainer}>
           <View style={styles.actionButtonContainer}>
             <TouchableOpacity
-              onPress={onProceed}
+              onPress={( ) => onProceed( accountShell )}
               style={ButtonStyles.primaryActionButton}
             >
               <Text style={ButtonStyles.actionButtonText}>{accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}</Text>
@@ -130,14 +132,14 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: Colors.white,
   },
 
   mainContentContainer: {
     padding: 30,
     paddingBottom: 20,
-    flex: 1,
+    // flex: 1,
   },
 
   footerSectionContainer: {

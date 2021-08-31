@@ -25,7 +25,7 @@ const NewSwanAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated } = useSwanIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from  Swan' )
+  const [ accountDescription, setAccountDescription ] = useState( 'Sats purchased from  Swan' )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   useEffect( ()=>{
     dispatch( clearSwanCache() )
@@ -93,7 +93,7 @@ const NewSwanAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
               <Input
                 inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
                 inputStyle={FormStyles.inputText}
-                placeholder={'Enter A Description'}
+                placeholder={'Enter a description'}
                 placeholderTextColor={FormStyles.placeholderText.color}
                 underlineColorAndroid={FormStyles.placeholderText.color}
                 value={accountDescription}

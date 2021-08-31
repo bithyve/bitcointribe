@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, EncryptedImage } from './Interface'
+import { INotification, EncryptedImage, NewWalletImage } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
 
@@ -73,10 +73,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { updated } = res.data
-      return {
-        updated
-      }
+      return res.data
     } catch ( err ) {
       throw new Error( 'Failed to fetch GetBittr Details' )
     }
@@ -126,7 +123,9 @@ export default class Relay {
           receivers,
           notification,
         } )
-        // console.log({ res });
+        console.log( 'sendNotifications', {
+          res
+        } )
       } catch ( err ) {
         // console.log({ err });
         if ( err.response ) throw new Error( err.response.data.err )
@@ -197,6 +196,135 @@ export default class Relay {
       }
     } catch ( err ) {
       throw new Error( 'Failed to deliver notification' )
+    }
+  };
+
+
+  public static getMessages = async (
+    walletID: string,
+    timeStamp: Date
+  ): Promise<{
+    messages:[];
+  }> => {
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'getMessages', {
+        HEXA_ID,
+        walletID,
+        timeStamp
+      } )
+    } catch ( err ) {
+      console.log( {
+        err
+      } )
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { messages } = res.data
+    return {
+      messages
+    }
+  };
+
+  public static updateMessageStatus = async (
+    walletID: string,
+    data: []
+  ): Promise<{
+    updated: boolean;
+  }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'updateMessages', {
+          HEXA_ID,
+          walletID,
+          data,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { updated } = res.data
+      return {
+        updated
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch GetBittr Details' )
+    }
+  }
+
+  public static walletCheckIn = async (
+    currencyCode?: any,
+  ): Promise<{
+    exchangeRates: { [currency: string]: number };
+    averageTxFees: any;
+  }> => {
+    const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
+      HEXA_ID,
+      ...currencyCode && {
+        currencyCode
+      },
+    } )
+
+    const {
+      exchangeRates,
+      averageTxFees,
+    } = res.data
+
+    return {
+      exchangeRates,
+      averageTxFees,
+    }
+  };
+
+  public static updateWalletImage = async (
+    walletImage: NewWalletImage,
+  ): Promise<{
+
+      status: number;
+      data: {
+        updated: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }  > => {
+    try {
+      const res: AxiosResponse = await BH_AXIOS.post( 'v2/updateWalletImage', {
+        HEXA_ID,
+        walletID: walletImage.walletId,
+        walletImage,
+      } )
+      const { updated } = res.data
+      return {
+        status: res.status,
+        data: updated
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to update Wallet Image' )
+    }
+  };
+
+  public static fetchWalletImage = async ( walletId: string ): Promise<{
+    walletImage: NewWalletImage;
+  }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'v2/fetchWalletImage', {
+          HEXA_ID,
+          walletID: walletId,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { walletImage } = res.data
+      return {
+        walletImage
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch Wallet Image' )
     }
   };
 }

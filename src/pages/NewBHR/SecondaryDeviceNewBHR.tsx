@@ -10,14 +10,14 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 
 
 export default function SecondaryDeviceModelContents( props ) {
   return (
     <View
       style={{
-        height: '100%',
+        // height: '100%',
         backgroundColor: Colors.white,
         borderColor: Colors.borderColor,
         alignSelf: 'center',
@@ -27,7 +27,7 @@ export default function SecondaryDeviceModelContents( props ) {
       <View
         style={{
           ...NavStyles.modalHeaderTitleView,
-          paddingTop: hp( '0.5%' ),
+          paddingTop: hp( '3%' ),
           alignItems: 'center',
           marginLeft: 20,
         }}
@@ -52,7 +52,7 @@ export default function SecondaryDeviceModelContents( props ) {
             <ActivityIndicator size="large" animating color={Colors.gray1}/>
           </View>
         ) : (
-          <QRCode value={props.secondaryQR} size={hp( '27%' )} />
+          <QRCode title="Keeper request" value={props.secondaryQR} size={hp( '27%' )} />
         )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}

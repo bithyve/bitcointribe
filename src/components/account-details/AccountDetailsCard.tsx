@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   View,
   Text,
@@ -22,11 +22,22 @@ import { subAccountSettingsUpdateCompleted } from '../../store/actions/accounts'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import { useSelector } from 'react-redux'
+import ModalContainer from '../home/ModalContainer'
+import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import { useDispatch } from 'react-redux'
+import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { withNavigation } from 'react-navigation'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
+  swanDeepLinkContent: string | null;
+  navigation: any
 };
 
 function backgroundImageForAccountKind(
@@ -83,8 +94,34 @@ const AccountDetailsCard: React.FC<Props> = ( {
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
+  swanDeepLinkContent,
+  navigation
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const [ swanModal, showSwanModal ] = useState( false )
+  const dispatch = useDispatch()
+  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  const isTestAccount = useMemo( () => {
+    return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
+  }, [ accountShell.primarySubAccount.kind ] )
+
+  useEffect( () => {
+    if (
+      startRegistration &&
+        primarySubAccount.kind === SubAccountKind.SERVICE &&
+      ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
+      dispatch( clearSwanCache() )
+      dispatch( updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED ) )
+      // else {
+      //   dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
+      // }
+      setTimeout( () => {
+        showSwanModal( true )
+      }, 600 )
+
+    }
+  }, [] )
 
   const rootContainerStyle = useMemo( () => {
     return {
@@ -103,7 +140,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           marginBottom: 8,
         }}>
           <Image
-            source={getAvatarForSubAccount( primarySubAccount )}
+            source={getAvatarForSubAccount( primarySubAccount, false, false, true )}
             style={styles.accountKindBadgeImage}
           />
 
@@ -152,9 +189,11 @@ const AccountDetailsCard: React.FC<Props> = ( {
           currencyImageStyle={styles.balanceCurrencyIcon}
           bitcoinIconColor="light"
           textColor={Colors.white}
+          isTestAccount={isTestAccount}
         />
-
+        { accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
         <KnowMoreButton />
+        }
       </View>
     )
   }
@@ -195,6 +234,15 @@ const AccountDetailsCard: React.FC<Props> = ( {
 
   return (
     <View style={rootContainerStyle}>
+      <ModalContainer visible={swanModal} closeBottomSheet={() => {}} >
+        <BottomSheetSwanInfo
+          swanDeepLinkContent={swanDeepLinkContent}
+          onClickSetting={() => {
+            showSwanModal( false )
+          }}
+          onPress={() => {showSwanModal( false ); navigation.pop()}}
+        />
+      </ModalContainer>
       <ImageBackground
         source={backgroundImageForAccountKind( primarySubAccount )}
         style={{
@@ -252,8 +300,8 @@ const styles = StyleSheet.create( {
   },
 
   accountKindBadgeImage: {
-    width: 58,
-    height: 58,
+    width: widthPercentageToDP( 16 ),
+    height: widthPercentageToDP( 16 ),
     resizeMode: 'contain',
   },
 
@@ -261,6 +309,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
+    letterSpacing: 0.01
   },
 
   title2Text: {
@@ -306,4 +355,8 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default AccountDetailsCard
+export default withNavigation( AccountDetailsCard )
+
+export {
+  shadowColorForAccountKind
+}

@@ -2,11 +2,14 @@
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
 export const SETUP_WALLET = 'SETUP_WALLET'
+
+export const WALLET_SETUP_COMPLETION = 'WALLET_SETUP_COMPLETION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED'
 export const INIT_RECOVERY_COMPLETED = 'INIT_RECOVERY_COMPLETED'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 
@@ -28,10 +31,20 @@ export const credsAuth = ( passcode, reLogin? ) => {
   }
 }
 
-export const setupWallet = ( walletName, security ) => {
+
+export const setupWallet = ( walletName: string, security: { questionId: string, question: string, answer: string } ) => {
   return {
     type: SETUP_WALLET, payload: {
       walletName, security
+    }
+  }
+}
+
+export const walletSetupCompletion = ( security ) => {
+  return {
+    type: WALLET_SETUP_COMPLETION,
+    payload: {
+      security
     }
   }
 }
@@ -83,6 +96,7 @@ export const WALLET_SETUP_FAILED = 'WALLET_SETUP_FAILED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
 export const PIN_CHANGED_FAILED = 'PIN_CHANGED_FAILED'
+export const UPDATE_APPLICATION = 'UPDATE_APPLICATION'
 
 export const credsStored = () => {
   return {
@@ -154,6 +168,15 @@ export const validatePin = ( passcode ) => {
     }
     return {
       error, key
+    }
+  }
+}
+
+export const updateApplication = ( newVersion: string, previousVersion: string ) => {
+  return {
+    type: UPDATE_APPLICATION,
+    payload: {
+      newVersion, previousVersion
     }
   }
 }

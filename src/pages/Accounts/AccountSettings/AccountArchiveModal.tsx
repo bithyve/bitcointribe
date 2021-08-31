@@ -1,10 +1,9 @@
 import React, {  } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import Colors from '../../../common/Colors'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 export type Props = {
@@ -78,26 +77,27 @@ const AccountArchiveBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
 
   mainContentContainer: {
-    padding: 30,
+    padding: wp( '6%' ),
     paddingBottom: 20,
   },
 
   footerSectionContainer: {
     marginTop: 'auto',
     flexDirection: 'row',
+    // backgroundColor: 'red'
   },
 
   actionButtonContainer: {
-    marginLeft: 20,
+    marginLeft: wp( '6%' ),
     flexDirection: 'row',
     marginTop: 'auto',
     justifyContent:'center',
-    marginBottom: 30
+    marginBottom: hp( '2%' )
   },
   errorImage: {
     width: wp( '31%' ),

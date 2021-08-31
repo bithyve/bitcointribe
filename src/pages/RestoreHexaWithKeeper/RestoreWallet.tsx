@@ -14,10 +14,10 @@ export default function RestoreWallet( props ) {
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerTitleText}>
-            Restore Hexa Wallet
+        Recover Hexa Wallet
         </Text>
         <Text style={styles.headerInfoText}>
-        You have enough Recovery Keys to restore your wallet. Click Restore and you're all done
+        You have enough Recovery Keys to recover your wallet. Click Recover and you're all done
         </Text>
       </View>
       <View style={{

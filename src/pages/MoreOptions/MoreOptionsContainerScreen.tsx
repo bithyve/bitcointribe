@@ -1,14 +1,22 @@
-import React from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, SafeAreaView, ImageSourcePropType } from 'react-native'
+import React, { useMemo, useState } from 'react'
+import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import openLink from '../../utils/OpenLink'
+import Header from '../../navigation/stacks/Header'
+import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import { useSelector, useDispatch } from 'react-redux'
+import { currencyKindSet } from '../../store/actions/preferences'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export type Props = {
   navigation: any;
+  containerStyle: {}
 };
 
 interface MenuOption {
@@ -17,9 +25,24 @@ interface MenuOption {
   imageSource: ImageSourcePropType;
   screenName?: string;
   onOptionPressed?: () => void;
+  // isSwitch: boolean;
 }
 
 const menuOptions: MenuOption[] = [
+  // {
+  //   title: 'Use FaceId',
+  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+  //   subtitle: 'Unlock your wallet using FaceId',
+  //   // screenName: 'FriendsAndFamily',
+  //   isSwitch: true
+  // },
+  // {
+  //   title: 'Dark Mode',
+  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+  //   subtitle: 'Use dark Mode on your wallet',
+  //   // screenName: 'FriendsAndFamily',
+  //   isSwitch: true
+  // },
   {
     title: 'Account Management',
     imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
@@ -31,7 +54,7 @@ const menuOptions: MenuOption[] = [
   leaving the option here so that it can be enabled in a future release.
 
   {
-    title: 'Friends and Family',
+    title: 'Friends & Family',
     imageSource: require( '../../assets/images/icons/addressbook.png' ),
     subtitle: 'View and manage your contacts',
     screenName: 'FriendsAndFamily',
@@ -40,7 +63,7 @@ const menuOptions: MenuOption[] = [
   {
     title: 'Node Settings',
     imageSource: require( '../../assets/images/icons/own-node.png' ),
-    subtitle: 'Connect Hexa wallet to your own Bitcoin node',
+    subtitle: 'Connect Hexa wallet to your own node',
     screenName: 'NodeSettings',
   },
   /*
@@ -54,29 +77,41 @@ const menuOptions: MenuOption[] = [
     screenName: 'FundingSources',
   },
   */
-  {
-    title: 'Hexa Community (Telegram)',
-    imageSource: require( '../../assets/images/icons/telegram.png' ),
-    subtitle: 'Questions, feedback and more',
-    onOptionPressed: () => {
-      Linking.openURL( 'https://t.me/HexaWallet' )
-        .then( ( _data ) => { } )
-        .catch( ( _error ) => {
-          alert( 'Make sure Telegram installed on your device' )
-        } )
-    },
-  },
+  // {
+  //   title: 'Hexa Community (Telegram)',
+  //   imageSource: require( '../../assets/images/icons/telegram.png' ),
+  //   subtitle: 'Questions, feedback and more',
+  //   onOptionPressed: () => {
+  //     Linking.openURL( 'https://t.me/HexaWallet' )
+  //       .then( ( _data ) => { } )
+  //       .catch( ( _error ) => {
+  //         alert( 'Make sure Telegram installed on your device' )
+  //       } )
+  //   },
+  // },
   {
     title: 'Wallet Settings',
     imageSource: require( '../../assets/images/icons/settings.png' ),
-    subtitle: 'Wallet setting and preferences',
+    subtitle: 'Your wallet settings & preferences',
     screenName: 'WalletSettings',
+  },
+  {
+    title: 'App Info',
+    imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    subtitle: 'Hexa app version number and details',
+    screenName: 'AppInfo',
   },
 ]
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
+  const [ isEnabled, setIsEnabled ] = useState( false )
+  const toggleSwitch = () => setIsEnabled( previousState => !previousState )
+  const currencyCode = useSelector(
+    ( state ) => state.preferences.currencyCode,
+  )
 
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
@@ -85,88 +120,262 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) =
       navigation.navigate( menuOption.screenName )
     }
   }
+  const dispatch = useDispatch()
+
+  const currencyKind: CurrencyKind = useCurrencyKind()
+
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   return (
-    <SafeAreaView style={styles.modalContentContainer}>
-      <View style={{
-        flex: 1
-      }}>
-        <FlatList
-          data={menuOptions}
-          keyExtractor={listItemKeyExtractor}
-          ItemSeparatorComponent={() => (
-            <View style={{
-              backgroundColor: Colors.white
-            }}>
-              <View style={styles.separatorView} />
+    <View style={{
+      backgroundColor: Colors.blue
+    }}>
+      <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+      {/* <Header from={'More'} /> */}
+      <View style={styles.accountCardsSectionContainer}>
+
+        <Text style={{
+          color: Colors.blue,
+          fontSize: RFValue( 18 ),
+          letterSpacing: 0.54,
+          // marginLeft: 2,
+          fontFamily: Fonts.FiraSansMedium,
+          paddingTop: heightPercentageToDP( 4 ),
+          paddingLeft: widthPercentageToDP( 4 ),
+          paddingBottom: heightPercentageToDP( 1 )
+        }}>
+            Settings & More
+        </Text>
+        {/* <View style={{
+            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
+          }}>
+            <Image
+              source={require( '../../assets/images/icons/recurring_buy.png' )}
+              style={{
+                width: widthPercentageToDP( 8 ),
+                height: widthPercentageToDP( 8 ),
+              }}
+            />
+            <View>
+              <Text style={styles.addModalTitleText}>
+          Show in Bitcoin
+              </Text>
+              <Text style={styles.addModalInfoText}>
+        Lorem ipsum dolor sit amet, consectetur
+              </Text>
             </View>
-          )}
-          renderItem={( { item: menuOption }: { item: MenuOption } ) => {
-            return <AppBottomSheetTouchableWrapper
-              onPress={() => handleOptionSelection( menuOption )}
-              style={styles.addModalView}
-            >
-              <View style={styles.modalElementInfoView}>
+            <CurrencyKindToggleSwitch
+              fiatCurrencyCode={currencyCode}
+              onpress={() => {
+                dispatch(
+                  currencyKindSet(
+                    prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                  )
+                )
+              }}
+              isOn={prefersBitcoin}
+            />
+          </View> */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingVertical: heightPercentageToDP( 3 ),
+          }}>
+          <FlatList
+            data={menuOptions}
+            keyExtractor={listItemKeyExtractor}
+            // ItemSeparatorComponent={() => (
+            //   <View style={{
+            //     backgroundColor: Colors.white
+            //   }}>
+            //     <View style={styles.separatorView} />
+            //   </View>
+            // )}
+            renderItem={( { item: menuOption }: { item: MenuOption } ) => {
+              return <AppBottomSheetTouchableWrapper
+                onPress={() => handleOptionSelection( menuOption )}
+                style={styles.addModalView}
+              >
+                <View style={styles.modalElementInfoView}>
+                  <View style={{
+                    justifyContent: 'center',
+                  }}>
+                    <Image
+                      source={menuOption.imageSource}
+                      style={{
+                        width: 25, height: 25, resizeMode: 'contain'
+                      }}
+                    />
+                  </View>
+                  <View style={{
+                    justifyContent: 'center', marginLeft: 10
+                  }}>
+                    <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
+                    <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
+                  </View>
+                  {/* {menuOption.isSwitch &&
                 <View style={{
-                  justifyContent: 'center'
+                  alignItems: 'flex-end',
+                  marginLeft: 'auto'
                 }}>
-                  <Image
-                    source={menuOption.imageSource}
-                    style={{
-                      width: 25, height: 25, resizeMode: 'contain'
+                  <Switch
+                    value={isEnabled}
+                    onValueChange={toggleSwitch}
+                    thumbColor={isEnabled ? Colors.blue : Colors.white}
+                    trackColor={{
+                      false: Colors.borderColor, true: Colors.lightBlue
                     }}
+                    onTintColor={Colors.blue}
                   />
                 </View>
-                <View style={{
-                  justifyContent: 'center', marginLeft: 10
-                }}>
-                  <Text style={styles.addModalTitleText}>{menuOption.title} </Text>
-                  <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
+                  } */}
                 </View>
-              </View>
-            </AppBottomSheetTouchableWrapper>
-          }}
-        />
+                <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+                  style={{
+                    width: widthPercentageToDP( '2.5%' ),
+                    height: widthPercentageToDP( '2.5%' ),
+                    alignSelf: 'center',
+                    resizeMode: 'contain'
+                  }}
+                />
+
+              </AppBottomSheetTouchableWrapper>
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL( 'https://hexawallet.io/faq/' )
+                .then( ( _data ) => { } )
+                .catch( ( _error ) => {
+                  alert( 'Make sure Telegram installed on your device' )
+                } )
+            }}
+            style={[ styles.otherCards, styles.extraHeight ]}
+          >
+            <Image
+              source={require( '../../assets/images/icons/question_active.png' )}
+              style={{
+                width: widthPercentageToDP( 8 ),
+                height: widthPercentageToDP( 8 ),
+              }}
+            />
+            <View style={{
+              marginLeft: 10
+            }}>
+              <Text style={styles.addModalTitleText}>
+              FAQ
+              </Text>
+              <Text style={styles.addModalInfoText}>
+              Your questions answered
+              </Text>
+            </View>
+            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+              style={{
+                width: widthPercentageToDP( '2.5%' ),
+                height: widthPercentageToDP( '2.5%' ),
+                alignSelf: 'center',
+                marginLeft: 'auto',
+                resizeMode: 'contain'
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL( 'https://t.me/HexaWallet' )
+                .then( ( _data ) => { } )
+                .catch( ( _error ) => {
+                  alert( 'Make sure Telegram installed on your device' )
+                } )
+            }}
+            style={styles.otherCards}
+          >
+            <Image
+              source={require( '../../assets/images/icons/icon_telegram.png' )}
+              style={{
+                width: widthPercentageToDP( 7 ),
+                height: widthPercentageToDP( 7 ),
+                resizeMode: 'contain'
+              }}
+            />
+            <View style={{
+              marginLeft: 10
+            }}>
+              <Text style={styles.addModalTitleText}>
+              Hexa Community Telegram Group
+              </Text>
+              <Text style={styles.addModalInfoText}>
+              Questions, feedback and more
+              </Text>
+
+            </View>
+            <Image
+              source={require( '../../assets/images/icons/link.png' )}
+              style={{
+                width: widthPercentageToDP( 4 ),
+                height: widthPercentageToDP( 4 ),
+                resizeMode: 'contain',
+                marginLeft: 'auto'
+              }}
+            />
+          </TouchableOpacity>
+          {/* </View> */}
+
+          {/* <View
+          style={styles.webLinkBarContainer}
+        >
+          <AppBottomSheetTouchableWrapper
+            onPress={() => openLink( 'http://hexawallet.io/faq' )}
+          >
+            <Text style={styles.addModalTitleText}>FAQs</Text>
+          </AppBottomSheetTouchableWrapper>
+
+          <View
+            style={{
+              height: 20, width: 1, backgroundColor: Colors.borderColor
+            }}
+          />
+
+          <AppBottomSheetTouchableWrapper
+            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+          >
+            <Text style={styles.addModalTitleText}>Terms of Service</Text>
+          </AppBottomSheetTouchableWrapper>
+
+          <View
+            style={{
+              height: 20, width: 1, backgroundColor: Colors.borderColor
+            }}
+          />
+
+          <AppBottomSheetTouchableWrapper
+            onPress={() => openLink( 'http://hexawallet.io/privacy-policy' )}
+          >
+            <Text style={styles.addModalTitleText}>Privacy Policy</Text>
+          </AppBottomSheetTouchableWrapper>
+        </View> */}
+        </ScrollView>
       </View>
-
-      <View
-        style={styles.webLinkBarContainer}
-      >
-        <AppBottomSheetTouchableWrapper
-          onPress={() => openLink( 'http://hexawallet.io/faq' )}
-        >
-          <Text style={styles.addModalTitleText}>FAQs</Text>
-        </AppBottomSheetTouchableWrapper>
-
-        <View
-          style={{
-            height: 20, width: 1, backgroundColor: Colors.borderColor
-          }}
-        />
-
-        <AppBottomSheetTouchableWrapper
-          onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
-        >
-          <Text style={styles.addModalTitleText}>Terms of Service</Text>
-        </AppBottomSheetTouchableWrapper>
-
-        <View
-          style={{
-            height: 20, width: 1, backgroundColor: Colors.borderColor
-          }}
-        />
-
-        <AppBottomSheetTouchableWrapper
-          onPress={() => openLink( 'http://hexawallet.io/privacy-policy' )}
-        >
-          <Text style={styles.addModalTitleText}>Privacy Policy</Text>
-        </AppBottomSheetTouchableWrapper>
-      </View>
-    </SafeAreaView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create( {
+  accountCardsSectionContainer: {
+    height: heightPercentageToDP( '70.83%' ),
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor1,
+    borderTopLeftRadius: 25,
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: {
+      width: 2,
+      height: -1,
+    },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   modalContentContainer: {
     flex: 1,
     justifyContent: 'space-between',
@@ -178,14 +387,46 @@ const styles = StyleSheet.create( {
     height: 2,
     backgroundColor: Colors.backgroundColor,
   },
-
-  addModalView: {
+  otherCards: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
     backgroundColor: Colors.white,
+    paddingVertical: heightPercentageToDP( 2 ),
+    paddingHorizontal: widthPercentageToDP( 4 ),
+    marginTop: heightPercentageToDP( '1%' ),
+    alignItems: 'center',
+    shadowOpacity: 0.1,
+    shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  extraHeight: {
+    marginTop: heightPercentageToDP( '3%' ),
+  },
+  addModalView: {
+    backgroundColor: Colors.gray7,
     paddingVertical: 4,
-    paddingHorizontal: 24,
+    paddingHorizontal: widthPercentageToDP( 5 ),
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-between',
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+    marginBottom: heightPercentageToDP( '1' ),
+    shadowOpacity: 0.6,
+    shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 5,
   },
 
   addModalTitleText: {
@@ -202,10 +443,11 @@ const styles = StyleSheet.create( {
   },
 
   modalElementInfoView: {
-    margin: 10,
+    flex: 1,
+    marginVertical: 10,
     height: heightPercentageToDP( '5%' ),
     flexDirection: 'row',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
   },
 

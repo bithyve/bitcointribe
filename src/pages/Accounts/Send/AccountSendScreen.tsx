@@ -1,10 +1,8 @@
 import React, { ReactElement, useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import Colors from '../../../common/Colors'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CoveredQRCodeScanner from '../../../components/qr-code-scanning/CoveredQRCodeScanner'
 import RecipientAddressTextInputSection from '../../../components/send/RecipientAddressTextInputSection'
@@ -14,13 +12,11 @@ import { ContactRecipientDescribing, RecipientDescribing } from '../../../common
 import { BarCodeReadEvent } from 'react-native-camera'
 import { KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-view'
 import { makeAccountRecipientDescription } from '../../../utils/sending/RecipientFactories'
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
-import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import RecipientKind from '../../../common/data/enums/RecipientKind'
 import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
 
 export type Props = {
-  primarySubAccount: SubAccountDescribing;
+  accountShell: AccountShell;
   sendableContacts: ContactRecipientDescribing[];
   sendableAccountShells: AccountShell[];
   onQRScanned: ( { data: barcodeDataString }: BarCodeReadEvent ) => void;
@@ -50,7 +46,7 @@ function renderSectionHeader(
 }
 
 const AccountSendScreen: React.FC<Props> = ( {
-  primarySubAccount,
+  accountShell,
   sendableContacts,
   sendableAccountShells,
   onQRScanned,
@@ -66,7 +62,7 @@ const AccountSendScreen: React.FC<Props> = ( {
 
   const isShowingSelectableAccountsSection = useMemo( () => {
     return Boolean( sendableAccountShells.length )
-  }, [ sendableAccountShells, primarySubAccount.kind ] )
+  }, [ sendableAccountShells, accountShell.primarySubAccount.kind ] )
 
   const selectedContactRecipients = useMemo( () => {
     return selectedRecipients.filter( recipient => recipient.kind == RecipientKind.CONTACT )
@@ -101,10 +97,11 @@ const AccountSendScreen: React.FC<Props> = ( {
               <View style={styles.viewSectionContainer}>
                 <RecipientAddressTextInputSection
                   containerStyle={{
-                    ...styles.viewSectionContentContainer, margin: 0
+                    width: widthPercentageToDP( 95 ),
+                    alignSelf: 'center'
                   }}
                   placeholder="Enter address manually"
-                  sourceAccountKind={primarySubAccount.sourceKind}
+                  accountShell={accountShell}
                   onAddressEntered={onAddressSubmitted}
                   onPaymentURIEntered={onPaymentURIEntered}
                 />
@@ -121,7 +118,7 @@ const AccountSendScreen: React.FC<Props> = ( {
                 <View style={styles.viewSectionContentContainer}>
                   {( sendableContacts.length && (
                     <RecipientSelectionStrip
-                      accountKind={primarySubAccount.kind}
+                      accountKind={accountShell.primarySubAccount.kind}
                       recipients={sendableContacts}
                       selectedRecipients={selectedContactRecipients}
                       onRecipientSelected={onRecipientSelected}
@@ -147,7 +144,7 @@ const AccountSendScreen: React.FC<Props> = ( {
             <View style={styles.viewSectionContainer}>
               <View style={styles.viewSectionContentContainer}>
                 <RecipientSelectionStrip
-                  accountKind={primarySubAccount.kind}
+                  accountKind={accountShell.primarySubAccount.kind}
                   recipients={accountRecipients}
                   selectedRecipients={selectedAccountRecipients}
                   onRecipientSelected={onRecipientSelected}
@@ -158,7 +155,7 @@ const AccountSendScreen: React.FC<Props> = ( {
         },
       } ] : [] ),
     ]
-  }, [] )
+  }, [ sendableContacts ] )
 
   return (
     <View style={styles.rootContainer}>
@@ -196,7 +193,7 @@ const styles = StyleSheet.create( {
   },
 
   viewSectionContentContainer: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 20,
   },
 
   listSectionHeading: {
@@ -207,8 +204,8 @@ const styles = StyleSheet.create( {
   },
 
   qrScannerContainer: {
-    width: '100%',
-    maxWidth: qrScannerHeight * ( 1.31 ),
+    // width: '100%',
+    // maxWidth: qrScannerHeight * ( 1.40 ),
     height: qrScannerHeight,
     marginBottom: 9,
   },

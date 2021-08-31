@@ -8,14 +8,14 @@ import {
 } from 'react-native-responsive-screen'
 
 export enum BottomTab {
-  Transactions,
+  Home,
   FriendsAndFamily,
-  QR,
-  More,
+  SecurityAndPrivacy,
+  Settings,
 }
 
 export interface Props {
-  isEnabled: boolean;
+  // isEnabled: boolean;
   tabBarZIndex?: number;
   selectedTab?: BottomTab | null;
   onSelect: ( tab: BottomTab ) => void;
@@ -29,7 +29,7 @@ type TabItem = {
 
 const tabItems: TabItem[] = [
   {
-    tab: BottomTab.Transactions,
+    tab: BottomTab.Home,
     activeImageSource: require( '../../assets/images/HomePageIcons/icon_transactions_active.png' ),
     inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_transactions.png' ),
   },
@@ -39,12 +39,12 @@ const tabItems: TabItem[] = [
     inactiveImageSource: require( '../../assets/images/icons/icon_contact.png' ),
   },
   {
-    tab: BottomTab.QR,
+    tab: BottomTab.SecurityAndPrivacy,
     activeImageSource: require( '../../assets/images/HomePageIcons/icon_qr_active.png' ),
     inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_qr.png' ),
   },
   {
-    tab: BottomTab.More,
+    tab: BottomTab.Settings,
     activeImageSource: require( '../../assets/images/HomePageIcons/icon_more.png' ),
     inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_more.png' ),
   },
@@ -83,12 +83,13 @@ const Tab: React.FC<TabViewProps> = ( {
 }
 
 const CustomBottomTabs: React.FC<Props> = ( {
-  isEnabled,
+  // isEnabled,
   tabBarZIndex = 1,
   onSelect,
   selectedTab,
 }: Props ) => {
   return (
+    <View style={styles.bottomTabBarMainView}>
     <View style={{
       ...styles.bottomTabBarContainer, zIndex: tabBarZIndex
     }}>
@@ -99,28 +100,36 @@ const CustomBottomTabs: React.FC<Props> = ( {
             tabItem={tabItem}
             isActive={selectedTab == tabItem.tab}
             onPress={() => {
-              if ( isEnabled ) {
+              // if ( isEnabled ) {
                 onSelect( tabItem.tab )
-              }
+              // }
             }}
           />
         )
       } )}
     </View>
+    </View>
   )
 }
 
-export const TAB_BAR_HEIGHT = hp( '12%' )
+export const TAB_BAR_HEIGHT = hp( '9%' )
 
 const styles = StyleSheet.create( {
-
-  bottomTabBarContainer: {
+  bottomTabBarMainView: {
     backgroundColor: Colors.white,
+    paddingBottom: DeviceInfo.hasNotch() ? hp( '4%' ) : hp( '1%' ),
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  bottomTabBarContainer: {
+    backgroundColor: Colors.blue,
+    borderRadius: wp ( 10 ),
     justifyContent: 'space-evenly',
     display: 'flex',
     marginTop: 'auto',
     flexDirection: 'row',
     height: TAB_BAR_HEIGHT,
+    width: wp ( '98%' ),
     alignItems: 'center',
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
@@ -128,7 +137,7 @@ const styles = StyleSheet.create( {
     borderRightWidth: 1,
     borderTopColor: Colors.borderColor,
     borderTopWidth: 1,
-    paddingBottom: DeviceInfo.hasNotch() ? hp( '4%' ) : 0,
+    // paddingBottom: DeviceInfo.hasNotch() ? hp( '4%' ) : 0,
   },
 
   tabBarTabView: {

@@ -93,7 +93,7 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ( {
 const styles = StyleSheet.create( {
   rootContainer: {
     backgroundColor: Colors.blue,
-    flex: 1,
+    // flex: 1,
   },
 
   handleContainer: {
@@ -101,7 +101,7 @@ const styles = StyleSheet.create( {
   },
 
   contentContainer: {
-    shadowOpacity: 0,
+    // shadowOpacity: 0,
   },
 } )
 

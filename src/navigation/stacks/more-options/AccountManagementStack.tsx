@@ -60,26 +60,29 @@ const AccountManagementStack = createStackNavigator(
   {
     AccountManagementRoot: {
       screen: AccountManagementContainerScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: 'Account Management',
-          headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-          },
-          headerRight: () => {
-            //
-            // 📝 Hiding this button for now until we have supporting functionality.
-            // (See: https://github.com/bithyve/hexa/issues/2454)
-            //
-
-            return (
-              <NavHeaderSettingsButton
-                onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
-              />
-            )
-          },
-        }
+      navigationOptions: {
+        header: null,
       },
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: 'Account Management',
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+      //     },
+      //     headerRight: () => {
+      //       //
+      //       // 📝 Hiding this button for now until we have supporting functionality.
+      //       // (See: https://github.com/bithyve/hexa/issues/2454)
+      //       //
+
+      //       return (
+      //         <NavHeaderSettingsButton
+      //           onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+      //         />
+      //       )
+      //     },
+      //   }
+      // },
     },
     PanAccountSettings: {
       screen: PanAccountSettingsStack,
@@ -89,7 +92,7 @@ const AccountManagementStack = createStackNavigator(
     },
   },
   {
-    mode: 'modal',
+    // mode: 'modal',
     defaultNavigationOptions: () => {
       return {
         ...defaultStackScreenNavigationOptions,

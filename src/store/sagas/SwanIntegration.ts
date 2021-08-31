@@ -35,10 +35,11 @@ import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import AccountShell from '../../common/data/models/AccountShell'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
-import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, AccountType, DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import { addNewAccount, generateShellFromAccount } from './accounts'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
 const redirect_uri = Config.SWAN_REDIRECT_URL
@@ -61,7 +62,6 @@ client_id=${Config.SWAN_CLIENT_ID}\
 &code_challenge_method=S256\
 &response_mode=query\
 `
-
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
   } ) )
@@ -97,7 +97,7 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
   yield call( createWithdrawalWalletOnSwanWorker, {
     payload: {
       data: {
-        minBtcThreshold: 0.02
+        minBtcThreshold: 0.01
       }
     }
   } )
@@ -115,12 +115,25 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   const { swanAuthenticatedToken, minBtcThreshold } = yield select(
     ( state ) => state.swanIntegration
   )
-  const { swanAccountDetails } = yield select(
-    ( state ) => state.swanIntegration
-  )
 
-  const swanXpub = swanAccountDetails.xPub
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accounts: Accounts = accountState.accounts
+
+  let swanAccountDetails = null
+
+  for ( const key in accounts ) {
+
+    if( accounts[ key ].type ==='SWAN_ACCOUNT' )
+
+      swanAccountDetails = accounts[ key ]
+  }
+
+  const swanXpub = swanAccountDetails.xpub
+
   let swanCreateResponse
+
   try {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
       access_token: swanAuthenticatedToken,
@@ -146,35 +159,23 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   } ) )
 }
 
-function* createTempSwanAccountInfo( { payload: subAccountInfo, }: {
-  payload: SubAccountDescribing;
-} ) {
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const network = accountsState[ REGULAR_ACCOUNT ].service.hdWallet.network
-
-  try {
-    const swanAccountDetails = {
-      accountName: subAccountInfo.customDisplayName || subAccountInfo.defaultTitle,
-      accountDescription: subAccountInfo.customDescription || subAccountInfo.defaultDescription,
-      xPub: ''
+function* createTempSwanAccountInfo( { payload }: {
+  payload: {
+    accountDetails: {
+      name: string,
+      description: string,
     }
-    const service = yield select(
-      ( state ) => state.accounts[ subAccountInfo.sourceKind ].service
-    )
-    const res = yield call(
-      service.setupDerivativeAccount,
-      DerivativeAccountTypes.SWAN,
-      swanAccountDetails
-    )
-
-    const subAccountXpub = res.data.accountXpub
-    subAccountInfo.xPub = Bitcoin.generateYpub( subAccountXpub, network )
-    swanAccountDetails.xPub = Bitcoin.generateYpub( subAccountXpub, network )
-
-    yield put( tempSwanAccountInfoSaved( swanAccountDetails ) )
-  } catch ( error ) {
-    console.log( 'createTempSwanAccountInfo saga::error: ' + error )
   }
+} ) {
+  const { accountDetails } = payload
+  const account: Account = yield call(
+    addNewAccount,
+    AccountType.SWAN_ACCOUNT,
+    accountDetails,
+  )
+  const accountShell = yield call( generateShellFromAccount, account )
+
+  yield put( tempSwanAccountInfoSaved( accountShell ) )
 }
 
 export const addTempSwanAccountInfoWatcher = createWatcher( createTempSwanAccountInfo, CREATE_TEMP_SWAN_ACCOUNT_INFO )

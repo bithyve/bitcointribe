@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { ActionMenuItem } from './RampIntegrationScreen'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import useRampIntegrationState from '../../utils/hooks/state-selectors/accounts/UseRampIntegrationState'
 import { RampActionKind } from '../../store/actions/RampIntegration'
 import useRampIntegrationResultFromAction from '../../utils/hooks/ramp-integration/UseRampIntegrationResultFromAction'
@@ -23,7 +22,7 @@ const ActionMenuListItem: React.FC<Props> = ( {
 
   return (
     <View style={{
-      ...styles.rootContainer, ...containerStyle 
+      ...styles.rootContainer, ...containerStyle
     }}>
 
       <TouchableOpacity
@@ -37,7 +36,7 @@ const ActionMenuListItem: React.FC<Props> = ( {
       <Text style={styles.subtitleText}>{actionItem.subtitle}</Text>
 
       <View style={{
-        flexDirection: 'row' 
+        flexDirection: 'row'
       }}>
         <Text style={styles.resultTextLabel}>Result: </Text>
         <Text style={styles.resultTextValue}>{actionResultText}</Text>

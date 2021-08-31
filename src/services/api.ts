@@ -9,7 +9,7 @@ const api = axios.create( {
 
 export const BH_AXIOS = axios.create( {
   baseURL: RELAY,
-  timeout: REQUEST_TIMEOUT,
+  timeout: REQUEST_TIMEOUT * 3,
 } )
 
 export const SIGNING_AXIOS: AxiosInstance = axios.create( {

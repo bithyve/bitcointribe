@@ -38,9 +38,9 @@ export default function KeeperTypeModalContents( props ) {
     name: '',
   } )
   const levelHealth: LevelHealthInterface[] = useSelector(
-    ( state ) => state.health.levelHealth
+    ( state ) => state.bhr.levelHealth
   )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const [ completedKeeperType, setCompletedKeeperType ] = useState( [] )
 
   const restrictChangeToContactType = () => {
@@ -50,16 +50,16 @@ export default function KeeperTypeModalContents( props ) {
     let deviceCount = 0
     let levelhealth: LevelHealthInterface[] = []
     if (
+      !levelHealth[ 1 ] &&
+      levelHealth[ 0 ] &&
+      levelHealth[ 0 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1
+    )
+      levelhealth = [ levelHealth[ 0 ] ]
+    if (
       levelHealth[ 1 ] &&
       levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1
     )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if (
-      levelHealth[ 2 ] &&
-      levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1
-    )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( levelHealth[ 2 ] && currentLevel == 3 ) levelhealth = [ levelHealth[ 2 ] ]
+      levelhealth = [ levelHealth[ 0 ], levelHealth[ 1 ] ]
     for ( let i = 0; i < levelhealth.length; i++ ) {
       const element = levelhealth[ i ]
       for ( let j = 2; j < element.levelInfo.length; j++ ) {
@@ -67,14 +67,14 @@ export default function KeeperTypeModalContents( props ) {
         if (
           props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'contact' &&
+          ( element2.shareType == 'contact' || element2.shareType == 'existingContact' ) &&
           props.keeper.shareId != element2.shareId
         ) {
           contactCount++
         } else if (
           !props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'contact'
+          ( element2.shareType == 'contact' || element2.shareType == 'existingContact' )
         )
           contactCount++
         if (
@@ -93,25 +93,26 @@ export default function KeeperTypeModalContents( props ) {
         if (
           props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'device' &&
+          ( element2.shareType == 'device' || element2.shareType == 'primaryDevice' ) &&
           props.keeper.shareId != element2.shareId
         ) {
           deviceCount++
         } else if (
           !props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'device'
+          ( element2.shareType == 'device' || element2.shareType == 'primaryDevice' )
         ) {
           deviceCount++
         }
       }
     }
-    // console.log("contactCount", contactCount);
-    // console.log("pdfCount", pdfCount);
-    // console.log("deviceCount", deviceCount);
     if ( contactCount >= 2 ) completedKeeperType.push( 'contact' )
     if ( pdfCount >= 1 ) completedKeeperType.push( 'pdf' )
-    if ( deviceCount >= 2 ) completedKeeperType.push( 'device' )
+    if ( deviceCount >= 3 ) completedKeeperType.push( 'device' )
+    console.log( 'contactCount', contactCount )
+    console.log( 'pdfCount', pdfCount )
+    console.log( 'deviceCount', deviceCount )
+
     setCompletedKeeperType( completedKeeperType )
   }
 
@@ -133,85 +134,85 @@ export default function KeeperTypeModalContents( props ) {
 
   return (
     <View style={{
-      ...styles.modalContentContainer, height: '100%'
+      ...styles.modalContentContainer
     }}>
-      <View style={{
+      {/* <View style={{
         height: '100%'
-      }}>
-        <View style={styles.successModalHeaderView}>
-          <Text style={styles.headerText}>{props.headerText}</Text>
-          <Text
-            style={{
-              ...styles.modalInfoText,
-              marginTop: wp( '1.5%' ),
-              color: Colors.lightTextColor,
-            }}
-          >
-            {props.subHeader}
-          </Text>
-        </View>
-        <View
+      }}> */}
+      <View style={styles.successModalHeaderView}>
+        <Text style={styles.headerText}>{props.headerText}</Text>
+        <Text
           style={{
-            ...styles.successModalAmountView,
-            flex: 1,
+            ...styles.modalInfoText,
+            marginTop: wp( '1.5%' ),
+            color: Colors.lightTextColor,
           }}
         >
-          {keeperTypesData.map( ( value, index ) => {
-            if (
-              value.type === 'pdf' &&
+          {props.subHeader}
+        </Text>
+      </View>
+      <View
+        style={{
+          ...styles.successModalAmountView,
+          // flex: 1,
+        }}
+      >
+        {keeperTypesData.map( ( value, index ) => {
+          if (
+            value.type === 'pdf' &&
               completedKeeperType.findIndex( ( value ) => value == 'pdf' ) > -1
-            ) {
-              return
-            }
-            if (
-              value.type === 'contact' &&
+          ) {
+            return
+          }
+          if (
+            value.type === 'contact' &&
               completedKeeperType.findIndex( ( value ) => value == 'contact' ) > -1
-            ) {
-              return
-            }
-            if (
-              value.type === 'device' &&
+          ) {
+            return
+          }
+          if (
+            value.type === 'device' &&
               completedKeeperType.findIndex( ( value ) => value == 'device' ) > -1
-            ) {
-              return
-            }
-            return (
-              <AppBottomSheetTouchableWrapper
-                activeOpacity={10}
-                onPress={() => onKeeperSelect( value )}
-                style={styles.keeperTypeElementView}
-                key={index}
-              >
-                <View style={styles.typeRadioButtonView}>
-                  <RadioButton
-                    size={15}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={value.type == SelectedKeeperType.type}
-                    onpress={() => onKeeperSelect( value )}
-                  />
-                </View>
-                <Image
-                  style={{
-                    width: wp( '9%' ),
-                    height: wp( '9%' ),
-                    resizeMode: 'contain',
-                    alignSelf: 'center',
-                    marginRight: wp( '5%' ),
-                  }}
-                  source={value.image}
+          ) {
+            return
+          }
+          return (
+            <AppBottomSheetTouchableWrapper
+              activeOpacity={10}
+              onPress={() => onKeeperSelect( value )}
+              style={styles.keeperTypeElementView}
+              key={index}
+            >
+              <View style={styles.typeRadioButtonView}>
+                <RadioButton
+                  size={15}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={value.type == SelectedKeeperType.type}
+                  onpress={() => onKeeperSelect( value )}
                 />
-                <View>
-                  <Text style={styles.keeperTypeTitle}>{value.name}</Text>
-                  <Text numberOfLines={2} style={styles.keeperTypeInfo}>
-                    {value.info}
-                  </Text>
-                </View>
-              </AppBottomSheetTouchableWrapper>
-            )
-          } )}
-        </View>
-        {/* <View style={styles.successModalAmountView}>
+              </View>
+              <Image
+                style={{
+                  width: wp( '9%' ),
+                  height: wp( '9%' ),
+                  resizeMode: 'contain',
+                  alignSelf: 'center',
+                  marginRight: wp( '5%' ),
+                }}
+                source={value.image}
+              />
+              <View>
+                <Text style={styles.keeperTypeTitle}>{value.name}</Text>
+                <Text numberOfLines={2} style={styles.keeperTypeInfo}>
+                  {value.info}
+                </Text>
+              </View>
+            </AppBottomSheetTouchableWrapper>
+          )
+        } )}
+      </View>
+      {/* <View style={styles.successModalAmountView}>
           <Text
             style={{
               ...styles.modalInfoText,
@@ -223,52 +224,52 @@ export default function KeeperTypeModalContents( props ) {
             eiusmod tempor incididunt ut labore et dolore.
           </Text>
         </View>*/}
-        <View style={styles.bottomButtonView}>
-          <AppBottomSheetTouchableWrapper
-            disabled={!SelectedKeeperType.name}
-            onPress={() => {
-              props.onPressSetup(
-                SelectedKeeperType.type,
-                SelectedKeeperType.name
-              )
-            }}
+      <View style={styles.bottomButtonView}>
+        <AppBottomSheetTouchableWrapper
+          disabled={!SelectedKeeperType.name}
+          onPress={() => {
+            props.onPressSetup(
+              SelectedKeeperType.type,
+              SelectedKeeperType.name
+            )
+          }}
+          style={{
+            ...styles.successModalButtonView,
+            shadowColor: Colors.shadowBlue,
+            backgroundColor: !SelectedKeeperType.name ? Colors.lightBlue : Colors.blue,
+          }}
+        >
+          <Text
             style={{
-              ...styles.successModalButtonView,
-              shadowColor: Colors.shadowBlue,
-              backgroundColor: !SelectedKeeperType.name ? Colors.lightBlue : Colors.blue,
+              ...styles.proceedButtonText,
+              color: Colors.white,
             }}
           >
-            <Text
-              style={{
-                ...styles.proceedButtonText,
-                color: Colors.white,
-              }}
-            >
                Share Recovery Key
-            </Text>
-          </AppBottomSheetTouchableWrapper>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressBack()}
-            style={styles.backButtonView}
+          </Text>
+        </AppBottomSheetTouchableWrapper>
+        <AppBottomSheetTouchableWrapper
+          onPress={() => props.onPressBack()}
+          style={styles.backButtonView}
+        >
+          <Text
+            style={{
+              ...styles.proceedButtonText,
+              color: Colors.blue,
+            }}
           >
-            <Text
-              style={{
-                ...styles.proceedButtonText,
-                color: Colors.blue,
-              }}
-            >
               Back
-            </Text>
-          </AppBottomSheetTouchableWrapper>
-        </View>
+          </Text>
+        </AppBottomSheetTouchableWrapper>
       </View>
+      {/* </View> */}
     </View>
   )
 }
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
@@ -301,6 +302,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '8%' ),
+    marginTop: hp( '3%' )
   },
   proceedButtonText: {
     color: Colors.white,
@@ -340,6 +342,7 @@ const styles = StyleSheet.create( {
     width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: hp( '3%' )
   },
   keeperTypeElementView: {
     flexDirection: 'row',

@@ -20,7 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { downloadMShare, ErrorReceiving } from '../../store/actions/sss'
+import { ErrorReceiving } from '../../store/actions/BHR'
 import { useDispatch, useSelector } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyle from '../../common/Styles/Styles'
@@ -35,7 +35,7 @@ export default function CustodianRequestOTP( props ) {
   const [ buttonText, setButtonText ] = useState( 'Try again' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.sss.errorReceiving,
+    ( state ) => state.bhr.errorReceiving,
   )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( false )
   const custodyRequest = props.navigation.getParam( 'custodyRequest' )
@@ -75,16 +75,18 @@ export default function CustodianRequestOTP( props ) {
   }
 
   const dispatch = useDispatch()
-  const { loading } = useSelector( ( state ) => state.sss )
+  const { loading } = useSelector( ( state ) => state.bhr )
 
-  useEffect( () => {
-    if ( otp ) dispatch( downloadMShare( ek, otp ) ) // secondary device auto download
-  }, [] )
+  // useEffect( () => {
+  // removed sss file
+  //   if ( otp ) dispatch( downloadMShare( ek, otp ) ) // secondary device auto download
+  // }, [] )
 
   const onOTPSubmit = () => {
     if ( passcode.join( '' ).length !== 6 || !ek ) return
     setIsConfirmDisabled( true )
-    dispatch( downloadMShare( ek, passcode.join( '' ) ) )
+    // Removed this method
+    // dispatch( downloadMShare( ek, passcode.join( '' ) ) )
   }
 
   const { UNDER_CUSTODY } = useSelector(

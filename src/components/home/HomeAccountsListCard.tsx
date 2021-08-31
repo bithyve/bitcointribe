@@ -16,6 +16,7 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   accountShell: AccountShell;
@@ -29,10 +30,11 @@ type BodyProps = Props;
 const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: HeaderProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
+  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
 
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo( () => {
     return secondarySubAccounts
-      .map( subAccount => getAvatarForSubAccount( subAccount ) )
+      .map( subAccount => getAvatarForSubAccount( subAccount, false ) )
   }, [ secondarySubAccounts ] )
 
   return (
@@ -43,9 +45,13 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
       />
       <Image
         style={styles.headerAccountImage}
-        source={getAvatarForSubAccount( primarySubAccount )}
+        source={getAvatarForSubAccount( primarySubAccount, false, true )}
       />
-
+      {
+        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration ) && (
+          <View style={styles.dot}/>
+        )
+      }
       <View style={styles.headerBadgeContainer}>
 
         {/*
@@ -70,7 +76,7 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
   const totalBalance = AccountShell.getTotalBalance( accountShell )
-
+  // const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   const balanceTextStyle = useMemo( () => {
     return {
       color: accountsState.accountsSynched ? Colors.black : Colors.textColorGrey,
@@ -90,14 +96,24 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
       <Text style={styles.subtitleText} numberOfLines={3}>
         {primarySubAccount.customDescription ?? primarySubAccount.defaultDescription}
       </Text>
+      {
+        ( primarySubAccount.type == AccountType.SWAN_ACCOUNT
+        ||
+        primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ) && !primarySubAccount.isUsable
+          ?
+          <View style={{
+            height: heightPercentageToDP( 3 )
+          }} />
+          :
+          <LabeledBalanceDisplay
+            balance={totalBalance}
+            bitcoinUnit={accountShell.unit}
+            containerStyle={styles.balanceRow}
+            amountTextStyle={balanceTextStyle}
+            isTestAccount={isTestAccount}
+          />
+      }
 
-      <LabeledBalanceDisplay
-        balance={totalBalance}
-        bitcoinUnit={accountShell.unit}
-        containerStyle={styles.balanceRow}
-        amountTextStyle={balanceTextStyle}
-        isTestAccount={isTestAccount}
-      />
     </View>
   )
 }
@@ -106,6 +122,7 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
 const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: Props ) => {
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
+
   return (
     <CardView cornerRadius={10} style={opacityChange ? {
       ...styles.rootContainer, opacity:0.3
@@ -118,14 +135,20 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    width: widthPercentageToDP( 42.6 ),
-    height: heightPercentageToDP( 20.1 ),
-    borderColor: Colors.borderColor,
-    borderWidth: 1,
+    width: widthPercentageToDP( 43 ),
+    height: heightPercentageToDP( 21 ),
+    // borderColor: Colors.borderColor,
+    // borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: widthPercentageToDP( 2.5 ),
     backgroundColor: Colors.white,
     justifyContent: 'space-between',
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    elevation: 6
   },
 
   headerSectionContainer: {
@@ -142,11 +165,22 @@ const styles = StyleSheet.create( {
     marginTop: widthPercentageToDP( -1.7 )
   },
 
-  headerAccountImage: {
-    width: widthPercentageToDP( 10 ),
-    height: widthPercentageToDP( 10 ),
-    marginTop: 0
+  dot: {
+    height: 8,
+    width: 8,
+    borderRadius: 8/2,
+    backgroundColor: 'tomato',
+    position: 'absolute',
+    left: widthPercentageToDP( 9 ),
+    top: heightPercentageToDP( 0.9 ),
+  },
 
+  headerAccountImage: {
+    width: widthPercentageToDP( 13 ),
+    height: widthPercentageToDP( 13 ),
+    // marginLeft: heightPercentageToDP( 0.5 ),
+    marginTop:heightPercentageToDP( 0.5 ),
+    resizeMode: 'contain'
   },
 
   headerBadgeContainer: {

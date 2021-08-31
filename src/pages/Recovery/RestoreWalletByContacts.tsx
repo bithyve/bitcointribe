@@ -87,11 +87,11 @@ export default function RestoreWalletByContacts( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -99,8 +99,8 @@ export default function RestoreWalletByContacts( props ) {
             onPress={() => {
               props.navigation.goBack()
             }}
-            hitSlop={{ 
-              top: 20, left: 20, bottom: 20, right: 20 
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -113,7 +113,7 @@ export default function RestoreWalletByContacts( props ) {
           </TouchableOpacity>
           <TouchableOpacity
             style={{
-              height: 54, marginLeft: 'auto' 
+              height: 54, marginLeft: 'auto'
             }}
             onPress={() => {}}
           >
@@ -124,13 +124,13 @@ export default function RestoreWalletByContacts( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <HeaderTitle
-            firstLineTitle={'Restore wallet using'}
+            firstLineTitle={'Recover wallet using'}
             secondLineTitle={'Contacts'}
             infoTextNormal={'Select contacts to '}
             infoTextBold={'send recovery request'}

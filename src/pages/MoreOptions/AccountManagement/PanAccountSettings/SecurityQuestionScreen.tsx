@@ -25,7 +25,7 @@ import { setShowAllAccount } from '../../../../store/actions/accounts'
 
 export default function SecurityQuestionScreen( props ) {
   const { security } = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
+    ( state ) => state.storage.wallet,
   )
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question
@@ -175,7 +175,8 @@ export default function SecurityQuestionScreen( props ) {
               setConfirm()
               if ( answer.trim() == securityAnswer.trim() ) {
                 dispatch( setShowAllAccount( true ) )
-                props.navigation.popToTop( 2 )
+                // props.navigation.popToTop( 3 )
+                props.navigation.navigate( 'AccountManagementRoot' )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }

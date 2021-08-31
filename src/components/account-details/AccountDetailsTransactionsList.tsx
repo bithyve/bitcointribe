@@ -1,8 +1,8 @@
 import React, { ReactElement, useCallback } from 'react'
 import {
   FlatList,
+  TouchableOpacity
 } from 'react-native'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import _ from 'lodash'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import TransactionsListItem from './AccountDetailsTransactionsListItem'
@@ -12,11 +12,13 @@ const keyExtractor = ( item: TransactionDescribing ) => item.txid
 export type Props = {
   transactions: TransactionDescribing[];
   onTransactionSelected: ( transaction: TransactionDescribing ) => void;
+  accountShellId: string,
 };
 
 const AccountDetailsTransactionsList: React.FC<Props> = ( {
   transactions,
   onTransactionSelected,
+  accountShellId,
 }: Props ) => {
 
   /**
@@ -38,7 +40,7 @@ const AccountDetailsTransactionsList: React.FC<Props> = ( {
       <TouchableOpacity
         onPress={() => transactionSelectionHandler( transaction )}
       >
-        <TransactionsListItem transaction={transaction} />
+        <TransactionsListItem accountShellId={accountShellId} transaction={transaction} />
       </TouchableOpacity>
     )
   }

@@ -1,11 +1,11 @@
 import React from 'react'
 import TrustedContactRequest from '../Contacts/TrustedContactRequest'
 import BottomSheet from '@gorhom/bottom-sheet'
+import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
 
 export interface Props {
   bottomSheetRef: React.RefObject<BottomSheet>;
   trustedContactRequest: any;
-  recoveryRequest: any;
   onPressAccept: ( key: any ) => void;
   onPressReject: ( key: any ) => void;
   onPhoneNumberChange: ( key: any ) => void;
@@ -14,31 +14,24 @@ export interface Props {
 const TrustedContactRequestContent: React.FC<Props> = ( {
   bottomSheetRef,
   trustedContactRequest,
-  recoveryRequest,
   onPressAccept,
   onPressReject,
   onPhoneNumberChange,
 }: Props ) => {
-  if ( !trustedContactRequest && !recoveryRequest ) return
-
-  const { requester, hintType, hint, isGuardian, isQR, isRecovery } =
-    trustedContactRequest || recoveryRequest
+  if ( !trustedContactRequest ) return
+  const { walletName, isKeeper, encryptionType, encryptionHint } = trustedContactRequest
 
   return (
     <TrustedContactRequest
-      isQR={isQR}
-      inputType={
-        hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
-      }
-      isGuardian={isGuardian}
-      isRecovery={isRecovery}
-      hint={hint}
+      inputNotRequired={encryptionType === DeepLinkEncryptionType.DEFAULT }
+      inputType={encryptionType}
+      isGuardian={isKeeper}
+      isRecovery={false}
+      hint={encryptionHint}
       bottomSheetRef={bottomSheetRef}
-      trustedContactName={requester}
-      onPressAccept={( key ) => onPressAccept( key )}
-      onPressReject={( key ) => {
-        onPressReject( key )
-      }}
+      trustedContactName={walletName}
+      onPressAccept={onPressAccept}
+      onPressReject={onPressReject}
       onPhoneNumberChange={( text ) => {
         onPhoneNumberChange( text )
       }}

@@ -15,16 +15,14 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountInfo, updateSwanStatus } from '../../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
-import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
 import { ListItem } from 'react-native-elements'
-import { addNewAccountShell } from '../../../store/actions/accounts'
-let swanAccountCount = 0
+import BottomInfoBox from '../../BottomInfoBox'
+
+const swanAccountCount = 0
 
 type Props = {
   swanDeepLinkContent: string | null;
@@ -36,9 +34,10 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const dispatch = useDispatch()
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-  const { currentSwanSubAccount } = useAccountsState()
-  let swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
-  let swanTitle = 'Buy bitcoin\n with Swan..'
+  const [ isConfirm, setIsConfirm ] = useState( false )
+  let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to Swan Bitcoin to complete registration'
+  let swanTitle = 'Stack Sats with\n Swan Bitcoin'
+  let  showNote = true
   let accountName = ''
   let accountDescription = ''
   function handleProceedButtonPress() {
@@ -51,12 +50,9 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     }
   }
 
-  function handleThresholdAmount() {
-    dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
-  }
-
   useEffect( ()=>{
     if( ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) && hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
+      onPress()
       openLink( swanAuthenticationUrl )
     }
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
@@ -64,6 +60,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   if( !hasRedeemSwanCodeForTokenInitiated && swanAccountCreationStatus == SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) {
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
+
   const renderFooter = () => {
     switch ( swanAccountCreationStatus ) {
         case SwanAccountCreationStatus.ERROR:
@@ -84,17 +81,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             />
           )
           break
+
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          if( swanAccountCount<1 ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: swanAccountDetails.accountName,
-              defaultDescription: swanAccountDetails.accountDescription,
-              serviceAccountKind: ServiceAccountKind.SWAN,
-            } )
-            dispatch( addNewAccountShell( newSubAccount ) )
-            swanAccountCount++
-          }
           return renderSuccessButton()
         case SwanAccountCreationStatus.ACCOUNT_CREATED:
           return renderSuccessButton()
@@ -108,53 +96,77 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         case SwanAccountCreationStatus.ERROR:
           swanMessage = 'We had a problem communicating with Swan.\n\n'
           swanTitle = 'Something went wrong'
+          showNote = false
           break
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
-          swanTitle = 'Hexa Wallet is communicating with Swan...'
-          swanMessage = 'Hexa Wallet is creating a Swan account to store your bitcoin purchased from Swan. This account will be linked to your Swan withdrawal wallet'
+          swanTitle = 'Your Hexa Wallet is communicating with Swan Bitcoin...'
+          swanMessage = 'This account is being linked with your profile on Swan Bitcoin'
+          showNote = false
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          swanMessage = 'Sats in your Swan withdrawal wallet will be transfered to Hexa Wallet.\nSwan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
-          swanTitle = 'Successfully linked Hexa Wallet to your Swan Account'
-          accountName = swanAccountDetails.accountName
-          accountDescription = swanAccountDetails.accountDescription
+          swanMessage = 'Your Hexa Wallet is now successfully linked to your Swan Bitcoin account. Sats will be transferred to Hexa as soon as you accumulate 1 million sats or 0.01 btc'
+          swanTitle = 'Successfully linked'
+          accountName = 'Swan Bitcoin'
+          accountDescription = 'Stack sats with Swan'
+          showNote = false
           break
         case SwanAccountCreationStatus.ACCOUNT_CREATED:
           swanMessage = 'Swan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
           swanTitle = 'Hexa Wallet and your Swan Account are linked'
-          accountName = currentSwanSubAccount.defaultTitle
-          accountDescription = currentSwanSubAccount.defaultDescription
+          showNote = false
+          // TODO: uncomment once able to access current-swan acc
+          // accountName = currentSwanSubAccount.defaultTitle
+          // accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
-          swanTitle = 'Buy bitcoin\nwith Swan'
+          swanMessage = 'This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches auto-withdrawal limit of 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.'
+          swanTitle = 'Stack Sats\nwith Swan'
+          showNote = true
+    }
+    if( isConfirm ) {
+      swanMessage = 'By proceeding you understand that you will be taken to Swan Bitcoin to complete the process.\n\nPlease check the available payment methods along with Terms and Conditions for using Swan Bitcoin as per your jurisdiction.'
     }
     return (
-      <View style={styles.successModalHeaderView}>
-        <TouchableOpacity
+      <>
+        {/* <TouchableOpacity
           activeOpacity={1}
           onPress={onPress}
           style={{
-            flexDirection: 'row'
+            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+            marginTop: wp( 3 ), marginRight: wp( 3 )
           }}
         >
-          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} style={{
-            marginTop: hp( 0.5 )
+          <FontAwesome name="close" color={Colors.white} size={19} style={{
+            // marginTop: hp( 0.5 )
           }} />
-          <Text style={styles.modalTitleText}>{swanTitle}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <View style={styles.successModalHeaderView}>
 
-        <Text style={{
-          ...styles.modalInfoText,
-          marginTop: wp( 1.5 ),
-          marginBottom: wp( 5 ),
-        }}>{swanMessage}</Text>
-        {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
+          <Text style={styles.modalTitleText}>{swanTitle}</Text>
+
+          <Text style={{
+            ...styles.modalInfoText,
+
+          }}>{swanMessage}</Text>
+          {showNote &&
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={
+                'Please register with Swan Bitcoin to use this account'
+              }
+            />
+          }
+
+          {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
           ||
           swanAccountCreationStatus == SwanAccountCreationStatus.ACCOUNT_CREATED ) ? renderAccount() : null}
 
-      </View>
+        </View>
+      </>
     )
   }
 
@@ -192,18 +204,43 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   }
   const renderProceedButton = () => {
     return ( <View style={{
-      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start'
+      flexDirection: 'row', marginTop: 'auto', alignItems: 'flex-start'
     }} >
       <AppBottomSheetTouchableWrapper
         disabled={hasButtonBeenPressed? true : false}
-        onPress={handleProceedButtonPress}
+        onPress={()=> {
+          if( isConfirm ) {
+            handleProceedButtonPress()
+          } else {
+            setIsConfirm( true )
+          }
+        }}
         style={{
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>{'Proceed to Swan'}</Text>
+        <Text style={styles.proceedButtonText}>{'Sign Me Up'}</Text>
       </AppBottomSheetTouchableWrapper>
-      <View style={{
+      <AppBottomSheetTouchableWrapper
+        onPress={() => {onPress()}}
+        style={{
+          height: wp( '15%' ),
+          width: wp( '36%' ),
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingLeft: wp( '8%' ),
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: Fonts.FiraSansMedium,
+            color: Colors.blue
+          }}
+        >
+          {'Not Now'}
+        </Text>
+      </AppBottomSheetTouchableWrapper>
+      {/* <View style={{
         flexDirection: 'row',
         alignItems: 'center',
         alignContent: 'center'
@@ -222,13 +259,14 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }}
         />
 
-      </View>
+      </View> */}
     </View> )
   }
   const renderSuccessButton = () => {
     return ( <View style={{
       marginTop: 'auto',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      marginBottom: hp( 4 )
     }} >
       <AppBottomSheetTouchableWrapper
         onPress={onClickSetting}
@@ -238,24 +276,19 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text style={styles.proceedButtonText}>{'Done'}</Text>
       </AppBottomSheetTouchableWrapper>
-      <Image
+      {/* <Image
         source={require( '../../../assets/images/icons/success.png' )
         }
         style={styles.successImage}
-      />
+      /> */}
     </View> )
   }
 
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
-    <View style={{
-      height: '95%'
-    }}>
-      {renderMessage()}
-      {renderFooter()}
-    </View>
-
+    {renderMessage()}
+    {renderFooter()}
   </View>
   )
 }
@@ -276,32 +309,37 @@ const styles = StyleSheet.create( {
     color: Colors.black,
   },
   successModalHeaderView: {
-    marginRight: wp( '10%' ),
-    marginLeft: wp( '3%' ),
+    marginRight: wp( '7%' ),
+    // marginLeft: wp( '5%' ),
     marginTop: wp( '5%' ),
-    flex: 1.7
+    // flex: 1.7
   },
   modalTitleText: {
-    marginBottom: wp( '5%' ),
+    marginBottom: wp( '4%' ),
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
-    marginLeft: 10
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: wp( '6%' )
   },
   modalInfoText: {
-    marginLeft: wp( '7%' ),
+    marginLeft: wp( '6%' ),
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    textAlign: 'justify'
+    textAlign: 'justify',
+    // marginTop: wp( 1 ),
+    marginBottom: wp( 4 ),
+    marginRight: wp( 5 ),
+    lineHeight: 18,
+    letterSpacing: 0.6
   },
   successModalButtonView: {
     minHeight: 50,
     minWidth: 144,
     paddingHorizontal: wp( 4 ),
     paddingVertical: wp( 3 ),
-    height: wp( '13%' ),
-    width: wp( '43%' ),
+    height: wp( '15%' ),
+    width: wp( '36%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
@@ -314,7 +352,8 @@ const styles = StyleSheet.create( {
     marginTop: 'auto',
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '10%' ),
+    marginLeft: wp( '6%' ),
+    marginBottom: hp( 3 )
   },
   proceedButtonText: {
     color: Colors.white,

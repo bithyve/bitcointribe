@@ -5,8 +5,12 @@ import {
   StyleSheet,
   TextInput,
   Platform,
+  TouchableOpacity,
+  KeyboardAvoidingView,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -16,12 +20,19 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import { ScrollView } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
+
+const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
+
+function validateAllowedCharacters( answer: string ): boolean {
+  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+}
 
 function SecurityQuestion( props ) {
   const { security } = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
+    ( state ) => state.storage.wallet,
   )
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question
@@ -30,7 +41,6 @@ function SecurityQuestion( props ) {
   const [ answer, setAnswer ] = useState( '' )
   const [ errorText, setErrorText ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
-
   const setConfirm = () => {
     if ( answer.length > 0 && answer != securityAnswer ) {
       if ( AnswerCounter < 2 ) {
@@ -40,6 +50,7 @@ function SecurityQuestion( props ) {
         props.navigation.navigate( 'ReLogin', {
           isPasscodeCheck: true
         } )
+        props.onClose()
         setShowAnswer( true )
         setErrorText( '' )
         return
@@ -68,19 +79,38 @@ function SecurityQuestion( props ) {
   }, [ answer, errorText ] )
 
   return (
-    <View style={{
-      ...styles.modalContentContainer, height: '100%'
-    }}>
+    <KeyboardAwareScrollView
+      resetScrollToCoords={{
+        x: 0, y: 0
+      }}
+      scrollEnabled={false}
+      style={{
+        ...styles.modalContentContainer
+      }}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={props.onClose}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+          // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity>
       <View style={styles.modalContentContainer}>
         <View>
           <View style={{
-            flexDirection: 'row', padding: wp( '7%' )
+            paddingHorizontal: wp( '7%' )
           }}>
             <View style={{
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                Health Check{'\n'}Security Question
+                Health Check{'\n'}Confirm Password
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
@@ -90,14 +120,24 @@ function SecurityQuestion( props ) {
               </Text>
             </View>
           </View>
-          <ScrollView style={{
+          <View style={{
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
           }}>
             <View style={styles.dropdownBox}>
               <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
             </View>
-            <View style={{
-            }}>
+            <KeyboardAwareScrollView
+              resetScrollToCoords={{
+                x: 0, y: 0
+              }}
+              scrollEnabled={false}
+              // style={styles.rootContainer}
+              style={{
+                flex: 1
+                // height: `${height}%`
+
+              }}
+            >
               <TextInput
                 style={{
                   ...styles.inputBox,
@@ -121,12 +161,15 @@ function SecurityQuestion( props ) {
                 onChangeText={( text ) => {
                   setAnswer( text )
                 }}
+                onBlur={() => {
+                  if ( validateAllowedCharacters( answer ) == false ) {
+                    setErrorText( 'Answer must contain lowercase characters(a-z) and digits (0-9)' )
+                  }
+                }}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 onSubmitEditing={( event ) => setConfirm()}
-                onFocus={() => props.onFocus()}
-                onBlur={() => props.onBlur()}
               />
               {errorText ? (
                 <Text
@@ -140,7 +183,7 @@ function SecurityQuestion( props ) {
                   {errorText}
                 </Text>
               ) : null}
-            </View>
+            </KeyboardAwareScrollView>
             {showAnswer && (
               <View
                 style={{
@@ -162,7 +205,7 @@ function SecurityQuestion( props ) {
                 </Text>
               </View>
             )}
-          </ScrollView>
+          </View>
         </View>
         <View
           style={{
@@ -183,6 +226,8 @@ function SecurityQuestion( props ) {
                 ).then( () => {
                   props.onPressConfirm()
                 } )
+              } else if ( validateAllowedCharacters( answer ) == false ) {
+                setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }
@@ -199,7 +244,7 @@ function SecurityQuestion( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   )
 }
 
@@ -207,7 +252,7 @@ export default withNavigation( SecurityQuestion )
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   modalTitleText: {

@@ -5,7 +5,7 @@ import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import FormStyles from '../../../common/Styles/FormStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
@@ -52,10 +52,14 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   } )
 
   function handleSaveButtonPress() {
-    primarySubAccount.customDisplayName = accountName
-    primarySubAccount.customDescription = accountDescription
-
-    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    const settings = {
+      accountName,
+      accountDescription,
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
+    navigation.navigate( 'Home' )
   }
 
   return (
@@ -64,10 +68,10 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <View style={{
           flexDirection: 'row'
         }}>
-          <Text style={styles.headerText}>Please edit the </Text>
-          <Text style={{
+          <Text style={styles.headerText}>You can set the Name and Description to reflect the account's purpose. </Text>
+          {/* <Text style={{
             ...styles.headerText, fontStyle: 'italic'
-          }}>Name and Description</Text>
+          }}>Name and Description</Text> */}
         </View>
       </View>
 
@@ -77,7 +81,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
           inputStyle={FormStyles.inputText}
           placeholder={'Enter an account name'}
           placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
+          // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountName}
           maxLength={24}
           numberOfLines={1}
@@ -89,9 +93,9 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <Input
           inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter A Description'}
+          placeholder={'Enter a description'}
           placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
+          // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountDescription}
           numberOfLines={2}
           onChangeText={setAccountDescription}

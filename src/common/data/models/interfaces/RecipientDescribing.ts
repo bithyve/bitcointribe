@@ -17,20 +17,11 @@ export interface RecipientDescribing {
 export type AddressRecipientDescribing = RecipientDescribing
 
 export interface ContactRecipientDescribing extends RecipientDescribing {
+  isActive: boolean,
+  channelKey: string,
   lastSeenActive: number | null;
   walletName: string | null;
   trustKind: ContactTrustKind;
-  hasTrustedAddress: boolean;
-
-  /**
-   * Whether or not a symmetric key exists between this user and the contact.
-   */
-  hasTrustedChannelWithUser: boolean;
-
-  /**
-   * Initiation Unix timestamp.
-   */
-  initiatedAt: number;
 }
 
 export interface AccountRecipientDescribing extends RecipientDescribing {

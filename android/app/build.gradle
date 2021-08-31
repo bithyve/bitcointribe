@@ -59,11 +59,15 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 293
-        versionName "1.7.0"
+        versionCode 334
+        versionName "1.9.5"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false
     }
 
      signingConfigs {
@@ -163,7 +167,6 @@ dependencies {
     implementation project(':react-native-config')
     implementation project(':jail-monkey')
     implementation project(':react-native-contacts')
-    implementation project(':react-native-mail')
     implementation project(':react-native-print')
     implementation project(':react-native-share')
     implementation project(':react-native-camera')

@@ -1,10 +1,9 @@
 import React, {  } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import Colors from '../../../common/Colors'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 
 export type Props = {
   onContinue: () => void;
@@ -64,14 +63,14 @@ const AccountShellRescanningPromptBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: Colors.white,
   },
 
   mainContentContainer: {
     padding: 30,
     paddingBottom: 40,
-    flex: 1,
+    // flex: 1,
   },
 
   footerSectionContainer: {

@@ -1,17 +1,19 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
-import useWalletServiceForSourceAccountKind from '../../utils/hooks/state-selectors/accounts/UseWalletServiceForSourceAccountKind'
-import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import { Account, AccountType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import AccountShell from '../../common/data/models/AccountShell'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 const SAMPLE_ADDRESS = '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8'
 
 export type Props = {
   placeholder: string;
   containerStyle?: Record<string, unknown>;
-  sourceAccountKind: SourceAccountKind;
+  accountShell: AccountShell,
   onAddressEntered: ( address: string ) => void;
   onPaymentURIEntered: ( uri: string ) => void;
 };
@@ -20,33 +22,18 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   placeholder = 'Enter address manually',
   containerStyle = {
   },
-  sourceAccountKind,
+  accountShell,
   onAddressEntered,
   onPaymentURIEntered,
 }: Props ) => {
   const [ recipientAddress, setRecipientAddress ] = useState( '' )
   const [ isAddressInvalid, setIsAddressInvalid ] = useState( false )
-
-  const walletService = useWalletServiceForSourceAccountKind( sourceAccountKind )
-
-  const walletInstance = useMemo( () => {
-    if( walletService ){
-      return walletService.hdWallet || walletService.secureHDWallet
-    }
-  }, [ walletService ] )
-
+  const account: Account = useAccountByAccountShell( accountShell )
+  const network = AccountUtilities.getNetworkByType( account.networkType )
 
   function handleTextChange( newValue: string ) {
+    const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( newValue.trim(), network )
     setRecipientAddress( newValue )
-
-    const isAddressInvalid = walletInstance.isValidAddress( newValue ) == false
-
-    setIsAddressInvalid( isAddressInvalid )
-
-    if ( isAddressInvalid ) { return }
-
-    const { type: scannedAddressKind }: { type: ScannedAddressKind } = walletService.addressDiff( newValue.trim() )
-
     switch ( scannedAddressKind ) {
         case ScannedAddressKind.ADDRESS:
           onAddressEntered( newValue )
@@ -54,6 +41,8 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
         case ScannedAddressKind.PAYMENT_URI:
           onPaymentURIEntered( newValue )
           break
+        default:
+          return
     }
   }
 
@@ -73,13 +62,21 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
           }
         }}
         onBlur={() => {
-          const isAddressValid = walletInstance.isValidAddress( recipientAddress )
+          const isAddressValid = AccountUtilities.isValidAddress( recipientAddress, network )
           setIsAddressInvalid( !isAddressValid )
         }}
         numberOfLines={1}
       />
-
-      {sourceAccountKind == SourceAccountKind.TEST_ACCOUNT && (
+      {isAddressInvalid && (
+        <View style={{
+          marginLeft: 'auto', marginRight: widthPercentageToDP( 5 )
+        }}>
+          <Text style={FormStyles.errorText}>
+            Enter correct address
+          </Text>
+        </View>
+      )}
+      {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT && (
         <TouchableOpacity
           onPress={() => {
             handleTextChange( SAMPLE_ADDRESS )
@@ -88,21 +85,15 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
             padding: 6, marginLeft: 'auto'
           }}
         >
-          <Text style={FormStyles.hintText}>
+          <Text style={[ FormStyles.hintText, {
+            marginRight: widthPercentageToDP( 4 )
+          } ]}>
             Send it to a sample address!
           </Text>
         </TouchableOpacity>
       )}
 
-      {isAddressInvalid && (
-        <View style={{
-          marginLeft: 'auto'
-        }}>
-          <Text style={FormStyles.errorText}>
-            Enter correct address
-          </Text>
-        </View>
-      )}
+
     </View>
   )
 }

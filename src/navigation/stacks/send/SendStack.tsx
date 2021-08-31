@@ -13,7 +13,7 @@ const SendStack = createStackNavigator(
     SentAmountForContactForm: {
       screen: SentAmountForContactFormScreen,
       navigationOptions: {
-        title: 'Send To Contact'
+        title: 'Send To'
       },
     },
     SendConfirmation: {

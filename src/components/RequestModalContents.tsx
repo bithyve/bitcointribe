@@ -1,58 +1,67 @@
-import React, { Component, useState, useCallback, useEffect } from 'react';
+import React, { Component, useState, useCallback, useEffect } from 'react'
 import {
   View,
   Image,
   Text,
   StyleSheet,
   Platform,
-} from 'react-native';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import BottomSheet from 'reanimated-bottom-sheet';
-import { nameToInitials } from '../common/CommonFunctions';
-import DeviceInfo from 'react-native-device-info';
-import SmallHeaderModal from './SmallHeaderModal';
-import SendViaQR from './SendViaQR';
-import SendViaLink from './SendViaLink';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+} from 'react-native-responsive-screen'
+import BottomSheet from 'reanimated-bottom-sheet'
+import { nameToInitials } from '../common/CommonFunctions'
+import DeviceInfo from 'react-native-device-info'
+import SmallHeaderModal from './SmallHeaderModal'
+import SendViaQR from './SendViaQR'
+import SendViaLink from './SendViaLink'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 
-export default function RequestModalContents(props) {
-  
-  const contact = props.contact;
-  const [Contact, setContact] = useState(props.contact ? props.contact : {});
+export default function RequestModalContents( props ) {
+
+  const contact = props.contact
+  const [ Contact, setContact ] = useState( props.contact ? props.contact : {
+  } )
   // console.log("Contact", Contact, props.contact);
 
-  useEffect(() => {
-    if (contact) {
-      setContact(props.contact);
+  useEffect( () => {
+    if ( contact ) {
+      setContact( props.contact )
     }
-  }, [contact]);
+  }, [ contact ] )
 
   const setPhoneNumber = () =>{
-    let phoneNumber = Contact.phoneNumbers[0].number;
-    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-    number = number.slice(number.length - 10); // last 10 digits only
-    return number;
+    const phoneNumber = Contact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    return number
   }
-  
+
   return (
-    <View style={{ ...styles.modalContentContainer, height: '100%' }}>
-      <View style={{ height: '100%' }}>
-        <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
+    <View style={{
+      ...styles.modalContentContainer, height: '100%'
+    }}>
+      <View style={{
+        height: '100%'
+      }}>
+        <View style={{
+          marginTop: hp( '3.5%' ), marginBottom: hp( '2%' )
+        }}>
           <Text style={styles.commModeModalHeaderText}>
-            Request Recovery Key{'\n'}from Friends and Family
+            Request Recovery Key{'\n'}from Friends & Family
           </Text>
           <Text style={styles.commModeModalInfoText}>
-            Request Key from Friends and Family, you can change your Keeper, or their primary mode of contact
+            Request Key from Friends & Family, you can change your Keeper, or their primary mode of contact
           </Text>
         </View>
         <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center'
+          }}>
             <View
               style={{
                 flexDirection: 'row',
@@ -64,13 +73,15 @@ export default function RequestModalContents(props) {
                 borderRadius: 10,
               }}
             >
-              <View style={{ marginLeft: 70 }}>
+              <View style={{
+                marginLeft: 70
+              }}>
                 {props.textHeader ? (
                   <Text
                     style={{
                       color: Colors.textColorGrey,
                       fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(11),
+                      fontSize: RFValue( 11 ),
                       marginLeft: 25,
                       paddingTop: 5,
                       paddingBottom: 3,
@@ -83,40 +94,40 @@ export default function RequestModalContents(props) {
                   {Contact && Contact.firstName && Contact.lastName
                     ? Contact.firstName + ' ' + Contact.lastName
                     : Contact && Contact.firstName && !Contact.lastName
-                    ? Contact.firstName
-                    : Contact && !Contact.firstName && Contact.lastName
-                    ? Contact.lastName
-                    : ''}
+                      ? Contact.firstName
+                      : Contact && !Contact.firstName && Contact.lastName
+                        ? Contact.lastName
+                        : ''}
                 </Text>
                 {Contact &&
                 Contact.phoneNumbers &&
                 Contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {setPhoneNumber()}
-                    {/* {Contact.phoneNumbers[0].digits} */}
-                  </Text>
-                ) : Contact && Contact.emails && Contact.emails.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {Contact && Contact.emails[0].email}
-                  </Text>
-                ) : null}
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontSize: RFValue( 10 ),
+                        marginLeft: 25,
+                        paddingTop: 3,
+                      }}
+                    >
+                      {setPhoneNumber()}
+                      {/* {Contact.phoneNumbers[0].digits} */}
+                    </Text>
+                  ) : Contact && Contact.emails && Contact.emails.length ? (
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontSize: RFValue( 10 ),
+                        marginLeft: 25,
+                        paddingTop: 3,
+                        paddingBottom: 5,
+                      }}
+                    >
+                      {Contact && Contact.emails[ 0 ].email}
+                    </Text>
+                  ) : null}
               </View>
             </View>
             {Contact && Contact.imageAvailable ? (
@@ -128,12 +139,16 @@ export default function RequestModalContents(props) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
+                  shadowOffset: {
+                    width: 2, height: 2
+                  },
                 }}
               >
                 <Image
                   source={Contact && Contact.image}
-                  style={{ ...styles.contactProfileImage }}
+                  style={{
+                    ...styles.contactProfileImage
+                  }}
                 />
               </View>
             ) : (
@@ -150,24 +165,26 @@ export default function RequestModalContents(props) {
                   borderRadius: 70 / 2,
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
+                  shadowOffset: {
+                    width: 2, height: 2
+                  },
                 }}
               >
                 <Text
                   style={{
                     textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    fontSize: RFValue( 20 ),
+                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
                   }}
                 >
                   {nameToInitials(
                     Contact && Contact.firstName && Contact.lastName
                       ? Contact.firstName + ' ' + Contact.lastName
                       : Contact && Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : Contact && !Contact.firstName && Contact.lastName
-                      ? Contact.lastName
-                      : '',
+                        ? Contact.firstName
+                        : Contact && !Contact.firstName && Contact.lastName
+                          ? Contact.lastName
+                          : '',
                   )}
                 </Text>
               </View>
@@ -175,7 +192,9 @@ export default function RequestModalContents(props) {
           </View>
         </View>
         <Text
-          style={{ ...styles.commModeModalInfoText, marginBottom: hp('3.5%') }}
+          style={{
+            ...styles.commModeModalInfoText, marginBottom: hp( '3.5%' )
+          }}
         >
           You can choose to request the Key via phone or email or via QR if
           your contact is nearby
@@ -189,12 +208,14 @@ export default function RequestModalContents(props) {
             marginLeft: 25,
             marginRight: 25,
             marginTop: 'auto',
-            marginBottom: hp('4%'),
+            marginBottom: hp( '4%' ),
             justifyContent: 'space-evenly',
             alignItems: 'center',
             shadowColor: Colors.shadowBlue,
             shadowOpacity: 1,
-            shadowOffset: { width: 15, height: 15 },
+            shadowOffset: {
+              width: 15, height: 15
+            },
           }}
         >
           <AppBottomSheetTouchableWrapper
@@ -202,33 +223,35 @@ export default function RequestModalContents(props) {
             style={styles.buttonInnerView}
           >
             <Image
-              source={require('../assets/images/icons/openlink.png')}
+              source={require( '../assets/images/icons/openlink.png' )}
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>Share</Text>
           </AppBottomSheetTouchableWrapper>
           <View
-            style={{ width: 1, height: 30, backgroundColor: Colors.white }}
+            style={{
+              width: 1, height: 30, backgroundColor: Colors.white
+            }}
           />
           <AppBottomSheetTouchableWrapper
             style={styles.buttonInnerView}
             onPress={()=>props.onPressViaQr()}
           >
             <Image
-              source={require('../assets/images/icons/qr-code.png')}
+              source={require( '../assets/images/icons/qr-code.png' )}
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>QR</Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-       
+
       </View>
-      
+
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -236,17 +259,17 @@ const styles = StyleSheet.create({
   commModeModalHeaderText: {
     color: Colors.blue,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     marginLeft: 25,
     marginRight: 25,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     marginLeft: 25,
     marginRight: 25,
-    marginTop: hp('0.7%'),
+    marginTop: hp( '0.7%' ),
   },
   contactProfileView: {
     flexDirection: 'row',
@@ -254,8 +277,8 @@ const styles = StyleSheet.create({
     marginRight: 25,
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: hp('3.5%'),
-    marginTop: hp('1.7%'),
+    marginBottom: hp( '3.5%' ),
+    marginTop: hp( '1.7%' ),
   },
   contactProfileImage: {
     width: 70,
@@ -265,7 +288,7 @@ const styles = StyleSheet.create({
   },
   contactNameText: {
     color: Colors.black,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
@@ -279,7 +302,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp( '30%' ),
   },
   buttonImage: {
     width: 20,
@@ -289,8 +312,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
-});
+} )

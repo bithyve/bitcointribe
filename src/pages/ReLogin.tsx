@@ -64,22 +64,22 @@ export default function Login( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>Welcome back!</Text>
+          <Text style={styles.headerTitleText}>Welcome back</Text>
           <View>
             <Text style={styles.headerInfoText}>
               Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
             <View style={{
-              alignSelf: 'baseline' 
+              alignSelf: 'baseline'
             }}>
               <View style={styles.passcodeTextInputView}>
                 <View
@@ -134,7 +134,7 @@ export default function Login( props ) {
                   >
                     {passcode.length >= 2 ? (
                       <Text style={{
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       }}>
                         <FontAwesome
                           size={10}
@@ -165,7 +165,7 @@ export default function Login( props ) {
                   >
                     {passcode.length >= 3 ? (
                       <Text style={{
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       }}>
                         <FontAwesome
                           size={10}
@@ -196,7 +196,7 @@ export default function Login( props ) {
                   >
                     {passcode.length >= 4 ? (
                       <Text style={{
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       }}>
                         <FontAwesome
                           size={10}
@@ -214,7 +214,7 @@ export default function Login( props ) {
               </View>
               {checkAuth ? (
                 <View style={{
-                  marginLeft: 'auto' 
+                  marginLeft: 'auto'
                 }}>
                   <Text style={styles.errorText}>
                     Incorrect passcode, try again!
@@ -244,7 +244,7 @@ export default function Login( props ) {
         </View>
 
         <View style={{
-          marginTop: 'auto' 
+          marginTop: 'auto'
         }}>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
@@ -354,7 +354,7 @@ export default function Login( props ) {
           <View style={styles.keyPadRow}>
             <View style={styles.keyPadElementTouchable}>
               <Text style={{
-                flex: 1, padding: 15 
+                flex: 1, padding: 15
               }}></Text>
             </View>
             <TouchableOpacity
@@ -407,7 +407,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     alignItems: 'center',
     justifyContent: 'center',
@@ -454,7 +454,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   proceedButtonText: {

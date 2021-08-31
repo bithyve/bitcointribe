@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import {
+  AccountType,
   Balances,
   TransactionDetails,
 } from '../../../../../bitcoin/utilities/Interface'
@@ -17,12 +18,15 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 export default class CheckingSubAccountInfo
 implements HexaSubAccountDescribing {
   id: string;
+  isUsable: boolean;
   xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
 
   kind: SubAccountKind = SubAccountKind.REGULAR_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
+  type: AccountType = AccountType.CHECKING_ACCOUNT
+
   balances: Balances;
   visibility: AccountVisibility;
   isTFAEnabled = false;
@@ -40,10 +44,11 @@ implements HexaSubAccountDescribing {
   constructor( {
     id = uuid(),
     xPub = null,
+    isUsable,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Checking Account',
-    defaultSubTitle= 'Fast and easy',
+    defaultSubTitle= 'SingleSig on-chain bitcoin wallet',
     balances = {
       confirmed: 0, unconfirmed: 0
     },
@@ -54,6 +59,7 @@ implements HexaSubAccountDescribing {
   }: ConstructorProps ) {
     this.id = id
     this.xPub = xPub
+    this.isUsable = isUsable,
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle

@@ -46,6 +46,7 @@ const TransactionsList: React.FC<Props> = ( {
           transaction={transaction}
           bitcoinUnit={bitcoinUnit}
           currencyKind={currencyKind}
+          accountShellId=""
         />
       </ListItem>
     )

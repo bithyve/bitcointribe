@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, SectionList, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native'
 import NewAccountOptionsSection from './NewAccountOptionsSection'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
@@ -17,6 +17,11 @@ import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import NavStyles from '../../../common/Styles/NavStyles'
 import ButtonBlue from '../../../components/ButtonBlue'
+import { useSelector } from 'react-redux'
+import ModalContainer from '../../../components/home/ModalContainer'
+import ErrorModalContents from '../../../components/ErrorModalContents'
+import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -31,9 +36,19 @@ function titleForSectionHeader( kind: SectionKind ) {
       case SectionKind.ADD_NEW_HEXA_ACCOUNT:
         return 'Add a Hexa Account'
       case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Add a service'
+        return 'Create a Shared Account'
       case SectionKind.IMPORT_WALLET:
         return 'Import a Wallet'
+  }
+}
+function titleForSectionSubHeader( kind: SectionKind ) {
+  switch ( kind ) {
+      case SectionKind.ADD_NEW_HEXA_ACCOUNT:
+        return 'Your keys, your coins, manage them your way'
+      case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
+        return 'Bitcoin is for everyone, share an account'
+      case SectionKind.IMPORT_WALLET:
+        return 'Have your sats somewhere else? Import them to Hexa'
   }
 }
 
@@ -41,9 +56,14 @@ function renderSectionHeader( { section } ) {
   const kind: SectionKind = section.kind
 
   return (
-    <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
-      {titleForSectionHeader( kind )}
-    </Text>
+    <>
+      <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
+        {titleForSectionHeader( kind )}
+      </Text>
+      <Text style={styles.listSubSectionHeading}>
+        {titleForSectionSubHeader( kind )}
+      </Text>
+    </>
   )
 }
 
@@ -56,40 +76,17 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   const [ selectedChoice, setSelectedChoice ] = useState<SubAccountDescribing>(
     null,
   )
+  const [ secureAccountAlert, setSecureAccountAlert ] = useState( false )
+  const [ secureAccountKnowMore, setSecureAccountKnowMore ] = useState( false )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
 
   const canProceed = useMemo( () => {
     return selectedChoice !== null
   }, [ selectedChoice ] )
 
   function handleProceedButtonPress() {
-    if ( selectedChoice.kind === SubAccountKind.SERVICE ) {
-      // TODO: Implement alongside supporting Service integration from "Add New".
-      //  - Present options for choosing b/w a standalone
-      //    service account or adding it to a Hexa
-      //    account (e.g. Checking or Savings account).
-      switch (
-        ( selectedChoice as ExternalServiceSubAccountInfo ).serviceAccountKind
-      ) {
-          case ServiceAccountKind.WYRE:
-            navigation.navigate( 'NewWyreAccountDetails', {
-              currentSubAccount: selectedChoice,
-            } )
-            break
-          case ServiceAccountKind.RAMP:
-            navigation.navigate( 'NewRampAccountDetails', {
-              currentSubAccount: selectedChoice,
-            } )
-            break
-          case ServiceAccountKind.SWAN:
-            navigation.navigate( 'NewSwanAccountDetails', {
-              currentSubAccount: selectedChoice,
-            } )
-            break
-          default:
-            break
-      }
-    }
-
     switch ( selectedChoice.kind ) {
         case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
@@ -98,22 +95,37 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
             currentSubAccount: selectedChoice,
           } )
           break
+
         case SubAccountKind.DONATION_ACCOUNT:
           navigation.navigate( 'AddNewDonationAccountDetails', {
             currentSubAccount: selectedChoice,
           } )
           break
+
+        case SubAccountKind.SERVICE:
+          switch( ( selectedChoice as ExternalServiceSubAccountInfo ).serviceAccountKind ){
+              case ServiceAccountKind.SWAN:
+                navigation.navigate( 'NewSwanAccountDetails', {
+                  currentSubAccount: selectedChoice,
+                } )
+                break
+          }
+          break
+
         case SubAccountKind.FULLY_IMPORTED_WALLET:
         case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
         // TODO: Implement alongside supporting Import integration from "Add New".
           break
+
         default:
           break
     }
   }
 
   function handleChoiceSelection( choice: SubAccountDescribing ) {
-    setSelectedChoice( choice )
+    if( choice.type == AccountType.SAVINGS_ACCOUNT && !AllowSecureAccount ) {
+      setSecureAccountAlert( true )
+    } else setSelectedChoice( choice )
   }
 
   const ListFooter: React.FC = () => {
@@ -128,124 +140,150 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
     )
   }
 
+  const renderSecureAccountAlertContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        title={'Complete Level 2'}
+        info={'You can only add a Savings Account when you have completed Level 2'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          setSecureAccountAlert( false )
+        }}
+        onPressIgnore={() => {
+          setSecureAccountKnowMore( true )
+          setSecureAccountAlert( false )
+        }}
+        proceedButtonText={'Ok'}
+        cancelButtonText={'Learn More'}
+        isBottomImage={true}
+        bottomImage={require( '../../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }, [ secureAccountAlert ] )
+
+  const renderSecureAccountKnowMoreContent = () => {
+    return (
+      <SavingAccountAlertBeforeLevel2
+        titleClicked={()=>setSecureAccountKnowMore( false )}
+        containerStyle={{
+        }}
+      />
+    )
+  }
+
   return (
     <SafeAreaView style={styles.rootContainer}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={NavStyles.modalContainer}>
-      <View
+        <TouchableOpacity
+          onPress={() => {
+            navigation.pop()
+          }}
+          hitSlop={{
+            top: 20, left: 20, bottom: 20, right: 20
+          }}
           style={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingRight: 10,
-            paddingBottom: hp( '1.5%' ),
-            paddingTop: hp( '1%' ),
-            marginLeft: 10,
-            marginRight: 10,
-            // marginBottom: hp( '1.5%' ),
+            height: 30, width: 30, justifyContent: 'center',
+            marginLeft: wp( '5%' )
           }}
         >
-          <View style={{
-            flex: 1, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.pop()
-              }}
-              hitSlop={{
-                top: 20, left: 20, bottom: 20, right: 20
-              }}
-              style={{
-                height: 30, width: 30, justifyContent: 'center'
-              }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <View style={{
-              flex: 1
-            }}>
-              <Text
-                style={{
-                  ...NavStyles.modalHeaderTitleText,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Add new Account
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  paddingTop: 5,
-                }}
-              >
+          <FontAwesome
+            name="long-arrow-left"
+            color={Colors.blue}
+            size={17}
+          />
+        </TouchableOpacity>
+        <View style={{
+          // flex: 1
+        }}>
+          <Text
+            style={{
+              ...NavStyles.modalHeaderTitleText,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 25 ),
+              marginLeft: wp( '5%' ),
+              marginTop: hp( '2%' ),
+              letterSpacing: 0.01
+            }}
+          >
+                Add Accounts
+          </Text>
+          {/* <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue( 12 ),
+              fontFamily: Fonts.FiraSansRegular,
+              paddingTop: 5,
+            }}
+          >
                 Add an account, add a service, or import a wallet
-              </Text>
-            </View>
-          </View>
+          </Text> */}
         </View>
-      <SectionList
-        contentContainerStyle={{
-          paddingVertical: 25
-        }}
-        ListFooterComponent={<ListFooter />}
-        extraData={[ selectedChoice ]}
-        sections={[
-          {
-            kind: SectionKind.ADD_NEW_HEXA_ACCOUNT,
-            data: [ newAccountChoices.hexaAccounts ],
-            renderItem: () => {
-              return (
-                <View style={styles.viewSectionContainer}>
-                  <NewAccountOptionsSection
-                    choices={newAccountChoices.hexaAccounts}
-                    selectedChoice={selectedChoice}
-                    onOptionSelected={handleChoiceSelection}
-                  />
-                </View>
-              )
+        <SectionList
+          contentContainerStyle={{
+            paddingVertical: 25
+          }}
+          // ListFooterComponent={<ListFooter />}
+          extraData={[ selectedChoice ]}
+          sections={[
+            {
+              kind: SectionKind.ADD_NEW_HEXA_ACCOUNT,
+              data: [ newAccountChoices.hexaAccounts ],
+              renderItem: () => {
+                return (
+                  <View style={styles.viewSectionContainer}>
+                    <NewAccountOptionsSection
+                      choices={newAccountChoices.hexaAccounts}
+                      selectedChoice={selectedChoice}
+                      onOptionSelected={handleChoiceSelection}
+                    />
+                  </View>
+                )
+              },
             },
-          },
-          {
-            kind: SectionKind.ADD_NEW_SERVICE_ACCOUNT,
-            data: [ newAccountChoices.serviceAccounts ],
-            renderItem: () => {
-              return (
-                <View style={styles.viewSectionContainer}>
-                  <NewAccountOptionsSection
-                    choices={newAccountChoices.serviceAccounts}
-                    selectedChoice={selectedChoice}
-                    onOptionSelected={handleChoiceSelection}
-                  />
-                </View>
-              )
+            {
+              kind: SectionKind.ADD_NEW_SERVICE_ACCOUNT,
+              data: [ newAccountChoices.serviceAccounts ],
+              renderItem: () => {
+                return (
+                  <View style={styles.viewSectionContainer}>
+                    <NewAccountOptionsSection
+                      choices={newAccountChoices.serviceAccounts}
+                      selectedChoice={selectedChoice}
+                      onOptionSelected={handleChoiceSelection}
+                    />
+                  </View>
+                )
+              },
             },
-          },
-          {
-            kind: SectionKind.IMPORT_WALLET,
-            data: [ newAccountChoices.importedWalletAccounts ],
-            renderItem: () => {
-              return (
-                <View style={styles.viewSectionContainer}>
-                  <NewAccountOptionsSection
-                    choices={newAccountChoices.importedWalletAccounts}
-                    selectedChoice={selectedChoice}
-                    onOptionSelected={handleChoiceSelection}
-                  />
-                </View>
-              )
+            {
+              kind: SectionKind.IMPORT_WALLET,
+              data: [ newAccountChoices.importedWalletAccounts ],
+              renderItem: () => {
+                return (
+                  <View style={styles.viewSectionContainer}>
+                    <NewAccountOptionsSection
+                      choices={newAccountChoices.importedWalletAccounts}
+                      selectedChoice={selectedChoice}
+                      onOptionSelected={handleChoiceSelection}
+                    />
+                  </View>
+                )
+              },
             },
-          },
-        ]}
-        keyExtractor={sectionListItemKeyExtractor}
-        renderSectionHeader={renderSectionHeader}
-        stickySectionHeadersEnabled={false}
-      ></SectionList>
+          ]}
+          keyExtractor={sectionListItemKeyExtractor}
+          renderSectionHeader={renderSectionHeader}
+          stickySectionHeadersEnabled={false}
+        ></SectionList>
+        {<ListFooter />}
       </View>
+      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {setSecureAccountAlert( false )}} >
+        {renderSecureAccountAlertContent()}
+      </ModalContainer>
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {setSecureAccountKnowMore( false )}} >
+        {renderSecureAccountKnowMoreContent()}
+      </ModalContainer>
     </SafeAreaView>
   )
 }
@@ -253,22 +291,32 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
+    backgroundColor: Colors.backgroundColor
   },
 
   listSectionHeading: {
-    fontSize: RFValue( 14 ),
-    marginBottom: 12,
-    paddingHorizontal: 24,
+    fontSize: RFValue( 13 ),
+    paddingHorizontal: wp( 6 ),
+    letterSpacing: 0.01,
+  },
+  listSubSectionHeading: {
+    paddingHorizontal: wp( 6 ),
+    letterSpacing: 0.06,
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    marginBottom: hp( 1 ),
+
   },
 
   viewSectionContainer: {
-    marginBottom: 22,
-    marginHorizontal: 24,
+    marginBottom: hp( 2 ),
+    marginHorizontal: wp( 5 ),
   },
 
   listFooterSection: {
-    paddingHorizontal: 30,
-    paddingBottom: 40,
+    paddingHorizontal: wp( 5 ),
+    paddingBottom: hp( 1 ),
     alignItems: 'flex-start',
   },
 } )

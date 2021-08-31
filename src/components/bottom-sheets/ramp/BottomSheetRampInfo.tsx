@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -14,6 +14,12 @@ import { fetchRampReceiveAddress, fetchRampReservation } from '../../../store/ac
 import useRampReservationFetchEffect from '../../../utils/hooks/ramp-integration/UseRampReservationFetchEffect'
 import openLink from '../../../utils/OpenLink'
 import { ListItem } from 'react-native-elements'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
+import useReceivingAddressFromAccount from '../../../utils/hooks/account-utils/UseReceivingAddressFromAccount'
+import useWallet from '../../../utils/hooks/state-selectors/UseWallet'
+import { newAccountsInfo } from '../../../store/sagas/accounts'
+import { addNewAccountShells } from '../../../store/actions/accounts'
+import DropDown from '../../../utils/Dropdown'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -25,31 +31,51 @@ type Props = {
 
 const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDeepLink, rampFromBuyMenu, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
-  const { rampHostedUrl, rampReceiveAddress } = useRampIntegrationState()
+  const { rampHostedUrl } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
+  const wallet = useWallet()
+  const [ pickReceiveAddressFrom, setPickReceiveAddressFrom ] = useState( AccountType.CHECKING_ACCOUNT )
+  const rampReceiveAddress = useReceivingAddressFromAccount( AccountType.RAMP_ACCOUNT, pickReceiveAddressFrom )
+  const [ dropdown, showDropdown ] = useState( false )
+  const dropdownBoxList = [ {
+    id: 1,
+    type: AccountType.CHECKING_ACCOUNT
+  },
+  {
+    id: 2,
+    type: AccountType.DEPOSIT_ACCOUNT
+  } ]
   function handleProceedButtonPress() {
-    if( !hasButtonBeenPressed && rampFromBuyMenu ){dispatch( fetchRampReservation() )}
+    if( !hasButtonBeenPressed && rampFromBuyMenu ){dispatch( fetchRampReservation( rampReceiveAddress ) )}
     setHasButtonBeenPressed( true )
   }
-
-  useEffect( () => {
-    dispatch( fetchRampReceiveAddress() )
-  }, [] )
-
 
   useRampReservationFetchEffect( {
     onSuccess: () => {
       openLink( rampHostedUrl )
+      onClickSetting()
     },
     onFailure: () => {
       setHasButtonBeenPressed( true )
     }
   } )
 
+  useEffect( ()=> {
+    if( pickReceiveAddressFrom === AccountType.DEPOSIT_ACCOUNT ){
+      if( !wallet.accounts[ AccountType.DEPOSIT_ACCOUNT ] ){
+      // create deposit account if an instance doesn't exist
+        const accountsInfo: newAccountsInfo = {
+          accountType: AccountType.DEPOSIT_ACCOUNT,
+        }
+        dispatch( addNewAccountShells( [ accountsInfo ] ) )
+      } else setPickReceiveAddressFrom( AccountType.DEPOSIT_ACCOUNT )
+    }
+  }, [ pickReceiveAddressFrom, wallet ] )
+
   // eslint-disable-next-line quotes
   let rampMessage = 'Ramp enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin.'
 
-  let rampTitle = 'Buy bitcoin with Ramp'
+  let rampTitle = 'Buy bitcoin\nwith Ramp'
 
   if( rampFromDeepLink && rampDeepLinkContent ) {
     rampMessage = rampDeepLinkContent.search( 'fail' )>=0
@@ -60,41 +86,67 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       : 'Order being processed'
   }
   return ( <View style={{
-    ...styles.modalContentContainer
+    ...styles.modalContentContainer,
   }}>
     <View style={{
-      height: '95%'
+      // height: hp( 74 )
     }}>
-      <View style={styles.successModalHeaderView}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={onPress}
-          style={{
-            flexDirection: 'row'
-          }}
-        >
-          <FontAwesome name="long-arrow-left" color={Colors.blue} size={19} style={{
-            marginTop: hp( 0.5 )
-          }} />
-          <Text style={styles.modalTitleText}>{rampTitle}</Text>
-        </TouchableOpacity>
-        <Text style={{
-          ...styles.modalInfoText,
-          marginTop: wp( 1.5 ),
-          marginBottom: wp( 5 ),
-        }}>{rampMessage}</Text>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={onPress}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity>
+      <Text style={ListStyles.modalTitle}>{rampTitle}</Text>
+      <Text style={{
+        ...styles.modalInfoText
+      }}>{rampMessage}</Text>
+      {/* <TouchableOpacity
+      onPress={() => showDropdown( true )}
+      style={styles.containerStyle}>
+      <View style={styles.headerImageView}>
+        <View style={styles.headerImageInitials}>
+          <Image
+            source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
+            style={styles.headerImage}
+            resizeMode="contain"
+          />
+        </View>
       </View>
-      <View style={{
-        flexDirection: 'row',
-        // marginLeft: wp( '1.5%' ),
-        alignSelf: 'center',
-        width: wp( '90%' ),
-        height: hp( 9 ),
-        backgroundColor: Colors.backgroundColor1,
-        alignItems: 'center',
-        marginBottom: wp( 2 ),
-        borderRadius: wp( 2 )
+
+      <ListItem.Content style={{
+        height: wp( '14%' )
       }}>
+        <ListItem.Subtitle
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            // alignSelf: 'flex-start'
+          } ]}
+          numberOfLines={1}
+        >
+              Account Type
+        </ListItem.Subtitle>
+        <ListItem.Title
+          style={styles.destinationTitleText}
+          numberOfLines={1}
+        >
+          {pickReceiveAddressFrom}
+        </ListItem.Title>
+      </ListItem.Content>
+    </TouchableOpacity>
+    {dropdown ? (
+      <DropDown onClose={( value ) => { setPickReceiveAddressFrom( value.type )
+        showDropdown( false ) }}
+      dropdownBoxList={dropdownBoxList} />
+    ) : null} */}
+      <View style={styles.containerStyle}>
         <View style={styles.headerImageView}>
           <View style={styles.headerImageInitials}>
             <Image
@@ -106,34 +158,33 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         </View>
 
         <ListItem.Content style={{
-          flex: 1,
+          height: wp( '14%' )
         }}>
           <ListItem.Subtitle
             style={ListStyles.infoHeaderSubtitleText}
             numberOfLines={1}
           >
-              bitcoin will be transferred to
+              Bitcoin will be transferred to
           </ListItem.Subtitle>
 
           <ListItem.Title
             style={styles.destinationTitleText}
             numberOfLines={1}
           >
-              Ramp Account
+              Checking Account
           </ListItem.Title>
+          {/* <ListItem.Subtitle
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
+          } ]}
+          numberOfLines={1}
+        >
+              Lorem ipsum dolor amet
+        </ListItem.Subtitle> */}
         </ListItem.Content>
       </View>
 
-      <View style={{
-        flexDirection: 'row',
-        alignSelf: 'center',
-        width: wp( '90%' ),
-        height: hp( 9 ),
-        backgroundColor: Colors.backgroundColor1,
-        alignItems: 'center',
-        marginBottom: wp( 2 ),
-        borderRadius: wp( 2 )
-      }}>
+      <View style={styles.containerStyle}>
         <View style={styles.headerImageView}>
           <View style={styles.headerImageInitials}>
             <Image
@@ -144,13 +195,13 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           </View>
         </View>
         <ListItem.Content style={{
-          flex: 1
+          height: wp( '14%' )
         }}>
           <ListItem.Subtitle
-            style={ListStyles.infoHeaderSubtitleText}
+            style={ListStyles.listItemSubtitle}
             numberOfLines={1}
           >
-              bitcoin will be transferred to
+              Bitcoin will be transferred to
           </ListItem.Subtitle>
 
           <ListItem.Title
@@ -159,7 +210,30 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           >
             {rampReceiveAddress}
           </ListItem.Title>
+          {/* <ListItem.Subtitle
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
+          } ]}
+          numberOfLines={1}
+        >
+              Lorem ipsum dolor amet
+        </ListItem.Subtitle> */}
         </ListItem.Content>
+      </View>
+
+      <View style={{
+        flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto'
+      }} >
+        <AppBottomSheetTouchableWrapper
+          disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
+          onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
+          style={{
+            ...styles.successModalButtonView
+          }}
+        >
+          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy Bitcoin' : 'OK'}</Text>
+
+        </AppBottomSheetTouchableWrapper>
       </View>
       {rampFromBuyMenu
         ? <View style={{
@@ -168,7 +242,8 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           alignItems: 'center',
           alignContent: 'center',
           marginTop: hp( '1.5' ),
-          marginRight: wp( '9%' ),
+          marginRight: wp( '6%' ),
+          marginBottom: hp( '2%' )
         }}>
           <Text style={{
             fontStyle: 'italic',
@@ -188,34 +263,35 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         </View>
         : null
       }
-      <View style={{
-        flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto'
-      }} >
-        <AppBottomSheetTouchableWrapper
-          disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
-          onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
-          style={{
-            ...styles.successModalButtonView
-          }}
-        >
-          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
-
-        </AppBottomSheetTouchableWrapper>
-      </View>
-
     </View>
-
   </View>
   )
 }
 
 const styles = StyleSheet.create( {
+  containerStyle: {
+    flexDirection: 'row',
+    marginLeft: wp( '3%' ),
+    // alignSelf: 'center',
+    width: wp( '85%' ),
+    height: hp( '11%' ),
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    marginBottom: hp( 3 ),
+    borderRadius: wp( 2 ),
+    // elevation: 10,
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 10,
+    // shadowOffset: {
+    //   width: 2, height: 2
+    // },
+  },
   headerImageView: {
-    width: wp( '15%' ),
-    height: wp( '15%' ),
+    width: wp( '17%' ),
+    height: wp( '17%' ),
     borderColor: 'red',
     elevation: 10,
-    shadowColor: Colors.borderColor,
+    shadowColor: Colors.bgColor,
     shadowOpacity: 10,
     shadowOffset: {
       width: 2, height: 2
@@ -223,7 +299,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: wp( '15%' ) / 2,
+    borderRadius: wp( '17%' ) / 2,
     margin: 5
   },
   headerImage: {
@@ -235,12 +311,12 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.backgroundColor,
-    width: wp( '13%' ),
-    height: wp( '13%' ),
-    borderRadius: wp( '13%' ) / 2,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    borderRadius: wp( '15%' ) / 2,
   },
   modalContentContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.bgColor,
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
@@ -252,32 +328,36 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
+    alignContent: 'center',
+    marginVertical: hp( 0.3 ),
+    letterSpacing: RFValue( 0.01 )
   },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
-    marginLeft: wp( '3%' ),
+    // marginLeft: wp( '6%' ),
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.FiraSansRegular,
     width: wp( 30 ),
-    marginLeft: 10
+    marginLeft: 10,
   },
   modalInfoText: {
     marginLeft: wp( '7%' ),
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    marginRight: wp( '12%' ),
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    textAlign: 'justify'
+    textAlign: 'justify',
+    letterSpacing: RFValue( 0.6 ),
+    lineHeight: RFValue( 18 ),
+    marginTop: wp( 1.5 ),
+    marginBottom: wp( 3 )
   },
   successModalButtonView: {
-    minHeight: 50,
-    minWidth: 144,
-    paddingHorizontal: wp( 4 ),
-    paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '43%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
@@ -289,7 +369,8 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '10%' ),
+    marginLeft: wp( '6%' ),
+    marginTop: hp( 2 )
   },
   successModalImage: {
     width: wp( '25%' ),

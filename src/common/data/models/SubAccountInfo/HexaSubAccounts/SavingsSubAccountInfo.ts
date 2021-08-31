@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import {
+  AccountType,
   Balances,
   TransactionDetails,
 } from '../../../../../bitcoin/utilities/Interface'
@@ -17,11 +18,13 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   id: string;
   xPub: string;
+  isUsable: boolean;
   accountShellID: string | null;
   instanceNumber: number;
 
   kind: SubAccountKind = SubAccountKind.SECURE_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.SECURE_ACCOUNT;
+  type: AccountType = AccountType.SAVINGS_ACCOUNT
 
   balances: Balances;
   visibility: AccountVisibility;
@@ -40,10 +43,11 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   constructor( {
     id = uuid(),
     xPub = null,
+    isUsable,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Savings Account',
-    defaultSubTitle= 'Multi-factor security',
+    defaultSubTitle= '2 of 3 MultiSig bitcoin wallet',
     balances = {
       confirmed: 0, unconfirmed: 0
     },
@@ -54,6 +58,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   }: ConstructorProps ) {
     this.id = id
     this.xPub = xPub
+    this.isUsable = isUsable,
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle

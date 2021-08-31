@@ -167,25 +167,25 @@ export default function SettingGetNewPin( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={{
         }}>
-          <View style={styles.modalHeaderTitleView}>
+          {/* <View style={styles.modalHeaderTitleView}>
             <View style={{
-              flexDirection: 'row', alignItems: 'center' 
+              flexDirection: 'row', alignItems: 'center'
             }}>
               <TouchableOpacity
                 onPress={() => props.navigation.goBack()}
-                hitSlop={{ 
-                  top: 20, left: 20, bottom: 20, right: 20 
+                hitSlop={{
+                  top: 20, left: 20, bottom: 20, right: 20
                 }}
                 style={{
-                  height: 30, width: 30, justifyContent: 'center' 
+                  height: 30, width: 30, justifyContent: 'center'
                 }}
               >
                 <FontAwesome
@@ -198,7 +198,7 @@ export default function SettingGetNewPin( props ) {
                 {'Manage Passcode'}
               </Text>
             </View>
-          </View>
+          </View> */}
           {/* <Text style={ styles.headerTitleText }>Hello!</Text> */}
           <View>
             <Text style={styles.headerInfoText}>
@@ -260,7 +260,7 @@ export default function SettingGetNewPin( props ) {
                   >
                     {passcode.length >= 2 ? (
                       <Text style={{
-                        fontSize: RFValue( 10, 812 ) 
+                        fontSize: RFValue( 10, 812 )
                       }}>
                         <FontAwesome
                           size={8}
@@ -291,7 +291,7 @@ export default function SettingGetNewPin( props ) {
                   >
                     {passcode.length >= 3 ? (
                       <Text style={{
-                        fontSize: RFValue( 10, 812 ) 
+                        fontSize: RFValue( 10, 812 )
                       }}>
                         <FontAwesome
                           size={8}
@@ -322,7 +322,7 @@ export default function SettingGetNewPin( props ) {
                   >
                     {passcode.length >= 4 ? (
                       <Text style={{
-                        fontSize: RFValue( 10, 812 ) 
+                        fontSize: RFValue( 10, 812 )
                       }}>
                         <FontAwesome
                           size={8}
@@ -347,7 +347,7 @@ export default function SettingGetNewPin( props ) {
               </Text>
               <View>
                 <View style={{
-                  flexDirection: 'row', marginTop: hp( '1.5%' ) 
+                  flexDirection: 'row', marginTop: hp( '1.5%' )
                 }}>
                   <View
                     style={[
@@ -367,14 +367,14 @@ export default function SettingGetNewPin( props ) {
                       style={[
                         confirmPasscode.length == 0 && confirmPasscodeFlag == 1
                           ? {
-                            ...styles.textFocused 
+                            ...styles.textFocused
                           }
                           : styles.textStyles,
                       ]}
                     >
                       {confirmPasscode.length >= 1 ? (
                         <Text style={{
-                          fontSize: RFValue( 10, 812 ) 
+                          fontSize: RFValue( 10, 812 )
                         }}>
                           <FontAwesome
                             size={8}
@@ -423,7 +423,7 @@ export default function SettingGetNewPin( props ) {
                     >
                       {confirmPasscode.length >= 2 ? (
                         <Text style={{
-                          fontSize: RFValue( 10, 812 ) 
+                          fontSize: RFValue( 10, 812 )
                         }}>
                           <FontAwesome
                             size={8}
@@ -471,7 +471,7 @@ export default function SettingGetNewPin( props ) {
                     >
                       {confirmPasscode.length >= 3 ? (
                         <Text style={{
-                          fontSize: RFValue( 10, 812 ) 
+                          fontSize: RFValue( 10, 812 )
                         }}>
                           <FontAwesome
                             size={8}
@@ -519,7 +519,7 @@ export default function SettingGetNewPin( props ) {
                     >
                       {confirmPasscode.length >= 4 ? (
                         <Text style={{
-                          fontSize: RFValue( 10, 812 ) 
+                          fontSize: RFValue( 10, 812 )
                         }}>
                           <FontAwesome
                             size={8}
@@ -555,7 +555,7 @@ export default function SettingGetNewPin( props ) {
           ) : null}
         </View>
         <View style={{
-          marginTop: 'auto' 
+          marginTop: 'auto'
         }}>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
@@ -665,7 +665,7 @@ export default function SettingGetNewPin( props ) {
           <View style={styles.keyPadRow}>
             <View style={styles.keyPadElementTouchable}>
               <Text style={{
-                flex: 1, padding: 15 
+                flex: 1, padding: 15
               }}></Text>
             </View>
             <TouchableOpacity
@@ -731,7 +731,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 0.35,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     borderColor: Colors.borderColor,
     alignItems: 'center',
@@ -779,7 +779,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   proceedButtonText: {

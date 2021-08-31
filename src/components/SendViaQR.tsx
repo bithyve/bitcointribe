@@ -11,13 +11,14 @@ import BottomInfoBox from './BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { nameToInitials } from '../common/CommonFunctions'
 import { ScrollView } from 'react-native-gesture-handler'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from './QRCode'
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../common/constants/wallet-service-types'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { ContactRecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
 
 export default function SendViaQR( props ) {
   const [ contactName, setContactName ] = useState( '' )
@@ -60,15 +61,7 @@ export default function SendViaQR( props ) {
   }, [ props.serviceType ] )
 
   useEffect( () => {
-    const contactName =
-      Contact && Contact.firstName && Contact.lastName
-        ? Contact.firstName + ' ' + Contact.lastName
-        : Contact && Contact.firstName && !Contact.lastName
-          ? Contact.firstName
-          : Contact && !Contact.firstName && Contact.lastName
-            ? Contact.lastName
-            : ''
-    setContactName( contactName )
+    setContactName( contact.contactName )
   }, [ Contact ] )
 
   const renderVerticalDivider = () => {
@@ -91,6 +84,32 @@ export default function SendViaQR( props ) {
     let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
     number = number.slice( number.length - 10 ) // last 10 digits only
     return number
+  }
+
+  const getImageIcon = ( item: ContactRecipientDescribing ) => {
+    if ( Object.keys( item ).length ) {
+      if ( item.avatarImageSource ) {
+        return (
+          <View style={styles.headerImageView}>
+            <Image source={item.avatarImageSource} style={styles.headerImage} />
+          </View>
+        )
+      } else {
+        return (
+          <View style={styles.headerImageView}>
+            <View style={styles.headerImageInitials}>
+              <Text style={styles.headerImageInitialsText}>
+                {item.displayedName
+                  ? nameToInitials(
+                    item.displayedName
+                  )
+                  : ''}
+              </Text>
+            </View>
+          </View>
+        )
+      }
+    }
   }
 
   return (
@@ -163,9 +182,7 @@ export default function SendViaQR( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView contentContainerStyle={{
-        flex: 1
-      }}>
+      <ScrollView>
         <View
           style={{
             marginLeft: 20,
@@ -215,91 +232,43 @@ export default function SendViaQR( props ) {
                           <Text style={styles.contactNameText}>
                             {contactName}
                           </Text>
-                        ) : null}
+                        ) : Contact.displayedName ? <Text style={styles.contactNameText}>
+                          {Contact.displayedName}
+                        </Text> : null}
                         {Contact &&
-                          Contact.phoneNumbers &&
-                          Contact.phoneNumbers.length ? (
-                            <Text
-                              style={{
-                                color: Colors.textColorGrey,
-                                fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue( 10 ),
-                                marginLeft: 25,
-                                paddingTop: 3,
-                              }}
-                            >
-                              {setPhoneNumber()}
-                              {/* {Contact && Contact.phoneNumbers[0].digits} */}
-                            </Text>
-                          ) : Contact &&
-                            Contact.emails &&
-                            Contact.emails.length ? (
-                              <Text
-                                style={{
-                                  color: Colors.textColorGrey,
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  fontSize: RFValue( 10 ),
-                                  marginLeft: 25,
-                                  paddingTop: 3,
-                                  paddingBottom: 5,
-                                }}
-                              >
-                                {Contact && Contact.emails[ 0 ].email}
-                              </Text>
-                            ) : null}
+                          Contact.connectedVia && (
+                          <Text
+                            style={{
+                              color: Colors.textColorGrey,
+                              fontFamily: Fonts.FiraSansRegular,
+                              fontSize: RFValue( 10 ),
+                              marginLeft: 25,
+                              paddingTop: 3,
+                            }}
+                          >
+                            {Contact.connectedVia}
+                          </Text>
+                        )}
                       </View>
                     </View>
-                    {Contact && Contact.imageAvailable ? (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          marginLeft: 15,
-                          marginRight: 15,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          shadowOpacity: 1,
-                          shadowOffset: {
-                            width: 2, height: 2
-                          },
-                        }}
-                      >
-                        <Image
-                          source={Contact && Contact.image}
-                          style={{
-                            ...styles.contactProfileImage
-                          }}
-                        />
-                      </View>
-                    ) : (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          marginLeft: 15,
-                          marginRight: 15,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          width: 70,
-                          height: 70,
-                          borderRadius: 70 / 2,
-                          shadowColor: Colors.shadowBlue,
-                          shadowOpacity: 1,
-                          shadowOffset: {
-                            width: 2, height: 2
-                          },
-                        }}
-                      >
-                        <Text
-                          style={{
-                            textAlign: 'center',
-                            fontSize: RFValue( 20 ),
-                            lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
-                          }}
-                        >
-                          {nameToInitials( contactName )}
-                        </Text>
-                      </View>
-                    )}
+                    <View
+                      style={{
+                        position: 'absolute',
+                        marginLeft: 15,
+                        marginRight: 15,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        elevation: 10,
+                        shadowColor: Colors.borderColor,
+                        shadowOpacity: 10,
+                        shadowOffset: {
+                          width: 2, height: 2
+                        },
+                        borderRadius: wp( '17%' ) / 2,
+                      }}
+                    >
+                      {getImageIcon( Contact )}
+                    </View>
                   </View>
                 </View>
               )}
@@ -413,7 +382,10 @@ export default function SendViaQR( props ) {
             {!props.QR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={props.QR} size={hp( '27%' )} />
+              <QRCode
+                title={serviceType && serviceType == TEST_ACCOUNT
+                  ? 'Testnet address'
+                  : 'Bitcoin address'} value={props.QR} size={hp( '27%' )} />
             )}
           </View>
           {/* <AppBottomSheetTouchableWrapper
@@ -444,12 +416,12 @@ export default function SendViaQR( props ) {
 
       {!props.isFromReceive ? (
         <View style={{
-          marginTop: 'auto'
+          marginTop: hp( 2 )
         }}>
           <BottomInfoBox
             title={props.noteHeader ? props.noteHeader : 'Note'}
             infoText={
-              props.noteText ? props.noteText : 'Use the scanner of your friends app to scan the QR and proceed with the Friends and Family request'
+              props.noteText ? props.noteText : 'Use the scanner of your friends app to scan the QR and proceed with the Friends & Family request'
             }
           />
         </View>
@@ -462,9 +434,9 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: hp( 2 )
   },
   modalContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
@@ -574,5 +546,31 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMediumItalic,
     fontStyle: 'italic',
     color: Colors.blue,
+  },
+  headerImageView: {
+    width: wp( '17%' ),
+    height: wp( '17%' ),
+    borderColor: 'red',
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: wp( '17%' ) / 2,
+  },
+  headerImage: {
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    borderRadius: wp( '15%' ) / 2,
+  },
+  headerImageInitials: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.shadowBlue,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    borderRadius: wp( '15%' ) / 2,
+  },
+  headerImageInitialsText: {
+    textAlign: 'center',
+    fontSize: RFValue( 17 ),
   },
 } )

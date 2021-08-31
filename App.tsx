@@ -5,7 +5,7 @@ import makeStore from './src/store'
 import NoInternetModalContents from './src/components/NoInternetModalContents'
 import { useDispatch } from 'react-redux'
 import NetInfo from '@react-native-community/netinfo'
-import { getVersion, getBuildId } from 'react-native-device-info'
+import { getVersion, getBuildId, getBuildNumber } from 'react-native-device-info'
 import { setApiHeaders } from './src/services/api'
 import firebase from '@react-native-firebase/app'
 import analytics from '@react-native-firebase/analytics'
@@ -16,6 +16,8 @@ import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sh
 import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs'
 import getActiveRouteName from './src/utils/navigation/GetActiveRouteName'
 import { LogBox } from 'react-native'
+import ModalContainer from './src/components/home/ModalContainer'
+import { RootSiblingParent } from 'react-native-root-siblings'
 
 LogBox.ignoreAllLogs( true )
 
@@ -23,13 +25,12 @@ export const URI_PREFIX = 'hexa://'
 
 async function configureAPIHeaders() {
   const version = await getVersion()
-  const buildNumber = await getBuildId()
+  const buildNumber = getBuildNumber()
 
   setApiHeaders( {
     appVersion: version, appBuildNumber: buildNumber
   } )
 }
-
 
 export default function AppWrapper() {
 
@@ -46,18 +47,21 @@ export default function AppWrapper() {
   }, [] )
 
   return (
-    <Provider store={store} uriPrefix={URI_PREFIX}>
-      <BottomSheetModalProvider>
-        <AppContent />
-      </BottomSheetModalProvider>
-    </Provider>
+    <RootSiblingParent>
+      <Provider store={store} uriPrefix={URI_PREFIX}>
+        <BottomSheetModalProvider>
+          <AppContent />
+        </BottomSheetModalProvider>
+      </Provider>
+    </RootSiblingParent>
+
   )
 }
 
 function AppContent() {
   const dispatch = useDispatch()
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
-
+  const [ noInternetModal, showNoInternetModal ] = useState( false )
   const preferencesState = usePreferencesState()
   const [ previousScreenName, setPreviousScreenName ] = useState<string | null>()
   const [ currentScreenName, setCurrentScreenName ] = useState<string | null>()
@@ -78,20 +82,20 @@ function AppContent() {
     } ) )
   }
 
-  const showNoInternetWarning = useCallback( () => {
-    presentBottomSheet(
-      <NoInternetModalContents
-        onPressTryAgain={() => {
-          dismissBottomSheet()
-        }}
-        onPressIgnore={() => {
-          resetInternetWarningFlag()
-          dismissBottomSheet()
-        }}
-      />,
-      defaultBottomSheetConfigs,
-    )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  // const showNoInternetWarning = useCallback( () => {
+  //   presentBottomSheet(
+  //     <NoInternetModalContents
+  //       onPressTryAgain={() => {
+  //         dismissBottomSheet()
+  //       }}
+  //       onPressIgnore={() => {
+  //         resetInternetWarningFlag()
+  //         dismissBottomSheet()
+  //       }}
+  //     />,
+  //     defaultBottomSheetConfigs,
+  //   )
+  // }, [ presentBottomSheet, dismissBottomSheet ] )
 
   function setupInternetWarningListener() {
     return NetInfo.addEventListener( ( state ) => {
@@ -103,9 +107,9 @@ function AppContent() {
       }
 
       if ( state.isInternetReachable ) {
-        dismissBottomSheet()
+        showNoInternetModal( false )
       } else {
-        showNoInternetWarning()
+        showNoInternetModal( true )
       }
     } )
   }
@@ -126,15 +130,28 @@ function AppContent() {
   }, [] )
 
   return (
-    <Navigator
-      onNavigationStateChange={async ( prevState, currentState ) => {
-        setPreviousScreenName( getActiveRouteName( prevState ) )
-        setCurrentScreenName( getActiveRouteName( currentState ) )
+    <>
+      <Navigator
+        onNavigationStateChange={async ( prevState, currentState ) => {
+          setPreviousScreenName( getActiveRouteName( prevState ) )
+          setCurrentScreenName( getActiveRouteName( currentState ) )
 
-        if ( previousScreenName !== currentScreenName ) {
-          analytics().logEvent( currentScreenName )
-        }
-      }}
-    />
+          if ( previousScreenName !== currentScreenName ) {
+            analytics().logEvent( currentScreenName )
+          }
+        }}
+      />
+      <ModalContainer visible={noInternetModal} closeBottomSheet={() => {}} >
+        <NoInternetModalContents
+          onPressTryAgain={() => {
+            showNoInternetModal( false )
+          }}
+          onPressIgnore={() => {
+            resetInternetWarningFlag()
+            showNoInternetModal( false )
+          }}
+        />
+      </ModalContainer>
+    </>
   )
 }

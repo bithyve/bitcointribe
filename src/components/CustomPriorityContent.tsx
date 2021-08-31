@@ -69,7 +69,7 @@ export default function CustomPriorityContent( props ) {
 
   return (
     <View style={{
-      height: '100%', backgroundColor: Colors.white
+      backgroundColor: Colors.white
     }}>
       <View
         style={{
@@ -117,7 +117,12 @@ export default function CustomPriorityContent( props ) {
           returnKeyLabel="Done"
           returnKeyType="done"
           keyboardType={'numeric'}
-          onChangeText={( value ) => onCustomFeeChange( value )}
+          onChangeText={( value ) => {
+            const regEx = /^[0-9]+$/
+            if( regEx.test( value ) ) {
+              onCustomFeeChange( value )
+            }
+          }}
           placeholderTextColor={Colors.borderColor}
           autoCorrect={false}
           autoCompleteType="off"
@@ -204,7 +209,7 @@ export default function CustomPriorityContent( props ) {
 const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginBottom: hp( '1%' ),
-    marginTop: hp( '1%' ),
+    marginTop: hp( '3%' ),
   },
   modalTitleText: {
     color: Colors.blue,

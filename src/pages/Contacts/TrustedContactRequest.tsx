@@ -19,6 +19,7 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
+import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
 
 export default function TrustedContactRequest( props ) {
   const [ WrongInputError, setWrongInputError ] = useState( '' )
@@ -42,7 +43,7 @@ export default function TrustedContactRequest( props ) {
   }
 
   useEffect( () => {
-    if ( !props.inputType ) setIsDisabled( false )
+    if ( !props.inputType || props.inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ props.inputType ] )
 
@@ -79,7 +80,7 @@ export default function TrustedContactRequest( props ) {
     }
   }
   const getInputBox = () => {
-    if ( props.inputType == 'email' ) {
+    if ( props.inputType == DeepLinkEncryptionType.EMAIL ) {
       return (
         <View style={styles.textboxView}>
           <TextInput
@@ -91,7 +92,7 @@ export default function TrustedContactRequest( props ) {
             placeholderTextColor={Colors.borderColor}
             placeholder={`${props.hint.charAt( 0 )}XXXX@XXX${props.hint.substring(
               1,
-            )}.com`}
+            )}`}
             onChangeText={( text ) => {
               setEmailId( text )
             }}
@@ -115,7 +116,7 @@ export default function TrustedContactRequest( props ) {
           />
         </View>
       )
-    } else if ( props.inputType == 'phone' ) {
+    } else if ( props.inputType == DeepLinkEncryptionType.NUMBER ) {
       return (
         <View style={styles.textboxView}>
           <View style={styles.separatorView} />
@@ -125,9 +126,9 @@ export default function TrustedContactRequest( props ) {
             returnKeyType="done"
             onSubmitEditing={Keyboard.dismiss}
             placeholderTextColor={Colors.borderColor}
-            placeholder={`${props.hint.charAt(
+            placeholder={`${props.hint?.charAt(
               0,
-            )}XXX XXX X${props.hint.substring( 1 )}`}
+            )}XXX XXX X${props.hint?.substring( 1 )}`}
             onChangeText={( text ) => {
               setPhoneNumber( text )
               if ( text.length === 10 ) checkForValidation( text )
@@ -152,7 +153,7 @@ export default function TrustedContactRequest( props ) {
           />
         </View>
       )
-    } else {
+    } else if ( props.inputType === DeepLinkEncryptionType.OTP ){
       return (
         <View style={{
           flexDirection: 'row', marginBottom: wp( '5%' )
@@ -199,6 +200,7 @@ export default function TrustedContactRequest( props ) {
                   if ( value && i == 5 ) {
                     onPressNumber( value, 5 )
                     this.textInput6.focus()
+
                   }
                 }}
                 onKeyPress={( e ) => {
@@ -228,20 +230,22 @@ export default function TrustedContactRequest( props ) {
                   }
                 }}
                 onFocus={() => {
-                  if ( Platform.OS == 'ios' ) {
-                    props.bottomSheetRef.current?.expand()
-                  }
+                  // if ( Platform.OS == 'ios' ) {
+                  props.bottomSheetRef.current?.expand()
+                  setIsDisabled( true )
+                  // }
                 }}
                 onBlur={() => {
-                  if ( Platform.OS == 'ios' ) {
-                    if (
-                      ( passcodeArray.length == 0 ||
+                  // if ( Platform.OS == 'ios' ) {
+                  if (
+                    ( passcodeArray.length == 0 ||
                         passcodeArray.length == 6 ) &&
                       i == 5
-                    ) {
-                      props.bottomSheetRef.current?.snapTo( 1 )
-                    }
+                  ) {
+                    props.bottomSheetRef.current?.snapTo( 1 )
+                    setIsDisabled( false )
                   }
+                  // }
                 }}
                 autoCorrect={false}
                 autoCompleteType="off"
@@ -256,7 +260,7 @@ export default function TrustedContactRequest( props ) {
 
   const checkForValidation = ( text ) => {
     console.log( 'TEXT', text.charAt( 0 ) + text.substring( 8 ), props.hint )
-    if ( props.inputType == 'phone' ) {
+    if ( props.inputType == DeepLinkEncryptionType.NUMBER ) {
       if ( text.length == 0 ) {
         setWrongInputError( '' )
         setIsDisabled( true )
@@ -277,14 +281,14 @@ export default function TrustedContactRequest( props ) {
         setIsDisabled( false )
       }
     }
-    if ( props.inputType == 'email' ) {
+    if ( props.inputType == DeepLinkEncryptionType.EMAIL ) {
       if ( text.length == 0 ) {
         setWrongInputError( 'Please enter Email, try again' )
         setIsDisabled( true )
       } else if (
         text.length >= 3 &&
         text.charAt( 0 ) +
-          text.replace( '.com', '' ).slice( text.replace( '.com', '' ).length - 2 ) !=
+          text.slice( text.length - 2 ) !=
           props.hint
       ) {
         setWrongInputError( 'Incorrect Email, try again' )
@@ -299,7 +303,7 @@ export default function TrustedContactRequest( props ) {
   return (
     <KeyboardAvoidingView
       style={{
-        height: '100%',
+        // height: '100%',
         backgroundColor: Colors.white,
       }}
       behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -320,7 +324,7 @@ export default function TrustedContactRequest( props ) {
                 <Text style={styles.modalTitleText}>
                   {props.isGuardian
                     ? 'Backup Request'
-                    : 'Friends and Family Request'}
+                    : 'Friends & Family Request'}
                 </Text>
               ) : (
                 <Text style={styles.modalTitleText}>Recovery Key Request</Text>
@@ -329,7 +333,7 @@ export default function TrustedContactRequest( props ) {
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
                 {props.inputType
-                  ? 'Accept the request to add your contact to Friends and Family'
+                  ? 'Accept the request to add your contact to Friends & Family'
                   : 'You have a request for securing the Recovery Key'}
               </Text>
             </View>
@@ -364,7 +368,7 @@ export default function TrustedContactRequest( props ) {
               marginBottom: hp( '3%' ),
             }}
           />
-          {!props.isQR ? (
+          {props.inputNotRequired ? null: (
             <Text
               style={{
                 ...styles.modalTitleText,
@@ -372,14 +376,14 @@ export default function TrustedContactRequest( props ) {
                 marginRight: wp( '8%' ),
               }}
             >
-              {props.inputType === 'phone'
+              {props.inputType === DeepLinkEncryptionType.NUMBER
                 ? 'Confirm your mobile number'
-                : props.inputType === 'email'
+                : props.inputType === DeepLinkEncryptionType.EMAIL
                   ? 'Confirm your email address'
                   : null}
             </Text>
-          ) : null}
-          {!props.isQR ? (
+          )}
+          {props.inputNotRequired ? null: (
             <Text
               style={{
                 ...styles.modalInfoText,
@@ -397,9 +401,9 @@ export default function TrustedContactRequest( props ) {
                   marginBottom: wp( '8%' ),
                 }}
               >
-                {props.inputType === 'phone'
+                {props.inputType === DeepLinkEncryptionType.NUMBER
                   ? 'mobile number, '
-                  : props.inputType === 'email'
+                  : props.inputType === DeepLinkEncryptionType.EMAIL
                     ? 'email address, '
                     : 'otp, '}
                 <Text style={{
@@ -418,9 +422,9 @@ export default function TrustedContactRequest( props ) {
                   : null}
               </Text> */}
             </Text>
-          ) : null}
+          )}
 
-          {!props.isQR ? (
+          {props.inputNotRequired ? null: (
             <View style={{
               marginLeft: wp( '8%' ), marginRight: wp( '8%' )
             }}>
@@ -431,22 +435,23 @@ export default function TrustedContactRequest( props ) {
               </View>
               {getInputBox()}
             </View>
-          ) : null}
+          )}
 
           <View
             style={{
               flexDirection: 'row',
               marginTop: 'auto',
               alignItems: 'center',
+              marginVertical: hp( '4%' )
             }}
           >
             <AppBottomSheetTouchableWrapper
               disabled={isDisabled}
               onPress={() => {
                 const key =
-                  props.inputType === 'phone'
+                  props.inputType === DeepLinkEncryptionType.NUMBER
                     ? PhoneNumber
-                    : props.inputType === 'email'
+                    : props.inputType === DeepLinkEncryptionType.EMAIL
                       ? EmailId
                       : passcode.toUpperCase()
                 setTimeout( () => {
@@ -468,9 +473,9 @@ export default function TrustedContactRequest( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => {
                 const key =
-                  props.inputType === 'phone'
+                  props.inputType === DeepLinkEncryptionType.NUMBER
                     ? PhoneNumber
-                    : props.inputType === 'email'
+                    : props.inputType === DeepLinkEncryptionType.EMAIL
                       ? EmailId
                       : null
                 props.onPressReject( key )
@@ -497,7 +502,7 @@ export default function TrustedContactRequest( props ) {
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   box: {
