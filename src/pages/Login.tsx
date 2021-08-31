@@ -7,10 +7,8 @@ import {
   StatusBar,
   Platform,
   BackHandler,
-  Alert,
   Linking
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
@@ -27,9 +25,6 @@ import LoaderModal from '../components/LoaderModal'
 import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
-import ModalHeader from '../components/ModalHeader'
-import { initMigration } from '../store/actions/preferences'
-import openLink from '../utils/OpenLink'
 import content from '../common/content'
 import { processDeepLink } from '../common/CommonFunctions'
 import ModalContainer from '../components/home/ModalContainer'
@@ -45,7 +40,7 @@ import {
 import { autoSyncShells } from '../store/actions/accounts'
 import Relay from '../bitcoin/utilities/Relay'
 
-const LOADER_MESSAGE_TIME = 2000
+const LOADER_MESSAGE_TIME = 200
 const loaderMessages = [
   {
     heading: 'Savings Account',
@@ -249,46 +244,30 @@ export default function Login( props ) {
 
   useEffect( () => {
     if ( isAuthenticated ) {
-      // migrate async keys
-      if ( !isMigrated ) {
-        dispatch( initMigration() )
-      }
+      if( !walletExists ) props.navigation.replace( 'WalletInitialization' )
 
-      bootStrapNotifications()
-
-      if ( walletExists ) {
-        dispatch( autoSyncShells() )
-
-        setTimeout( () => {
-          // if ( loaderBottomSheet.current ) {
-          //   loaderBottomSheet.current.snapTo( 0 )
-          // }
-          setloaderModal( false )
-          //console.log( 'requestName**', requestName )
-          //console.log( 'creationFlag**', creationFlag )
-
-          if( !creationFlag ) {
-            props.navigation.navigate( 'Home', {
-              screen: 'Home',
+      setTimeout( () => {
+        setloaderModal( false )
+        if( !creationFlag ) {
+          props.navigation.navigate( 'Home', {
+            screen: 'Home'
+          } )
+        } else if( requestName ){
+          props.navigation.navigate( 'Home', {
+            screen: 'Home',
+            params: {
+              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+              userKey: requestName && requestName.userKey ? requestName.userKey : null,
+              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
             }
-            )
-          } else if( requestName ){
-            props.navigation.navigate( 'Home', {
-              screen: 'Home',
-              params: {
-                custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-                recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-                trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                userKey: requestName && requestName.userKey ? requestName.userKey : null,
-                swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
-              }
-            } )
-          }
-        }, LOADER_MESSAGE_TIME )
-      } else {
-        props.navigation.replace( 'WalletInitialization' )
-      }
+          } )
+        }
 
+        bootStrapNotifications()
+        dispatch( autoSyncShells() )
+      }, LOADER_MESSAGE_TIME )
     }
   }, [ isAuthenticated, walletExists, requestName ] )
 
