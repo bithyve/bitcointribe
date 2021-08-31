@@ -229,14 +229,18 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
         <ListItem.Content>
           <ListItem.Title
-            style={ListStyles.listItemTitle}
+            style={[ ListStyles.listItemTitle, {
+              fontSize: RFValue( 12 )
+            } ]}
             numberOfLines={1}
           >
             {primarySubAccount.customDisplayName || primarySubAccount.defaultTitle}
           </ListItem.Title>
 
           <ListItem.Subtitle
-            style={ListStyles.listItemSubtitle}
+            style={[ ListStyles.listItemSubtitle, {
+              fontSize: RFValue( 10 )
+            } ]}
             numberOfLines={2}
           >
             {primarySubAccount.customDescription || primarySubAccount.defaultDescription}
@@ -247,7 +251,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           style={{
             backgroundColor: Colors.lightBlue,
             marginLeft: 'auto',
-            borderRadius: 5,
+            borderRadius: 7,
             justifyContent: 'center',
             alignItems: 'center',
             paddingLeft: 10,
@@ -435,12 +439,14 @@ const styles = StyleSheet.create( {
   },
   pageInfoText: {
     paddingLeft: 30,
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 14 ),
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
+    fontWeight: '600',
     marginTop: 3,
     backgroundColor: Colors.white,
-    paddingVertical: hp( 0.5 )
+    paddingVertical: hp( 0.5 ),
+    letterSpacing: 0.55
   },
 } )
 
