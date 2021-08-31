@@ -56,8 +56,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
   },
   currencyImageStyle = {
   },
-  amountTextStyle = {
-  },
+  amountTextStyle,
   unitTextStyle = {
   },
   isTestAccount = false,
@@ -156,8 +155,8 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       <Text
         style={{
           ...defaultStyles.amountText,
+          color: textColor,
           ...amountTextStyle,
-          color: Colors.black,
         }}
       >
         {formattedBalanceText}
