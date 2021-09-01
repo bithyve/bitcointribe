@@ -480,7 +480,7 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   const accountState: AccountsState = yield select(
     ( state ) => state.accounts
   )
-
+  const accountIds = []
   const accounts: Accounts = accountState.accounts
   const accountsToSync: Accounts = {
   }
@@ -501,9 +501,13 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   yield put( accountShellRefreshCompleted( accountShells ) )
   for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
     yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
+    if( synchedAcc.hasNewTxn ) {
+      accountIds.push( synchedAcc.id )
+    }
   }
   yield put( updateWalletImageHealth( {
-    updateAccounts: true
+    updateAccounts: true,
+    accountIds: accountIds
   } ) )
 
   // update F&F channels if any new txs found on an assigned address

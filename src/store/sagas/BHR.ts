@@ -709,41 +709,45 @@ function* updateWalletImageWorker( { payload } ) {
     encrypted += cipher.final( 'hex' )
     walletImage.details2FA = encrypted
   }
-  if( updateAccounts ) {
+  if( updateAccounts && accountIds.length > 0 ) {
+    const accounts = yield call( dbManager.getAccounts )
     const acc = {
     }
     accounts.forEach( account => {
       const data = account.toJSON()
-      const txns = []
-      account.transactions.forEach( tx => {
-        txns.push( {
-          receivers: tx.receivers,
-          sender: tx.sender,
-          txid: tx.txid,
-          notes: tx.notes,
-          tags: tx.tags,
-          amount: tx.amount,
-          accountType: tx.accountType,
-          address: tx.address,
-          isNew: tx.isNew,
-          type: tx.type
+      const shouldUpdate = accountIds.includes( data.id )
+      if( shouldUpdate )  {
+        const txns = []
+        account.transactions.forEach( tx => {
+          txns.push( {
+            receivers: tx.receivers,
+            sender: tx.sender,
+            txid: tx.txid,
+            notes: tx.notes,
+            tags: tx.tags,
+            amount: tx.amount,
+            accountType: tx.accountType,
+            address: tx.address,
+            isNew: tx.isNew,
+            type: tx.type
+          } )
         } )
-      } )
-      data.transactions = []
-      data.transactionsMeta = txns
-      const cipher = crypto.createCipheriv(
-        BHROperations.cipherSpec.algorithm,
-        encKey,
-        BHROperations.cipherSpec.iv,
-      )
-      let encrypted = cipher.update(
-        JSON.stringify( data ),
-        'utf8',
-        'hex',
-      )
-      encrypted += cipher.final( 'hex' )
-      acc[ account.id ] = {
-        encryptedData: encrypted
+        data.transactions = []
+        data.transactionsMeta = txns
+        const cipher = crypto.createCipheriv(
+          BHROperations.cipherSpec.algorithm,
+          encKey,
+          BHROperations.cipherSpec.iv,
+        )
+        let encrypted = cipher.update(
+          JSON.stringify( data ),
+          'utf8',
+          'hex',
+        )
+        encrypted += cipher.final( 'hex' )
+        acc[ account.id ] = {
+          encryptedData: encrypted
+        }
       }
     } )
     walletImage.accounts = acc
