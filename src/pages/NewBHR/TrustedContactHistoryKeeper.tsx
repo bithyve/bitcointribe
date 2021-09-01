@@ -687,11 +687,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const onPressContinue = ( selectedContacts ) => {
     Keyboard.dismiss()
-    selectedContacts.length && selectedContacts[ 0 ].isExisting ? setShareType( 'existingContact' ) : setShareType( 'contact' )
-    createGuardian( {
-      chosenContactTmp: getContacts( selectedContacts )
-    } )
-    setShowQrCode( true )
+    if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); setShareType( 'existingContact' ) } else setShareType( 'contact' )
+    setTimeout( () => {
+      createGuardian( {
+        chosenContactTmp: getContacts( selectedContacts )
+      } )
+      setShowQrCode( true )
+    }, 10 )
   }
 
   const renderSecondaryDeviceMessageContents = useCallback( () => {

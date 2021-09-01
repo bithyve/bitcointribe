@@ -844,7 +844,7 @@ function* getPDFDataWorker( { payload } ) {
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
     yield put( pdfSuccessfullyCreated( false ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error GET_PDF_DATA', error )
   }
 }
 
@@ -1031,7 +1031,7 @@ function* confirmPDFSharedWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error CONFIRM_PDF_SHARED', error )
   }
 }
 
@@ -1293,7 +1293,7 @@ function* setLevelToNotSetupStatusWorker( ) {
     yield put( switchS3LoaderKeeper( 'setToBaseStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'setToBaseStatus' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error SET_LEVEL_TO_NOT_SETUP', error )
   }
 }
 
@@ -1339,7 +1339,7 @@ function* setHealthStatusWorker( ) {
     yield put( switchS3LoaderKeeper( 'healthExpiryStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'healthExpiryStatus' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error SET_HEALTH_STATUS', error )
   }
 }
 
@@ -1388,7 +1388,7 @@ function* createChannelAssetsWorker( { payload } ) {
     }
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error CREATE_CHANNEL_ASSETS', error )
   }
 }
 
@@ -1432,7 +1432,7 @@ function* downloadSMShareWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error DOWNLOAD_SM_SHARE', error )
   }
 }
 
@@ -1448,7 +1448,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    if( existingContact ){
+    if( existingContact ) {
       const existingContactDetails = contacts[ channelKey ].contactDetails
       const channelUpdate =  {
         contactInfo: {
@@ -1583,7 +1583,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     }
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'CREATE_OR_CHANGE_GUARDIAN Error', error )
   }
 }
 
@@ -1630,7 +1630,7 @@ function* modifyLevelDataWorker( ) {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error MODIFY_LEVELDATA', error )
   }
 }
 
@@ -1670,7 +1670,7 @@ function* downloadBackupDataWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error DOWNLOAD_BACKUP_DATA', error )
   }
 }
 

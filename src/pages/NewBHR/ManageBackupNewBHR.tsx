@@ -1144,7 +1144,7 @@ Wallet Backup
               </View>
             </View>
           </ScrollView>
-          {/* {this.state.showLoader ? <Loader isLoading={true}/> : null} */}
+
           <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}

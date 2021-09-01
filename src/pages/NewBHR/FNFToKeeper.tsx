@@ -160,7 +160,7 @@ const FNFToKeeper = ( props ) => {
           alignItems: 'flex-start'
         }}>
           <Text style={{
-            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: contact.length && contact[ 0 ].id == contactDescription.contactDetails.id && contact[ 0 ].isExisting ? Colors.white : Colors.textColorGrey
           }}>{firstNamePieceText( contactDescription.contactDetails )}
             <Text style={{
               ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansMedium
