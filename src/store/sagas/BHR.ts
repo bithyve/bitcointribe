@@ -684,40 +684,16 @@ function* updateWalletImageWorker( { payload } ) {
     name: wallet.walletName,
     walletId : wallet.walletId,
   }
-  const encKey = BHROperations.getDerivedKey(
-    bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' ),
-  )
+  const encryptionKey = bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' )
   if( updateSmShare ) {
-    const cipher = crypto.createCipheriv(
-      BHROperations.cipherSpec.algorithm,
-      encKey,
-      BHROperations.cipherSpec.iv,
-    )
-    let encrypted = cipher.update(
-      JSON.stringify( wallet.smShare ),
-      'utf8',
-      'hex',
-    )
-    encrypted += cipher.final( 'hex' )
-    walletImage.SM_share = encrypted
+    walletImage.SM_share = BHROperations.encryptWithAnswer( wallet.smShare, encryptionKey ).encryptedData
   }
   if( update2fa && wallet.secondaryXpub ) {
-    const cipher = crypto.createCipheriv(
-      BHROperations.cipherSpec.algorithm,
-      encKey,
-      BHROperations.cipherSpec.iv,
-    )
     const details2FA = {
       secondaryXpub: wallet.secondaryXpub,
       ...wallet.details2FA
     }
-    let encrypted = cipher.update(
-      JSON.stringify( details2FA ),
-      'utf8',
-      'hex',
-    )
-    encrypted += cipher.final( 'hex' )
-    walletImage.details2FA = encrypted
+    walletImage.details2FA = BHROperations.encryptWithAnswer( details2FA, encryptionKey ).encryptedData
   }
   if( updateAccounts && accountIds.length > 0 ) {
     const accounts = yield call( dbManager.getAccounts )
@@ -744,19 +720,8 @@ function* updateWalletImageWorker( { payload } ) {
         } )
         data.transactions = []
         data.transactionsMeta = txns
-        const cipher = crypto.createCipheriv(
-          BHROperations.cipherSpec.algorithm,
-          encKey,
-          BHROperations.cipherSpec.iv,
-        )
-        let encrypted = cipher.update(
-          JSON.stringify( data ),
-          'utf8',
-          'hex',
-        )
-        encrypted += cipher.final( 'hex' )
         acc[ account.id ] = {
-          encryptedData: encrypted
+          encryptedData: BHROperations.encryptWithAnswer( JSON.stringify( data ), encryptionKey ).encryptedData
         }
       }
     } )
@@ -768,34 +733,13 @@ function* updateWalletImageWorker( { payload } ) {
     contacts.forEach( contact => {
       channelIds.push( contact.channelKey )
     } )
-    const cipher = crypto.createCipheriv(
-      BHROperations.cipherSpec.algorithm,
-      encKey,
-      BHROperations.cipherSpec.iv,
-    )
-    let encrypted = cipher.update(
-      JSON.stringify( channelIds ),
-      'utf8',
-      'hex',
-    )
-    encrypted += cipher.final( 'hex' )
-    walletImage.contacts = encrypted
+    walletImage.contacts = BHROperations.encryptWithAnswer( JSON.stringify( channelIds ), encryptionKey ).encryptedData
   }
   if( updateVersion ) {
     const STATE_DATA = yield call( stateDataToBackup )
-    const cipher = crypto.createCipheriv(
-      BHROperations.cipherSpec.algorithm,
-      encKey,
-      BHROperations.cipherSpec.iv,
-    )
-    let encrypted = cipher.update(
-      JSON.stringify( STATE_DATA.versionHistory ),
-      'utf8',
-      'hex',
-    )
-    encrypted += cipher.final( 'hex' )
-    walletImage.versionHistory = encrypted
+    walletImage.versionHistory = BHROperations.encryptWithAnswer( JSON.stringify( STATE_DATA.versionHistory ), encryptionKey ).encryptedData
   }
+  console.log( 'WALLET IMAGE', walletImage )
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
     if ( res.data ) console.log( 'Wallet Image updated' )

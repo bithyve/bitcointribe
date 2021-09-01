@@ -509,10 +509,12 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
       computeNetBalance = true
     }
   }
-  yield put( updateWalletImageHealth( {
-    updateAccounts: true,
-    accountIds: accountIds
-  } ) )
+  if( accountIds.length > 0 ) {
+    yield put( updateWalletImageHealth( {
+      updateAccounts: true,
+      accountIds: accountIds
+    } ) )
+  }
 
   if( computeNetBalance ) yield put( recomputeNetBalance() )
 
