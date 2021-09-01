@@ -10,6 +10,7 @@ import { UsNumberFormat } from '../../../common/utilities'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import { shadowColorForAccountKind } from '../../../components/account-details/AccountDetailsCard'
 
 export type Props = {
   availableBalance: Satoshis;
@@ -41,7 +42,9 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
     <View style={styles.rootContainer}>
 
       <Text style={{
-        ...ListStyles.listItemTitle, marginBottom: 12,
+        ...ListStyles.listItemTitle, marginBottom: 12,  color: shadowColorForAccountKind( {
+          kind
+        } )
       }}>
         Available to spend: {formattedBalanceText} {formattedUnitText}
       </Text>

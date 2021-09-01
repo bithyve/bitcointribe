@@ -75,7 +75,7 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
       case SubAccountKind.SECURE_ACCOUNT:
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
-        return Colors.borderColor
+        return Colors.kashmirBlue
       case SubAccountKind.SERVICE:
         switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
             case ( ServiceAccountKind.WYRE ):
@@ -86,7 +86,7 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
               return Colors.kashmirBlue
         }
       default:
-        return Colors.borderColor
+        return Colors.kashmirBlue
   }
 }
 
