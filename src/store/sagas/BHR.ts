@@ -510,6 +510,21 @@ function* recoverWalletWorker( { payload } ) {
       accountData[ JSON.parse( decryptedAccData ).type ] = JSON.parse( decryptedAccData ).id
       acc.push( JSON.parse( decryptedAccData ) )
     } )
+
+    let secondaryXpub, details2FA
+    if( image.details2FA ){
+      const decipher = crypto.createDecipheriv(
+        BHROperations.cipherSpec.algorithm,
+        decKey,
+        BHROperations.cipherSpec.iv,
+      )
+      let decryptedData = decipher.update( image.details2FA, 'hex', 'utf8' )
+      decryptedData += decipher.final( 'utf8' )
+      const decrypted2FADetails = JSON.parse( decryptedData )
+      secondaryXpub = decrypted2FADetails.secondaryXpub
+      details2FA = decrypted2FADetails.details2FA
+    }
+
     // Update Wallet
     const wallet: Wallet = {
       walletId: image.walletId,
@@ -522,7 +537,9 @@ function* recoverWalletWorker( { payload } ) {
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: DeviceInfo.getVersion(),
-      primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
+      primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
+      secondaryXpub,
+      details2FA
     }
     // restore Contacts
     if( image.contacts ) {
@@ -702,14 +719,18 @@ function* updateWalletImageWorker( { payload } ) {
     encrypted += cipher.final( 'hex' )
     walletImage.SM_share = encrypted
   }
-  if( update2fa ) {
+  if( update2fa && wallet.secondaryXpub ) {
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
       BHROperations.cipherSpec.iv,
     )
+    const details2FA = {
+      secondaryXpub: wallet.secondaryXpub,
+      ...wallet.details2FA
+    }
     let encrypted = cipher.update(
-      JSON.stringify( wallet.details2FA ),
+      JSON.stringify( details2FA ),
       'utf8',
       'hex',
     )
