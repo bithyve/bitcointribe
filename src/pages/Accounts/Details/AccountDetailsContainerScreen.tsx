@@ -251,7 +251,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const renderSecureAccountKnowMoreContent = () => {
     return (
       <SavingAccountAlertBeforeLevel2
-        titleClicked={()=>{setSecureAccountKnowMore( false );  navigation.pop() }}
+        titleClicked={()=>{setSecureAccountAlert( true ); setSecureAccountKnowMore( false ) }}
         containerStyle={{
         }}
       />
@@ -395,7 +395,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {}} >
         {renderSecureAccountAlertContent()}
       </ModalContainer>
-      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {}} >
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => { setSecureAccountAlert( true ); setSecureAccountKnowMore( false )  }} >
         {renderSecureAccountKnowMoreContent()}
       </ModalContainer>
     </View>
