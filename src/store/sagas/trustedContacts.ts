@@ -284,7 +284,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const instream = useStreamFromContact( primaryKeeper, walletId, true )
         const secondarySetupData = idx( instream, ( _ ) => _.primaryData.secondarySetupData )
         if( secondarySetupData ){
-          shouldUpdateSmShare = secondarySetupData.secondaryShardWI !== ''
           const secondaryXpub = secondarySetupData.secondaryXpub
           yield put( updateWallet(
             {
@@ -292,14 +291,15 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               secondaryXpub,
             }
           ) )
+          const smShare = secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
+          shouldUpdateSmShare = secondarySetupData.secondaryShardWI !== ''
           yield call( dbManager.updateWallet, {
             secondaryXpub,
-            smShare: secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
+            smShare,
           } )
         }
       }
-
-      if( updateWI ) yield put( updateWalletImageHealth( {
+      if( updateWI ||  shouldUpdateSmShare ) yield put( updateWalletImageHealth( {
         updateContacts: true,
         updateSmShare : shouldUpdateSmShare,
         update2fa: shouldUpdateSmShare
