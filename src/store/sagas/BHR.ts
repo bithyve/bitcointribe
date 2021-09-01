@@ -491,7 +491,6 @@ function* recoverWalletWorker( { payload } ) {
     if( getWI.status == 200 ) {
       image = getWI.data.walletImage
     }
-    const contactsChannelKeys = image.contacts
     const accounts = image.accounts
     const acc = []
     const accountData = {
@@ -526,12 +525,22 @@ function* recoverWalletWorker( { payload } ) {
       primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
     }
     // restore Contacts
-    if( contactsChannelKeys.length > 0 ) {
-      yield call( restoreTrustedContactsWorker, {
-        payload: {
-          walletId: wallet.walletId, channelKeys: contactsChannelKeys
-        }
-      } )
+    if( image.contacts ) {
+      const decipher = crypto.createDecipheriv(
+        BHROperations.cipherSpec.algorithm,
+        decKey,
+        BHROperations.cipherSpec.iv,
+      )
+      let decryptedChannelIds = decipher.update( image.contacts, 'hex', 'utf8' )
+      decryptedChannelIds += decipher.final( 'utf8' )
+      const contactsChannelKeys = JSON.parse( decryptedChannelIds )
+      if( contactsChannelKeys.length > 0 ) {
+        yield call( restoreTrustedContactsWorker, {
+          payload: {
+            walletId: wallet.walletId, channelKeys: contactsChannelKeys
+          }
+        } )
+      }
     }
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
@@ -756,6 +765,7 @@ function* updateWalletImageWorker( { payload } ) {
     contacts.forEach( contact => {
       channelIds.push( contact.channelKey )
     } )
+    console.log( 'channelIds', channelIds )
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
@@ -785,7 +795,6 @@ function* updateWalletImageWorker( { payload } ) {
     walletImage.versionHistory = encrypted
   }
   const res = yield call( Relay.updateWalletImage, walletImage )
-
   if ( res.status === 200 ) {
     if ( res.data ) console.log( 'Wallet Image updated' )
     yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
