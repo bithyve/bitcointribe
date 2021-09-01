@@ -765,7 +765,6 @@ function* updateWalletImageWorker( { payload } ) {
     contacts.forEach( contact => {
       channelIds.push( contact.channelKey )
     } )
-    console.log( 'channelIds', channelIds )
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
