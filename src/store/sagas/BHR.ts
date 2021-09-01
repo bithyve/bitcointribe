@@ -491,7 +491,6 @@ function* recoverWalletWorker( { payload } ) {
     if( getWI.status == 200 ) {
       image = getWI.data.walletImage
     }
-    const contactsChannelKeys = image.contacts
     const accounts = image.accounts
     const acc = []
     const accountData = {
@@ -526,12 +525,22 @@ function* recoverWalletWorker( { payload } ) {
       primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
     }
     // restore Contacts
-    if( contactsChannelKeys.length > 0 ) {
-      yield call( restoreTrustedContactsWorker, {
-        payload: {
-          walletId: wallet.walletId, channelKeys: contactsChannelKeys
-        }
-      } )
+    if( image.contacts ) {
+      const decipher = crypto.createDecipheriv(
+        BHROperations.cipherSpec.algorithm,
+        decKey,
+        BHROperations.cipherSpec.iv,
+      )
+      let decryptedChannelIds = decipher.update( image.contacts, 'hex', 'utf8' )
+      decryptedChannelIds += decipher.final( 'utf8' )
+      const contactsChannelKeys = JSON.parse( decryptedChannelIds )
+      if( contactsChannelKeys.length > 0 ) {
+        yield call( restoreTrustedContactsWorker, {
+          payload: {
+            walletId: wallet.walletId, channelKeys: contactsChannelKeys
+          }
+        } )
+      }
     }
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
@@ -661,67 +670,130 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA
 }
 
-function* updateWalletImageWorker() {
+function* updateWalletImageWorker( { payload } ) {
+  const {
+    updateContacts,
+    updateVersion,
+    updateSmShare,
+    update2fa,
+    updateAccounts,
+    accountIds
+  } = payload
   yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
   const wallet = yield call( dbManager.getWallet )
-  const contacts = yield call( dbManager.getTrustedContacts )
-  const accounts = yield call( dbManager.getAccounts )
+  const walletImage : NewWalletImage = {
+    name: wallet.walletName,
+    walletId : wallet.walletId,
+  }
   const encKey = BHROperations.getDerivedKey(
     bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' ),
   )
-  const acc = {
-  }
-  accounts.forEach( account => {
-    const data = account.toJSON()
-    const txns = []
-    account.transactions.forEach( tx => {
-      txns.push( {
-        receivers: tx.receivers,
-        sender: tx.sender,
-        txid: tx.txid,
-        notes: tx.notes,
-        tags: tx.tags,
-        amount: tx.amount,
-        accountType: tx.accountType,
-        address: tx.address,
-        isNew: tx.isNew,
-        type: tx.type
-      } )
-    } )
-    data.transactions = []
-    data.transactionsMeta = txns
+  if( updateSmShare ) {
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
       BHROperations.cipherSpec.iv,
     )
     let encrypted = cipher.update(
-      JSON.stringify( data ),
+      JSON.stringify( wallet.smShare ),
       'utf8',
       'hex',
     )
     encrypted += cipher.final( 'hex' )
-    acc[ account.id ] = {
-      encryptedData: encrypted
-    }
-  } )
-  const channelIds = []
-  contacts.forEach( contact => {
-    channelIds.push( contact.channelKey )
-  } )
-  const STATE_DATA = yield call( stateDataToBackup )
-  const image : NewWalletImage = {
-    name: wallet.walletName,
-    walletId : wallet.walletId,
-    contacts : channelIds,
-    accounts : acc,
-    versionHistory: STATE_DATA.versionHistory,
-    SM_share: wallet.smShare,
-    details2FA: wallet.details2FA,
+    walletImage.SM_share = encrypted
   }
-
-  const res = yield call( Relay.updateWalletImage, image )
-  // const getWI = yield call( BHROperations.fetchWalletImage, wallet.walletId )
+  if( update2fa ) {
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      encKey,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update(
+      JSON.stringify( wallet.details2FA ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    walletImage.details2FA = encrypted
+  }
+  if( updateAccounts && accountIds.length > 0 ) {
+    const accounts = yield call( dbManager.getAccounts )
+    const acc = {
+    }
+    accounts.forEach( account => {
+      const data = account.toJSON()
+      const shouldUpdate = accountIds.includes( data.id )
+      if( shouldUpdate )  {
+        const txns = []
+        account.transactions.forEach( tx => {
+          txns.push( {
+            receivers: tx.receivers,
+            sender: tx.sender,
+            txid: tx.txid,
+            notes: tx.notes,
+            tags: tx.tags,
+            amount: tx.amount,
+            accountType: tx.accountType,
+            address: tx.address,
+            isNew: tx.isNew,
+            type: tx.type
+          } )
+        } )
+        data.transactions = []
+        data.transactionsMeta = txns
+        const cipher = crypto.createCipheriv(
+          BHROperations.cipherSpec.algorithm,
+          encKey,
+          BHROperations.cipherSpec.iv,
+        )
+        let encrypted = cipher.update(
+          JSON.stringify( data ),
+          'utf8',
+          'hex',
+        )
+        encrypted += cipher.final( 'hex' )
+        acc[ account.id ] = {
+          encryptedData: encrypted
+        }
+      }
+    } )
+    walletImage.accounts = acc
+  }
+  if( updateContacts ) {
+    const contacts = yield call( dbManager.getTrustedContacts )
+    const channelIds = []
+    contacts.forEach( contact => {
+      channelIds.push( contact.channelKey )
+    } )
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      encKey,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update(
+      JSON.stringify( channelIds ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    walletImage.contacts = encrypted
+  }
+  if( updateVersion ) {
+    const STATE_DATA = yield call( stateDataToBackup )
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      encKey,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update(
+      JSON.stringify( STATE_DATA.versionHistory ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    walletImage.versionHistory = encrypted
+  }
+  const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
     if ( res.data ) console.log( 'Wallet Image updated' )
     yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
