@@ -121,6 +121,7 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import secrets from 'secrets.js-grempe'
 import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
+import { setVersionHistory } from '../actions/versionHistory'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -495,31 +496,17 @@ function* recoverWalletWorker( { payload } ) {
     const acc = []
     const accountData = {
     }
-    const decKey = BHROperations.getDerivedKey(
-      bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
-    )
+
+    const decryptionKey = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
     Object.keys( accounts ).forEach( ( key ) => {
-      const decipher = crypto.createDecipheriv(
-        BHROperations.cipherSpec.algorithm,
-        decKey,
-        BHROperations.cipherSpec.iv,
-      )
-      const account = accounts[ key ]
-      let decryptedAccData = decipher.update( account.encryptedData, 'hex', 'utf8' )
-      decryptedAccData += decipher.final( 'utf8' )
-      accountData[ JSON.parse( decryptedAccData ).type ] = JSON.parse( decryptedAccData ).id
-      acc.push( JSON.parse( decryptedAccData ) )
+      const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
+      accountData[ JSON.parse( decryptedData ).type ] = JSON.parse( decryptedData ).id
+      acc.push( JSON.parse( decryptedData ) )
     } )
 
     let secondaryXpub, details2FA
     if( image.details2FA ){
-      const decipher = crypto.createDecipheriv(
-        BHROperations.cipherSpec.algorithm,
-        decKey,
-        BHROperations.cipherSpec.iv,
-      )
-      let decryptedData = decipher.update( image.details2FA, 'hex', 'utf8' )
-      decryptedData += decipher.final( 'utf8' )
+      const decryptedData = BHROperations.decryptWithAnswer( image.details2FA, decryptionKey ).decryptedData
       const decrypted2FADetails = JSON.parse( decryptedData )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
@@ -543,13 +530,7 @@ function* recoverWalletWorker( { payload } ) {
     }
     // restore Contacts
     if( image.contacts ) {
-      const decipher = crypto.createDecipheriv(
-        BHROperations.cipherSpec.algorithm,
-        decKey,
-        BHROperations.cipherSpec.iv,
-      )
-      let decryptedChannelIds = decipher.update( image.contacts, 'hex', 'utf8' )
-      decryptedChannelIds += decipher.final( 'utf8' )
+      const decryptedChannelIds = BHROperations.decryptWithAnswer( image.contacts, decryptionKey ).decryptedData
       const contactsChannelKeys = JSON.parse( decryptedChannelIds )
       if( contactsChannelKeys.length > 0 ) {
         yield call( restoreTrustedContactsWorker, {
@@ -562,7 +543,8 @@ function* recoverWalletWorker( { payload } ) {
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
     yield call( dbManager.createWallet, wallet )
-
+    // Version histroy Restore
+    if( image.versionHistory ) yield put( setVersionHistory( JSON.parse( BHROperations.decryptWithAnswer( image.versionHistory, decryptionKey ).decryptedData ) ) )
     // restore Accounts
     yield put( restoreAccountShells( acc ) )
     // restore health
