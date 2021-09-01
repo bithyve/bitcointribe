@@ -403,7 +403,7 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 10, height: 10
     },
-    // shadowRadius: 6,
+    shadowRadius: 6,
     elevation: 6,
   },
   extraHeight: {
@@ -426,7 +426,7 @@ const styles = StyleSheet.create( {
       width: 10, height: 10
     },
     shadowRadius: 6,
-    elevation: 5,
+    elevation: 6,
   },
 
   addModalTitleText: {

@@ -1,11 +1,14 @@
 import React, { ReactElement, useCallback } from 'react'
 import {
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  View
 } from 'react-native'
 import _ from 'lodash'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import TransactionsListItem from './AccountDetailsTransactionsListItem'
+import Colors from '../../common/Colors'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 const keyExtractor = ( item: TransactionDescribing ) => item.txid
 
@@ -41,6 +44,9 @@ const AccountDetailsTransactionsList: React.FC<Props> = ( {
         onPress={() => transactionSelectionHandler( transaction )}
       >
         <TransactionsListItem accountShellId={accountShellId} transaction={transaction} />
+        <View style={{
+          borderBottomWidth: 1, borderColor: Colors.gray1, marginHorizontal: widthPercentageToDP( 4 )
+        }} />
       </TouchableOpacity>
     )
   }

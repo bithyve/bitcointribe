@@ -600,7 +600,7 @@ export default function AddContactAddressBook( props ) {
               // modalRef={contactPermissionBottomSheet}
               title={'Why do we need access\nto your address book?'}
               info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\n\nIt is a good way to remember who the contacts are with their name and image'}
-              otherText={'\n\n\n\n\nWe neither store this data nor pass it to anyone else. This is for your convenience only'}
+              otherText={'\n\n\n\nWe neither store this data nor pass it to anyone else. This is for your convenience only'}
               proceedButtonText={'Continue'}
               isIgnoreButton={false}
               onPressProceed={() => {
