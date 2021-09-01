@@ -115,6 +115,9 @@ export const AccountSchema: ObjectSchema = {
     },
     lastSynched: {
       type: 'int', optional: true
+    },
+    isUsable: {
+      type: 'bool', default: true
     }
   },
 }
