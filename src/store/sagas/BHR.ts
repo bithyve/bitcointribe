@@ -523,7 +523,7 @@ function* recoverWalletWorker( { payload } ) {
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: DeviceInfo.getVersion(),
-      primarySeed: image.primarySeed
+      primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
     }
     // restore Contacts
     if( contactsChannelKeys.length > 0 ) {
@@ -617,8 +617,6 @@ export const cloudMetaShareHealthWatcher = createWatcher(
 
 
 function* stateDataToBackup() {
-  // state data to backup
-  const accountShells = yield select( ( state ) => state.accounts.accountShells )
   // const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
 
@@ -632,12 +630,6 @@ function* stateDataToBackup() {
 
   const STATE_DATA = {
   }
-
-  if ( accountShells && accountShells.length )
-    STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
-
-  // if ( trustedContactsInfo && trustedContactsInfo.length )
-  //   STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
 
   if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
@@ -726,7 +718,6 @@ function* updateWalletImageWorker() {
     versionHistory: STATE_DATA.versionHistory,
     SM_share: wallet.smShare,
     details2FA: wallet.details2FA,
-    primarySeed: wallet.primarySeed
   }
 
   const res = yield call( Relay.updateWalletImage, image )
