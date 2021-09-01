@@ -25,6 +25,7 @@ import {
 import Entypo from 'react-native-vector-icons/Entypo'
 import { newAccountsInfo } from '../../../../store/sagas/accounts'
 import { AccountType, Wallet } from '../../../../bitcoin/utilities/Interface'
+import Toast from '../../../../components/Toast'
 
 export type Props = {
   navigation: any;
@@ -47,6 +48,9 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
     currentSubAccount.isTFAEnabled,
   )
   const [ showLoader, setShowLoader ] = useState( false )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
 
   const canProceed = useMemo( () => {
     return accountName.length > 0 && accountDescription.length > 0
@@ -152,9 +156,9 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
 
             <TouchableOpacity
               style={styles.tfaSelectionField}
-              onPress={() => setIsTFAEnabled( !isTFAEnabled )}
+              onPress={() =>  !AllowSecureAccount ? Toast( 'Upgrade backup to Level 2 to use this feature' ) : setIsTFAEnabled( !isTFAEnabled )}
               activeOpacity={1}
-              disabled={( !wallet.secondaryXpub && !wallet.details2FA )}
+              // disabled={( !wallet.secondaryXpub && !wallet.details2FA )}
             >
               <View style={styles.tfaSelectionFieldContentContainer}>
                 <Text style={{
