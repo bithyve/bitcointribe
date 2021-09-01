@@ -13,6 +13,11 @@ import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { useSelector, useDispatch } from 'react-redux'
 import { currencyKindSet } from '../../store/actions/preferences'
 import { ScrollView } from 'react-native-gesture-handler'
+import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
+import Node from '../../assets/images/svgs/node.svg'
+import Wallet from '../../assets/images/svgs/icon_settings.svg'
+import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 
 export type Props = {
   navigation: any;
@@ -22,7 +27,6 @@ export type Props = {
 interface MenuOption {
   title: string;
   subtitle: string;
-  imageSource: ImageSourcePropType;
   screenName?: string;
   onOptionPressed?: () => void;
   // isSwitch: boolean;
@@ -45,7 +49,7 @@ const menuOptions: MenuOption[] = [
   // },
   {
     title: 'Account Management',
-    imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
+    // imageSource: AccManagement,
     subtitle: 'View and manage your accounts',
     screenName: 'AccountManagement',
   },
@@ -62,7 +66,6 @@ const menuOptions: MenuOption[] = [
   */
   {
     title: 'Node Settings',
-    imageSource: require( '../../assets/images/icons/own-node.png' ),
     subtitle: 'Connect Hexa wallet to your own node',
     screenName: 'NodeSettings',
   },
@@ -91,13 +94,11 @@ const menuOptions: MenuOption[] = [
   // },
   {
     title: 'Wallet Settings',
-    imageSource: require( '../../assets/images/icons/settings.png' ),
     subtitle: 'Your wallet settings & preferences',
     screenName: 'WalletSettings',
   },
   {
     title: 'App Info',
-    imageSource: require( '../../assets/images/icons/icon_info.png' ),
     subtitle: 'Hexa app version number and details',
     screenName: 'AppInfo',
   },
@@ -128,6 +129,20 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
 
+  const findImage = ( name ) => {
+    switch ( name ){
+        case 'Account Management':
+          return ( <AccManagement /> )
+        case 'Node Settings':
+          return ( <Node /> )
+        case 'Wallet Settings':
+          return ( <Wallet /> )
+        case 'App Info':
+          return ( <AppInfo /> )
+        default:
+          return null //You might want to return something else here//
+    }
+  }
   return (
     <View style={{
       backgroundColor: Colors.blue
@@ -202,12 +217,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   <View style={{
                     justifyContent: 'center',
                   }}>
-                    <Image
-                      source={menuOption.imageSource}
-                      style={{
-                        width: 25, height: 25, resizeMode: 'contain'
-                      }}
-                    />
+                    {findImage( menuOption.title )}
                   </View>
                   <View style={{
                     justifyContent: 'center', marginLeft: 10
