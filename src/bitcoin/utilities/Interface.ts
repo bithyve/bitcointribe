@@ -623,19 +623,15 @@ export interface Trusted_Contacts {
 export interface NewWalletImage {
   walletId: string;
   name: string;
-  accounts: {
+  accounts?: {
     [accountId: string]: {
       encryptedData: string
     }
   },
-  details2FA : {
-    secondaryXpub: string,
-    bithyveXpub: string,
-    twoFAKey: string,
-  };
-  contacts:string[];
-  versionHistory: string;
-  SM_share: string,
+  details2FA ?: string;
+  contacts?:string;
+  versionHistory?: string;
+  SM_share?: string,
 }
 
 export interface EncryptedImage {

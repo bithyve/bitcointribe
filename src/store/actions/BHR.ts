@@ -163,9 +163,17 @@ export const updateMSharesHealth = ( shares, isNeedToUpdateCurrentLevel? ) => {
   }
 }
 
-export const updateWalletImageHealth = () => {
+export const updateWalletImageHealth = ( payload: {
+  updateContacts?: boolean,
+  updateVersion?: boolean,
+  updateSmShare?: boolean,
+  update2fa?: boolean,
+  updateAccounts?: boolean,
+  accountIds?: string[]
+} ) => {
   return {
-    type: UPDATE_WALLET_IMAGE_HEALTH
+    type: UPDATE_WALLET_IMAGE_HEALTH,
+    payload
   }
 }
 

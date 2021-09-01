@@ -87,7 +87,8 @@ function* updateWalletWorker( { payload } ) {
     walletName,
   } )
   yield call( dbManager.getWallet )
-  // yield put( updateWalletImageHealth() )
+  yield put( updateWalletImageHealth( {
+  } ) )
   yield put ( updateWalletNameToChannel() )
 }
 
@@ -276,12 +277,14 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         yield call( dbManager.updateContact, value )
       }
 
+      let shouldUpdateSmShare = false
       // update secondary setup data on inital primary keeper sync
       if( synchingPrimaryKeeperChannelKey && !wallet.secondaryXpub ){
         const primaryKeeper =  updatedContacts[ synchingPrimaryKeeperChannelKey ]
         const instream = useStreamFromContact( primaryKeeper, walletId, true )
         const secondarySetupData = idx( instream, ( _ ) => _.primaryData.secondarySetupData )
         if( secondarySetupData ){
+          shouldUpdateSmShare = secondarySetupData.secondaryShardWI !== ''
           const secondaryXpub = secondarySetupData.secondaryXpub
           yield put( updateWallet(
             {
@@ -296,7 +299,11 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         }
       }
 
-      if( updateWI ) yield put( updateWalletImageHealth() )
+      if( updateWI ) yield put( updateWalletImageHealth( {
+        updateContacts: true,
+        updateSmShare : shouldUpdateSmShare,
+        update2fa: shouldUpdateSmShare
+      } ) )
 
       if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
@@ -642,7 +649,6 @@ function* editTrustedContactWorker( { payload }: { payload: { channelKey: string
   }
   yield put( updateTrustedContacts( updatedContacts ) )
   yield call ( dbManager.updateContact, contactToUpdate )
-  yield put( updateWalletImageHealth() )
 
 }
 
