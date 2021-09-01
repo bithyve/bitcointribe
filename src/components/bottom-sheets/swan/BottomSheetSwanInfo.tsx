@@ -101,7 +101,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
           swanTitle = 'Your Hexa Wallet is communicating with Swan Bitcoin...'
-          swanMessage = 'This account is being linked with your profile on Swan Bitcoin'
+          swanMessage = 'This account is being linked with your profile on Swan Bitcoin.\nThis may take a few seconds, please do not close the application.'
           showNote = false
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
@@ -156,7 +156,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
               backgroundColor={Colors.white}
               title={'Note'}
               infoText={
-                'Please register with Swan Bitcoin to use this account'
+                'Please login/register your Swan Bitcoin Account to use this wallet'
               }
             />
           }
@@ -288,12 +288,36 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     ...styles.modalContentContainer
   }}>
     {renderMessage()}
+    <View style={styles.statusIndicatorView}>
+      <View style={styles.statusIndicatorInactiveView} />
+      {/* <View style={styles.statusIndicatorInactiveView} /> */}
+      <View style={styles.statusIndicatorActiveView} />
+    </View>
     {renderFooter()}
   </View>
   )
 }
 
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '6%' ),
+    marginBottom: hp( 2 )
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
   modalContentContainer: {
     backgroundColor: Colors.white,
   },
@@ -338,8 +362,8 @@ const styles = StyleSheet.create( {
     minWidth: 144,
     paddingHorizontal: wp( 4 ),
     paddingVertical: wp( 3 ),
-    height: wp( '15%' ),
-    width: wp( '36%' ),
+    height: wp( '13%' ),
+    width: wp( '27%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,

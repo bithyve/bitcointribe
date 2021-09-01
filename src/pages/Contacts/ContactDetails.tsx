@@ -1,4 +1,4 @@
-import React, { PureComponent, createRef } from 'react'
+import React, { PureComponent, createRef, useMemo } from 'react'
 import {
   View,
   Text,
@@ -12,7 +12,6 @@ import {
   Alert,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import NavStyles from '../../common/Styles/NavStyles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -53,6 +52,10 @@ import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import EditContactScreen from './EditContact'
 import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
+import BackIconTitle from '../../utils/BackIconTitle'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import CardWithArrow from '../../components/CardWithArrow'
+import More from '../../assets/images/svgs/icon_more.svg'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -100,7 +103,7 @@ interface ContactDetailsPropTypes {
   uploadRequestedSMShare: any;
   hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
-  newBHRFlowStarted : any;
+  newBHRFlowStarted: any;
   keeperInfo: KeeperInfoInterface[];
 }
 interface ContactDetailsStateTypes {
@@ -122,12 +125,13 @@ interface ContactDetailsStateTypes {
   edit: boolean;
   sendViaQRModel: boolean;
   exitKeyModel: boolean;
+  showContactDetails: boolean;
 }
 
 class ContactDetails extends PureComponent<
   ContactDetailsPropTypes,
   ContactDetailsStateTypes
-> {
+  > {
   ReshareBottomSheet: any;
   shareBottomSheet: any;
   SendViaLinkBottomSheet: any;
@@ -193,13 +197,14 @@ class ContactDetails extends PureComponent<
       reshareModal: false,
       edit: false,
       sendViaQRModel: false,
-      exitKeyModel: false
+      exitKeyModel: false,
+      showContactDetails: false,
     }
 
     this.contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
-    if( this.contactsType == 'My Keepers' ){
-      this.isExistingContact = this.contact.channelKey && this.props.keeperInfo.find( value=>value.channelKey == this.contact.channelKey ) ? true : false
+    if ( this.contactsType == 'My Keepers' ) {
+      this.isExistingContact = this.contact.channelKey && this.props.keeperInfo.find( value => value.channelKey == this.contact.channelKey ) ? true : false
     }
   }
 
@@ -300,7 +305,7 @@ class ContactDetails extends PureComponent<
   // };
 
   onPressSend = () => {
-    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id ===  this.contact.id )
+    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id === this.contact.id )
     this.props.sourceAccountSelectedForSending(
       this.props.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
     )
@@ -315,7 +320,7 @@ class ContactDetails extends PureComponent<
     )
   };
 
-  onPressResendRequest = ( payload?: {isKeeper?: boolean, isPrimary?: boolean } ) => {
+  onPressResendRequest = ( payload?: { isKeeper?: boolean, isPrimary?: boolean } ) => {
     if ( this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER ) {
       this.createDeepLink( this.contact )
       setTimeout( () => {
@@ -327,10 +332,10 @@ class ContactDetails extends PureComponent<
     } else {
       const navigationParams = {
         SelectedContact: [ this.contact ],
-        headerText:'Add a contact',
-        subHeaderText:'Send a Friends & Family request',
-        contactText:'Adding to Friends & Family:',
-        showDone:true,
+        headerText: 'Add a contact',
+        subHeaderText: 'Send a Friends & Family request',
+        contactText: 'Adding to Friends & Family:',
+        showDone: true,
         isKeeper: payload && payload.isKeeper ? payload.isKeeper : false,
         isPrimary: payload && payload.isPrimary ? payload.isPrimary : false,
         existingContact: this.isExistingContact
@@ -340,11 +345,11 @@ class ContactDetails extends PureComponent<
   };
 
   syncContact = ( hardSync?: boolean ) => {
-    if( this.contact ){
+    if ( this.contact ) {
       const contactInfo = {
         channelKey: this.contact.channelKey,
       }
-      const channelUpdate =  {
+      const channelUpdate = {
         contactInfo
       }
       this.props.syncPermanentChannels( {
@@ -481,7 +486,7 @@ class ContactDetails extends PureComponent<
     if (
       !contacts &&
       ( contacts.relationType == TrustedContactRelationTypes.KEEPER_WARD ||
-      contacts.relationType == TrustedContactRelationTypes.WARD )
+        contacts.relationType == TrustedContactRelationTypes.WARD )
     ) {
       Alert.alert(
         'Recovery request failed',
@@ -490,7 +495,7 @@ class ContactDetails extends PureComponent<
       return
     }
     let qrString = ''
-    if( type == 'recovery' ){
+    if ( type == 'recovery' ) {
       qrString = JSON.stringify( {
         type: QRCodeTypes.RECOVERY_REQUEST,
         walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
@@ -524,9 +529,9 @@ class ContactDetails extends PureComponent<
     let currentContact: TrustedContact
     let channelKey: string
 
-    if( trustedContacts )
-      for( const ck of Object.keys( trustedContacts ) ){
-        if ( trustedContacts[ ck ].contactDetails.id === contact.id ){
+    if ( trustedContacts )
+      for ( const ck of Object.keys( trustedContacts ) ) {
+        if ( trustedContacts[ ck ].contactDetails.id === contact.id ) {
           currentContact = trustedContacts[ ck ]
           channelKey = ck
           break
@@ -729,358 +734,121 @@ class ContactDetails extends PureComponent<
     )
   };
 
-  render() {
-    const { navigation } = this.props
-    const {
-      Loading,
-      SelectedOption,
-      encryptedExitKey,
-      isSendDisabled,
-      trustedContactHistory,
-      reshareModal,
-      edit,
-      sendViaQRModel,
-      exitKeyModel
-    } = this.state
+  firstNamePieceText = () => {
+    return this.contact.displayedName.split( ' ' )[ 0 ] + ' '
+  }
+
+  secondNamePieceText = () => {
+    return this.contact.displayedName.split( ' ' ).slice( 1 ).join( ' ' )
+  }
+
+  showDetails = () => {
+    this.setState( {
+      showContactDetails: true
+    } )
+  }
+
+  renderContactDetailsModal = () => {
     return (
       <View style={{
-        flex: 1
+        backgroundColor: Colors.bgColor
       }}>
-        <SafeAreaView
+        <AppBottomSheetTouchableWrapper
+          onPress={() => this.setState( {
+            showContactDetails: false
+          } )}
           style={{
-            flex: 0, backgroundColor: Colors.backgroundColor
+            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+            marginTop: wp( 3 ), marginRight: wp( 3 )
           }}
-        />
-        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeaderTitleView}>
-            <View style={styles.headerRowContainer}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.backArrowView}
-                hitSlop={{
-                  top: 20, left: 20, bottom: 20, right: 20
-                }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity>
-              {getImageIcon( this.contact )}
-              <View style={{
-                flex: 1, marginRight: 5
-              }}>
-                <Text style={styles.contactTypeText}>{this.contactsType}</Text>
-                <Text
-                  style={styles.contactText}
-                  ellipsizeMode="clip"
-                  numberOfLines={1}
-                >
-                  {`${this.contact.displayedName.length > 13 ? this.contact.displayedName.substr( 0, 11 )+'...' : this.contact.displayedName}`}
-                </Text>
-                <View style={{
-                  flexDirection: 'row', marginLeft: 10, alignItems: 'flex-end'
-                }}>
-                  <Text style={styles.lastSeenText}>Last seen </Text>
-                  {Number.isFinite( this.contact.lastSeenActive ) ? (
-                    <Text style={{
-                      fontFamily: Fonts.FiraSansMediumItalic
-                    }}>
-                      {agoTextForLastSeen( this.contact.lastSeenActive )}
-                    </Text>
-                  ) : (
-                    <Text style={[ styles.lastSeenText, {
-                      fontFamily: Fonts.FiraSansMediumItalic,
-                      // fontSize: RFValue( 9 )
-                    } ]}>
-                      Unknown
-                    </Text>
-                  )}
-                </View>
-
-                {/* {this.contact.connectedVia ? (
-                  <Text style={styles.phoneText}>
-                    {this.contact.usesOTP
-                      ? !contact.hasTrustedChannel
-                        ? 'OTP: ' + contact.connectedVia
-                        : ''
-                      : this.contact.connectedVia}
-                  </Text>
-                ) : null} */}
-              </View>
-              <View style={{
-                alignSelf: 'center'
-              }}>
-                <TouchableOpacity
-                  disabled={isSendDisabled}
-                  onPress={() => {
-                    this.setState( {
-                      isSendDisabled: true,
-                    } )
-                    this.contact.lastSeenActive ? this.onPressSend() : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName ) ? this.onPressResendRequest() : this.onPressResendRequest( {
-                      isKeeper: true, isPrimary: this.contact.displayedName == 'Personal Device1' ? true : false
-                    } )
-                  }}
-                  style={styles.resendContainer}
-                >
-                  {this.contact.lastSeenActive ? (
-                    <Image
-                      source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                      style={styles.bitcoinIconStyle}
-                    />
-                  ) : null}
-                  <Text style={styles.sendTextStyle}>
-                    {this.contact.lastSeenActive
-                      ? 'Send'
-                      : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
-                        ? 'Reshare'
-                        : 'Resend Request'}
-                  </Text>
-                </TouchableOpacity>
-                {this.contact.lastSeenActive &&
-                <TouchableOpacity
-                  disabled={isSendDisabled}
-                  onPress={() => {
-                    this.setState( {
-                      edit: true
-                    } )
-                  }}
-                  style={[ styles.resendContainer, {
-                    alignSelf: 'center',
-                    marginTop: 10
-                  } ]}
-                >
-                  <Text style={styles.sendTextStyle}>
-                    Edit
-                  </Text>
-                </TouchableOpacity>
-                }
-              </View>
-            </View>
-          </View>
-          {Loading ? (
-            <View style={{
-              flex: 1
-            }}>
-              <ScrollView style={{
-                flex: 1
-              }}>
-                {[ 1, 2, 3, 4, 5 ].map( ( value, index ) => {
-                  return (
-                    <View key={index} style={styles.scrollViewContainer}>
-                      <View>
-                        <View
-                          style={{
-                            backgroundColor: Colors.backgroundColor,
-                            height: wp( '4%' ),
-                            width: wp( '40%' ),
-                            borderRadius: 10,
-                          }}
-                        />
-                        <View
-                          style={{
-                            backgroundColor: Colors.backgroundColor,
-                            height: wp( '4%' ),
-                            width: wp( '30%' ),
-                            marginTop: 5,
-                            borderRadius: 10,
-                          }}
-                        />
-                      </View>
-                    </View>
-                  )
-                } )}
-              </ScrollView>
-              <BottomInfoBox
-                backgroundColor={Colors.white}
-                title={'Note'}
-                infoText={'The details of your contact will appear here.'}
-              />
-            </View>
-          ) : (
-            <View style={{
-              flex: 1
-            }}>
-              <ScrollView style={{
-                flex: 1
-              }}>
-                {this.contact.walletName &&
-                <View style={[ styles.selectOptionContainer, {
-                  height: hp( 6 ), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                } ]}>
-                  <View style={{
-                    flexDirection: 'row', alignItems: 'center'
-                  }}>
-                    <Image
-                      source={require( '../../assets/images/icons/icon_wallet_setting.png' )}
-                      style={{
-                        width: 32, height: 32, resizeMode: 'contain'
-                      }}
-                    />
-                    <Text style={styles.headerTitleText}>Wallet Name</Text>
-                  </View>
-
-                  <Text style={styles.headerTitleText}>{this.contact.walletName}</Text>
-                </View>
-                }
-                {this.sortedHistory( trustedContactHistory ).map( ( value ) => {
-                  if ( SelectedOption == value.id ) {
-                    return (
-                      <TouchableOpacity
-                        key={value.id}
-                        onPress={() => this.SelectOption( value.id )}
-                        style={styles.selectOptionContainer}
-                      >
-                        <Text
-                          style={{
-                            color: Colors.blue,
-                            fontSize: RFValue( 13 ),
-                            fontFamily: Fonts.FiraSansRegular,
-                          }}
-                        >
-                          {value.title}
-                        </Text>
-                        {/* <Text
-                          style={{
-                            color: Colors.textColorGrey,
-                            fontSize: RFValue(10),
-                            fontFamily: Fonts.FiraSansRegular,
-                            marginTop: 5,
-                          }}
-                        >
-                          {value.info}
-                        </Text> */}
-                        <Text style={styles.dateTextStyle}>{value.date}</Text>
-                      </TouchableOpacity>
-                    )
-                  } else {
-                    return (
-                      <TouchableOpacity
-                        key={value.id}
-                        onPress={() => this.SelectOption( value.id )}
-                        style={styles.selectOptionSecond}
-                      >
-                        <View
-                          style={{
-                            flexDirection: 'row', alignItems: 'center'
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontSize: RFValue( 10 ),
-                              fontFamily: Fonts.FiraSansRegular,
-                            }}
-                          >
-                            {value.title}
-                          </Text>
-                          <Text style={styles.dateTextSecondStyle}>
-                            {value.date}
-                          </Text>
-                        </View>
-                        {/* <Text
-                          style={{
-                            color: Colors.textColorGrey,
-                            fontSize: RFValue(8),
-                            fontFamily: Fonts.FiraSansRegular,
-                            marginTop: 5,
-                          }}
-                        >
-                          {value.info}
-                        </Text> */}
-                      </TouchableOpacity>
-                    )
-                  }
-                } )}
-              </ScrollView>
-              {this.sortedHistory( trustedContactHistory ).length <= 1 && (
-                <BottomInfoBox
-                  backgroundColor={Colors.white}
-                  title={'Note'}
-                  infoText={'The details of your contact will appear here.'}
-                />
-              )}
-            </View>
-          )}
-          {this.contactsType == 'I\'m Keeper of' && (
-            <View style={styles.keeperViewStyle}>
-              <TouchableOpacity
-                disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING ) }
-                style={{
-                  ...styles.bottomButton,
-                  opacity: this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING ? 1 : 0.5,
-                }}
-                onPress={()=>
-                {
-                  this.generateQR( 'recovery' )
-                }
-                }
-              >
-                <Image
-                  source={require( '../../assets/images/icons/icon_restore.png' )}
-                  style={styles.buttonImage}
-                />
-                <Text style={styles.buttonText} numberOfLines={1}>Help Restore</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  ...styles.bottomButton,
-                  justifyContent: 'space-around',
-                }}
-                onPress={() => {
-                  this.generateQR( 'approval' )
-                }}
-              >
-                <Image
-                  source={require( '../../assets/images/icons/icon_restore.png' )}
-                  style={styles.buttonImage}
-                />
-                <Text style={[ styles.buttonText, {
-                  marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
-                } ]}>Show Secondary Key</Text>
-              </TouchableOpacity>
-
-              {encryptedExitKey ? (
-                <TouchableOpacity
-                  style={{
-                    ...styles.bottomButton,
-                    opacity: encryptedExitKey ? 1 : 0.5,
-                  }}
-                  disabled={encryptedExitKey ? false : true}
-                  onPress={() => {
-                    if ( encryptedExitKey ) {
-                      this.setState( {
-                        exitKeyModel: true
-                      } )
-                    }
-                  }}
-                >
-                  <Image
-                    source={require( '../../assets/images/icons/icon_request.png' )}
-                    style={styles.buttonImage}
-                  />
-                  <View>
-                    <Text style={styles.buttonText} numberOfLines={1}>
-                      {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
-                    </Text>
-                    {encryptedExitKey ? (
-                      <Text numberOfLines={1} style={styles.buttonInfo}>
-                        {'Help recover PDF'}
-                      </Text>
-                    ) : null}
-                  </View>
-                </TouchableOpacity>
-              ) : null}
-            </View>
-          )}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} style={{
+            // marginTop: hp( 0.5 )
+          }} />
+        </AppBottomSheetTouchableWrapper>
+        <View style={styles.headerRowContainer}>
+          {getImageIcon( this.contact )}
+          <Text
+            style={styles.contactText}
+            ellipsizeMode="clip"
+            numberOfLines={1}
+          >{this.firstNamePieceText()}
+            <Text style={styles.contactTextBold}>{this.secondNamePieceText()}</Text>
+          </Text>
+        </View>
+        <View style={styles.detailsView}>
+          <Text style={styles.titleText}>
+            Relationship
+          </Text>
+          <Text style={styles.titleSubText}>
+            {this.contactsType}
+          </Text>
+          <Text style={styles.titleText}>
+          Status
+          </Text>
+          <Text style={styles.titleSubText}>
+            {this.contact.isActive ? 'Approved' : 'Pending'}
+          </Text>
+          {/* <Text style={styles.titleText}>
+            Contact Created
+            </Text>
+            <Text style={styles.titleSubText}>
+            18 June ‘21
+            </Text> */}
+          {this.contact.walletName &&
+          <>
+            <Text style={styles.titleText}>
+          Wallet Name
+            </Text>
+            <Text style={styles.titleSubText}>
+              {this.contact.walletName}
+            </Text>
+          </>
+          }
+          {this.contact.walletId &&
+          <>
+            <Text style={styles.titleText}>
+          Wallet ID
+            </Text>
+            <Text style={styles.titleSubText}>
+              {this.contact.walletId}
+            </Text>
+          </>
+          }
+        </View>
+        <View style={styles.CTAView}>
+          {this.contact.lastSeenActive &&
+          <CardWithArrow
+            onPress={() => this.setState( {
+              showContactDetails: false,
+              edit: true
+            } )}
+            icon={'Edit'}
+            mainText={'Edit Name'}
+            subText={'Lorem ipsum dolor sit amets .'}
+          />
+          }
+          {this.contact.lastSeenActive &&
+          <CardWithArrow
+            onPress={() => {
+              this.setState( {
+                showContactDetails: false,
+              } )
+              this.props.navigation.navigate( 'AddContact', {
+                fromScreen: 'Edit', contactToEdit: this.contact
+              } )
+            }
+            }
+            icon={'Associate'}
+            mainText={'Associate another contact'}
+            subText={'Lorem ipsum dolor sit amets .'}
+          />
+          }
           {
-            this.contact.trustKind !== ContactTrustKind.OTHER && this.contact.lastSeenActive ? null: (
-              <TouchableOpacity
-                style={{
-                  ...styles.bottomButton,
-                }}
+            this.contact.trustKind !== ContactTrustKind.OTHER && this.contact.lastSeenActive ? null : (
+              <CardWithArrow
                 onPress={() => {
                   Alert.alert(
                     'Remove Contact',
@@ -1092,12 +860,15 @@ class ContactDetails extends PureComponent<
                           this.props.removeTrustedContact( {
                             channelKey: this.contact.channelKey
                           } )
+                          this.setState( {
+                            showContactDetails: false
+                          } )
                           this.props.navigation.goBack()
                         },
                       },
                       {
                         text: 'Cancel',
-                        onPress: () => {},
+                        onPress: () => { },
                         style: 'cancel',
                       },
                     ],
@@ -1106,15 +877,348 @@ class ContactDetails extends PureComponent<
                     }
                   )
                 }}
+                icon={'Remove'}
+                mainText={'Remove Contact'}
+                subText={'Lorem ipsum dolor sit amets .'}
+              />
+            )}
+        </View>
+
+      </View>
+    )
+  }
+
+  render() {
+    const {
+      Loading,
+      SelectedOption,
+      encryptedExitKey,
+      isSendDisabled,
+      trustedContactHistory,
+      reshareModal,
+      edit,
+      sendViaQRModel,
+      exitKeyModel,
+      showContactDetails
+    } = this.state
+    return (
+      <View style={{
+        flex: 1, backgroundColor: Colors.backgroundColor
+      }}>
+        <SafeAreaView
+          style={{
+            backgroundColor: Colors.backgroundColor
+          }}
+        />
+        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+        <View style={{
+          flexDirection: 'row'
+        }}>
+          <BackIconTitle />
+          <TouchableOpacity
+            disabled={isSendDisabled}
+            onPress={() => {
+              this.setState( {
+                isSendDisabled: true,
+              } )
+              this.contact.lastSeenActive ? this.onPressSend() : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName ) ? this.onPressResendRequest() : this.onPressResendRequest( {
+                isKeeper: true, isPrimary: this.contact.displayedName == 'Personal Device1' ? true : false
+              } )
+            }}
+            style={styles.resendContainer}
+          >
+            {this.contact.lastSeenActive ? (
+              <Image
+                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                style={styles.bitcoinIconStyle}
+              />
+            ) : null}
+            <Text style={styles.sendTextStyle}>
+              {this.contact.lastSeenActive
+                ? 'Send'
+                : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
+                  ? 'Reshare'
+                  : 'Resend Request'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {showContactDetails &&
+          <ModalContainer visible={showContactDetails} closeBottomSheet={() => {
+            this.setState( {
+              showContactDetails: false
+            } )
+          }} >
+            {this.renderContactDetailsModal()}
+          </ModalContainer>
+        }
+        {/* <View style={styles.modalContainer}> */}
+        <TouchableOpacity
+          onPress={this.showDetails}
+          style={styles.modalHeaderTitleView}>
+          <View style={styles.headerRowContainer}>
+            {getImageIcon( this.contact )}
+            <View style={{
+              flex: 1, marginRight: 5
+            }}>
+              <View style={{
+                flexDirection: 'row', marginLeft: 10, alignItems: 'flex-end'
+              }}>
+                <Text style={styles.lastSeenText}>Last seen </Text>
+                {Number.isFinite( this.contact.lastSeenActive ) ? (
+                  <Text style={[ styles.lastSeenText, {
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                  } ]}>
+                    {agoTextForLastSeen( this.contact.lastSeenActive )}
+                  </Text>
+                ) : (
+                  <Text style={[ styles.lastSeenText, {
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                    // fontSize: RFValue( 9 )
+                  } ]}>
+                      Unknown
+                  </Text>
+                )}
+              </View>
+              <Text
+                style={styles.contactText}
+                ellipsizeMode="clip"
+                numberOfLines={1}
+              >{this.firstNamePieceText()}
+                <Text style={styles.contactTextBold}>{this.secondNamePieceText()}</Text>
+              </Text>
+              <Text style={styles.contactTypeText}>{this.contactsType}</Text>
+
+
+              {/* {this.contact.connectedVia ? (
+                  <Text style={styles.phoneText}>
+                    {this.contact.usesOTP
+                      ? !contact.hasTrustedChannel
+                        ? 'OTP: ' + contact.connectedVia
+                        : ''
+                      : this.contact.connectedVia}
+                  </Text>
+                ) : null} */}
+            </View>
+            <More width={14} height={4} />
+          </View>
+        </TouchableOpacity>
+        {Loading ? (
+          <View style={{
+            flex: 1
+          }}>
+            <ScrollView style={{
+              flex: 1
+            }}>
+              {[ 1, 2, 3, 4, 5 ].map( ( value, index ) => {
+                return (
+                  <View key={index} style={styles.scrollViewContainer}>
+                    <View>
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp( '4%' ),
+                          width: wp( '40%' ),
+                          borderRadius: 10,
+                        }}
+                      />
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp( '4%' ),
+                          width: wp( '30%' ),
+                          marginTop: 5,
+                          borderRadius: 10,
+                        }}
+                      />
+                    </View>
+                  </View>
+                )
+              } )}
+            </ScrollView>
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={'The details of your contact will appear here.'}
+            />
+          </View>
+        ) : (
+          <View style={{
+            flex: 1
+          }}>
+            <ScrollView style={{
+              flex: 1
+            }}>
+              {this.contact.walletName &&
+                  <View style={[ styles.selectOptionContainer, {
+                    height: hp( 6 ), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+                  } ]}>
+                    <View style={{
+                      flexDirection: 'row', alignItems: 'center'
+                    }}>
+                      <Image
+                        source={require( '../../assets/images/icons/icon_wallet_setting.png' )}
+                        style={{
+                          width: 32, height: 32, resizeMode: 'contain'
+                        }}
+                      />
+                      <Text style={styles.headerTitleText}>Wallet Name</Text>
+                    </View>
+
+                    <Text style={styles.headerTitleText}>{this.contact.walletName}</Text>
+                  </View>
+              }
+              {this.sortedHistory( trustedContactHistory ).map( ( value ) => {
+                if ( SelectedOption == value.id ) {
+                  return (
+                    <TouchableOpacity
+                      key={value.id}
+                      onPress={() => this.SelectOption( value.id )}
+                      style={styles.selectOptionContainer}
+                    >
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          fontSize: RFValue( 13 ),
+                          fontFamily: Fonts.FiraSansRegular,
+                        }}
+                      >
+                        {value.title}
+                      </Text>
+                      {/* <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontSize: RFValue(10),
+                            fontFamily: Fonts.FiraSansRegular,
+                            marginTop: 5,
+                          }}
+                        >
+                          {value.info}
+                        </Text> */}
+                      <Text style={styles.dateTextStyle}>{value.date}</Text>
+                    </TouchableOpacity>
+                  )
+                } else {
+                  return (
+                    <TouchableOpacity
+                      key={value.id}
+                      onPress={() => this.SelectOption( value.id )}
+                      style={styles.selectOptionSecond}
+                    >
+                      <View
+                        style={{
+                          flexDirection: 'row', alignItems: 'center'
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontSize: RFValue( 10 ),
+                            fontFamily: Fonts.FiraSansRegular,
+                          }}
+                        >
+                          {value.title}
+                        </Text>
+                        <Text style={styles.dateTextSecondStyle}>
+                          {value.date}
+                        </Text>
+                      </View>
+                      {/* <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontSize: RFValue(8),
+                            fontFamily: Fonts.FiraSansRegular,
+                            marginTop: 5,
+                          }}
+                        >
+                          {value.info}
+                        </Text> */}
+                    </TouchableOpacity>
+                  )
+                }
+              } )}
+            </ScrollView>
+            {this.sortedHistory( trustedContactHistory ).length <= 1 && (
+              <BottomInfoBox
+                backgroundColor={Colors.white}
+                title={'Note'}
+                infoText={'The details of your contact will appear here.'}
+              />
+            )}
+          </View>
+        )}
+        {this.contactsType == 'I\'m Keeper of' && (
+          <View style={styles.keeperViewStyle}>
+            <TouchableOpacity
+              disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING )}
+              style={{
+                ...styles.bottomButton,
+                opacity: this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING ? 1 : 0.5,
+              }}
+              onPress={() => {
+                this.generateQR( 'recovery' )
+              }
+              }
+            >
+              <Image
+                source={require( '../../assets/images/icons/icon_restore.png' )}
+                style={styles.buttonImage}
+              />
+              <Text style={styles.buttonText} numberOfLines={1}>Help Restore</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+                justifyContent: 'space-around',
+              }}
+              onPress={() => {
+                this.generateQR( 'approval' )
+              }}
+            >
+              <Image
+                source={require( '../../assets/images/icons/icon_restore.png' )}
+                style={styles.buttonImage}
+              />
+              <Text style={[ styles.buttonText, {
+                marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
+              } ]}>Show Secondary Key</Text>
+            </TouchableOpacity>
+
+            {encryptedExitKey ? (
+              <TouchableOpacity
+                style={{
+                  ...styles.bottomButton,
+                  opacity: encryptedExitKey ? 1 : 0.5,
+                }}
+                disabled={encryptedExitKey ? false : true}
+                onPress={() => {
+                  if ( encryptedExitKey ) {
+                    this.setState( {
+                      exitKeyModel: true
+                    } )
+                  }
+                }}
               >
+                <Image
+                  source={require( '../../assets/images/icons/icon_request.png' )}
+                  style={styles.buttonImage}
+                />
                 <View>
-                  <Text style={styles.buttonText} numberOfLines={1}>Remove</Text>
+                  <Text style={styles.buttonText} numberOfLines={1}>
+                    {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
+                  </Text>
+                  {encryptedExitKey ? (
+                    <Text numberOfLines={1} style={styles.buttonInfo}>
+                      {'Help recover PDF'}
+                    </Text>
+                  ) : null}
                 </View>
               </TouchableOpacity>
-            )
-          }
+            ) : null}
+          </View>
+        )}
 
-        </View>
+        {/* </View> */}
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -1128,23 +1232,24 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderSendViaLinkContents}
           renderHeader={this.renderSendViaLinkHeader}
         />
-        <ModalContainer visible={sendViaQRModel} closeBottomSheet={() => {}}>
+        <ModalContainer visible={sendViaQRModel} closeBottomSheet={() => { }}>
           {this.renderSendViaQRContents()}
         </ModalContainer>
-        <ModalContainer visible={exitKeyModel} closeBottomSheet={() => {}}>
+        <ModalContainer visible={exitKeyModel} closeBottomSheet={() => { }}>
           {this.renderExitKeyQRContents()}
         </ModalContainer>
         <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
           edit: false
         } )}>
-          <EditContactScreen navigation={navigation} contact={this.contact} closeModal={( name ) => {
+          <EditContactScreen contact={this.contact} closeModal={( name ) => {
             if ( name !== '' ) {
               this.contact.displayedName = name
             }
             this.setState( {
-              edit: false
+              edit: false,
+              showContactDetails: true
             } )
-          } } />
+          }} />
         </ModalContainer>
         <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
@@ -1161,10 +1266,10 @@ class ContactDetails extends PureComponent<
               // ( this.shareBottomSheet as any ).current.snapTo( 1 )
               this.props.navigation.navigate( 'AddContactSendRequest', {
                 SelectedContact: [ this.contact ],
-                headerText:`Send Recovery Key${'\n'}to contact`,
-                subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-                contactText:'Sharing Recovery Key with',
-                showDone:false,
+                headerText: `Send Recovery Key${'\n'}to contact`,
+                subHeaderText: 'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
+                contactText: 'Sharing Recovery Key with',
+                showDone: false,
               } )
 
               // ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
@@ -1256,9 +1361,30 @@ export default connect( mapStateToProps, {
 } )( ContactDetails )
 
 const styles = StyleSheet.create( {
+  CTAView: {
+    // paddingHorizontal: wp( 2 ),
+    paddingVertical: hp( 2 )
+  },
+  detailsView: {
+    paddingHorizontal: wp( 8 ),
+    paddingVertical: hp( 2 )
+  },
+  titleText: {
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue( 12 ),
+    letterSpacing: 0.24,
+    color: Colors.textColorGrey,
+    marginTop: hp( 2 )
+  },
+  titleSubText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    marginRight: wp( 3 )
+  },
   lastSeenText: {
     // marginBottom: 3,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
@@ -1271,23 +1397,42 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 2 )
   },
   modalContainer: {
-    height: '100%',
     backgroundColor: Colors.backgroundColor,
     alignSelf: 'center',
-    width: '100%',
     paddingBottom: wp( '15%' ),
   },
 
   modalHeaderTitleView: {
-    ...NavStyles.modalHeaderTitleView,
-    paddingRight: 0,
+    marginHorizontal: wp( 5 ),
+    backgroundColor: Colors.backgroundColor1,
+    borderRadius: wp( 2 ),
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingBottom: 15,
+    paddingTop: 10,
+    // marginHorizontal: 20,
+    marginBottom: 15,
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 6,
   },
-
+  contactTextBold: {
+    marginLeft: 10,
+    fontSize: RFValue( 20 ),
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.blue,
+    letterSpacing: 0.01,
+  },
   contactText: {
     marginLeft: 10,
     fontSize: RFValue( 20 ),
+    letterSpacing: 0.01,
     fontFamily: Fonts.FiraSansRegular,
-    color: Colors.black,
+    color: Colors.blue,
   },
   phoneText: {
     marginTop: 3,
@@ -1307,7 +1452,6 @@ const styles = StyleSheet.create( {
   headerImageView: {
     width: wp( '17%' ),
     height: wp( '17%' ),
-    borderColor: 'red',
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
@@ -1320,17 +1464,17 @@ const styles = StyleSheet.create( {
     borderRadius: wp( '17%' ) / 2,
   },
   headerImage: {
-    width: wp( '15%' ),
-    height: wp( '15%' ),
-    borderRadius: wp( '15%' ) / 2,
+    width: wp( '16%' ),
+    height: wp( '16%' ),
+    borderRadius: wp( '16%' ) / 2,
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.shadowBlue,
-    width: wp( '15%' ),
-    height: wp( '15%' ),
-    borderRadius: wp( '15%' ) / 2,
+    width: wp( '16%' ),
+    height: wp( '16%' ),
+    borderRadius: wp( '16%' ) / 2,
   },
   headerImageInitialsText: {
     textAlign: 'center',
@@ -1378,12 +1522,12 @@ const styles = StyleSheet.create( {
     height: 30, width: 30, justifyContent: 'center'
   },
   headerRowContainer: {
-    flex: 1, flexDirection: 'row', alignItems: 'center'
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: wp( 3 )
   },
   contactTypeText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 10 ),
     marginLeft: 10,
   },
   resendContainer: {
@@ -1392,12 +1536,13 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     backgroundColor: Colors.lightBlue,
     marginLeft: 'auto',
-    // marginBottom: 10,
+    marginTop: hp( 1 ),
     borderRadius: 4,
     flexDirection: 'row',
-    alignSelf: 'flex-end',
+    alignSelf: 'center',
     paddingLeft: wp( '1.5%' ),
     paddingRight: wp( '1.5%' ),
+    marginRight: wp( 5 )
   },
   bitcoinIconStyle: {
     height: wp( '4%' ),
