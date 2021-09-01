@@ -558,7 +558,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
             case DeepLinkEncryptionType.OTP:
             // openTimer()
-              encryption_key = TrustedContactsOperations.generateKey( 6 )
+              encryption_key = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
               setOTP( encryption_key )
               setIsOTPType( true )
               // setShareOtpWithTrustedContactModel( true )
