@@ -44,6 +44,7 @@ import {
   accountChecked,
   autoSyncShells,
   setResetTwoFALoader,
+  recomputeNetBalance,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -499,16 +500,21 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
     accounts: synchedAccounts
   } ) )
   yield put( accountShellRefreshCompleted( accountShells ) )
+
+  let computeNetBalance = false
   for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
     yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
-    if( synchedAcc.hasNewTxn ) {
-      accountIds.push( synchedAcc.id )
+    if( ( synchedAcc as Account ).hasNewTxn ) {
+      accountIds.push( ( synchedAcc as Account ).id )
+      computeNetBalance = true
     }
   }
   yield put( updateWalletImageHealth( {
     updateAccounts: true,
     accountIds: accountIds
   } ) )
+
+  if( computeNetBalance ) yield put( recomputeNetBalance() )
 
   // update F&F channels if any new txs found on an assigned address
   if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
