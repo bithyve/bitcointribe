@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, StyleSheet, FlatList, Image, TextInput, TouchableOpacity, Platform } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
@@ -8,9 +8,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Fonts from '../../common/Fonts'
-import {
-  TouchableOpacity,
-} from '@gorhom/bottom-sheet'
 import BottomInfoBox from '../BottomInfoBox'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 const ReceiveAmountContent = ( {

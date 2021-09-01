@@ -90,8 +90,10 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         // dismissBottomSheet()
           setSuccess( false )
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          dispatch( refreshAccountShells( [ sourceAccountShell ], {
-          } ) )
+          requestAnimationFrame( () => {
+            dispatch( refreshAccountShells( [ sourceAccountShell ], {
+            } ) )
+          } )
           navigation.dispatch(
             resetStackToAccountDetails( {
               accountShellID: sourceAccountShell.id,

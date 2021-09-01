@@ -88,8 +88,7 @@ export default function SendConfirmationContent( props ) {
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}
-            onPress={() => props.onPressOk()}>{props.okButtonText}</Text>
+          <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
         </AppBottomSheetTouchableWrapper>
         {props.isCancel && (
           <AppBottomSheetTouchableWrapper

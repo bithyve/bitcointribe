@@ -118,7 +118,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <View
             style={styles.text}
           >
-            <Text style={styles.titleText}>{'Enter amount to receive'}</Text>
+            <Text style={styles.titleText}>{amount ? amount : 'Enter amount to receive'}</Text>
           </View>
 
           <View style={{
@@ -147,15 +147,17 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
               <View style={styles.dropDownView}>
                 <ScrollView>
-                  {accounts.map( ( value ) => {
+                  {accounts.map( ( value, index ) => {
                     return (
-                      <TouchableOpacity activeOpacity={0.65} onPress={() => {
-                        setHideShow( false )
-                        setSelectedAccount( value )
-                      }}
-                      style={{
-                        ...styles.dropDownElement,
-                      }}>
+                      <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.65} onPress={() => {
+                          setHideShow( false )
+                          setSelectedAccount( value )
+                        }}
+                        style={{
+                          ...styles.dropDownElement,
+                        }}>
                         {/* <View style={styles.imageView}>
                           <Image source={value.accountImage} style={{
                             width: wp( '8%' ), height: wp( '8%' )

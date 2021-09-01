@@ -182,19 +182,26 @@ const styles = StyleSheet.create( {
   containerImg: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: 40,
-    width: 40,
+    height: 45,
+    width: 45,
     marginRight: 10,
     backgroundColor: '#F4F4F4',
     padding: 2,
-    borderRadius: 30,
-    borderColor: 'white',
+    borderRadius: 45/2,
+    borderColor: Colors.white,
     borderWidth: 2,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 0.6,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+
   },
 
   avatarImage: {
-    height: 35,
-    width: 35,
+    height: 33,
+    width: 33,
     // borderRadius: 10,
   },
 

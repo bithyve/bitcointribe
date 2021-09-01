@@ -251,7 +251,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const renderSecureAccountKnowMoreContent = () => {
     return (
       <SavingAccountAlertBeforeLevel2
-        titleClicked={()=>{setSecureAccountKnowMore( false );  navigation.pop() }}
+        titleClicked={()=>{setSecureAccountAlert( true ); setSecureAccountKnowMore( false ) }}
         containerStyle={{
         }}
       />
@@ -362,7 +362,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <>
+    <View style={{
+      backgroundColor: Colors.backgroundColor, flex: 1
+    }}>
+
+
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
@@ -391,10 +395,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {}} >
         {renderSecureAccountAlertContent()}
       </ModalContainer>
-      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {}} >
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => { setSecureAccountAlert( true ); setSecureAccountKnowMore( false )  }} >
         {renderSecureAccountKnowMoreContent()}
       </ModalContainer>
-    </>
+    </View>
   )
 }
 
@@ -405,7 +409,7 @@ const styles = StyleSheet.create( {
 
   scrollViewContainer: {
     paddingTop: 20,
-    height: '100%',
+    // height: '100%',
     paddingHorizontal: 0,
     backgroundColor: Colors.backgroundColor,
   },
