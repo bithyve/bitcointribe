@@ -670,10 +670,8 @@ function* updateWalletImageWorker( { payload } ) {
     updateAccounts,
     accountIds
   } = payload
-
   yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
   const wallet = yield call( dbManager.getWallet )
-  const accounts = yield call( dbManager.getAccounts )
   const walletImage : NewWalletImage = {
     name: wallet.walletName,
     walletId : wallet.walletId,
