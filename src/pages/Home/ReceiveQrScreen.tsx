@@ -57,7 +57,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     if ( allAccounts ) {
       const acc = []
       for ( const [ key, value ] of Object.entries( allAccounts ) ) {
-        acc.push( value )
+        if( value.isUsable ) acc.push( value )
       }
       setAccounts( acc )
       setSelectedAccount( acc[ 0 ] )
