@@ -63,12 +63,12 @@ const FNFToKeeper = ( props ) => {
         } )
       }
     }
-    if ( c.length === 0 ) {
-      props.navigation.state.params.selectContact( 'AddContact', {
-      } )
-      props.navigation.goBack()
-    }
-    // setContacts( c )
+    // if ( c.length === 0 ) {
+    //   props.navigation.state.params.selectContact( 'AddContact', {
+    //   } )
+    //   props.navigation.goBack()
+    // }
+    setContacts( c )
   }, [] )
 
   const selectedContactsList = useCallback( ( list ) => {
@@ -85,6 +85,7 @@ const FNFToKeeper = ( props ) => {
       id: uuid(),
     }
     props.navigation.state.params.onPressContinue( [ contactDummy ] )
+    props.navigation.goBack()
   }
 
   // const getContact = () => {
@@ -159,7 +160,7 @@ const FNFToKeeper = ( props ) => {
           alignItems: 'flex-start'
         }}>
           <Text style={{
-            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: contact.length && contact[ 0 ].id == contactDescription.contactDetails.id && contact[ 0 ].isExisting ? Colors.white : Colors.textColorGrey
           }}>{firstNamePieceText( contactDescription.contactDetails )}
             <Text style={{
               ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansMedium
@@ -173,6 +174,7 @@ const FNFToKeeper = ( props ) => {
 
   const onPressContinue = () => {
     props.navigation.state.params.onPressContinue( contact )
+    props.navigation.goBack()
   }
 
   // For contact List
@@ -386,6 +388,30 @@ const FNFToKeeper = ( props ) => {
       />
     )
   }, [ errorMessage ] )
+
+  const renderContactPermissionModalContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        // modalRef={contactPermissionBottomSheet}
+        title={'Hexa needs access to your address book.'}
+        info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
+        otherText={'We neither store this data nor pass it to anyone else. This is for your convenience only'}
+        proceedButtonText={'Continue'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          getContactPermission()
+          // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+          setPermissionsModal( false )
+        }}
+        onPressIgnore={() => {
+          // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+          setPermissionsModal( false )
+        }}
+        isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+      />
+    )
+  }, [] )
 
   async function onCancel( value ) {
     if ( filterContactData.findIndex( ( tmp ) => tmp.id == value.id ) > -1 ) {
@@ -651,6 +677,9 @@ const FNFToKeeper = ( props ) => {
       </View>
       <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => {}} >
         {renderContactListErrorModalContent()}
+      </ModalContainer>
+      <ModalContainer visible={permissionsModal} closeBottomSheet={() => {}} >
+        {renderContactPermissionModalContent()}
       </ModalContainer>
       {/* </SafeAreaView> */}
     </View>

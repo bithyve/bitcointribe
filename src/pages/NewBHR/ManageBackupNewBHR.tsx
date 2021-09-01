@@ -484,6 +484,9 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus && this.state.isLevel3Started ) {
+      this.setState( {
+        showLoader: false
+      } )
       console.log( 'APPROVe MB' )
       this.setState( {
         showQRModal: false
@@ -676,8 +679,14 @@ class ManageBackupNewBHR extends Component<
         }
         isOpenedFlag={this.state.showQRModal}
         onQrScan={async( qrScannedData ) => {
+          this.setState( {
+            showLoader: true
+          } )
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
+          this.setState( {
+            showQRModal: false
+          } )
         }}
         onBackPress={() => {
           this.setState( {
@@ -685,9 +694,15 @@ class ManageBackupNewBHR extends Component<
           } )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asafd","channelId":"ce77f9e12e79c10b703e423ff2d5642b949ad9addc32feef549c1a76c54cfaf1","streamId":"f4a5edbbd","secondaryChannelKey":"3HnBqIVwlaam5IUAUTMSfr36","version":"1.9.5","walletId":"5d0b3ea87b54ba82626f5cc0a2696d7c5aaf223c2b08ab8b1661d707de9c5128"}'
+          this.setState( {
+            showLoader: true
+          } )
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sdfsd","channelId":"b819ad391b9b81c5a6debd67f82c2ea772d282ab75af67cfb4a599328c80f99f","streamId":"5adb81478","secondaryChannelKey":"YUlXUgC4q6mzJx2DalfRw5cV","version":"1.9.5","walletId":"4ec72a6d467844c32bd136250496238cafc5baabed1f474a7a1e2122b86444d3"}'
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
+          this.setState( {
+            showQRModal: false
+          } )
         }}
       />
     )
@@ -1129,7 +1144,7 @@ Wallet Backup
               </View>
             </View>
           </ScrollView>
-          {/* {this.state.showLoader ? <Loader isLoading={true}/> : null} */}
+
           <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
@@ -1221,6 +1236,7 @@ Wallet Backup
             {this.renderKnowMoreModalContent()}
           </ModalContainer>
         </View>
+        {this.state.showLoader ? <Loader /> : null}
       </View>
     )
   }
