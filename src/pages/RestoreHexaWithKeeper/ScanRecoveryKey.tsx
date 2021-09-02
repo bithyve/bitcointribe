@@ -125,7 +125,7 @@ class ScanRecoveryKey extends Component<
               }}>
                 Recovering Wallet
               </Text>
-              <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.navigation.state.params.walletName ? this.props.navigation.state.params.walletName : ''}` + '’s Wallet'}</Text>
+              { this.props.walletName || this.props.navigation.state.params.walletName ? <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.navigation.state.params.walletName ? this.props.navigation.state.params.walletName : ''}` + '’s Wallet'}</Text> : null }
 
             </View>
           </View>

@@ -819,8 +819,8 @@ class ContactDetails extends PureComponent<
                     this.setState( {
                       isSendDisabled: true,
                     } )
-                    this.contact.lastSeenActive ? this.onPressSend() : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName ) ? this.onPressResendRequest() : this.onPressResendRequest( {
-                      isKeeper: true, isPrimary: this.contact.displayedName == 'Personal Device1' ? true : false
+                    this.contact.lastSeenActive ? this.onPressSend() : ![ 'Personal Device', 'Personal Device 1', 'Personal Device 2', 'Personal Device 3' ].includes( this.contact.displayedName ) ? this.onPressResendRequest() : this.onPressResendRequest( {
+                      isKeeper: true, isPrimary: this.contact.displayedName == 'Personal Device 1' ? true : false
                     } )
                   }}
                   style={styles.resendContainer}

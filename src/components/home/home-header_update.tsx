@@ -77,19 +77,11 @@ const HomeHeader = ( {
   const levelData: LevelData[] = useSelector(
     ( state ) => state.bhr.levelData
   )
-  const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
 
-  const newBHRFlowStarted = useSelector(
-    ( state ) => state.bhr.newBHRFlowStarted
-  )
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
-
-  const upgradeProcessStatus = useSelector(
-    ( state ) => state.upgradeToNewBhr.upgradeProcessStatus
-  )
 
   const cloudBackupStatus = useSelector(
     ( state ) => state.cloud.cloudBackupStatus
