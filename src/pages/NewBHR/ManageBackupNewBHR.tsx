@@ -300,14 +300,21 @@ class ManageBackupNewBHR extends Component<
           this.handleContactSelection( contactDescription, index, contactsType )
         }
         style={{
+          marginTop: hp( 1 ),
           alignItems: 'center',
           justifyContent: 'center'
         }}
         key={index}
       >
-        <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+        <View style={styles.imageContainer}>
+          <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+        </View>
         <Text style={{
-          textAlign: 'center', marginTop: hp ( 0.5 ), alignSelf: 'center'
+          textAlign: 'center',
+          marginTop: hp ( 0.5 ),
+          alignSelf: 'center',
+          fontSize: RFValue( 10 ),
+          fontFamily: Fonts.FiraSansRegular
         }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
       </TouchableOpacity>
     )
@@ -930,9 +937,7 @@ class ManageBackupNewBHR extends Component<
               } )}
             </View>
             <View style={{
-              marginTop: wp( '5%' ), backgroundColor: Colors.white, height: '100%',
-              borderTopLeftRadius: wp( 4 ),
-              borderTopRightRadius: wp( 4 ),
+              marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor, height: '100%',
               paddingLeft: wp ( '6%' ),
               paddingBottom: hp( 3 )
             }}>
@@ -944,17 +949,20 @@ class ManageBackupNewBHR extends Component<
                 marginBottom: 15
               }}>
                 {keeping.length > 0 ?
-                  <View style={{
-                    height: 'auto', alignItems: 'flex-start', flexDirection: 'row'
-                  }}>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{
+                      height: 'auto', alignItems: 'flex-start', flexDirection: 'row'
+                    }}>
                     {keeping.length && keeping.map( ( item, index ) => {
                       return this.renderContactItem( {
                         contactDescription: item,
                         index,
-                        contactsType: 'I\'m Keeper of',
+                        contactsType: 'I am the Keeper of',
                       } )
                     } ) }
-                  </View>
+                  </ScrollView>
                   :
                   <BottomInfoBox
                     containerStyle={{
@@ -1100,10 +1108,24 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  imageContainer: {
+    width: wp( 15 ),
+    height: wp( 15 ),
+    borderRadius: wp( 15 )/2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 0.6,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    elevation: 10
+  },
   avatarImage: {
-    ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 12 )/2,
-    marginHorizontal: wp ( 1 )
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
+    marginHorizontal: wp ( 1 ),
   },
   moreImage: {
     width: wp( '10%' ),

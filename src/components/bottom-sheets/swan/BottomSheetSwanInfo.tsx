@@ -120,7 +120,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           // accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches auto-withdrawal limit of 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.'
+          swanMessage = 'This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.'
           swanTitle = 'Stack Sats\nwith Swan'
           showNote = true
     }

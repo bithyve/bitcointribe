@@ -205,7 +205,7 @@ class ContactDetails extends PureComponent<
 
     this.contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
-    if ( this.contactsType == 'My Keepers' ) {
+    if ( this.contactsType == 'Keeper' ) {
       this.isExistingContact = this.contact.channelKey && this.props.keeperInfo.find( value => value.channelKey == this.contact.channelKey ) ? true : false
     }
   }
@@ -225,7 +225,7 @@ class ContactDetails extends PureComponent<
 
     // this.setExitKey()
 
-    if ( this.contactsType == 'My Keepers' ) {
+    if ( this.contactsType == 'Keeper' ) {
       // this.saveInTransitHistory( 'inTransit' )
     } else {
       this.getHistoryForTrustedContacts()
@@ -364,7 +364,7 @@ class ContactDetails extends PureComponent<
 
   getHistoryForTrustedContacts = async () => {
     let OtherTrustedContactsHistory = []
-    if ( this.contactsType === 'Other Contacts' ) {
+    if ( this.contactsType === 'Contact' ) {
       OtherTrustedContactsHistory = JSON.parse(
         await AsyncStorage.getItem( 'OtherTrustedContactsHistory' )
       )
@@ -642,7 +642,7 @@ class ContactDetails extends PureComponent<
     return (
       <SendViaQR
         headerText={`Scan ${this.state.qrModalTitle}`}
-        subHeaderText={`Scan the QR to  ${this.state.qrSubTitle}`}
+        subHeaderText={`Scan the QR to ${this.state.qrSubTitle}`}
         contactText={''}
         contact={this.contact}
         QR={this.state.trustedQR}
@@ -797,7 +797,7 @@ class ContactDetails extends PureComponent<
           Status
           </Text>
           <Text style={styles.titleSubText}>
-            {this.contact.isActive ? 'Approved' : 'Pending'}
+            {!this.contact.isActive && !this.contact.streamId ? 'Rejected' : this.contact.streamId ? 'Approved' :  'Pending'}
           </Text>
           {/* <Text style={styles.titleText}>
             Contact Created
@@ -835,7 +835,7 @@ class ContactDetails extends PureComponent<
             } )}
             icon={'Edit'}
             mainText={'Edit Name'}
-            subText={'Lorem ipsum dolor sit amets .'}
+            subText={'Change name of your contact'}
           />
           }
           {this.contact.lastSeenActive &&
@@ -851,7 +851,7 @@ class ContactDetails extends PureComponent<
             }
             icon={'Associate'}
             mainText={'Associate another contact'}
-            subText={'Lorem ipsum dolor sit amets .'}
+            subText={'Select from your address book'}
           />
           }
           {
@@ -887,7 +887,7 @@ class ContactDetails extends PureComponent<
                 }}
                 icon={'Remove'}
                 mainText={'Remove Contact'}
-                subText={'Lorem ipsum dolor sit amets .'}
+                subText={'Remove the contact from Friends & Family'}
               />
             )}
         </View>
@@ -1015,7 +1015,7 @@ class ContactDetails extends PureComponent<
           <View style={{
             flex: 1
           }}>
-            <ScrollView style={{
+            {/* <ScrollView style={{
               flex: 1
             }}>
               {[ 1, 2, 3, 4, 5 ].map( ( value, index ) => {
@@ -1043,7 +1043,7 @@ class ContactDetails extends PureComponent<
                   </View>
                 )
               } )}
-            </ScrollView>
+            </ScrollView> */}
             <BottomInfoBox
               backgroundColor={Colors.white}
               title={'Note'}
@@ -1136,7 +1136,7 @@ class ContactDetails extends PureComponent<
             )}
           </View>
         )}
-        {this.contactsType == 'I\'m Keeper of' && (
+        {this.contactsType == 'I am the Keeper of' && (
           <View style={styles.keeperViewStyle}>
             <TouchableOpacity
               disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING )}
@@ -1153,8 +1153,8 @@ class ContactDetails extends PureComponent<
                 source={require( '../../assets/images/icons/icon_restore.png' )}
                 style={styles.buttonImage}
               /> */}
-              <Text style={styles.buttonText}>Send Recovery Key</Text>
-              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit am </Text>
+              <Text style={styles.buttonText}>Show Recovery Key</Text>
+              <Text style={styles.buttonSubText}>During wallet recovery process</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -1172,7 +1172,7 @@ class ContactDetails extends PureComponent<
               <Text style={[ styles.buttonText, {
 
               } ]}>Show Approval Key</Text>
-              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit am</Text>
+              <Text style={styles.buttonSubText}>Approve changes for the contact</Text>
             </TouchableOpacity>
 
             {encryptedExitKey ? (
@@ -1485,12 +1485,12 @@ const styles = StyleSheet.create( {
   },
   buttonSubText: {
     marginTop: hp( 0.4 ),
-    color: Colors.backgroundColor1,
+    color: Colors.white,
     fontSize: RFValue( 11 ),
     letterSpacing: 0.5,
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
-    width: wp( '44%' )
+    width: wp( '46%' )
   },
   buttonText: {
     color: Colors.backgroundColor1,
@@ -1499,7 +1499,10 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium,
     // marginLeft: 10,
     // marginRight: 10,
-    marginLeft: 0, marginRight: 0, width: wp( '42%' ), textAlign: 'center'
+    marginLeft: 0,
+    marginRight: 0,
+    width: wp( '46%' ),
+    textAlign: 'center'
   },
   buttonInfo: {
     color: Colors.textColorGrey,
@@ -1510,8 +1513,8 @@ const styles = StyleSheet.create( {
   },
   bottomButton: {
     backgroundColor: Colors.lightBlue,
-    height: wp( '22%' ),
-    width: wp( '45%' ),
+    height: wp( '18%' ),
+    width: wp( '47%' ),
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1606,7 +1609,7 @@ const styles = StyleSheet.create( {
   keeperViewStyle: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
     paddingTop: wp( '3%' ),
     paddingBottom: wp( '4%' ),
     height: wp( '30' ),
