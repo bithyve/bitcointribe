@@ -557,24 +557,27 @@ export default function AddContactAddressBook( props ) {
             >
               <Text style={styles.buttonText}>Confirm & Proceed</Text>
             </AppBottomSheetTouchableWrapper>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => onSkipContinue()}
-              style={{
-                // height: wp( '8%' ),
-                marginTop: hp( 1.8 ),
-                width: wp( '25%' ),
-                alignSelf: 'flex-start',
-                paddingLeft: wp( '8%' ),
-              }}
-            >
-              <Text
+            {props.navigation.state.params?.fromScreen === 'Edit' ?
+              null :
+              <AppBottomSheetTouchableWrapper
+                onPress={() => onSkipContinue()}
                 style={{
-                  ...styles.proceedButtonText,
+                // height: wp( '8%' ),
+                  marginTop: hp( 1.8 ),
+                  width: wp( '25%' ),
+                  alignSelf: 'flex-start',
+                  paddingLeft: wp( '8%' ),
                 }}
               >
-                {'Skip'}
-              </Text>
-            </AppBottomSheetTouchableWrapper>
+                <Text
+                  style={{
+                    ...styles.proceedButtonText,
+                  }}
+                >
+                  {'Skip'}
+                </Text>
+              </AppBottomSheetTouchableWrapper>
+            }
           </View>
           {/* )} */}
           <ModalContainer visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
