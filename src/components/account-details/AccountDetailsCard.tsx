@@ -75,7 +75,7 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
       case SubAccountKind.SECURE_ACCOUNT:
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
-        return Colors.borderColor
+        return Colors.kashmirBlue
       case SubAccountKind.SERVICE:
         switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
             case ( ServiceAccountKind.WYRE ):
@@ -86,7 +86,7 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
               return Colors.kashmirBlue
         }
       default:
-        return Colors.borderColor
+        return Colors.kashmirBlue
   }
 }
 
@@ -100,14 +100,14 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
-  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  //const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
   }, [ accountShell.primarySubAccount.kind ] )
 
   useEffect( () => {
     if (
-      startRegistration &&
+      !primarySubAccount.isUsable &&
         primarySubAccount.kind === SubAccountKind.SERVICE &&
       ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
     ) {

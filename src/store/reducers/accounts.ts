@@ -41,16 +41,18 @@ import {
   UPDATE_ACCOUNTS,
   READ_TRANSACTION,
   ACCOUNT_CHECKED,
+  RECOMPUTE_NET_BALANCE,
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import { Account, Accounts } from '../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 export type AccountsState = {
   accountsSynched: boolean;
   accounts: Accounts,
   accountShells: AccountShell[];
-
+  netBalance: number;
   exchangeRates?: any;
   averageTxFees: any;
   twoFAHelpFlags: {
@@ -95,7 +97,7 @@ const initialState: AccountsState = {
   accounts: {
   },
   accountShells: [],
-
+  netBalance: 0,
   twoFAHelpFlags: {
     xprivGenerated: null,
     twoFAValid: null,
@@ -262,6 +264,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             ...action.payload.accounts,
           },
         }
+
       case READ_TRANSACTION: {
         const { accountShells, accounts } = action.payload
         return {
@@ -270,6 +273,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accounts: accounts,
         }
       }
+
       case ACCOUNT_CHECKED: {
         const { accountShells, accounts } = action.payload
         return {
@@ -278,6 +282,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accounts: accounts,
         }
       }
+
       case UPDATE_ACCOUNT_SHELLS:
         const accounts = action.payload.accounts
         const shells = state.accountShells
@@ -309,6 +314,20 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             ...action.payload.accounts,
           },
           accountShells: shells,
+        }
+
+      case RECOMPUTE_NET_BALANCE:
+        let netBalance = 0
+        state.accountShells.forEach( ( accountShell: AccountShell ) => {
+          if (
+            accountShell.primarySubAccount.sourceKind !==
+          SourceAccountKind.TEST_ACCOUNT
+          )
+            netBalance += AccountShell.getTotalBalance( accountShell )
+        } )
+        return {
+          ...state,
+          netBalance
         }
 
       case ACCOUNT_SETTINGS_UPDATED:
