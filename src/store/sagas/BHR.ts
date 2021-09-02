@@ -315,6 +315,11 @@ function* updateSharesHealthWorker( { payload } ) {
         'updateSharesHealthWatcher'
       )
     )
+    yield call( modifyLevelDataWorker, {
+      payload: {
+        levelHealth: tempLevelHealth.length ? tempLevelHealth : levelHealth, currentLevel
+      }
+    } )
 
     // savings account activation
     if( currentLevel == 2 ){
@@ -1610,17 +1615,18 @@ export const createOrChangeGuardianWatcher = createWatcher(
   CREATE_OR_CHANGE_GUARDIAN
 )
 
-function* modifyLevelDataWorker( ) {
+function* modifyLevelDataWorker( { payload } ) {
   try {
+    const { levelHealth, currentLevel } = payload
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
-    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
-    const currentLevel: number = yield select( ( state ) => state.bhr.currentLevel )
+    const levelHealthState: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
+    const currentLevelState: number = yield select( ( state ) => state.bhr.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     let levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     let isError = false
-    const abc = JSON.stringify( levelHealth )
+    const abc = JSON.stringify( levelHealth ? levelHealth : levelHealthState )
     const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ), contacts ) ]
     console.log( 'levelHealthVar', levelHealthVar )
     for ( let i = 0; i < levelHealthVar.length; i++ ) {
@@ -1642,8 +1648,8 @@ function* modifyLevelDataWorker( ) {
     if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }
-    yield put( updateHealth( levelHealthVar, currentLevel, 'modifyLevelDataWatcher' ) )
-    const levelDataUpdated = getLevelInfoStatus( levelData, currentLevel )
+    yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
+    const levelDataUpdated = getLevelInfoStatus( levelData, currentLevel ? currentLevel : currentLevelState )
     yield put ( updateLevelData( levelDataUpdated, isError ) )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
   } catch ( error ) {
@@ -2266,7 +2272,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
       id: value.id,
       selectedKeeper: {
         ...keeper,
-        name: keeper.shareType == 'primaryKeeper' ? 'Personal Device1' : keeper.name,
+        name: keeper.shareType == 'primaryKeeper' ? 'Personal Device 1' : keeper.name,
         shareType: keeper.shareType,
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? metaSharesKeeper[ 1 ] ? metaSharesKeeper[ 1 ].shareId: '' : metaSharesKeeper[ 4 ] ? metaSharesKeeper[ 4 ].shareId : ''
       },
