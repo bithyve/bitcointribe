@@ -515,7 +515,7 @@ const FNFToKeeper = ( props ) => {
                 return renderContactListItem( {
                   contactDescription: item,
                   index,
-                  contactsType: 'Other Contacts',
+                  contactsType: 'Contact',
                   contact
                 } )
               } ) ) ||

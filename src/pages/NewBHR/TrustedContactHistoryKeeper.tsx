@@ -889,7 +889,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             return renderContactListItem( {
               contactDescription: item,
               index,
-              contactsType: 'My Keepers',
+              contactsType: 'Keeper',
             } )
           } ) ) || <View style={{
             height: wp( '22%' ) + 30

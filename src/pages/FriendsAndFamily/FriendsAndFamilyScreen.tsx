@@ -691,7 +691,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
             <View>
 
-              {/* <Text style={styles.pageTitle}>My Keepers</Text>
+              {/* <Text style={styles.pageTitle}>Keeper</Text>
             <Text style={styles.pageInfoText}>
               Contacts who can help me restore my wallet
             </Text>
@@ -706,7 +706,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                   return this.renderContactListItem( {
                     contactDescription: item,
                     index,
-                    contactsType: 'My Keepers',
+                    contactsType: 'Keeper',
                   } )
                 } ) ) || <View style={{
                   height: wp( '22%' ) + 30
@@ -764,7 +764,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                       return this.renderContactListItem( {
                         contactDescription: item,
                         index,
-                        contactsType: 'My Keepers',
+                        contactsType: 'Keeper',
                       } )
                     } ) }
                   </>
@@ -775,7 +775,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                       return this.renderContactListItem( {
                         contactDescription: item,
                         index,
-                        contactsType: 'I\'m Keeper of',
+                        contactsType: 'I am the Keeper of',
                       } )
                     } ) }
                   </>
@@ -786,7 +786,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                       return this.renderContactListItem( {
                         contactDescription: item,
                         index,
-                        contactsType: 'Other Contacts',
+                        contactsType: 'Contact',
                       } )
                     } ) }
                   </>
