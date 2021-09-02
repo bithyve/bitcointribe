@@ -58,7 +58,7 @@ export default class AccountUtilities {
     bitcoinJS.ECPair.fromWIF( privateKey, network )
 
   static deriveAddressFromKeyPair = (
-    keyPair: bip32.BIP32Interface,
+    keyPair: bip32.BIP32Interface | bitcoinJS.ECPairInterface,
     standard: number,
     network: bitcoinJS.Network
   ): string => {

@@ -974,4 +974,32 @@ export default class AccountOperations {
       txid
     }
   };
+
+  static generateGift = async (
+    account: Account | MultiSigAccount,
+    amount: number,
+    averageTxFees: AverageTxFees,
+  ): Promise<{
+    txid: string;
+    privateKey: string;
+   }> => {
+
+    const keyPair = bitcoinJS.ECPair.makeRandom()
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+
+    const recipient = {
+      address: AccountUtilities.deriveAddressFromKeyPair(
+        keyPair,
+        config.DPATH_PURPOSE,
+        network
+      ),
+      amount,
+    }
+    const { txPrerequisites } = await AccountOperations.transferST1( account, [ recipient ], averageTxFees )
+    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, TxPriority.LOW, network, [ recipient ] )
+
+    return {
+      txid, privateKey: keyPair.toWIF()
+    }
+  }
 }
