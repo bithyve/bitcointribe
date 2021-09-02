@@ -739,10 +739,9 @@ function* updateWalletImageWorker( { payload } ) {
     const STATE_DATA = yield call( stateDataToBackup )
     walletImage.versionHistory = BHROperations.encryptWithAnswer( JSON.stringify( STATE_DATA.versionHistory ), encryptionKey ).encryptedData
   }
-  console.log( 'WALLET IMAGE', walletImage )
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
-    if ( res.data ) console.log( 'Wallet Image updated' )
+    if ( res.data ) console.log( 'Wallet Image updated', payload )
     yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
     //yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {

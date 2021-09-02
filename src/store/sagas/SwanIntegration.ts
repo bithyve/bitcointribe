@@ -34,8 +34,9 @@ import { Account, Accounts, AccountType, Wallet } from '../../bitcoin/utilities/
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import { addNewAccount, generateShellFromAccount } from './accounts'
 import { updateAccountShells } from '../actions/accounts'
-import dbManager from '../../storage/realm/dbManager'
 import { updateWalletImageHealth } from '../actions/BHR'
+
+import dbManager from '../../storage/realm/dbManager'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
 const redirect_uri = Config.SWAN_REDIRECT_URL
