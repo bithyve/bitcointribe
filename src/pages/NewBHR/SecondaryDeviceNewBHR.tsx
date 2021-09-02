@@ -42,7 +42,7 @@ export default function SecondaryDeviceModelContents( props ) {
         marginLeft: 20,
         marginRight: 20
       }}>
-  Open the QR scanner at the bottom of the Home screen on another Personal Device running Hexa app and scan this QR
+  Open the QR scanner at the top right of the home screen on another Personal Device running Hexa app and scan this QR
       </Text>
       <View style={NavStyles.modalContentView}>
         {!props.secondaryQR ? (

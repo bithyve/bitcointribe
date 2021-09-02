@@ -34,6 +34,8 @@ import { Account, Accounts, AccountType, Wallet } from '../../bitcoin/utilities/
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import { addNewAccount, generateShellFromAccount } from './accounts'
 import { updateAccountShells } from '../actions/accounts'
+import { updateWalletImageHealth } from '../actions/BHR'
+
 import dbManager from '../../storage/realm/dbManager'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
@@ -159,13 +161,19 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   if( swanAccounts.length ){
     // upgrade default savings account
     const defaultSwanAccount = accounts[ swanAccounts[ 0 ] ]
-    defaultSwanAccount.isUsable = true
-    yield put( updateAccountShells( {
-      accounts: {
-        [ defaultSwanAccount.id ]: defaultSwanAccount
-      }
-    } ) )
-    yield call( dbManager.updateAccount, defaultSwanAccount.id, defaultSwanAccount )
+    if( !defaultSwanAccount.isUsable ){
+      defaultSwanAccount.isUsable = true
+      yield put( updateAccountShells( {
+        accounts: {
+          [ defaultSwanAccount.id ]: defaultSwanAccount
+        }
+      } ) )
+      yield call( dbManager.updateAccount, defaultSwanAccount.id, defaultSwanAccount )
+      yield put( updateWalletImageHealth( {
+        updateAccounts: true,
+        accountIds: [ defaultSwanAccount.id ]
+      } ) )
+    }
   }
 }
 

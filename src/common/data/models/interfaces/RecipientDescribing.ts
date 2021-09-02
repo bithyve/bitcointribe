@@ -22,6 +22,7 @@ export interface ContactRecipientDescribing extends RecipientDescribing {
   lastSeenActive: number | null;
   walletName: string | null;
   trustKind: ContactTrustKind;
+  walletId?: string;
 }
 
 export interface AccountRecipientDescribing extends RecipientDescribing {

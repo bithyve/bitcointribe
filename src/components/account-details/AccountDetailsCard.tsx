@@ -100,14 +100,14 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
-  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  //const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
   }, [ accountShell.primarySubAccount.kind ] )
 
   useEffect( () => {
     if (
-      startRegistration &&
+      !primarySubAccount.isUsable &&
         primarySubAccount.kind === SubAccountKind.SERVICE &&
       ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
     ) {
