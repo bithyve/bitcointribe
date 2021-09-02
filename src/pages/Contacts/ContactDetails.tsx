@@ -120,6 +120,7 @@ interface ContactDetailsStateTypes {
   trustedContactHistory: any;
   SMShareQR: string;
   qrModalTitle: string;
+  qrSubTitle: string;
   reshareModal: boolean;
   showQRCode: boolean;
   edit: boolean;
@@ -194,6 +195,7 @@ class ContactDetails extends PureComponent<
         },
       ],
       qrModalTitle: '',
+      qrSubTitle: '',
       reshareModal: false,
       edit: false,
       sendViaQRModel: false,
@@ -494,8 +496,10 @@ class ContactDetails extends PureComponent<
       )
       return
     }
-    let qrString = ''
+    let qrString = '', qrTitle= '', qrSubTitleText=''
     if ( type == 'recovery' ) {
+      qrTitle = 'Recovery Key'
+      qrSubTitleText = 'help restore'
       qrString = JSON.stringify( {
         type: QRCodeTypes.RECOVERY_REQUEST,
         walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
@@ -507,6 +511,8 @@ class ContactDetails extends PureComponent<
         walletId: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletID
       } )
     } else {
+      qrTitle = 'Approval Key'
+      qrSubTitleText = 'approve'
       qrString = JSON.stringify( {
         type: QRCodeTypes.RECOVERY_REQUEST,
         walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
@@ -518,6 +524,8 @@ class ContactDetails extends PureComponent<
       } )
     }
     this.setState( {
+      qrModalTitle: qrTitle,
+      qrSubTitle: qrSubTitleText,
       trustedQR: qrString,
       sendViaQRModel: true
     } )
@@ -633,8 +641,8 @@ class ContactDetails extends PureComponent<
   renderSendViaQRContents = () => {
     return (
       <SendViaQR
-        headerText={this.state.qrModalTitle}
-        subHeaderText={'You should scan the QR to restore'}
+        headerText={`Scan ${this.state.qrModalTitle}`}
+        subHeaderText={`Scan the QR to  ${this.state.qrSubTitle}`}
         contactText={''}
         contact={this.contact}
         QR={this.state.trustedQR}
@@ -1049,25 +1057,6 @@ class ContactDetails extends PureComponent<
             <ScrollView style={{
               flex: 1
             }}>
-              {this.contact.walletName &&
-                  <View style={[ styles.selectOptionContainer, {
-                    height: hp( 6 ), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                  } ]}>
-                    <View style={{
-                      flexDirection: 'row', alignItems: 'center'
-                    }}>
-                      <Image
-                        source={require( '../../assets/images/icons/icon_wallet_setting.png' )}
-                        style={{
-                          width: 32, height: 32, resizeMode: 'contain'
-                        }}
-                      />
-                      <Text style={styles.headerTitleText}>Wallet Name</Text>
-                    </View>
-
-                    <Text style={styles.headerTitleText}>{this.contact.walletName}</Text>
-                  </View>
-              }
               {this.sortedHistory( trustedContactHistory ).map( ( value ) => {
                 if ( SelectedOption == value.id ) {
                   return (
@@ -1160,28 +1149,30 @@ class ContactDetails extends PureComponent<
               }
               }
             >
-              <Image
+              {/* <Image
                 source={require( '../../assets/images/icons/icon_restore.png' )}
                 style={styles.buttonImage}
-              />
-              <Text style={styles.buttonText} numberOfLines={1}>Help Restore</Text>
+              /> */}
+              <Text style={styles.buttonText}>Send Recovery Key</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit am </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
                 ...styles.bottomButton,
-                justifyContent: 'space-around',
+                // justifyContent: 'space-around',
               }}
               onPress={() => {
                 this.generateQR( 'approval' )
               }}
             >
-              <Image
+              {/* <Image
                 source={require( '../../assets/images/icons/icon_restore.png' )}
                 style={styles.buttonImage}
-              />
+              /> */}
               <Text style={[ styles.buttonText, {
-                marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
-              } ]}>Show Secondary Key</Text>
+
+              } ]}>Show Approval Key</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit am</Text>
             </TouchableOpacity>
 
             {encryptedExitKey ? (
@@ -1199,16 +1190,16 @@ class ContactDetails extends PureComponent<
                   }
                 }}
               >
-                <Image
+                {/* <Image
                   source={require( '../../assets/images/icons/icon_request.png' )}
                   style={styles.buttonImage}
-                />
+                /> */}
                 <View>
                   <Text style={styles.buttonText} numberOfLines={1}>
                     {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
                   </Text>
                   {encryptedExitKey ? (
-                    <Text numberOfLines={1} style={styles.buttonInfo}>
+                    <Text numberOfLines={1} style={styles.buttonSubText}>
                       {'Help recover PDF'}
                     </Text>
                   ) : null}
@@ -1492,12 +1483,23 @@ const styles = StyleSheet.create( {
     height: wp( '10%' ),
     resizeMode: 'contain',
   },
-  buttonText: {
-    color: Colors.black,
+  buttonSubText: {
+    marginTop: hp( 0.4 ),
+    color: Colors.backgroundColor1,
     fontSize: RFValue( 11 ),
+    letterSpacing: 0.5,
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'center',
+    width: wp( '44%' )
+  },
+  buttonText: {
+    color: Colors.backgroundColor1,
+    fontSize: RFValue( 15 ),
+    letterSpacing: 0.01,
     fontFamily: Fonts.FiraSansMedium,
-    marginLeft: 10,
-    marginRight: 10,
+    // marginLeft: 10,
+    // marginRight: 10,
+    marginLeft: 0, marginRight: 0, width: wp( '42%' ), textAlign: 'center'
   },
   buttonInfo: {
     color: Colors.textColorGrey,
@@ -1507,10 +1509,9 @@ const styles = StyleSheet.create( {
     marginLeft: 10,
   },
   bottomButton: {
-    flexDirection: 'row',
-    backgroundColor: Colors.white,
-    height: wp( '17%' ),
-    width: wp( '40%' ),
+    backgroundColor: Colors.lightBlue,
+    height: wp( '22%' ),
+    width: wp( '45%' ),
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
