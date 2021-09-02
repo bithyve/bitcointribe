@@ -469,17 +469,6 @@ class ManageBackupNewBHR extends Component<
         } )
       } )
       this.props.setIsKeeperTypeBottomSheetOpen( false )
-      // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
-
-    }
-
-    if( prevProps.modifyLevelDataStatus != this.props.modifyLevelDataStatus ){
-      if( this.props.modifyLevelDataStatus ) this.setState( {
-        showLoader: true
-      } )
-      else  this.setState( {
-        showLoader: false
-      } )
     }
 
     if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus && this.state.isLevel3Started ) {
@@ -545,8 +534,8 @@ class ManageBackupNewBHR extends Component<
       for ( let i = 0; i < this.props.levelData.length; i++ ) {
         const element = this.props.levelData[ i ]
         if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
-          if ( element.keeper1.shareType == 'contact' ) count++
-          if ( element.keeper2.shareType == 'contact' ) count++
+          if ( element.keeper1.shareType == 'contact' || element.keeper1.shareType == 'existingContact' ) count++
+          if ( element.keeper2.shareType == 'contact' || element.keeper2.shareType == 'existingContact' ) count++
         }
         if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
           if ( element.keeper1.shareType == 'device' || element.keeper1.shareType == 'primaryKeeper' ) count++
