@@ -480,6 +480,7 @@ class RestoreWithICloud extends Component<
       //   backupModal: true
       // })
       this.props.navigation.navigate( 'ScanRecoveryKey', {
+        walletName: 'newArray[ 0 ].walletName',
         scannedData: ( scannedData ) => {
           if ( semver.lte( JSON.parse( scannedData ).version, '1.4.6' ) ) {
             this.props.navigation.navigate( 'RestoreSelectedContactsList' )
@@ -1141,6 +1142,7 @@ class RestoreWithICloud extends Component<
             style={styles.buttonInnerView}
             onPress={() => {
               navigation.navigate( 'ScanRecoveryKey', {
+                walletName: selectedBackup.walletName,
                 scannedData: ( scannedData ) =>
                   this.handleScannedData( scannedData ),
               } )

@@ -121,9 +121,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   useEffect( ()=>{
     const firstName = 'Personal'
     let lastName = 'Device'
-    if( index === 0 ) lastName = 'Device1'
-    else if( index === 3 ) lastName = 'Device2'
-    else lastName = 'Device3'
+    if( index === 0 ) lastName = 'Device 1'
+    else if( index === 3 ) lastName = 'Device 2'
+    else lastName = 'Device 3'
 
     const Contact = {
       id: uuid(),
