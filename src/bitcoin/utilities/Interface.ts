@@ -529,11 +529,13 @@ export interface PrimaryStreamData {
   walletName?: string,
   relationType?: TrustedContactRelationTypes,
   FCM?: string,
+  contactDetails?: ContactDetails,
   paymentAddresses?: {
     [accountType: string]: string
   },
-  contactDetails?: ContactDetails,
-
+  gifts? : {
+    [id: string]: Gift
+  }
   // primary keeper exclusives
   secondarySetupData? :{
     secondaryXpub: string
@@ -932,7 +934,7 @@ export enum GiftStatus {
   EXPIRED = 'EXPIRED'
 }
 export interface Gift {
-  primaryId: string,
+  id: string,
   privateKey: string,
   address: string,
   amount: number,
@@ -944,9 +946,9 @@ export interface Gift {
     walletName: string
   },
   receiver?: {
-    walletId: string,
-    accountId: string,
-    walletName: string,
+    walletId?: string,
+    accountId?: string,
+    walletName?: string,
     contactId?: string
   },
 }

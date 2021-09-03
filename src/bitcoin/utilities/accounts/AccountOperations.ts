@@ -1003,15 +1003,16 @@ export default class AccountOperations {
     const recipient = {
       address,
       amount,
+      name: 'Gift',
     }
     const { txPrerequisites } = await AccountOperations.transferST1( account, [ recipient ], averageTxFees )
     const { txid } = await AccountOperations.transferST2( account, txPrerequisites, TxPriority.LOW, network, [ recipient ] )
 
     const privateKey = keyPair.toWIF()
-    const primaryId = crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' )
+    const id = crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' )
 
     const createdGift: Gift = {
-      primaryId,
+      id,
       privateKey,
       address,
       amount,

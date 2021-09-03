@@ -37,6 +37,8 @@ import {
   ActiveAddressAssignee,
   NetworkType,
   Account,
+  Gift,
+  GiftStatus,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -44,6 +46,7 @@ import {  exchangeRatesCalculated, setAverageTxFee, updateAccountShells } from '
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
+import crypto from 'crypto'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import dbManager from '../../storage/realm/dbManager'
@@ -60,6 +63,7 @@ import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
 import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -450,7 +454,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     contactInfo.channelAssets = channelAssets
   }
 
-  let testReceivingAddress, checkingReceivingAddress
+  let testReceivingAddress, checkingReceivingAddress, defaultCheckingAccountId
   const assigneeInfo: ActiveAddressAssignee = {
     type: AccountType.FNF_ACCOUNT,
     id: contactInfo.channelKey,
@@ -458,6 +462,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       name: contactInfo.contactDetails.contactName
     },
   }
+
   for( const shell of accountsState.accountShells ){
     const { primarySubAccount } = shell
     if( primarySubAccount.instanceNumber === 0 ){
@@ -468,6 +473,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
             break
 
           case AccountType.CHECKING_ACCOUNT:
+            defaultCheckingAccountId = primarySubAccount.id
             checkingReceivingAddress = yield call( getNextFreeAddressWorker, account, assigneeInfo )
             break
       }
@@ -487,6 +493,36 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
   }
 
+  // TODO: prepare gift based on CTA
+  let generatedGift: Gift
+  try{
+
+    const amount = 2000 // amount in sats
+    const defaultAccount = accounts[ defaultCheckingAccountId ]
+    const averageTxFeeByNetwork = accountsState.averageTxFees[ defaultAccount.networkType ]
+    const walletDetails = {
+      walletId: wallet.walletId,
+      walletName: wallet.walletName
+    }
+    const { txid, gift } = yield call( AccountOperations.generateGift, walletDetails, defaultAccount, amount, averageTxFeeByNetwork )
+    if( txid ) {
+      const permanentChannelAddress = crypto
+        .createHash( 'sha256' )
+        .update( channelKey )
+        .digest( 'hex' )
+
+      generatedGift = gift
+      generatedGift.status = GiftStatus.SENT,
+      generatedGift.receiver = {
+        contactId: permanentChannelAddress
+      }
+    }
+  } catch( err ) {
+    console.log( 'Failed to generate gift', {
+      err
+    } )
+  }
+
   // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
@@ -494,6 +530,9 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     relationType,
     FCM,
     paymentAddresses,
+    gifts: generatedGift? {
+      [ generatedGift.id ]: generatedGift
+    }: null,
     contactDetails: contactInfo.contactDetails
   }
 
