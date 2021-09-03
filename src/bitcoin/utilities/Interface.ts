@@ -919,6 +919,38 @@ export enum DeepLinkEncryptionType {
   OTP = 'OTP'
 }
 
+
+export enum GiftType {
+  SENT = 'SENT',
+  RECEIVED = 'RECEIVED'
+}
+
+export enum GiftStatus {
+  CREATED = 'CREATED',
+  SENT = 'SENT',
+  CLAIMED = 'CLAIMED',
+  EXPIRED = 'EXPIRED'
+}
+export interface Gift {
+  primaryId: string,
+  privateKey: string,
+  address: string,
+  amount: number,
+  type: GiftType,
+  status: GiftStatus,
+  sender: {
+    walletId: string,
+    accountId: string,
+    walletName: string
+  },
+  receiver?: {
+    walletId: string,
+    accountId: string,
+    walletName: string,
+    contactId?: string
+  },
+}
+
 export interface cloudDataInterface {
   levelStatus: number;
   encryptedCloudDataJson: string;
