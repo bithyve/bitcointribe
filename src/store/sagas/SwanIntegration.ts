@@ -38,7 +38,7 @@ import { updateWalletImageHealth } from '../actions/BHR'
 
 import dbManager from '../../storage/realm/dbManager'
 
-const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
+const swan_auth_url = `${Config.SWAN_BASE_URL}/oidc/auth`
 const redirect_uri = Config.SWAN_REDIRECT_URL
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
@@ -59,6 +59,7 @@ client_id=${Config.SWAN_CLIENT_ID}\
 &code_challenge_method=S256\
 &response_mode=query\
 `
+
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
   } ) )
