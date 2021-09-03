@@ -174,7 +174,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             style={styles.destinationTitleText}
             numberOfLines={1}
           >
-            Wyre Account
+            Checking Account
           </ListItem.Title>
         </ListItem.Content>
       </View>
