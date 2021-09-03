@@ -94,19 +94,19 @@ const HomeHeader = ( {
     }}>
       { isInit ?
         <View style={{
-          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ), backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'
+          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ), backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'
         }}>
           <Image
             source={require( '../../assets/images/icons/icon_account_sync_in_progress.gif' )}
             style={{
-              width: wp( '4.0%' ), height: wp( '4.0%' ), borderRadius: wp( '5.5/2%' ),
+              width: wp( '4.0%' ), height: wp( '4.0%' ), borderRadius: wp( '4.0/2%' ),
             }}
             resizeMode={'contain'}
           />
         </View>
         : <View style={{
           backgroundColor: isError ? Colors.red : Colors.green,
-          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ),
+          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
         }}>
