@@ -23,6 +23,7 @@ export interface ContactRecipientDescribing extends RecipientDescribing {
   walletName: string | null;
   trustKind: ContactTrustKind;
   walletId?: string;
+  streamId?: string;
 }
 
 export interface AccountRecipientDescribing extends RecipientDescribing {

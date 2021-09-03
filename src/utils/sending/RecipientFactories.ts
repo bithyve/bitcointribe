@@ -96,6 +96,7 @@ export function makeContactRecipientDescription(
     avatarImageSource,
     lastSeenActive,
     walletId,
+    streamId: instreamId,
   }
 
   return contactRecipient
