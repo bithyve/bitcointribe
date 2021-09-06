@@ -352,8 +352,6 @@ export default function AddContactSendRequest( props ) {
     )
   }, [ OTP, renderTimer ] )
 
-  console.log( 'trustedQR', trustedQR )
-
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor

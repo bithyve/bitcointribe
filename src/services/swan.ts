@@ -1,5 +1,5 @@
 import config from '../../src/bitcoin/HexaConfig'
-const { HEXA_ID, SWAN_BASE_URL } = config
+const { HEXA_ID, SWAN_BASE_URL, SWAN_URL_PREFIX } = config
 import { BH_AXIOS, SWAN_AXIOS } from './api'
 import axios from 'axios'
 import qs from 'querystring'
@@ -8,6 +8,7 @@ export const redeemAuthCodeForToken = ( { code, state, code_verifier } ) => {
     const body = {
       code_verifier, code, state
     }
+
     return BH_AXIOS.post( 'swanAuth', {
       HEXA_ID,
       ...body
@@ -34,7 +35,7 @@ export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey,
 
     return axios( {
       method: 'POST',
-      url: `${SWAN_BASE_URL}v1/wallets`,
+      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}v1/wallets`,
       headers,
       data
     } )
@@ -59,7 +60,7 @@ export const setupAutomaticWithdrawals = ( { access_token, walletId, minBtcThres
 
     return axios( {
       method: 'POST',
-      url: `${SWAN_BASE_URL}v1/automatic-withdrawal`,
+      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}v1/automatic-withdrawal`,
       headers,
       data
     } )

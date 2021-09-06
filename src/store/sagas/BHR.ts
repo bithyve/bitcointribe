@@ -1199,14 +1199,7 @@ function* autoShareLevel2KeepersWorker( ) {
           relationType: TrustedContactRelationTypes.KEEPER,
         }
         const backupData: BackupStreamData = {
-          primaryMnemonicShard: {
-            ...MetaShares.find( value=>value.shareId == levelHealth[ 1 ].levelInfo[ i ].shareId ),
-            encryptedShare: {
-              pmShare: MetaShares.find( value=>value.shareId == levelHealth[ 1 ].levelInfo[ i ].shareId ).encryptedShare.pmShare,
-              smShare: '',
-              bhXpub: '',
-            }
-          },
+          primaryMnemonicShard: MetaShares.find( value=>value.shareId == levelHealth[ 1 ].levelInfo[ i ].shareId ),
           keeperInfo
         }
         const streamUpdates: UnecryptedStreamData = {
@@ -1391,11 +1384,7 @@ function* createChannelAssetsWorker( { payload } ) {
       const primaryMnemonicShardTemp = {
         shareId: MetaShares.find( value=>value.shareId==shareId ).shareId,
         meta: MetaShares.find( value=>value.shareId==shareId ).meta,
-        encryptedShare: {
-          pmShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.pmShare,
-          smShare: '',
-          bhXpub: '',
-        }
+        encryptedShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare
       }
       const channelAssets: ChannelAssets = {
         primaryMnemonicShard: primaryMnemonicShardTemp,
@@ -1615,9 +1604,9 @@ export const createOrChangeGuardianWatcher = createWatcher(
   CREATE_OR_CHANGE_GUARDIAN
 )
 
-function* modifyLevelDataWorker( { payload } ) {
+function* modifyLevelDataWorker( ss?:{ payload } ) {
   try {
-    const { levelHealth, currentLevel } = payload
+    const { levelHealth, currentLevel } = ss.payload
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     const levelHealthState: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const currentLevelState: number = yield select( ( state ) => state.bhr.currentLevel )
@@ -1864,14 +1853,7 @@ function* updateKeeperInfoToChannelWorker( ) {
         }
 
         const backupData: BackupStreamData = {
-          primaryMnemonicShard: {
-            ...MetaShares.find( value=>value.shareId == element.shareId ),
-            encryptedShare: {
-              pmShare: MetaShares.find( value=>value.shareId == element.shareId ).encryptedShare.pmShare,
-              smShare: '',
-              bhXpub: '',
-            }
-          },
+          primaryMnemonicShard: MetaShares.find( value=>value.shareId == element.shareId ),
           keeperInfo
         }
 
@@ -1916,7 +1898,7 @@ function* updateKeeperInfoToChannelWorker( ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
-    console.log( 'Error autoShareLevel2KeepersWorker', error )
+    console.log( 'Error UPDATE_KEEPER_INFO_TO_CHANNEL', error )
   }
 }
 
@@ -1974,7 +1956,7 @@ function* acceptExistingContactRequestWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
-    console.log( 'Error autoShareLevel2KeepersWorker', error )
+    console.log( 'Error ACCEPT_EC_REQUEST', error )
   }
 }
 
