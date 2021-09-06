@@ -212,6 +212,8 @@ class RestoreWithICloud extends Component<
   SendViaLinkBottomSheet: any;
   shareOtpWithTrustedContactBottomSheet: any;
   SecurityQuestionBottomSheet: any;
+  bottomTextMessage: string
+  subPoints: string[]
 
   constructor( props ) {
     super( props )
@@ -255,7 +257,7 @@ class RestoreWithICloud extends Component<
       isLinkCreated: false,
       walletName: '',
       loaderMessage: {
-        heading: 'Manage Backup', text: 'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup'
+        heading: 'Creating your wallet', text: 'This may take a short time, while the app sets it all up for you:'
       },
       question: '',
       answer: '',
@@ -273,6 +275,12 @@ class RestoreWithICloud extends Component<
       errorModalTitle: '',
       errorModalInfo: '',
     }
+    this.bottomTextMessage = 'Hexa encrypts and secures all the data on the app and any communication that goes out'
+    this.subPoints = [
+      'Setting up multi-accounts',
+      'Automatically creating backup on the cloud',
+      'Preloading the Test Account with test sats',
+    ]
   }
 
   componentDidMount = () => {
@@ -804,51 +812,51 @@ class RestoreWithICloud extends Component<
     // this.downloadSecret()
   };
 
-  setLoaderMessages = () => {
-    setTimeout( () => {
-      const newMessage = this.getNextMessage()
-      this.setState( {
-        loaderMessage: newMessage
-      } )
-      setTimeout( () => {
-        const newMessage = this.getNextMessage()
-        this.setState( {
-          loaderMessage: newMessage
-        } )
-        setTimeout( () => {
-          const newMessage = this.getNextMessage()
-          this.setState( {
-            loaderMessage: newMessage
-          } )
-          setTimeout( () => {
-            const newMessage = this.getNextMessage()
-            this.setState( {
-              loaderMessage: newMessage
-            } )
-            setTimeout( () => {
-              const newMessage = this.getNextMessage()
-              this.setState( {
-                loaderMessage: newMessage
-              } )
-              setTimeout( () => {
-                const newMessage = this.getNextMessage()
-                this.setState( {
-                  loaderMessage: newMessage
-                } )
-              }, LOADER_MESSAGE_TIME )
-            }, LOADER_MESSAGE_TIME )
-          }, LOADER_MESSAGE_TIME )
-        }, LOADER_MESSAGE_TIME )
-      }, LOADER_MESSAGE_TIME )
-    }, LOADER_MESSAGE_TIME )
-  }
+  // setLoaderMessages = () => {
+  //   setTimeout( () => {
+  //     const newMessage = this.getNextMessage()
+  //     this.setState( {
+  //       loaderMessage: newMessage
+  //     } )
+  //     setTimeout( () => {
+  //       const newMessage = this.getNextMessage()
+  //       this.setState( {
+  //         loaderMessage: newMessage
+  //       } )
+  //       setTimeout( () => {
+  //         const newMessage = this.getNextMessage()
+  //         this.setState( {
+  //           loaderMessage: newMessage
+  //         } )
+  //         setTimeout( () => {
+  //           const newMessage = this.getNextMessage()
+  //           this.setState( {
+  //             loaderMessage: newMessage
+  //           } )
+  //           setTimeout( () => {
+  //             const newMessage = this.getNextMessage()
+  //             this.setState( {
+  //               loaderMessage: newMessage
+  //             } )
+  //             setTimeout( () => {
+  //               const newMessage = this.getNextMessage()
+  //               this.setState( {
+  //                 loaderMessage: newMessage
+  //               } )
+  //             }, LOADER_MESSAGE_TIME )
+  //           }, LOADER_MESSAGE_TIME )
+  //         }, LOADER_MESSAGE_TIME )
+  //       }, LOADER_MESSAGE_TIME )
+  //     }, LOADER_MESSAGE_TIME )
+  //   }, LOADER_MESSAGE_TIME )
+  // }
 
   showLoaderModal = () => {
     // this.loaderBottomSheet.current.snapTo( 1 )
     this.setState( {
       loaderModal: true
     } )
-    this.setLoaderMessages()
+    // this.setLoaderMessages()
   }
   getNextMessage = () => {
     if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
@@ -1243,7 +1251,11 @@ class RestoreWithICloud extends Component<
           />
         </ModalContainer>
         <ModalContainer visible={loaderModal} closeBottomSheet={() => { }} >
-          <LoaderModal headerText={this.state.loaderMessage.heading} messageText={this.state.loaderMessage.text} />
+          <LoaderModal
+            headerText={this.state.loaderMessage.heading}
+            messageText={this.state.loaderMessage.text}
+            subPoints={this.subPoints}
+            bottomText={this.bottomTextMessage} />
         </ModalContainer>
         {/* <BottomSheet
           enabledGestureInteraction={false}

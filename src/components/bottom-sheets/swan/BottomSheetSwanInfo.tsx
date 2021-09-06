@@ -287,6 +287,22 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
+    {swanAccountCreationStatus === SwanAccountCreationStatus.ERROR &&
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={onClickSetting}
+      style={{
+        width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+        alignSelf: 'flex-end',
+        backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+        marginTop: wp( 3 ), marginRight: wp( 3 )
+      }}
+    >
+      <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+      }} />
+    </TouchableOpacity>
+    }
     {renderMessage()}
     {showNote &&
     <View style={styles.statusIndicatorView}>
@@ -337,7 +353,7 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '7%' ),
     // marginLeft: wp( '5%' ),
-    marginTop: wp( '5%' ),
+    marginTop: wp( '3.6%' ),
     // flex: 1.7
   },
   modalTitleText: {

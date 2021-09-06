@@ -379,7 +379,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
-      console.log( 'focusListenerfocusListenerfocusListenerfocusListenerfocusListenerfocusListener' )
 
       this.setCurrencyCodeFromAsync()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )

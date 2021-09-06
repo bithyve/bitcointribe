@@ -96,22 +96,21 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
-  const [ message, setMessage ] = useState( 'Bootstrapping Accounts' )
+  const [ message, setMessage ] = useState( 'Creating your wallet' )
   const [ subTextMessage, setSubTextMessage ] = useState(
-    'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
+    'This may take a short time, while the app sets it all up for you:',
   )
-  const [ bottomTextMessage, setBottomTextMessage ] = useState(
-    'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  const [ bottomTextMessage ] = useState(
+    'Hexa encrypts and secures all the data on the app and any communication that goes out',
   )
   const subPoints = [
     'Setting up multi-accounts',
-    'Fetching test sats & balances',
-    'Generating shares for back-up',
-    'Getting the latest details'
+    'Automatically creating backup on the cloud',
+    'Preloading the Test Account with test sats',
   ]
   const [ Elevation, setElevation ] = useState( 10 )
   // const [ height, setHeight ] = useState( 72 )
-  const [ isLoaderStart, setIsLoaderStart ] = useState( false )
+  // const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
@@ -253,7 +252,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       setElevation( 0 )
     }, 0.2 )
     setTimeout( () => {
-      setIsLoaderStart( true )
+      // setIsLoaderStart( true )
       setIsEditable( false )
       setIsDisabled( true )
     }, 2 )
