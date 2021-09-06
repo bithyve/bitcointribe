@@ -525,7 +525,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChangeKeeperAllow}
+          isChangeKeeperAllow={isChangeKeeperAllow && !isPrimaryKeeper && selectedKeeper.updatedAt}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => { setKeeperTypeModal( true ) }}
         />
