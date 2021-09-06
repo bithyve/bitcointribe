@@ -377,12 +377,6 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    if( this.props.currentLevel == 3 ) {
-      this.setState( {
-        loaderModal: false
-      } )
-    }
-
     if (
       prevState.metaSharesKeeper != this.state.metaSharesKeeper && this.state.metaSharesKeeper.length == 3 && this.state.onKeeperButtonClick
     ) {
