@@ -100,15 +100,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ subTextMessage, setSubTextMessage ] = useState(
     'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
   )
-  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
-  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
-  // )
-  // const subPoints = [
-  //   'Setting up multi-accounts',
-  //   'Fetching test sats & balances',
-  //   'Generating shares for back-up',
-  //   'Getting the latest details'
-  // ]
+  const [ bottomTextMessage, setBottomTextMessage ] = useState(
+    'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  )
+  const subPoints = [
+    'Setting up multi-accounts',
+    'Fetching test sats & balances',
+    'Generating shares for back-up',
+    'Getting the latest details'
+  ]
   const [ Elevation, setElevation ] = useState( 10 )
   // const [ height, setHeight ] = useState( 72 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
@@ -248,7 +248,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
     setLoaderModal( true )
-    setLoaderMessages()
+    // setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
@@ -417,7 +417,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   const renderLoaderModalContent = useCallback( () => {
-    return <LoaderModal headerText={message} messageText={subTextMessage} />
+    return <LoaderModal headerText={message} messageText={subTextMessage} subPoints={subPoints} bottomText={bottomTextMessage} />
   }, [ message, subTextMessage ] )
 
   const renderLoaderModalHeader = () => {
