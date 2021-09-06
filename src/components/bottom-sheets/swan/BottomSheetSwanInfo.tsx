@@ -101,7 +101,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
           swanTitle = 'Your Hexa Wallet is communicating with Swan Bitcoin...'
-          swanMessage = 'This account is being linked with your profile on Swan Bitcoin.\nThis may take a few seconds, please do not close the application.'
+          swanMessage = 'This account is being linked with your profile on Swan Bitcoin.\n\nThis may take a few seconds, please do not close the application.'
           showNote = false
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
@@ -288,11 +288,13 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     ...styles.modalContentContainer
   }}>
     {renderMessage()}
+    {showNote &&
     <View style={styles.statusIndicatorView}>
       <View style={styles.statusIndicatorInactiveView} />
       {/* <View style={styles.statusIndicatorInactiveView} /> */}
       <View style={styles.statusIndicatorActiveView} />
     </View>
+    }
     {renderFooter()}
   </View>
   )

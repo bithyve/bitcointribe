@@ -202,7 +202,7 @@ export default function SettingGetNewPin( props ) {
           {/* <Text style={ styles.headerTitleText }>Hello!</Text> */}
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter the{' '}
+              Please enter a new{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
 
@@ -343,7 +343,7 @@ export default function SettingGetNewPin( props ) {
           {passcode.length == 4 ? (
             <View>
               <Text style={styles.headerInfoText}>
-                Re-enter the <Text style={styles.boldItalicText}>passcode</Text>{' '}
+              Please re-enter new <Text style={styles.boldItalicText}>passcode</Text>{' '}
               </Text>
               <View>
                 <View style={{
@@ -804,6 +804,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: hp( 1 )
   },
   passcodeTextInputText: {
     color: Colors.blue,

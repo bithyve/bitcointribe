@@ -349,8 +349,6 @@ export default function AddContactSendRequest( props ) {
     )
   }, [ OTP, renderTimer ] )
 
-  console.log( 'trustedQR', trustedQR )
-
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -411,7 +409,7 @@ export default function AddContactSendRequest( props ) {
             title={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'Secure with additional factor' :
               `Secure with contacts ${encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number' : encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email' : 'OTP' }`
             }
-            infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'You can optionally add a second factor when you are sending the link/ QR through an unencrypted channel'
+            infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'You can optionally add a second factor when you are sending the link/QR through an unencrypted channel'
               :
               encryptLinkWith === DeepLinkEncryptionType.NUMBER ? `Your contact will have to verify their phone number '${encryptionKey}' to accept the request`
                 :

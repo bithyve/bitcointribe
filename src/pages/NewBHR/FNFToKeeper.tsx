@@ -433,7 +433,7 @@ const FNFToKeeper = ( props ) => {
       flex: 1,
       backgroundColor: Colors.backgroundColor
     }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <SafeAreaView />
       <View style={{
         flex: 1,
@@ -596,6 +596,7 @@ const FNFToKeeper = ( props ) => {
           <View style={{
             position: 'relative',
             // flex:1
+            height: hp( 63 )
           }}>
             {filterContactData ? (
               <FlatList
@@ -655,7 +656,7 @@ const FNFToKeeper = ( props ) => {
           <View
             style={{
               position: 'absolute',
-              bottom: contacts.length ? hp( 63 ) : hp ( 35 ),
+              bottom: contacts.length ? hp( 10 ) : hp ( 5 ),
               flex:1,
               width: wp( '50%' ),
               alignSelf: 'center',
