@@ -801,7 +801,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                 <BottomInfoBox
                   containerStyle={{
                     // alignItems: 'flex-end'
-                    backgroundColor: Colors.gray7,
+                    backgroundColor: Colors.backgroundColor1,
                     // marginTop: hp( 22 )
                   }}
                   title={''}
