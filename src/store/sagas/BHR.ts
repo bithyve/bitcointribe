@@ -1325,13 +1325,14 @@ function* setHealthStatusWorker( ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS
-    let shareArray
+
     if( currentLevel ){
       for ( let j = 0; j < levelHealth.length; j++ ) {
         const element = levelHealth[ j ]
         for ( let i = 0; i < element.levelInfo.length; i++ ) {
+          let shareArray
           const element2 = element.levelInfo[ i ]
-          if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
+          if( element2.updatedAt > 0 ) {
             const delta = Math.abs( Date.now() - element2.updatedAt )
             const minutes = Math.round( delta / ( 60 * 1000 ) )
             if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
@@ -1342,6 +1343,15 @@ function* setHealthStatusWorker( ) {
                 reshareVersion: element2.reshareVersion,
                 status: 'notAccessible',
               }
+            } else {
+              shareArray =  {
+                walletId: wallet.walletId,
+                shareId: element2.shareId,
+                reshareVersion: element2.reshareVersion,
+                status: 'accessible',
+              }
+            }
+            if( shareArray ){
               yield call( updateSharesHealthWorker, {
                 payload: {
                   shares: shareArray, isNeedToUpdateCurrentLevel: true
