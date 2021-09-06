@@ -42,10 +42,11 @@ import {
   READ_TRANSACTION,
   ACCOUNT_CHECKED,
   RECOMPUTE_NET_BALANCE,
+  ADD_NEW_GIFT,
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import { Account, Accounts } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, Gift } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 export type AccountsState = {
@@ -60,6 +61,9 @@ export type AccountsState = {
       twoFAValid: boolean | null;
       twoFAResetted: boolean | null;
   };
+  gifts : {
+    [id: string]: Gift
+  }
 
   isGeneratingNewAccountShell: boolean;
   hasNewAccountShellGenerationSucceeded: boolean;
@@ -103,7 +107,8 @@ const initialState: AccountsState = {
     twoFAValid: null,
     twoFAResetted: null,
   },
-
+  gifts: {
+  },
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
   hasNewAccountShellGenerationFailed: false,
@@ -528,6 +533,17 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
           resetTwoFALoader: action.payload.flag,
         }
+
+      case ADD_NEW_GIFT:
+        const newGift: Gift = action.payload.newGift
+        return {
+          ...state,
+          gifts: {
+            ...state.gifts,
+            [ newGift.id ]: newGift
+          }
+        }
+
       default:
         return state
   }

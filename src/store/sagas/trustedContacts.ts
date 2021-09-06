@@ -39,10 +39,11 @@ import {
   Account,
   Gift,
   GiftStatus,
+  GiftType,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
-import {  exchangeRatesCalculated, setAverageTxFee, updateAccountShells } from '../actions/accounts'
+import {  addNewGift, exchangeRatesCalculated, setAverageTxFee, updateAccountShells } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
@@ -62,7 +63,6 @@ import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
-import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 
 function* generateSecondaryAssets(){
@@ -97,6 +97,27 @@ function* updateWalletWorker( { payload } ) {
 }
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
+
+function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+
+  for ( const channelKey of  Object.keys( trustedContacts ) ){
+    const contact = trustedContacts[ channelKey ]
+    const instreamId = contact.streamId
+    if( instreamId ){
+      const giftsFromContact = idx( contact, _ => _.unencryptedPermanentChannel[ instreamId ].primaryData.gifts )
+      if( giftsFromContact ){
+        for( const gift of Object.values( giftsFromContact ) ){
+          if( !storedGifts[ gift.id ] ){
+            gift.status = GiftStatus.CLAIMED
+            gift.type = GiftType.RECEIVED
+            yield put( addNewGift( gift ) )
+          }
+        }
+      }
+    }
+  }
+}
 
 export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, updateWI?: boolean, }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -280,6 +301,8 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
         yield call( dbManager.updateContact, value )
       }
+
+      yield call( updateGiftsWorker, updatedContacts ) // update gifts(if there are new)
 
       let shouldUpdateSmShare = false
       // update secondary setup data on inital primary keeper sync
@@ -495,32 +518,35 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   // TODO: prepare gift based on CTA
   let generatedGift: Gift
-  try{
-
-    const amount = 2000 // amount in sats
-    const defaultAccount = accounts[ defaultCheckingAccountId ]
-    const averageTxFeeByNetwork = accountsState.averageTxFees[ defaultAccount.networkType ]
-    const walletDetails = {
-      walletId: wallet.walletId,
-      walletName: wallet.walletName
-    }
-    const { txid, gift } = yield call( AccountOperations.generateGift, walletDetails, defaultAccount, amount, averageTxFeeByNetwork )
-    if( txid ) {
-      const permanentChannelAddress = crypto
-        .createHash( 'sha256' )
-        .update( channelKey )
-        .digest( 'hex' )
-
-      generatedGift = gift
-      generatedGift.status = GiftStatus.SENT,
-      generatedGift.receiver = {
-        contactId: permanentChannelAddress
+  if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
+    try{
+      const amount = 2000 // amount in sats
+      const defaultAccount = accounts[ defaultCheckingAccountId ]
+      const averageTxFeeByNetwork = accountsState.averageTxFees[ defaultAccount.networkType ]
+      const walletDetails = {
+        walletId: wallet.walletId,
+        walletName: wallet.walletName
       }
+      const { txid, gift } = yield call( AccountOperations.generateGift, walletDetails, defaultAccount, amount, averageTxFeeByNetwork )
+
+      if( txid ) {
+        const permanentChannelAddress = crypto
+          .createHash( 'sha256' )
+          .update( contactInfo.channelKey )
+          .digest( 'hex' )
+
+        generatedGift = gift
+        generatedGift.status = GiftStatus.SENT,
+        generatedGift.receiver = {
+          contactId: permanentChannelAddress
+        }
+        yield put( addNewGift( gift ) )
+      }
+    } catch( err ) {
+      console.log( 'Failed to generate gift', {
+        err
+      } )
     }
-  } catch( err ) {
-    console.log( 'Failed to generate gift', {
-      err
-    } )
   }
 
   // prepare primary data

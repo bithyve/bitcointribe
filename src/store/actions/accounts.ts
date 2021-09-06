@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Account, Accounts, ContactInfo, DonationAccount } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, ContactInfo, DonationAccount, Gift } from '../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -571,6 +571,7 @@ export const TRANSACTION_REASSIGNMENT_FAILED =
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 export const BLIND_REFRESH_STARTED = 'BLIND_REFRESH_STARTED'
+export const ADD_NEW_GIFT = 'ADD_NEW_GIFT'
 
 export const testcoinsReceived = ( ) => {
   return {
@@ -796,6 +797,15 @@ export const setResetTwoFALoader = ( flag ) => {
   return {
     type: RESET_TWO_FA_LOADER, payload:{
       flag
+    }
+  }
+}
+
+export const addNewGift = ( newGift: Gift ) => {
+  return {
+    type: ADD_NEW_GIFT,
+    payload: {
+      newGift
     }
   }
 }
