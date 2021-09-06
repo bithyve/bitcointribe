@@ -6,6 +6,9 @@ import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSend
 import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
 import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
 import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const SendStack = createStackNavigator(
   {

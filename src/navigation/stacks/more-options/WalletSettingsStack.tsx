@@ -9,6 +9,9 @@ import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import ReLogin from '../../../pages/ReLogin'
 import SettingGetNewPin from '../../../pages/SettingGetNewPin'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const WalletSettingsStack = createStackNavigator(
   {

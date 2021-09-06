@@ -8,7 +8,9 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import EnterPasscodeScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/EnterPasscodeScreen'
 import SecurityQuestionScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/SecurityQuestionScreen'
+import { translations } from '../../../common/content/LocContext'
 
+const strings  = translations[ 'stackTitle' ]
 
 const PanAccountSettingsStack = createStackNavigator(
   {
@@ -16,7 +18,7 @@ const PanAccountSettingsStack = createStackNavigator(
       screen: PanAccountSettingsContainerScreen,
       navigationOptions: ( { navigation } ) => {
         return {
-          title: 'Account Settings',
+          title: strings[ 'AccountSettings' ],
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
@@ -27,7 +29,7 @@ const PanAccountSettingsStack = createStackNavigator(
       screen: EnterPasscodeScreen,
       navigationOptions: ( { navigation } ) => {
         return {
-          title: 'Show all accounts',
+          title: strings[ 'ShowAllAccounts' ],
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
@@ -38,7 +40,7 @@ const PanAccountSettingsStack = createStackNavigator(
       screen: SecurityQuestionScreen,
       navigationOptions: ( { navigation } ) => {
         return {
-          title: 'Show all accounts',
+          title: strings[ 'ShowAllAccounts' ],
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },

@@ -21,10 +21,12 @@ import CopyThisText from '../components/CopyThisText'
 import UserDetails from './UserDetails'
 import BottomInfoBox from './BottomInfoBox'
 import HeaderTitle from './HeaderTitle'
+import { translations } from '../common/content/LocContext'
 
 export default function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
-
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const contact = props.contact
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
@@ -121,8 +123,8 @@ export default function RequestKeyFromContact( props ) {
           Contact={Contact} />
       </View> */}
       <HeaderTitle
-        firstLineTitle={'Scan QR'}
-        secondLineTitle={'With your contacts Hexa app'}
+        firstLineTitle={strings.scanQR}
+        secondLineTitle={strings.withHexa}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -150,8 +152,8 @@ export default function RequestKeyFromContact( props ) {
 
       </View>
       <HeaderTitle
-        firstLineTitle={'or Share link'}
-        secondLineTitle={'With the contact'}
+        firstLineTitle={strings.orShare}
+        secondLineTitle={strings.WithContact}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -160,7 +162,7 @@ export default function RequestKeyFromContact( props ) {
       <CopyThisText
         openLink={shareLink ? shareOption : () => { }}
         backgroundColor={Colors.white}
-        text={shareLink ? shareLink : 'Creating Link....'}
+        text={shareLink ? shareLink : strings.Creating}
         width={'22%'}
         height={'22%'}
       />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import {
   View,
   Text,
@@ -36,6 +36,7 @@ import { v4 as uuid } from 'uuid'
 import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { editTrustedContact } from '../../store/actions/trustedContacts'
 import HeaderTitle from '../../components/HeaderTitle'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -47,6 +48,9 @@ export default function AddContactAddressBook( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const [ permissionModal, setModal ] = useState( false )
   const [ permissionErrModal, setErrModal ] = useState( false )
   const [
@@ -299,9 +303,9 @@ export default function AddContactAddressBook( props ) {
       } else {
         props.navigation.navigate( 'AddContactSendRequest', {
           SelectedContact: selectedContacts,
-          headerText:'Add a contact  ',
-          subHeaderText:'Send a Friends & Family request',
-          contactText:'Adding to Friends & Family:',
+          headerText: strings.addContact,
+          subHeaderText:strings.send,
+          contactText:strings.adding,
           showDone:true,
         } )
       }
@@ -321,9 +325,9 @@ export default function AddContactAddressBook( props ) {
 
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: [ skippedContact ],
-      headerText:'Add a contact  ',
-      subHeaderText:'Send a Friends & Family request',
-      contactText:'Adding to Friends & Family:',
+      headerText: strings.addContact,
+      subHeaderText:strings.send,
+      contactText:strings.adding,
       showDone:true,
     } )
   }
@@ -351,8 +355,8 @@ export default function AddContactAddressBook( props ) {
         </TouchableOpacity>
       </View>
       <HeaderTitle
-        firstLineTitle={props.modalTitle ? props.modalTitle : 'Associate a contact'}
-        secondLineTitle={'Select a contact from your phone\'s address book'}
+        firstLineTitle={props.modalTitle ? props.modalTitle : strings.Associate}
+        secondLineTitle={strings.Select}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -470,7 +474,7 @@ export default function AddContactAddressBook( props ) {
               }
               autoCorrect={false}
               autoFocus={false}
-              placeholder="Search"
+              placeholder={common.search}
               placeholderTextColor={Colors.textColorGrey}
               onChangeText={( nameKeyword ) => {
                 nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
@@ -555,7 +559,7 @@ export default function AddContactAddressBook( props ) {
                 backgroundColor: Colors.lightBlue
               } ]}
             >
-              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+              <Text style={styles.buttonText}>{common.confirmProceed}</Text>
             </AppBottomSheetTouchableWrapper>
             {props.navigation.state.params?.fromScreen === 'Edit' ?
               null :
@@ -574,7 +578,7 @@ export default function AddContactAddressBook( props ) {
                     ...styles.proceedButtonText,
                   }}
                 >
-                  {'Skip'}
+                  {common.skip}
                 </Text>
               </AppBottomSheetTouchableWrapper>
             }
@@ -582,9 +586,9 @@ export default function AddContactAddressBook( props ) {
           {/* )} */}
           <ModalContainer visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
-              title={'Error while accessing your contacts '}
+              title={strings.erroraAccessing}
               info={errorMessage}
-              proceedButtonText={'Open Setting'}
+              proceedButtonText={strings.openSetting}
               isIgnoreButton={true}
               onPressProceed={() => {
                 Linking.openURL( 'app-settings:' )
@@ -601,10 +605,10 @@ export default function AddContactAddressBook( props ) {
           <ModalContainer visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
-              title={'Why do we need access\nto your address book?'}
-              info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\n\nIt is a good way to remember who the contacts are with their name and image'}
-              otherText={'\n\n\n\nWe neither store this data nor pass it to anyone else. This is for your convenience only'}
-              proceedButtonText={'Continue'}
+              title={strings.why}
+              info={strings.info}
+              otherText={strings.otherText}
+              proceedButtonText={common.continue}
               isIgnoreButton={false}
               onPressProceed={() => {
                 getContactPermission()

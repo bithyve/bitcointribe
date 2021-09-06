@@ -23,6 +23,9 @@ import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
 import AppInfo from '../../../pages/MoreOptions/AppInfo/Appinfo'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const MoreOptionsStack = createStackNavigator(
   {

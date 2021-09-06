@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext } from 'react'
 import {
   View,
   Image,
@@ -11,8 +11,12 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function NoInternetModalContents( props ) {
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'noInternet' ]
+  const common = translations[ 'common' ]
 
   return ( <View style={{
     ...styles.modalContentContainer
@@ -21,17 +25,17 @@ export default function NoInternetModalContents( props ) {
       height: '100%'
     }}> */}
     <View style={styles.successModalHeaderView}>
-      <Text style={styles.modalTitleText}>No Internet{'\n'}Connection</Text>
+      <Text style={styles.modalTitleText}>{`${strings.no}\n${strings.Connection}`}</Text>
       <Text style={{
         ...styles.modalInfoText, marginTop: wp( '1.5%' )
-      }}>There seems to be a problem with your{'\n'}<Text style={{
+      }}>{`${strings.there}\n`}<Text style={{
           fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic'
-        }}>internet connection</Text></Text>
+        }}>{`${strings.internet}`}</Text></Text>
     </View>
     <View style={styles.successModalAmountView}>
       <Text style={{
         ...styles.modalInfoText, marginBottom: hp( '3%' )
-      }}>Some of the features will not work as expected in your Hexa app, including:</Text>
+      }}>{`${strings.some}`}</Text>
       <View style={{
       }}>
         <View style={{
@@ -40,19 +44,19 @@ export default function NoInternetModalContents( props ) {
           <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
           <Text style={{
             ...styles.modalInfoText,
-          }}>fetching your balance and transactions</Text>
+          }}>{strings.fetching}</Text>
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginBottom: 5
         }}>
           <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
-          <Text style={styles.modalInfoText}>sending sats</Text>
+          <Text style={styles.modalInfoText}>{strings.sending}</Text>
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginBottom: 5
         }}>
           <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
-          <Text style={styles.modalInfoText}>contact requests
+          <Text style={styles.modalInfoText}>{strings.contact}
           </Text>
         </View>
       </View>
@@ -66,7 +70,7 @@ export default function NoInternetModalContents( props ) {
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>OK</Text>
+        <Text style={styles.proceedButtonText}>{common.ok}</Text>
       </AppBottomSheetTouchableWrapper>
       {/* <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressIgnore()}
