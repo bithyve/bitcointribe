@@ -78,7 +78,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
     : useFormattedAmountText( amountToDisplay )
 
   const formattedUnitText = isTestAccount ?
-    displayNameForBitcoinUnit( bitcoinUnit )
+    displayNameForBitcoinUnit( BitcoinUnit.TSATS )
     : useFormattedUnitText( {
       bitcoinUnit, currencyKind
     } )
@@ -161,8 +161,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       >
         {formattedBalanceText}
       </Text>
-
-      <Text style={unitTextStyles}>{` ${formattedUnitText}`}</Text>
+      <Text style={unitTextStyles}>{`${formattedUnitText}`}</Text>
     </View>
   )
 }
