@@ -463,38 +463,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
     )
   }
 
-  const createGuardian = useCallback(
-    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
-      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-      const Contact = props.navigation.getParam( 'isChangeKeeperType' ) || isChangeKeeper ? payload.chosenContactTmp : ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload && payload.chosenContactTmp ? payload.chosenContactTmp : chosenContact : chosenContact
-      setChosenContact( Contact )
-      console.log( 'shareType != "existingContact"', shareType != 'existingContact' )
-      console.log( 'isReshare', isReshare )
-      console.log( 'isChangeKeeper', isChangeKeeper )
-      if( shareType != 'existingContact' && isReshare && !isChangeKeeper ){
-        console.log( 'RETURN' ); return}
-      setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-      setChannelKey( channelKeyTemp )
-      console.log( 'shareType', shareType )
-      props.navigation.navigate( 'QrAndLink', {
-        contact: Contact,
-        selectedKeeper: selectedKeeper,
-        isChange: isChangeKeeper,
-        shareType,
-        isReshare,
-        oldChannelKey,
-        channelKey: channelKeyTemp
-      } )
-    },
-    [ trustedContacts, chosenContact ],
-  )
+  const createGuardian = async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, shareType?: string} ) => {
+    const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+    const Contact = payload.chosenContactTmp
 
-  useEffect( () => {
-    if( shareType == 'existingContact' && !isGuardianCreationClicked && ( ( chosenContact && Object.keys( chosenContact ).length ) || chosenContact != null ) ) {
-      createGuardian( )
-    }
-  }, [ chosenContact ] )
+    if( payload.shareType != 'existingContact' && isReshare && !isChangeKeeper ){
+      console.log( 'RETURN' ); return}
+    setIsGuardianCreationClicked( true )
+    const channelKeyTemp: string = payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    setChannelKey( channelKeyTemp )
+
+    props.navigation.navigate( 'QrAndLink', {
+      contact: Contact,
+      selectedKeeper: selectedKeeper,
+      isChange: isChangeKeeper,
+      shareType: payload.shareType,
+      isReshare,
+      oldChannelKey,
+      channelKey: channelKeyTemp
+    } )
+  }
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
@@ -566,22 +554,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ channelAssets ] )
 
-  useEffect( () => {
-    if ( isNavigation ) {
-      props.navigation.navigate( 'TrustedContactNewBHR', {
-        LoadContacts: true,
-        onPressContinue: onPressContinue
-      } )
-    }
-
-  }, [ isNavigation ] )
 
   const onPressContinue = ( selectedContacts ) => {
     Keyboard.dismiss()
-    if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); setShareType( 'existingContact' ) } else setShareType( 'contact' )
+    let shareType = 'contact'
+    if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); shareType = 'existingContact' }
+    setShareType( shareType )
     setTimeout( () => {
       createGuardian( {
-        chosenContactTmp: getContacts( selectedContacts )
+        chosenContactTmp: getContacts( selectedContacts ), shareType
       } )
       setShowQrCode( true )
     }, 10 )

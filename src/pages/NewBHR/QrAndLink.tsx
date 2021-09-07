@@ -21,7 +21,7 @@ import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
 import ModalContainer from '../../components/home/ModalContainer'
 import Secure2FA from '../Contacts/Secure2FAModal'
-import { ChannelAssets, DeepLinkEncryptionType, KeeperInfoInterface, MetaShare, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { ChannelAssets, DeepLinkEncryptionType, KeeperInfoInterface, LevelInfo, MetaShare, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { useDispatch, useSelector } from 'react-redux'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
@@ -70,7 +70,6 @@ export default function QrAndLink( props ) {
   const index = props.navigation.getParam( 'index' )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-  console.log( 'props.navigation.state.params', props.navigation.state.params )
   const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 
@@ -93,44 +92,38 @@ export default function QrAndLink( props ) {
     } )
   }, [ Contact ] )
 
-  const createGuardian = useCallback(
-    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
-      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-      if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
-      setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-      setChannelKey( channelKeyTemp )
+  const createGuardian = ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+    const isChangeKeeper = isChange ? isChange : false
+    if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
+    setIsGuardianCreationClicked( true )
+    const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    setChannelKey( channelKeyTemp )
 
-      const obj: KeeperInfoInterface = {
-        shareId: selectedKeeper.shareId,
-        name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
-        type: shareType,
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
-        currentLevel: currentLevel,
-        createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
-        data: {
-          ...Contact, index
-        },
-        channelKey: channelKeyTemp
-      }
-      console.log( 'USEEFFECT obj', obj )
-      dispatch( updatedKeeperInfo( obj ) )
-      dispatch( createChannelAssets( selectedKeeper.shareId ) )
-    },
-    [ trustedContacts, Contact ],
-  )
+    const obj: KeeperInfoInterface = {
+      shareId: selectedKeeper.shareId,
+      name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
+      type: shareType,
+      scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+      currentLevel: currentLevel,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+      data: {
+        ...Contact, index
+      },
+      channelKey: channelKeyTemp
+    }
+
+    dispatch( updatedKeeperInfo( obj ) )
+    dispatch( createChannelAssets( selectedKeeper.shareId ) )
+  }
 
   useEffect( ()=> {
     if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
-      console.log( 'USEEFFECT chosenContact', Contact )
-      console.log( 'USEEFFECT channelKey', channelKey )
-      console.log( 'USEEFFECT oldChannelKey', oldChannelKey )
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
       } ) )
     }
-  }, [ Contact, createChannelAssetsStatus, channelAssets ] )
+  }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
     console.log( 'useEffect Contact', Contact )
@@ -147,7 +140,7 @@ export default function QrAndLink( props ) {
           break
         }
       }
-    if ( !currentContact ) return
+    if ( !currentContact || ( shareType == 'existingContact' && ( currentContact.relationType != TrustedContactRelationTypes.EXISTING_CONTACT && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) ) return
 
     // generate deep link & QR for the contact
     let encryption_key: string
@@ -212,7 +205,7 @@ export default function QrAndLink( props ) {
         }
       } ) )
     if( isGuardianCreationClicked ) {
-      const shareObj = {
+      const shareObj: LevelInfo = {
         walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
         shareId: selectedKeeper.shareId,
         reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
@@ -220,6 +213,7 @@ export default function QrAndLink( props ) {
         status: 'notAccessible',
         name: Contact && Contact.name ? Contact.name : ''
       }
+      if( shareType == 'existingContact' ) shareObj.updatedAt = 0
       dispatch( updateMSharesHealth( shareObj, isChange ) )
       dispatch( setChannelAssets( {
       } ) )

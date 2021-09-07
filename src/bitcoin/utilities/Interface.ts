@@ -703,14 +703,15 @@ export interface LevelHealthInterface {
 }
 
 export interface LevelInfo {
-  shareType: string;
-  updatedAt: number;
-  status: string;
+  shareType?: string;
+  updatedAt?: number;
+  status?: string;
   shareId: string;
   reshareVersion?: number;
   name?: string;
   data?: any;
-  channelKey?: string
+  channelKey?: string;
+  walletId?: string
 }
 
 export interface KeeperInfoInterface {
