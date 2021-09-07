@@ -646,7 +646,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: widthPercentageToDP ( 2 )
   },
   accountCardsSectionContainer: {
-    height: hp( '70.83%' ),
+    height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,

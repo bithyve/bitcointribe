@@ -276,10 +276,10 @@ export default function EditWalletName( props ) {
         <View style={styles.statusIndicatorActiveView} />
       </View>
       <BottomInfoBox
-        backgroundColor={Colors.bgColor}
+        backgroundColor={Colors.backgroundColor}
         title={'Note'}
         infoText={
-          'The wallets name will get updated automatically across your Friends & Family network'
+          'The wallet\'s name will get updated automatically across your Friends & Family network'
         }
       />
       {setButtonVisible()}
