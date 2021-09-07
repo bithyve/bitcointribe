@@ -775,8 +775,8 @@ class ManageBackupNewBHR extends Component<
           this.props.navigation.navigate(
             'CloudBackupHistory',
             {
-              selectedTime: selectedKeeper.updatedAt
-                ? getTime( selectedKeeper.updatedAt )
+              selectedTime: value.keeper2.updatedAt
+                ? getTime( value.keeper2.updatedAt )
                 : 'never',
             }
           )
@@ -785,8 +785,8 @@ class ManageBackupNewBHR extends Component<
         this.props.navigation.navigate(
           'SecurityQuestionHistoryNewBHR',
           {
-            selectedTime: selectedKeeper.updatedAt
-              ? getTime( selectedKeeper.updatedAt )
+            selectedTime: value.keeper1.updatedAt
+              ? getTime( value.keeper1.updatedAt )
               : 'never',
           }
         )

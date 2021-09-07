@@ -18,12 +18,12 @@ const iCloud = NativeModules.iCloud
 
 const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[] ) => {
 
-  const obj ={
+  const obj = {
     title,
     confirmed: Date.now(),
     date: Date.now(),
   }
-  const updatedCloudBackupHistory = cloudBackupHistory
+  const updatedCloudBackupHistory = [ ...cloudBackupHistory ]
   updatedCloudBackupHistory.push( obj )
   return updatedCloudBackupHistory
 }
