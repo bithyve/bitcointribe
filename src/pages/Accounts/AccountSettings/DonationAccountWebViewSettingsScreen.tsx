@@ -343,8 +343,10 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 thumbColor={
                   isIncomingTxnEnabled ? Colors.blue : Colors.white
                 }
-                onpress={() =>
+                onpress={() =>{
+                  if( isIncomingTxnEnabled ) setIsOutgoingTxnEnabled( false )
                   setIsIncomingTxnEnabled( ( prevState ) => !prevState )
+                }
                 }
                 isOn={isIncomingTxnEnabled}
               />
@@ -377,8 +379,9 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 thumbColor={
                   isOutgoingTxnEnabled ? Colors.blue : Colors.white
                 }
-                onpress={() =>
-                  setIsOutgoingTxnEnabled( ( prevState ) => !prevState )
+                onpress={() => {
+                  if( isIncomingTxnEnabled || isOutgoingTxnEnabled ) setIsOutgoingTxnEnabled( ( prevState ) => !prevState )
+                }
                 }
                 isOn={isOutgoingTxnEnabled}
               />
