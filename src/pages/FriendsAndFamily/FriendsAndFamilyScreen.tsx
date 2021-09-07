@@ -799,12 +799,8 @@ class FriendsAndFamilyScreen extends PureComponent<
             otherContacts.length == 0 && (
                 // feature/2.0
                 <BottomInfoBox
-                  containerStyle={{
-                    // alignItems: 'flex-end'
-                    backgroundColor: Colors.backgroundColor1,
-                    // marginTop: hp( 22 )
-                  }}
-                  title={''}
+                  backgroundColor={Colors.white}
+                  title={'Note'}
                   infoText={
                     'Your contacts appear here when\nadded to Hexa wallet'
                   }
@@ -956,7 +952,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp ( 1 )
   },
   accountCardsSectionContainer: {
-    height: hp( '70.83%' ),
+    height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     opacity: 1,

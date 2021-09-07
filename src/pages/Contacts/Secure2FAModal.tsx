@@ -87,7 +87,7 @@ export default function Secure2FA( props ) {
       <BottomInfoBox
         title={'Note'}
         infoText={'If the communication channel is not encrypted / secure, the second factor sent through a different channel improves the security guarantees'}
-        // backgroundColor={Colors.white}
+        backgroundColor={Colors.white}
       />
       <View style={{
         marginTop: 0, marginBottom: hp( 2 )

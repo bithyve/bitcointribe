@@ -1059,6 +1059,8 @@ export default class AccountUtilities {
       disableAccount?: boolean;
       configuration?: {
         displayBalance: boolean;
+        displayIncomingTxs: boolean;
+        displayOutgoingTxs: boolean;
       };
       accountDetails?: {
         donee: string;
