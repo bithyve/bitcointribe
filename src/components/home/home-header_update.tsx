@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
+  Linking,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -409,6 +410,11 @@ const HomeHeader = ( {
           />
         </TouchableOpacity>
       </View>
+      {/* <TouchableOpacity style={{
+        alignItems:'center', padding: 5
+      }} onPress={()=>Linking.openURL( 'https://www.google.com/' )}><Text style={{
+          color: Colors.white, fontSize: RFValue( 13 ), fontFamily: Fonts.FiraSansMedium
+        }}>{'-> Get updated version 2.0 from here for new features <-'}</Text></TouchableOpacity> */}
     </View>
   )
 }

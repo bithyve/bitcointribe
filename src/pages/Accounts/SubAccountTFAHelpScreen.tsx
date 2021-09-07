@@ -7,6 +7,7 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
+  Keyboard,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -39,6 +40,7 @@ import idx from 'idx'
 import { AccountsState } from '../../store/reducers/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { resetSendState } from '../../store/actions/sending'
+import SecurityQuestion from '../NewBHR/SecurityQuestion'
 
 export type Props = {
   navigation: any;
@@ -56,11 +58,16 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const [
     ServerNotRespondingBottomSheet,
   ] = useState( React.createRef() )
-
+  const [
+    SecurityQuestionBottomSheet,
+    setSecurityQuestionBottomSheet,
+  ] = useState( React.createRef() )
   const accountsState: AccountsState = useAccountsState()
   const sourceAccountShell = useSourceAccountShellForSending()
   const dispatch = useDispatch()
   const twoFASetupDetails = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.twoFASetup )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
+  const secondaryMnemonics = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.secondaryMnemonic )
   useEffect( () => {
     const resettedTwoFA = idx( accountsState.twoFAHelpFlags, ( _ ) => _.twoFAResetted )
 
@@ -235,6 +242,36 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     )
   }, [] )
 
+  const renderSecurityQuestionContent = useCallback( () => {
+    return (
+      <SecurityQuestion
+        onFocus={() => {
+          if ( Platform.OS == 'ios' )
+            ( SecurityQuestionBottomSheet as any ).current.snapTo( 2 )
+        }}
+        onBlur={() => {
+          if ( Platform.OS == 'ios' )
+            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+        }}
+        onPressConfirm={async () => {
+          Keyboard.dismiss()
+          if( secondaryMnemonics ) dispatch( resetTwoFA( secondaryMnemonics ) );
+          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+    )
+  }, [] )
+
+  const renderSecurityQuestionHeader = useCallback( () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+    )
+  }, [] )
+
   return (
     <SafeAreaView style={{
       flex: 1
@@ -278,9 +315,11 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
               setTimeout( () => {
                 setQRModalHeader( 'Reset 2FA' )
               }, 2 )
-              if ( QrBottomSheet.current ) {
+              if( currentLevel > 2 || secondaryMnemonics ){
+                ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+              } else if ( !secondaryMnemonics ){
                 ( QrBottomSheet as any ).current.snapTo( 1 )
-              }
+              } else ( QrBottomSheet as any ).current.snapTo( 1 )
             }}
             style={{
               ...styles.selectedContactsView, marginBottom: hp( '3%' )
@@ -420,6 +459,13 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         ]}
         renderContent={renderServerNotRespondingContent}
         renderHeader={renderServerNotRespondingHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SecurityQuestionBottomSheet as any}
+        snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
+        renderContent={renderSecurityQuestionContent}
+        renderHeader={renderSecurityQuestionHeader}
       />
     </SafeAreaView>
   )
