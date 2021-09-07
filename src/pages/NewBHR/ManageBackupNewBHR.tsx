@@ -953,7 +953,7 @@ class ManageBackupNewBHR extends Component<
                       marginTop: hp( 2.5 ),
                       backgroundColor: Colors.white
                     }}
-                    title=""
+                    title="Note"
                     infoText="When you have Friends & Family who you can help with wallet recovery, they will be listed here"
                   />
                 }
@@ -1161,7 +1161,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp ( '6%' )
   },
   accountCardsSectionContainer: {
-    height: hp( '70.83%' ),
+    height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

@@ -456,7 +456,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    height: heightPercentageToDP( '70.83%' ),
+    height: heightPercentageToDP( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,

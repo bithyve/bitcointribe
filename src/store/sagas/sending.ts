@@ -150,6 +150,7 @@ function* executeSendStage2( { payload }: {payload: {
   accountShell: AccountShell;
   txnPriority: TxPriority,
   token?: number,
+  note?: string,
 }} ) {
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
@@ -158,7 +159,7 @@ function* executeSendStage2( { payload }: {payload: {
     ( state ) => state.sending
   )
 
-  const { accountShell, txnPriority, token } = payload
+  const { accountShell, txnPriority, token, note } = payload
   const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
@@ -174,6 +175,13 @@ function* executeSendStage2( { payload }: {payload: {
       successful: true,
       txid,
     } ) )
+
+    if( note ){
+      account.transactionsNote[ txid ] = note
+      if( account.type === AccountType.DONATION_ACCOUNT ) Relay.sendDonationNote( account.id.slice( 0, 15 ), {
+        txId: txid, note
+      } )
+    }
 
     const accounts = {
       [ account.id ]: account

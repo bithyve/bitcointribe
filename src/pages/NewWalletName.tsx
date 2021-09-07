@@ -271,7 +271,7 @@ export default function NewWalletName( props ) {
             marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
           }}>
             <BottomInfoBox
-              title={'Note:'}
+              title={'Note'}
               infoText={
                 'Wallet name is used in the messages you send to your Friends & Family contacts'
               }

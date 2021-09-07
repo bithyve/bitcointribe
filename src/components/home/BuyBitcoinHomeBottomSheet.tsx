@@ -11,6 +11,7 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import { LocalizationContext } from '../../common/content/LocContext'
+import BottomInfoBox from '../BottomInfoBox'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -165,7 +166,18 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
           renderItem={renderItem}
           scrollEnabled={false}
         />
+        <BottomInfoBox
+          backgroundColor={Colors.backgroundColor}
+          containerStyle={{
+            marginRight: wp( 3 )
+          }}
+          title={''}
+          infoText={
+            '* Some methods may not be available in the US states of Hawaii, Nebraska, New York and Texas'
+          }
+        />
       </View>
+
     </View>
 
   )
@@ -204,7 +216,7 @@ const styles = StyleSheet.create( {
   },
   mainCardContainer: {
     marginTop: hp( 1.5 ),
-    paddingHorizontal: 0
+    paddingHorizontal: 0,
   },
   rootContainer: {
     backgroundColor: Colors.white,
@@ -221,7 +233,7 @@ const styles = StyleSheet.create( {
   },
   modelHeight: {
     height: 'auto',
-    marginBottom: hp( 4 )
+    marginBottom: hp( 2 )
   },
   cardMiddle: {
     // paddingLeft: 0,
