@@ -31,6 +31,8 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalContainer from '../../components/home/ModalContainer'
 import RadioButton from '../../components/RadioButton'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import DeviceInfo from 'react-native-device-info'
+
 
 const FNFToKeeper = ( props ) => {
   const [ contact, setContact ] = useState( [] )
@@ -71,15 +73,6 @@ const FNFToKeeper = ( props ) => {
     setContacts( c )
   }, [] )
 
-  const selectedContactsList = useCallback( ( list ) => {
-    console.log( 'sdfsdf' )
-    if ( list.length > 0 ) {
-      console.log( 'selectedContactsList' )
-      setIsExistingContact( false )
-      setContact( [ ...list ] )
-    }
-  }, [] )
-
   const onPressSkip = () => {
     const contactDummy = {
       id: uuid(),
@@ -87,17 +80,6 @@ const FNFToKeeper = ( props ) => {
     props.navigation.state.params.onPressContinue( [ contactDummy ] )
     props.navigation.goBack()
   }
-
-  // const getContact = () => {
-  //   ExpoContacts.getContactsAsync().then( async ( { data } ) => {
-  //     const filteredData = data.find( item => item.id === contactInfo.id )
-  //     // setPhoneumber( filteredData.phoneNumbers )
-
-  //     setContact( filteredData )
-  //     // setEmails( filteredData.emails )
-  //     // await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
-  //   } )
-  // }
 
   const firstNamePieceText = ( contact ) => {
     return contact && contact.contactName ? contact.contactName?.split( ' ' )[ 0 ] + ' ' : ''
@@ -127,6 +109,7 @@ const FNFToKeeper = ( props ) => {
     return <TouchableOpacity style={{
       ...styles.listItem, backgroundColor: contact.length && contact[ 0 ].id == contactDescription.contactDetails.id && contact[ 0 ].isExisting ? Colors.primaryAccent : Colors.backgroundColor1
     }} onPress={() => {
+
       const obj = {
         name: contactDescription.contactDetails.contactName,
         imageAvailable: contactDescription.contactDetails.imageAvailable ? true : false,
@@ -135,7 +118,17 @@ const FNFToKeeper = ( props ) => {
         channelKey: contactDescription.channelKey,
         isExisting: true
       }
-      setContact( [ obj ] )
+      let contactTemp = [ ]
+      if( contact.length && contact[ 0 ].id == obj.id && contact[ 0 ].isExisting ) {
+        setContact( [ ] )
+        contactTemp=[]
+      } else {setContact( [ obj ] );contactTemp=[ obj ]}
+      const contacts = filterContactData
+      if( contactTemp.length && contacts.find( ( value )=> value.checked == true ) ){
+        contacts[ contacts.findIndex( ( value )=>value.checked == true ) ].checked = false
+      }
+      setRadioOnOff( !radioOnOff )
+      setFilterContactData( contacts )
       setIsExistingContact( true )
     }}
     >
@@ -344,26 +337,18 @@ const FNFToKeeper = ( props ) => {
   }, [] )
 
   async function onContactSelect( index ) {
-    let contact = []
+    let contactTemp = []
     const contacts = filterContactData
-    if ( contacts[ index ].checked ) {
-      contact = []
+    if ( contact.length && contacts[ index ].id == contact[ 0 ].id && !contact[ 0 ].isExisting ) {
+      contactTemp = []
+      contacts[ index ].checked = false
     } else {
-      contact[ 0 ] = contacts[ index ]
+      contactTemp[ 0 ] = contacts[ index ]
+      contacts[ index ].checked = true
     }
-    setContact( contact )
-    for ( let i = 0; i < contacts.length; i++ ) {
-      if (
-        contact.findIndex( ( value ) => value.id == contacts[ i ].id ) > -1
-      ) {
-        contacts[ i ].checked = true
-      } else {
-        contacts[ i ].checked = false
-      }
-    }
+    setContact( contactTemp )
     setRadioOnOff( !radioOnOff )
     setFilterContactData( contacts )
-    // props.onSelectContact( selectedContacts )
   }
 
   const renderContactListErrorModalContent = useCallback( () => {
@@ -595,8 +580,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            // flex:1
-            height: hp( 63 )
+            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '45%' ) : hp( '65%' ),
           }}>
             {filterContactData ? (
               <FlatList
