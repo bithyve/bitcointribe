@@ -68,6 +68,8 @@ export function generateAccount(
       },
       internal: {
       }
+    },
+    transactionsNote: {
     }
   }
 
@@ -167,6 +169,8 @@ export function generateMultiSigAccount(
       },
       internal: {
       }
+    },
+    transactionsNote: {
     }
   }
 
