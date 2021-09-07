@@ -236,6 +236,8 @@ export function generateDonationAccount(
     donee,
     configuration: {
       displayBalance: true,
+      displayIncomingTxs: true,
+      displayOutgoingTxs: true,
     },
     disableAccount: false,
     is2FA,

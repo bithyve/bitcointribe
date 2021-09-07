@@ -876,6 +876,8 @@ export interface DonationAccount extends Account {
   donee: string;
   configuration: {
     displayBalance: boolean;
+    displayIncomingTxs: boolean;
+    displayOutgoingTxs: boolean;
   };
   disableAccount: boolean;
   is2FA: boolean,                       // is2FA enabled
