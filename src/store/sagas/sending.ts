@@ -176,9 +176,12 @@ function* executeSendStage2( { payload }: {payload: {
       txid,
     } ) )
 
-    if( note && account.type === AccountType.DONATION_ACCOUNT ) Relay.sendDonationNote( account.id.slice( 0, 15 ), {
-      txId: txid, note
-    } )
+    if( note ){
+      account.transactionsNote[ txid ] = note
+      if( account.type === AccountType.DONATION_ACCOUNT ) Relay.sendDonationNote( account.id.slice( 0, 15 ), {
+        txId: txid, note
+      } )
+    }
 
     const accounts = {
       [ account.id ]: account
