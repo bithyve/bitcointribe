@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import React, { useState, useCallback, useEffect, useContext } from 'react'
 import { View, Text, StatusBar, ScrollView, TouchableOpacity, SafeAreaView, StyleSheet, Image, FlatList, Platform, PermissionsAndroid, TextInput, Linking } from 'react-native'
 import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
@@ -32,10 +32,14 @@ import ModalContainer from '../../components/home/ModalContainer'
 import RadioButton from '../../components/RadioButton'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import DeviceInfo from 'react-native-device-info'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 
 const FNFToKeeper = ( props ) => {
   const [ contact, setContact ] = useState( [] )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const [ IsExistingContact, setIsExistingContact ] = useState( false )
   const [ contacts, setContacts ] = useState( [] )
   const [ selectedItem, setSelected ] = useState( '' )
@@ -217,7 +221,7 @@ const FNFToKeeper = ( props ) => {
       if ( !data.length ) {
         //Alert.alert('No contacts found!');
         setErrorMessage(
-          'No contacts found. Please add contacts to your Address Book and try again',
+          strings.Nocontacts,
         )
         // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
@@ -240,9 +244,7 @@ const FNFToKeeper = ( props ) => {
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
         setContactPermissionAndroid( false )
@@ -254,9 +256,7 @@ const FNFToKeeper = ( props ) => {
       const { status } = await Permissions.getAsync( Permissions.CONTACTS )
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
         return
@@ -272,11 +272,11 @@ const FNFToKeeper = ( props ) => {
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
-          title: 'Hexa Would Like to Access Your Contacts',
+          title: strings.hexaWould,
           message:
-            'Address book details are only stored locally',
-          buttonPositive: 'Allow',
-          buttonNegative: 'Deny',
+            strings.Addressbookdetails,
+          buttonPositive: common.allow,
+          buttonNegative: common.deny,
         },
       )
       return result
@@ -355,9 +355,9 @@ const FNFToKeeper = ( props ) => {
     return (
       <ErrorModalContents
         // modalRef={contactListErrorBottomSheet}
-        title={'Error while accessing your contacts '}
+        title={strings.erroraAccessing}
         info={errorMessage}
-        proceedButtonText={'Open Setting'}
+        proceedButtonText={common.openSetting}
         isIgnoreButton={true}
         onPressProceed={() => {
           Linking.openURL( 'app-settings:' )
@@ -378,10 +378,10 @@ const FNFToKeeper = ( props ) => {
     return (
       <ErrorModalContents
         // modalRef={contactPermissionBottomSheet}
-        title={'Hexa needs access to your address book.'}
-        info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-        otherText={'We neither store this data nor pass it to anyone else. This is for your convenience only'}
-        proceedButtonText={'Continue'}
+        title={strings.Hexaneedsaddressbook}
+        info={strings.Ifyouwantto}
+        otherText={strings.Weneither}
+        proceedButtonText={common.continue}
         isIgnoreButton={false}
         onPressProceed={() => {
           getContactPermission()
@@ -448,13 +448,13 @@ const FNFToKeeper = ( props ) => {
           <View style={{
             flex:1,
           }}>
-            <Text style={BackupStyles.modalHeaderTitleText}>Send Recovery Key</Text>
+            <Text style={BackupStyles.modalHeaderTitleText}>{strings.sendRecoveryKey}</Text>
             <Text numberOfLines={2} style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
               fontFamily: Fonts.FiraSansRegular
             }} >
-              {'Send the Recovery Key to your Friends & Family, or select a new contact from the address book'}
+              {strings.sendRecoveryKeyTo}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper
@@ -476,7 +476,7 @@ const FNFToKeeper = ( props ) => {
                 color: Colors.blue,
               }}
             >
-            Skip
+              {common.skip}
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
@@ -508,7 +508,7 @@ const FNFToKeeper = ( props ) => {
                 <Text style={{
                   color: Colors.gray2,
                 }}>
-              No contacts</Text>
+                  {strings.Nocontacts1}</Text>
               </View>
               }
             </ScrollView>
@@ -522,7 +522,7 @@ const FNFToKeeper = ( props ) => {
           marginLeft: wp( 4 ),
           marginBottom: wp( 2 ),
           marginTop: wp( 2 )
-        }}>Select from address book: </Text>
+        }}>{strings.Selectfromaddressbook} </Text>
         <View style={{
         }}>
           <View style={styles.selectedContactContainer}>
@@ -567,7 +567,7 @@ const FNFToKeeper = ( props ) => {
               autoCorrect={false}
               autoFocus={false}
               autoCompleteType="off"
-              placeholder="Search"
+              placeholder={common.search}
               placeholderTextColor={Colors.textColorGrey}
               onChangeText={( nameKeyword ) => {
                 nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
@@ -654,7 +654,7 @@ const FNFToKeeper = ( props ) => {
                 backgroundColor: Colors.blue,
               }}
             >
-              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+              <Text style={styles.buttonText}>{common.confirmProceed}</Text>
             </AppBottomSheetTouchableWrapper>
           </View>
           }

@@ -20,7 +20,14 @@
     "relationship": "Beziehung",
     "status": "Status",
     "walletName": "Wallet-Name",
-    "walletID": "Wallet-ID"
+    "walletID": "Wallet-ID",
+    "allow": "Erlauben",
+    "deny": "Aberkennen",
+    "ignore": "Ignorieren",
+    "openSetting": "Einstellung öffnen",
+    "back": "zurück",
+    "receive": "Erhalten",
+    "learnMore": "Erfahren Sie mehr"
   },
   "noInternet": {
     "no": "Ohne Internet",
@@ -39,33 +46,124 @@
     "tos": "Nutzungsbedingungen",
     "tos_agree": "Indem Sie mit dem nächsten Schritt fortfahren, stimmen Sie unseren",
     "Incorrect": "Falscher Passcode, versuchen Sie es erneut!",
-    "loaderMessages": {
-      "0": {
+    "loaderMessages": [
+      {
         "heading": "Sparkonto",
         "text": "Das Sparkonto wird entsperrt, sobald Ihr Backup Level 2 erreicht hat. Richten Sie außerdem Ihren 2FA-Code in einer Authenticator-App ein",
         "subText": ""
       },
-      "1": {
+      {
         "heading": "Nicht verwahrte Käufe",
         "text": "Holen Sie sich Sats direkt in Ihre Brieftasche von kompatiblen Börsen",
         "subText": ""
       },
-      "2": {
+      {
         "heading": "Freunde Familie",
         "text": "Fügen Sie Kontakte zu Hexa hinzu und senden Sie Sats, ohne jedes Mal nach ihrer Wallet-Adresse zu fragen",
         "subText": ""
       },
-      "3": {
+      {
         "heading": "Spendenkonten",
         "text": "Erhalten Sie Spenden direkt in Ihrem Hexa Wallet, von überall auf der Welt",
         "subText": ""
       },
-      "4": {
+      {
         "heading": "Satoshis oder Sats",
         "text": "1 Bitcoin = 100 Millionen Satoshis oder Sats",
         "subText": "Hexa verwendet Sats, um die Verwendung von Bitcoin zu vereinfachen"
       }
-    }
+    ],
+    "Hello": "Hallo!",
+    "create": "Login erstellen",
+    "reEnter": "Geben Sie den Passcode erneut ein, um sich zu verifizieren und anzumelden",
+    "appcreates": "Die App erstellt für Sie eine neue Wallet mit Konten, die Sie sofort verwenden können.",
+    "previously": "Wenn Sie zuvor eine Hexa-Wallet hatten, können Sie sie wiederherstellen. Lassen Sie die Allgemeinen Geschäftsbedingungen unten.",
+    "TermsService": "Nutzungsbedingungen",
+    "proceeding": "Indem Sie mit dem nächsten Schritt fortfahren, stimmen Sie unseren",
+    "Step1": "Schritt 1\nBitte benennen Sie Ihre Brieftasche",
+    "Step2": "Schritt 2\nErstellen Sie ein erstes Cloud-Backup",
+    "creation": "Schaffung",
+    "walletName": "Geben Sie den Namen der Brieftasche ein",
+    "numbers": "Zahlen oder Sonderzeichen werden nicht unterstützt",
+    "Next": "Nächste",
+    "info": "Der Wallet-Name wird in den Nachrichten verwendet, die Sie an Ihre Freundes- und Familienkontakte senden",
+    "Creatingyourwallet": "Erstellen Sie Ihre Brieftasche",
+    "Thismay": "Dies kann eine kurze Zeit dauern, während die App alles für Sie einrichtet:",
+    "Hexaencrypts": "Hexa verschlüsselt und sichert alle Daten in der App und jede ausgehende Kommunikation",
+    "creatingbackup": "Backup automatisch in der Cloud erstellen",
+    "preloading": "Vorladen des Testkontos mit Test-Sats",
+    "multi": "Einrichten von Mehrfachkonten",
+    "Answersdonotmatch": "Antworten stimmen nicht überein",
+    "Answersmust": "Antworten dürfen nur Kleinbuchstaben (a-z) und Ziffern (0-9) enthalten",
+    "Passworddonotmatch": "Passwort stimmt nicht überein",
+    "Passwordmust": "Das Passwort darf nur Kleinbuchstaben (a-z) und Ziffern (0-9) enthalten",
+    "encryptionpassword": "Verwenden Sie Ihre eigenen\nVerschlüsselungspasswort",
+    "Enteryourpassword": "Geben Sie Ihr Passwort ein",
+    "Confirmyourpassword": "Bestätigen Sie Ihr Passwort",
+    "Numbersorspecial": "Zahlen oder Sonderzeichen werden nicht unterstützt",
+    "Addhint": "Tipp hinzufügen",
+    "Makesure": "Merken Sie sich das Verschlüsselungspasswort und bewahren Sie es sicher auf",
+    "AnswerSecurityQuestion": "Antworten\neine Sicherheitsfrage",
+    "SelectQuestion": "Wähle eine Frage aus",
+    "Enteryouranswer": "Gib deine Antwort ein",
+    "Confirmyouranswer": "Bestätige deine Antwort",
+    "Answersmust1": "Antworten dürfen nur Kleinbuchstaben und Zahlen enthalten",
+    "TheAnswer": "Die Antwort wird verwendet, um das Backup zu verschlüsseln. Die Sicherheitsfrage dient als Hinweis zum Erinnern",
+    "AnsweraSecurityQuestion": "Beantworten Sie eine Sicherheitsfrage",
+    "Easiertoremember": "Leichter zu merken. Empfohlen",
+    "Useencryptionpassword": "Verwenden Sie Ihr eigenes Verschlüsselungspasswort",
+    "Createapassword": "Erstelle ein Passwort. Denken Sie daran, es zu merken",
+    "Backuplets": "Mit Backup können Sie Ihre Brieftasche wiederherstellen, selbst wenn Sie Ihr Telefon verlieren. Verwalten von",
+    "questionList": [
+      {
+        "id": "1",
+        "question": "In welche Stadt sind Sie das erste Mal geflogen, als Sie mit einem Flugzeug geflogen sind?"
+      },
+       {
+        "id": "2",
+        "question": "Wie lautet der Vorname der Person, die Sie zum ersten Mal geküsst haben?"
+      },
+       {
+        "id": "3",
+        "question": "Wie heißt dein bester Freund in der High School mit Vornamen?"
+      },
+       {
+        "id": "4",
+        "question": "Wie lautet der Vorname Ihres ältesten Neffen?"
+      },
+       {
+        "id": "5",
+        "question": "Wie lautet der Vorname Ihrer ältesten Nichte?"
+      },
+       {
+        "id": "6",
+        "question": "Wie heißt dein Lieblingsfreund aus Kindertagen mit Vornamen?"
+      },
+       {
+        "id": "7",
+        "question": "Wie lautet der Nachname Ihres Lehrers in der dritten Klasse?"
+      },
+      {
+        "id": "8",
+        "question": "In welcher Straße wohnte dein bester Freund aus der High School?"
+      },
+       {
+        "id": "9",
+        "question": "In welcher Stadt war Ihr erster Job?"
+      },
+       {
+        "id": "10",
+        "question": "Wie lautet der Nachname Ihres Lieblingslehrers aus der Kindheit?"
+      },
+      {
+        "id": "11",
+        "question": "Nennen Sie das erste Unternehmen, bei dem Sie gearbeitet haben"
+      },
+      {
+        "id": "12",
+        "question": "In welcher Straße hast du gelebt, als du 10 warst?"
+      }
+    ]
   },
   "home": {
     "the_wallet_backup": "Das Wallet-Backup ist",
@@ -188,6 +286,72 @@
     "AssociateanotherSub": "Wählen Sie aus Ihrem Adressbuch",
     "RemoveContact": "Kontakt entfernen",
     "sure": "Sind Sie sicher, dass Sie den Kontakt entfernen möchten?",
-    "Removefrom": "Kontakt aus Freunde & Familie entfernen"
+    "Removefrom": "Kontakt aus Freunde & Familie entfernen",
+    "hexaWould": "Hexa möchte auf Ihre Kontakte zugreifen",
+    "Hexaneedsaddressbook": "Hexa benötigt Zugriff auf Ihr Adressbuch.",
+    "Addressbookdetails": "Adressbuchdetails werden nur lokal gespeichert",
+    "sendRecoveryKey": "Wiederherstellungsschlüssel senden",
+    "Nocontacts1": "Keine Kontakte",
+    "Selectfromaddressbook": "Aus Adressbuch auswählen",
+    "sendRecoveryKeyTo": "Senden Sie den Wiederherstellungsschlüssel an Ihre Freunde und Familie oder wählen Sie einen neuen Kontakt aus dem Adressbuch",
+    "Weneither": "Diese Daten werden von uns weder gespeichert noch an Dritte weitergegeben. Dies ist nur zu Ihrer Bequemlichkeit",
+    "Nocontacts": "Keine Kontakte gefunden. Bitte fügen Sie Kontakte zu Ihrem Adressbuch hinzu und versuchen Sie es erneut",
+    "Ifyouwantto": "Wenn Sie einen Adressbuchkontakt mit Ihren Freunden & Familie in Hexa verknüpfen möchten, müssen Sie Zugriff auf Ihr Adressbuch gewähren\n\nEs ist eine gute Möglichkeit, sich mit ihrem Namen und Bild daran zu erinnern, wer die Kontakte sind",
+    "cannotSelect": "Kontakte können nicht ausgewählt werden. Erlaubnis verweigert.\nSie können Kontakte auf der Telefoneinstellungsseite Einstellungen > Hexa > Kontakte aktivieren"
+  },
+  "accounts": {
+    "availableToSpend": "Verfügbar zum Ausgeben",
+    "SendUnsuccessful": "Senden fehlgeschlagen",
+    "SentSuccessfully": "Erfolgreich gesendet",
+    "SendingFrom": "Senden von",
+    "AddRecipient": "Empfänger hinzufügen",
+    "RecentTransactions": "kürzliche Transaktionen",
+    "ViewMore": "Mehr sehen",
+    "ViewAccount": "Konto anzeigen",
+    "Chooseaccounttosendfrom": "Wählen Sie das Konto aus, von dem aus gesendet werden soll",
+    "ChangeAccount": "Account wechseln",
+    "Transactionsubmitted": "Transaktion(en) erfolgreich übermittelt",
+    "tsatsSent": "t-sats erfolgreich von Ihrem Konto gesendet",
+    "ConfirmSend": "Bestätigen & senden",
+    "test1": "Wir sind uns bewusst, dass die Welt von Bitcoin zunächst entmutigend erscheinen könnte. Wir haben das Testkonto entwickelt, um Bitcoin zu entmystifizieren, ohne Ihr eigenes Geld zu riskieren",
+    "test2": "Lernen Sie Hexa und Bitcoin mit dem Testkonto zu verwenden. Stellen Sie sich dieses Konto als die Stützräder der Brieftasche vor!",
+    "test3": "Dieses Konto ist mit Test-Sats geladen, die Sie an die Test-Konten Ihrer Freunde senden können. Auf diese Weise lernen Sie, Transaktionen mit echten Sats zu tätigen, ohne echtes Geld zu senden",
+    "test4": "Denken Sie daran, dass Test-Sats nur an andere Wallets gesendet werden können, die auch Test-Sats unterstützen - versuchen Sie nicht, sie an echte Bitcoin-Adressen zu senden",
+    "test5": "Mit dem Testkonto können Sie sicher sein, dass Sie bei allem, was Sie tun, nicht riskieren, Ihre realen Sats oder Bitcoin zu verlieren. Die Test-Sats haben keinen Geldwert, sind also risikofrei",
+    "test6": "Lassen Sie Ihrer Fantasie freien Lauf, senden Sie Test-Sats an und empfangen Sie Sats von mehreren Freunden in verschiedenen Permutationen und Kombinationen!",
+    "clickhere": "Klicke hier",
+    "toknowmore": "Mehr wissen,",
+    "checking1": "Lagern Sie hier einige Sats, aber nicht alle. Die Sats hier sind Ihre täglichen Sats - ideal, um online Geld auszugeben oder an Ihre Freunde und Familie zu senden",
+    "checking2": "Um größere Mengen Sats sicher aufzubewahren, können Sie Ihr Sparkonto nutzen. Dadurch bleibt Ihr Bitcoin sicher und geschützt!",
+    "checking3": "Ihr Girokonto ist ein Einzelsignaturkonto. Ihr Sparkonto ist ein 2 von 3 Multi-Signatur-Konto, das durch einen Authentifikator gesichert ist",
+    "checking4": "Für Transaktionen von Ihrem Girokonto fallen im Vergleich zum Sparkonto niedrigere Gebühren an – bewahren Sie Bitcoin hier zum kurzfristigen Halten oder Ausgeben auf",
+    "checking5": "Vorsichtig sein! Jemand, der die Passcodes Ihres Telefons und Ihrer Hexa-Wallet hat, könnte leicht Sats aus Ihrem Girokonto ausgeben oder senden. Bewahren Sie hier keine Sats auf, von denen Sie nicht erwarten, dass Sie sie bald verwenden werden",
+    "checking6": "Zur Erinnerung: Aufgrund der von uns verwendeten Methode zur Sicherung Ihres Sparkontos ist es günstiger, Sats von Ihrem Girokonto als von Ihrem Sparkonto zu senden",
+    "donation1": "Sammeln Sie Spenden für die Zwecke Ihrer Wahl – aus der ganzen Welt.",
+    "donation2": "Verwalten Sie Ihr Spendenkonto selbst, ohne sich um die damit verbundene Technik kümmern zu müssen.",
+    "donation3": "Eine Webseite und ein Einbettungscode für das Konto generieren alle paar Minuten eine neue Adresse, um die Privatsphäre Ihrer Transaktionen zu schützen, ohne dass Sie eine Eingabe benötigen.",
+    "donation4": "Ihre Unterstützer können spenden, indem sie an die auf diesen Seiten generierten Adressen bezahlen.",
+    "saving1": "Wenn Sie Level 2 abgeschlossen haben, haben Sie auch ein persönliches Gerät, auf dem Sie den Wiederherstellungsschlüssel gespeichert haben. Das gleiche Gerät wird verwendet, um die zweite Mnemonik zu erstellen, die für das Sparkonto benötigt wird.",
+    "saving2": "Dies bedeutet, dass Ihr Sparkonto auch dann sicher ist, wenn Ihr Telefon vollständig kompromittiert ist",
+    "saving3": "Verwenden Sie dieses Konto, um Bitcoin und Sats langfristig zu speichern oder zu halten",
+    "saving4": "Seien Sie vorsichtig: Wenn Sie Sats von Ihrem Girokonto auf Ihr Sparkonto senden und sich dann entscheiden, Sats von Ihrem Sparkonto auszugeben, kostet es Sie jedes Mal viel mehr Transaktionsgebühren",
+    "saving5": "Für das Konto müssen Sie ein 2-Faktor-Authentifizierungssystem (2FA) mit Ihrer bevorzugten Authentifizierungssoftware einrichten. Diese Methode macht es für jeden außer Ihnen extrem schwer, auf Ihre Bitcoins zuzugreifen",
+    "saving6": "Ihr 2FA-Code muss von Ihrem Keeper-Gerät abgerufen werden - richten Sie niemals die 2-Faktor-Authentifizierung für Ihr Sparkonto auf Ihrem Wallet-Gerät ein, da dies ein Sicherheitsrisiko darstellt",
+    "saving7": "Ihr Sparkonto ist ein 2-von-3-Multi-Signatur-Konto, bei dem Sie zwei Schlüssel besitzen (einen auf diesem Gerät und den anderen auf Ihrem Keeper-Gerät).",
+    "saving8": "BitHyve enthält den dritten Schlüssel, der nur verwendet wird, wenn Sie zuerst unterschreiben und den richtigen 2FA-Code angeben. BitHyve verwahrt niemals Ihre Gelder. Der Schlüssel auf dem Keeper-Gerät kann verwendet werden, um Ihr Geld von Hexa zu migrieren, auch wenn wir die App nicht mehr unterstützen!",
+    "CompleteLevel2": "Schließe Level 2 ab",
+    "Level2": "Sie können nur ein Sparkonto hinzufügen, wenn Sie Level 2 abgeschlossen haben",
+    "NameDescription": "Name & Beschreibung",
+    "NameDescriptionSub": "Anzeigeeigenschaften anpassen",
+    "ShowxPub": "xPub anzeigen",
+    "ShowxPubSub": "Details für xPub dieses Kontos anzeigen",
+    "2FASettings": "2FA-Einstellungen",
+    "2FASettingsSub": "2FA zurücksetzen oder keine Serverantwort",
+    "AccountVisibility": "Kontosichtbarkeit",
+    "AccountVisibilitySub": "Für verschiedene Sichtbarkeitseinstellungen konfigurieren",
+    "ArchiveSub": "Verschieben Sie dieses Konto aus den Augen und aus dem Sinn",
+    "Youcanset": "Sie können den Namen und die Beschreibung so einstellen, dass sie den Zweck des Kontos widerspiegeln.",
+    "Enteraccountname": "Geben Sie einen Kontonamen ein",
+    "Enterdescription": "Geben Sie eine Beschreibung ein"
   }
 }

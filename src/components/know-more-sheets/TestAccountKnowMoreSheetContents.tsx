@@ -11,9 +11,11 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { ScrollView } from 'react-native-gesture-handler'
+import { translations } from '../../common/content/LocContext'
 
 export default function TestAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
@@ -49,7 +51,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '1%' ),
               }}
             >
-            We realise that the world of Bitcoin could seem daunting at first. We’ve designed the Test Account to help demystify Bitcoin without risking your own funds
+              {strings.test1}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -65,7 +67,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '15%' ),
               }}
             >
-            Learn to use Hexa and bitcoin with the Test Account. Think of this account as the wallet’s training wheels!
+              {strings.test2}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -96,7 +98,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '3%' ),
               }}
             >
-            his account is loaded with test sats that you can send to your friend's Test Accounts. This helps you learn to transact using real sats, without sending real money
+              {strings.test3}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -112,7 +114,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '9%' ),
               }}
             >
-            Remember that test sats can only be sent to other wallets that also support test sats - don't try to send them to real bitcoin addresses
+              {strings.test4}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -142,7 +144,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginTop: wp( '18%' ),
               }}
             >
-            With the Test Account, you can rest assured that, whatever you do, you aren't risking losing your real-world sats or bitcoin. The test sats have no monetary value, so they're risk-free
+              {strings.test5}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -156,19 +158,19 @@ export default function TestAccountKnowMoreSheetContents( props ) {
               <Text style={{
                 ...styles.infoText, marginLeft: 0, marginRight: 0
               }}>
-              Let your imagination run wild, try sending test sats to, and receiving sats, from multiple friends in different permutations and combinations!
+                {strings.test6}
               </Text>
               <View style={{
                 ...styles.linkView, marginTop: wp( '7%' )
               }}>
-                <Text style={styles.toKnowMoreText}>To know more,</Text>
+                <Text style={styles.toKnowMoreText}>{strings.toknowmore}</Text>
                 <AppBottomSheetTouchableWrapper
                   style={{
                     marginLeft: 5
                   }}
                   onPress={() => openLink( 'https://en.bitcoin.it/wiki/Testnet' )}
                 >
-                  <Text style={styles.clickHereText}>click here</Text>
+                  <Text style={styles.clickHereText}>{strings.clickhere}</Text>
                 </AppBottomSheetTouchableWrapper>
               </View>
             </View>

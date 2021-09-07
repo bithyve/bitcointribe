@@ -185,7 +185,7 @@ const HomeHeader = ( {
               alignItems: 'flex-start',
             }}
           >
-            <Text style={styles.headerTitleText}>{`${walletName}’s ${strings.wallet}`}</Text>
+            <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
             <View
               style={{
                 flexDirection: 'row',

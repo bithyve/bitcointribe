@@ -8,8 +8,10 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { translations } from '../common/content/LocContext'
 
 export default function KnowMoreButton( props ) {
+  const strings  = translations[ 'common' ]
   return (
     <TouchableOpacity
       style={{
@@ -19,7 +21,7 @@ export default function KnowMoreButton( props ) {
     >
       <Text style={{
         ...styles.knowMoreButtonText, ...props.textStyle
-      }}>Know more</Text>
+      }}>{strings.knowMore}</Text>
     </TouchableOpacity>
   )
 }

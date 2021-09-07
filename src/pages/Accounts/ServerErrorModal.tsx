@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext } from 'react'
 import {
   View,
   Image,
@@ -10,8 +10,11 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function ServerErrorModal( props ) {
+  const { translations } = useContext( LocalizationContext )
+  const common = translations[ 'common' ]
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
@@ -63,7 +66,7 @@ export default function ServerErrorModal( props ) {
                     >
                       <Text style={{
                         ...styles.proceedButtonText, color: props.buttonTextColor ? props.buttonTextColor : Colors.blue,
-                      }}>{props.cancelButtonText ? props.cancelButtonText : 'Ignore'}</Text>
+                      }}>{props.cancelButtonText ? props.cancelButtonText : common.ignore}</Text>
                     </AppBottomSheetTouchableWrapper>
       }
     </View>

@@ -69,10 +69,10 @@ export default function AddContactAddressBook( props ) {
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
-          'title': 'Hexa Would Like to Access Your Contacts',
-          'message': 'Address book details are only stored locally',
-          'buttonPositive': 'Allow',
-          'buttonNegative': 'Deny'
+          'title': strings.hexaWould,
+          'message':  strings.Addressbookdetails,
+          buttonPositive: common.allow,
+          buttonNegative: common.deny,
         }
       )
       return result
@@ -93,7 +93,7 @@ export default function AddContactAddressBook( props ) {
     ExpoContacts.getContactsAsync().then( async ( { data } ) => {
       if ( !data.length ) {
         setErrorMessage(
-          'No contacts found. Please add contacts to your Address Book and try again',
+          strings.Nocontacts,
         )
         setErrModal( true )
       }
@@ -117,9 +117,7 @@ export default function AddContactAddressBook( props ) {
       const granted = await requestContactsPermission()
       //console.log('GRANTED', granted);
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         setErrModal( true )
         setContactPermissionAndroid( false )
         return
@@ -135,9 +133,7 @@ export default function AddContactAddressBook( props ) {
       )
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         setErrModal( true )
         return
       } else {
