@@ -154,7 +154,8 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
 
   return (
     <View style={{
-      backgroundColor: Colors.bgColor
+      backgroundColor: Colors.bgColor,
+
     }}>
       <View style={styles.modelHeight}>
         <FlatList
@@ -164,7 +165,8 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
           renderItem={renderItem}
           scrollEnabled={false}
         />
-      </View></View>
+      </View>
+    </View>
 
   )
 }
@@ -218,11 +220,13 @@ const styles = StyleSheet.create( {
     elevation: 6
   },
   modelHeight: {
-    height: hp( 60 )
+    height: 'auto',
+    marginBottom: hp( 4 )
   },
   cardMiddle: {
-    paddingLeft: 0,
-    paddingRight: wp( 1 )
+    // paddingLeft: 0,
+    marginRight: wp( -2 ),
+    marginLeft: wp( -1 ),
   }
 } )
 

@@ -81,24 +81,32 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
     ( state ) => state.swanIntegration
   )
 
-  const swanResponse = yield call( redeemAuthCodeForToken, {
-    code,
-    state,
-    code_verifier
-  } )
+  try {
+    const swanResponse = yield call( redeemAuthCodeForToken, {
+      code,
+      state,
+      code_verifier
+    } )
 
-  const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
-  yield put( redeemSwanCodeForTokenSucceeded( {
-    swanAuthenticatedToken: access_token
-  } ) )
-
-  yield call( createWithdrawalWalletOnSwanWorker, {
-    payload: {
-      data: {
-        minBtcThreshold: 0.01
+    const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
+    yield put( redeemSwanCodeForTokenSucceeded( {
+      swanAuthenticatedToken: access_token
+    } ) )
+    yield call( createWithdrawalWalletOnSwanWorker, {
+      payload: {
+        data: {
+          minBtcThreshold: 0.01
+        }
       }
+    } )
+  } catch ( error ) {
+    const data = {
+      linkSwanWalletFailed: true,
+      linkSwanWalletFailedMessage: 'Swan Account link failed',
     }
-  } )
+    yield put( linkSwanWalletFailed( data ) )
+  }
+
 }
 
 
