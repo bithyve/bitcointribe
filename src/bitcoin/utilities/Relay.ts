@@ -142,6 +142,34 @@ export default class Relay {
     }
   };
 
+  public static sendDonationNote = async (
+    donationId: string,
+    txNote: { txId: string; note: string }
+  ): Promise<{
+    added: boolean;
+  }> => {
+    try {
+
+      if ( !txNote || !txNote.txId || !txNote.note )
+        throw new Error( 'Failed to send donation note: txid|note missing' )
+
+      const res: AxiosResponse = await BH_AXIOS.post( 'addDonationTxNote', {
+        HEXA_ID,
+        donationId,
+        txNote,
+      } )
+
+      const { added } = res.data
+      if ( !added ) throw new Error()
+
+      return {
+        added
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to send donation note' )
+    }
+  };
+
   public static fetchFeeAndExchangeRates = async ( currencyCode ): Promise<{
     exchangeRates: any;
     averageTxFees: any;
