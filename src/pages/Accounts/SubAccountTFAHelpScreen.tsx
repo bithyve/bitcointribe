@@ -66,12 +66,13 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const sourceAccountShell = useSourceAccountShellForSending()
   const dispatch = useDispatch()
   const twoFASetupDetails = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.twoFASetup )
-  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
+  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const secondaryMnemonics = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.secondaryMnemonic )
   useEffect( () => {
     const resettedTwoFA = idx( accountsState.twoFAHelpFlags, ( _ ) => _.twoFAResetted )
 
     if ( resettedTwoFA ) {
+      ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
       navigation.navigate( 'TwoFASetup', {
         twoFASetup: twoFASetupDetails,
         onPressBack: () => {
