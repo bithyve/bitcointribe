@@ -20,6 +20,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { markReadTx } from '../../../store/actions/accounts'
 import { update } from '../../../storage/database'
 import { TransactionType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
+
 export type Props = {
   navigation: any;
 };
@@ -30,6 +32,8 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   const transaction: TransactionDescribing = navigation.getParam( 'transaction' )
   const accountShellID: SubAccountKind = navigation.getParam( 'accountShellID' )
   const accountShell = useAccountShellForID( accountShellID )
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'stackTitle' ]
 
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
@@ -57,9 +61,9 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   const destinationHeadingText = useCallback( () => {
     switch ( transaction.transactionType ) {
         case TransactionKind.RECEIVE:
-          return 'From Address'
+          return common.fromAddress
         case TransactionKind.SEND:
-          return 'To Address'
+          return common.toAddress
         default:
           return ''
     }
@@ -82,7 +86,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
   return (
     <ScrollView contentContainerStyle={styles.rootContainer} overScrollMode="never" bounces={false}>
-      <Text style={styles.textHeader}>Transaction Details</Text>
+      <Text style={styles.textHeader}>{strings[ 'Transaction Details' ]}</Text>
 
       <TransactionDetailsHeader
         transaction={transaction}
@@ -92,7 +96,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
       <View style={styles.bodySection}>
 
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitleTransaction}>Amount</Text>
+          <Text style={ListStyles.listItemTitleTransaction}>{common.amount}</Text>
 
           <LabeledBalanceDisplay
             balance={transaction.transactionType === TransactionType.RECEIVED ? transaction.amount : transaction.amount - Number( transaction.fee )}
@@ -114,7 +118,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
             transaction.receivers.length > 1
           ) && (
             <View style={styles.lineItem}>
-              <Text style={ListStyles.listItemTitleTransaction}>Recipients</Text>
+              <Text style={ListStyles.listItemTitleTransaction}>{common.recipients}</Text>
               {
                 transaction.receivers.map( ( rec, index ) => (
                   <View key={index} style={styles.containerRec}>
@@ -143,7 +147,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
         }
 
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitleTransaction}>Transaction ID</Text>
+          <Text style={ListStyles.listItemTitleTransaction}>{common.TransactionID}</Text>
           <Text style={ListStyles.listItemSubtitle} onPress={() =>
             openLink(
               `https://blockstream.info${
@@ -158,12 +162,12 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
         </View>
 
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitleTransaction}>Fees</Text>
+          <Text style={ListStyles.listItemTitleTransaction}>{common.fees}</Text>
           <Text style={ListStyles.listItemSubtitle}>{feeText()}</Text>
         </View>
 
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitleTransaction}>Confirmations</Text>
+          <Text style={ListStyles.listItemTitleTransaction}>{common.confirmations}</Text>
           <Text style={ListStyles.listItemSubtitle}>{confirmationsText()}</Text>
         </View>
 

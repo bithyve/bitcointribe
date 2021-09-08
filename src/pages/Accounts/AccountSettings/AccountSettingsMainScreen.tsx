@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateAccountSettings } from '../../../store/actions/accounts'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
 
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
@@ -41,7 +42,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
   const dispatch = useDispatch()
-
+  const strings  = translations[ 'accounts' ]
   const [ showRescanning, setShowRescanning ] = useState( false )
   const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
   const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
@@ -62,8 +63,8 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     return [
       ...[
         {
-          title: 'Name & Description',
-          subtitle: 'Customize display properties',
+          title: strings.NameDescription,
+          subtitle: strings.NameDescriptionSub,
           screenName: 'EditDisplayProperties',
           screenParams: {
             accountShellID: accountShell.id,
@@ -72,8 +73,8 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         },
         ...( !accountShell.primarySubAccount.isTFAEnabled ? [
           {
-            title: 'Show xPub',
-            subtitle: 'Show details for this account\'s xPub',
+            title: strings.ShowxPub,
+            subtitle: strings.ShowxPubSub,
             screenName: 'ShowXPub',
             screenParams: {
               primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
@@ -91,8 +92,8 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       ],
       ...( accountShell.primarySubAccount.isTFAEnabled ? [
         {
-          title: '2FA Settings',
-          subtitle: 'Reset 2FA or no server response',
+          title: strings[ '2FASettings' ],
+          subtitle: strings[ '2FASettingsSub' ],
           screenName: 'SubAccountTFAHelp',
           screenParams: {
             accountShellID: accountShell.id,
@@ -111,8 +112,8 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       //   imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
       // },
       {
-        title: 'Account Visibility',
-        subtitle: 'Configure for different visibility settings',
+        title: strings.AccountVisibility,
+        subtitle: strings.AccountVisibilitySub,
         screenName: 'EditVisibility',
         screenParams: {
           accountShellID: accountShell.id,
@@ -127,7 +128,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       // },
       {
         title: 'Archive Account',
-        subtitle: 'Move this account out of sight and out of mind',
+        subtitle: strings.ArchiveSub,
         onOptionPressed: showArchiveModal,
         imageSource: require( '../../../assets/images/icons/icon_archive.png' ),
       },

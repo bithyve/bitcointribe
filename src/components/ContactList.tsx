@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import {
   View,
   Text,
@@ -34,6 +34,7 @@ import Toast from '../components/Toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { setIsPermissionGiven } from '../store/actions/preferences'
 import ModalContainer from './home/ModalContainer'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function ContactList( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -44,6 +45,9 @@ export default function ContactList( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const [ contactPermissionIOS, setContactPermissionIOS ] = useState( false )
   const [
     contactListErrorBottomSheet,
@@ -99,11 +103,11 @@ export default function ContactList( props ) {
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
-          title: 'Hexa Would Like to Access Your Contacts',
+          title: strings.hexaWould,
           message:
-            'Address book details are only stored locally',
-          buttonPositive: 'Allow',
-          buttonNegative: 'Deny',
+          strings.Addressbookdetails,
+          buttonPositive: common.allow,
+          buttonNegative: common.deny,
         },
       )
       return result
@@ -117,7 +121,7 @@ export default function ContactList( props ) {
       if ( !data.length ) {
         //Alert.alert('No contacts found!');
         setErrorMessage(
-          'No contacts found. Please add contacts to your Address Book and try again',
+          strings.Nocontacts,
         )
         // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
@@ -140,9 +144,7 @@ export default function ContactList( props ) {
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
         setContactPermissionAndroid( false )
@@ -154,9 +156,7 @@ export default function ContactList( props ) {
       const { status } = await Permissions.getAsync( Permissions.CONTACTS )
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
         return
@@ -338,7 +338,7 @@ export default function ContactList( props ) {
     return (
       <ErrorModalContents
         // modalRef={contactListErrorBottomSheet}
-        title={'Error while accessing your contacts '}
+        title={strings.erroraAccessing}
         info={errorMessage}
         proceedButtonText={'Open Setting'}
         isIgnoreButton={true}
@@ -372,10 +372,10 @@ export default function ContactList( props ) {
     return (
       <ErrorModalContents
         // modalRef={contactPermissionBottomSheet}
-        title={'Hexa needs access to your address book.'}
-        info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-        otherText={'We neither store this data nor pass it to anyone else. This is for your convenience only'}
-        proceedButtonText={'Continue'}
+        title={strings.Hexaneedsaddressbook}
+        info={strings.Ifyouwantto}
+        otherText={strings.Weneither}
+        proceedButtonText={common.continue}
         isIgnoreButton={false}
         onPressProceed={() => {
           getContactPermission()
@@ -450,7 +450,7 @@ export default function ContactList( props ) {
           autoCorrect={false}
           autoFocus={false}
           autoCompleteType="off"
-          placeholder="Search"
+          placeholder={common.search}
           placeholderTextColor={Colors.textColorGrey}
           onChangeText={( nameKeyword ) => {
             nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )

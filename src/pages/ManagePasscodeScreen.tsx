@@ -15,8 +15,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { translations } from '../common/content/LocContext'
 
 export default function ManagePasscodeScreen( props ) {
+  const strings  = translations[ 'login' ]
+  const common  = translations[ 'common' ]
+
   const [ pin, setPin ] = useState( '' )
   const [ pinFlag ] = useState( true )
   function onPressNumber( text ) {
@@ -69,8 +73,8 @@ export default function ManagePasscodeScreen( props ) {
       }}>
         <View>
           <Text style={styles.headerInfoText}>
-            Please enter your{' '}
-            <Text style={styles.boldItalicText}>existing passcode</Text>
+            {strings.enter_your}{' '}
+            <Text style={styles.boldItalicText}>{strings.existingPasscode}</Text>
           </Text>
           <View style={styles.passcodeTextInputView}>
             <View
@@ -203,7 +207,7 @@ export default function ManagePasscodeScreen( props ) {
             marginLeft: 'auto'
           }}>
             <Text style={styles.errorText}>
-              Incorrect passcode, try again!
+              {strings.Incorrect}
             </Text>
           </View>
         ) : null}
@@ -225,7 +229,7 @@ export default function ManagePasscodeScreen( props ) {
                 pin.length == 4 ? Colors.blue : Colors.lightBlue,
             }}
           >
-            <Text style={styles.proceedButtonText}>Proceed</Text>
+            <Text style={styles.proceedButtonText}>{common.proceed}</Text>
           </TouchableOpacity>
         </View>
       ) : (

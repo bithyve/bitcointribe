@@ -24,6 +24,7 @@ import { processDeepLink } from '../common/CommonFunctions'
 import {
   getMessages,
 } from '../store/actions/notifications'
+import { LocalizationContext } from '../common/content/LocContext'
 
 type LaunchScreenProps = {
   navigation: any;
@@ -37,6 +38,8 @@ type LaunchScreenProps = {
 type LaunchScreenState = { }
 
 class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
+  static contextType = LocalizationContext
+
   errorBottomSheet: any;
   url: any;
   constructor( props ) {
@@ -54,6 +57,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     setTimeout( ()=>{
       this.postSplashScreenActions()
     }, 4000 )
+    this.context.initializeAppLanguage()
   };
 
    handleDeepLinkEvent = async ( { url } ) => {

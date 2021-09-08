@@ -11,9 +11,11 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { ScrollView } from 'react-native-gesture-handler'
+import { translations } from '../../common/content/LocContext'
 
 export default function SavingAccountAlertBeforeLevel2( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
@@ -67,7 +69,7 @@ export default function SavingAccountAlertBeforeLevel2( props ) {
             <Text
               style={styles.infoText}
             >
-          When you complete Level 2, you also have a personal device that you have used to store recovery key. The same device is used to create the second mnemonic needed for the Savings Account.
+              {strings.saving1}
             </Text>
             <View
               style={{
@@ -91,7 +93,7 @@ export default function SavingAccountAlertBeforeLevel2( props ) {
                 ...styles.infoText, marginBottom: hp( '8%' ),
               }}
             >
-            This means that your Savings Account is secure even if your phone is completely compromised
+              {strings.saving2}
             </Text>
           </View>
         </ScrollView>

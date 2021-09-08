@@ -10,9 +10,11 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { translations } from '../../common/content/LocContext'
 
 export default function DonationAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
@@ -47,7 +49,7 @@ export default function DonationAccountKnowMoreSheetContents( props ) {
                 marginTop: wp( '4%' ),
               }}
             >
-            Collect donations for the causes of your choice - from all over the world.
+              {strings.donation1}
             </Text>
             <View style={styles.viewStyle}>
               <Image
@@ -61,7 +63,7 @@ export default function DonationAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '4%' ),
               }}
             >
-            Self-manage your Donation Account without worrying about the tech involved.
+              {strings.donation2}
             </Text>
 
             <AppBottomSheetTouchableWrapper
@@ -94,7 +96,7 @@ export default function DonationAccountKnowMoreSheetContents( props ) {
                 ...styles.infoText,
               }}
             >
-            A web page and embed code for the account generates a new address every few minutes, helping with privacy of your transactions without needing any input from you.
+              {strings.donation3}
             </Text>
             <View style={styles.viewStyle}>
               <Image
@@ -108,7 +110,7 @@ export default function DonationAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '4%' ),
               }}
             >
-           Your supporters can donate by paying to the addresses these pages generate.
+              {strings.donation4}
             </Text>
             <View style={styles.viewStyle}>
               {/* <View style={styles.separatorView}/> */}

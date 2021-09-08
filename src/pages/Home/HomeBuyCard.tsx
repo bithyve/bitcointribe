@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useContext } from 'react'
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import ButtonStyles from '../../common/Styles/ButtonStyles'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
 import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -83,6 +84,8 @@ const HomeBuyCard = ( {
   //   const prefersBitcoin = useMemo( () => {
   //     return currencyKind === CurrencyKind.BITCOIN
   //   }, [ currencyKind ] )
+  const { translations, formatString } = useContext( LocalizationContext )
+  const strings = translations[ 'home' ]
   return (
     <View
       style={cardContainer}
@@ -95,7 +98,7 @@ const HomeBuyCard = ( {
           fontFamily: Fonts.FiraSansRegular,
           alignSelf: 'flex-start'
         }}>
-              BTC to {fiatCurrencyCode} today
+          {formatString( strings.btcTo, fiatCurrencyCode )}
         </Text>
         <View style={{
           flexDirection: 'row', marginTop: hp( '1' ), alignItems: 'center'
@@ -126,7 +129,7 @@ const HomeBuyCard = ( {
       </View>
       <Button
         raised
-        title="Buy BTC"
+        title={strings.buy}
         // icon={
         //   <Image
         //     source={require( '../../assets/images/icons/recurring_buy.png' )}

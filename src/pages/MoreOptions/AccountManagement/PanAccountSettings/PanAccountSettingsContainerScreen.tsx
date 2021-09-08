@@ -3,6 +3,7 @@ import { StyleSheet, Image, FlatList, ImageSourcePropType } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import ImageStyles from '../../../../common/Styles/ImageStyles'
+import { translations } from '../../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -20,11 +21,11 @@ const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
 
 const PanAccountSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-
+  const strings = translations[ 'stackTitle' ]
   const menuOptions: MenuOption[] = [
     {
-      title: 'Show All Accounts',
-      subtitle: 'Include Hidden and Archived accounts in your display',
+      title: strings[ 'ShowAllAccounts' ],
+      subtitle: strings[ 'ShowAllAccountsSub' ],
       imageSource: require( '../../../../assets/images/icons/account-visibility/icon_visible.png' ),
       screenName: 'EnterPasscode',
     },

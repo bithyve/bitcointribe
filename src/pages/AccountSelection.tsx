@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ButtonBlue from '../components/ButtonBlue'
 import { ActivityIndicator } from 'react-native-paper'
 import { AccountType } from '../bitcoin/utilities/Interface'
+import { translations } from '../common/content/LocContext'
 
 interface AccountOption {
     id: number;
@@ -94,6 +95,8 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   const [ selectedAcc, setSelectedAcc ] = useState( [ AccountType.CHECKING_ACCOUNT ] )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   const onProceed = useCallback( () => {
     props.navigation.navigate( 'NewWalletQuestion', {

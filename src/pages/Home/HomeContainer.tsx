@@ -33,6 +33,7 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import HomeBuyCard from './HomeBuyCard'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -40,7 +41,8 @@ export enum BottomSheetKind {
   RAMP_STATUS_INFO,
 }
 interface HomeStateTypes {
-  currencyCode: string;
+  currencyCode?: string;
+  strings: object;
 }
 
 interface HomePropsTypes {
@@ -58,12 +60,15 @@ interface HomePropsTypes {
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
-
+  static contextType = LocalizationContext
   static whyDidYouRender = true;
 
-  constructor( props ) {
-    super( props )
+  constructor( props, context ) {
+    super( props, context )
     this.props.setShowAllAccount( false )
+    this.state = {
+      strings: this.context.translations [ 'home' ],
+    }
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -119,7 +124,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             fontFamily: Fonts.FiraSansMedium,
             letterSpacing: 0.54
           }}>
-              My Accounts
+            {this.state.strings.myaccounts}
           </Text>
           <ToggleContainer />
         </View>
