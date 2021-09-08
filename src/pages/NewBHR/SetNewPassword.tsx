@@ -118,7 +118,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const setupPasswordStatus = useSelector( ( state ) => state.bhr.loading.setupPasswordStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.bhr.cloudPermissionGranted )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
-
+  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -140,7 +140,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   }, [] )
 
   useEffect( () =>{
-    if( !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo[ 0 ].status !=='notSetup' ){
+    if( !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !=='notSetup' ){
       setLoaderModal( false )
       props.navigation.goBack()
     }
@@ -167,7 +167,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
   useEffect( ()=>{
     if( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true && !isSkipClicked && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+      cloudPermissionGranted === true && !isSkipClicked && ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) ) ){
       dispatch( setCloudData() )
     }
   }, [ cloudPermissionGranted, levelHealth ] )

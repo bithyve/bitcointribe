@@ -35,8 +35,8 @@ function SecurityQuestion( props ) {
     ( state ) => state.storage.wallet,
   )
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
-  const securityQuestion = security.question
-  const securityAnswer = security.answer
+  const securityQuestion = security.question ? security.question : ''
+  const securityAnswer = security.answer ? security.answer : ''
   const [ showAnswer, setShowAnswer ] = useState( false )
   const [ answer, setAnswer ] = useState( '' )
   const [ errorText, setErrorText ] = useState( '' )

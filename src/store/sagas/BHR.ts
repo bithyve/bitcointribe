@@ -1644,7 +1644,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
       }
     }
     levelData = checkLevelHealth( levelData, levelHealthVar )
-    if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
+    if ( levelData && levelData.length && levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }
     yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
