@@ -24,6 +24,7 @@ import { clearSendMaxFee } from '../../../store/actions/sending'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import idx from 'idx'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   currentRecipient: RecipientDescribing,
@@ -47,7 +48,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const sendingState = useSendingState()
   const totalSpendingAmount = useTotalSpendingAmount( currentRecipient )
   const dispatch = useDispatch()
-
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const [ isSendingMax, setIsSendingMax ] = useState( false )
   const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
   const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String(  currentAmount ? currentAmount : 0 ) )
@@ -160,8 +162,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             inputStyle={styles.textInputContent}
             editable={currencyKindForEntry == CurrencyKind.FIAT}
             placeholder={currencyKindForEntry == CurrencyKind.BITCOIN
-              ? 'Converted amount in ' + currencyCode
-              : 'Enter amount in ' + currencyCode
+              ? `${strings.ConvertedIn} ` + currencyCode
+              : `${strings.Enteramountin} ` + currencyCode
             }
             placeholderTextColor={FormStyles.placeholderText.color}
             value={currentFiatAmountTextValue}
@@ -209,7 +211,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                     fontFamily: Fonts.FiraSansItalic,
                   }}
                 >
-              Send Max
+                  {strings.SendMax}
                 </Text>
               </AppBottomSheetTouchableWrapper>
 
@@ -247,11 +249,11 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             placeholder={
               currencyKindForEntry == CurrencyKind.BITCOIN
                 ? subAccountKind == SubAccountKind.TEST_ACCOUNT
-                  ? 'Enter amount in t-sats'
-                  : 'Enter amount in sats'
+                  ? `${strings.Enteramountin} in t-sats`
+                  : `${strings.Enteramountin} in sats`
                 : subAccountKind == SubAccountKind.TEST_ACCOUNT
-                  ? 'Converted amount in t-sats'
-                  : 'Converted amount in sats'
+                  ? `${strings.ConvertedIn} t-sats`
+                  : `${strings.ConvertedIn} sats`
             }
             placeholderTextColor={FormStyles.placeholderText.color}
             value={currentSatsAmountTextValue}
@@ -297,7 +299,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                     fontFamily: Fonts.FiraSansItalic,
                   }}
                 >
-                  Send Max
+                  {strings.SendMax}
                 </Text>
               </TouchableOpacity>
             )}
@@ -308,7 +310,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
           <View style={{
             marginLeft: 'auto'
           }}>
-            <Text style={FormStyles.errorText}>Insufficient balance</Text>
+            <Text style={FormStyles.errorText}>{strings.Insufficient}</Text>
           </View>
         )}
 

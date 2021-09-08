@@ -27,7 +27,19 @@
     "openSetting": "Ajuste abierto",
     "back": "espalda",
     "receive": "Recibir",
-    "learnMore": "Aprende más"
+    "learnMore": "Aprende más",
+    "copied": "Copiado con éxito",
+    "amount": "Monto",
+    "recipients": "Destinatarios",
+    "TransactionID": "ID de transacción",
+    "fees": "Tarifa",
+    "confirmations": "Confirmaciones",
+    "fromAddress": "De la Dirección",
+    "toAddress": "Dirigirse",
+    "confirm": "Confirmar",
+    "visible": "Visible",
+    "hidden": "Oculto",
+    "duress": "Coacción"
   },
   "noInternet": {
     "no": "No Internet",
@@ -42,6 +54,7 @@
   "login": {
     "welcome": "¡Dar una buena acogida!",
     "enter_your": "Por favor ingrese su ",
+    "existingPasscode": "contraseña existente",
     "passcode": "contraseña",
     "tos": "Términos de servicio",
     "tos_agree": "Al continuar con el siguiente paso, acepta nuestros ",
@@ -57,7 +70,7 @@
         "text": "Obtenga sats directamente en su billetera desde intercambios compatibles",
         "subText": ""
       },
-      {
+       {
         "heading": "Amigos y familia",
         "text": "Agregue contactos a Hexa y envíe sats sin pedir la dirección de su billetera cada vez",
         "subText": ""
@@ -115,11 +128,11 @@
     "Createapassword": "Crea una contraseña. Asegúrate de recordarlo",
     "Backuplets": "La copia de seguridad le permite recuperar su billetera incluso si pierde su teléfono. Gestionar desde",
     "questionList": [
-      {
+       {
         "id": "1",
         "question": "¿A qué ciudad fuiste la primera vez que subiste a un avión?"
       },
-       {
+     {
         "id": "2",
         "question": "¿Cuál es el primer nombre de la persona que besó por primera vez?"
       },
@@ -163,7 +176,16 @@
         "id": "12",
         "question": "¿En qué calle vivías cuando tenías 10 años?"
       }
-    ]
+    ],
+    "new": "Nuevo",
+    "Createanew": "Crear un nuevo",
+    "Existing": "Existente",
+    "Toviewallaccounts": "Para ver todas las cuentas",
+    "confirmpin": "confirmar PIN",
+    "Incorrectpasscode": "Código de acceso incorrecto, inténtelo de nuevo.",
+    "Answerisincorrect": "La respuesta es incorrecta",
+    "Specifythe": "Especifique la respuesta como lo hizo en el momento de configurar la billetera",
+    "Enteranswer": "Ingrese la respuesta"
   },
   "home": {
     "the_wallet_backup": "La copia de seguridad de la billetera ",
@@ -182,6 +204,9 @@
     "wyreSub": "Compra cualquier cantidad",
     "manyWays": "Muchas formas de apilar sats directamente en Hexa",
     "Poweredby": "Energizado por",
+    "Notifications": "Notificaciones",
+    "Nonotification": "Aún no hay notificación",
+    "Allrecentnotifications": "Todas sus notificaciones recientes serán visibles aquí",
     "bitcoinWill": "Bitcoin se transferirá a",
     "rampTitle": "Comprar bitcoins\ncon ramp",
     "rampMessage": "Ramp permite compras de BTC utilizando Apple Pay, tarjeta de débito / crédito, transferencia bancaria y banca abierta donde esté disponible. Los métodos de pago disponibles pueden variar según su país.\n\nAl continuar, comprende que Ramp procesará el pago y la transferencia del bitcoin comprado.",
@@ -211,7 +236,28 @@
     "walletSettings": "Configuración de la billetera",
     "walletSettingsSub": "Configuración y preferencias de tu monedero",
     "AppInfo": "Información de la aplicación",
-    "AppInfoSub": "Número de versión y detalles de la aplicación Hexa"
+    "AppInfoSub": "Número de versión y detalles de la aplicación Hexa",
+    "Disconnectyour": "Desconecte su propio nodo y conéctese al nodo Hexa",
+    "Disconnectfrom": "Desconéctese del nodo Hexa y conéctese al suyo",
+    "Connecttomynode": "Conectarse a mi nodo",
+    "nodeisaccessible": "Asegúrese de que su nodo esté accesible en todo momento para que la aplicación pueda conectarse a él",
+    "PersonalNodeDetails": "Detalles del nodo personal",
+    "NodeAddress": "Dirección de nodo",
+    "NoAddressSet": "Sin dirección establecida",
+    "PortNumber": "Número de puerto",
+    "NoPort": "Sin conjunto de número de puerto",
+    "fallback": "Utilice el nodo Hexa como respaldo",
+    "SetupPersonal": "Configurar nodo personal",
+    "ManagePasscode": "Administrar contraseña",
+    "Changeyourpasscode": "Cambia tu contraseña",
+    "ChangeCurrency": "Cambiar moneda",
+    "Chooseyourcurrency": "Elija su moneda",
+    "Selectyourlocalcurrency": "Seleccione su moneda local",
+    "SaveChanges": "Guardar cambios",
+    "Edityourwalletnamehere": "Edite el nombre de su billetera aquí",
+    "WalletID": "Su ID de billetera es única para su aplicación Hexa",
+    "currentversion": "Ver la versión actual de las aplicaciones y su historial",
+    "VersionHistory": "Historial de versiones"
   },
   "header": {
     "init": "Inicialización de la copia de seguridad en la nube",
@@ -352,6 +398,57 @@
     "ArchiveSub": "Mover esta cuenta fuera de la vista y fuera de la mente",
     "Youcanset": "Puede configurar el Nombre y la Descripción para reflejar el propósito de la cuenta.",
     "Enteraccountname": "Ingrese un nombre de cuenta",
-    "Enterdescription": "Ingrese una descripción"
+    "Enterdescription": "Ingrese una descripción",
+    "ReceiveBitcoins": "Recibe Bitcoins",
+    "Receivebitcoin": "Recibe bitcoins",
+    "Toreceive": "Para recibir sats o bitcoins, comparte el código QR con la persona que intenta enviarle dinero. Escanear el código QR con la cámara de su teléfono les da su dirección bitcoin.",
+    "Foryourprivacy": "Para su privacidad, se genera una nueva dirección cada vez que desea recibir sats o bitcoin. La aplicación hace esto por sí sola, ¡no tienes que hacer nada!",
+    "Dependingon": "Dependiendo de la billetera del remitente, es posible que reciba algunos sats menos de los que solicitó; esto puede deberse a la tarifa de minería.",
+    "Ifyoursender": "Si su remitente envía la transacción con tarifas de minería más altas, le llega más rápido. ¡Asegúrate de que lo sepan!",
+    "Whenyousendsats": "Cuando envía sats, nuestra aplicación calcula las tarifas para llevar su dinero a su destinatario dentro de un cierto período de tiempo, o puede usar una tarifa personalizada, si sabe lo que está haciendo.",
+    "Feesprovide": "Las tarifas brindan incentivos adicionales para que el minero procese su transacción, lo que hace que usted (o su destinatario) reciba sus sats más rápido.",
+    "Receivesats": "Tasa de recepción",
+    "Receivesatsinto": "Recibe sats en la cuenta seleccionada",
+    "Enteramount": "Ingrese la cantidad a recibir",
+    "Balance": "Equilibrio",
+    "ReceivingTo": "Recibiendo a:",
+    "Itwouldtake": "Los sats tardarían algún tiempo en reflejarse en su cuenta en función de la congestión de la red.",
+    "TransactionDetails": "Detalles de la transacción",
+    "Enteraddressmanually": "Ingrese la dirección manualmente",
+    "Whatcanyouscan": "¿Qué puedes escanear?",
+    "scan": "Escanee una dirección de bitcoin, una solicitud de Hexa Friends & Family, una solicitud de Hexa Keeper o una solicitud de recuperación",
+    "ScanaBitcoinaddress": "Escanee una dirección de Bitcoin o cualquier QR Hexa",
+    "YouhavenotaddedanyContacts": "No has agregado ningún contacto",
+    "AddaContact": "Agregue un contacto para enviarles sats sin tener que escanear una dirección",
+    "Sendtocontact": "Enviar a contacto",
+    "Sendtoaccount": "Enviar a la cuenta",
+    "AHidden": "Una cuenta oculta es diferente de una cuenta archivada. Las cuentas ocultas aún pueden tener sats, mientras que una cuenta debe vaciarse antes de ser archivada",
+    "Choosewhen": "Elija cuándo y si desea que esta cuenta aparezca en su pantalla de inicio",
+    "Alwaysshow": "Mostrar siempre esta cuenta",
+    "Onlyshow": "Mostrar solo al revelar manualmente todas las cuentas",
+    "Duressmode": "Mostrar solo en modo Coacción o al revelar manualmente todas las cuentas",
+    "Archive": "Archivo",
+    "ErrorArchiving": "Error al archivar",
+    "Accountshouldbeempty": "Una cuenta debe estar vacía antes de que se pueda archivar",
+    "archiveunusedaccount": "Puede archivar una cuenta no utilizada desde la pantalla de inicio",
+    "accountisempty": "Asegúrese de que la cuenta esté vacía antes de archivar",
+    "UnhideAccount": "Mostrar cuenta",
+    "RestoreAccount": "Restaurar cuenta",
+    "Startshowing": "Comience a mostrar la cuenta en Mis cuentas",
+    "RestoretoHomescreen": "Restaurar la cuenta a la pantalla de inicio",
+    "Youcanhide": "Puede ocultar la cuenta nuevamente de Mis cuentas desde la configuración de la cuenta",
+    "Onceconfirmed": "Una vez confirmado, puede utilizar esta cuenta como una cuenta normal de Mis cuentas",
+    "ConvertedIn": "Importe convertido en",
+    "Enteramountin": "Ingrese la cantidad en",
+    "SendMax": "Enviar Max",
+    "Insufficient": "Saldo insuficiente"
+  },
+  "bhr": {
+    "Pleaseapprovethis": "Apruebe esta solicitud escaneando la clave secundaria almacenada con cualquiera de las otras copias de seguridad",
+    "Generatingyour": "Generando tu",
+    "Itmaytake": "Es posible que la billetera tarde un poco en crear claves de recuperación. No cierres la aplicación ni vuelvas atrás",
+    "SecurityPrivacy": "Seguridad y Privacidad",
+    "Contactswhose": "Contactos cuyas billeteras puedo ayudar a restaurar",
+    "Whenyouhave": "Cuando tenga amigos y familiares a quienes pueda ayudar con la recuperación de la billetera, aparecerán aquí."
   }
 }

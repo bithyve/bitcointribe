@@ -23,5 +23,37 @@ export default [
     country: 'Gernamy',
     country_code: 'de',
   },
+  {
+    language: 'French',
+    displayTitle: 'Français',
+    iso: 'fr',
+    flag: '🇫🇷',
+    country: 'France',
+    country_code: 'fr',
+  },
+  {
+    language: 'Marathi',
+    displayTitle: 'Marathi',
+    iso: 'mr',
+    flag: '🇮🇳',
+    country: 'India',
+    country_code: 'mr',
+  },
+  {
+    language: 'Hindi',
+    displayTitle: 'Hindi',
+    iso: 'hi',
+    flag: '🇮🇳',
+    country: 'India',
+    country_code: 'hi',
+  },
+  {
+    language: 'Portuguese',
+    displayTitle: 'Português',
+    iso: 'pt',
+    flag: '🇵🇹',
+    country: 'Portugal',
+    country_code: 'pt',
+  },
 ]
 

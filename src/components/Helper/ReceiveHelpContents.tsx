@@ -10,9 +10,11 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
+import { translations } from '../../common/content/LocContext'
 
 export default function ReceiveHelpContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={styles.modalContainer}>
@@ -26,7 +28,7 @@ export default function ReceiveHelpContents( props ) {
           activeOpacity={10}
           onPress={() => props.titleClicked && props.titleClicked()}
         >
-          <Text style={styles.headerText}>Receive Bitcoins</Text>
+          <Text style={styles.headerText}>{strings.ReceiveBitcoins}</Text>
         </AppBottomSheetTouchableWrapper>
         <View style={styles.headerSeparator} />
         <ScrollView
@@ -45,7 +47,7 @@ export default function ReceiveHelpContents( props ) {
                 marginTop: wp( '5%' ),
               }}
             >
-            To receive sats or bitcoin, you share the QR code with the person trying to send you money. Scanning the QR code with their phone camera gives them your bitcoin address.
+              {strings.Toreceive}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -61,7 +63,7 @@ export default function ReceiveHelpContents( props ) {
                 marginBottom: wp( '15%' ),
               }}
             >
-            For your privacy, a new address is generated each time you want to receive sats or bitcoin. The app does this on its own - you don't have to do a thing!
+              {strings.Foryourprivacy}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -90,7 +92,7 @@ export default function ReceiveHelpContents( props ) {
                 marginTop: wp( '10%' ),
               }}
             >
-            Depending on the sender's wallet, you may receive a few less sats than you requested - this may be due to the mining fee.
+              {strings.Dependingon}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -103,7 +105,7 @@ export default function ReceiveHelpContents( props ) {
             <Text style={{
               ...styles.infoText, marginBottom: wp( '15%' ),
             }}>
-           If your sender sends the transaction with higher mining fees, it gets to you faster. Make sure they know!
+              {strings.Ifyoursender}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -133,7 +135,7 @@ export default function ReceiveHelpContents( props ) {
                 marginTop: wp( '10%' ),
               }}
             >
-            When you send sats, our app calculates the fees to get your money to your recipient within a certain window of time - or you can use a custom fee, if you know what you're doing.
+              {strings.Whenyousendsats}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -147,7 +149,7 @@ export default function ReceiveHelpContents( props ) {
               <Text style={{
                 ...styles.infoText, marginLeft: 0, marginRight: 0
               }}>
-             Fees provide additional incentives for the miner to process your transaction, resulting in you (or your recipient) receiving your sats faster.
+                {strings.Feesprovide}
               </Text>
               <View
                 style={{
@@ -167,7 +169,7 @@ export default function ReceiveHelpContents( props ) {
                     fontFamily: Fonts.FiraSansRegular,
                   }}
                 >
-              To know more,
+                  {strings.toknowmore}
                 </Text>
                 <AppBottomSheetTouchableWrapper
                   style={{
@@ -188,7 +190,7 @@ export default function ReceiveHelpContents( props ) {
                       textAlign: 'center',
                     }}
                   >
-                click here
+                    {strings.clickhere}
                   </Text>
                 </AppBottomSheetTouchableWrapper>
               </View>

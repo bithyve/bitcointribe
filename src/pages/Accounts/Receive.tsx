@@ -53,6 +53,7 @@ import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts
 import ModalContainer from '../../components/home/ModalContainer'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
+import { translations } from '../../common/content/LocContext'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
@@ -65,7 +66,8 @@ export default function Receive( props ) {
   const savingWarning = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.savingWarning ),
   )
-
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
   const [ amount, setAmount ] = useState( '' )
   const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
@@ -143,8 +145,8 @@ export default function Receive( props ) {
     return(
 
       <ReceiveAmountContent
-        title={'Receive sats'}
-        message={'Receive sats into the selected account'}
+        title={strings.Receivesats}
+        message={strings.Receivesatsinto}
         onPressConfirm={( amount ) => {
           setAmount( amount )
           setReceiveModal( false )
@@ -219,7 +221,7 @@ export default function Receive( props ) {
                 <View style={{
                   marginLeft: wp( '2.5%' )
                 }}>
-                  <Text style={NavStyles.modalHeaderTitleText}>Receive</Text>
+                  <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
                   <Text
                     style={{
                       color: Colors.textColorGrey,
@@ -261,7 +263,7 @@ export default function Receive( props ) {
                 <View
                   style={styles.text}
                 >
-                  <Text style={styles.titleText}>{amount ? amount : 'Enter amount to receive'}</Text>
+                  <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>
                 </View>
 
                 <View style={{
@@ -281,8 +283,8 @@ export default function Receive( props ) {
               marginBottom: hp( '2.5%' )
             }}>
               <BottomInfoBox
-                title="Note"
-                infoText="It would take some time for the sats to reflect in your account based on the network congestion"
+                title={common.note}
+                infoText={strings.Itwouldtake}
               />
             </View>
           </View>

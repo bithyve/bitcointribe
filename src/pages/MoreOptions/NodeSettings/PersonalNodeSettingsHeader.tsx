@@ -4,6 +4,7 @@ import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   isConnectionEnabled: boolean;
@@ -17,10 +18,12 @@ const PersonalNodeSettingsHeader: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
+  const strings  = translations[ 'settings' ]
+
   const subtitleText = useMemo( () => {
     return isConnectionEnabled ?
-      'Disconnect your own node and connect to Hexa node'
-      : 'Disconnect from Hexa node and connect to your own'
+      strings.Disconnectyour
+      : strings.Disconnectfrom
   }, [ isConnectionEnabled ] )
 
   return (
@@ -41,7 +44,7 @@ const PersonalNodeSettingsHeader: React.FC<Props> = ( {
             style={ListStyles.listItemTitle}
             numberOfLines={1}
           >
-          Connect to my node
+            {strings.Connecttomynode}
           </ListItem.Title>
 
           <ListItem.Subtitle
