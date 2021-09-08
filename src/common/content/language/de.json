@@ -39,7 +39,9 @@
     "confirm": "Bestätigen Sie",
     "visible": "Sichtbar",
     "hidden": "Versteckt",
-    "duress": "Zwang"
+    "duress": "Zwang",
+    "addNote": "Füg ein Notiz hinzu",
+    "subNote": "Damit Sie sich an die Transaktionen erinnern"
   },
   "noInternet": {
     "no": "Ohne Internet",
