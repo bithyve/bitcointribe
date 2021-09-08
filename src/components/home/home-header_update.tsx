@@ -7,6 +7,7 @@ import {
   ImageBackground,
   Image,
   Linking,
+  Platform,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -410,11 +411,11 @@ const HomeHeader = ( {
           />
         </TouchableOpacity>
       </View>
-      {/* <TouchableOpacity style={{
-        alignItems:'center', padding: 5
-      }} onPress={()=>Linking.openURL( 'https://www.google.com/' )}><Text style={{
+      <TouchableOpacity style={{
+        alignItems:'center', padding: 5, marginBottom: -wp( 3 )
+      }} onPress={()=> Platform.OS=='android'? Linking.openURL( 'https://www.google.com/' ) : Linking.openURL( 'https://in.search.yahoo.com/?fr2=inr' )}><Text style={{
           color: Colors.white, fontSize: RFValue( 13 ), fontFamily: Fonts.FiraSansMedium
-        }}>{'-> Get updated version 2.0 from here for new features <-'}</Text></TouchableOpacity> */}
+        }}>{'Please download Hexa 2.0, our new improved app'}</Text></TouchableOpacity>
     </View>
   )
 }

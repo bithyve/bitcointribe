@@ -192,7 +192,7 @@ export default function Login( props ) {
 
     RelayServices.fetchReleases( DeviceInfo.getBuildNumber() )
       .then( async ( res ) => {
-        // console.log('Release note', res.data.releases);
+        // console.log( 'Release note', res.data.releases )
         const releaseCases = releaseCasesValue
 
         if (
@@ -200,7 +200,7 @@ export default function Login( props ) {
           res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
         ) {
           if (
-            releaseCases &&
+            releaseCases && releaseCases.build &&
             releaseCases.build == res.data.releases[ 0 ].build &&
             releaseCases.ignoreClick &&
             releaseCases.reminderLimit < 0
