@@ -8,6 +8,8 @@ import mr from './language/mr.json'
 import hi from './language/hi.json'
 import fr from './language/fr.json'
 import pt from './language/pt.json'
+import gu from './language/gu.json'
+import bn from './language/bn.json'
 
 import moment from 'moment'
 import 'moment/locale/es'
@@ -18,7 +20,7 @@ const DEFAULT_LANGUAGE = 'en'
 const APP_LANGUAGE = 'appLanguage'
 
 const languages = {
-  en, es, de, mr, hi, fr, pt
+  en, es, de, mr, hi, fr, pt, gu, bn
 }
 export const translations = new LocalizedContent( languages )
 
