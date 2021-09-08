@@ -10,7 +10,9 @@ import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/Accoun
 import SendStack from '../send/SendStack'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
 // import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
+import { translations } from '../../../common/content/LocContext'
 
+const strings  = translations[ 'stackTitle' ]
 
 const AccountDetailsStack = createStackNavigator(
   {

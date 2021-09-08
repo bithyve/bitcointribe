@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import {
   View,
   Text,
@@ -52,6 +52,7 @@ import RecipientAvatar from '../../components/RecipientAvatar'
 import Header from '../../navigation/stacks/Header'
 import ModalContainer from '../../components/home/ModalContainer'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -77,23 +78,25 @@ interface FriendsAndFamilyStateTypes {
   activeIndex: number | null;
 }
 
-class FriendsAndFamilyScreen extends PureComponent<
+class FriendsAndFamilyScreen extends React.Component<
   FriendsAndFamilyPropTypes,
   FriendsAndFamilyStateTypes
 > {
   // static navigationOptions = makeNavigationOptions;
+  static contextType = LocalizationContext
 
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
   helpBottomSheetRef: React.RefObject<BottomSheet>;
   focusListener: any;
+  strings: object;
 
-  constructor( props ) {
-    super( props )
+  constructor( props, context ) {
+    super( props, context )
 
     this.focusListener = null
     this.addContactAddressBookBottomSheetRef = React.createRef<BottomSheet>()
     this.helpBottomSheetRef = React.createRef<BottomSheet>()
-
+    this.strings = this.context.translations[ 'f&f' ]
     this.state = {
       onRefresh: false,
       isLoadContacts: false,
@@ -552,7 +555,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               marginTop: hp( 4 ),
             } ]}
           >
-              Friends & Family
+            {this.strings[ 'f&f' ]}
           </Text>
           <ScrollView
             refreshControl={
@@ -597,7 +600,9 @@ class FriendsAndFamilyScreen extends PureComponent<
                     fontSize: RFValue( 13 ),
                     marginHorizontal: wp ( 0 ),
                   } ]}>
-                Add a Contact
+                    {this.strings[
+                      'addContact'
+                    ]}
                   </Text>
                   <Text style={{
                     color: Colors.textColorGrey,
@@ -606,7 +611,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                     marginTop: 3,
                     width: '100%',
                   }}>
-                    {'You can choose from your phone\'s\naddress book'}
+                    {this.strings[ 'addressbook' ]}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -630,9 +635,8 @@ class FriendsAndFamilyScreen extends PureComponent<
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/icon_add_grey.png' )}
                   /> */}
-                  <View>
-                    <Text style={styles.contactText}>Add New</Text>
-                  </View>
+                  <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
+
                 </TouchableOpacity>
               </View>
 
@@ -802,7 +806,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                   backgroundColor={Colors.white}
                   title={'Note'}
                   infoText={
-                    'Your contacts appear here when\nadded to Hexa wallet'
+                    this.strings[ 'appear' ]
                   }
                 />
               )}
@@ -996,9 +1000,9 @@ const styles = StyleSheet.create( {
     borderRadius: wp ( 2 ),
     // width: wp( 22 )
     // padding: wp( 1 ),
-    width: wp( 24 ),
+    //width: wp( 24 ),
     height: hp( 4 ),
-    paddingHorizontal: wp( 1 )
+    paddingHorizontal: wp( 2 )
   },
   pageTitle: {
     color: Colors.blue,

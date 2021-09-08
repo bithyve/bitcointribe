@@ -12,6 +12,7 @@ import ButtonBlue from '../../../components/ButtonBlue'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import Colors from '../../../common/Colors'
 import BottomInfoBox from '../../../components/BottomInfoBox'
+import { translations } from '../../../common/content/LocContext'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
@@ -23,10 +24,10 @@ export type Props = {
   navigation: any;
 };
 
-const HeaderSection: React.FC = () => {
+const HeaderSection: React.FC = ( { title } ) => {
   return (
     <View style={ListStyles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderSubtitleText}>Choose when and if you want this account to appear on your Home Screen</Text>
+      <Text style={ListStyles.infoHeaderSubtitleText}>{title}</Text>
     </View>
   )
 }
@@ -36,7 +37,8 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   const accountShell = useAccountShellFromNavigation( navigation )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ selectedVisibility, setSelectedVisibility ] = useState( primarySubAccount.visibility )
-
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
   function handleSelection( visibilityOption: AccountVisibility ) {
     setSelectedVisibility( visibilityOption )
   }
@@ -57,7 +59,7 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
 
   return (
     <View style={styles.rootContainer}>
-      <HeaderSection />
+      <HeaderSection title={strings.Choosewhen}/>
 
       <View style={{
         backgroundColor: Colors.backgroundColor1
@@ -73,14 +75,14 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
       <View style={styles.proceedButtonContainer}>
         <BottomInfoBox
           backgroundColor={Colors.backgroundColor}
-          title={'Note'}
+          title={common.note}
           infoText={
-            'A Hidden Account is different from an Archived Account. Hidden Accounts can still have sats while an account needs to be emptied before being archived'
+            strings.AHidden
           }
         />
         <View style={styles.actionButtonContainer}>
           <ButtonBlue
-            buttonText="Confirm"
+            buttonText={common.confirm}
             handleButtonPress={handleSaveButtonPress}
           />
           <TouchableOpacity
@@ -95,7 +97,7 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
               ...ButtonStyles.actionButtonText,
               color: Colors.blue,
             }}>
-                Back
+              {common.back}
             </Text>
           </TouchableOpacity>
         </View>

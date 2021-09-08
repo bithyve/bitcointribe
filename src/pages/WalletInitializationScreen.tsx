@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import {
   StyleSheet,
   View,
@@ -17,8 +17,11 @@ import Colors from '../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../components/BottomInfoBox'
 import openLink from '../utils/OpenLink'
+import { LocalizationContext } from '../common/content/LocContext'
 
 const WalletInitializationScreen = props => {
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -28,9 +31,9 @@ const WalletInitializationScreen = props => {
         marginBottom: wp( '5%' )
       }}>
         <View style={styles.titleView}>
-          <Text style={styles.headerTitleText}>New Wallet</Text>
+          <Text style={styles.headerTitleText}>{`${strings.new} Wallet`}</Text>
           <Text style={styles.headerInfoText}>
-            The app creates a new wallet for you with accounts you can start using right away.
+            {strings.appcreates}
           </Text>
         </View>
         <TouchableOpacity
@@ -46,7 +49,7 @@ const WalletInitializationScreen = props => {
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
-                Create a new wallet
+              {`${strings.Createanew} Wallet`}
             </Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -67,9 +70,9 @@ const WalletInitializationScreen = props => {
         <View style={{
           ...styles.titleView, marginTop: wp( '2%' )
         }}>
-          <Text style={styles.headerTitleText}>Existing Wallet</Text>
+          <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
           <Text style={styles.headerInfoText}>
-            If you previously had a Hexa wallet you can recover it Leave the Terms and Condition thing at the bottom.
+            {strings.previously}
           </Text>
         </View>
         <TouchableOpacity
@@ -137,11 +140,11 @@ const WalletInitializationScreen = props => {
           }}>
             <BottomInfoBox
               backgroundColor={Colors.white}
-              title={'Terms of Service'}
+              title={strings.TermsService}
               infoText={
-                'By proceeding to the next step, you agree to our '
+                `${strings.proceeding} `
               }
-              linkText={'Terms of Service'}
+              linkText={strings.TermsService}
               onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
             />
           </View>

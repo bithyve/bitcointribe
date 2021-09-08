@@ -22,11 +22,14 @@ import { AppBottomSheetTouchableWrapper } from '../../../../components/AppBottom
 import { useDispatch, useSelector } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { setShowAllAccount } from '../../../../store/actions/accounts'
+import { translations } from '../../../../common/content/LocContext'
 
 export default function SecurityQuestionScreen( props ) {
   const { security } = useSelector(
     ( state ) => state.storage.wallet,
   )
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'login' ]
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question
   const securityAnswer = security.answer
@@ -46,7 +49,7 @@ export default function SecurityQuestionScreen( props ) {
         setErrorText( '' )
         return
       }
-      setErrorText( 'Answer is incorrect' )
+      setErrorText( strings.Answerisincorrect )
     } else {
       setErrorText( '' )
     }
@@ -85,9 +88,8 @@ export default function SecurityQuestionScreen( props ) {
           paddingLeft: 30,
           paddingRight: 30
         }}>
-            To view all accounts,{' '}
-          <Text style={styles.boldItalicText}>Specify the answer as you did at
-                the time of setting up the wallet</Text>
+          {strings.Toviewallaccounts},{' '}
+          <Text style={styles.boldItalicText}>{strings.Specifythe}</Text>
         </Text>
 
         <ScrollView style={{
@@ -104,11 +106,11 @@ export default function SecurityQuestionScreen( props ) {
                 width: '100%',
                 marginBottom: hp( '1%' ),
                 borderColor:
-                    errorText == 'Answer is incorrect'
+                    errorText == strings.Answerisincorrect
                       ? Colors.red
                       : Colors.borderColor,
               }}
-              placeholder={'Enter answer'}
+              placeholder={strings.Enteranswer}
               placeholderTextColor={Colors.borderColor}
               value={answer}
               textContentType="none"
@@ -178,7 +180,7 @@ export default function SecurityQuestionScreen( props ) {
                 // props.navigation.popToTop( 3 )
                 props.navigation.navigate( 'AccountManagementRoot' )
               } else {
-                setErrorText( 'Answer is incorrect' )
+                setErrorText( strings.Answerisincorrect )
               }
               setIsDisabled( false )
             }}
@@ -188,7 +190,7 @@ export default function SecurityQuestionScreen( props ) {
             }}
           >
             <Text style={styles.proceedButtonText}>
-              {!errorText ? 'Confirm' : 'Try Again'}
+              {!errorText ? common.confirm : common.tryAgain}
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>

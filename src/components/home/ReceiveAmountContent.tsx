@@ -9,6 +9,9 @@ import {
 } from 'react-native-responsive-screen'
 import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../BottomInfoBox'
+import { translations } from '../../common/content/LocContext'
+
+
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 const ReceiveAmountContent = ( {
   title,
@@ -18,6 +21,7 @@ const ReceiveAmountContent = ( {
   onPressBack
 } ) => {
   const [ amount, setAmount ] = useState( selectedAmount )
+  const common  = translations[ 'common' ]
 
   return (
     <View style={styles.modalContentContainer}>
@@ -69,7 +73,7 @@ const ReceiveAmountContent = ( {
               }}
               style={styles.successModalButtonView}
             >
-              <Text style={styles.proceedButtonText}>Receive</Text>
+              <Text style={styles.proceedButtonText}>{common.receive}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => onPressBack()}
@@ -78,7 +82,7 @@ const ReceiveAmountContent = ( {
               <Text style={{
                 ...styles.proceedButtonText, color: Colors.blue
               }}>
-            Back
+                {common.back}
               </Text>
             </TouchableOpacity>
           </View>

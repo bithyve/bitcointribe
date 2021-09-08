@@ -13,6 +13,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import Fonts from '../../../common/Fonts'
+import { translations } from '../../../common/content/LocContext'
 
 export type PersonalNodeFormData = {
   ipAddress: string;
@@ -27,7 +28,8 @@ export type Props = {
 
 const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => {
   const activePersonalNode = useActivePersonalNode()
-
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
   const [ currentIPAddressValue, setCurrentIPAddressValue ] = useState(
     activePersonalNode?.ipAddress || ''
   )
@@ -63,7 +65,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
     <View style={styles.rootContainer}>
 
       <View style={ListStyles.infoHeaderSection}>
-        <Text style={ListStyles.infoHeaderTitleText}>Setup Personal Node</Text>
+        <Text style={ListStyles.infoHeaderTitleText}>{strings.SetupPersonal}</Text>
       </View>
 
       <View style={styles.bodySection}>
@@ -105,7 +107,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
         style={styles.useFallbackTouchable}
       >
         <Text style={styles.useFallbackText}>
-                    Use Hexa node as fallback
+          {strings.fallback}
         </Text>
         <View style={styles.useFallbackCheckView}>
           {useFallback && (
@@ -120,7 +122,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
 
       <View style={styles.footerSection}>
         <ButtonBlue
-          buttonText="Proceed"
+          buttonText={common.proceed}
           handleButtonPress={handleProceedButtonPress}
           buttonDisable={canProceed === false}
         />

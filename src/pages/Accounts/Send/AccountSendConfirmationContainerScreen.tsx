@@ -29,6 +29,7 @@ import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../..
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { TxPriority } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
 
 export type NavigationParams = {
 };
@@ -43,7 +44,8 @@ export type Props = {
 
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
-
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const [ sendSuccessModal, setSuccess ] = useState( false )
   const [ sendFailureModal, setFailure ] = useState( false )
   const [ errorMessage, setError ] = useState( '' )
@@ -64,7 +66,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+    return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
   useEffect( () => {
@@ -78,13 +80,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const showSendSuccessBottomSheet = () => {
     return(
       <SendConfirmationContent
-        title={'Sent Successfully'}
-        info={'Transaction(s) successfully submitted'}
-        infoText={'t-sats successfully sent from your account'}
+        title={strings.SentSuccessfully}
+        info={strings.Transactionsubmitted}
+        infoText={strings.tsatsSent}
         recipients={sendingState.selectedRecipients}
         isFromContact={false}
-        okButtonText={'View Account'}
-        cancelButtonText={'Back'}
+        okButtonText={strings.ViewAccount}
+        cancelButtonText={common.back}
         isCancel={false}
         onPressOk={() => {
         // dismissBottomSheet()
@@ -117,12 +119,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const showSendFailureBottomSheet = useCallback( () => {
     return(
       <SendConfirmationContent
-        title={'Send Unsuccessful'}
+        title={strings.SendUnsuccessful}
         info={String( errorMessage )}
         isFromContact={false}
         recipients={sendingState.selectedRecipients}
-        okButtonText={'Try Again'}
-        cancelButtonText={'Back'}
+        okButtonText={common.tryAgain}
+        cancelButtonText={common.back}
         isCancel={true}
         onPressOk={() => setFailure( false )}
         onPressCancel={() => {
@@ -203,7 +205,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         <Text style={{
           marginRight: RFValue( 4 )
         }}>
-          Sending From:
+          {`${strings.SendingFrom}:`}
         </Text>
 
         <Text style={{
@@ -234,7 +236,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           onPress={handleConfirmationButtonPress}
           style={ButtonStyles.primaryActionButton}
         >
-          <Text style={ButtonStyles.actionButtonText}>Confirm & Send</Text>
+          <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -249,7 +251,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
             ...ButtonStyles.actionButtonText,
             color: Colors.blue,
           }}>
-            Back
+            {common.back}
           </Text>
         </TouchableOpacity>
       </View>

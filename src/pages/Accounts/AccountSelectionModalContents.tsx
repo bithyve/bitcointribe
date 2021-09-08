@@ -10,8 +10,12 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RadioButton from '../../components/RadioButton'
+import { translations } from '../../common/content/LocContext'
 
 export default function AccountSelectionModalContents( props ) {
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
+
   const RegularBalance = props.RegularAccountBalance
   const SavingBalance = props.SavingAccountBalance
   const [ SelectedAccountType, setSelectedAccountType ] = useState( '' )
@@ -51,11 +55,11 @@ export default function AccountSelectionModalContents( props ) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
-        <Text style={styles.modalTitleText}>Change Account</Text>
+        <Text style={styles.modalTitleText}>{strings.ChangeAccount}</Text>
         <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' )
         }}>
-          Choose the account to send from
+          {strings.Chooseaccounttosendfrom}
         </Text>
       </View>
       <View>
@@ -101,7 +105,7 @@ export default function AccountSelectionModalContents( props ) {
                 }}>{item.accountName}</Text>
                 <Text style={{
                   color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue( 10 ), marginTop: 5
-                }}>Available to spend {item.accountBalance} sats</Text>
+                }}>{`${strings.availableToSpend} ${item.accountBalance} sats`}</Text>
               </View>
             </AppBottomSheetTouchableWrapper>
           </View>
@@ -125,7 +129,7 @@ export default function AccountSelectionModalContents( props ) {
           {props.loading && props.loading == true ? (
             <ActivityIndicator color={Colors.white} size="small" />
           ) : (
-            <Text style={styles.proceedButtonText}>Confirm</Text>
+            <Text style={styles.proceedButtonText}>{common.confirm}</Text>
           )}
         </AppBottomSheetTouchableWrapper>
         <AppBottomSheetTouchableWrapper
@@ -141,7 +145,7 @@ export default function AccountSelectionModalContents( props ) {
           <Text style={{
             ...styles.proceedButtonText, color: Colors.blue
           }}>
-            Back
+            {common.back}
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>

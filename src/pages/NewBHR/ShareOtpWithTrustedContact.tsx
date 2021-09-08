@@ -12,13 +12,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Toast from '../../components/Toast'
 import CountDown from 'react-native-countdown-component'
+import { translations } from '../../common/content/LocContext'
 
 export default function ShareOtpWithTrustedContact( props ) {
   const OTP = props.OTP
   const index = props.index
+  const common  = translations[ 'common' ]
+
   const writeToClipboard = () => {
     Clipboard.setString( OTP )
-    Toast( 'Copied Successfully' )
+    Toast( common.copied )
   }
   return (
     <View style={styles.modalContainer}>

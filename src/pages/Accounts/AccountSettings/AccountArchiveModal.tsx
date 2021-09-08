@@ -5,6 +5,7 @@ import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
 	isError: boolean;
@@ -22,22 +23,24 @@ const AccountArchiveBottomSheet: React.FC<Props> = ( {
   isError,
   account
 }: Props ) => {
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
   return (
     <View style={styles.rootContainer}>
 
       <View style={styles.mainContentContainer}>
         <Text style={BottomSheetStyles.confirmationMessageHeading}>
-          {isError ? `Error Archiving${'\n'}${account.customDisplayName ? account.customDisplayName : account.defaultTitle}` : `Archive${'\n'}${account.customDisplayName ? account.customDisplayName : account.defaultTitle}`}
+          {isError ? `${strings.ErrorArchiving}${'\n'}${account.customDisplayName ? account.customDisplayName : account.defaultTitle}` : `${strings.Archive}${'\n'}${account.customDisplayName ? account.customDisplayName : account.defaultTitle}`}
         </Text>
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {isError ? 'An account should be empty before it can be archived' : 'You can archive an unused account from the home screen'}
+          {isError ? strings.Accountshouldbeempty : strings.archiveunusedaccount}
         </Text>
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-            Please ensure that account is empty before archiving
+          {strings.accountisempty}
         </Text>
       </View>
       <View style={styles.footerSectionContainer}>
@@ -46,7 +49,7 @@ const AccountArchiveBottomSheet: React.FC<Props> = ( {
             onPress={isError ? onViewAccount : onProceed}
             style={ButtonStyles.primaryActionButton}
           >
-            <Text style={ButtonStyles.actionButtonText}>{isError ? 'View Account' : 'Continue'}</Text>
+            <Text style={ButtonStyles.actionButtonText}>{isError ? strings.ViewAccount : common.continue}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -60,7 +63,7 @@ const AccountArchiveBottomSheet: React.FC<Props> = ( {
               ...ButtonStyles.actionButtonText,
               color: Colors.blue,
             }}>
-                Back
+              {common.back}
             </Text>
           </TouchableOpacity>
 

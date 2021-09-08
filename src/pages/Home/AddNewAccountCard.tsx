@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import CardView from 'react-native-cardview'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export type Props = {
   onPress: () => void;
@@ -15,6 +16,8 @@ const AddNewAccountCard: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
+  const { translations } = useContext( LocalizationContext )
+  const add_new = translations[ 'home' ].add_new
   return (
     <TouchableOpacity onPress={onPress} style={containerStyle}>
       <CardView cornerRadius={10} style={styles.cardContainer}>
@@ -38,7 +41,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
               fontWeight: '500',
             }}
           >
-            Add New
+            {add_new}
           </Text>
         </View>
       </CardView>

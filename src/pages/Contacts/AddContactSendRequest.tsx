@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import {
   View,
   Text,
@@ -39,10 +39,13 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import ModalContainer from '../../components/home/ModalContainer'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Secure2FA from './Secure2FAModal'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ExpoContacts from 'expo-contacts'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function AddContactSendRequest( props ) {
+  const { translations, formatString } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const [ isOTPType, setIsOTPType ] = useState( false )
   const [ shareOtpWithTrustedContactModel, setShareOtpWithTrustedContactModel ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
@@ -189,7 +192,7 @@ export default function AddContactSendRequest( props ) {
               const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
               encryption_key = number.slice( number.length - 10 ) // last 10 digits only
               setEncryptKey( encryption_key )
-            } else { Toast( 'F&F contact number missing' ); return }
+            } else { Toast( strings.numberMissing ); return }
             break
 
           case DeepLinkEncryptionType.EMAIL:
@@ -197,7 +200,7 @@ export default function AddContactSendRequest( props ) {
             if( email ){
               encryption_key = email // last 10 digits only
               setEncryptKey( encryption_key )
-            } else { Toast( 'F&F contact email missing' ); return }
+            } else { Toast( strings.emailMissing ); return }
             break
 
           case DeepLinkEncryptionType.OTP:
@@ -257,8 +260,8 @@ export default function AddContactSendRequest( props ) {
       return (
         <SendViaLink
           isFromReceive={true}
-          headerText={'Share'}
-          subHeaderText={'Send to your contact'}
+          headerText={common.share}
+          subHeaderText={strings.sendTo}
           contactText={contactText}
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
@@ -377,7 +380,7 @@ export default function AddContactSendRequest( props ) {
           isModal={false}
           // headerText={'Request Recovery Secret from trusted contact'}
           // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
-          contactText={'Adding to Friends & Family:'}
+          contactText={strings.adding}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
@@ -406,16 +409,16 @@ export default function AddContactSendRequest( props ) {
           }}>
           <BottomInfoBox
             icon={true}
-            title={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'Secure with additional factor' :
+            title={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? strings.secure :
               `Secure with contacts ${encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number' : encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email' : 'OTP' }`
             }
-            infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'You can optionally add a second factor when you are sending the link/QR through an unencrypted channel'
+            infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? strings.optionally
               :
-              encryptLinkWith === DeepLinkEncryptionType.NUMBER ? `Your contact will have to verify their phone number '${encryptionKey}' to accept the request`
+              encryptLinkWith === DeepLinkEncryptionType.NUMBER ? formatString( strings.number, encryptionKey )
                 :
-                encryptLinkWith === DeepLinkEncryptionType.EMAIL ? `Your contact will have to verify their email '${encryptionKey}' to accept the request`
+                encryptLinkWith === DeepLinkEncryptionType.EMAIL ? formatString( strings.email, encryptionKey )
                   :
-                  `Your contact will have to confirm the OTP '${encryptionKey}' to accept the request`
+                  formatString( strings.otp, encryptionKey )
             }
             backgroundColor={Colors.white}
           />
