@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { View, ImageSourcePropType, FlatList, Image, Platform, TouchableOpacity, Text, Linking, StyleSheet } from 'react-native'
 import { ListItem } from 'react-native-elements'
+import * as RNLocalize from 'react-native-localize'
 import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import {
@@ -166,6 +167,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
           renderItem={renderItem}
           scrollEnabled={false}
         />
+        {RNLocalize.getCountry() == 'US' &&
         <BottomInfoBox
           backgroundColor={Colors.backgroundColor}
           containerStyle={{
@@ -176,6 +178,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
             '* Some methods may not be available in the US states of Hawaii, Nebraska, New York and Texas'
           }
         />
+        }
       </View>
 
     </View>
@@ -233,7 +236,7 @@ const styles = StyleSheet.create( {
   },
   modelHeight: {
     height: 'auto',
-    marginBottom: hp( 2 )
+    marginBottom: hp( 3 )
   },
   cardMiddle: {
     // paddingLeft: 0,

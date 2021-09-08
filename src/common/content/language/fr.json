@@ -400,7 +400,7 @@
     "Enteraccountname": "Entrez un nom de compte",
     "Enterdescription": "Entrez une description",
     "ReceiveBitcoins": "Recevez des Bitcoins",
-    "Receivebitcoin": "Recevoir des bitcoins",
+    "Receivebitcoin": "Recevoir des Bitcoin",
     "Toreceive": "Pour recevoir des sats ou des bitcoins, vous partagez le code QR avec la personne qui essaie de vous envoyer de l'argent. Scanner le code QR avec l'appareil photo de leur téléphone leur donne votre adresse bitcoin.",
     "Foryourprivacy": "Pour votre confidentialité, une nouvelle adresse est générée à chaque fois que vous souhaitez recevoir des sats ou des bitcoins. L'application le fait toute seule - vous n'avez rien à faire !",
     "Dependingon": "Selon le portefeuille de l'expéditeur, vous pouvez recevoir quelques sats de moins que ce que vous avez demandé - cela peut être dû aux frais de minage.",

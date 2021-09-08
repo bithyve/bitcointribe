@@ -94,6 +94,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // }
   };
 
+  numberWithCommas = ( x ) => {
+    return x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' )
+  }
+
   render() {
     const {
       currentLevel,
@@ -153,7 +157,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               },
               elevation: 6
             }}
-            amount={exchangeRates ? exchangeRates[ currencyCode ]?.last.toFixed( 2 ) : ''}
+            amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
             incramount={''}
             percentIncr={'5%'}
             asset={'../../assets/images/HomePageIcons/graph.png'}

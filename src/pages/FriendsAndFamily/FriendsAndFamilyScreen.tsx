@@ -28,7 +28,7 @@ import {
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import { TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
@@ -61,7 +61,8 @@ interface FriendsAndFamilyPropTypes {
   syncPermanentChannels: any;
   existingPermanentChannelsSynching: any;
   clearTrustedContactsCache: any;
-  containerStyle: {}
+  containerStyle: {},
+  keeperInfo: KeeperInfoInterface[]
 }
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
@@ -173,7 +174,7 @@ class FriendsAndFamilyScreen extends React.Component<
   };
 
   updateAddressBook = async () => {
-    const { trustedContacts } = this.props
+    const { trustedContacts, keeperInfo } = this.props
 
     const keepers = []
     const keeping = []
@@ -181,12 +182,12 @@ class FriendsAndFamilyScreen extends React.Component<
 
     for( const channelKey of Object.keys( trustedContacts ) ){
       const contact = trustedContacts[ channelKey ]
-      const isGuardian =[ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
-      const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
 
+      const isGuardian =[ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD, TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( contact.relationType )
+      const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
       if( contact.isActive ){
         if( isGuardian || isWard ){
-          if( isGuardian ) keepers.push(  makeContactRecipientDescription(
+          if( isGuardian && keeperInfo.findIndex( value=> value.channelKey == channelKey && ( value.type == 'device' || value.type == 'primaryKeeper' ) ) === -1 ) keepers.push(  makeContactRecipientDescription(
             channelKey,
             contact,
             ContactTrustKind.KEEPER_OF_USER,
@@ -854,6 +855,7 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.trustedContacts.loading.existingPermanentChannelsSynching,
     ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo )
   }
 }
 
