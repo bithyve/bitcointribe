@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -24,12 +24,14 @@ import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccount
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { TxPriority } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 
 export type NavigationParams = {
 };
@@ -59,7 +61,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
-
+  const [ note, setNote ] = useState( '' )
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
@@ -187,7 +189,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
 
   return (
-    <ScrollView style={styles.rootContainer}>
+    <KeyboardAwareScrollView
+      resetScrollToCoords={{
+        x: 0, y: 0
+      }}
+      style={styles.rootContainer}
+    >
       <ModalContainer visible={sendSuccessModal} closeBottomSheet={() => {}} >
         {showSendSuccessBottomSheet()}
       </ModalContainer>
@@ -230,7 +237,37 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         bitcoinDisplayUnit={sourceAccountShell.unit}
         onTransactionPriorityChanged={setTransactionPriority}
       />
-
+      {selectedRecipients.length === 1 &&
+      <>
+        <HeadingAndSubHeading
+          heading={common.addNote}
+          subHeading={common.subNote}
+        />
+        <View
+          style={[ styles.inputBox, styles.inputField ]}
+        >
+          <TextInput
+            style={styles.modalInputBox}
+            placeholder={common.note}
+            placeholderTextColor={Colors.gray1}
+            value={note}
+            keyboardType={
+              Platform.OS == 'ios'
+                ? 'ascii-capable'
+                : 'visible-password'
+            }
+            returnKeyType="done"
+            returnKeyLabel="Done"
+            autoCompleteType="off"
+            autoCorrect={false}
+            autoCapitalize="none"
+            onChangeText={( text ) => {
+              setNote( text )
+            }}
+          />
+        </View>
+      </>
+      }
       <View style={styles.footerSection}>
         <TouchableOpacity
           onPress={handleConfirmationButtonPress}
@@ -255,11 +292,59 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
+  inputField: {
+    marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    borderColor: Colors.white,
+    backgroundColor: Colors.bgColor,
+    width: widthPercentageToDP( 90 )
+  },
+  inputBox: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  inputBoxFocused: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 10,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    backgroundColor: Colors.backgroundColor1,
+  },
+  modalInputBox: {
+    flex: 1,
+    height: 50,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    paddingLeft: 15,
+    width: '90%'
+
+  },
+  modalInfoText: {
+    width: widthPercentageToDP( 90 ),
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'justify',
+    lineHeight: 18,
+    marginLeft: widthPercentageToDP( 5 ),
+    paddingVertical: heightPercentageToDP( 1 )
+  },
   rootContainer: {
     flex: 1,
   },

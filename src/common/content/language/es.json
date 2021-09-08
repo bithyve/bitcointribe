@@ -39,7 +39,9 @@
     "confirm": "Confirmar",
     "visible": "Visible",
     "hidden": "Oculto",
-    "duress": "Coacción"
+    "duress": "Coacción",
+    "addNote": "Añadir la nota",
+    "subNote": "Para que recuerdes las transaccione"
   },
   "noInternet": {
     "no": "No Internet",

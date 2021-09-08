@@ -210,28 +210,30 @@ export default function Login( props ) {
 
   useEffect( () => {
     if ( isAuthenticated ) {
-      if( !walletExists ) props.navigation.replace( 'WalletInitialization' )
+      if( !walletExists ) {
+        props.navigation.replace( 'WalletInitialization' )
+      } else {
+        setloaderModal( false )
+        if( !creationFlag ) {
+          props.navigation.navigate( 'Home', {
+            screen: 'Home'
+          } )
+        } else if( requestName ){
+          props.navigation.navigate( 'Home', {
+            screen: 'Home',
+            params: {
+              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+              userKey: requestName && requestName.userKey ? requestName.userKey : null,
+              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+            }
+          } )
+        }
 
-      setloaderModal( false )
-      if( !creationFlag ) {
-        props.navigation.navigate( 'Home', {
-          screen: 'Home'
-        } )
-      } else if( requestName ){
-        props.navigation.navigate( 'Home', {
-          screen: 'Home',
-          params: {
-            custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-            recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-            trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-            userKey: requestName && requestName.userKey ? requestName.userKey : null,
-            swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
-          }
-        } )
+        bootStrapNotifications()
+        dispatch( autoSyncShells() )
       }
-
-      bootStrapNotifications()
-      dispatch( autoSyncShells() )
     }
   }, [ isAuthenticated, walletExists, requestName ] )
 
