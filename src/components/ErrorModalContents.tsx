@@ -176,6 +176,16 @@ export default function ErrorModalContents( props ) {
               {props.proceedButtonText}
             </Text>
           </AppBottomSheetTouchableWrapper>
+          {props.isBottomImage && (
+            <Image
+              source={
+                props.bottomImage
+                  ? props.bottomImage
+                  : require( '../assets/images/icons/noInternet.png' )
+              }
+              style={props.isBottomImageStyle ? props.isBottomImageStyle : styles.successModalImage}
+            />
+          )}
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
@@ -185,6 +195,8 @@ export default function ErrorModalContents( props ) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 alignSelf: 'center',
+                position: 'absolute',
+                left: wp( 53 )
               }}
               delayPressIn={0}
             >
@@ -201,16 +213,7 @@ export default function ErrorModalContents( props ) {
             </AppBottomSheetTouchableWrapper>
           )}
 
-          {props.isBottomImage && (
-            <Image
-              source={
-                props.bottomImage
-                  ? props.bottomImage
-                  : require( '../assets/images/icons/noInternet.png' )
-              }
-              style={props.isBottomImageStyle ? props.isBottomImageStyle : styles.successModalImage}
-            />
-          )}
+
         </View>
       </View>
     </View>
@@ -241,8 +244,8 @@ const styles = StyleSheet.create( {
     marginTop: hp( '2%' ),
   },
   successModalButtonView: {
-    height: wp( '12%' ),
-    width: 'auto',
+    height: wp( '13%' ),
+    width: wp( '45%' ),
     paddingLeft: wp( '5%' ),
     paddingRight: wp( '5%' ),
     justifyContent: 'center',
@@ -264,7 +267,7 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
     resizeMode: 'stretch',
     marginRight: -15,
-    marginBottom: -15
+    marginBottom: -15,
   },
   proceedButtonText: {
     color: Colors.white,
