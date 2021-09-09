@@ -10,17 +10,26 @@ import fr from './language/fr.json'
 import pt from './language/pt.json'
 import gu from './language/gu.json'
 import bn from './language/bn.json'
+//import ja from './language/ja.json'
 
-import moment from 'moment'
+/*import moment from 'moment'
 import 'moment/locale/es'
 import 'moment/locale/de'
+import 'moment/locale/ja'
+import 'moment/locale/pt'
+import 'moment/locale/fr'
+import 'moment/locale/gu'
+import 'moment/locale/mr'
+import 'moment/locale/hi'
+import 'moment/locale/bn'*/
+
 import LocalizedContent from 'react-localization'
 
 const DEFAULT_LANGUAGE = 'en'
 const APP_LANGUAGE = 'appLanguage'
 
 const languages = {
-  en, es, de, mr, hi, fr, pt, gu, bn
+  en, es, de, mr, hi, fr, pt, gu, bn,
 }
 export const translations = new LocalizedContent( languages )
 
@@ -49,7 +58,7 @@ export const LocalizationProvider = ( { children } ) => {
     const currentLanguage = await AsyncStorage.getItem( APP_LANGUAGE )
     if ( currentLanguage ) {
       setLanguage( currentLanguage )
-      moment.locale( currentLanguage )
+      //moment.locale( currentLanguage )
     } else {
       let localeCode = DEFAULT_LANGUAGE
       const supportedLocaleCodes = translations.getAvailableLanguages()
@@ -62,8 +71,7 @@ export const LocalizationProvider = ( { children } ) => {
           return true
         }
       } )
-      moment.locale( localeCode )
-
+      //moment.locale( localeCode )
       setLanguage( localeCode )
     }
   }
