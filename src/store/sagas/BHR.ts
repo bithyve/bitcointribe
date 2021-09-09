@@ -1269,11 +1269,8 @@ function* setLevelToNotSetupStatusWorker( ) {
     let toDelete:LevelInfo[]
     const shareArray = []
     if( currentLevel > 0 ) {
-      if( currentLevel == 1 && metaShares.length == 3 && levelHealth[ 1 ] ) {
+      if( ( currentLevel == 1 || currentLevel == 2 ) && levelHealth[ 1 ] ) {
         toDelete = levelHealth[ 1 ].levelInfo
-      }
-      if( currentLevel == 2 && metaShares.length == 5 && levelHealth[ 2 ] ) {
-        toDelete = levelHealth[ 2 ].levelInfo
       }
     }
     if( toDelete ){
