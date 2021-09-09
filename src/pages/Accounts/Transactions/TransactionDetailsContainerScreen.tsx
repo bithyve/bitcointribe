@@ -172,10 +172,10 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
           <Text style={ListStyles.listItemSubtitle}>{confirmationsText()}</Text>
         </View>
 
-        {account.transactionsNote[ transaction.txid ]?
+        {transaction.notes?
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>{common.note}</Text>
-            <Text style={ListStyles.listItemSubtitle}>{account.transactionsNote[ transaction.txid ]}</Text>
+            <Text style={ListStyles.listItemSubtitle}>{transaction.notes}</Text>
           </View>
           : null}
 
