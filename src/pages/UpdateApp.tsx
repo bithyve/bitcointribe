@@ -254,9 +254,10 @@ export default function UpdateApp( props ) {
           </View>
 
         </View>
-        {releaseNotes.map( ( value ) => {
+        {releaseNotes.map( ( value, index ) => {
           return (
             <View
+              key={index}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -291,7 +292,7 @@ export default function UpdateApp( props ) {
           <Text style={{
             ...styles.modalInfoText, marginBottom: hp( '3%' )
           }}>
-            For updating you will be taken to the App Store/ Play Store
+            {Platform.OS == 'ios' ? 'For updating you will be taken to the App Store' : 'For updating you will be taken to the Play Store'}
           </Text>
 
           <View
