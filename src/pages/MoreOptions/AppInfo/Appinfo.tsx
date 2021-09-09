@@ -38,6 +38,7 @@ import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
 import { updateCloudData } from '../../../store/actions/cloud'
 import { NavigationActions, StackActions } from 'react-navigation'
 // import { goHomeAction } from '../../../navigation/actions/NavigationActions'
+import { translations } from '../../../common/content/LocContext'
 
 interface MenuOption {
     title: string;
@@ -55,7 +56,8 @@ const AppInfo = ( props ) => {
   const [ editName, showEditName ] = useState( false )
   const [ success, setSuccess ] = useState( false )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
-
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
 
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
@@ -76,7 +78,7 @@ const AppInfo = ( props ) => {
     {
       title: 'Wallet Name',
       imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
-      subtitle: 'Edit your wallet name here',
+      subtitle: strings.Edityourwalletnamehere,
       onOptionPressed: () => showModal()
     },
     {
@@ -86,9 +88,9 @@ const AppInfo = ( props ) => {
       screenName: '',
     },
     {
-      title: 'Version History',
+      title: strings.VersionHistory,
       imageSource: require( '../../../assets/images/icons/icon_versionhistory_tilt.png' ),
-      subtitle: 'View apps current version and its history',
+      subtitle: strings.currentversion,
       screenName: 'VersionHistory',
     },
   ]
@@ -223,8 +225,8 @@ const AppInfo = ( props ) => {
         </TouchableOpacity>
       </View>
       <HeaderTitle
-        firstLineTitle={'App Info'}
-        secondLineTitle={'Hexa app version number and details'}
+        firstLineTitle={strings.AppInfo}
+        secondLineTitle={strings.AppInfoSub}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}

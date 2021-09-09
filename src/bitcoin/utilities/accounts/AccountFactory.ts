@@ -68,6 +68,8 @@ export function generateAccount(
       },
       internal: {
       }
+    },
+    transactionsNote: {
     }
   }
 
@@ -167,6 +169,8 @@ export function generateMultiSigAccount(
       },
       internal: {
       }
+    },
+    transactionsNote: {
     }
   }
 
@@ -236,6 +240,8 @@ export function generateDonationAccount(
     donee,
     configuration: {
       displayBalance: true,
+      displayIncomingTxs: true,
+      displayOutgoingTxs: true,
     },
     disableAccount: false,
     is2FA,

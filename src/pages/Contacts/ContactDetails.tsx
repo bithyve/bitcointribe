@@ -56,6 +56,7 @@ import BackIconTitle from '../../utils/BackIconTitle'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import CardWithArrow from '../../components/CardWithArrow'
 import More from '../../assets/images/svgs/icon_more.svg'
+import { translations } from '../../common/content/LocContext'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -141,6 +142,8 @@ class ContactDetails extends PureComponent<
   contactsType: any;
   setIsSendDisabledListener: any;
   isExistingContact: boolean;
+  strings: object;
+  common: object;
 
   constructor( props ) {
     super( props )
@@ -149,13 +152,15 @@ class ContactDetails extends PureComponent<
     this.SendViaLinkBottomSheet = createRef()
     this.ErrorBottomSheet = createRef()
     this.isExistingContact = false
+    this.strings = translations[ 'f&f' ]
+    this.common = translations[ 'common' ]
     this.state = {
       Loading: true,
       key: '',
       isSendDisabled: false,
       SelectedOption: 0,
       errorMessage: '',
-      buttonText: 'Try again',
+      buttonText: this.common[ 'tryAgain' ],
       errorMessageHeader: '',
       trustedLink: '',
       trustedQR: '',
@@ -249,7 +254,7 @@ class ContactDetails extends PureComponent<
         errorMessageHeader: 'Error sending Recovery Secret',
         errorMessage:
           'There was an error while sending your Recovery Secret, please try again in a little while',
-        buttonText: 'Try again',
+        buttonText: this.common[ 'tryAgain' ],
       } );
       ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
       this.props.ErrorSending( null )
@@ -788,13 +793,13 @@ class ContactDetails extends PureComponent<
         </View>
         <View style={styles.detailsView}>
           <Text style={styles.titleText}>
-            Relationship
+            {this.common[ 'relationship' ]}
           </Text>
           <Text style={styles.titleSubText}>
             {this.contactsType}
           </Text>
           <Text style={styles.titleText}>
-          Status
+            {this.common[ 'status' ]}
           </Text>
           <Text style={styles.titleSubText}>
             {!this.contact.isActive && !this.contact.streamId ? 'Rejected' : this.contact.streamId ? 'Approved' :  'Pending'}
@@ -808,7 +813,7 @@ class ContactDetails extends PureComponent<
           {this.contact.walletName &&
           <>
             <Text style={styles.titleText}>
-          Wallet Name
+              {this.common[ 'walletName' ]}
             </Text>
             <Text style={styles.titleSubText}>
               {this.contact.walletName}
@@ -818,7 +823,7 @@ class ContactDetails extends PureComponent<
           {this.contact.walletId &&
           <>
             <Text style={styles.titleText}>
-          Wallet ID
+              {this.common[ 'walletID' ]}
             </Text>
             <Text style={styles.titleSubText}>
               {this.contact.walletId}
@@ -834,8 +839,8 @@ class ContactDetails extends PureComponent<
               edit: true
             } )}
             icon={'Edit'}
-            mainText={'Edit Name'}
-            subText={'Change name of your contact'}
+            mainText={this.strings[ 'editName' ]}
+            subText={this.strings[ 'editNameSub' ]}
           />
           }
           {this.contact.lastSeenActive &&
@@ -850,8 +855,8 @@ class ContactDetails extends PureComponent<
             }
             }
             icon={'Associate'}
-            mainText={'Associate another contact'}
-            subText={'Select from your address book'}
+            mainText={this.strings[ 'Associateanother' ]}
+            subText={this.strings[ 'AssociateanotherSub' ]}
           />
           }
           {
@@ -859,11 +864,11 @@ class ContactDetails extends PureComponent<
               <CardWithArrow
                 onPress={() => {
                   Alert.alert(
-                    'Remove Contact',
-                    'Are you sure about removing the contact?',
+                    this.strings[ 'RemoveContact' ],
+                    this.strings[ 'sure' ],
                     [
                       {
-                        text: 'Yes',
+                        text: this.common[ 'yes' ],
                         onPress: () => {
                           this.props.removeTrustedContact( {
                             channelKey: this.contact.channelKey
@@ -875,7 +880,7 @@ class ContactDetails extends PureComponent<
                         },
                       },
                       {
-                        text: 'Cancel',
+                        text: this.common[ 'cancel' ],
                         onPress: () => { },
                         style: 'cancel',
                       },
@@ -886,8 +891,8 @@ class ContactDetails extends PureComponent<
                   )
                 }}
                 icon={'Remove'}
-                mainText={'Remove Contact'}
-                subText={'Remove the contact from Friends & Family'}
+                mainText={this.strings[ 'RemoveContact' ]}
+                subText={this.strings[ 'Removefrom' ]}
               />
             )}
         </View>
@@ -943,10 +948,10 @@ class ContactDetails extends PureComponent<
             ) : null}
             <Text style={styles.sendTextStyle}>
               {this.contact.lastSeenActive
-                ? 'Send'
+                ? this.common[ 'send' ]
                 : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
                   ? 'Reshare'
-                  : 'Resend Request'}
+                  : this.strings[ 'ResendRequest' ]}
             </Text>
           </TouchableOpacity>
         </View>
@@ -972,19 +977,19 @@ class ContactDetails extends PureComponent<
               <View style={{
                 flexDirection: 'row', marginLeft: 10, alignItems: 'flex-end'
               }}>
-                <Text style={styles.lastSeenText}>Last seen </Text>
+                <Text style={styles.lastSeenText}>{`${this.strings[ 'lastSeen' ]} `}</Text>
                 {Number.isFinite( this.contact.lastSeenActive ) ? (
                   <Text style={[ styles.lastSeenText, {
                     fontFamily: Fonts.FiraSansMediumItalic,
                   } ]}>
-                    {agoTextForLastSeen( this.contact.lastSeenActive )}
+                    {agoTextForLastSeen( this.contact.lastSeenActive ) === 'today' ? this.strings[ 'today' ] : agoTextForLastSeen( this.contact.lastSeenActive )}
                   </Text>
                 ) : (
                   <Text style={[ styles.lastSeenText, {
                     fontFamily: Fonts.FiraSansMediumItalic,
                     // fontSize: RFValue( 9 )
                   } ]}>
-                      Unknown
+                    {this.common[ 'unknown' ]}
                   </Text>
                 )}
               </View>
@@ -1046,8 +1051,10 @@ class ContactDetails extends PureComponent<
             </ScrollView> */}
             <BottomInfoBox
               backgroundColor={Colors.white}
-              title={'Note'}
-              infoText={'The details of your contact will appear here.'}
+              title={this.common[
+                'note'
+              ]}
+              infoText={this.strings[ 'detailsOf' ]}
             />
           </View>
         ) : (
@@ -1130,8 +1137,10 @@ class ContactDetails extends PureComponent<
             {this.sortedHistory( trustedContactHistory ).length <= 1 && (
               <BottomInfoBox
                 backgroundColor={Colors.white}
-                title={'Note'}
-                infoText={'The details of your contact will appear here.'}
+                title={this.common[
+                  'note'
+                ]}
+                infoText={this.strings[ 'detailsOf' ]}
               />
             )}
           </View>

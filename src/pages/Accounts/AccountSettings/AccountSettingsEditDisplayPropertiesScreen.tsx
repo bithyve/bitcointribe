@@ -11,6 +11,7 @@ import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import ButtonBlue from '../../../components/ButtonBlue'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -21,6 +22,8 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   const [ accountName, setAccountName ] = useState(
     primarySubAccount?.customDisplayName ||
@@ -68,7 +71,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <View style={{
           flexDirection: 'row'
         }}>
-          <Text style={styles.headerText}>You can set the Name and Description to reflect the account's purpose. </Text>
+          <Text style={styles.headerText}>{strings.Youcanset}</Text>
           {/* <Text style={{
             ...styles.headerText, fontStyle: 'italic'
           }}>Name and Description</Text> */}
@@ -79,7 +82,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <Input
           inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter an account name'}
+          placeholder={strings.Enteraccountname}
           placeholderTextColor={FormStyles.placeholderText.color}
           // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountName}
@@ -93,7 +96,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <Input
           inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter a description'}
+          placeholder={strings.Enterdescription}
           placeholderTextColor={FormStyles.placeholderText.color}
           // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountDescription}
@@ -105,7 +108,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
 
       <View style={styles.listFooterSection}>
         <ButtonBlue
-          buttonText="Confirm & Proceed"
+          buttonText={common.confirmProceed}
           handleButtonPress={handleSaveButtonPress}
           buttonDisable={canSaveChanges === false}
         />

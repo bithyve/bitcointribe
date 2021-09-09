@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useContext } from 'react'
 import { View, Image, Text, StyleSheet, Platform, Dimensions } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -14,10 +14,14 @@ import DeviceInfo from 'react-native-device-info'
 import Loader from './loader'
 import { getEnvReleaseTopic } from '../utils/geEnvSpecificParams'
 import { getTime } from '../common/CommonFunctions/timeFormatter'
+import { LocalizationContext } from '../common/content/LocContext'
 
 const releaseNotificationTopic = getEnvReleaseTopic()
 const { height } = Dimensions.get( 'window' )
 export default function NotificationListContent( props ) {
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'home' ]
+
   return (
     <View style={styles.modalContainer}>
       <AppBottomSheetTouchableWrapper
@@ -38,7 +42,7 @@ export default function NotificationListContent( props ) {
         <View style={{
           justifyContent: 'center'
         }}>
-          <Text style={styles.modalHeaderTitleText}>{'Notifications'}</Text>
+          <Text style={styles.modalHeaderTitleText}>{strings.Notifications}</Text>
         </View>
       </View>
       <ScrollView style={{
@@ -110,10 +114,10 @@ export default function NotificationListContent( props ) {
         }}>
           <View style={styles.waterMarkInfoBoxView}>
             <Text style={styles.waterMarkInfoBoxTitle}>
-              No notification yet
+              {strings.Nonotification}
             </Text>
             <Text style={styles.waterMarkInfoBoxInfo}>
-              All your recent notifications will be visible here
+              {strings.Allrecentnotifications}
             </Text>
           </View>
         </View>

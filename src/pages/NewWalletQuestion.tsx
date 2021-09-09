@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
+import React, { useState, useEffect, useCallback, createRef, useContext } from 'react'
 import {
   StyleSheet,
   View,
@@ -19,7 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../common/Fonts'
 import Colors from '../common/Colors'
-import QuestionList from '../common/QuestionList'
+//import QuestionList from '../common/QuestionList'
 import CommonStyles from '../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
@@ -47,6 +47,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -61,57 +62,33 @@ export enum BottomSheetState {
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 let messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
-const loaderMessages = [
-  {
-    heading: 'Test Account',
-    text:
-      'If you\'re a new user, the best place to start exploring the wallet is the Test Account',
-    subText: '',
-  },
-  {
-    heading: 'Free Sats!',
-    text: 'Register with Swan Bitcoin to get $10 USD worth of free sats',
-    subText: '',
-  },
-  {
-    heading: 'Manage Backup',
-    text:
-      'Make sure to backup your wallet to secure your sats. The first level of backup is done automatically once you allow it',
-    subText: '',
-  },
-  {
-    heading: 'Backup Levels',
-    text: 'Hexa has three levels of backup. Upgrade your backup when you want to secure more sats',
-    subText: '',
-  },
-]
 
-const getNextMessage = () => {
-  if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
-  return loaderMessages[ messageIndex++ ]
-}
 
 function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
 export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
-  const [ message, setMessage ] = useState( 'Bootstrapping Accounts' )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
+  const QuestionList = strings.questionList
+  const loaderMessages = translations[ 'login' ].loaderMessages
+  const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ subTextMessage, setSubTextMessage ] = useState(
-    'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
+    strings.Thismay,
   )
-  const [ bottomTextMessage, setBottomTextMessage ] = useState(
-    'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  const [ bottomTextMessage ] = useState(
+    strings.Hexaencrypts,
   )
   const subPoints = [
-    'Setting up multi-accounts',
-    'Fetching test sats & balances',
-    'Generating shares for back-up',
-    'Getting the latest details'
+    strings.multi,
+    strings.creatingbackup,
+    strings.preloading,
   ]
   const [ Elevation, setElevation ] = useState( 10 )
   // const [ height, setHeight ] = useState( 72 )
-  const [ isLoaderStart, setIsLoaderStart ] = useState( false )
+  // const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
@@ -173,6 +150,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const bottomSheetRef = createRef<BottomSheet>()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
 
+  const getNextMessage = () => {
+    if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
+    return loaderMessages[ messageIndex++ ]
+  }
 
   // useEffect( ()=>{
   //   const keyboardDidShowListener = Keyboard.addListener(
@@ -253,7 +234,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       setElevation( 0 )
     }, 0.2 )
     setTimeout( () => {
-      setIsLoaderStart( true )
+      // setIsLoaderStart( true )
       setIsEditable( false )
       setIsDisabled( true )
     }, 2 )
@@ -263,12 +244,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     setConfirmAnswer( tempAns )
 
     if ( answer && confirmAnswer && confirmAnswer != answer ) {
-      setAnswerError( 'Answers do not match' )
+      setAnswerError( strings.Answersdonotmatch )
     } else if (
       validateAllowedCharacters( answer ) == false ||
       validateAllowedCharacters( tempAns ) == false
     ) {
-      setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
+      setAnswerError( strings.Answersmust )
     } else {
       setTimeout( () => {
         setAnswerError( '' )
@@ -280,12 +261,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     setConfirmPswd( tempPswd )
 
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
-      setPswdError( 'Password do not match' )
+      setPswdError( strings.Passworddonotmatch )
     } else if (
       validateAllowedCharacters( pswd ) == false ||
       validateAllowedCharacters( tempPswd ) == false
     ) {
-      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
+      setPswdError( strings.Passwordmust )
     } else {
       // setTimeout( () => {
       //   setPswdError( '' )
@@ -317,12 +298,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       setVisibleButton( false )
 
       if ( answer && confirmAnswer && confirmAnswer != answer ) {
-        setAnswerError( 'Answers do not match' )
+        setAnswerError( strings.Answersdonotmatch )
       } else if (
         validateAllowedCharacters( answer ) == false ||
         validateAllowedCharacters( confirmAnswer ) == false
       ) {
-        setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
+        setAnswerError( strings.Answersmust )
       }
     }
   }, [ confirmAnswer ] )
@@ -334,12 +315,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       setVisibleButton( false )
 
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
-        setPswdError( 'Password do not match' )
+        setPswdError( strings.Passworddonotmatch )
       } else if (
         validateAllowedCharacters( pswd ) == false ||
         validateAllowedCharacters( confirmPswd ) == false
       ) {
-        setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
+        setPswdError( strings.Passwordmust )
       }
     }
   }, [ confirmPswd ] )
@@ -375,7 +356,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         }}
       >
         {/* {!loading.initializing ? ( */}
-        <Text style={styles.buttonText}>Proceed</Text>
+        <Text style={styles.buttonText}>{common.proceed}</Text>
         {/* ) : (
           <ActivityIndicator size="small" />
         )} */}
@@ -486,7 +467,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Use your own{'\n'}encryption password</Text>
+          }} >{strings.encryptionpassword}</Text>
           <View
             style={{
               ...pswdInputStyle,
@@ -500,7 +481,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <TextInput
               style={styles.modalInputBox}
-              placeholder={'Enter your password'}
+              placeholder={strings.Enteryourpassword}
               placeholderTextColor={Colors.borderColor}
               value={hideShowPswd ? pswdMasked : pswd}
               autoCompleteType="off"
@@ -575,7 +556,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TextInput
               style={styles.modalInputBox}
               ref={confirmPswdTextInput}
-              placeholder={'Confirm your password'}
+              placeholder={strings.Confirmyourpassword}
               placeholderTextColor={Colors.borderColor}
               value={hideShowConfirmPswd ? confirmPswdMasked : tempPswd}
               autoCompleteType="off"
@@ -644,7 +625,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
               {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              Numbers or special characters are not supported
+              {strings.Numbersorspecial}
             </Text>
           )}
           <View
@@ -661,7 +642,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TextInput
               style={styles.modalInputBox}
               ref={hint}
-              placeholder={'Add a hint'}
+              placeholder={strings.Addhint}
               placeholderTextColor={Colors.borderColor}
               value={hintText}
               autoCompleteType="off"
@@ -748,8 +729,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         }}>
           {/* {pswd.length === 0 && confirmPswd.length === 0 && */}
           <BottomInfoBox
-            title={'Note'}
-            infoText={'Make sure you remember the encryption password and keep it safe'}
+            title={common.note}
+            infoText={strings.Makesure}
             italicText={''}
             backgroundColor={Colors.white}
           />
@@ -799,7 +780,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Answer{'\n'}a Security Question</Text>
+          }} >{strings.AnswerSecurityQuestion}</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -815,7 +796,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <Text style={styles.dropdownBoxText}>
               {dropdownBoxValue.question
                 ? dropdownBoxValue.question
-                : 'Select Question'}
+                : strings.SelectQuestion}
             </Text>
             <Ionicons
               style={{
@@ -894,7 +875,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               >
                 <TextInput
                   style={styles.modalInputBox}
-                  placeholder={'Enter your answer'}
+                  placeholder={strings.Enteryouranswer}
                   placeholderTextColor={Colors.borderColor}
                   value={hideShowAnswer ? answerMasked : answer}
                   autoCompleteType="off"
@@ -968,7 +949,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 <TextInput
                   style={styles.modalInputBox}
                   ref={confirmAnswerTextInput}
-                  placeholder={'Confirm your answer'}
+                  placeholder={strings.Confirmyouranswer}
                   placeholderTextColor={Colors.borderColor}
                   value={
                     hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
@@ -1033,7 +1014,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
               {answerError.length == 0 && (
                 <Text style={styles.helpText}>
-              Answers must contain only lower case alphabets and numbers
+                  {strings.Answersmust1}
                 </Text>
               )}
             </View>
@@ -1115,8 +1096,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}>
             {answer.length === 0 && confirmAnswer.length === 0 &&
             <BottomInfoBox
-              title={'Note'}
-              infoText={'The Answer is used to encrypt the backup. The Security Question acts as a hint to remember'}
+              title={common.note}
+              infoText={strings.TheAnswer}
               italicText={''}
               backgroundColor={Colors.white}
             />
@@ -1235,9 +1216,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Step 2\nCreate initial cloud backup'}
+              firstLineTitle={strings.Step2}
               secondLineBoldTitle={'New Wallet '}
-              secondLineTitle={'creation'}
+              secondLineTitle={strings.creation}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -1245,16 +1226,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             />
             <CardWithRadioBtn
               icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
-              mainText={'Answer a Security Question'}
-              subText={'Easier to remember. Recommended'}
+              mainText={strings.AnsweraSecurityQuestion}
+              subText={strings.Easiertoremember}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
               index={0}
             />
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
-              mainText={'Use your own encryption password'}
-              subText={'Create a password. Make sure to remember it'}
+              mainText={strings.Useencryptionpassword}
+              subText={strings.Createapassword}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
@@ -1277,8 +1258,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}
         >
           <BottomInfoBox
-            title={'Note'}
-            infoText={'Backup lets you recover your wallet even if you lose your phone. Manage from '}
+            title={common.note}
+            infoText={`${strings.Backuplets} `}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />
@@ -1289,7 +1270,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         flexDirection: 'row', marginTop: hp( 2 )
       }}>
         <ButtonBlue
-          buttonText="Confirm & Proceed"
+          buttonText={common.confirmProceed}
           handleButtonPress={confirmAction}
           buttonDisable={false}
         />
@@ -1307,7 +1288,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontFamily: Fonts.FiraSansMedium,
             alignSelf: 'center',
             marginLeft: wp( '5%' )
-          }}>Skip Backup</Text>
+          }}>{`${common.skip} Backup`}</Text>
         </TouchableOpacity>
       </View>
       {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >

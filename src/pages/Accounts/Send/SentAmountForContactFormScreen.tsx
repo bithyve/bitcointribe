@@ -33,6 +33,7 @@ import idx from 'idx'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
 import RecipientKind from '../../../common/data/enums/RecipientKind'
 import ModalContainer from '../../../components/home/ModalContainer'
+import { translations } from '../../../common/content/LocContext'
 
 export type NavigationParams = {
 };
@@ -50,6 +51,8 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   const [ sendFailureModal, setFailure ] = useState( false )
   const [ errorMessage, setError ] = useState( '' )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   const selectedRecipients = useSelectedRecipientsForSending()
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
@@ -71,7 +74,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+    return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
 
@@ -134,12 +137,12 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const showSendFailureBottomSheet = useCallback( () => {
     return(
       <SendConfirmationContent
-        title={'Send Unsuccessful'}
+        title={strings.SendUnsuccessful}
         info={String( errorMessage )}
         isFromContact={false}
         recipients={sendingState.selectedRecipients}
-        okButtonText={'Try Again'}
-        cancelButtonText={'Back'}
+        okButtonText={common.tryAgain}
+        cancelButtonText={common.back}
         isCancel={true}
         onPressOk={() => setFailure( false )}
         onPressCancel={() => {
@@ -201,7 +204,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         <Text style={{
           marginRight: RFValue( 4 )
         }}>
-          Sending From:
+          {`${strings.SendingFrom}:`}
         </Text>
 
         <Text style={{
@@ -234,7 +237,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
           }}
         >
-          <Text style={ButtonStyles.actionButtonText}>Confirm & Proceed</Text>
+          <Text style={ButtonStyles.actionButtonText}>{common.confirmProceed}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -250,7 +253,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             ...ButtonStyles.actionButtonText,
             color: sendingState.sendMaxFee || !selectedAmount ? Colors.lightBlue: Colors.blue,
           }}>
-              Add Recipient
+            {strings.AddRecipient}
           </Text>
         </TouchableOpacity>
       </View>

@@ -12,6 +12,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import useAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountShell'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   onProceed: ( accountShell ) => void;
@@ -20,6 +21,7 @@ export type Props = {
 };
 
 const renderAccount = ( accountInfo ) => {
+  const strings  = translations[ 'accounts' ]
   return (
     <View style={{
       flexDirection: 'row',
@@ -45,7 +47,7 @@ const renderAccount = ( accountInfo ) => {
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText,
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide Account' : 'Restore Account'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? strings.UnhideAccount : strings.RestoreAccount}
         </Text>
 
         <ListItem.Content style={{
@@ -79,25 +81,26 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
   accountInfo
 }: Props ) => {
   const accountShell = useAccountShell( accountInfo.accountShellID )
-
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
   return (
     <View style={styles.rootContainer}>
 
       <View style={styles.mainContentContainer}>
         <Text style={BottomSheetStyles.confirmationMessageHeading}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide Account' : 'Restore Archived Account'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? strings.UnhideAccount : 'Restore Archived Account'}
         </Text>
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Start showing the account in My Accounts' : 'Restore the account to Home screen'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? strings.Startshowing : strings.RestoretoHomescreen}
         </Text>
         {renderAccount( accountInfo )}
 
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'You can hide the account again from My Accounts from account settings' : 'Once confirmed you can use this account like a normal account from My Accounts'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? strings.Youcanhide : strings.Onceconfirmed}
         </Text>
         <View style={styles.footerSectionContainer}>
           <View style={styles.actionButtonContainer}>
@@ -119,7 +122,7 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
                 ...ButtonStyles.actionButtonText,
                 color: Colors.blue,
               }}>
-                Back
+                {common.back}
               </Text>
             </TouchableOpacity>
           </View>

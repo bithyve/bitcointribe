@@ -315,6 +315,8 @@ export const updateDonationPreferences = (
     disableAccount?: boolean;
     configuration?: {
       displayBalance: boolean;
+      displayIncomingTxs: boolean;
+      displayOutgoingTxs: boolean;
     };
     accountDetails?: {
       donee: string;

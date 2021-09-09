@@ -83,35 +83,37 @@ export const checkLevelHealth = (
   levelHealthVar: LevelHealthInterface[],
 ) => {
   try {
-    if( levelHealthVar.length == 1 ){
-      const levelInfo = levelHealthVar[ 0 ].levelInfo
-      const elements =  arrayChunks( levelInfo, 2 )
-      for ( let j = 0; j < elements.length; j++ ) {
-        const element = elements[ j ]
-        levelData[ j ].keeper1 = element[ 0 ]
-        levelData[ j ].keeper2 = element[ 1 ]
-        levelData[ j ].status = checkStatus( levelInfo )
-      }
-    } else {
-      const levelInfo0 = levelHealthVar[ 0 ].levelInfo
-      const levelInfo1 = levelHealthVar[ 1 ].levelInfo
-      const elements0 =  arrayChunks( levelInfo0, 2 )
-      const elements1 =  arrayChunks( levelInfo1, 2 )
-      for ( let j = elements1.length - 1; j >= 0; j-- ) {
-        const element0 = elements0[ j ] ? elements0[ j ] : null
-        const element1 = elements1[ j ]
-        levelData[ j ].keeper1 = element0 && element0[ 0 ] ? element0[ 0 ] : levelData[ j ].keeper1
-        levelData[ j ].keeper2 = element0 && element0[ 1 ] ? element0[ 1 ] : levelData[ j ].keeper2
-        levelData[ j ].status = checkStatus( levelInfo1 )
-        if( elements1.length == 3 && j == 2 ) {
-          levelData[ j ].keeper1 = element1[ 0 ]
-          levelData[ j ].keeper2 = element1[ 1 ]
-          levelData[ j ].status = checkStatus( levelInfo1 )
+    if( levelHealthVar.length ){
+      if( levelHealthVar.length == 1 ){
+        const levelInfo = levelHealthVar[ 0 ].levelInfo
+        const elements =  arrayChunks( levelInfo, 2 )
+        for ( let j = 0; j < elements.length; j++ ) {
+          const element = elements[ j ]
+          levelData[ j ].keeper1 = element[ 0 ]
+          levelData[ j ].keeper2 = element[ 1 ]
+          levelData[ j ].status = checkStatus( levelInfo )
         }
-        if( elements1.length == 2 && j == 1 ) {
-          levelData[ j ].keeper1 = element1[ 0 ]
-          levelData[ j ].keeper2 = element1[ 1 ]
+      } else {
+        const levelInfo0 = levelHealthVar[ 0 ].levelInfo
+        const levelInfo1 = levelHealthVar[ 1 ].levelInfo
+        const elements0 =  arrayChunks( levelInfo0, 2 )
+        const elements1 =  arrayChunks( levelInfo1, 2 )
+        for ( let j = elements1.length - 1; j >= 0; j-- ) {
+          const element0 = elements0[ j ] ? elements0[ j ] : null
+          const element1 = elements1[ j ]
+          levelData[ j ].keeper1 = element0 && element0[ 0 ] ? element0[ 0 ] : levelData[ j ].keeper1
+          levelData[ j ].keeper2 = element0 && element0[ 1 ] ? element0[ 1 ] : levelData[ j ].keeper2
           levelData[ j ].status = checkStatus( levelInfo1 )
+          if( elements1.length == 3 && j == 2 ) {
+            levelData[ j ].keeper1 = element1[ 0 ]
+            levelData[ j ].keeper2 = element1[ 1 ]
+            levelData[ j ].status = checkStatus( levelInfo1 )
+          }
+          if( elements1.length == 2 && j == 1 ) {
+            levelData[ j ].keeper1 = element1[ 0 ]
+            levelData[ j ].keeper2 = element1[ 1 ]
+            levelData[ j ].status = checkStatus( levelInfo1 )
+          }
         }
       }
     }
@@ -178,7 +180,8 @@ export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
 
     const displayName1 = element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.displayedName ? element.keeper1.data.displayedName : ''
     const displayName2 = element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.displayedName ? element.keeper2.data.displayedName : ''
-    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name
+    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name ? element.keeper1.name : i == 0 && !element.keeper1.name ? 'Set Password' : ''
+    console.log( 'levelData[ i ].keeper1ButtonText', i, levelData[ i ].keeper1ButtonText )
     levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : element.keeper2.name ? element.keeper2.name : i == 0 && !element.keeper2.name ? Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive' : ''
   }
   return levelData

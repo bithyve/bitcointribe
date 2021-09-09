@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import {
   StyleSheet,
   Text,
@@ -25,7 +25,6 @@ import LoaderModal from '../components/LoaderModal'
 import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
-import content from '../common/content'
 import { processDeepLink } from '../common/CommonFunctions'
 import ModalContainer from '../components/home/ModalContainer'
 import firebase from '@react-native-firebase/app'
@@ -39,46 +38,7 @@ import {
 } from '../store/actions/notifications'
 import { autoSyncShells } from '../store/actions/accounts'
 import Relay from '../bitcoin/utilities/Relay'
-
-const loaderMessages = [
-  {
-    heading: 'Savings Account',
-    text: 'The Savings Account unlocks once your backup is at Level 2. Also, setup your 2FA code on an authenticator app',
-    subText: '',
-  },
-  {
-    heading: 'Non-custodial buys',
-    text:
-      'Get sats directly in your wallet from compatible exchanges',
-    subText: '',
-  },
-  {
-    heading: 'Friends & Family',
-    text: 'Add contacts to Hexa and send sats w/o asking for their wallet address every time',
-    subText: '',
-  },
-  {
-    heading: 'Donation Accounts',
-    text:
-      'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
-    subText: '',
-  },
-  {
-    heading: 'Satoshis or Sats',
-    text: '1 bitcoin = 100 million satoshis or sats',
-    subText: 'Hexa uses sats to make using bitcoin easier',
-  },
-  // {
-  //   heading: 'Hexa Test Account',
-  //   text: 'Test Account comes preloaded with test-sats',
-  //   subText: 'Best place to start if you are new to Bitcoin',
-  // },
-]
-
-const getRandomMessage = () => {
-  const randomIndex = Math.floor( Math.random() * 5 )
-  return loaderMessages[ randomIndex ]
-}
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -90,7 +50,14 @@ export default function Login( props ) {
   // const [ bottomTextMessage, setBottomTextMessage ] = useState(
   //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
   // )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
+  const getRandomMessage = () => {
+    const randomIndex = Math.floor( Math.random() * 5 )
+    return strings.loaderMessages[ randomIndex ]
+  }
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
   const [ subTextMessage1 ] = useState( initialMessage.text )
@@ -243,28 +210,30 @@ export default function Login( props ) {
 
   useEffect( () => {
     if ( isAuthenticated ) {
-      if( !walletExists ) props.navigation.replace( 'WalletInitialization' )
+      if( !walletExists ) {
+        props.navigation.replace( 'WalletInitialization' )
+      } else {
+        setloaderModal( false )
+        if( !creationFlag ) {
+          props.navigation.navigate( 'Home', {
+            screen: 'Home'
+          } )
+        } else if( requestName ){
+          props.navigation.navigate( 'Home', {
+            screen: 'Home',
+            params: {
+              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+              userKey: requestName && requestName.userKey ? requestName.userKey : null,
+              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+            }
+          } )
+        }
 
-      setloaderModal( false )
-      if( !creationFlag ) {
-        props.navigation.navigate( 'Home', {
-          screen: 'Home'
-        } )
-      } else if( requestName ){
-        props.navigation.navigate( 'Home', {
-          screen: 'Home',
-          params: {
-            custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-            recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-            trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-            userKey: requestName && requestName.userKey ? requestName.userKey : null,
-            swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
-          }
-        } )
+        bootStrapNotifications()
+        dispatch( autoSyncShells() )
       }
-
-      bootStrapNotifications()
-      dispatch( autoSyncShells() )
     }
   }, [ isAuthenticated, walletExists, requestName ] )
 
@@ -357,7 +326,7 @@ export default function Login( props ) {
         <View style={{
           marginLeft: 'auto'
         }}>
-          <Text style={styles.errorText}>Incorrect Passcode, Try Again!</Text>
+          <Text style={styles.errorText}>{strings.Incorrect}</Text>
         </View>
       )
     }
@@ -411,11 +380,11 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>{content.login.welcome}</Text>
+          <Text style={styles.headerTitleText}>{strings.welcome}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              {content.login.enter_your}{' '}
-              <Text style={styles.boldItalicText}>{content.login.passcode}</Text>
+              {strings.enter_your}{' '}
+              <Text style={styles.boldItalicText}>{strings.passcode}</Text>
             </Text>
             <View style={{
               alignSelf: 'baseline'
@@ -576,7 +545,7 @@ export default function Login( props ) {
                     : Colors.blue,
                 }}
               >
-                <Text style={styles.proceedButtonText}>Proceed</Text>
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
               </TouchableOpacity>
             </View>
           ) : null}

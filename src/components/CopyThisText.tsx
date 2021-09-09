@@ -13,11 +13,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import { translations } from '../common/content/LocContext'
 
 export default function CopyThisText( props ) {
+  const common  = translations[ 'common' ]
+
   function writeToClipboard() {
     Clipboard.setString( props.text )
-    Toast( 'Copied Successfully' )
+    Toast( common.copied )
   }
 
   return (

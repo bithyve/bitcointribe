@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { View, Image, Text, StyleSheet } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../common/Colors'
@@ -9,8 +9,11 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function ErrorModalContents( props ) {
+  const { translations } = useContext( LocalizationContext )
+  const common = translations[ 'common' ]
   return (
     <View style={{
       ...styles.modalContentContainer,
@@ -55,7 +58,7 @@ export default function ErrorModalContents( props ) {
               style={{
                 ...styles.modalInfoText,
                 marginTop: wp( '1.5%' ),
-                marginRight: wp( 13 )
+                marginRight: wp( 9 )
               }}
             >
               {props.info}
@@ -143,7 +146,7 @@ export default function ErrorModalContents( props ) {
         ) : null}
         <View
           style={{
-            height: hp( '18%' ),
+            height: hp( '12%' ),
             flexDirection: 'row',
             marginTop: 'auto',
             alignItems: 'flex-end',
@@ -177,7 +180,7 @@ export default function ErrorModalContents( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
               style={{
-                height: wp( '13%' ),
+                height: wp( '12%' ),
                 width: wp( '27%' ),
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -193,7 +196,7 @@ export default function ErrorModalContents( props ) {
                     : Colors.blue,
                 }}
               >
-                {props.cancelButtonText ? props.cancelButtonText : 'Ignore'}
+                {props.cancelButtonText ? props.cancelButtonText : common.ignore}
               </Text>
             </AppBottomSheetTouchableWrapper>
           )}
@@ -238,8 +241,10 @@ const styles = StyleSheet.create( {
     marginTop: hp( '2%' ),
   },
   successModalButtonView: {
-    height: wp( '13%' ),
-    width: wp( '35%' ),
+    height: wp( '12%' ),
+    width: 'auto',
+    paddingLeft: wp( '5%' ),
+    paddingRight: wp( '5%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,

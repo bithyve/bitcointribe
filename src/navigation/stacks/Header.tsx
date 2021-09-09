@@ -318,6 +318,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressNotifications = async () => {
+    this.readAllNotifications()
     setTimeout( () => {
       this.setState( {
         notificationLoading: false,
@@ -345,13 +346,33 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
         this.currentNotificationId = ''
       } else {
-        const message = messages.find( message => message.additionalInfo === null )
+        const message = messages.find( message => message.additionalInfo === null &&  message.status === 'unread' )
         if( message ){
           this.handleNotificationBottomSheetSelection( message )
         }
       }
     }
   }
+
+  readAllNotifications= () => {
+    const { messages } = this.props
+    const arr = []
+    messages.forEach( message => {
+      if( message.status === 'unread' ) {
+        arr.push(
+          {
+            notificationId: message.notificationId,
+            status : 'read'
+          }
+        )
+        this.props.updateMessageStatusInApp( message.notificationId )
+      }
+    } )
+    if( arr.length > 0 ) {
+      this.props.updateMessageStatus( arr )
+    }
+  }
+
   handleNotificationBottomSheetSelection = ( message ) => {
     const storeName = Platform.OS == 'ios' ? 'App Store' : 'Play Store'
     this.setState( {
@@ -1219,21 +1240,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.CLOUD_ERROR:
           return (
             <ErrorModalContents
-              title={'Automated Cloud\nBackup Error'}
-              info={'We could not backup your wallet\non the cloud. This may be due to:'}
-              errPoints={[ 'A network issue', 'Inadequate space in your cloud storage', 'A bug on our part' ]}
-              note={'Please try again in some time.\nIn case the error persists,\nplease reach out to us on:'}
-              links={[ {
-                link: 'hello@bithyve.com',
-                icon: require( '../../assets/images/socialicon/twitter.png' )
-              }, {
-                link: '@HexaWallet',
-                icon: require( '../../assets/images/socialicon/twitter.png' )
-              }, {
-                link: 'https://t.me/HexaWallet',
-                icon: require( '../../assets/images/socialicon/twitter.png' )
-              }
-              ]}
+              title={'Cloud Backup Error'}
+              info={'The wallet could not be backed up.\n\nThis may be due to network issues. Please try again in sometime from Security & Privacy.\nIf the problem persists, contact us at hexa@bithyve.com'}
+              // errPoints={[ 'A network issue', 'Inadequate space in your cloud storage', 'A bug on our part' ]}
+              // note={'Please try again in some time.\nIn case the error persists,\nplease reach out to us on:'}
+              // links={[ {
+              //   link: 'hello@bithyve.com',
+              //   icon: require( '../../assets/images/icons/icon_email.png' )
+              // }, {
+              //   link: '@HexaWallet',
+              //   icon: require( '../../assets/images/socialicon/twitter.png' )
+              // }, {
+              //   link: 'https://t.me/HexaWallet',
+              //   icon: require( '../../assets/images/icons/icon_telegram.png' )
+              // }
+              // ]}
               onPressProceed={()=>{
                 if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
                   this.props.setCloudData()
@@ -1244,9 +1265,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.props.updateCloudPermission( false )
                 this.closeBottomSheet()
               }}
-              closeModal={() => this.closeBottomSheet()}
+              // closeModal={() => this.closeBottomSheet()}
               proceedButtonText={'Try Again'}
-              cancelButtonText={'Skip'}
+              cancelButtonText={'Not Now'}
               isIgnoreButton={true}
               isBottomImage={true}
               isBottomImageStyle={styles.cloudErrorModalImage}

@@ -226,9 +226,6 @@ class ManageBackupNewBHR extends Component<
       this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
-          this.setState( {
-            showLoader: true
-          } )
           this.props.setLevelToNotSetupStatus()
           this.props.modifyLevelData()
         } else {
@@ -371,6 +368,8 @@ class ManageBackupNewBHR extends Component<
         prevProps.levelHealth.length == 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
         this.props.cloudPermissionGranted === true &&
+        this.props.levelHealth.length &&
+        this.props.levelHealth[ 0 ].levelInfo.length &&
         this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup'
       ) {
         this.props.setCloudData( )
@@ -764,9 +763,8 @@ class ManageBackupNewBHR extends Component<
   }
 
   onKeeperButtonPress = ( value, keeperNumber ) =>{
-    const { selectedKeeper } = this.state
     requestAnimationFrame( () => {
-      if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) {
+      if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
         this.props.setLevelCompletionError( 'Please set password', 'It seems you have not set passward to backup. Please set password first to proceed', LevelStatus.FAILED )
         return
       }
@@ -775,8 +773,8 @@ class ManageBackupNewBHR extends Component<
           this.props.navigation.navigate(
             'CloudBackupHistory',
             {
-              selectedTime: selectedKeeper.updatedAt
-                ? getTime( selectedKeeper.updatedAt )
+              selectedTime: value.keeper2.updatedAt
+                ? getTime( value.keeper2.updatedAt )
                 : 'never',
             }
           )
@@ -785,8 +783,8 @@ class ManageBackupNewBHR extends Component<
         this.props.navigation.navigate(
           'SecurityQuestionHistoryNewBHR',
           {
-            selectedTime: selectedKeeper.updatedAt
-              ? getTime( selectedKeeper.updatedAt )
+            selectedTime: value.keeper1.updatedAt
+              ? getTime( value.keeper1.updatedAt )
               : 'never',
           }
         )
@@ -953,7 +951,7 @@ class ManageBackupNewBHR extends Component<
                       marginTop: hp( 2.5 ),
                       backgroundColor: Colors.white
                     }}
-                    title=""
+                    title="Note"
                     infoText="When you have Friends & Family who you can help with wallet recovery, they will be listed here"
                   />
                 }
@@ -1001,14 +999,14 @@ class ManageBackupNewBHR extends Component<
               modalRef={this.ErrorBottomSheet as any}
               title={this.state.errorTitle}
               info={this.state.errorInfo}
-              proceedButtonText={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? 'Proceed To Password' : 'Got it'}
-              cancelButtonText={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? 'Got it' : ''}
-              isIgnoreButton={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? true : false}
+              proceedButtonText={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? 'Proceed To Password' : 'Got it'}
+              cancelButtonText={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? 'Got it' : ''}
+              isIgnoreButton={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? true : false}
               onPressProceed={() => {
                 this.setState( {
                   errorModal: false
                 } )
-                if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) this.props.navigation.navigate( 'SetNewPassword', {
+                if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) this.props.navigation.navigate( 'SetNewPassword', {
                   isFromManageBackup: true,
                 } )
               }}
@@ -1161,7 +1159,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp ( '6%' )
   },
   accountCardsSectionContainer: {
-    height: hp( '70.83%' ),
+    height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

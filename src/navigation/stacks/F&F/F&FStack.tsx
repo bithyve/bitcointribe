@@ -26,6 +26,9 @@ import Login from '../../../pages/Login'
 import ReLogin from '../../../pages/ReLogin'
 import Intermediate from '../../../pages/Intermediate'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
   'AllTransactions',

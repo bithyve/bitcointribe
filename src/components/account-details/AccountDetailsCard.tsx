@@ -31,6 +31,7 @@ import { useDispatch } from 'react-redux'
 import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
 import { withNavigation } from 'react-navigation'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { translations } from '../../common/content/LocContext'
 
 export type Props = {
   accountShell: AccountShell;
@@ -104,6 +105,8 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
   }, [ accountShell.primarySubAccount.kind ] )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   useEffect( () => {
     if (
@@ -201,7 +204,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const KnowMoreButton: React.FC = () => {
     return (
       <Button
-        title="Know More"
+        title={common.knowMore}
         type="outline"
         buttonStyle={{
           borderRadius: 5,

@@ -205,6 +205,7 @@ export const executeSendStage2 = (
     accountShell: AccountShell;
     txnPriority: TxPriority,
     token?: number,
+    note?: string
     },
 ): ExecuteSendStage2Action => {
   return {

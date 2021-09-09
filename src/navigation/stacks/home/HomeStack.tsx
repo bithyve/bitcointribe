@@ -55,6 +55,9 @@ import QRStack from '../home/QRStack'
 import Home from '../../../pages/Home/Home'
 import Header from '../Header'
 import Login from '../../../pages/Login'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
   'AllTransactions',
