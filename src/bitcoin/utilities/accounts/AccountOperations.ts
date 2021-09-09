@@ -88,6 +88,13 @@ export default class AccountOperations {
     }
   };
 
+  static importAddress = async ( account: Account | MultiSigAccount, privateKey: string, address: string ) => {
+    account.importedAddresses[ address ] = {
+      address,
+      privateKey
+    }
+  }
+
   static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
     txsFound: Transaction[],

@@ -864,6 +864,12 @@ export interface Account {
   hasNewTxn?: boolean;                  // indicates new txns
   transactionsNote : {
     [txId: string]: string
+  },
+  importedAddresses: {                  // non-xpub/imported addresses
+    [address: string]: {
+      address: string,
+      privateKey: string
+    }
   }
 }
 export interface MultiSigAccount extends Account {
@@ -951,7 +957,7 @@ export interface Gift {
     accountId: string,
     walletName: string
   },
-  receiver?: {
+  receiver: {
     walletId?: string,
     accountId?: string,
     walletName?: string,

@@ -100,7 +100,18 @@ export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WAL
 
 function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const accounts: Accounts = accountsState.accounts
+  let defaultCheckingAccount: Account
+  for( const accountId in accounts ){
+    const account = accounts[ accountId ]
+    if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
+      defaultCheckingAccount= account
+      break
+    }
+  }
 
+  let giftImportedToAccount = false
   for ( const channelKey of  Object.keys( trustedContacts ) ){
     const contact = trustedContacts[ channelKey ]
     const instreamId = contact.streamId
@@ -111,11 +122,29 @@ function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
           if( !storedGifts[ gift.id ] ){
             gift.status = GiftStatus.CLAIMED
             gift.type = GiftType.RECEIVED
+
+            AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address )
+            giftImportedToAccount = true
+            gift.receiver.accountId = defaultCheckingAccount.id
+
             yield put( addNewGift( gift ) )
           }
         }
       }
     }
+  }
+
+  if( giftImportedToAccount ){
+    yield put( updateAccountShells( {
+      accounts: {
+        [ defaultCheckingAccount.id ]: defaultCheckingAccount
+      }
+    } ) )
+    yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
+    yield put( updateWalletImageHealth( {
+      updateAccounts: true,
+      accountIds: [ defaultCheckingAccount.id ]
+    } ) )
   }
 }
 
