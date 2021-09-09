@@ -63,9 +63,9 @@ import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/Accou
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
-  const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
+  const derivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, derivationPath )
   const secondaryShards = secrets.share(
     BHROperations.stringToHex( secondaryMnemonic ),
     config.SSS_LEVEL1_TOTAL,
