@@ -772,7 +772,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         switch( accountType ){
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
-              defaultAccountDescription = 'Register to use\nthis account'
+              defaultAccountDescription = 'Register\nand claim $10'
               break
 
             case AccountType.DEPOSIT_ACCOUNT:
