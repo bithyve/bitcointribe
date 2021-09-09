@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useCallback } from 'react'
+import React, { useMemo, useEffect, useCallback, useState } from 'react'
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
@@ -19,7 +19,7 @@ import Fonts from '../../../common/Fonts'
 import { useSelector, useDispatch } from 'react-redux'
 import { markReadTx } from '../../../store/actions/accounts'
 import { update } from '../../../storage/database'
-import { TransactionType } from '../../../bitcoin/utilities/Interface'
+import { Account, TransactionType } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
@@ -36,6 +36,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   const strings  = translations[ 'stackTitle' ]
 
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const account: Account = useSelector( state => state.accounts.accounts[ primarySubAccount.id ] )
 
   useEffect( () => {
     if( transaction.isNew ) dispatch( markReadTx( transaction.txid, accountShellID ) )
@@ -170,6 +171,13 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
           <Text style={ListStyles.listItemTitleTransaction}>{common.confirmations}</Text>
           <Text style={ListStyles.listItemSubtitle}>{confirmationsText()}</Text>
         </View>
+
+        {account.transactionsNote[ transaction.txid ]?
+          <View style={styles.lineItem}>
+            <Text style={ListStyles.listItemTitleTransaction}>{common.note}</Text>
+            <Text style={ListStyles.listItemSubtitle}>{account.transactionsNote[ transaction.txid ]}</Text>
+          </View>
+          : null}
 
       </View>
     </ScrollView>

@@ -148,12 +148,14 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   function handleConfirmationButtonPress() {
     if( sourceAccountShell.primarySubAccount.isTFAEnabled )
       navigation.navigate( 'OTPAuthentication', {
-        txnPriority: transactionPriority
+        txnPriority: transactionPriority,
+        note
       } )
     else
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: transactionPriority,
+        note
       } ) )
   }
 

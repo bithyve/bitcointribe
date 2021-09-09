@@ -32,6 +32,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 
 export default function OTPAuthenticationScreen( { navigation } ) {
   const txnPriority = navigation.getParam( 'txnPriority' )
+  const note = navigation.getParam( 'note' )
   const [ Elevation, setElevation ] = useState( 10 )
   const [ token, setToken ] = useState( '' )
   const [ tokenArray, setTokenArray ] = useState( [ '' ] )
@@ -367,7 +368,8 @@ export default function OTPAuthenticationScreen( { navigation } ) {
                 dispatch( executeSendStage2( {
                   accountShell: sourceAccountShell,
                   txnPriority,
-                  token: parseInt( token )
+                  token: parseInt( token ),
+                  note
                 } ) )
               }}
               style={{
