@@ -789,8 +789,12 @@ export interface UTXO {
   status?: any;
 }
 
+
+export enum ActiveAddressAssigneeType  {
+    GIFT = 'GIFT'
+}
 export interface ActiveAddressAssignee{
-    type: AccountType;
+    type: AccountType | ActiveAddressAssigneeType;
     id?: string;
     senderInfo?: {
       name: string,

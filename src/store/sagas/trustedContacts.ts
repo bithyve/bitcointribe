@@ -40,6 +40,7 @@ import {
   Gift,
   GiftStatus,
   GiftType,
+  ActiveAddressAssigneeType,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -123,7 +124,13 @@ function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
             gift.status = GiftStatus.CLAIMED
             gift.type = GiftType.RECEIVED
 
-            AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address )
+            AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address, {
+              type: ActiveAddressAssigneeType.GIFT,
+              id: gift.id,
+              senderInfo: {
+                name: gift.sender.walletName
+              }
+            } )
             giftImportedToAccount = true
             gift.receiver.accountId = defaultCheckingAccount.id
 

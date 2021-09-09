@@ -192,6 +192,10 @@ export default class AccountUtilities {
         return AccountUtilities.getPrivateKeyByIndex( xpriv, true, itr, network )
     }
 
+    for( const importedAddress in account.importedAddresses ){
+      if( address === importedAddress ) return account.importedAddresses[ importedAddress ].privateKey
+    }
+
     throw new Error( 'Could not find private key for: ' + address )
   };
 

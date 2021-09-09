@@ -88,10 +88,14 @@ export default class AccountOperations {
     }
   };
 
-  static importAddress = async ( account: Account | MultiSigAccount, privateKey: string, address: string ) => {
+  static importAddress = async ( account: Account | MultiSigAccount, privateKey: string, address: string, requester: ActiveAddressAssignee ) => {
     account.importedAddresses[ address ] = {
       address,
       privateKey
+    }
+    account.activeAddresses.external[ address ] = {
+      index: -1,
+      assignee: requester
     }
   }
 
@@ -151,6 +155,12 @@ export default class AccountOperations {
         externalAddresses[ address ] = itr
         ownedAddresses.push( address )
       }
+
+      // include imported external addresses
+      Object.keys( account.importedAddresses ).forEach( address => {
+        externalAddresses[ address ] = -1
+        ownedAddresses.push( address )
+      } )
 
       const internalAddresses :{[address: string]: number}  = {
       }// all internal addresses(till closingIntIndex)
@@ -1029,6 +1039,8 @@ export default class AccountOperations {
         walletId: walletDetails.walletId,
         walletName: walletDetails.walletName,
         accountId: account.id,
+      },
+      receiver: {
       }
     }
 
