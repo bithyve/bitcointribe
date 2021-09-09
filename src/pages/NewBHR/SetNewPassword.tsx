@@ -543,11 +543,15 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                 // setConfirmPswdMasked( text )
               }}
               onBlur={() => {
+                setShowNote( true )
                 let temp = ''
                 for ( let i = 0; i < hintText.length; i++ ) {
                   temp += '*'
                 }
                 setHintMasked( temp )
+              }}
+              onFocus={() => {
+                setShowNote( false )
               }}
             />
             {hintText ? (
@@ -603,7 +607,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
         </View> : null}
-        <View style={{
+        {showNote ? ( <View style={{
           marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
           marginBottom: hp( 1 )
         }}>
@@ -613,7 +617,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             italicText={''}
             backgroundColor={Colors.white}
           />
-        </View>
+        </View> ) : null }
       </KeyboardAwareScrollView>
       // </ScrollView>
     )
@@ -934,7 +938,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
           </View> : null}
-          <View style={{
+          {showNote ? ( <View style={{
             marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
             marginBottom: hp( 1 )
           }}>
@@ -944,7 +948,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               italicText={''}
               backgroundColor={Colors.white}
             />
-          </View>
+          </View> ): null }
         </View>
       </KeyboardAwareScrollView>
     )

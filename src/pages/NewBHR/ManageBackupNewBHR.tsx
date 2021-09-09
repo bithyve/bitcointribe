@@ -226,9 +226,6 @@ class ManageBackupNewBHR extends Component<
       this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
-          this.setState( {
-            showLoader: true
-          } )
           this.props.setLevelToNotSetupStatus()
           this.props.modifyLevelData()
         } else {
