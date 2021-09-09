@@ -153,7 +153,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }}>{swanMessage}</Text>
           {showNote &&
             <BottomInfoBox
-              backgroundColor={Colors.white}
+              // backgroundColor={Colors.white}
               title={'Note'}
               infoText={
                 'Please login/register your Swan Bitcoin Account to use this wallet'
