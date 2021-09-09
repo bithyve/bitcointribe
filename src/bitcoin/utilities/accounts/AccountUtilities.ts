@@ -944,8 +944,7 @@ export default class AccountUtilities {
   ): Promise<{
     secret: any;
   }> => {
-    const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 ) )
     if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
 
     let res: AxiosResponse
@@ -971,11 +970,11 @@ export default class AccountUtilities {
   ): {
     secondaryXpriv: string
   } => {
-    const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+    const derivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, derivationPath )
     if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
 
-    const secondaryXpriv = AccountUtilities.generateExtendedKey( secondaryMnemonic, true, network, rootDerivationPath )
+    const secondaryXpriv = AccountUtilities.generateExtendedKey( secondaryMnemonic, true, network, derivationPath )
     return {
       secondaryXpriv
     }
