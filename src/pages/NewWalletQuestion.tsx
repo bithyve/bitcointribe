@@ -727,14 +727,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           marginTop: showNote ? hp( '0%' ) :hp( '2%' ),
           marginBottom: hp( 1 )
         }}>
-          {/* {pswd.length === 0 && confirmPswd.length === 0 && */}
+          {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
             title={common.note}
             infoText={strings.Makesure}
             italicText={''}
             backgroundColor={Colors.white}
           />
-          {/* } */}
+          }
         </View>
           }
         </View>
