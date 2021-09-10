@@ -1013,8 +1013,10 @@ export default class AccountOperations {
     gift: Gift;
    }> => {
 
-    const keyPair = bitcoinJS.ECPair.makeRandom()
     const network = AccountUtilities.getNetworkByType( account.networkType )
+    const keyPair = bitcoinJS.ECPair.makeRandom( {
+      network: network
+    } )
 
     const address = AccountUtilities.deriveAddressFromKeyPair(
       keyPair,
