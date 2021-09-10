@@ -13,7 +13,7 @@ import {
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 
-export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subText, isSelected, index } ) {
+export default function CardWithRadioBtn( { setActiveIndex, geticon, mainText, subText, isSelected, index } ) {
   return (
     <TouchableOpacity
       onPress={() => setActiveIndex( index )}
@@ -57,14 +57,10 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
           />
           }
         </View>
-        {icon !== '' &&
-        <Image
-          style={{
-            width: 27, height: 27, resizeMode: 'contain', marginLeft: wp( '3%' )
-          }}
-          source={icon}
-        />
-        }
+        {/* {icon !== '' &&
+        <icon />
+        } */}
+        {geticon()}
         <View style={{
           marginLeft: wp( '4%' )
         }}>

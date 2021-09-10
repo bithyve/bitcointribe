@@ -48,6 +48,11 @@ import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 
+import PassActive from '../assets/images/svgs/icon_password_active.svg'
+import PassInActive from '../assets/images/svgs/icon_password.svg'
+import QueActive from '..assets/images/svgs/icon_question_active.svg'
+import QueInActive from '../assets/images/svgs/icon_question.svg'
+
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
 }
@@ -1244,21 +1249,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               step={''}
             />
             <CardWithRadioBtn
-              icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
+              geticon={() => {if( activeIndex === 0 ) { return <QueInActive /> } else { <QueInActive />}}}
               mainText={'Answer a Security Question'}
               subText={'Easier to remember. Recommended'}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
               index={0}
             />
-            <CardWithRadioBtn
-              icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
+            {/* <CardWithRadioBtn
+              icon={activeIndex === 1 ? PassActive : PassInActive}
               mainText={'Use your own encryption password'}
               subText={'Create a password. Make sure to remember it'}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
-            />
+            /> */}
           </TouchableOpacity>
 
         </View>
