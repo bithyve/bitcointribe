@@ -21,6 +21,7 @@ const ListStyles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.1
   },
   listItemTitleTransaction: {
     color: Colors.blue,

@@ -98,7 +98,7 @@ const HistoryPageComponent = ( props ) => {
         <View style={{
           flex: 1
         }}>
-          <ScrollView>
+          {/* <ScrollView>
             {[ 1, 2, 3, 4 ].map( ( index ) => {
               return (
                 <View style={styles.waterMarkCard} key={index}>
@@ -109,9 +109,9 @@ const HistoryPageComponent = ( props ) => {
                 </View>
               )
             } )}
-          </ScrollView>
+          </ScrollView> */}
           <View style={{
-            backgroundColor: Colors.backgroundColor
+            backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
           }}>
             <BottomInfoBox
               backgroundColor={Colors.white}
@@ -189,7 +189,6 @@ const HistoryPageComponent = ( props ) => {
               </TouchableOpacity>
             ) : null}
           {!props.isVersionMismatch &&
-          props.IsReshare &&
           props.isChangeKeeperAllow ? (
               <TouchableOpacity
                 disabled={props.disableChange ? props.disableChange : false}

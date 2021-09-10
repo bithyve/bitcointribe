@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   StyleSheet,
   Text,
@@ -19,6 +19,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { storeCreds } from '../store/actions/setupAndAuth'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function PasscodeConfirm( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -26,6 +27,9 @@ export default function PasscodeConfirm( props ) {
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 )
   // const iCloud = NativeModules.iCloud
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
 
   function onPressNumber( text ) {
     let tmpPasscode = passcode
@@ -98,10 +102,10 @@ export default function PasscodeConfirm( props ) {
       } }>
         <View style={ {
         } }>
-          <Text style={ styles.headerTitleText }>Hello!</Text>
+          <Text style={ styles.headerTitleText }>{strings.Hello}</Text>
           <View>
             <Text style={ styles.headerInfoText }>
-              Create a login <Text style={ styles.boldItalicText }>passcode</Text>
+              {strings.create} <Text style={ styles.boldItalicText }>{strings.passcode}</Text>
             </Text>
 
             <View>
@@ -241,8 +245,7 @@ export default function PasscodeConfirm( props ) {
           { passcode.length == 4 ? (
             <View>
               <Text style={ styles.headerInfoText }>
-                Re-enter the <Text style={ styles.boldItalicText }>passcode </Text>
-                to<Text style={ styles.boldItalicText }> verify and login</Text>
+                {strings.reEnter}
               </Text>
               <View>
                 <View style={ {
@@ -444,7 +447,7 @@ export default function PasscodeConfirm( props ) {
                     passcode == confirmPasscode ? Colors.blue : Colors.lightBlue
                 } }
               >
-                <Text style={ styles.proceedButtonText }>Proceed</Text>
+                <Text style={ styles.proceedButtonText }>{common.proceed}</Text>
               </TouchableOpacity>
             </View>
           ) : null }

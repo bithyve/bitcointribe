@@ -379,7 +379,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
-      console.log( 'focusListenerfocusListenerfocusListenerfocusListenerfocusListenerfocusListener' )
 
       this.setCurrencyCodeFromAsync()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
@@ -647,7 +646,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: widthPercentageToDP ( 2 )
   },
   accountCardsSectionContainer: {
-    height: hp( '70.83%' ),
+    height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,

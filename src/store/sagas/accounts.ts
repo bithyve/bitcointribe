@@ -44,6 +44,7 @@ import {
   accountChecked,
   autoSyncShells,
   setResetTwoFALoader,
+  recomputeNetBalance,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -480,7 +481,7 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   const accountState: AccountsState = yield select(
     ( state ) => state.accounts
   )
-
+  const accountIds = []
   const accounts: Accounts = accountState.accounts
   const accountsToSync: Accounts = {
   }
@@ -499,10 +500,23 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
     accounts: synchedAccounts
   } ) )
   yield put( accountShellRefreshCompleted( accountShells ) )
+
+  let computeNetBalance = false
   for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
     yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
+    if( ( synchedAcc as Account ).hasNewTxn ) {
+      accountIds.push( ( synchedAcc as Account ).id )
+      computeNetBalance = true
+    }
   }
-  yield put( updateWalletImageHealth() )
+  if( accountIds.length > 0 ) {
+    yield put( updateWalletImageHealth( {
+      updateAccounts: true,
+      accountIds: accountIds
+    } ) )
+  }
+
+  if( computeNetBalance ) yield put( recomputeNetBalance() )
 
   // update F&F channels if any new txs found on an assigned address
   if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
@@ -720,7 +734,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.SAVINGS_ACCOUNT,
           instanceNum: savingsInstanceCount,
           accountName: accountName? accountName: 'Savings Account',
-          accountDescription: accountDescription? accountDescription: 'Level up to use\nthis account',
+          accountDescription: accountDescription? accountDescription: 'Available after\nLevel 2 Backup',
           primarySeed,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.secondaryXpub,
@@ -758,7 +772,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         switch( accountType ){
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
-              defaultAccountDescription = 'Register to use\nthis account'
+              defaultAccountDescription = 'Register\nand claim $10'
               break
 
             case AccountType.DEPOSIT_ACCOUNT:
@@ -794,10 +808,11 @@ export interface newAccountsInfo {
   accountDetails?: newAccountDetails
 }
 
-export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[]} ) {
+export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[], } ) {
   const newAccountShells: AccountShell[] = []
   const accounts = {
   }
+  const accountIds = []
   let testcoinsToAccount
 
   for ( const { accountType, accountDetails } of newAccountsInfo ){
@@ -807,7 +822,7 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
       accountDetails || {
       }
     )
-
+    accountIds.push( account.id )
     const accountShell = yield call( generateShellFromAccount, account )
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
@@ -839,7 +854,10 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   yield call( dbManager.updateWallet, {
     accounts: presentAccounts
   } )
-  yield put( updateWalletImageHealth() )
+  yield put( updateWalletImageHealth( {
+    updateAccounts: true,
+    accountIds: accountIds
+  } ) )
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
@@ -873,7 +891,10 @@ function* updateAccountSettingsWorker( { payload }: {
       }
     } ) )
     yield call( dbManager.updateAccount, account.id, account )
-    yield put( updateWalletImageHealth() )
+    yield put( updateWalletImageHealth( {
+      updateAccounts: true,
+      accountIds: [ account.id ]
+    } ) )
     if( visibility === AccountVisibility.DEFAULT ) {
       yield put( accountSettingsUpdated() )
     }

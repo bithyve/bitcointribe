@@ -124,7 +124,7 @@ function SecurityQuestion( props ) {
               ...styles.modalInfoText,
             }}>: Confirm Security Question</Text>
           </View>
-          <ScrollView style={{
+          <View style={{
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
           }}>
             <View style={styles.dropdownBox}>
@@ -201,7 +201,7 @@ function SecurityQuestion( props ) {
                 </Text>
               </View>
             )}
-          </ScrollView>
+          </View>
         </View>
         <View style={[ styles.statusIndicatorView, {
           marginTop: `${height}%`

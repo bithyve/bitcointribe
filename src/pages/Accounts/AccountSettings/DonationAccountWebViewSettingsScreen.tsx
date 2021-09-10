@@ -49,6 +49,12 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
   const [ isDonationTotalEnable, setIsDonationTotalEnable ] = useState(
     donationAccount.configuration.displayBalance
   )
+  const [ isIncomingTxnEnabled, setIsIncomingTxnEnabled ] = useState(
+    donationAccount.configuration.displayIncomingTxs
+  )
+  const [ isOutgoingTxnEnabled, setIsOutgoingTxnEnabled ] = useState(
+    donationAccount.configuration.displayOutgoingTxs
+  )
 
   const [ disableSave, setDisableSave ] = useState( true )
   const [ doneeName, setDoneeName ] = useState( donationAccount.donee )
@@ -75,10 +81,14 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     }
 
     if (
-      isDonationTotalEnable !== donationAccount.configuration.displayBalance
+      isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
+      isIncomingTxnEnabled !== donationAccount.configuration.displayIncomingTxs ||
+      isOutgoingTxnEnabled !== donationAccount.configuration.displayOutgoingTxs
     ) {
       const configuration = {
         displayBalance: isDonationTotalEnable,
+        displayIncomingTxs: isIncomingTxnEnabled,
+        displayOutgoingTxs: isOutgoingTxnEnabled,
       }
 
       preferences = preferences
@@ -124,6 +134,8 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
       ( description && description !== donationAccount.accountDescription ) ||
       ( cause && cause !== donationAccount.accountName ) ||
       isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
+      isIncomingTxnEnabled !== donationAccount.configuration.displayIncomingTxs ||
+      isOutgoingTxnEnabled !== donationAccount.configuration.displayOutgoingTxs ||
       isDonationPause !== donationAccount.disableAccount
     ) {
       setDisableSave( false )
@@ -136,6 +148,8 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     cause,
     isDonationPause,
     isDonationTotalEnable,
+    isIncomingTxnEnabled,
+    isOutgoingTxnEnabled,
   ] )
 
   return (
@@ -299,6 +313,77 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                   setIsDonationTotalEnable( ( prevState ) => !prevState )
                 }
                 isOn={isDonationTotalEnable}
+              />
+            </View>
+
+            <View style={{
+              ...styles.rowContainer, marginTop: 10
+            }}>
+              <Image
+                style={styles.imageStyle}
+                source={require( '../../../assets/images/icons/icon_donation_total.png' )}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.titleTextStyle}>Incoming Transactions</Text>
+                <Text
+                  style={{
+                    ...styles.modalInfoText,
+                    marginTop: wp( '1.2%' ),
+                    color: Colors.lightTextColor,
+                  }}
+                >
+                  Show incoming donation transactions
+                </Text>
+              </View>
+              <CurrencyKindToggleSwitch
+                changeSettingToggle={true}
+                thumbSize={wp( '6%' )}
+                isNotImage={true}
+                trackColor={Colors.lightBlue}
+                thumbColor={
+                  isIncomingTxnEnabled ? Colors.blue : Colors.white
+                }
+                onpress={() =>{
+                  if( isIncomingTxnEnabled ) setIsOutgoingTxnEnabled( false )
+                  setIsIncomingTxnEnabled( ( prevState ) => !prevState )
+                }
+                }
+                isOn={isIncomingTxnEnabled}
+              />
+            </View>
+
+            <View style={{
+              ...styles.rowContainer, marginTop: 10
+            }}>
+              <Image
+                style={styles.imageStyle}
+                source={require( '../../../assets/images/icons/icon_donation_total.png' )}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.titleTextStyle}>Outgoing Transactions</Text>
+                <Text
+                  style={{
+                    ...styles.modalInfoText,
+                    marginTop: wp( '1.2%' ),
+                    color: Colors.lightTextColor,
+                  }}
+                >
+                  Show outgoing donation transactions
+                </Text>
+              </View>
+              <CurrencyKindToggleSwitch
+                changeSettingToggle={true}
+                thumbSize={wp( '6%' )}
+                isNotImage={true}
+                trackColor={Colors.lightBlue}
+                thumbColor={
+                  isOutgoingTxnEnabled ? Colors.blue : Colors.white
+                }
+                onpress={() => {
+                  if( isIncomingTxnEnabled || isOutgoingTxnEnabled ) setIsOutgoingTxnEnabled( ( prevState ) => !prevState )
+                }
+                }
+                isOn={isOutgoingTxnEnabled}
               />
             </View>
 

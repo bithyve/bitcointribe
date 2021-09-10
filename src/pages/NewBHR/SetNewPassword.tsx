@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import {
   StyleSheet,
   View,
@@ -41,6 +41,7 @@ import { updateCloudPermission } from '../../store/actions/BHR'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -60,6 +61,9 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 export default function SetNewPassword( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName?: any } ) => void, goBack: () => any; } } ) {
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
   const message = 'Setting Up password'
   const subTextMessage = 'Setting Up password for backup encryption'
   const [ Elevation, setElevation ] = useState( 10 )
@@ -72,6 +76,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     question: '',
   } )
   const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
+  const [ hintInputStyle, setHintInputStyle ] = useState( styles.inputBox )
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
     styles.inputBox,
@@ -118,7 +123,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const setupPasswordStatus = useSelector( ( state ) => state.bhr.loading.setupPasswordStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.bhr.cloudPermissionGranted )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
-
+  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -140,7 +145,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   }, [] )
 
   useEffect( () =>{
-    if( !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo[ 0 ].status !=='notSetup' ){
+    if( !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !=='notSetup' ){
       setLoaderModal( false )
       props.navigation.goBack()
     }
@@ -167,7 +172,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
   useEffect( ()=>{
     if( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true && !isSkipClicked && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+      cloudPermissionGranted === true && !isSkipClicked && ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) ) ){
       dispatch( setCloudData() )
     }
   }, [ cloudPermissionGranted, levelHealth ] )
@@ -312,21 +317,18 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
   const renderEncryptionPswd = () => {
     return(
-      // <ScrollView >
       <KeyboardAwareScrollView
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled
+        scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
-
         }}
       >
         <View style={{
-          flex: 1
+          height: hp( '72%' )
         }}>
           <TouchableOpacity
             activeOpacity={1}
@@ -348,21 +350,21 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Use your own{'\n'}encryption password</Text>
+          }} >{strings.encryptionpassword}</Text>
           <View
             style={{
-              ...answerInputStyle,
+              ...pswdInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: pswdError ? Colors.red : Colors.borderColor,
+              borderColor: pswdError ? Colors.red : Colors.white,
               marginTop: 10,
               backgroundColor: Colors.white
             }}
           >
             <TextInput
               style={styles.modalInputBox}
-              placeholder={'Enter your password'}
+              placeholder={strings.Enteryourpassword}
               placeholderTextColor={Colors.borderColor}
               value={hideShowPswd ? pswdMasked : pswd}
               autoCompleteType="off"
@@ -380,7 +382,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text )
+                setPswd( text.toLowerCase() )
                 setPswdMasked( text )
                 // setPswdError( '' )
               }}
@@ -425,11 +427,11 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           </View>
           <View
             style={{
-              ...answerInputStyle,
+              ...confirmPswdInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: pswdError ? Colors.red : Colors.borderColor,
+              borderColor: pswdError ? Colors.red : Colors.white,
               marginTop: 10,
               backgroundColor: Colors.white
             }}
@@ -437,7 +439,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             <TextInput
               style={styles.modalInputBox}
               ref={confirmPswdTextInput}
-              placeholder={'Confirm your password'}
+              placeholder={strings.Confirmyourpassword}
               placeholderTextColor={Colors.borderColor}
               value={hideShowConfirmPswd ? confirmPswdMasked : tempPswd}
               autoCompleteType="off"
@@ -506,16 +508,16 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
               {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              Numbers or special characters are not supported
+              {strings.Numbersorspecial}
             </Text>
           )}
           <View
             style={{
-              ...answerInputStyle,
+              ...hintInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: Colors.borderColor,
+              borderColor: Colors.backgroundColor1,
               marginVertical: 10,
               backgroundColor: Colors.white
             }}
@@ -523,9 +525,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             <TextInput
               style={styles.modalInputBox}
               ref={hint}
-              placeholder={'Add a hint'}
+              placeholder={strings.Addhint}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowHint ? hintMasked : hintText}
+              value={hintText}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
@@ -539,18 +541,18 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               }
               onChangeText={( text ) => {
                 setHint( text )
-                setHintMasked( text )
-                // setConfirmPswdMasked( text )
+              }}
+              onFocus={() => {
+                setShowNote( false )
+                setHintInputStyle( styles.inputBoxFocused )
               }}
               onBlur={() => {
-                let temp = ''
-                for ( let i = 0; i < hintText.length; i++ ) {
-                  temp += '*'
-                }
-                setHintMasked( temp )
-              }}
+                setShowNote( true )
+                setHintInputStyle( styles.inputBox )
+              }
+              }
             />
-            {hintText ? (
+            {/* {hintText ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowHint( !hideShowHint )
@@ -567,55 +569,59 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   name={hideShowHint ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
-            ) : null}
+            ) : null} */}
           </View>
-        </View>
-        <View
-          style={{
-            marginLeft: 20,
-            marginRight: 20,
-            flexDirection: 'row',
-          }}
-        >
-          <Text
+
+          <View
             style={{
-              color: Colors.red,
-              fontFamily: Fonts.FiraSansMediumItalic,
-              fontSize: RFValue( 10 ),
-              marginLeft: 'auto',
+              marginLeft: 20,
+              marginRight: 20,
+              flexDirection: 'row',
             }}
           >
-            {pswdError}
-          </Text>
-        </View>
-        {showNote ? <View style={{
-          ...styles.bottomButtonView,
-        }}>
-          {(
-            pswd.trim() === confirmPswd.trim() &&
+            <Text
+              style={{
+                color: Colors.red,
+                fontFamily: Fonts.FiraSansMediumItalic,
+                fontSize: RFValue( 10 ),
+                marginLeft: 'auto',
+              }}
+            >
+              {pswdError}
+            </Text>
+          </View>
+          {showNote ? <View style={{
+            ...styles.bottomButtonView,
+          }}>
+            {(
+              pswd.trim() === confirmPswd.trim() &&
             confirmPswd.trim() &&
             pswd.trim() && pswdError.length === 0 && hintText.length > 0
-          ) && (
-            setButtonVisible()
-          ) || null}
-          {/* <View style={styles.statusIndicatorView}>
+            ) && (
+              setButtonVisible()
+            ) || null}
+            {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
-        </View> : null}
+          </View> : null}
+          {showNote &&
         <View style={{
-          marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+          marginTop: showNote ? hp( '0%' ) :hp( '2%' ),
           marginBottom: hp( 1 )
         }}>
+          {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
-            title={'Note'}
-            infoText={'Make sure you remember the encryption password and keep it safe'}
+            title={common.note}
+            infoText={strings.Makesure}
             italicText={''}
             backgroundColor={Colors.white}
           />
+          }
+        </View>
+          }
         </View>
       </KeyboardAwareScrollView>
-      // </ScrollView>
     )
   }
 
@@ -626,16 +632,16 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled
+        scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
-          backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
+          backgroundColor: Colors.bgColor,
+          // height: `${height}%`
 
         }}
       >
         <View style={{
-          flex: 1
+          height: hp( '72%' ),
         }}>
           <TouchableOpacity
             activeOpacity={1}
@@ -657,7 +663,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Answer{'\n'}a Security Question</Text>
+          }} >{strings.AnswerSecurityQuestion}</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -673,7 +679,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             <Text style={styles.dropdownBoxText}>
               {dropdownBoxValue.question
                 ? dropdownBoxValue.question
-                : 'Select Question'}
+                : strings.SelectQuestion}
             </Text>
             <Ionicons
               style={{
@@ -746,13 +752,13 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingRight: 15,
-                  borderColor: answerError ? Colors.red : Colors.borderColor,
+                  borderColor: answerError ? Colors.red : Colors.white,
                   backgroundColor: Colors.white
                 }}
               >
                 <TextInput
                   style={styles.modalInputBox}
-                  placeholder={'Enter your answer'}
+                  placeholder={strings.Enteryouranswer}
                   placeholderTextColor={Colors.borderColor}
                   value={hideShowAnswer ? answerMasked : answer}
                   autoCompleteType="off"
@@ -819,14 +825,14 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   alignItems: 'center',
                   paddingRight: 15,
                   marginTop: 10,
-                  borderColor: answerError ? Colors.red : Colors.borderColor,
+                  borderColor: answerError ? Colors.red : Colors.white,
                   backgroundColor: Colors.white
                 }}
               >
                 <TextInput
                   style={styles.modalInputBox}
                   ref={confirmAnswerTextInput}
-                  placeholder={'Confirm your answer'}
+                  placeholder={strings.Confirmyouranswer}
                   placeholderTextColor={Colors.borderColor}
                   value={
                     hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
@@ -891,7 +897,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
               {answerError.length == 0 && (
                 <Text style={styles.helpText}>
-              Answers must contain only lower case alphabets and numbers
+                  {strings.Answersmust1}
                 </Text>
               )}
             </View>
@@ -934,17 +940,21 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
           </View> : null}
+          {showNote &&
           <View style={{
-            marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+            marginTop: showNote ? hp( '0%' ) : hp( '2%' ),
             marginBottom: hp( 1 )
           }}>
+            {answer.length === 0 && confirmAnswer.length === 0 &&
             <BottomInfoBox
-              title={'Note'}
-              infoText={'The Answer is used to encrypt the backup. The security Question acts as a hint to remember the same'}
+              title={common.note}
+              infoText={strings.TheAnswer}
               italicText={''}
               backgroundColor={Colors.white}
             />
+            }
           </View>
+          }
         </View>
       </KeyboardAwareScrollView>
     )
@@ -1005,16 +1015,16 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             />
             <CardWithRadioBtn
               icon={activeIndex === 0 ? require( '../../assets/images/icons/icon_questions.png' ) : require( '../../assets/images/icons/question_inactive.png' )}
-              mainText={'Answer a Security Question'}
-              subText={'Easier to remember. Recommended'}
+              mainText={strings.AnsweraSecurityQuestion}
+              subText={strings.Easiertoremember}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
               index={0}
             />
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../../assets/images/icons/icon_password_active.png' ) : require( '../../assets/images/icons/icon_password.png' )}
-              mainText={'Use your own encryption password'}
-              subText={'Choose any password. Make sure you remember and keep it safe'}
+              mainText={strings.Useencryptionpassword}
+              subText={strings.Createapassword}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
@@ -1024,11 +1034,11 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         </View>
       </ScrollView>
 
-      <View style={styles.statusIndicatorView}>
+      {/* <View style={styles.statusIndicatorView}>
         <View style={styles.statusIndicatorInactiveView} />
         <View style={styles.statusIndicatorInactiveView} />
         <View style={styles.statusIndicatorActiveView} />
-      </View>
+      </View> */}
       {showNote && !visibleButton ? (
         <View
           style={{
@@ -1037,8 +1047,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           }}
         >
           <BottomInfoBox
-            title={'Note'}
-            infoText={'Initial cloud backup ensures you have a way to recover if you lose your phone. You can change this from the '}
+            title={common.note}
+            infoText={`${strings.Backuplets} `}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />
@@ -1086,7 +1096,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 const styles = StyleSheet.create( {
   dropdownBox: {
     flexDirection: 'row',
-    borderColor: Colors.borderColor,
+    borderColor: Colors.white,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1100,7 +1110,7 @@ const styles = StyleSheet.create( {
   },
   dropdownBoxOpened: {
     flexDirection: 'row',
-    borderColor: Colors.borderColor,
+    borderColor: Colors.white,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1182,7 +1192,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2
+      width: 10, height: 10
     },
     backgroundColor: Colors.white,
   },
@@ -1221,12 +1231,13 @@ const styles = StyleSheet.create( {
   },
 
   helpText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansItalic,
     marginRight: wp( 5 ),
     alignSelf: 'flex-end',
-    width: wp( '72%' ),
-    textAlign: 'right'
+    width: wp( '54%' ),
+    textAlign: 'right',
+    marginTop: hp( 0.5 )
   }
 } )

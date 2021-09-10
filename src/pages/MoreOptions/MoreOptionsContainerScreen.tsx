@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useContext } from 'react'
 import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
@@ -18,6 +18,15 @@ import Node from '../../assets/images/svgs/node.svg'
 import Wallet from '../../assets/images/svgs/icon_settings.svg'
 import AppInfo from '../../assets/images/svgs/icon_info.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
+import { LocalizationContext } from '../../common/content/LocContext'
+import Languages from '../../common/content/availableLanguages'
+
+import ModalContainer from '../../components/home/ModalContainer'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation: any;
@@ -28,11 +37,28 @@ interface MenuOption {
   title: string;
   subtitle: string;
   screenName?: string;
+  name ?: string,
   onOptionPressed?: () => void;
   // isSwitch: boolean;
 }
 
-const menuOptions: MenuOption[] = [
+const listItemKeyExtractor = ( item: MenuOption ) => item.title
+
+const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  const {
+    translations,
+    appLanguage,
+    setAppLanguage,
+  } = useContext( LocalizationContext )
+  // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
+  const [ isEnabled, setIsEnabled ] = useState( false )
+  const [ showLangModal, setShowLangModal ] = useState( false )
+  const toggleSwitch = () => setIsEnabled( previousState => !previousState )
+  const currencyCode = useSelector(
+    ( state ) => state.preferences.currencyCode,
+  )
+  const strings = translations[ 'settings' ]
+  const menuOptions: MenuOption[] = [
   // {
   //   title: 'Use FaceId',
   //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
@@ -47,13 +73,13 @@ const menuOptions: MenuOption[] = [
   //   // screenName: 'FriendsAndFamily',
   //   isSwitch: true
   // },
-  {
-    title: 'Account Management',
-    // imageSource: AccManagement,
-    subtitle: 'View and manage your accounts',
-    screenName: 'AccountManagement',
-  },
-  /*
+    {
+      title: 'Account Management',
+      // imageSource: AccManagement,
+      subtitle: 'View and manage your accounts',
+      screenName: 'AccountManagement',
+    },
+    /*
   Commenting this out as per https://github.com/bithyve/hexa/issues/2560
   leaving the option here so that it can be enabled in a future release.
 
@@ -64,12 +90,12 @@ const menuOptions: MenuOption[] = [
     screenName: 'FriendsAndFamily',
   },
   */
-  {
-    title: 'Node Settings',
-    subtitle: 'Connect Hexa wallet to your own node',
-    screenName: 'NodeSettings',
-  },
-  /*
+    {
+      title: 'Node Settings',
+      subtitle: 'Connect Hexa wallet to your own node',
+      screenName: 'NodeSettings',
+    },
+    /*
   Commenting this out as per https://github.com/bithyve/hexa/issues/2560
   leaving the option here so that it can be enabled in a future release.
 
@@ -80,40 +106,34 @@ const menuOptions: MenuOption[] = [
     screenName: 'FundingSources',
   },
   */
-  // {
-  //   title: 'Hexa Community (Telegram)',
-  //   imageSource: require( '../../assets/images/icons/telegram.png' ),
-  //   subtitle: 'Questions, feedback and more',
-  //   onOptionPressed: () => {
-  //     Linking.openURL( 'https://t.me/HexaWallet' )
-  //       .then( ( _data ) => { } )
-  //       .catch( ( _error ) => {
-  //         alert( 'Make sure Telegram installed on your device' )
-  //       } )
-  //   },
-  // },
-  {
-    title: 'Wallet Settings',
-    subtitle: 'Your wallet settings & preferences',
-    screenName: 'WalletSettings',
-  },
-  {
-    title: 'App Info',
-    subtitle: 'Hexa app version number and details',
-    screenName: 'AppInfo',
-  },
-]
+    // {
+    //   title: 'Hexa Community (Telegram)',
+    //   imageSource: require( '../../assets/images/icons/telegram.png' ),
+    //   subtitle: 'Questions, feedback and more',
+    //   onOptionPressed: () => {
+    //     Linking.openURL( 'https://t.me/HexaWallet' )
+    //       .then( ( _data ) => { } )
+    //       .catch( ( _error ) => {
+    //         alert( 'Make sure Telegram installed on your device' )
+    //       } )
+    //   },
+    // },
+    {
+      title: 'Wallet Settings',
+      subtitle: 'Your wallet settings & preferences',
+      screenName: 'WalletSettings',
+    },
+    {
+      title: 'App Info',
+      subtitle: 'Hexa app version number and details',
+      screenName: 'AppInfo',
+    },
+  ]
 
-const listItemKeyExtractor = ( item: MenuOption ) => item.title
+  const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-  const [ isEnabled, setIsEnabled ] = useState( false )
-  const toggleSwitch = () => setIsEnabled( previousState => !previousState )
-  const currencyCode = useSelector(
-    ( state ) => state.preferences.currencyCode,
-  )
 
+  //const [ strings, setstrings ] = useState( content.settings )
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
@@ -150,7 +170,52 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
       <View style={styles.accountCardsSectionContainer}>
-
+        <ModalContainer visible={showLangModal} closeBottomSheet={() => {setShowLangModal( false )}} >
+          <View style={styles.modalContentContainer}>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => setShowLangModal( false )}
+              style={{
+                width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+                alignSelf: 'flex-end',
+                backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+                margin: wp( 3 ),
+                position: 'absolute',
+                zIndex: 10,
+                right: 0,
+                top: 0,
+              }}
+            >
+              <FontAwesome name="close" color={Colors.white} size={19} style={{
+              }} />
+            </TouchableOpacity>
+            <Text
+              style={{
+                color:Colors.blue,
+                fontSize: RFValue( 18 ),
+                fontFamily: Fonts.FiraSansRegular,
+                marginTop: wp( 2 ),
+              }}
+              numberOfLines={1}
+            >
+              {strings.changeLanguage}
+            </Text>
+            <FlatList
+              data={Languages}
+              contentContainerStyle={styles.list}
+              renderItem={( { item, } ) => (
+                <TouchableOpacity
+                  key={item.iso}
+                  activeOpacity={0.6}
+                  style={appLanguage === item.iso ? styles.containerItemSelected : styles.containerItem}
+                  onPress={() => setAppLanguage( item.iso )}>
+                  <Text style={styles.flag}>{item.flag}</Text>
+                  <Text style={styles.textLanName}>{item.displayTitle}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </ModalContainer>
         <Text style={{
           color: Colors.blue,
           fontSize: RFValue( 18 ),
@@ -161,7 +226,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           paddingLeft: widthPercentageToDP( 4 ),
           paddingBottom: heightPercentageToDP( 1 )
         }}>
-            Settings & More
+          {strings.settingsAndMore}
         </Text>
         {/* <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
@@ -255,6 +320,37 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
           />
           <TouchableOpacity
+            onPress={() => setShowLangModal( true )}
+            style={[ styles.otherCards, styles.extraHeight ]}
+          >
+            <Image
+              source={require( '../../assets/images/icons/translate.png' )}
+              style={{
+                width: widthPercentageToDP( 8 ),
+                height: widthPercentageToDP( 8 ),
+              }}
+            />
+            <View style={{
+              marginLeft: 10
+            }}>
+              <Text style={styles.addModalTitleText}>
+                {strings.Language}
+              </Text>
+              <Text style={styles.addModalInfoText}>
+                {strings.changeLanguage }
+              </Text>
+            </View>
+            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+              style={{
+                width: widthPercentageToDP( '2.5%' ),
+                height: widthPercentageToDP( '2.5%' ),
+                alignSelf: 'center',
+                marginLeft: 'auto',
+                resizeMode: 'contain'
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => {
               Linking.openURL( 'https://hexawallet.io/faq/' )
                 .then( ( _data ) => { } )
@@ -275,10 +371,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               marginLeft: 10
             }}>
               <Text style={styles.addModalTitleText}>
-              FAQ
+                {strings.FAQ}
               </Text>
               <Text style={styles.addModalInfoText}>
-              Your questions answered
+                {strings.yourQuestions}
               </Text>
             </View>
             <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
@@ -313,10 +409,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               marginLeft: 10
             }}>
               <Text style={styles.addModalTitleText}>
-              Hexa Community Telegram Group
+                {strings.hexaCommunity}
               </Text>
               <Text style={styles.addModalInfoText}>
-              Questions, feedback and more
+                {strings.questionsFeedback}
               </Text>
 
             </View>
@@ -373,7 +469,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    height: heightPercentageToDP( '70.83%' ),
+    height: heightPercentageToDP( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
@@ -387,8 +483,39 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-around'
   },
   modalContentContainer: {
+    backgroundColor: Colors.white,
+    padding: 10,
+    minHeight: '60%',
+  },
+
+  list: {
+    marginTop: 20,
+  },
+
+  containerItem: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: 'center',
+  },
+
+  containerItemSelected: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: 'center',
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+  },
+
+  textLanName: {
+    fontSize: 18,
     flex: 1,
-    justifyContent: 'space-between',
+  },
+
+  flag: {
+    fontSize: 35,
+    paddingRight: 15,
   },
 
   separatorView: {

@@ -613,7 +613,7 @@ class UpgradeBackup extends Component<
         } )
         const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
         const firstName = 'Personal'
-        const lastName = 'Device1'
+        const lastName = 'Device 1'
 
         const contactName = `${firstName} ${lastName ? lastName : ''}`
           .toLowerCase()
@@ -717,9 +717,9 @@ class UpgradeBackup extends Component<
 
       const firstName = 'Personal'
       let lastName = 'Device'
-      if( index === 0 ) lastName = 'Device1'
-      else if( index === 3 ) lastName = 'Device2'
-      else lastName = 'Device3'
+      if( index === 0 ) lastName = 'Device 1'
+      else if( index === 3 ) lastName = 'Device 2'
+      else lastName = 'Device 3'
       const contactName = `${firstName} ${lastName ? lastName : ''}`
         .toLowerCase()
         .trim()
@@ -774,9 +774,9 @@ class UpgradeBackup extends Component<
     const index = 0
     if( this.props.levelHealth[ this.props.levelToSetup-1 ] && this.props.levelHealth[ this.props.levelToSetup-1 ].levelInfo[ 2 ].updatedAt > 0 ) return
     let contactName = 'Personal Device'
-    if( index === 0 ) contactName = 'Personal Device1'
-    else if( index === 3 ) contactName = 'Personal Device2'
-    else contactName = 'Personal Device3'
+    if( index === 0 ) contactName = 'Personal Device 1'
+    else if( index === 3 ) contactName = 'Personal Device 2'
+    else contactName = 'Personal Device 3'
     const shareObj =
       {
         walletId: this.props.wallet.walletId,

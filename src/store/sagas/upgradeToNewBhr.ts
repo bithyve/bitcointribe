@@ -108,7 +108,7 @@ function* autoShareSecondaryWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
     const { shareId } = payload
-    const name = 'Personal Device1'
+    const name = 'Personal Device 1'
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const s3 = yield call( dbManager.getBHR )
     const metaSharesKeeper: MetaShare[] = [ ...s3.metaSharesKeeper ]

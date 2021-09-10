@@ -81,7 +81,7 @@ export default function EditWalletSuccess( props ) {
       </View>
       <BottomInfoBox
         // backgroundColor={Colors.white}
-        // title={'Note'}
+        title={'Note'}
         infoText={
           'All your Friends & Family will see this wallet name going forward'
         }

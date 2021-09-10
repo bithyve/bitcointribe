@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createRef } from 'react'
+import React, { useContext, useState, createRef } from 'react'
 import { useDispatch } from 'react-redux'
 import {
   StyleSheet,
@@ -37,6 +37,7 @@ import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
 import { Easing } from 'react-native-reanimated'
 import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
 import ModalContainer from '../components/home/ModalContainer'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -60,6 +61,8 @@ export default function NewWalletName( props ) {
   const bottomSheetRef = createRef<BottomSheet>()
   const dispatch = useDispatch()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
 
   // useEffect( () => {
   //   if( timeLeft===0 ){
@@ -186,9 +189,9 @@ export default function NewWalletName( props ) {
             flex: 1
           }} >
             <HeaderTitle
-              firstLineTitle={'Step 1\nPlease name your wallet'}
+              firstLineTitle={strings.Step1}
               secondLineBoldTitle={'New Wallet '}
-              secondLineTitle={'creation'}
+              secondLineTitle={strings.creation}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -196,7 +199,7 @@ export default function NewWalletName( props ) {
             />
             <TextInput
               style={inputStyle}
-              placeholder={'Enter wallet name'}
+              placeholder={strings.walletName}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               keyboardType={
@@ -225,7 +228,7 @@ export default function NewWalletName( props ) {
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
-                  Numbers or special characters are not supported</Text>
+                {strings.numbers}</Text>
             </View>
           </View>
           {/* </KeyboardAvoidingView> */}
@@ -257,7 +260,7 @@ export default function NewWalletName( props ) {
                   }}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>Next</Text>
+                  <Text style={styles.buttonText}>{strings.Next}</Text>
                 </TouchableOpacity>
               </View>
             ) : null}
@@ -271,9 +274,9 @@ export default function NewWalletName( props ) {
             marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
           }}>
             <BottomInfoBox
-              title={'Note:'}
+              title={'Note'}
               infoText={
-                'Wallet name is used in the messages you send to your Friends & Family contacts'
+                strings.info
               }
             />
           </View>

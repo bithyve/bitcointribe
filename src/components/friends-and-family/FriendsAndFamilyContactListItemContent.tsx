@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
@@ -14,6 +14,7 @@ import ImageStyles from '../../common/Styles/ImageStyles'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
 import { agoTextForLastSeen } from '../send/LastSeenActiveUtils'
+import {  LocalizationContext } from '../../common/content/LocContext'
 
 export type Props = {
   contact: ContactRecipientDescribing,
@@ -21,7 +22,9 @@ export type Props = {
 };
 
 const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, index }: Props ) => {
-
+  const { translations, appLanguage } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const firstNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' )[ 0 ] + ' '
   }, [ contact ] )
@@ -67,19 +70,19 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
           style={styles.lastSeenText}
           numberOfLines={1}
         >
-          <Text>Last seen </Text>
+          <Text>{`${strings.lastSeen} `}</Text>
           {Number.isFinite( contact.lastSeenActive ) ? (
 
             <Text style={{
               fontFamily: Fonts.FiraSansMediumItalic
             }}>
-              {agoTextForLastSeen( contact.lastSeenActive )}
+              {agoTextForLastSeen( contact.lastSeenActive, appLanguage ) === 'today' ? strings.today : agoTextForLastSeen( contact.lastSeenActive, appLanguage )}
             </Text>
           ) : (
             <Text style={{
               fontFamily: Fonts.FiraSansMediumItalic
             }}>
-              Unknown
+              {common.unknown}
             </Text>
           )}
         </ListItem.Subtitle>

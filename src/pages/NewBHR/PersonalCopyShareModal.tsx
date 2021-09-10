@@ -128,6 +128,7 @@ export default function PersonalCopyShareModal( props ) {
           paddingTop: hp( '1.5%' ),
           alignItems: 'center',
           marginLeft: 20,
+          marginTop: hp( 1 )
         }}
       >
         <Text
@@ -296,6 +297,7 @@ const styles = StyleSheet.create( {
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,
+    width: wp( 60 )
   },
   listElementIcon: {
     paddingRight: 5,

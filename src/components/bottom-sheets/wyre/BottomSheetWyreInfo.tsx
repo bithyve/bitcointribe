@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
@@ -20,6 +20,7 @@ import useWallet from '../../../utils/hooks/state-selectors/UseWallet'
 import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { addNewAccountShells } from '../../../store/actions/accounts'
 import DropDown from '../../../utils/Dropdown'
+import { LocalizationContext } from '../../../common/content/LocContext'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -31,6 +32,9 @@ type Props = {
 
 const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBuyMenu, wyreFromDeepLink, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'home' ]
+  const common = translations[ 'common' ]
   const { wyreHostedUrl } = useWyreIntegrationState()
   const wallet = useWallet()
   const [ dropdown, showDropdown ] = useState( false )
@@ -73,17 +77,17 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   }, [ pickReceiveAddressFrom, wallet ] )
 
   // eslint-disable-next-line quotes
-  let wyreMessage = `Wyre enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin.`
+  let wyreMessage = strings.wyreMessage
 
-  let wyreTitle = 'Buy Bitcoin\nwith Wyre'
+  let wyreTitle = strings.wyreTitle
 
   if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'fail' )>=0 ) {
-    wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment method'
-    wyreTitle = 'Wyre order failed'
+    wyreMessage = strings.wyrePaymentFail
+    wyreTitle = strings.wyreFail
   }
   if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'success' )>=0 ) {
-    wyreMessage = 'Your order is successful, the purchased bitcoin will be transferred to your Wyre account shortly'
-    wyreTitle = 'Order successful'
+    wyreMessage = strings.wyreProcessed
+    wyreTitle = strings.Ordersuccessful
   }
   return ( <View style={{
     ...styles.modalContentContainer
@@ -167,14 +171,14 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             style={ListStyles.infoHeaderSubtitleText}
             numberOfLines={1}
           >
-            Bitcoin will be transferred to
+            {strings.bitcoinWill}
           </ListItem.Subtitle>
 
           <ListItem.Title
             style={styles.destinationTitleText}
             numberOfLines={1}
           >
-            Wyre Account
+            Checking Account
           </ListItem.Title>
         </ListItem.Content>
       </View>
@@ -196,7 +200,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             style={ListStyles.infoHeaderSubtitleText}
             numberOfLines={1}
           >
-            Bitcoin will be transferred to
+            {strings.bitcoinWill}
           </ListItem.Subtitle>
 
           <ListItem.Title
@@ -218,7 +222,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoin' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? strings.buyBitCoin : common.ok}</Text>
 
         </AppBottomSheetTouchableWrapper>
       </View>
@@ -237,7 +241,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             fontSize: RFValue( 11 ),
             color: Colors.textColorGrey
           }}>
-              Powered by
+            {strings.Poweredby}
           </Text>
           <Image
             source={require( '../../../assets/images/icons/wyre_logo_large.png' )}

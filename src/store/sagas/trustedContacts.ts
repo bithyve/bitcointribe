@@ -63,9 +63,9 @@ import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/Accou
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
-  const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
+  const derivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, derivationPath )
   const secondaryShards = secrets.share(
     BHROperations.stringToHex( secondaryMnemonic ),
     config.SSS_LEVEL1_TOTAL,
@@ -87,7 +87,8 @@ function* updateWalletWorker( { payload } ) {
     walletName,
   } )
   yield call( dbManager.getWallet )
-  // yield put( updateWalletImageHealth() )
+  yield put( updateWalletImageHealth( {
+  } ) )
   yield put ( updateWalletNameToChannel() )
 }
 
@@ -276,6 +277,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         yield call( dbManager.updateContact, value )
       }
 
+      let shouldUpdateSmShare = false
       // update secondary setup data on inital primary keeper sync
       if( synchingPrimaryKeeperChannelKey && !wallet.secondaryXpub ){
         const primaryKeeper =  updatedContacts[ synchingPrimaryKeeperChannelKey ]
@@ -289,14 +291,19 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               secondaryXpub,
             }
           ) )
+          const smShare = secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
+          shouldUpdateSmShare = secondarySetupData.secondaryShardWI !== ''
           yield call( dbManager.updateWallet, {
             secondaryXpub,
-            smShare: secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
+            smShare,
           } )
         }
       }
-
-      if( updateWI ) yield put( updateWalletImageHealth() )
+      if( updateWI ||  shouldUpdateSmShare ) yield put( updateWalletImageHealth( {
+        updateContacts: true,
+        updateSmShare : shouldUpdateSmShare,
+        update2fa: shouldUpdateSmShare
+      } ) )
 
       if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
@@ -642,7 +649,6 @@ function* editTrustedContactWorker( { payload }: { payload: { channelKey: string
   }
   yield put( updateTrustedContacts( updatedContacts ) )
   yield call ( dbManager.updateContact, contactToUpdate )
-  yield put( updateWalletImageHealth() )
 
 }
 

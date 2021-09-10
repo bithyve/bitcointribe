@@ -98,7 +98,6 @@ interface ManageBackupNewBHRStateTypes {
   errorModal: boolean;
   showQRModal: boolean;
   isLevel3Started: boolean;
-  approvePrimaryKeeper: boolean;
   loaderModal: boolean;
   knwowMoreModal: boolean;
   metaSharesKeeper: MetaShare[];
@@ -208,7 +207,6 @@ class ManageBackupNewBHR extends Component<
       errorModal: false,
       showQRModal: false,
       isLevel3Started: false,
-      approvePrimaryKeeper: false,
       loaderModal: false,
       knwowMoreModal: false,
       metaSharesKeeper: [ ...s3.metaSharesKeeper  ],
@@ -228,19 +226,16 @@ class ManageBackupNewBHR extends Component<
       this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
-          this.setState( {
-            showLoader: true
-          } )
           this.props.setLevelToNotSetupStatus()
           this.props.modifyLevelData()
         } else {
           await this.onRefresh()
           this.props.modifyLevelData()
         }
-      // updates the new FCM token to channels post recovery
-      // if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
-      //   this.props.updateNewFcm()
-      // }
+        // updates the new FCM token to channels post recovery
+        // if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
+        //   this.props.updateNewFcm()
+        // }
       } )
       this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
         this.updateAddressBook( )
@@ -302,14 +297,21 @@ class ManageBackupNewBHR extends Component<
           this.handleContactSelection( contactDescription, index, contactsType )
         }
         style={{
+          marginTop: hp( 1 ),
           alignItems: 'center',
           justifyContent: 'center'
         }}
         key={index}
       >
-        <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+        <View style={styles.imageContainer}>
+          <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+        </View>
         <Text style={{
-          textAlign: 'center', marginTop: hp ( 0.5 ), alignSelf: 'center'
+          textAlign: 'center',
+          marginTop: hp ( 0.5 ),
+          alignSelf: 'center',
+          fontSize: RFValue( 10 ),
+          fontFamily: Fonts.FiraSansRegular
         }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
       </TouchableOpacity>
     )
@@ -359,7 +361,6 @@ class ManageBackupNewBHR extends Component<
 
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
-      this.props.modifyLevelData( )
       this.autoCloudUpload()
       if (
         this.props.levelHealth.length > 0 &&
@@ -367,16 +368,12 @@ class ManageBackupNewBHR extends Component<
         prevProps.levelHealth.length == 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
         this.props.cloudPermissionGranted === true &&
+        this.props.levelHealth.length &&
+        this.props.levelHealth[ 0 ].levelInfo.length &&
         this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup'
       ) {
         this.props.setCloudData( )
       }
-    }
-
-    if( this.props.currentLevel == 3 ) {
-      this.setState( {
-        loaderModal: false
-      } )
     }
 
     if (
@@ -386,7 +383,7 @@ class ManageBackupNewBHR extends Component<
         id: 2,
         selectedKeeper: {
           shareType: 'primaryKeeper',
-          name: 'Personal Device1',
+          name: 'Personal Device 1',
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
@@ -472,28 +469,32 @@ class ManageBackupNewBHR extends Component<
         } )
       } )
       this.props.setIsKeeperTypeBottomSheetOpen( false )
-      // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
-
-    }
-
-    if( prevProps.modifyLevelDataStatus != this.props.modifyLevelDataStatus ){
-      if( this.props.modifyLevelDataStatus ) this.setState( {
-        showLoader: true
-      } )
-      else  this.setState( {
-        showLoader: false
-      } )
     }
 
     if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus && this.state.isLevel3Started ) {
+      this.setState( {
+        showLoader: false
+      } )
       console.log( 'APPROVe MB' )
       this.setState( {
         showQRModal: false
       },
       () => {
-        this.setState( {
-          approvePrimaryKeeper: true
-        } )
+        const {
+          selectedKeeper,
+          selectedLevelId,
+          selectedKeeperType,
+          selectedKeeperName,
+        } = this.state
+        const obj = {
+          id: selectedLevelId,
+          selectedKeeper: {
+            ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+            shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
+          },
+          isSetup: true,
+        }
+        this.goToHistory( obj )
       } )
     }
 
@@ -533,11 +534,11 @@ class ManageBackupNewBHR extends Component<
       for ( let i = 0; i < this.props.levelData.length; i++ ) {
         const element = this.props.levelData[ i ]
         if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
-          if ( element.keeper1.shareType == 'contact' ) count++
-          if ( element.keeper2.shareType == 'contact' ) count++
+          if ( element.keeper1.shareType == 'contact' || element.keeper1.shareType == 'existingContact' ) count++
+          if ( element.keeper2.shareType == 'contact' || element.keeper2.shareType == 'existingContact' ) count++
         }
-        if( selectedKeeper.shareType == 'device' ) {
-          if ( element.keeper1.shareType == 'device' ) count++
+        if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
+          if ( element.keeper1.shareType == 'device' || element.keeper1.shareType == 'primaryKeeper' ) count++
           if ( element.keeper2.shareType == 'device' ) count++
         }
       }
@@ -546,7 +547,7 @@ class ManageBackupNewBHR extends Component<
         else if ( count == 0 && isSetup ) index = 1
         else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
       }
-      if( selectedKeeper.shareType == 'device' ) {
+      if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
         if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ) index = selectedKeeper.data.index
         else if ( count == 0 && isSetup ) index = 0
         else if ( count == 1 && isSetup ) index = 3
@@ -559,7 +560,6 @@ class ManageBackupNewBHR extends Component<
     this.setState( {
       keeperTypeModal: false,
       showQRModal: false,
-      approvePrimaryKeeper: false
     } )
     if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
@@ -667,6 +667,9 @@ class ManageBackupNewBHR extends Component<
         }
         isOpenedFlag={this.state.showQRModal}
         onQrScan={async( qrScannedData ) => {
+          this.setState( {
+            showLoader: true
+          } )
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
           this.setState( {
@@ -679,7 +682,10 @@ class ManageBackupNewBHR extends Component<
           } )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asafd","channelId":"ce77f9e12e79c10b703e423ff2d5642b949ad9addc32feef549c1a76c54cfaf1","streamId":"f4a5edbbd","secondaryChannelKey":"3HnBqIVwlaam5IUAUTMSfr36","version":"1.9.5","walletId":"5d0b3ea87b54ba82626f5cc0a2696d7c5aaf223c2b08ab8b1661d707de9c5128"}'
+          this.setState( {
+            showLoader: true
+          } )
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sdfsd","channelId":"b819ad391b9b81c5a6debd67f82c2ea772d282ab75af67cfb4a599328c80f99f","streamId":"5adb81478","secondaryChannelKey":"YUlXUgC4q6mzJx2DalfRw5cV","version":"1.9.5","walletId":"4ec72a6d467844c32bd136250496238cafc5baabed1f474a7a1e2122b86444d3"}'
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
           this.setState( {
@@ -757,9 +763,8 @@ class ManageBackupNewBHR extends Component<
   }
 
   onKeeperButtonPress = ( value, keeperNumber ) =>{
-    const { selectedKeeper } = this.state
     requestAnimationFrame( () => {
-      if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) {
+      if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
         this.props.setLevelCompletionError( 'Please set password', 'It seems you have not set passward to backup. Please set password first to proceed', LevelStatus.FAILED )
         return
       }
@@ -768,8 +773,8 @@ class ManageBackupNewBHR extends Component<
           this.props.navigation.navigate(
             'CloudBackupHistory',
             {
-              selectedTime: selectedKeeper.updatedAt
-                ? getTime( selectedKeeper.updatedAt )
+              selectedTime: value.keeper2.updatedAt
+                ? getTime( value.keeper2.updatedAt )
                 : 'never',
             }
           )
@@ -778,8 +783,8 @@ class ManageBackupNewBHR extends Component<
         this.props.navigation.navigate(
           'SecurityQuestionHistoryNewBHR',
           {
-            selectedTime: selectedKeeper.updatedAt
-              ? getTime( selectedKeeper.updatedAt )
+            selectedTime: value.keeper1.updatedAt
+              ? getTime( value.keeper1.updatedAt )
               : 'never',
           }
         )
@@ -830,7 +835,6 @@ class ManageBackupNewBHR extends Component<
       keeperTypeModal,
       errorModal,
       showQRModal,
-      approvePrimaryKeeper,
       loaderModal,
       knwowMoreModal
     } = this.state
@@ -841,49 +845,11 @@ class ManageBackupNewBHR extends Component<
         flex: 1
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        {/* <Suspense fallback={
-          <ActivityIndicator color={Colors.white} size='large'/>
-        }>
-          <HeaderComponent />
-        </Suspense> */}
-        {/* <Header fromScreen={'ManageBackup'} /> */}
         <View style={styles.accountCardsSectionContainer}>
-          {/* <View style={{
-        flex: 1, backgroundColor: 'white'
-      }}> */}
-
-          {/* <View style={styles.modalHeaderTitleView}> */}
-          {/* <View style={{
-            flex: 1, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <TouchableOpacity
-              onPress={() => navigation.replace( 'Home' )}
-              style={styles.headerBackArrowView}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-          </View> */}
-          {/* <TouchableOpacity
-            onPress={() => navigation.replace( 'Home' )}
-            style={styles.headerBackArrowView}
-          >
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
-            </TouchableOpacity>*/}
-          {/* </View> */}
-
           <Text style={{
             color: Colors.blue,
             fontSize: RFValue( 18 ),
             letterSpacing: 0.54,
-            // marginLeft: 2,
             fontFamily: Fonts.FiraSansMedium,
             marginTop: hp( 4 ),
             marginHorizontal: wp( 4 ),
@@ -906,65 +872,15 @@ class ManageBackupNewBHR extends Component<
               flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp( 4 ), alignItems: 'center', paddingTop: wp( 3 ),
             }}>
               <View style={{
-                // width: '60%'
                 flex:2
               }}>
                 <Text style={{
                   color: Colors.blue,
                   fontSize: RFValue( 12 ),
-                  // marginLeft: 2,
                   fontFamily: Fonts.FiraSansRegular
                 }}>Wallet Backup</Text>
                 <Text style={styles.headerMessageText}>{this.getHeaderMessage()}</Text>
               </View>
-              {/* <View style={{
-                justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
-              }}> */}
-              {/* <ImageBackground
-                source={require( '../../assets/images/icons/keeper_sheild.png' )}
-                style={{
-                  ...styles.healthShieldImage, position: 'relative',
-                }}
-                resizeMode={'contain'}
-              >
-                {isError && (
-                  <View
-                    style={{
-                      backgroundColor: Colors.red,
-                      height: wp( '3%' ),
-                      width: wp( '3%' ),
-                      borderRadius: wp( '3%' ) / 2,
-                      position: 'absolute',
-                      top: wp( '5%' ),
-                      right: 0,
-                      borderWidth: 2,
-                      borderColor: Colors.white,
-                    }}
-                  />
-                )}
-              </ImageBackground> */}
-              {/* {isError && (
-                    <View
-                      style={{
-                        backgroundColor: Colors.red,
-                        height: wp( '3%' ),
-                        width: wp( '3%' ),
-                        borderRadius: wp( '3%' ) / 2,
-                        position: 'absolute',
-                        top: wp( '5%' ),
-                        right: 0,
-                        borderWidth: 2,
-                        borderColor: Colors.white,
-                      }}
-                    />
-                  )}
-                </ImageBackground> */}
-              {/* </View> */}
-              {/* </View> */}
-              {/* <View style={ styles.topHealthView }> */}
-              {/* <View style={{
-              justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
-            }}> */}
               <ImageBackground
                 source={require( '../../assets/images/icons/keeper_sheild.png' )}
                 style={{
@@ -977,59 +893,6 @@ class ManageBackupNewBHR extends Component<
                 )}
               </ImageBackground>
             </View>
-            {/* <View style={ styles.topHealthView }>
-              <View style={{
-                flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp( 6 ), alignItems: 'center'
-              }}>
-                <View style={{
-                // width: '60%'
-                  flex:2
-                }}>
-                  <Text style={{
-                    color: Colors.blue,
-                    fontSize: RFValue( 12 ),
-                    marginLeft: 2,
-                    fontFamily: Fonts.FiraSansRegular
-                  }}>
-Wallet Backup
-                  </Text>
-                  <Text style={{
-                    color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular,
-                  }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
-                </View>
-                {/* <View style={{
-                justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
-              }}> */}
-            {/* <ImageBackground
-                  source={require( '../../assets/images/icons/keeper_sheild.png' )}
-                  style={{
-                    ...styles.healthShieldImage, position: 'relative',
-                  }}
-                  resizeMode={'contain'}
-                >
-                  {shieldHealth && (
-                    <View style={styles.shieldErrorDot} />
-                  )}
-                </ImageBackground>
-              </View> */}
-            {/* <View style={styles.headerSeparator} />
-            {currentLevel ?
-              <View style={{
-                width: wp( '35%' )
-              }}>
-                <Text style={styles.backupText}>Wallet Security</Text>
-                <Text style={styles.backupInfoText}>You are</Text>
-                <Text style={styles.backupInfoText}>at Level {currentLevel ? currentLevel : ''}
-                </Text>
-              </View>:
-              <View style={{
-                width: wp( '35%' ),
-              }}>
-                <Text style={styles.backupText}>Wallet Security</Text>
-                <Text style={styles.backupInfoText}>Complete Level 1</Text>
-              </View>
-            } */}
-            {/* </View> */}
             <View style={styles.body}>
               {levelData.map( ( value, index ) => {
                 return (
@@ -1054,46 +917,12 @@ Wallet Backup
                 )
               } )}
             </View>
-            {/* <View style={styles.modalElementInfoView}>
-              <View style={{
-                justifyContent: 'center',
-              }}>
-                <Text style={styles.addModalTitleText}>Enable Tor </Text>
-                <Text style={styles.addModalInfoText}>Improve your online privacy</Text>
-              </View>
-              <View style={{
-                alignItems: 'flex-end',
-                marginLeft: 'auto'
-              }}>
-                <Switch
-                  value={isEnabled}
-                  onValueChange={this.toggleSwitch}
-                  thumbColor={isEnabled ? Colors.blue : Colors.white}
-                  trackColor={{
-                    false: Colors.borderColor, true: Colors.lightBlue
-                  }}
-                  onTintColor={Colors.blue}
-                />
-              </View>
-            </View> */}
             <View style={{
-              marginTop: wp( '5%' ), backgroundColor: Colors.white, height: '100%',
-              borderTopLeftRadius: wp( 4 ),
-              borderTopRightRadius: wp( 4 ),
+              marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor, height: '100%',
               paddingLeft: wp ( '6%' ),
               paddingBottom: hp( 3 )
             }}>
-              {/* <View style={{
-                paddingBottom: hp( 3 )
-              }}> */}
               <Text style={styles.pageTitle}>I am the Keeper of</Text>
-              {/* <TouchableOpacity>
-                  <Image
-                    style={styles.moreImage}
-                    source={require( '../../assets/images/icons/icon_more.png' )}
-                  />
-                </TouchableOpacity> */}
-              {/* </View> */}
               <Text style={styles.pageInfoText}>
                Contacts whose wallets I can help restore
               </Text>
@@ -1101,33 +930,35 @@ Wallet Backup
                 marginBottom: 15
               }}>
                 {keeping.length > 0 ?
-                  <View style={{
-                    height: 'auto', alignItems: 'flex-start', flexDirection: 'row'
-                  }}>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{
+                      height: 'auto', alignItems: 'flex-start', flexDirection: 'row'
+                    }}>
                     {keeping.length && keeping.map( ( item, index ) => {
                       return this.renderContactItem( {
                         contactDescription: item,
                         index,
-                        contactsType: 'I\'m Keeper of',
+                        contactsType: 'I am the Keeper of',
                       } )
                     } ) }
-                  </View>
+                  </ScrollView>
                   :
                   <BottomInfoBox
                     containerStyle={{
-                      // paddingLeft: wp ( '6%' ),
                       marginLeft: wp( 0 ),
                       marginTop: hp( 2.5 ),
                       backgroundColor: Colors.white
                     }}
-                    title=""
+                    title="Note"
                     infoText="When you have Friends & Family who you can help with wallet recovery, they will be listed here"
                   />
                 }
               </View>
             </View>
           </ScrollView>
-          {/* {this.state.showLoader ? <Loader isLoading={true}/> : null} */}
+
           <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
@@ -1168,14 +999,14 @@ Wallet Backup
               modalRef={this.ErrorBottomSheet as any}
               title={this.state.errorTitle}
               info={this.state.errorInfo}
-              proceedButtonText={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? 'Proceed To Password' : 'Got it'}
-              cancelButtonText={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? 'Got it' : ''}
-              isIgnoreButton={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? true : false}
+              proceedButtonText={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? 'Proceed To Password' : 'Got it'}
+              cancelButtonText={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? 'Got it' : ''}
+              isIgnoreButton={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? true : false}
               onPressProceed={() => {
                 this.setState( {
                   errorModal: false
                 } )
-                if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) this.props.navigation.navigate( 'SetNewPassword', {
+                if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) this.props.navigation.navigate( 'SetNewPassword', {
                   isFromManageBackup: true,
                 } )
               }}
@@ -1188,62 +1019,14 @@ Wallet Backup
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           </ModalContainer>
-          {/* <BottomSheet
-            enabledInnerScrolling={true}
-            ref={( c ) => { this.ErrorBottomSheet = c }}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp( '30%' )
-                : hp( '35%' ),
-            ]}
-            renderContent={()=><ErrorModalContents
-              modalRef={this.ErrorBottomSheet as any}
-              title={this.state.errorTitle}
-              info={this.state.errorInfo}
-              proceedButtonText={'Got it'}
-              isIgnoreButton={false}
-              onPressProceed={() => ( this.ErrorBottomSheet as any ).snapTo( 0 )}
-              isBottomImage={true}
-              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
-            />}
-            renderHeader={()=><ModalHeader onPressHeader={() => ( this.ErrorBottomSheet as any ).snapTo( 0 )} />}
-          /> */}
-          <ModalContainer visible={approvePrimaryKeeper} closeBottomSheet={() => {}}>
-            <ApproveSetup
-              isContinueDisabled={false}
-              onPressContinue={() => {
-                this.setState( {
-                  approvePrimaryKeeper: false
-                } )
-                const {
-                  selectedKeeper,
-                  selectedLevelId,
-                  selectedKeeperType,
-                  selectedKeeperName,
-                } = this.state
-                const obj = {
-                  id: selectedLevelId,
-                  selectedKeeper: {
-                    ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
-                  },
-                  isSetup: true,
-                }
-                this.goToHistory( obj )
-              }}
-            />
-          </ModalContainer>
           <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
             {this.renderQrContent()}
           </ModalContainer>
-          {/* <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
-            {this.renderLoaderModalContent()}
-          </ModalContainer> */}
           <ModalContainer visible={knwowMoreModal} closeBottomSheet={() => {}} >
             {this.renderKnowMoreModalContent()}
           </ModalContainer>
         </View>
+        {this.state.showLoader ? <Loader /> : null}
       </View>
     )
   }
@@ -1306,10 +1089,24 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  imageContainer: {
+    width: wp( 15 ),
+    height: wp( 15 ),
+    borderRadius: wp( 15 )/2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 0.6,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    elevation: 10
+  },
   avatarImage: {
-    ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 12 )/2,
-    marginHorizontal: wp ( 1 )
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
+    marginHorizontal: wp ( 1 ),
   },
   moreImage: {
     width: wp( '10%' ),
@@ -1362,7 +1159,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp ( '6%' )
   },
   accountCardsSectionContainer: {
-    height: hp( '70.83%' ),
+    height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

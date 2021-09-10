@@ -11,9 +11,11 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { ScrollView } from 'react-native-gesture-handler'
+import { translations } from '../../common/content/LocContext'
 
 export default function CheckingAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
@@ -48,7 +50,7 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
                 // marginTop: wp( '5%' ),
               }}
             >
-            Store some sats here, but not all. The sats here are your everyday sats - great for spending online or sending to your friends & family
+              {strings.checking1}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -64,7 +66,7 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '5%' ),
               }}
             >
-            For safely storing larger amounts of sats, you can use your Savings Account. This will keep your bitcoin safe and sound with better security!
+              {strings.checking2}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -98,7 +100,7 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
                 // marginTop: wp( '5%' ),
               }}
             >
-            Your Checking Account is a single signature account. Your Savings Account is a 2 of 3 multi-signature account, secured by an authenticator
+              {strings.checking3}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -114,7 +116,7 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '5%' ),
               }}
             >
-            Transactions from your Checking Account have lower fees compared to the Savings Account - keep bitcoin here for short-term holding or spending
+              {strings.checking4}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -148,7 +150,7 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
                 marginTop: wp( '5%' ),
               }}
             >
-            Be careful! Someone having your phone's and Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account. Don't keep sats here you don't expect to use soon
+              {strings.checking5}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -165,7 +167,7 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
                 paddingBottom: hp( '6%' ),
               }}
             >
-            Reminder: Due to the method we use to secure your Savings account, it is cheaper to send sats from your Checking Account compared to your Savings account
+              {strings.checking6}
             </Text>
           </View>
         </ScrollView>

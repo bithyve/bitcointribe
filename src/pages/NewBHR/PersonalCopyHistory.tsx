@@ -69,7 +69,6 @@ const PersonalCopyHistory = ( props ) => {
 
   const [ qrModal, setQRModal ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const [ approvePrimaryKeeperModal, setApprovePrimaryKeeperModal ] = useState( false )
   const [ isChangeClicked, setIsChangeClicked ] = useState( false )
   const [ personalCopyHistory, setPersonalCopyHistory ] = useState( historyArray )
   // const [
@@ -522,7 +521,6 @@ const PersonalCopyHistory = ( props ) => {
           } else {
             dispatch( setApprovalStatus( false ) )
             dispatch( downloadSMShare( qrScannedData ) )
-            setQrBottomSheetsFlag( false )
           }
         }}
         onBackPress={() => {
@@ -532,7 +530,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Shivani","channelId":"a7684345255def374b2994578ee7fb8afb1b93307784fb7b6d579abd5a7cea83","streamId":"da9bca0b5","channelKey":"MejswyO3a4oX1Xe2neCQJqg2","secondaryChannelKey":"O8m1SBsJJ6GqVlHVE3EoD5Us","version":"1.9.5","walletId":"b7dcd593347f05717fa6903329002ae3d4da7db884e8f4ceb40444738c721f11","encryptedKey":"625c90757f83a0c0563a9205603b19f5fabac786776057ac8bddb7fe4ce98011ae0456d76a30214c4d34bdceedd0bc4c5c8de6156805c80c99bcc2c85d154ac7858cff64aadc69bbec02f0def7dbb412"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Assa","channelId":"71a5d2b39c9396f8023c19070d70d0f78594d31d9eb137c524ab20ccc653b8f6","streamId":"def0d8970","channelKey":"lSiTUPAsqBCdgH6P6PzXzJ50","secondaryChannelKey":"lRm8RJ3vdm6dFvM6iNtrveoe","version":"1.9.5","walletId":"8a428172e0983cc1425aaaa122c74333022e9fad12bd30f28969659b03f2b3ed","encryptedKey":"6e8282c13d1f33cabad34fc8e5c91ad941944fa11e2207e907e6ef8b57c0966c092fd3e5bf5c99e7ed8a2dd3ac87eed377c31779f3c261927c415775dfed42c72ceb9d927c5fce69020b43c6ff71a635"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
@@ -541,11 +539,9 @@ const PersonalCopyHistory = ( props ) => {
             props.navigation.dispatch( popAction )
           } else {
             setQRModal( false )
-            // setApprovePrimaryKeeperModal( true )
             const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
             dispatch( setApprovalStatus( false ) )
             dispatch( downloadSMShare( qrScannedData ) )
-            setQrBottomSheetsFlag( false )
           }
         }}
       />
@@ -556,8 +552,8 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( ()=>{
     if( approvalStatus && isChangeClicked ){
       console.log( 'APPROVe' )
-      setApprovePrimaryKeeperModal( true )
       setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
     }
   }, [ approvalStatus ] )
 
@@ -654,15 +650,6 @@ const PersonalCopyHistory = ( props ) => {
       </ModalContainer>
       <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
         {renderQrContent()}
-      </ModalContainer>
-      <ModalContainer visible={approvePrimaryKeeperModal} closeBottomSheet={()=>{setApprovePrimaryKeeperModal( false )}} >
-        {<ApproveSetup
-          isContinueDisabled={false}
-          onPressContinue={() => {
-            onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-            setApprovePrimaryKeeperModal( false )
-          }}
-        />}
       </ModalContainer>
       <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
         {renderStoragePermissionModalContent()}

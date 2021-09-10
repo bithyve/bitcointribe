@@ -29,19 +29,16 @@ import { createWatcher } from '../utils/utilities'
 
 import { generatePKCEParameters } from '../../utils/random/pkce'
 import Config from '../../bitcoin/HexaConfig'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { AccountsState } from '../reducers/accounts'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
-import AccountShell from '../../common/data/models/AccountShell'
-import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
-import { Account, Accounts, AccountType, DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { Account, Accounts, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import { addNewAccount, generateShellFromAccount } from './accounts'
+import { updateAccountShells } from '../actions/accounts'
+import { updateWalletImageHealth } from '../actions/BHR'
 
-const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
+import dbManager from '../../storage/realm/dbManager'
+
+const swan_auth_url = `${Config.SWAN_BASE_URL}/oidc/auth`
 const redirect_uri = Config.SWAN_REDIRECT_URL
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
@@ -62,6 +59,7 @@ client_id=${Config.SWAN_CLIENT_ID}\
 &code_challenge_method=S256\
 &response_mode=query\
 `
+
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
   } ) )
@@ -83,24 +81,32 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
     ( state ) => state.swanIntegration
   )
 
-  const swanResponse = yield call( redeemAuthCodeForToken, {
-    code,
-    state,
-    code_verifier
-  } )
+  try {
+    const swanResponse = yield call( redeemAuthCodeForToken, {
+      code,
+      state,
+      code_verifier
+    } )
 
-  const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
-  yield put( redeemSwanCodeForTokenSucceeded( {
-    swanAuthenticatedToken: access_token
-  } ) )
-
-  yield call( createWithdrawalWalletOnSwanWorker, {
-    payload: {
-      data: {
-        minBtcThreshold: 0.01
+    const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
+    yield put( redeemSwanCodeForTokenSucceeded( {
+      swanAuthenticatedToken: access_token
+    } ) )
+    yield call( createWithdrawalWalletOnSwanWorker, {
+      payload: {
+        data: {
+          minBtcThreshold: 0.01
+        }
       }
+    } )
+  } catch ( error ) {
+    const data = {
+      linkSwanWalletFailed: true,
+      linkSwanWalletFailedMessage: 'Swan Account link failed',
     }
-  } )
+    yield put( linkSwanWalletFailed( data ) )
+  }
+
 }
 
 
@@ -157,6 +163,27 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   yield put( createWithdrawalWalletOnSwanSucceeded( {
     swanWalletId: swanWithdrawalResponse.data.item.id
   } ) )
+
+  // enable hexa-swan account
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  const swanAccounts = wallet.accounts[ AccountType.SWAN_ACCOUNT ]
+  if( swanAccounts.length ){
+    // upgrade default savings account
+    const defaultSwanAccount = accounts[ swanAccounts[ 0 ] ]
+    if( !defaultSwanAccount.isUsable ){
+      defaultSwanAccount.isUsable = true
+      yield put( updateAccountShells( {
+        accounts: {
+          [ defaultSwanAccount.id ]: defaultSwanAccount
+        }
+      } ) )
+      yield call( dbManager.updateAccount, defaultSwanAccount.id, defaultSwanAccount )
+      yield put( updateWalletImageHealth( {
+        updateAccounts: true,
+        accountIds: [ defaultSwanAccount.id ]
+      } ) )
+    }
+  }
 }
 
 function* createTempSwanAccountInfo( { payload }: {

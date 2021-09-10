@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { View, ImageSourcePropType, FlatList, Image, Platform, TouchableOpacity, Text, Linking, StyleSheet } from 'react-native'
 import { ListItem } from 'react-native-elements'
+import * as RNLocalize from 'react-native-localize'
 import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import {
@@ -10,6 +11,8 @@ import {
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
+import { LocalizationContext } from '../../common/content/LocContext'
+import BottomInfoBox from '../BottomInfoBox'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -33,69 +36,72 @@ export type BuyBitcoinBottomSheetMenuItem = {
   link: string;
 }
 
-const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
-  {
-    title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
-    subtitle: 'Low fee for those big buys',
-    kind: BuyMenuItemKind.RAMP,
-    imageSource: require( '../../assets/images/accIcons/ramp.png' ),
-    disabled: false,
-    hasButton: true,
-    link: 'https://support.ramp.network/en/',
-  },
-  {
-    title: 'Buy with Wyre',
-    subtitle: 'Buy any amount',
-    kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/accIcons/wyre.png' ),
-    disabled: false,
-    hasButton: false,
-    link: 'https://support.sendwyre.com/hc/en-us',
-  },
-  {
-    title: Platform.OS == 'ios' ? 'Buy with FastBitcoins' : 'Buy with FastBitcoins',
-    subtitle: 'Scan FastBitcoin vouchers',
-    kind: BuyMenuItemKind.FAST_BITCOINS,
-    imageSource: require( '../../assets/images/icons/fastbitcoins.png' ),
-    disabled: false,
-    hasButton: false,
-    link: 'https://fastbitcoins.com/help',
-  },
-  // {
-  //   title: 'GetBittr',
-  //   subtitle: 'Buy any amount',
-  //   kind: '',
-  //   imageSource: require( '../../assets/images/icons/icon_getbitter.png' ),
-  //   disabled: false,
-  //   hasButton: false,
-  // },
-  // {
-  //   title: 'Swan Bitcoin',
-  //   subtitle: 'Stack sats with Swan Bitcoin',
-  //   kind: BuyMenuItemKind.SWAN,
-  //   imageSource: require( '../../assets/images/icons/swan.png' ),
-  //   disabled: false,
-  //   hasButton: false,
-  // }
-  // {
-  //   title: 'Set up automatic buys',
-  //   subtitle: 'Stack sats with Swan Bitcoin',
-  //   kind: BuyMenuItemKind.SWAN,
-  //   imageSource: require( '../../assets/images/icons/swan.png' ),
-  //   disabled: false
-  // },
-  // {
-  //   title: 'Scan a Voucher',
-  //   subtitle: 'From select retail stores with FastBitcoins',
-  //   kind: BuyMenuItemKind.FAST_BITCOINS,
-  //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
-  //   disabled: false
-  // }
-]
 
 const listItemKeyExtractor = ( item: BuyBitcoinBottomSheetMenuItem ) => item.title
 
 const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPress }: Props ) => {
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'home' ]
+
+  const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
+    {
+      title: Platform.OS == 'ios' ? strings.ramp : strings.ramp,
+      subtitle: strings.rampSub,
+      kind: BuyMenuItemKind.RAMP,
+      imageSource: require( '../../assets/images/accIcons/ramp.png' ),
+      disabled: false,
+      hasButton: true,
+      link: 'https://support.ramp.network/en/',
+    },
+    {
+      title: strings.wyre,
+      subtitle: strings.wyreSub,
+      kind: BuyMenuItemKind.WYRE,
+      imageSource: require( '../../assets/images/accIcons/wyre.png' ),
+      disabled: false,
+      hasButton: false,
+      link: 'https://support.sendwyre.com/hc/en-us',
+    },
+    // {
+    //   title: Platform.OS == 'ios' ? 'Buy with FastBitcoins' : 'Buy with FastBitcoins',
+    //   subtitle: 'Scan FastBitcoin vouchers',
+    //   kind: BuyMenuItemKind.FAST_BITCOINS,
+    //   imageSource: require( '../../assets/images/icons/fastbitcoins.png' ),
+    //   disabled: false,
+    //   hasButton: false,
+    //   link: 'https://fastbitcoins.com/help',
+    // },
+    // {
+    //   title: 'GetBittr',
+    //   subtitle: 'Buy any amount',
+    //   kind: '',
+    //   imageSource: require( '../../assets/images/icons/icon_getbitter.png' ),
+    //   disabled: false,
+    //   hasButton: false,
+    // },
+    // {
+    //   title: 'Swan Bitcoin',
+    //   subtitle: 'Stack sats with Swan Bitcoin',
+    //   kind: BuyMenuItemKind.SWAN,
+    //   imageSource: require( '../../assets/images/icons/swan.png' ),
+    //   disabled: false,
+    //   hasButton: false,
+    // }
+    // {
+    //   title: 'Set up automatic buys',
+    //   subtitle: 'Stack sats with Swan Bitcoin',
+    //   kind: BuyMenuItemKind.SWAN,
+    //   imageSource: require( '../../assets/images/icons/swan.png' ),
+    //   disabled: false
+    // },
+    // {
+    //   title: 'Scan a Voucher',
+    //   subtitle: 'From select retail stores with FastBitcoins',
+    //   kind: BuyMenuItemKind.FAST_BITCOINS,
+    //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+    //   disabled: false
+    // }
+  ]
 
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
@@ -122,7 +128,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
             disabled={menuItem.disabled}
             style={styles.buyContainer}>
             <Text style={styles.buyButton}>
-              Buy Bitcoin
+              {strings.buyBitCoin}
             </Text>
           </TouchableOpacity>
         </ListItem>
@@ -134,9 +140,9 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
           }
         >
           <Text style={[ ListStyles.listItemSubtitle, styles.linkText ]}>
-        Fees & Supported Regions
+            {strings.fees}
             <Text style={styles.learnMore}>
-              {' Learn More  '}
+              {` ${strings.learnMore} `}
             </Text>
           </Text>
           <Image
@@ -150,7 +156,8 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
 
   return (
     <View style={{
-      backgroundColor: Colors.bgColor
+      backgroundColor: Colors.bgColor,
+
     }}>
       <View style={styles.modelHeight}>
         <FlatList
@@ -160,7 +167,21 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
           renderItem={renderItem}
           scrollEnabled={false}
         />
-      </View></View>
+        {RNLocalize.getCountry() == 'US' &&
+        <BottomInfoBox
+          backgroundColor={Colors.backgroundColor}
+          containerStyle={{
+            marginRight: wp( 3 )
+          }}
+          title={''}
+          infoText={
+            '* Some methods may not be available in the US states of Hawaii, Nebraska, New York and Texas'
+          }
+        />
+        }
+      </View>
+
+    </View>
 
   )
 }
@@ -198,7 +219,7 @@ const styles = StyleSheet.create( {
   },
   mainCardContainer: {
     marginTop: hp( 1.5 ),
-    paddingHorizontal: 0
+    paddingHorizontal: 0,
   },
   rootContainer: {
     backgroundColor: Colors.white,
@@ -214,11 +235,13 @@ const styles = StyleSheet.create( {
     elevation: 6
   },
   modelHeight: {
-    height: hp( 60 )
+    height: 'auto',
+    marginBottom: hp( 3 )
   },
   cardMiddle: {
-    paddingLeft: 0,
-    paddingRight: wp( 1 )
+    // paddingLeft: 0,
+    marginRight: wp( -2 ),
+    marginLeft: wp( -1 ),
   }
 } )
 

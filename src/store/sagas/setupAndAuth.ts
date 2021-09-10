@@ -56,7 +56,7 @@ function* setupWalletWorker( { payload } ) {
 
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
-
+  yield call( dbManager.createWallet, wallet )
   // prepare default accounts for the wallet
   const accountsInfo: newAccountsInfo[] = [];
   [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ].forEach( ( accountType ) => {
@@ -70,7 +70,6 @@ function* setupWalletWorker( { payload } ) {
     payload: accountsInfo
   } )
   yield put( newAccountShellCreationCompleted() )
-  yield call( dbManager.createWallet, wallet )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
   yield put( completedWalletSetup( ) )
 }
@@ -222,7 +221,9 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
     channelUpdates,
     metaSync: true
   } ) )
-  yield put( updateWalletImageHealth() )
+  yield put( updateWalletImageHealth( {
+    updateVersion: true
+  } ) )
 }
 
 export const applicationUpdateWatcher = createWatcher(

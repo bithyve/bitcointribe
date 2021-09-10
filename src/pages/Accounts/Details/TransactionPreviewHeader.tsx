@@ -10,6 +10,8 @@ import { UsNumberFormat } from '../../../common/utilities'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import { shadowColorForAccountKind } from '../../../components/account-details/AccountDetailsCard'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   availableBalance: Satoshis;
@@ -26,6 +28,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
   isTestAccount = false,
   kind,
 }: Props ) => {
+  const strings  = translations[ 'accounts' ]
 
   const formattedBalanceText = isTestAccount ?
     UsNumberFormat( availableBalance )
@@ -41,13 +44,15 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
     <View style={styles.rootContainer}>
 
       <Text style={{
-        ...ListStyles.listItemTitle, marginBottom: 12,
+        ...ListStyles.listItemTitle, marginBottom: 12,  color: shadowColorForAccountKind( {
+          kind
+        } )
       }}>
-        Available to spend: {formattedBalanceText} {formattedUnitText}
+        {`${strings.availableToSpend}: ${formattedBalanceText} ${formattedUnitText}`}
       </Text>
 
       <View style={styles.viewMoreLinkRow}>
-        <Text style={styles.headerDateText}>Recent Transactions</Text>
+        <Text style={styles.headerDateText}>{strings.RecentTransactions}</Text>
 
         <TouchableOpacity
           style={{
@@ -56,7 +61,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
           onPress={onViewMorePressed}
         >
           <Text style={styles.headerTouchableText}>
-            View More
+            {strings.ViewMore}
           </Text>
         </TouchableOpacity>
       </View>

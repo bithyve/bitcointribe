@@ -623,20 +623,15 @@ export interface Trusted_Contacts {
 export interface NewWalletImage {
   walletId: string;
   name: string;
-  accounts: {
+  accounts?: {
     [accountId: string]: {
       encryptedData: string
     }
   },
-  details2FA : {
-    secondaryXpub: string,
-    bithyveXpub: string,
-    twoFAKey: string,
-  };
-  contacts:string[];
-  versionHistory: string;
-  SM_share: string,
-  primarySeed?: string,
+  details2FA ?: string;
+  contacts?:string;
+  versionHistory?: string;
+  SM_share?: string,
 }
 
 export interface EncryptedImage {
@@ -708,14 +703,15 @@ export interface LevelHealthInterface {
 }
 
 export interface LevelInfo {
-  shareType: string;
-  updatedAt: number;
-  status: string;
+  shareType?: string;
+  updatedAt?: number;
+  status?: string;
   shareId: string;
   reshareVersion?: number;
   name?: string;
   data?: any;
-  channelKey?: string
+  channelKey?: string;
+  walletId?: string
 }
 
 export interface KeeperInfoInterface {
@@ -863,7 +859,10 @@ export interface Account {
   newTransactions?: Transaction[];      // new transactions arrived during the current sync
   txIdMap?: {[txid: string]: string[]}; // tx-mapping; tx insertion checker
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
-  hasNewTxn?: boolean                   // indicates new txns
+  hasNewTxn?: boolean;                  // indicates new txns
+  transactionsNote : {
+    [txId: string]: string
+  }
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -880,6 +879,8 @@ export interface DonationAccount extends Account {
   donee: string;
   configuration: {
     displayBalance: boolean;
+    displayIncomingTxs: boolean;
+    displayOutgoingTxs: boolean;
   };
   disableAccount: boolean;
   is2FA: boolean,                       // is2FA enabled

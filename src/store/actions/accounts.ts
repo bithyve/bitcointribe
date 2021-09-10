@@ -42,6 +42,7 @@ export const MERGE_ACCOUNT_SHELLS = 'MERGE_ACCOUNT_SHELLS'
 export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED'
 export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED'
 export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT'
+export const RECOMPUTE_NET_BALANCE = 'RECOMPUTE_NET_BALANCE'
 export const REFRESH_ACCOUNT_SHELLS = 'REFRESH_ACCOUNT_SHELLS'
 export const BLIND_REFRESH = 'BLIND_REFRESH'
 export const ACCOUNT_SHELLS_REFRESH_STARTED = 'ACCOUNT_SHELLS_REFRESH_STARTED'
@@ -314,6 +315,8 @@ export const updateDonationPreferences = (
     disableAccount?: boolean;
     configuration?: {
       displayBalance: boolean;
+      displayIncomingTxs: boolean;
+      displayOutgoingTxs: boolean;
     };
     accountDetails?: {
       donee: string;
@@ -335,6 +338,12 @@ export const remapAccountShells = ( services ) => {
     type: REMAP_ACCOUNT_SHELLS, payload: {
       services
     }
+  }
+}
+
+export const recomputeNetBalance = () => {
+  return {
+    type: RECOMPUTE_NET_BALANCE
   }
 }
 

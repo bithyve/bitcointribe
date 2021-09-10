@@ -14,6 +14,9 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import XPubDetailsScreen from '../../../pages/Accounts/AccountSettings/XPubDetailsScreen'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const SubAccountSettingsStack = createStackNavigator(
   {
@@ -21,7 +24,7 @@ const SubAccountSettingsStack = createStackNavigator(
       screen: AccountSettingsMainScreen,
       navigationOptions: ( { navigation } ) => {
         return {
-          title: 'Account Settings',
+          title: strings[ 'AccountSettings' ],
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
@@ -31,25 +34,25 @@ const SubAccountSettingsStack = createStackNavigator(
     EditDisplayProperties: {
       screen: AccountSettingsEditDisplayPropertiesScreen,
       navigationOptions: {
-        title: 'Name & Description',
+        title: strings[ 'NameDescription' ],
       },
     },
     ReassignTransactionsMainOptions: {
       screen: ReassignTransactionsMainOptionsScreen,
       navigationOptions: {
-        title: 'Reassign Transactions',
+        title: strings[ 'ReassignTransactions' ],
       },
     },
     SelectReassignableTransactions: {
       screen: SelectReassignableTransactionsScreen,
       navigationOptions: {
-        title: 'Reassign Transactions',
+        title: strings[ 'ReassignTransactions' ],
       },
     },
     ReassignSubAccountSourcesSelectSources: {
       screen: ReassignSubAccountSourcesSelectSourcesScreen,
       navigationOptions: {
-        title: 'Reassign Sources',
+        title: strings[ 'ReassignSources' ],
       },
     },
     ReassignTransactionsSelectDestination: {
@@ -83,13 +86,13 @@ const SubAccountSettingsStack = createStackNavigator(
     MergeAccounts: {
       screen: AccountSettingsMergeAccountShellsScreen,
       navigationOptions: {
-        title: 'Merge Accounts',
+        title: strings[ 'MergeAccounts' ],
       },
     },
     TransactionDetails: {
       screen: TransactionDetailsContainerScreen,
       navigationOptions: {
-        title: 'Transaction Details',
+        title: strings[ 'TransactionDetails' ],
       },
     }
   },

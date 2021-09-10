@@ -80,7 +80,7 @@ export default function RecoveryTrustedQR( props ) {
       <BottomInfoBox
         title={'Send your Recovery Key'}
         infoText={
-          'Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR'
+          'Open the QR scanner at the top right of the home screen on your Keeper Device and scan this QR'
         }
       />
     </View>

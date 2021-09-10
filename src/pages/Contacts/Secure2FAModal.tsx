@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -16,8 +16,11 @@ import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import idx from 'idx'
 import * as ExpoContacts from 'expo-contacts'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import { translations } from '../../common/content/LocContext'
 
 export default function Secure2FA( props ) {
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
 
   const [ activeType, setActiveType ] = useState( DeepLinkEncryptionType.NUMBER )
   // const [ contactData, setContactData ] = useState( null )
@@ -47,18 +50,18 @@ export default function Secure2FA( props ) {
         <View style={{
           marginLeft: wp( 6 ),
         }}>
-          <Text style={styles.modalTitleText}>{'Select the\nsecond factor'}</Text>
+          <Text style={styles.modalTitleText}>{strings.SelectSecond}</Text>
           <Text style={{
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
             marginRight: wp( 13 )
-          }}>Select one of the below to add as a second factor to your link/QR</Text>
+          }}>{strings.select1}</Text>
         </View>
         {phoneNumbers && phoneNumbers.length && phoneNumbers[ 0 ].number ?
           <CardWithRadioBtn
             icon={''}
-            mainText={'Confirm phone number'}
+            mainText={strings.ConfirmPhone}
             subText={phoneNumbers[ 0 ].number}
             isSelected={activeType === DeepLinkEncryptionType.NUMBER}
             setActiveIndex={setActiveType}
@@ -68,7 +71,7 @@ export default function Secure2FA( props ) {
         {emails && emails.length && emails[ 0 ].email ?
           <CardWithRadioBtn
             icon={''}
-            mainText={'Confirm email address'}
+            mainText={strings.ConfirmEmail}
             subText={emails[ 0 ].email}
             isSelected={activeType === DeepLinkEncryptionType.EMAIL}
             setActiveIndex={setActiveType}
@@ -77,16 +80,16 @@ export default function Secure2FA( props ) {
           : null }
         <CardWithRadioBtn
           icon={''}
-          mainText={'Confirm with OTP'}
-          subText={'An alphanumeric code will be generated'}
+          mainText={strings.ConfirmOTP}
+          subText={strings.subText}
           isSelected={activeType === DeepLinkEncryptionType.OTP}
           setActiveIndex={setActiveType}
           index={DeepLinkEncryptionType.OTP}
         />
       </View>
       <BottomInfoBox
-        title={'Note'}
-        infoText={'If the communication channel is not encrypted / secure, the second factor sent through a different channel improves the security guarantees'}
+        title={common.note}
+        infoText={strings.infoText}
         // backgroundColor={Colors.white}
       />
       <View style={{
@@ -103,7 +106,7 @@ export default function Secure2FA( props ) {
             backgroundColor:Colors.blue,
           }}
         >
-          <Text style={styles.proceedButtonText}>Proceed</Text>
+          <Text style={styles.proceedButtonText}>{common.proceed}</Text>
         </TouchableOpacity>
       </View>
 

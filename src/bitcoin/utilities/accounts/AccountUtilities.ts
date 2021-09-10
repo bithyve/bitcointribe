@@ -406,6 +406,9 @@ export default class AccountUtilities {
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
+    transactionsNote: {
+      [txId: string]: string
+    },
     contactName?: string,
     primaryAccType?: string,
     accountName?: string,
@@ -514,7 +517,7 @@ export default class AccountUtilities {
       }
 
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName, transactionsNote } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
         const UTXOs = cachedUTXOs
 
@@ -553,7 +556,7 @@ export default class AccountUtilities {
                 txIdMap[ tx.txid ] = [ addressInfo.Address ]
 
                 if ( tx.transactionType === 'Self' ) {
-                  const outgoingTx = {
+                  const outgoingTx: Transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
                     status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -572,9 +575,10 @@ export default class AccountUtilities {
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
                     address: addressInfo.Address,
                     isNew: true,
+                    notes: transactionsNote[ tx.txid ]
                   }
 
-                  const incomingTx = {
+                  const incomingTx: Transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
                     status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -591,7 +595,8 @@ export default class AccountUtilities {
                     primaryAccType,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
-                    isNew: true
+                    isNew: true,
+                    notes: transactionsNote[ tx.txid ]
                   }
 
                   newTxs.push(
@@ -615,7 +620,8 @@ export default class AccountUtilities {
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
                     address: addressInfo.Address,
-                    isNew: true
+                    isNew: true,
+                    notes: transactionsNote[ tx.txid ]
                   }
 
                   newTxs.push( transaction )
@@ -774,7 +780,7 @@ export default class AccountUtilities {
   static setNewTransactions = ( transactions: Transaction[], lastSynched: number ) => {
     const lastSynced = lastSynched
     let latestSync = lastSynced
-    const newTransactions = [] // delta transactions
+    const newTransactions: Transaction[] = [] // delta transactions
     for ( const tx of transactions ) {
       if ( tx.status === 'Confirmed' && tx.transactionType === TransactionType.RECEIVED ) {
         if ( tx.blockTime > lastSynced ) newTransactions.push( tx )
@@ -944,8 +950,7 @@ export default class AccountUtilities {
   ): Promise<{
     secret: any;
   }> => {
-    const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 ) )
     if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
 
     let res: AxiosResponse
@@ -971,11 +976,11 @@ export default class AccountUtilities {
   ): {
     secondaryXpriv: string
   } => {
-    const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+    const derivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, derivationPath )
     if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
 
-    const secondaryXpriv = AccountUtilities.generateExtendedKey( secondaryMnemonic, true, network, rootDerivationPath )
+    const secondaryXpriv = AccountUtilities.generateExtendedKey( secondaryMnemonic, true, network, derivationPath )
     return {
       secondaryXpriv
     }
@@ -1059,6 +1064,8 @@ export default class AccountUtilities {
       disableAccount?: boolean;
       configuration?: {
         displayBalance: boolean;
+        displayIncomingTxs: boolean;
+        displayOutgoingTxs: boolean;
       };
       accountDetails?: {
         donee: string;

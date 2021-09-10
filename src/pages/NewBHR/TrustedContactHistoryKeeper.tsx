@@ -69,12 +69,12 @@ import dbManager from '../../storage/realm/dbManager'
 import idx from 'idx'
 import Toast from '../../components/Toast'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Loader from '../../components/loader'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
-  const [ approvePrimaryKeeperModal, setApprovePrimaryKeeperModal ] = useState( false )
   const [ qrModal, setQRModal ] = useState( false )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
@@ -97,11 +97,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ConfirmBottomSheet, setConfirmBottomSheet ] = useState(
     React.createRef(),
   )
+  const [ showLoader, setShowLoader ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
   const [ renderTimer, setRenderTimer ] = useState( false )
   const [ isOTPType, setIsOTPType ] = useState( false )
   const [ trustedLink, setTrustedLink ] = useState( '' )
-  const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ trustedContactHistory, setTrustedContactHistory ] = useState( historyArray )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
@@ -310,16 +310,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     )
   }, [ onOTPShare, OTP, renderTimer ] )
 
-  const renderShareOtpWithTrustedContactHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setShareOtpWithTrustedContactModal( false )
-        }}
-      />
-    )
-  }, [] )
-
   const renderConfirmContent = useCallback( () => {
     return (
       <ErrorModalContents
@@ -365,8 +355,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const onPressReshare = useCallback( async () => {
     setReshareModal( false )
-    createGuardian( {
-      chosenContactTmp: getContacts( chosenContact )
+    props.navigation.navigate( 'QrAndLink', {
+      contact: chosenContact,
+      selectedKeeper: selectedKeeper,
+      isChange: isChange,
+      shareType,
+      isReshare,
+      oldChannelKey,
+      channelKey: channelKey
     } )
   }, [ selectedTitle, chosenContact, getContacts ] )
 
@@ -467,140 +463,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
     )
   }
 
-  const createGuardian = useCallback(
-    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
-      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-      const Contact = props.navigation.getParam( 'isChangeKeeperType' ) || isChangeKeeper ? payload.chosenContactTmp : ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload && payload.chosenContactTmp ? payload.chosenContactTmp : chosenContact : chosenContact
-      setChosenContact( Contact )
-      if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
-      setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-      setChannelKey( channelKeyTemp )
+  const createGuardian = async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, shareType?: string} ) => {
+    const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+    const Contact = payload.chosenContactTmp
 
-      const obj: KeeperInfoInterface = {
-        shareId: selectedKeeper.shareId,
-        name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
-        type: shareType,
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
-        currentLevel: currentLevel,
-        createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
-        data: {
-          ...Contact, index
-        },
-        channelKey: channelKeyTemp
-      }
-      console.log( 'USEEFFECT obj', obj )
-      dispatch( updatedKeeperInfo( obj ) )
-      dispatch( createChannelAssets( selectedKeeper.shareId ) )
-    },
-    [ trustedContacts, chosenContact ],
-  )
+    if( payload.shareType != 'existingContact' && isReshare && !isChangeKeeper ){
+      console.log( 'RETURN' ); return}
+    setIsGuardianCreationClicked( true )
+    const channelKeyTemp: string = payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    setChannelKey( channelKeyTemp )
 
-  useEffect( ()=> {
-    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
-      console.log( 'USEEFFECT chosenContact', chosenContact )
-      console.log( 'USEEFFECT channelKey', channelKey )
-      dispatch( createOrChangeGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
-      } ) )
-    }
-  }, [ chosenContact, createChannelAssetsStatus, channelAssets ] )
-
-  useEffect( () => {
-    if( shareType == 'existingContact' && !isGuardianCreationClicked && ( ( chosenContact && Object.keys( chosenContact ).length ) || chosenContact != null ) ) {
-      createGuardian( )
-      // setShowQrCode( true )
-    }
-  }, [ chosenContact ] )
-
-  useEffect( () => {
-    if( !chosenContact ) return
-
-    const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
-    let channelKey: string
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === chosenContact.id ){
-          currentContact = contacts[ ck ]
-          channelKey = ck
-          break
-        }
-      }
-    if ( currentContact ) {
-      const { secondaryChannelKey } = currentContact
-      const appVersion = DeviceInfo.getVersion()
-      // generate deep link & QR for the contact
-      let encryption_key: string
-      if( currentContact.deepLinkConfig ){
-        const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
-        if( encryptLinkWith === encryptionType ) encryption_key = encryptionKey
-      }
-
-      if( !encryption_key )
-        switch( encryptLinkWith ){
-            case DeepLinkEncryptionType.NUMBER:
-              const phoneNumber = idx( chosenContact, ( _ ) => _.phoneNumbers[ 0 ].number )
-
-              if( phoneNumber ){
-                const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-                encryption_key = number.slice( number.length - 10 ) // last 10 digits only
-              } else { Toast( 'F&F contact number missing' ); return }
-              break
-
-            case DeepLinkEncryptionType.EMAIL:
-              const email = idx( chosenContact, ( _ ) => _.emails[ 0 ].email )
-              if( email ){
-                encryption_key = email // last 10 digits only
-              } else { Toast( 'F&F contact email missing' ); return }
-              break
-
-            case DeepLinkEncryptionType.OTP:
-            // openTimer()
-              encryption_key = TrustedContactsOperations.generateKey( 6 )
-              setOTP( encryption_key )
-              setIsOTPType( true )
-              // setShareOtpWithTrustedContactModel( true )
-              // setEncryptLinkWith( DeepLinkEncryptionType.DEFAULT )
-              break
-        }
-      console.log( 'QR currentContact', currentContact )
-      const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
-      setTrustedLink( deepLink )
-      const QRData = JSON.stringify( {
-        type: shareType == 'existingContact' ? QRCodeTypes.EXISTING_CONTACT : QRCodeTypes.KEEPER_REQUEST,
-        encryptedChannelKeys: encryptedChannelKeys,
-        encryptionType,
-        encryptionHint,
-        walletName: wallet.walletName,
-        version: appVersion,
-      } )
-      setTrustedQR( QRData )
-      console.log( 'QR DATA', QRData )
-      if( showQrCode && ( deepLink.includes( 'EXISTING_CONTACT' ) || deepLink.includes( 'KEEPER' ) ) ){
-        props.navigation.navigate( 'QrAndLink', {
-          otp: encryptionHint,
-          trustedLink: deepLink,
-          trustedQr: QRData,
-        } )
-      }
-      if( isGuardianCreationClicked ) {
-        const shareObj = {
-          walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
-          shareId: selectedKeeper.shareId,
-          reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
-          shareType: shareType,
-          status: 'notAccessible',
-          name: chosenContact && chosenContact.name ? chosenContact.name : ''
-        }
-        dispatch( updateMSharesHealth( shareObj, isChange ) )
-        dispatch( setChannelAssets( {
-        } ) )
-        saveInTransitHistory()
-      }
-    }
-  }, [ chosenContact, trustedContacts, showQrCode ] )
+    props.navigation.navigate( 'QrAndLink', {
+      contact: Contact,
+      selectedKeeper: selectedKeeper,
+      isChange: isChangeKeeper,
+      shareType: payload.shareType,
+      isReshare,
+      oldChannelKey,
+      channelKey: channelKeyTemp
+    } )
+  }
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
@@ -643,10 +525,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          // setApprovePrimaryKeeperModal( true )
           dispatch( setApprovalStatus( false ) )
           dispatch( downloadSMShare( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
@@ -655,9 +535,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         onPressContinue={async() => {
           const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
           dispatch( setApprovalStatus( false ) )
-          // setApprovePrimaryKeeperModal( true )
           dispatch( downloadSMShare( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
         }}
       />
     )
@@ -665,8 +543,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( ()=>{
     if( approvalStatus && isChangeClicked ){
-      setApprovePrimaryKeeperModal( true )
       setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
     }
   }, [ approvalStatus ] )
 
@@ -676,23 +554,18 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ channelAssets ] )
 
-  useEffect( () => {
-    if ( isNavigation ) {
-      props.navigation.navigate( 'TrustedContactNewBHR', {
-        LoadContacts: true,
-        onPressContinue: onPressContinue
-      } )
-    }
-
-  }, [ isNavigation ] )
 
   const onPressContinue = ( selectedContacts ) => {
     Keyboard.dismiss()
-    selectedContacts.length && selectedContacts[ 0 ].isExisting ? setShareType( 'existingContact' ) : setShareType( 'contact' )
-    createGuardian( {
-      chosenContactTmp: getContacts( selectedContacts )
-    } )
-    setShowQrCode( true )
+    let shareType = 'contact'
+    if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); shareType = 'existingContact' }
+    setShareType( shareType )
+    setTimeout( () => {
+      createGuardian( {
+        chosenContactTmp: getContacts( selectedContacts ), shareType
+      } )
+      setShowQrCode( true )
+    }, 10 )
   }
 
   const renderSecondaryDeviceMessageContents = useCallback( () => {
@@ -761,7 +634,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setReshareModal( true )
           }}
           isVersionMismatch={isVersionMismatch}
-          isChangeKeeperAllow={isChangeKeeperAllow}
+          isChangeKeeperAllow={isChangeKeeperAllow && selectedKeeper.updatedAt}
           reshareButtonText={'Reshare'}
           changeButtonText={'Change'}
         />
@@ -785,7 +658,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           cancelButtonText={'Back'}
           isIgnoreButton={true}
           onPressProceed={() => {
-            setShowQrCode( true )
             onPressReshare()
           }}
           onPressIgnore={() => {
@@ -888,7 +760,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             return renderContactListItem( {
               contactDescription: item,
               index,
-              contactsType: 'My Keepers',
+              contactsType: 'Keeper',
             } )
           } ) ) || <View style={{
             height: wp( '22%' ) + 30
@@ -916,18 +788,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
           keeper={selectedKeeper}
         />
       </ModalContainer>
-      <ModalContainer visible={approvePrimaryKeeperModal} closeBottomSheet={()=>{setApprovePrimaryKeeperModal( false )}} >
-        {<ApproveSetup
-          isContinueDisabled={false}
-          onPressContinue={() => {
-            onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-            setApprovePrimaryKeeperModal( false )
-          }}
-        />}
-      </ModalContainer>
       <ModalContainer visible={qrModal} closeBottomSheet={() => {setQRModal( false )}} >
         {renderQrContent()}
       </ModalContainer>
+      {showLoader ? <Loader /> : null}
     </View>
   )
 }

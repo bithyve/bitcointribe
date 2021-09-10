@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { View, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
@@ -20,6 +20,7 @@ import useWallet from '../../../utils/hooks/state-selectors/UseWallet'
 import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { addNewAccountShells } from '../../../store/actions/accounts'
 import DropDown from '../../../utils/Dropdown'
+import { LocalizationContext } from '../../../common/content/LocContext'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -31,6 +32,9 @@ type Props = {
 
 const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDeepLink, rampFromBuyMenu, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'home' ]
+  const common = translations[ 'common' ]
   const { rampHostedUrl } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const wallet = useWallet()
@@ -73,17 +77,17 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   }, [ pickReceiveAddressFrom, wallet ] )
 
   // eslint-disable-next-line quotes
-  let rampMessage = 'Ramp enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin.'
+  let rampMessage = strings.rampMessage
 
-  let rampTitle = 'Buy bitcoin\nwith Ramp'
+  let rampTitle = strings.rampTitle
 
   if( rampFromDeepLink && rampDeepLinkContent ) {
     rampMessage = rampDeepLinkContent.search( 'fail' )>=0
-      ? 'Ramp was not able to process your payment. Please try after sometime or use a different payment method'
-      : 'Your order is being processed by Ramp, once successful the purchased bitcoin will be transferred to your Ramp account'
+      ? strings.rampPaymentFail
+      : strings.rampProcessed
     rampTitle = ( rampDeepLinkContent.search( 'fail' )>=0 )
-      ? 'Ramp order failed'
-      : 'Order being processed'
+      ? strings.rampFail
+      : strings.beingProcessed
   }
   return ( <View style={{
     ...styles.modalContentContainer,
@@ -164,7 +168,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             style={ListStyles.infoHeaderSubtitleText}
             numberOfLines={1}
           >
-              Bitcoin will be transferred to
+            {strings.bitcoinWill}
           </ListItem.Subtitle>
 
           <ListItem.Title
@@ -201,7 +205,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             style={ListStyles.listItemSubtitle}
             numberOfLines={1}
           >
-              Bitcoin will be transferred to
+            {strings.bitcoinWill}
           </ListItem.Subtitle>
 
           <ListItem.Title
@@ -231,7 +235,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy Bitcoin' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? strings.buyBitCoin : common.ok}</Text>
 
         </AppBottomSheetTouchableWrapper>
       </View>
@@ -250,7 +254,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             fontSize: RFValue( 11 ),
             color: Colors.textColorGrey
           }}>
-        Powered by
+            {strings.Poweredby}
           </Text>
           <Image
             source={require( '../../../assets/images/icons/ramp_logo_large.png' )}

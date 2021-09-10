@@ -57,6 +57,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const [
     ResetTwoFASuccessBottomSheet,
   ] = useState( React.createRef<BottomSheet>() )
+  const [ reset2FAModal, setReset2FAModal ] = useState( false )
   const [ failureMessage, setFailureMessage ] = useState( '' )
   const [ failureMessageHeader, setFailureMessageHeader ] = useState( '' )
   const [
@@ -93,8 +94,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         setFailureMessage(
           'The QR you have scanned seems to be invalid, pls try again',
         )
-      }, 2 );
-      ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
+      }, 2 )
+      setReset2FAModal( true )
       dispatch( twoFAResetted( null ) )
     }
   }, [ accountsState.twoFAHelpFlags, wallet ] )
@@ -117,8 +118,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       setTimeout( () => {
         setFailureMessageHeader( 'Invalid Exit Key' )
         setFailureMessage( 'Invalid Exit Key, please try again' )
-      }, 2 );
-      ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
+      }, 2 )
+      setReset2FAModal( true )
       dispatch( secondaryXprivGenerated( null ) )
     }
   }, [ accountsState.twoFAHelpFlags ] )
@@ -187,23 +188,13 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         info={failureMessage}
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
-          ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
+          setReset2FAModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/icon_twoFASuccess.png' )}
       />
     )
   }, [ failureMessage, failureMessageHeader ] )
-
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
 
   const renderServerNotRespondingContent = useCallback( () => {
     return (
@@ -224,7 +215,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
             setQRModalHeader( 'Sweep Funds' )
           }, 2 )
 
-          if ( !qrModal ) showQRModel( true )
+          if ( !qrModal ) { showQRModel( true ); setQrBottomSheetsFlag( true ) }
           showServerNotRespondingModal( false )
         }}
       />
@@ -286,6 +277,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
               }, 2 )
               if ( !qrModal ) {
                 showQRModel( true )
+                setQrBottomSheetsFlag( true )
               }
             }}
             style={{
@@ -389,7 +381,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         </Text> */}
       </View>
       {showLoader ? <Loader isLoading={true}/> : null}
-      <BottomSheet
+      {/* <BottomSheet
         onOpenEnd={() => {
           setQrBottomSheetsFlag( true )
         }}
@@ -406,34 +398,15 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
-      />
-      {
+      /> */}
+      {qrModal &&
         <ModalContainer visible={qrModal} closeBottomSheet={() => {}}>
           {renderQrContent()}
         </ModalContainer>
       }
-
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ResetTwoFASuccessBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
-
-      {/* <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ServerNotRespondingBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
-        ]}
-        renderContent={renderServerNotRespondingContent}
-        renderHeader={renderServerNotRespondingHeader}
-      /> */}
+      <ModalContainer visible={reset2FAModal} closeBottomSheet={() => {}} >
+        {renderErrorModalContent()}
+      </ModalContainer>
       <ModalContainer visible={serverNotRespondingModal} closeBottomSheet={() => {}}>
         {renderServerNotRespondingContent()}
       </ModalContainer>

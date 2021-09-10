@@ -31,6 +31,7 @@ import { useDispatch } from 'react-redux'
 import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
 import { withNavigation } from 'react-navigation'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { translations } from '../../common/content/LocContext'
 
 export type Props = {
   accountShell: AccountShell;
@@ -75,7 +76,7 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
       case SubAccountKind.SECURE_ACCOUNT:
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
-        return Colors.borderColor
+        return Colors.kashmirBlue
       case SubAccountKind.SERVICE:
         switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
             case ( ServiceAccountKind.WYRE ):
@@ -86,7 +87,7 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
               return Colors.kashmirBlue
         }
       default:
-        return Colors.borderColor
+        return Colors.kashmirBlue
   }
 }
 
@@ -100,14 +101,16 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
-  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  //const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
   }, [ accountShell.primarySubAccount.kind ] )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   useEffect( () => {
     if (
-      startRegistration &&
+      !primarySubAccount.isUsable &&
         primarySubAccount.kind === SubAccountKind.SERVICE &&
       ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
     ) {
@@ -201,7 +204,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const KnowMoreButton: React.FC = () => {
     return (
       <Button
-        title="Know More"
+        title={common.knowMore}
         type="outline"
         buttonStyle={{
           borderRadius: 5,

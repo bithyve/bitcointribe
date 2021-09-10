@@ -221,6 +221,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           isLinkingSwanWallet: false,
           linkSwanWalletFailed: true,
           linkSwanWalletFailedMessage: action.payload.linkSwanWalletFailedMessage,
+          swanAccountCreationStatus: SwanAccountCreationStatus.ERROR,
         }
 
       case LINK_SWAN_WALLET_SUCCEEDED:

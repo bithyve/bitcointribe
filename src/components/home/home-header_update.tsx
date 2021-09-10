@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, useContext } from 'react'
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { UsNumberFormat } from '../../common/utilities'
 import { useDispatch, useSelector } from 'react-redux'
 import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
+import { LocalizationContext } from '../../common/content/LocContext'
+
 const currencyCode = [
   'BRL',
   'CNY',
@@ -73,23 +75,17 @@ const HomeHeader = ( {
   navigation,
   currentLevel,
 } ) => {
+  const { translations, } = useContext( LocalizationContext )
+  const strings = translations[ 'header' ]
   const fiatCurrencyCode = useCurrencyCode()
   const levelData: LevelData[] = useSelector(
     ( state ) => state.bhr.levelData
   )
-  const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
 
-  const newBHRFlowStarted = useSelector(
-    ( state ) => state.bhr.newBHRFlowStarted
-  )
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
-
-  const upgradeProcessStatus = useSelector(
-    ( state ) => state.upgradeToNewBhr.upgradeProcessStatus
-  )
 
   const cloudBackupStatus = useSelector(
     ( state ) => state.cloud.cloudBackupStatus
@@ -102,19 +98,19 @@ const HomeHeader = ( {
     }}>
       { isInit ?
         <View style={{
-          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ), backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'
+          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ), backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'
         }}>
           <Image
             source={require( '../../assets/images/icons/icon_account_sync_in_progress.gif' )}
             style={{
-              width: wp( '4.0%' ), height: wp( '4.0%' ), borderRadius: wp( '5.5/2%' ),
+              width: wp( '4.0%' ), height: wp( '4.0%' ), borderRadius: wp( '4.0/2%' ),
             }}
             resizeMode={'contain'}
           />
         </View>
         : <View style={{
           backgroundColor: isError ? Colors.red : Colors.green,
-          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '5.5/2%' ),
+          width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
         }}>
@@ -151,24 +147,24 @@ const HomeHeader = ( {
   const getMessageToShow = () => {
     if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
       return {
-        isFirstMessageBold: false, messageOne: 'Initialising Cloud Backup', messageTwo: '', isError: false, isInit: true
+        isFirstMessageBold: false, messageOne: strings.init, messageTwo: '', isError: false, isInit: true
       }
     }
     if( currentLevel == 0 ){
       return {
-        isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
       }
     } else if( currentLevel === 1 ){
       return {
-        isFirstMessageBold: false, messageOne: 'Level 1 Cloud Backup is complete', messageTwo: '', isError: false
+        isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
       }
     } else if( currentLevel === 2 ){
       return {
-        isFirstMessageBold: false, messageOne: 'Level 2 Double Backup is complete', messageTwo: '', isError: false
+        isFirstMessageBold: false, messageOne: strings.l2, messageTwo: '', isError: false
       }
     } else if( currentLevel == 3 ){
       return {
-        isFirstMessageBold: true, messageOne: 'Level 3 Multi-key Backup is complete', messageTwo: '', isError: false
+        isFirstMessageBold: true, messageOne: strings.l3, messageTwo: '', isError: false
       }
     }
   }

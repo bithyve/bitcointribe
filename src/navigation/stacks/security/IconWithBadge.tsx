@@ -89,6 +89,11 @@ const IconWithBadge = ( {
         <SecurityInactive />
       }
       {isError && <View style={styles.dot}/>}
+      {focused ?
+        <View style={styles.activeStyle}/>
+        :
+        <View style={styles.inactiveStyle}/>
+      }
     </View>
   )
 }

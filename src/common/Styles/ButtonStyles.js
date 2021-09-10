@@ -63,7 +63,7 @@ const ButtonStyles = StyleSheet.create( {
       width: 10, height: 10
     },
     shadowRadius: 6,
-    elevation: 8,
+    // elevation: 5,
   },
 
   actionButtonText,

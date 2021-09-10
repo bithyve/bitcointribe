@@ -101,7 +101,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
           swanTitle = 'Your Hexa Wallet is communicating with Swan Bitcoin...'
-          swanMessage = 'This account is being linked with your profile on Swan Bitcoin'
+          swanMessage = 'This account is being linked with your profile on Swan Bitcoin.\n\nThis may take a few seconds, please do not close the application.'
           showNote = false
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
@@ -120,7 +120,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           // accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches auto-withdrawal limit of 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.'
+          swanMessage = 'This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.'
           swanTitle = 'Stack Sats\nwith Swan'
           showNote = true
     }
@@ -153,10 +153,10 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }}>{swanMessage}</Text>
           {showNote &&
             <BottomInfoBox
-              backgroundColor={Colors.white}
+              // backgroundColor={Colors.white}
               title={'Note'}
               infoText={
-                'Please register with Swan Bitcoin to use this account'
+                'Please login/register your Swan Bitcoin Account to use this wallet'
               }
             />
           }
@@ -287,13 +287,55 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
+    {swanAccountCreationStatus === SwanAccountCreationStatus.ERROR &&
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={onClickSetting}
+      style={{
+        width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+        alignSelf: 'flex-end',
+        backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+        marginTop: wp( 3 ), marginRight: wp( 3 )
+      }}
+    >
+      <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+      }} />
+    </TouchableOpacity>
+    }
     {renderMessage()}
+    {showNote &&
+    <View style={styles.statusIndicatorView}>
+      <View style={styles.statusIndicatorInactiveView} />
+      {/* <View style={styles.statusIndicatorInactiveView} /> */}
+      <View style={styles.statusIndicatorActiveView} />
+    </View>
+    }
     {renderFooter()}
   </View>
   )
 }
 
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '6%' ),
+    marginBottom: hp( 2 )
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
   modalContentContainer: {
     backgroundColor: Colors.white,
   },
@@ -311,7 +353,7 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '7%' ),
     // marginLeft: wp( '5%' ),
-    marginTop: wp( '5%' ),
+    marginTop: wp( '3.6%' ),
     // flex: 1.7
   },
   modalTitleText: {
@@ -338,8 +380,8 @@ const styles = StyleSheet.create( {
     minWidth: 144,
     paddingHorizontal: wp( 4 ),
     paddingVertical: wp( 3 ),
-    height: wp( '15%' ),
-    width: wp( '36%' ),
+    height: wp( '13%' ),
+    width: wp( '27%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,

@@ -190,20 +190,32 @@ export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer
       encryptedData: encrypted
     }
   } )
-  const channelIds = []
-  contacts.forEach( contact => {
-    channelIds.push( contact.channelKey )
-  } )
   const STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, restoreVersions )
   const image : NewWalletImage = {
     name: walletDB.walletName,
     walletId : walletDB.walletId,
-    contacts : channelIds,
     accounts : acc,
     versionHistory: STATE_DATA.versionHistory,
     SM_share: walletDB.smShare,
     details2FA: walletDB.details2FA,
-    primarySeed: walletDB.primarySeed,
+  }
+  const channelIds = []
+  contacts.forEach( contact => {
+    channelIds.push( contact.channelKey )
+  } )
+  if( channelIds.length > 0 ) {
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      encKey,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update(
+      JSON.stringify( channelIds ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    image.contacts = encrypted
   }
   const key = BHROperations.strechKey( answer )
   return await encrypt( image, key )

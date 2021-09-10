@@ -13,7 +13,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 export default function LoaderModal( props ) {
   return ( <View style={{
-    height: hp( '25%' ), backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    maxHeight: hp( '72%' ), backgroundColor: 'rgba(0, 0, 0, 0.3)',
   }}>
     <View style={styles.modalContentContainer}>
       <View style={{
@@ -27,14 +27,14 @@ export default function LoaderModal( props ) {
         // Removed the showGif condition from here as we are not using the animated gif loader anymore
         // The animated gif loader file size can impact performance
         <View style={{
-          marginLeft: wp( '8%' ), marginRight: wp( '30%' ), marginTop: wp( '8%' ),
+          marginLeft: wp( '8%' ), marginRight:  props.subPoints ? wp( '12%' ) : wp( '30%' ), marginTop: wp( '8%' ),
         }}>
           <Text style={{
             color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.54
             // letterSpacing: 0.54
           }}>{props.headerText}</Text>
           <Text style={{
-            marginRight: wp( '10%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
+            color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
             // letterSpacing: 0.6
           }}>{props.messageText}</Text>
           {props.subPoints &&
@@ -61,11 +61,11 @@ export default function LoaderModal( props ) {
           }
           {props.bottomText &&
           <Text style={{
-            marginRight: wp( '20%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), width: '65%'
+            color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), width: '65%'
           }}>{props.bottomText}</Text>
           }
           <Text style={{
-            marginRight: wp( '20%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
+            marginRight: wp( '3%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
           }}>{props.messageText2 ? props.messageText2 : ''}</Text>
         </View>
       }

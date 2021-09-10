@@ -110,6 +110,9 @@ export default class AccountOperations {
         lastUsedAddressIndex: number,
         lastUsedChangeAddressIndex: number,
         accountType: string,
+        transactionsNote: {
+          [txId: string]: string
+        }
         contactName?: string,
         primaryAccType?: string,
         accountName?: string,
@@ -171,6 +174,7 @@ export default class AccountOperations {
         cachedAQL,
         lastUsedAddressIndex: account.nextFreeAddressIndex - 1,
         lastUsedChangeAddressIndex: account.nextFreeChangeAddressIndex - 1,
+        transactionsNote: account.transactionsNote,
         accountType: account.type,
         accountName: account.accountName,
       }

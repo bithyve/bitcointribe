@@ -11,6 +11,7 @@ import { RescannedTransactionData } from '../../../store/reducers/wallet-rescann
 import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
 import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
 import ModalContainer from '../../../components/home/ModalContainer'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -28,19 +29,19 @@ const versionString = `Version ${DeviceInfo.getVersion()} (${DeviceInfo.getBuild
 
 
 const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-
+  const strings  = translations[ 'settings' ]
   const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
   const [ showRescanningModal, setShowRescanningModal ] = useState( false )
   const menuOptions: MenuOption[] = [
     {
-      title: 'Manage Passcode',
-      subtitle: 'Change your passcode',
+      title: strings.ManagePasscode,
+      subtitle: strings.Changeyourpasscode,
       imageSource: require( '../../../assets/images/icons/managepin.png' ),
       screenName: 'ManagePasscode',
     },
     {
-      title: 'Change Currency',
-      subtitle: 'Choose your currency',
+      title: strings.ChangeCurrency,
+      subtitle: strings.Chooseyourcurrency,
       imageSource: require( '../../../assets/images/icons/country.png' ),
       screenName: 'ChangeCurrency',
     },

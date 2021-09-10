@@ -222,7 +222,7 @@ const SecurityQuestionHistory = ( props ) => {
         selectedTitle={'Encryption Password'}
         selectedTime={props.navigation.state.params.selectedTime}
         moreInfo={''}
-        headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
+        headerImage={require( '../../assets/images/icons/icon_password.png' )}
       />
       <View style={{
         flex: 1

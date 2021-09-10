@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-import { BackupStreamData, cloudDataInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, cloudDataInterface, LevelHealthInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -163,9 +163,17 @@ export const updateMSharesHealth = ( shares, isNeedToUpdateCurrentLevel? ) => {
   }
 }
 
-export const updateWalletImageHealth = () => {
+export const updateWalletImageHealth = ( payload: {
+  updateContacts?: boolean,
+  updateVersion?: boolean,
+  updateSmShare?: boolean,
+  update2fa?: boolean,
+  updateAccounts?: boolean,
+  accountIds?: string[]
+} ) => {
   return {
-    type: UPDATE_WALLET_IMAGE_HEALTH
+    type: UPDATE_WALLET_IMAGE_HEALTH,
+    payload
   }
 }
 
@@ -477,10 +485,10 @@ export const setHealthStatus = ( ) =>{
   }
 }
 
-export const modifyLevelData = ( shareId, contactDetails ) =>{
+export const modifyLevelData = ( levelHealth?: LevelHealthInterface[], currentLevel?: number ) =>{
   return {
     type: MODIFY_LEVELDATA, payload: {
-      shareId, contactDetails
+      levelHealth, currentLevel
     }
   }
 }

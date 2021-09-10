@@ -1,4 +1,4 @@
-import React, { useState, useMemo, createRef, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useContext, useCallback, useEffect } from 'react'
 import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform, ScrollView, StatusBar } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
@@ -30,6 +30,7 @@ import { color } from 'react-native-reanimated'
 import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -37,6 +38,7 @@ export type Props = {
 
 const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
+  const strings = translations[ 'accManagement' ]
   const originalAccountShells = useActiveAccountShells()
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
   // const [ tempValue, setTempValue ] = useState( false )
@@ -279,7 +281,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
               fontWeight: '700'
             }}
           >
-            {primarySubAccount.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}
+            {primarySubAccount.visibility === AccountVisibility.HIDDEN ? strings.Unhide :strings.Restore}
           </Text>
         </TouchableOpacity> : null}
       </ListItem>
@@ -322,8 +324,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           alignItems: 'flex-start'
         }}>
           <HeaderTitle
-            firstLineTitle={'Account Management'}
-            secondLineTitle={'Rearrange, archive and reinstate accounts from here'}
+            firstLineTitle={strings[ 'AccountManagement' ]}
+            secondLineTitle={strings.Rearrange}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
@@ -374,7 +376,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             backgroundColor: Colors.white
           }}>
             <Text style={styles.pageInfoText}>
-              Hidden Accounts
+              {strings.HiddenAccounts}
             </Text>
           </View>
           <View style={{
@@ -395,7 +397,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           marginTop: wp( '2%' ),
         }}>
           <Text style={styles.pageInfoText}>
-              Archived Accounts
+            {strings.ArchivedAccounts}
           </Text>
           <View style={{
             marginBottom: 15
@@ -415,7 +417,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       <View style={styles.proceedButtonContainer}>
         {canSaveOrder && (
           <ButtonBlue
-            buttonText="Save New Ordering"
+            buttonText={strings.Save}
             handleButtonPress={handleProceedButtonPress}
           />
         )}
