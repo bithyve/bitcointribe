@@ -51,8 +51,8 @@ import { LocalizationContext } from '../common/content/LocContext'
 
 import PassActive from '../assets/images/svgs/icon_password_active.svg'
 import PassInActive from '../assets/images/svgs/icon_password.svg'
-import QueActive from '..assets/images/svgs/icon_question_active.svg'
-import QueInActive from '../assets/images/svgs/icon_question.svg'
+import QueActive from '../assets/images/svgs/icon_question.svg'
+import QueInActive from '../assets/images/svgs/question_inactive.svg'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -1230,21 +1230,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               step={''}
             />
             <CardWithRadioBtn
-              geticon={() => {if( activeIndex === 0 ) { return <QueInActive /> } else { <QueInActive />}}}
+              geticon={() => {if( activeIndex === 0 ) { return <QueActive /> } else { return <QueInActive/>}}}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
               index={0}
             />
-            {/* <CardWithRadioBtn
-              icon={activeIndex === 1 ? PassActive : PassInActive}
+            <CardWithRadioBtn
+              geticon={() => {if( activeIndex === 0 ) { return <PassInActive /> } else { return <PassActive/>}}}
               mainText={strings.Useencryptionpassword}
               subText={strings.Createapassword}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
-            /> */}
+            />
           </TouchableOpacity>
 
         </View>
