@@ -10,7 +10,7 @@ import AccountTestActive from '../../assets/images/accIcons/test_small_active.sv
 import AccountTestInactive from '../../assets/images/accIcons/test_small_inactive.svg'
 import SavingsActive from '../../assets/images/accIcons/savings_small_active.svg'
 import SavingsInactive from '../../assets/images/accIcons/savings_small_inactive.svg'
-import DonationtActive from '../../assets/images/accIcons/donation_small_inactive.svg'
+import DonationtActive from '../../assets/images/accIcons/donation_small_active.svg'
 import DonationtInavtive from '../../assets/images/accIcons/donation_small_inactive.svg'
 import CheckingActive from '../../assets/images/accIcons/checking_small_active.svg'
 import CheckingInactive from '../../assets/images/accIcons/checking_small_inactive.svg'
@@ -20,8 +20,8 @@ import AccountDonation from '../../assets/images/accIcons/acc_donation.svg'
 import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
 import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
 import AccountSavings from '../../assets/images/accIcons/acc_savings.svg'
-// import AccountChecking from '../../assets/images/accIcons/icon_checking.svg'
-
+import Wallet from '../../assets/images/accIcons/icon_wallet.svg'
+import Watch from '../../assets/images/accIcons/view.svg'
 const getAvatarForSubAccount = (
   subAccount: SubAccountDescribing,
   active?: boolean,
@@ -60,11 +60,11 @@ const getAvatarForSubAccount = (
       case SubAccountKind.DONATION_ACCOUNT:
         return isAccount ? <AccountDonation /> : isHome ? <AccountDonation /> : active ? <DonationtActive /> : <DonationtInavtive />
       case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
-        return isAccount ? <AccountSavings /> : isHome ? <AccountSavingsHome /> : active ? <SavingsActive /> : <SavingsInactive />
+        return <Watch />
       case SubAccountKind.FULLY_IMPORTED_WALLET:
-        return isHome ? <AccountSavingsHome /> : active ? <SavingsActive /> : <SavingsInactive />
-      // case SubAccountKind.SERVICE:
-      //   return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
+        return <Wallet />
+      case SubAccountKind.SERVICE:
+        return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:
         return isHome ? <AccountSavingsHome /> : active ? <SavingsActive /> : <SavingsInactive />
   }
