@@ -25,7 +25,7 @@ import HistoryPageComponent from './HistoryPageComponent'
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact'
 import moment from 'moment'
 import _ from 'underscore'
-import { generateDeepLink, nameToInitials } from '../../common/CommonFunctions'
+import { nameToInitials } from '../../common/CommonFunctions'
 import {
   ErrorSending,
   updateMSharesHealth,

@@ -34,7 +34,7 @@ import { updateTrustedContacts } from '../../store/actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import idx from 'idx'
-import { generateDeepLink } from '../../common/CommonFunctions'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import DeviceInfo from 'react-native-device-info'
 
 
@@ -179,7 +179,14 @@ export default function QrAndLink( props ) {
             break
       }
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
+    const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+      deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      encryptionType: encryptLinkWith,
+      encryptionKey: encryption_key,
+      walletName: wallet.walletName,
+      keysToEncrypt,
+    } )
     setTrustedLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(

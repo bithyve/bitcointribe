@@ -323,29 +323,9 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
   return levelHealthVar[ currentLevel - 1 ].levelInfo
 }
 
-export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryptionKey: string, correspondingTrustedContact: TrustedContact, walletName: string ) => {
-  const keysToEncrypt = correspondingTrustedContact.channelKey + '-' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' )
-  let encryptedChannelKeys: string
-  let encryptionHint: string
-  switch ( encryptionType ) {
-      case DeepLinkEncryptionType.DEFAULT:
-        encryptionHint = ''
-        encryptedChannelKeys = keysToEncrypt
-        break
-
-      case DeepLinkEncryptionType.NUMBER:
-      case DeepLinkEncryptionType.EMAIL:
-      case DeepLinkEncryptionType.OTP:
-        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
-        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
-          keysToEncrypt,
-          encryptionKey
-        )
-        break
-  }
-
+export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: TrustedContactRelationTypes ) => {
   let deepLinkKind: DeepLinkKind
-  switch( correspondingTrustedContact.relationType ){
+  switch( contactRelationType ){
       case TrustedContactRelationTypes.CONTACT:
         deepLinkKind = DeepLinkKind.CONTACT
         break
@@ -364,6 +344,30 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
 
       case TrustedContactRelationTypes.EXISTING_CONTACT:
         deepLinkKind = DeepLinkKind.EXISTING_CONTACT
+  }
+
+  return deepLinkKind
+}
+
+export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string } ) => {
+
+  let encryptedChannelKeys: string
+  let encryptionHint: string
+  switch ( encryptionType ) {
+      case DeepLinkEncryptionType.DEFAULT:
+        encryptionHint = ''
+        encryptedChannelKeys = keysToEncrypt
+        break
+
+      case DeepLinkEncryptionType.NUMBER:
+      case DeepLinkEncryptionType.EMAIL:
+      case DeepLinkEncryptionType.OTP:
+        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
+        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+          keysToEncrypt,
+          encryptionKey
+        )
+        break
   }
 
   const appType = config.APP_STAGE
