@@ -17,6 +17,7 @@ import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
 import Node from '../../assets/images/svgs/node.svg'
 import Wallet from '../../assets/images/svgs/icon_settings.svg'
 import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
 import Languages from '../../common/content/availableLanguages'
@@ -360,13 +361,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={[ styles.otherCards, styles.extraHeight ]}
           >
-            <Image
-              source={require( '../../assets/images/icons/question_active.png' )}
-              style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
-              }}
-            />
+            <QueActive/>
             <View style={{
               marginLeft: 10
             }}>
@@ -397,14 +392,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={styles.otherCards}
           >
-            <Image
-              source={require( '../../assets/images/icons/icon_telegram.png' )}
-              style={{
-                width: widthPercentageToDP( 7 ),
-                height: widthPercentageToDP( 7 ),
-                resizeMode: 'contain'
-              }}
-            />
+            <Telegram />
             <View style={{
               marginLeft: 10
             }}>

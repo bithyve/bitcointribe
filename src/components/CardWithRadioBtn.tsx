@@ -12,7 +12,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import CheckMark from '../assets/images/svgs/iconcheckmark.svg'
+import CheckMark from '../assets/images/svgs/icon_checkmark.svg'
 
 export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, mainText, subText, isSelected, index } ) {
   return (

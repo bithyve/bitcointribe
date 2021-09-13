@@ -223,11 +223,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           backgroundColor: Colors.backgroundColor
         }}
       >
-        <Image
-          source={getAvatarForSubAccount( primarySubAccount, false, true )}
-          style={ImageStyles.thumbnailImageLarge}
-          resizeMode="contain"
-        />
+        {getAvatarForSubAccount( primarySubAccount, false, true )}
 
         <ListItem.Content>
           <ListItem.Title
