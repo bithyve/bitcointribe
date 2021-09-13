@@ -15,6 +15,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import {  useSelector } from 'react-redux'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
+import Illustration from '../../../assets/images/svgs/illustration.svg'
+import Wallet from '../../../assets/images/svgs/wallet.svg'
 
 export default function EditWalletSuccess( props ) {
   const walletName = useSelector(
@@ -25,11 +27,9 @@ export default function EditWalletSuccess( props ) {
       backgroundColor: Colors.bgColor
     }}>
       <View style={{
-        marginTop: 'auto', right: 0, bottom: 0, position: 'absolute'
+        marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
       }}>
-        <Image source={require( '../../../assets/images/illustration.png' )} style={{
-          width: wp( '30%' ), height: wp( '35%' ), marginLeft: 'auto', resizeMode: 'stretch',
-        }} />
+        <Illustration/>
       </View>
       <TouchableOpacity
         activeOpacity={1}
@@ -41,9 +41,7 @@ export default function EditWalletSuccess( props ) {
           marginTop: wp( 3 ), marginRight: wp( 3 )
         }}
       >
-        <FontAwesome name="close" color={Colors.white} size={19} style={{
-          // marginTop: hp( 0.5 )
-        }} />
+        <FontAwesome name="close" color={Colors.white} size={19} />
       </TouchableOpacity>
       <View style={{
         alignSelf: 'baseline'
@@ -69,12 +67,7 @@ export default function EditWalletSuccess( props ) {
           justifyContent: 'flex-start', marginVertical: 10,
           marginHorizontal: 10, flexDirection: 'row', alignItems: 'center'
         }}>
-          <Image
-            source={require( '../../../assets/images/icons/wallet.png' )}
-            style={{
-              width: 73, height: 73, resizeMode: 'contain'
-            }}
-          />
+          <Wallet />
           <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
         </View>
 

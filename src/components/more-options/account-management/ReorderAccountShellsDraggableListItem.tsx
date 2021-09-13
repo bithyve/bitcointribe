@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image } from 'react-native'
+import { Image, View } from 'react-native'
 import AccountShell from '../../../common/data/models/AccountShell'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { ListItem } from 'react-native-elements'
@@ -39,11 +39,10 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
         width: isActive ? '105%' : '100%',
       }}
     >
-      <Image
-        source={getAvatarForSubAccount( primarySubAccount, false, true )}
-        style={ImageStyles.thumbnailImageLarge}
-        resizeMode="contain"
-      />
+      <View style={ImageStyles.thumbnailImageLarge} >
+        {getAvatarForSubAccount( primarySubAccount, false, true )}
+      </View>
+
 
       <ListItem.Content>
         <ListItem.Title

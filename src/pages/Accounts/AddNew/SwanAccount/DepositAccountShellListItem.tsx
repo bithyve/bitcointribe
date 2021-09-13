@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Image } from 'react-native'
+import { StyleSheet, Image, View } from 'react-native'
 import AccountShell from '../../../../common/data/models/AccountShell'
 import Colors from '../../../../common/Colors'
 import ListStyles from '../../../../common/Styles/ListStyles'
@@ -27,11 +27,9 @@ const DepositSubAccountShellListItem: React.FC<Props> = ( {
 
   return (
     <>
-      <Image
-        source={getAvatarForSubAccount( primarySubAccount )}
-        style={styles.avatarImage}
-        resizeMode="contain"
-      />
+      <View style={styles.avatarImage} >
+        {getAvatarForSubAccount( primarySubAccount )}
+      </View>
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title

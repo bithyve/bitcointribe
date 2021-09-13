@@ -13,6 +13,12 @@ import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { useSelector, useDispatch } from 'react-redux'
 import { currencyKindSet } from '../../store/actions/preferences'
 import { ScrollView } from 'react-native-gesture-handler'
+import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
+import Node from '../../assets/images/svgs/node.svg'
+import Wallet from '../../assets/images/svgs/icon_settings.svg'
+import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import QueActive from '../../assets/images/svgs/question_inactive.svg'
+import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
 import Languages from '../../common/content/availableLanguages'
 
@@ -31,7 +37,6 @@ export type Props = {
 interface MenuOption {
   title: string;
   subtitle: string;
-  imageSource: ImageSourcePropType;
   screenName?: string;
   name ?: string,
   onOptionPressed?: () => void;
@@ -70,9 +75,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   //   isSwitch: true
   // },
     {
-      title: strings.accountManagement,
-      imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
-      subtitle: strings.accountManagementSub,
+      title: 'Account Management',
+      // imageSource: AccManagement,
+      subtitle: 'View and manage your accounts',
       screenName: 'AccountManagement',
     },
     /*
@@ -87,9 +92,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   },
   */
     {
-      title: strings.node,
-      imageSource: require( '../../assets/images/icons/own-node.png' ),
-      subtitle: strings.nodeSub,
+      title: 'Node Settings',
+      subtitle: 'Connect Hexa wallet to your own node',
       screenName: 'NodeSettings',
     },
     /*
@@ -116,18 +120,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   },
     // },
     {
-      imageSource: require( '../../assets/images/icons/settings.png' ),
-      subtitle: strings.walletSettingsSub,
-      title: strings.walletSettings,
+      title: 'Wallet Settings',
+      subtitle: 'Your wallet settings & preferences',
       screenName: 'WalletSettings',
     },
     {
-      title: strings.AppInfo,
-      imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle: strings.AppInfoSub,
+      title: 'App Info',
+      subtitle: 'Hexa app version number and details',
       screenName: 'AppInfo',
     },
   ]
+
+  const listItemKeyExtractor = ( item: MenuOption ) => item.title
+
 
   //const [ strings, setstrings ] = useState( content.settings )
   function handleOptionSelection( menuOption: MenuOption ) {
@@ -145,6 +150,20 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
 
+  const findImage = ( name ) => {
+    switch ( name ){
+        case 'Account Management':
+          return ( <AccManagement /> )
+        case 'Node Settings':
+          return ( <Node /> )
+        case 'Wallet Settings':
+          return ( <Wallet /> )
+        case 'App Info':
+          return ( <AppInfo /> )
+        default:
+          return null //You might want to return something else here//
+    }
+  }
   return (
     <View style={{
       backgroundColor: Colors.blue
@@ -264,12 +283,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   <View style={{
                     justifyContent: 'center',
                   }}>
-                    <Image
-                      source={menuOption.imageSource}
-                      style={{
-                        width: 25, height: 25, resizeMode: 'contain'
-                      }}
-                    />
+                    {findImage( menuOption.title )}
                   </View>
                   <View style={{
                     justifyContent: 'center', marginLeft: 10
@@ -347,13 +361,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={[ styles.otherCards, styles.extraHeight ]}
           >
-            <Image
-              source={require( '../../assets/images/icons/question_active.png' )}
-              style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
-              }}
-            />
+            <QueActive/>
             <View style={{
               marginLeft: 10
             }}>
@@ -384,14 +392,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={styles.otherCards}
           >
-            <Image
-              source={require( '../../assets/images/icons/icon_telegram.png' )}
-              style={{
-                width: widthPercentageToDP( 7 ),
-                height: widthPercentageToDP( 7 ),
-                resizeMode: 'contain'
-              }}
-            />
+            <Telegram />
             <View style={{
               marginLeft: 10
             }}>

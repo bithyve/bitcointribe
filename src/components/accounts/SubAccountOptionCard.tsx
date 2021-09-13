@@ -123,11 +123,10 @@ const SubAccountOptionCard: React.FC<Props> = ( {
             {specialTag}
           </Card.Title>
         )}
+        <View style={styles.image} >
+          {getAvatarForSubAccount( subAccountInfo, isSelected )}
+        </View>
 
-        <Image
-          style={styles.image}
-          source={getAvatarForSubAccount( subAccountInfo, isSelected )}
-        />
 
         <View style={descriptionTextContainerStyle}>
           <Card.Title style={titleTextStyle} numberOfLines={1}>

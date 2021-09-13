@@ -13,6 +13,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import { LocalizationContext } from '../../common/content/LocContext'
 import BottomInfoBox from '../BottomInfoBox'
+import Ramp from '../../assets/images/svgs/ramp.svg'
+import Wyre from  '../../assets/images/svgs/wyre.svg'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -30,10 +32,11 @@ export type BuyBitcoinBottomSheetMenuItem = {
   title: string;
   subtitle: string;
   kind: BuyMenuItemKind | '';
-  imageSource: ImageSourcePropType;
+  // imageSource: ImageSourcePropType;
   disabled: boolean;
   hasButton: boolean;
   link: string;
+  getImage: any
 }
 
 
@@ -48,7 +51,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
       title: Platform.OS == 'ios' ? strings.ramp : strings.ramp,
       subtitle: strings.rampSub,
       kind: BuyMenuItemKind.RAMP,
-      imageSource: require( '../../assets/images/accIcons/ramp.png' ),
+      getImage: () => <Ramp />,
       disabled: false,
       hasButton: true,
       link: 'https://support.ramp.network/en/',
@@ -57,7 +60,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
       title: strings.wyre,
       subtitle: strings.wyreSub,
       kind: BuyMenuItemKind.WYRE,
-      imageSource: require( '../../assets/images/accIcons/wyre.png' ),
+      getImage: () => <Wyre />,
       disabled: false,
       hasButton: false,
       link: 'https://support.sendwyre.com/hc/en-us',
@@ -111,11 +114,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
         <ListItem
           containerStyle={menuItem.disabled ? ListStyles.disabledContainer : [ ListStyles.container, styles.mainCardContainer ]}
         >
-          <Image
-            source={menuItem.imageSource}
-            style={ImageStyles.thumbnailImageLarge}
-            resizeMode="contain"
-          />
+          {menuItem.getImage()}
 
           <ListItem.Content style={styles.cardMiddle}>
             <ListItem.Title style={menuItem.disabled ? ListStyles.disabledListItemTitle : [ ListStyles.listItemTitle, styles.CardText ]}>{menuItem.title}</ListItem.Title>

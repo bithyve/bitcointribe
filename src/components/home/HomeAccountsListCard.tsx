@@ -43,10 +43,9 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         style={styles.headerAccountSync}
         source={getAccountSyncIcon( accountShell.syncStatus )}
       />
-      <Image
-        style={styles.headerAccountImage}
-        source={getAvatarForSubAccount( primarySubAccount, false, true )}
-      />
+      <View style={styles.headerAccountImage} >
+        {getAvatarForSubAccount( primarySubAccount, false, true )}
+      </View>
       {
         accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration ) && (
           <View style={styles.dot}/>
