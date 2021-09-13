@@ -20,6 +20,8 @@ import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
+import ManageGifts from '../../../pages/FriendsAndFamily/ManageGifts'
+import CreateGift from '../../../pages/FriendsAndFamily/CreateGift'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
@@ -48,6 +50,8 @@ const FriendsAndFamily = createStackNavigator(
         // tabBarVisibl
       },
     },
+    ManageGifts,
+    CreateGift,
     Login,
     Launch,
     Intermediate,
