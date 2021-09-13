@@ -556,14 +556,14 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   let generatedGift: Gift
   if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
     try{
-      const amount = 2000 // amount in sats
+      const amounts = [ 2000 ] // amount in sats
       const defaultAccount = accounts[ defaultCheckingAccountId ]
       const averageTxFeeByNetwork = accountsState.averageTxFees[ defaultAccount.networkType ]
       const walletDetails = {
         walletId: wallet.walletId,
         walletName: wallet.walletName
       }
-      const { txid, gift } = yield call( AccountOperations.generateGift, walletDetails, defaultAccount, amount, averageTxFeeByNetwork )
+      const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, defaultAccount, amounts, averageTxFeeByNetwork )
 
       if( txid ) {
         const permanentChannelAddress = crypto
@@ -571,12 +571,12 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
           .update( contactInfo.channelKey )
           .digest( 'hex' )
 
-        generatedGift = gift
+        generatedGift = gifts[ 0 ]
         generatedGift.status = GiftStatus.SENT,
         generatedGift.receiver = {
           contactId: permanentChannelAddress
         }
-        yield put( addNewGift( gift ) )
+        yield put( addNewGift( gifts[ 0 ] ) )
       }
     } catch( err ) {
       console.log( 'Failed to generate gift', {

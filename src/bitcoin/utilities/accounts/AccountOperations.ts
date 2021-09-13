@@ -1000,58 +1000,66 @@ export default class AccountOperations {
     }
   };
 
-  static generateGift = async (
+  static generateGifts = async (
     walletDetails: {
       walletId: string,
       walletName: string,
     },
     account: Account | MultiSigAccount,
-    amount: number,
+    amounts: number[],
     averageTxFees: AverageTxFees,
   ): Promise<{
     txid: string;
-    gift: Gift;
+    gifts: Gift[];
    }> => {
 
     const network = AccountUtilities.getNetworkByType( account.networkType )
-    const keyPair = bitcoinJS.ECPair.makeRandom( {
-      network: network
+
+    const recipients = []
+    const gifts: Gift[] = []
+    amounts.forEach( amount => {
+      const keyPair = bitcoinJS.ECPair.makeRandom( {
+        network: network
+      } )
+
+      const privateKey = keyPair.toWIF()
+      const address = AccountUtilities.deriveAddressFromKeyPair(
+        keyPair,
+        config.DPATH_PURPOSE,
+        network
+      )
+
+      recipients.push( {
+        address,
+        amount,
+        name: 'Gift',
+      } )
+
+      const createdGift: Gift = {
+        id: crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' ),
+        privateKey,
+        address,
+        amount,
+        type: GiftType.SENT,
+        status: GiftStatus.CREATED,
+        sender: {
+          walletId: walletDetails.walletId,
+          walletName: walletDetails.walletName,
+          accountId: account.id,
+        },
+        receiver: {
+        }
+      }
+
+      gifts.push( createdGift )
     } )
 
-    const address = AccountUtilities.deriveAddressFromKeyPair(
-      keyPair,
-      config.DPATH_PURPOSE,
-      network
-    )
-    const recipient = {
-      address,
-      amount,
-      name: 'Gift',
-    }
-    const { txPrerequisites } = await AccountOperations.transferST1( account, [ recipient ], averageTxFees )
-    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, TxPriority.LOW, network, [ recipient ] )
 
-    const privateKey = keyPair.toWIF()
-    const id = crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' )
-
-    const createdGift: Gift = {
-      id,
-      privateKey,
-      address,
-      amount,
-      type: GiftType.SENT,
-      status: GiftStatus.CREATED,
-      sender: {
-        walletId: walletDetails.walletId,
-        walletName: walletDetails.walletName,
-        accountId: account.id,
-      },
-      receiver: {
-      }
-    }
+    const { txPrerequisites } = await AccountOperations.transferST1( account, recipients, averageTxFees )
+    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, TxPriority.LOW, network, recipients )
 
     return {
-      txid, gift: createdGift
+      txid, gifts
     }
   }
 }
