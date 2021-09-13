@@ -42,7 +42,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
-
 import PassActive from '../../assets/images/svgs/icon_password_active.svg'
 import PassInActive from '../../assets/images/svgs/icon_password.svg'
 import QueActive from '../../assets/images/svgs/icon_question.svg'
