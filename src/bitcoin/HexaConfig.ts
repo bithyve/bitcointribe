@@ -29,9 +29,9 @@ class HexaConfig {
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa'
   public SWAN_BASE_URL:string = Config.SWAN_BASE_URL || 'https://api.swanbitcoin.com'
-  public SWAN_URL_PREFIX:string = Config.SWAN_URL_PREFIX || '/apps/v20180824/'
+  public SWAN_URL_PREFIX:string = Config.SWAN_URL_PREFIX || '/apps/v20210824/'
   public SWAN_REDIRECT_URL: string = Config.SWAN_REDIRECT_URL || 'https%3A%2F%2Fhexa.bithyve.com%2FdeepLink%2Fdev%2Fswan%2F'
-  public WALLET_SLUG: string = Config.WALLET_SLUG ? Config.WALLET_SLUG.trim() : 'WALLET_SLUG'
+  public WALLET_SLUG: string = Config.WALLET_SLUG ? Config.WALLET_SLUG.trim() : 'hexa'
   public FBTC_REGISTRATION_URL: string = Config.FBTC_REGISTRATION_URL ? Config.FBTC_REGISTRATION_URL.trim() : 'https://fastbitcoins.com/create-account/hexa'
   public FBTC_URL: string = Config.FBTC_URL ? Config.FBTC_URL.trim() : 'https://wallet-api.fastbitcoins.com/v2/'
   public TESTNET_BASE_URL: string = Config.BIT_TESTNET_BASE_URL ? Config.BIT_TESTNET_BASE_URL.trim() : 'https://test-wrapper.bithyve.com'
