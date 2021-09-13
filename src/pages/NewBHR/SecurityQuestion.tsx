@@ -111,12 +111,12 @@ function SecurityQuestion( props ) {
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                Health Check{'\n'}Confirm {parseInt( security.questionId ) > 0 ? 'Answer' : 'Password' }
+                Health Check{'\n'}Confirm Password
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
-                Specify the {parseInt( security.questionId ) > 0 ? 'answer' : 'password'}{'\n'}as you did at
+                Specify the password{'\n'}as you did at
                 the time of setting up the wallet
               </Text>
             </View>
