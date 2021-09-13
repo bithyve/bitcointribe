@@ -1,8 +1,10 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, EncryptedImage, NewWalletImage } from './Interface'
+import { INotification, NewWalletImage } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
+import crypto from 'crypto'
+import TrustedContactsOperations from './TrustedContactsOperations'
 
 const { HEXA_ID } = config
 export default class Relay {
@@ -355,4 +357,67 @@ export default class Relay {
       throw new Error( 'Failed to fetch Wallet Image' )
     }
   };
+
+  public static updateTemporaryChannel = async ( encryptionKey: string, data: any ): Promise<{
+    updated: boolean;
+  }> => {
+    try {
+
+      const temporaryChannelAddress = crypto
+        .createHash( 'sha256' )
+        .update( encryptionKey )
+        .digest( 'hex' )
+      const encryptedData = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( data ), encryptionKey )
+
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'updateTemporaryChannel', {
+          HEXA_ID,
+          temporaryChannelAddress,
+          encryptedData
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { updated } = res.data
+      return {
+        updated
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to update temporary channel' )
+    }
+  };
+
+  public static fetchTemporaryChannel = async ( decryptionKey: string ): Promise<{
+    data: any;
+  }> => {
+    try {
+
+      const temporaryChannelAddress = crypto
+        .createHash( 'sha256' )
+        .update( decryptionKey )
+        .digest( 'hex' )
+
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'fetchTemporaryChannel', {
+          HEXA_ID,
+          temporaryChannelAddress,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { encryptedData } = res.data
+      const decryptedData = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedData, decryptionKey ) )
+
+      return {
+        data: decryptedData
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch temporary channel' )
+    }
+  };
+
 }
