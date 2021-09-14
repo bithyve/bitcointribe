@@ -73,6 +73,18 @@ const createAccount = async ( account ) => {
     if( account.activeAddresses ) {
       data.activeAddresses = getActiveAddresses( account.activeAddresses )
     }
+    if( account.transactionsNote && Object.keys( account.transactionsNote ).length > 0 ) {
+      const notes = []
+      for ( const [ key, value ] of Object.entries( account.transactionsNote ) ) {
+        notes.push( {
+          txId: key,
+          note: value
+        } )
+      }
+      data.transactionsNote = notes
+    } else {
+      data.transactionsNote = []
+    }
     if( data.txIdMap ){
       if( Object.keys( data.txIdMap ).length === 0 ) {
         delete data.txIdMap
@@ -103,6 +115,18 @@ const updateAccount = async ( accountId, account ) => {
     }
     if( account.activeAddresses ) {
       data.activeAddresses = getActiveAddresses( account.activeAddresses )
+    }
+    if( Object.keys( account.transactionsNote ).length > 0 ) {
+      const notes = []
+      for ( const [ key, value ] of Object.entries( account.transactionsNote ) ) {
+        notes.push( {
+          txId: key,
+          note: value
+        } )
+      }
+      data.transactionsNote = notes
+    } else {
+      data.transactionsNote = []
     }
     if( data.txIdMap ){
       if( Object.keys( data.txIdMap ).length === 0 ) {
