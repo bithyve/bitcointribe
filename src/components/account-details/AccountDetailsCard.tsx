@@ -142,11 +142,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
           alignItems: 'flex-start',
           marginBottom: 8,
         }}>
-          <Image
-            source={getAvatarForSubAccount( primarySubAccount, false, false, true )}
-            style={styles.accountKindBadgeImage}
-          />
-
+          <View style={styles.accountKindBadgeImage} >
+            {getAvatarForSubAccount( primarySubAccount, false, false, true )}
+          </View>
           <View style={{
             marginLeft: 'auto'
           }}>

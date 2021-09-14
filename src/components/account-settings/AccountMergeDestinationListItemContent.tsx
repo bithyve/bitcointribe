@@ -1,28 +1,24 @@
-import React from 'react';
-import { StyleSheet, Image } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import AccountShell from '../../common/data/models/AccountShell';
-import ListStyles from '../../common/Styles/ListStyles';
-import ImageStyles from '../../common/Styles/ImageStyles';
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
+import React from 'react'
+import { StyleSheet, Image, View } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import AccountShell from '../../common/data/models/AccountShell'
+import ListStyles from '../../common/Styles/ListStyles'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 
 export type Props = {
   accountShell: AccountShell;
 };
 
-const AccountMergeDestinationListItemContent: React.FC<Props> = ({
-  accountShell,
-}: Props) => {
-  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
+const AccountMergeDestinationListItemContent: React.FC<Props> = ( { accountShell, }: Props ) => {
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
   return (
     <>
-      <Image
-        source={getAvatarForSubAccount(primarySubAccount)}
-        style={styles.avatarImage}
-        resizeMode="contain"
-      />
+      <View style={styles.avatarImage} >
+        {getAvatarForSubAccount( primarySubAccount )}
+      </View>
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title
@@ -40,10 +36,10 @@ const AccountMergeDestinationListItemContent: React.FC<Props> = ({
         </ListItem.Subtitle>
       </ListItem.Content>
     </>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.thumbnailImageMedium,
     marginRight: 14,
@@ -53,7 +49,7 @@ const styles = StyleSheet.create({
   titleSection: {
     flex: 1,
   },
-});
+} )
 
 
-export default AccountMergeDestinationListItemContent;
+export default AccountMergeDestinationListItemContent

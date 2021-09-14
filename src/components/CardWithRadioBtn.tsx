@@ -12,8 +12,9 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
+import CheckMark from '../assets/images/svgs/icon_checkmark.svg'
 
-export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subText, isSelected, index } ) {
+export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, mainText, subText, isSelected, index } ) {
   return (
     <TouchableOpacity
       onPress={() => setActiveIndex( index )}
@@ -49,21 +50,15 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
           },
         }}>
           {isSelected &&
-          <Image
-            style={{
-              width: '100%', height: '100%'
-            }}
-            source={require( '../assets/images/icons/checkmark.png' )}
-          />
+          <CheckMark />
           }
         </View>
-        {icon !== '' &&
-        <Image
-          style={{
-            width: 27, height: 27, resizeMode: 'contain', marginLeft: wp( '3%' )
-          }}
-          source={icon}
-        />
+        {geticon !== '' &&
+        <View style={{
+          marginLeft: wp( '3%' )
+        }} >
+          {geticon()}
+        </View>
         }
         <View style={{
           marginLeft: wp( '4%' )

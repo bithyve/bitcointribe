@@ -117,11 +117,10 @@ const TransactionListItemContent: React.FC<Props> = ( {
       /> */}
 
       <View style={styles.containerImg}>
-        <Image
-          source={getAvatarForSubAccount( primarySubAccount, false, true )}
-          style={styles.avatarImage}
-          resizeMode="contain"
-        />
+        <View style={styles.avatarImage} >
+          {getAvatarForSubAccount( primarySubAccount, false, true )}
+        </View>
+
 
         {
           transaction.isNew &&(

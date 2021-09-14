@@ -49,6 +49,11 @@ import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAut
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../common/content/LocContext'
 
+import PassActive from '../assets/images/svgs/icon_password_active.svg'
+import PassInActive from '../assets/images/svgs/icon_password.svg'
+import QueActive from '../assets/images/svgs/icon_question.svg'
+import QueInActive from '../assets/images/svgs/question_inactive.svg'
+
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
 }
@@ -1225,7 +1230,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               step={''}
             />
             <CardWithRadioBtn
-              icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
+              geticon={() => {if( activeIndex === 0 ) { return <QueActive /> } else { return <QueInActive/>}}}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
               isSelected={activeIndex === 0}
@@ -1233,7 +1238,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               index={0}
             />
             <CardWithRadioBtn
-              icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
+              geticon={() => {if( activeIndex === 0 ) { return <PassInActive /> } else { return <PassActive/>}}}
               mainText={strings.Useencryptionpassword}
               subText={strings.Createapassword}
               isSelected={activeIndex === 1}

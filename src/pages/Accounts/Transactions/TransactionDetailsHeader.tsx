@@ -68,11 +68,11 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
   return (
     <View style={styles.rootContainer}>
       <View style={styles.contentContainer}>
-        <Image
-          source={getAvatarForSubAccount( primarySubAccount, false, true )}
-          style={styles.avatarImage}
-          resizeMode="contain"
-        />
+        <View style={{
+          marginRight: 14,
+        }} >
+          {getAvatarForSubAccount( primarySubAccount, false, true )}
+        </View>
 
         <View style={{
           flex: 1
