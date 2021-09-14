@@ -227,18 +227,20 @@ export const accountCheckWatcher = createWatcher(
 )
 
 function* txnReadWoker( { payload } ) {
-  const { shellId, txId } = payload
+  const { shellId, txIds } = payload
   const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
   const shellToUpdate = accountShells.findIndex( s => s.id === shellId )
-  const shellTxIndex = accountShells[ shellToUpdate ].primarySubAccount.transactions.findIndex( tx => tx.txid === txId )
-  accountShells[ shellToUpdate ].primarySubAccount.transactions[ shellTxIndex ].isNew = false
   const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
   const accId = accountShells[ shellToUpdate ].primarySubAccount.id
-  accounts[ accId ].hasNewTxn = false
-  const accTxIndex = accounts[ accId ].transactions.findIndex( tx => tx.txid === txId )
-  accounts[ accId ].transactions[ accTxIndex ].isNew = false
+  txIds.forEach( txId => {
+    const shellTxIndex = accountShells[ shellToUpdate ].primarySubAccount.transactions.findIndex( tx => tx.txid === txId )
+    accountShells[ shellToUpdate ].primarySubAccount.transactions[ shellTxIndex ].isNew = false
+    accounts[ accId ].hasNewTxn = false
+    const accTxIndex = accounts[ accId ].transactions.findIndex( tx => tx.txid === txId )
+    accounts[ accId ].transactions[ accTxIndex ].isNew = false
+  } )
   yield put( readTxn( accountShells, accounts ) )
-  yield call( dbManager.updateTransaction, txId, {
+  yield call( dbManager.updateTransactions, txIds, {
     isNew: false
   } )
 }
