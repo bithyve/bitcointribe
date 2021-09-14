@@ -727,6 +727,14 @@ function* updateWalletImageWorker( { payload } ) {
         } )
         data.transactions = []
         data.transactionsMeta = txns
+        const transactionsNote = {
+        }
+        if( data.transactionsNote.length > 0 ) {
+          data.transactionsNote.forEach( txNote => {
+            transactionsNote[ txNote.txId ] = txNote.note
+          } )
+        }
+        data.transactionsNote = transactionsNote
         acc[ account.id ] = {
           encryptedData: BHROperations.encryptWithAnswer( JSON.stringify( data ), encryptionKey ).encryptedData
         }

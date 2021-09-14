@@ -6,6 +6,7 @@ import {
   ImageBackground,
   Image,
   ImageSourcePropType,
+  AppState,
 } from 'react-native'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import Fonts from '../../common/Fonts'
@@ -108,6 +109,23 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
 
+  useEffect( () => {
+    AppState.addEventListener(
+      'change',
+      onAppStateChange
+    )
+    return () => AppState.removeEventListener( 'change', onAppStateChange )
+  } )
+
+  const  onAppStateChange = ( state ) => {
+    if( state === 'background' && swanModal && !primarySubAccount.isUsable &&
+    primarySubAccount.kind === SubAccountKind.SERVICE &&
+  ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
+      showSwanModal( false )
+      navigation.pop()
+    }
+  }
   useEffect( () => {
     if (
       !primarySubAccount.isUsable &&

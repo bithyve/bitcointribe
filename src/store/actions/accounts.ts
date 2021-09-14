@@ -109,11 +109,11 @@ export const markAccountChecked = ( shellId: string ) => {
   }
 }
 
-export const markReadTx = ( txId: string, shellId: string ) => {
+export const markReadTx = ( txIds: string[], shellId: string ) => {
   return {
     type: MARK_READ_TRANSACTION,
     payload: {
-      txId,
+      txIds,
       shellId
     },
   }

@@ -35,7 +35,7 @@ export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey,
 
     return axios( {
       method: 'POST',
-      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}v1/wallets`,
+      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}wallets`,
       headers,
       data
     } )
@@ -60,7 +60,7 @@ export const setupAutomaticWithdrawals = ( { access_token, walletId, minBtcThres
 
     return axios( {
       method: 'POST',
-      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}v1/automatic-withdrawal`,
+      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}automatic-withdrawal`,
       headers,
       data
     } )
