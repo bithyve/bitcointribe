@@ -15,7 +15,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import moment from 'moment'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -49,9 +48,13 @@ const CreateGift = ( { navigation } ) => {
 
   const closeModal = ( navigate ) => {
     setGiftModal( false )
-    if ( navigate ) navigation.navigate( 'AddContact', {
-      fromScreen: 'Gift'
-    } )
+    if ( navigate ) {
+      navigation.navigate( 'AddContact', {
+        fromScreen: 'Gift'
+      } )
+    } else {
+      navigation.goBack()
+    }
   }
 
   const renderButton = ( text ) => {
@@ -97,10 +100,10 @@ const CreateGift = ( { navigation } ) => {
           <View style={{
             marginLeft: wp( 6 ),
           }}>
-            <Text style={styles.modalTitleText}>Edit Wallet Name</Text>
+            <Text style={styles.modalTitleText}>Gift Created</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>Change your wallet's name</Text>
+            }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
           </View>
           <DashedContainer
             titleText={'Available Gift'}
@@ -318,6 +321,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
+    marginRight: wp( 10 )
   },
   modalContentContainer: {
     // height: '100%',

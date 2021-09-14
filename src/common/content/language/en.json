@@ -41,7 +41,8 @@
         "hidden": "Hidden",
         "duress": "Duress",
         "addNote": "Add a Note",
-        "subNote": "For you to remember the transaction"
+        "subNote": "For you to remember the transaction",
+        "optional": "Optional"
     },
     "noInternet": {
       "no": "No Internet",
