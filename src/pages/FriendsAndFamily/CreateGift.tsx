@@ -22,9 +22,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
-import NavHeaderSettingsButton from '../../components/navigation/NavHeaderSettingsButton'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
 import Dollar from '../../assets/images/svgs/icon_dollar.svg'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
@@ -65,11 +62,7 @@ const CreateGift = ( { navigation } ) => {
           ...styles.buttonView
         }}
       >
-        {/* {!loading.initializing ? ( */}
         <Text style={styles.buttonText}>{text}</Text>
-        {/* ) : (
-          <ActivityIndicator size="small" />
-        )} */}
       </TouchableOpacity>
     )
   }
@@ -80,7 +73,7 @@ const CreateGift = ( { navigation } ) => {
         <View style={{
           marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
         }}>
-          <Illustration/>
+          <Illustration />
         </View>
         <TouchableOpacity
           activeOpacity={1}
@@ -139,7 +132,6 @@ const CreateGift = ( { navigation } ) => {
     >
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-        {/* <View style={styles.modalHeaderTitleView}> */}
         {giftModal &&
       <ModalContainer visible={giftModal} closeBottomSheet={() => {}} >
         {renderCreateGiftModal()}
@@ -174,10 +166,6 @@ const CreateGift = ( { navigation } ) => {
             infoTextNormal1={''}
             step={''}
           />
-          {/* <NavHeaderSettingsButton
-          onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
-          accManagement={true}
-        /> */}
         </View>
         <TouchableOpacity
           style={{
@@ -202,10 +190,6 @@ const CreateGift = ( { navigation } ) => {
           <View style={{
             marginHorizontal: wp( 3 )
           }}>
-            {/* <View style={styles.accImage} >
-            {getAvatarForSubAccount( usePrimarySubAccountForShell( accountInfo ) )}
-          </View> */}
-
             <Text style={{
               color: Colors.gray4,
               fontSize: RFValue( 10 ),
@@ -249,13 +233,8 @@ const CreateGift = ( { navigation } ) => {
             placeholder={'Enter amount'}
             placeholderTextColor={Colors.borderColor}
             value={amount}
-            autoCompleteType="off"
-            textContentType="none"
-
-            autoCorrect={false}
-            autoCapitalize="none"
             keyboardType={'numeric'}
-            onChangeText={( text ) => {}}
+            onChangeText={( text ) => {setAmount( text )}}
           />
         </KeyboardAvoidingView>
         <View style={{
@@ -317,14 +296,12 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   modalInfoText: {
-    // marginTop: hp( '3%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginRight: wp( 10 )
   },
   modalContentContainer: {
-    // height: '100%',
     backgroundColor: Colors.backgroundColor,
     paddingBottom: hp( 4 ),
   },
@@ -354,13 +331,10 @@ const styles = StyleSheet.create( {
     width: 18,
     height: 18,
     borderRadius: 9,
-    // borderWidth: 0.3,
-    // borderColor: Colors.borderColor,
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 10,
-    // shadowColor: Colors.gray,
     shadowOpacity: 0.1,
     shadowOffset: {
       width: 1, height: 1
@@ -372,7 +346,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    // paddingLeft: 15,
     backgroundColor: Colors.white,
   },
   inputBox: {
@@ -415,31 +388,18 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium
   },
   selectedContactsView: {
-    // marginLeft: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    // marginRight: 20,
-    // marginTop: 5,
-    // paddingBottom: 15,
-    // paddingTop: 15,
-    // borderBottomWidth: 1,
-    // borderColor: Colors.borderColor,
     backgroundColor: Colors.blue,
     borderRadius: wp ( 2 ),
-    // width: wp( 22 )
-    // padding: wp( 1 ),
-    //width: wp( 24 ),
     height: hp( 4 ),
     paddingHorizontal: wp( 2 )
   },
   contactText: {
-    // marginLeft: 10,
-    // marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
-    // padding: wp( 2 )
   },
 } )
 

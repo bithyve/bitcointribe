@@ -1,9 +1,6 @@
 import React, { useContext } from 'react'
 import {
   View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
   Text
 } from 'react-native'
 import {
@@ -14,11 +11,7 @@ import moment from 'moment'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import HeaderTitle from '../../components/HeaderTitle'
-import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
-import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 
 const DashedContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -28,7 +21,6 @@ const DashedContainer = ( props ) => {
     <View
       style={{
         width: '90%',
-        // height: '54%',
         backgroundColor: Colors.gray7,
         // shadowOpacity: 0.06,
         // shadowOffset: {
@@ -48,8 +40,8 @@ const DashedContainer = ( props ) => {
       <View style={{
         backgroundColor: Colors.gray7,
         borderRadius: wp( 2 ),
-        // paddingVertical: hp( 0.3 ),
-        // paddingHorizontal: wp( 0.3 ),
+        paddingVertical: hp( 2 ),
+        paddingHorizontal: wp( 4 ),
         borderColor: Colors.lightBlue,
         borderWidth: 1,
         borderStyle: 'dashed',
@@ -63,7 +55,8 @@ const DashedContainer = ( props ) => {
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
-              fontWeight: '500'
+              fontWeight: '500',
+              letterSpacing: 0.8
             }}>
               {props.titleText}
             </Text>
@@ -76,6 +69,7 @@ const DashedContainer = ( props ) => {
               {props.subText}
             </Text>
           </View>
+          {props.date &&
           <Text style={{
             color: Colors.lightTextColor,
             fontSize: RFValue( 10 ),
@@ -84,9 +78,10 @@ const DashedContainer = ( props ) => {
           }}>
             {moment( props.date ).format( 'lll' )}
           </Text>
+          }
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: hp( 1 )
         }}>
           <Text style={{
             color: Colors.black,

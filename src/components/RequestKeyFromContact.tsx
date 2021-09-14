@@ -9,9 +9,6 @@ import Share from 'react-native-share'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
-import { ScrollView } from 'react-native-gesture-handler'
 import QRCode from './QRCode'
 import {
   REGULAR_ACCOUNT,
@@ -19,11 +16,8 @@ import {
   SECURE_ACCOUNT,
 } from '../common/constants/wallet-service-types'
 import CopyThisText from '../components/CopyThisText'
-import UserDetails from './UserDetails'
-import BottomInfoBox from './BottomInfoBox'
 import HeaderTitle from './HeaderTitle'
 import { translations } from '../common/content/LocContext'
-import DashedContainer from '../pages/FriendsAndFamily/DashedContainer'
 import GiftCard from '../assets/images/svgs/icon_gift.svg'
 
 export default function RequestKeyFromContact( props ) {
@@ -35,13 +29,11 @@ export default function RequestKeyFromContact( props ) {
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
   )
-  //console.log("amountCurrency", props.amountCurrency);
   const [ Contact, setContact ] = useState( props.contact ? props.contact : {
   } )
 
   useEffect( () => {
     setShareLink( props.link.replace( /\s+/g, '' ) )
-    // if ( props.infoText ) setInfoText( props.infoText )
   }, [ props.link ] )
 
   useEffect( () => {
@@ -84,48 +76,6 @@ export default function RequestKeyFromContact( props ) {
   }
   return (
     <View style={styles.modalContainer}>
-      {/* <ScrollView> */}
-      {/* <View
-          style={styles.mainView}
-        > */}
-      {/* {props.isModal &&
-          <View style={styles.topSubView}>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => {
-                props.onPressBack()
-              }}
-              style={styles.backButton}
-            >
-              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-            </AppBottomSheetTouchableWrapper>
-            <View style={{
-              flex: 1, marginLeft: 5
-            }}>
-              {props.headerText &&
-                <Text style={styles.modalHeaderTitleText}>
-                  {props.headerText}
-                </Text>
-              }
-              {props.subHeaderText &&
-                <Text
-                  style={styles.subHeaderText}
-                >
-                  {props.subHeaderText}
-                </Text>
-              }
-            </View>
-          </View>
-        } */}
-      {/* </View> */}
-      {/* <View style={[ styles.topContainer, {
-        marginTop: !props.isModal ? 0 : hp( '1.7%' ),
-        marginBottom: !props.isModal ? 0 : hp( '1.7%' ),
-      } ]}>
-        <UserDetails
-          titleStyle={styles.titleStyle}
-          contactText={props.contactText}
-          Contact={Contact} />
-      </View> */}
       <HeaderTitle
         firstLineTitle={props.headerText ? props.headerText : strings.scanQR}
         secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
@@ -148,7 +98,7 @@ export default function RequestKeyFromContact( props ) {
             elevation: 2,
             alignSelf: 'center',
             borderRadius: wp( 2 ),
-            marginTop: hp( 3 ),
+            marginTop: hp( 1 ),
             marginBottom: hp( 1 ),
             paddingVertical: hp( 3 ),
             paddingHorizontal: wp( 3 ),
@@ -263,8 +213,6 @@ export default function RequestKeyFromContact( props ) {
         width={'20%'}
         height={'18%'}
       />
-      {/* </ScrollView> */}
-
     </View>
   )
 }
