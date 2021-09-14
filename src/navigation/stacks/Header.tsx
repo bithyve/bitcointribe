@@ -62,7 +62,8 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import {
   initializeHealthSetup,
   updateCloudPermission,
-  acceptExistingContactRequest
+  acceptExistingContactRequest,
+  updateSecondaryShard
 } from '../../store/actions/BHR'
 import {
   updateFCMTokens,
@@ -149,7 +150,6 @@ interface HomeStateTypes {
   notificationIgnoreText: string | null;
   isIgnoreButton: boolean;
   currentMessage: any;
-
   errorMessageHeader: string;
   errorMessage: string;
   selectedContact: any[];
@@ -164,7 +164,7 @@ interface HomeStateTypes {
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
-  releaseNotes: string,
+  releaseNotes: string;
 }
 
 interface HomePropsTypes {
@@ -238,6 +238,7 @@ interface HomePropsTypes {
   getMessages: any;
   syncPermanentChannels: any;
   updateLastSeen: any;
+  updateSecondaryShard: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -301,18 +302,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
       onCodeScanned:  ( qrData )=>{
+        console.log( 'qrData', qrData )
         const trustedContactRequest = processFriendsAndFamilyQR( qrData )
-        if( trustedContactRequest )
-          this.setState( {
-            trustedContactRequest
-          },
-          () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
+        if( trustedContactRequest ){
+          if( JSON.parse( qrData ).type == QRCodeTypes.APPROVE_KEEPER ){
+            this.props.updateSecondaryShard( qrData )
+          } else {
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
             )
           }
-          )
+        }
       },
     } )
   };
@@ -1303,7 +1310,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
-
         default:
           break
     }
@@ -1445,7 +1451,8 @@ export default withNavigationFocus(
     updateMessageStatus,
     getMessages,
     syncPermanentChannels,
-    updateLastSeen
+    updateLastSeen,
+    updateSecondaryShard
   } )( Home )
 )
 

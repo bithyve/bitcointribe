@@ -615,6 +615,7 @@ export const LEVEL_COMPLETION_ERROR= 'LEVEL_COMPLETION_ERROR'
 export const NAVIGATING_HISTORY_PAGE = 'NAVIGATING_HISTORY_PAGE'
 export const TYPE_BOTTOMSHEET_OPEN = 'TYPE_BOTTOMSHEET_OPEN'
 export const ALLOW_SECURE_ACCOUNT = 'ALLOW_SECURE_ACCOUNT'
+export const UPDATE_SECONDARY_SHARD = 'UPDATE_SECONDARY_SHARD'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -659,6 +660,15 @@ export const setAllowSecureAccount = ( flag ) => {
     type: ALLOW_SECURE_ACCOUNT,
     payload: {
       flag
+    }
+  }
+}
+
+export const updateSecondaryShard = ( scannedData ) => {
+  return {
+    type: UPDATE_SECONDARY_SHARD,
+    payload: {
+      scannedData
     }
   }
 }
