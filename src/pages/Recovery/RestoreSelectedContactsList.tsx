@@ -647,6 +647,7 @@ export default function RestoreSelectedContactsList( props ) {
               {selectedContacts.map( ( contact, index ) => {
                 return (
                   <TouchableOpacity
+                    key={index}
                     activeOpacity={contact.status == '' ? 0 : 10}
                     onPress={() => {
                       props.navigation.navigate( 'RecoveryCommunication', {

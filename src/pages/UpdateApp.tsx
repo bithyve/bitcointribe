@@ -254,9 +254,10 @@ export default function UpdateApp( props ) {
           </View>
 
         </View>
-        {releaseNotes.map( ( value ) => {
+        {releaseNotes.map( ( value, index ) => {
           return (
             <View
+              key={index}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',

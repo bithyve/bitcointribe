@@ -279,9 +279,9 @@ class ManageBackupNewBHR extends Component<
     await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
 
       if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
-        this.setState( {
-          showLoader: true
-        } )
+        // this.setState( {
+        //   showLoader: true
+        // } )
         this.props.setLevelToNotSetupStatus()
         this.modifyLevelData()
       } else {
