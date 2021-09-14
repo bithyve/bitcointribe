@@ -87,15 +87,42 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
   }, [ accountShell.primarySubAccount.kind ] )
 
+  const getText = ( text ) => {
+    if ( text.includes( 'Register' ) ) {
+      return(
+        <Text style={styles.subtitleText} numberOfLines={3}>
+          <Text style={styles.boldItalicText}>
+            {'Register\n'}
+          </Text>
+          {'and claim $10'}
+        </Text>
+      )
+    }
+    if ( text.includes( 'Level 2' ) ) {
+      return(
+        <Text style={styles.subtitleText} numberOfLines={3}>
+          {'Available after\n'}
+          <Text style={styles.boldItalicText}>
+          Level 2
+          </Text>
+          {' Backup'}
+        </Text>
+      )
+    }
+    return (
+      <Text style={styles.subtitleText} numberOfLines={3}>
+        {text}
+      </Text>
+    )
+  }
   return (
     <View style={styles.bodyContainer}>
       <Text style={styles.titleText} numberOfLines={2}>
         {primarySubAccount.customDisplayName ?? primarySubAccount.defaultTitle}
       </Text>
 
-      <Text style={styles.subtitleText} numberOfLines={3}>
-        {primarySubAccount.customDescription ?? primarySubAccount.defaultDescription}
-      </Text>
+
+      {getText( primarySubAccount.customDescription ?? primarySubAccount.defaultDescription )}
       {
         ( primarySubAccount.type == AccountType.SWAN_ACCOUNT
         ||
@@ -134,6 +161,12 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
 }
 
 const styles = StyleSheet.create( {
+  boldItalicText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    fontSize: RFValue( 11 ),
+  },
   rootContainer: {
     width: widthPercentageToDP( 43 ),
     height: heightPercentageToDP( 21 ),
