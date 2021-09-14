@@ -89,7 +89,6 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     let currentColumn = []
     sortedShells.forEach( ( accountShell, index ) => {
     // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
-      // if( accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT ){
       currentColumn.push( accountShell )
 
       // Make a new column after adding two items -- or after adding the

@@ -59,6 +59,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     ( state ) => state.preferences.currencyCode,
   )
   const strings = translations[ 'settings' ]
+  const common = translations[ 'common' ]
   const menuOptions: MenuOption[] = [
   // {
   //   title: 'Use FaceId',
@@ -173,29 +174,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <View style={styles.accountCardsSectionContainer}>
         <ModalContainer visible={showLangModal} closeBottomSheet={() => {setShowLangModal( false )}} >
           <View style={styles.modalContentContainer}>
-            <TouchableOpacity
-              activeOpacity={0.6}
-              onPress={() => setShowLangModal( false )}
-              style={{
-                width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-                alignSelf: 'flex-end',
-                backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-                margin: wp( 3 ),
-                position: 'absolute',
-                zIndex: 10,
-                right: 0,
-                top: 0,
-              }}
-            >
-              <FontAwesome name="close" color={Colors.white} size={19} style={{
-              }} />
-            </TouchableOpacity>
             <Text
               style={{
                 color:Colors.blue,
                 fontSize: RFValue( 18 ),
                 fontFamily: Fonts.FiraSansRegular,
-                marginTop: wp( 2 ),
+                marginVertical: wp( 2 ),
               }}
               numberOfLines={1}
             >
@@ -215,6 +199,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 </TouchableOpacity>
               )}
             />
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => setShowLangModal( false )}
+              style={{
+                height: 45, borderRadius: wp( 7/2 ),
+                backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+                margin: wp( 3 ),
+              }}
+            >
+              <Text style={{
+                color: 'white'
+              }}>{common.done}</Text>
+            </TouchableOpacity>
           </View>
         </ModalContainer>
         <Text style={{
@@ -334,9 +331,14 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             <View style={{
               marginLeft: 10
             }}>
-              <Text style={styles.addModalTitleText}>
-                {strings.Language}
-              </Text>
+              <View style={{
+                flexDirection: 'row'
+              }}>
+                <Text style={styles.addModalTitleText}>
+                  {strings.Language}
+                </Text>
+                <Text style={styles.textBeta}>Beta</Text>
+              </View>
               <Text style={styles.addModalInfoText}>
                 {strings.changeLanguage }
               </Text>
@@ -473,11 +475,14 @@ const styles = StyleSheet.create( {
   modalContentContainer: {
     backgroundColor: Colors.white,
     padding: 10,
+    maxHeight: '80%',
     minHeight: '60%',
   },
 
   list: {
     marginTop: 20,
+    flexGrow: 1,
+    paddingBottom: 40,
   },
 
   containerItem: {
@@ -499,11 +504,13 @@ const styles = StyleSheet.create( {
   textLanName: {
     fontSize: 18,
     flex: 1,
+    color: 'black',
   },
 
   flag: {
     fontSize: 35,
     paddingRight: 15,
+    color: 'black',
   },
 
   separatorView: {
@@ -558,6 +565,17 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular
+  },
+
+  textBeta: {
+    marginHorizontal: 10,
+    backgroundColor: 'tomato',
+    color: 'white',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 5,
+    fontSize: 12,
+    overflow: 'hidden'
   },
 
   addModalInfoText: {
