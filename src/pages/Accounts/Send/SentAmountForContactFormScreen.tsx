@@ -211,7 +211,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
           disabled={!selectedAmount}
           onPress={handleConfirmationButtonPress}
           style={{
-            ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
+            ...ButtonStyles.primaryActionButton, backgroundColor: !selectedAmount ? Colors.lightBlue: Colors.blue
           }}
         >
           <Text style={ButtonStyles.actionButtonText}>Confirm & Proceed</Text>
