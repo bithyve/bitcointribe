@@ -2300,70 +2300,62 @@ export const onPressKeeperChannelWatcher = createWatcher(
 
 function* updateSecondaryShardWorker( { payload } ) {
   try {
+    console.log( 'payload update SS', payload )
     yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
     const { scannedData } = payload
     if( scannedData ) {
       const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
       const walletId = wallet.walletId
-      const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
       const qrDataObj = JSON.parse( scannedData )
-      let currentContact: TrustedContact
-      let channelKey: string
+      const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+      let trustedContact: TrustedContact
       if( contacts ){
         for( const ck of Object.keys( contacts ) ){
-          channelKey=ck
-          currentContact = contacts[ ck ]
-          if( currentContact.permanentChannelAddress == qrDataObj.channelId ){
-            break
+          if( contacts[ ck ].walletID == qrDataObj.walletId ){
+            trustedContact = contacts[ ck ]
           }
         }
       }
-      const res = yield call( TrustedContactsOperations.retrieveFromStream, {
-        walletId, channelKey, options: {
-          retrieveSecondaryData: true,
-        }, secondaryChannelKey: qrDataObj.secondaryChannelKey
-      } )
-      if( res.secondaryData.secondaryMnemonicShard ) {
-        console.log( 'res.secondaryData.secondaryMnemonicShard', res.secondaryData.secondaryMnemonicShard )
+      if( trustedContact ) {
+        const res = yield call( TrustedContactsOperations.retrieveFromStream, {
+          walletId, PermanentChannelAddress: qrDataObj.channelId, StreamId: qrDataObj.streamId, options: {
+            retrieveSecondaryData: true,
+          }, secondaryChannelKey: qrDataObj.secondaryChannelKey
+        } )
+        if( res.secondaryData.secondaryMnemonicShard ) {
+          const secondaryData: SecondaryStreamData = {
+            secondaryMnemonicShard: res.secondaryData.secondaryMnemonicShard,
+            bhXpub: res.secondaryData.bhXpub
+          }
 
+          const streamUpdates: UnecryptedStreamData = {
+            streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+            secondaryData,
+            metaData: {
+              flags:{
+                active: true,
+                newData: true,
+                lastSeen: Date.now(),
+              },
+              version: DeviceInfo.getVersion()
+            }
+          }
+          const response = yield call(
+            TrustedContactsOperations.syncPermanentChannels,
+            [ {
+              channelKey: trustedContact.channelKey,
+              streamId: streamUpdates.streamId,
+              unEncryptedOutstreamUpdates: streamUpdates,
+              secondaryChannelKey: qrDataObj.secondaryChannelKey,
+              contactDetails: trustedContact.contactDetails,
+            } ]
+          )
 
-        const primaryData: PrimaryStreamData = {
-          contactDetails: contacts[ channelKey ].contactDetails,
-          walletID: wallet.walletId,
-          walletName: wallet.walletName,
-        }
-        const secondaryData: SecondaryStreamData = {
-          secondaryMnemonicShard: res.secondaryData.secondaryMnemonicShard,
-          bhXpub: res.secondaryData.bhXpub
-        }
-
-        const streamUpdates: UnecryptedStreamData = {
-          streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
-          primaryData,
-          secondaryData,
-          metaData: {
-            flags:{
-              active: true,
-              newData: true,
-              lastSeen: Date.now(),
-            },
-            version: DeviceInfo.getVersion()
+          if( response.updated ) {
+            Toast( 'Approved Successfully' )
           }
         }
-
-        const response = yield call(
-          TrustedContactsOperations.syncPermanentChannels,
-          [ {
-            channelKey,
-            streamId: streamUpdates.streamId,
-            unEncryptedOutstreamUpdates: streamUpdates,
-            secondaryChannelKey: BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-          } ]
-        )
-        if( response.updated ){
-          Toast( 'Approved Successfully' )
-        }
-      }
+      } else Toast( 'First scan qr from primary device to setup keeper' )
     }
     yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
   } catch ( error ) {

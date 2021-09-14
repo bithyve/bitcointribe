@@ -108,7 +108,6 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import {
   updateLastSeen
 } from '../../store/actions/preferences'
-import QRModal from '../../pages/Accounts/QRModal'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -127,7 +126,6 @@ export enum BottomSheetKind {
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
-  APPROVE_KEEPER_REQUEST
 }
 
 interface HomeStateTypes {
@@ -167,7 +165,6 @@ interface HomeStateTypes {
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
   releaseNotes: string;
-  showQRModal: boolean;
 }
 
 interface HomePropsTypes {
@@ -305,22 +302,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
       onCodeScanned:  ( qrData )=>{
+        console.log( 'qrData', qrData )
         const trustedContactRequest = processFriendsAndFamilyQR( qrData )
         if( trustedContactRequest ){
-          if( trustedContactRequest.type == QRCodeTypes.APPROVE_KEEPER ){
-            this.setState( {
-              trustedContactRequest
-            },
-            () => {
-              this.setState( {
-                showQRModal: true
-              } )
-              this.openBottomSheetOnLaunch(
-                BottomSheetKind.APPROVE_KEEPER_REQUEST,
-                1
-              )
-            }
-            )
+          if( JSON.parse( qrData ).type == QRCodeTypes.APPROVE_KEEPER ){
+            this.props.updateSecondaryShard( qrData )
           } else {
             this.setState( {
               trustedContactRequest
@@ -1323,38 +1309,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               releaseNotes={releaseNotes}
             />
           )
-
-        case BottomSheetKind.APPROVE_KEEPER_REQUEST:
-          return (
-            <QRModal
-              isFromKeeperDeviceHistory={true}
-              QRModalHeader={'QR scanner'}
-              title={'Note'}
-              infoText={
-                'Please approve this request by scanning the Secondary Key stored with any of the other backups'
-              }
-              isOpenedFlag={this.state.showQRModal}
-              onQrScan={async( qrScannedData ) => {
-                // this.props.setApprovalStatus( false )
-                this.props.updateSecondaryShard( qrScannedData )
-              }}
-              onBackPress={() => {
-                this.setState( {
-                  showQRModal: false
-                } )
-                this.openBottomSheetOnLaunch(
-                  BottomSheetKind.APPROVE_KEEPER_REQUEST,
-                  0
-                )
-              }}
-              onPressContinue={async() => {
-                const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asa","channelId":"3631e83fb00e03d9763fa0c980159b47b50a0afa7057cda39a238aef38312a6b","streamId":"249d717b3","secondaryChannelKey":"2in9VlaswqPD3fgKxNeNWpQ2","version":"1.9.5","walletId":"66cd989f707454a8fc6d4b3cd3d4804f25f0f8965515d9be4d6644341ba1f669"}'
-                // this.props.setApprovalStatus( false )
-                this.props.updateSecondaryShard( qrScannedData )
-              }}
-            />
-          )
-
 
         default:
           break

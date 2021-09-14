@@ -664,11 +664,11 @@ export const setAllowSecureAccount = ( flag ) => {
   }
 }
 
-export const updateSecondaryShard = ( data ) => {
+export const updateSecondaryShard = ( scannedData ) => {
   return {
     type: UPDATE_SECONDARY_SHARD,
     payload: {
-      data
+      scannedData
     }
   }
 }
