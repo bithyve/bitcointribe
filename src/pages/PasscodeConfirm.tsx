@@ -246,6 +246,13 @@ export default function PasscodeConfirm( props ) {
             <View>
               <Text style={ styles.headerInfoText }>
                 {strings.reEnter}
+                <Text style={styles.boldItalicText}>
+                  {` ${strings.passcode} `}
+                </Text>
+                {strings.to}
+                <Text style={styles.boldItalicText}>
+                  {` ${strings.verifylogin} `}
+                </Text>
               </Text>
               <View>
                 <View style={ {
@@ -674,7 +681,8 @@ const styles = StyleSheet.create( {
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     fontWeight: 'bold',
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    fontSize: RFValue( 12 ),
   },
   headerTitleText: {
     color: Colors.blue,
@@ -688,6 +696,12 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
+  },
+  headerInfoBoldText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    fontWeight: '600',
   },
   passcodeTextInputText: {
     color: Colors.blue,

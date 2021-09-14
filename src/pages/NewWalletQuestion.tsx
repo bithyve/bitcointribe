@@ -1095,12 +1095,42 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             marginBottom: hp( 1 )
           }}>
             {answer.length === 0 && confirmAnswer.length === 0 &&
-            <BottomInfoBox
-              title={common.note}
-              infoText={strings.TheAnswer}
-              italicText={''}
-              backgroundColor={Colors.white}
-            />
+            <View
+              style={{
+                marginBottom: 10,
+                padding: 20,
+                backgroundColor: Colors.white,
+                marginLeft: 12,
+                marginRight: 20,
+                borderRadius: 10,
+                flexDirection: 'row'
+              }}
+            >
+              <View>
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontSize: RFValue( 13 ),
+                    marginBottom: 2,
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {strings.note}
+                </Text>
+                <Text style={styles.bottomNoteInfoText}>
+                  {strings.TheAnswer}
+                  <Text style={styles.boldItalicText}>
+                    {` ${strings.encrypt} `}
+                  </Text>
+                  {strings.backup} {strings.securityQuestion}
+                  <Text style={styles.boldItalicText}>
+                    {` ${strings.hint} `}
+                  </Text>
+                  {strings.toremember}
+                </Text>
+
+              </View>
+            </View>
             }
           </View>
           }
@@ -1318,6 +1348,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 }
 
 const styles = StyleSheet.create( {
+  bottomNoteInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    lineHeight: 18
+  },
+  boldItalicText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    fontSize: RFValue( 12 ),
+  },
   dropdownBox: {
     flexDirection: 'row',
     borderColor: Colors.white,
