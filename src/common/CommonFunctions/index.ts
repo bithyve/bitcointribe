@@ -473,6 +473,19 @@ export const processFriendsAndFamilyQR = ( qrData: string ) => {
             isExistingContact: true
           }
           break
+
+        case QRCodeTypes.APPROVE_KEEPER:
+          trustedContactRequest = {
+            walletName: scannedData.walletName,
+            channelKey: scannedData.channelKey,
+            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            isKeeper: false,
+            isQR: true,
+            version: scannedData.version,
+            type: scannedData.type,
+            isExistingContact: false
+          }
+          break
     }
 
     return trustedContactRequest
