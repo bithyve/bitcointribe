@@ -138,8 +138,8 @@ interface HomeStateTypes {
   currencyCode: string;
   notificationDataChange: boolean;
   trustedContactRequest: any;
+  giftRequest: any;
   recoveryRequest: any;
-  custodyRequest: any;
   isLoadContacts: boolean;
   notificationTitle: string | null;
   notificationInfo: string | null;
@@ -267,8 +267,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currencyCode: 'USD',
       notificationDataChange: false,
       trustedContactRequest: null,
+      giftRequest: null,
       recoveryRequest: null,
-      custodyRequest: null,
       isLoadContacts: false,
       notificationLoading: true,
       notificationTitle: null,
@@ -622,7 +622,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
-    const { trustedContactRequest, swanRequest } = await processDeepLink( url )
+    const { trustedContactRequest, swanRequest, giftRequest } = await processDeepLink( url )
     if( trustedContactRequest ){
       this.setState( {
         trustedContactRequest
@@ -634,6 +634,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         )
       }
       )
+    } else if ( giftRequest ){
+      this.setState( {
+        giftRequest
+      } )
     }
     else if ( swanRequest ) {
       this.setState( {
@@ -812,35 +816,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.firebaseNotificationListener()
     }
   }
-  // handleDeepLinking = async ( url ) => {
-  //   const { trustedContactRequest } = await processDeepLink( url )
-  //   if( trustedContactRequest )
-  //     this.setState( {
-  //       trustedContactRequest
-  //     },
-  //     () => {
-  //       this.openBottomSheetOnLaunch(
-  //         BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-  //         1
-  //       )
-  //     }
-  //     )
-  // }
-
-  // handleDeepLinkEvent = async ( { url } ) => {
-  //   const { navigation, isFocused } = this.props
-  //   // If the user is on one of Home's nested routes, and a
-  //   // deep link is opened, we will navigate back to Home first.
-  //   if ( !isFocused ) {
-  //     navigation.dispatch(
-  //       resetToHomeAction( {
-  //         unhandledDeepLinkURL: url,
-  //       } )
-  //     )
-  //   } else {
-  //     this.handleDeepLinking( url )
-  //   }
-  // };
 
   componentWillUnmount() {
     this.cleanupListeners()
@@ -1095,8 +1070,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   renderBottomSheetContent() {
-    const { UNDER_CUSTODY, navigation } = this.props
-    const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
+    const { navigation } = this.props
+    const { notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
     // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
