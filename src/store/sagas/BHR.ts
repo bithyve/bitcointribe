@@ -111,7 +111,7 @@ import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, setOpenToApproval, syncPermanentChannels } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker, restoreTrustedContactsWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -2362,6 +2362,7 @@ function* updateSecondaryShardWorker( { payload } ) {
           if( response.updated ) {
             Toast( 'Approved Successfully' )
           }
+          yield put ( setOpenToApproval( false ) )
         }
       } else Toast( 'First scan qr from primary device to setup keeper' )
     }
