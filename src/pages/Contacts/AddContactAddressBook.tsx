@@ -282,6 +282,7 @@ export default function AddContactAddressBook( props ) {
 
   const onPressContinue= () => {
     if ( selectedContacts && selectedContacts.length ) {
+
       if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
         selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
         selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
@@ -296,6 +297,10 @@ export default function AddContactAddressBook( props ) {
           contact: selectedContacts[ 0 ],
         } )
 
+      } else if ( props.navigation.state.params?.fromScreen === 'Gift' ){
+        props.navigation.navigate( 'SendGift', {
+          contact: selectedContacts[ 0 ],
+        } )
       } else {
         props.navigation.navigate( 'AddContactSendRequest', {
           SelectedContact: selectedContacts,

@@ -123,8 +123,8 @@ export default function RequestKeyFromContact( props ) {
           Contact={Contact} />
       </View> */}
       <HeaderTitle
-        firstLineTitle={strings.scanQR}
-        secondLineTitle={strings.withHexa}
+        firstLineTitle={props.headerText ? props.headerText : strings.scanQR}
+        secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -151,6 +151,7 @@ export default function RequestKeyFromContact( props ) {
         </View>
 
       </View>
+      {props.linkHeader &&
       <HeaderTitle
         firstLineTitle={strings.orShare}
         secondLineTitle={strings.WithContact}
@@ -159,12 +160,13 @@ export default function RequestKeyFromContact( props ) {
         infoTextNormal1={''}
         step={''}
       />
+      }
       <CopyThisText
         openLink={shareLink ? shareOption : () => { }}
         backgroundColor={Colors.white}
         text={shareLink ? shareLink : strings.Creating}
-        width={'22%'}
-        height={'22%'}
+        width={'20%'}
+        height={'18%'}
       />
       {/* </ScrollView> */}
 

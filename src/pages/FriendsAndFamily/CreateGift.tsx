@@ -49,7 +49,9 @@ const CreateGift = ( { navigation } ) => {
 
   const closeModal = ( navigate ) => {
     setGiftModal( false )
-    if ( navigate ) navigation.navigate( 'AddContact' )
+    if ( navigate ) navigation.navigate( 'AddContact', {
+      fromScreen: 'Gift'
+    } )
   }
 
   const renderButton = ( text ) => {

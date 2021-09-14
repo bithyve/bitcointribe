@@ -29,6 +29,7 @@ import ReLogin from '../../../pages/ReLogin'
 import Intermediate from '../../../pages/Intermediate'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
+import SendGift from '../../../pages/FriendsAndFamily/SendGift'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -52,6 +53,7 @@ const FriendsAndFamily = createStackNavigator(
     },
     ManageGifts,
     CreateGift,
+    SendGift,
     Login,
     Launch,
     Intermediate,

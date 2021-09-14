@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   StatusBar,
   SafeAreaView,
-  Text
+  Text,
+  ScrollView
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -21,6 +22,8 @@ import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from './DashedContainer'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import ImageStyles from '../../common/Styles/ImageStyles'
 
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
@@ -30,9 +33,15 @@ const ManageGifts = ( { navigation } ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
   return (
-    <SafeAreaView style={styles.modalContentContainer}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      {/* <View style={styles.modalHeaderTitleView}> */}
+    <ScrollView style={{
+      flex: 1, backgroundColor: Colors.backgroundColor
+    }}>
+      <SafeAreaView
+        style={{
+          backgroundColor: Colors.backgroundColor
+        }}
+      />
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor
       } ]}>
@@ -97,32 +106,86 @@ const ManageGifts = ( { navigation } ) => {
       <View style={{
         marginHorizontal: wp( 6 ), marginTop: hp( 1 )
       }}>
-
-
-        <Text style={{
-          color: Colors.lightTextColor,
-          fontSize: RFValue( 10 ),
-          fontFamily: Fonts.FiraSansRegular,
-          fontWeight: '600'
-        }}>Sent to recipient</Text>
         {[ 1, 2, 3, 4 ].map( ( item ) => {
           return(
             <>
-              <View style={{
+              {/* <View style={{
                 backgroundColor: Colors.backgroundColor1, borderRadius: wp( 2 )
               }}>
 
+              </View> */}
+              <View style={{
+                flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 )
+              }}>
+                <Text style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontWeight: '600'
+                }}>Sent to recipient</Text>
+                <Text style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  alignSelf: 'flex-end'
+                }}>
+                  {moment(  ).format( 'lll' )}
+                </Text>
               </View>
+
+              <TouchableOpacity style={{
+                ...styles.listItem
+              }}
+              >
+                <View style={styles.avatarContainer}>
+                  {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
+                </View>
+                <View style={{
+                  alignItems: 'flex-start', marginHorizontal: wp( 2 )
+                }}>
+                  <Text style={{
+                    textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                  }}>Uraiah Cabe
+
+                  </Text>
+                  <Text style={{
+                    ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
+                  }}>Lorem ipsum dolor sit amet</Text>
+                </View>
+              </TouchableOpacity>
             </>
           )
 
         } )}
       </View>
-    </SafeAreaView>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
+  secondNamePieceText: {
+    fontSize: RFValue( 10 ),
+    color: Colors.lightTextColor
+  },
+  avatarImage: {
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp( 9 ) / 2,
+    marginHorizontal: wp( 1 ),
+  },
+  avatarContainer: {
+    ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp( 9 )/2,
+  },
+  listItem: {
+    marginVertical: hp( 0.5 ),
+    borderRadius: wp( 2 ),
+    padding: wp( 3 ),
+    // justifyContent:'center',
+    // alignItems:'center',
+    backgroundColor: Colors.backgroundColor1,
+    flexDirection: 'row'
+  },
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
