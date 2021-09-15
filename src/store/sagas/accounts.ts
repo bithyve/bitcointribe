@@ -1079,7 +1079,20 @@ export const restoreAccountShellsWatcher = createWatcher(
 export function* generateGiftWorker( { payload } : {payload: { accountId: string, amounts: number[] }} ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const accountsState: AccountsState = yield select( state => state.accounts )
-  const account: Account = accountsState.accounts[ payload.accountId ]
+  const accounts: Accounts = accountsState.accounts
+
+  let accountId = payload.accountId
+  if( !accountId ){
+    for( const id in accounts ){
+      const account = accounts[ id ]
+      if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
+        accountId = id
+        break
+      }
+    }
+  }
+
+  const account = accounts[ accountId ]
   const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
   const walletDetails = {
     walletId: wallet.walletId,

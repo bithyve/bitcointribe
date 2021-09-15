@@ -553,7 +553,7 @@ export const accountShellOrderedToFront = (
   }
 }
 
-export const generateGifts = ( accountId: string, amounts: number[] ) => {
+export const generateGifts = ( amounts: number[], accountId?: string ) => {
   return {
     type: GENERATE_GIFTS,
     payload: {

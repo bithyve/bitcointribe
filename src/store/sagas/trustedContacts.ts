@@ -558,7 +558,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   let gift: Gift
   if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
     const giftToSend = accountsState.gifts[ giftId ]
-    if( giftToSend.status !== GiftStatus.SENT ){
+    if( giftToSend && giftToSend.status !== GiftStatus.SENT ){
       const permanentChannelAddress = crypto
         .createHash( 'sha256' )
         .update( contactInfo.channelKey )

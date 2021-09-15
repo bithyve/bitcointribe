@@ -15,6 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -30,8 +31,10 @@ import DashedContainer from './DashedContainer'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
+import { generateGifts } from '../../store/actions/accounts'
 
 const CreateGift = ( { navigation } ) => {
+  const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
@@ -57,7 +60,15 @@ const CreateGift = ( { navigation } ) => {
   const renderButton = ( text ) => {
     return(
       <TouchableOpacity
-        onPress={()=>{ text === 'Create Gift' ? setGiftModal( true ) : closeModal( true )}}
+        onPress={()=>{
+          if( text === 'Create Gift' ){
+            dispatch( generateGifts( [ Number( amount ) ] ) )
+            setGiftModal( true )
+          }
+          else if ( text === 'Send Gift' ) {
+            closeModal( true )
+          }
+        }}
         style={{
           ...styles.buttonView
         }}
