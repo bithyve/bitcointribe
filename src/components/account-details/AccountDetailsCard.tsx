@@ -29,7 +29,7 @@ import ModalContainer from '../home/ModalContainer'
 import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import { useDispatch } from 'react-redux'
-import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { clearSwanCache, isSwanVisited, updateSwanStatus } from '../../store/actions/SwanIntegration'
 import { withNavigation } from 'react-navigation'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../common/content/LocContext'
@@ -102,7 +102,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
-  //const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
   }, [ accountShell.primarySubAccount.kind ] )
@@ -261,7 +261,13 @@ const AccountDetailsCard: React.FC<Props> = ( {
           onClickSetting={() => {
             showSwanModal( false )
           }}
-          onPress={() => {showSwanModal( false ); navigation.pop()}}
+          onPress={() => {
+            if ( !isVisited ) {
+              dispatch( isSwanVisited() )
+            }
+            showSwanModal( false )
+            navigation.pop()
+          }}
         />
       </ModalContainer>
       <ImageBackground

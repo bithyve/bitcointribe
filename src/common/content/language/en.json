@@ -461,8 +461,8 @@
       "shareanaccount": "Bitcoin is for everyone, share an account",
       "somewhereelse": "Have your sats somewhere else? Import them to Hexa",
       "AddAccounts": "Add Accounts",
-      "Register": "Register",
-      "andclaim": "and claim $10",
+      "Register": "Register ",
+      "andclaim": "and\nclaim $10",
       "Availableafter": "Available after"
     },
     "bhr": {

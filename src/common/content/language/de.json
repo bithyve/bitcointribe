@@ -471,8 +471,8 @@
     "shareanaccount": "Bitcoin ist für alle da, teile ein Konto",
     "somewhereelse": "Haben Sie Ihre Sats woanders? Importieren Sie sie in Hexa",
     "AddAccounts": "Konten hinzufügen",
-    "Register": "Registrieren",
-    "andclaim": "und beanspruche $10",
+    "Register": "Registrieren ",
+    "andclaim": "und\nbeanspruche $10",
     "Availableafter": "Verfügbar nach"
   },
   "bhr": {

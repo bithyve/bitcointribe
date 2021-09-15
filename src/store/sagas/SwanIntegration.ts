@@ -172,6 +172,7 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
     const defaultSwanAccount = accounts[ swanAccounts[ 0 ] ]
     if( !defaultSwanAccount.isUsable ){
       defaultSwanAccount.isUsable = true
+      defaultSwanAccount.accountDescription = 'Auto-withdraw wallet'
       yield put( updateAccountShells( {
         accounts: {
           [ defaultSwanAccount.id ]: defaultSwanAccount

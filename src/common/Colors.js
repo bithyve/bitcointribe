@@ -42,6 +42,7 @@ const Colors = {
   gray5: '#3A3A3C',
   gray6: '#2F2F2F',
   gray7: '#FCFCFC',
+  gray8: '#A0A0A0',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',
