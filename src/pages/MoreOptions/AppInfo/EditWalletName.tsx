@@ -15,6 +15,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import { translations } from '../../../common/content/LocContext'
 
 const ALLOWED_CHARACTERS_REGEXP = /^[A-Za-z]+$/
 
@@ -23,6 +24,9 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 export default function EditWalletName( props ) {
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
+  const login = translations[ 'login' ]
   const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
   const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
     styles.inputBox,
@@ -38,12 +42,12 @@ export default function EditWalletName( props ) {
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
     if ( answer && tempAns && tempAns != answer ) {
-      setAnswerError( 'Answers do not match' )
+      setAnswerError( login.Answersdonotmatch )
     } else if (
       validateAllowedCharacters( answer ) == false ||
       validateAllowedCharacters( tempAns ) == false
     ) {
-      setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
+      setAnswerError( login.Answersmust )
     } else {
       setTimeout( () => {
         setAnswerError( '' )
@@ -77,7 +81,7 @@ export default function EditWalletName( props ) {
             ) ? Colors.lightBlue : Colors.blue, elevation: Elevation
           }}
         >
-          <Text style={styles.buttonText}>Save</Text>
+          <Text style={styles.buttonText}>{common.save}</Text>
         </TouchableOpacity>
         {/* <AppBottomSheetTouchableWrapper
           onPress={() => {}}
@@ -124,17 +128,17 @@ export default function EditWalletName( props ) {
         <View style={{
           marginLeft: wp( 6 ),
         }}>
-          <Text style={styles.modalTitleText}>Edit Wallet Name</Text>
+          <Text style={styles.modalTitleText}>{strings.EditWalletName}</Text>
           <Text style={{
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             paddingRight: wp( 10 )
-          }}>Change your wallet's name</Text>
+          }}>{strings.Changeyourwallet}</Text>
         </View>
         <View style={{
           marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 5 )
         }}>
-          <Text style={styles.modalBoldText}>Step 3: New Wallet Name</Text>
+          <Text style={styles.modalBoldText}>{strings.NewWalletName}</Text>
         </View>
         <View
           style={{
@@ -149,7 +153,7 @@ export default function EditWalletName( props ) {
         >
           <TextInput
             style={styles.modalInputBox}
-            placeholder={'Enter new wallet name'}
+            placeholder={strings.Enternewwalletname}
             placeholderTextColor={Colors.borderColor}
             value={answer}
             autoCompleteType="off"
@@ -215,7 +219,7 @@ export default function EditWalletName( props ) {
           <TextInput
             style={styles.modalInputBox}
             ref={confirmAnswerTextInput}
-            placeholder={'Confirm new wallet name'}
+            placeholder={strings.Confirmnewwalletname}
             placeholderTextColor={Colors.borderColor}
             value={tempAns}
             keyboardType={
@@ -277,9 +281,9 @@ export default function EditWalletName( props ) {
       </View>
       <BottomInfoBox
         backgroundColor={Colors.backgroundColor}
-        title={'Note'}
+        title={common.note}
         infoText={
-          'The wallet\'s name will get updated automatically across your Friends & Family network'
+          strings.acrossyour
         }
       />
       {setButtonVisible()}

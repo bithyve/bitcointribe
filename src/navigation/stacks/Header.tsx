@@ -1444,8 +1444,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 const styles = StyleSheet.create( {
   cloudErrorModalImage: {
-    width: widthPercentageToDP( '30%' ),
-    height: widthPercentageToDP( '25%' ),
+    width: widthPercentageToDP( '27%' ),
+    height: widthPercentageToDP( '27%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
   }
