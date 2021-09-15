@@ -128,8 +128,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           </Text>
           <ToggleContainer />
         </View>
+
         <ScrollView style={{
-          paddingBottom: 10
+          marginBottom: 20, flex:1
         }}>
           <HomeAccountCardsList
             contentContainerStyle={{
@@ -143,10 +144,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             cardContainer={{
               backgroundColor: 'white',
               marginHorizontal: wp( 4 ),
-              height: hp( '11%' ),
+              height: hp( '13%' ),
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: hp( 5 ),
+              paddingHorizontal: hp( 3 ),
+              marginBottom: hp( 3 ),
               borderRadius: wp( 2 ),
               padding: hp( '1.4%' ),
               flexDirection: 'row',

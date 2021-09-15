@@ -30,7 +30,7 @@ type BodyProps = Props;
 const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: HeaderProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
-  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
 
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo( () => {
     return secondarySubAccounts
@@ -48,7 +48,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         source={getAvatarForSubAccount( primarySubAccount, false, true )}
       />
       {
-        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration ) && (
+        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited ) && (
           <View style={styles.dot}/>
         )
       }
@@ -92,9 +92,9 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
       return(
         <Text style={styles.subtitleText} numberOfLines={3}>
           <Text style={styles.boldItalicText}>
-            {'Register\n'}
+            {'Register '}
           </Text>
-          {'and claim $10'}
+          {'and\nclaim $10'}
         </Text>
       )
     }
@@ -129,7 +129,7 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
         primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ) && !primarySubAccount.isUsable
           ?
           <View style={{
-            height: heightPercentageToDP( 3 )
+            height: heightPercentageToDP( 2 )
           }} />
           :
           <LabeledBalanceDisplay
@@ -169,7 +169,7 @@ const styles = StyleSheet.create( {
   },
   rootContainer: {
     width: widthPercentageToDP( 43 ),
-    height: heightPercentageToDP( 21 ),
+    height: heightPercentageToDP( 20 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,

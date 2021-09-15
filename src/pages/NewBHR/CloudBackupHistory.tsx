@@ -108,8 +108,8 @@ const CloudBackupHistory = ( props ) => {
         isIgnoreButton={true}
         isBottomImage={true}
         isBottomImageStyle={{
-          width: wp( '30%' ),
-          height: wp( '25%' ),
+          width: wp( '27%' ),
+          height: wp( '27%' ),
           marginLeft: 'auto',
           resizeMode: 'stretch',
           marginBottom: hp( '-3%' ),

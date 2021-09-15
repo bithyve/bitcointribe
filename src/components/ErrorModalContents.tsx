@@ -176,16 +176,7 @@ export default function ErrorModalContents( props ) {
               {props.proceedButtonText}
             </Text>
           </AppBottomSheetTouchableWrapper>
-          {props.isBottomImage && (
-            <Image
-              source={
-                props.bottomImage
-                  ? props.bottomImage
-                  : require( '../assets/images/icons/noInternet.png' )
-              }
-              style={props.isBottomImageStyle ? props.isBottomImageStyle : styles.successModalImage}
-            />
-          )}
+
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
@@ -195,8 +186,8 @@ export default function ErrorModalContents( props ) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 alignSelf: 'center',
-                position: 'absolute',
-                left: wp( 53 )
+                // position: 'absolute',
+                // left: wp( 53 )
               }}
               delayPressIn={0}
             >
@@ -213,7 +204,16 @@ export default function ErrorModalContents( props ) {
             </AppBottomSheetTouchableWrapper>
           )}
 
-
+          {props.isBottomImage && (
+            <Image
+              source={
+                props.bottomImage
+                  ? props.bottomImage
+                  : require( '../assets/images/icons/noInternet.png' )
+              }
+              style={props.isBottomImageStyle ? props.isBottomImageStyle : styles.successModalImage}
+            />
+          )}
         </View>
       </View>
     </View>
@@ -244,8 +244,8 @@ const styles = StyleSheet.create( {
     marginTop: hp( '2%' ),
   },
   successModalButtonView: {
-    height: wp( '13%' ),
-    width: wp( '45%' ),
+    height: wp( '12%' ),
+    minWidth: wp( '22%' ),
     paddingLeft: wp( '5%' ),
     paddingRight: wp( '5%' ),
     justifyContent: 'center',
@@ -262,12 +262,12 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '8%' ),
   },
   successModalImage: {
-    width: wp( '35%' ),
-    height: wp( '35%' ),
+    width: wp( '23%' ),
+    height: wp( '30%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
-    marginRight: -15,
-    marginBottom: -15,
+    marginRight: wp( -2 ),
+    marginBottom: wp( -2 ),
   },
   proceedButtonText: {
     color: Colors.white,

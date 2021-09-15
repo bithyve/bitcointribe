@@ -14,7 +14,8 @@ import {
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
   LINK_SWAN_WALLET,
-  TEMP_SWAN_ACCOUNT_INFO_SAVED
+  TEMP_SWAN_ACCOUNT_INFO_SAVED,
+  IS_VISITED
 } from '../actions/SwanIntegration'
 
 
@@ -49,6 +50,9 @@ export type SwanIntegrationState = {
 
   // indicator for swan registration
   startRegistration: boolean | true
+
+  // is account open
+  isVisited: boolean | false
 
   // The below values are currently not being used
   swanAuthenticatedToken: string | null,
@@ -103,6 +107,7 @@ const INITIAL_STATE: SwanIntegrationState = {
 
   startRegistration: true,
 
+  isVisited: false,
   hasCreateWithdrawalWalletOnSwanSucceeded: false,
   hasCreateWithdrawalWalletOnSwanCompleted: false,
   hasCreateWithdrawalWalletOnSwanInitiated: false,
@@ -137,6 +142,11 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         return {
           ...state,
           swanAccountCreationStatus: action.payload.data
+        }
+      case IS_VISITED:
+        return {
+          ...state,
+          isVisited: true
         }
 
       case CLEAR_SWAN_CACHE:
