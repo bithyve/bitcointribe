@@ -267,9 +267,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={secondaryDeviceMessageBottomSheet}
-        title={'Keeper Device'}
+        title={'Personal Device'}
         note={
-          'For confirming your Recovery Key on the Keeper Device, simply open the app on that device and log in'
+          'For confirming your Recovery Key on the Personal Device, simply open the app on that device and log in'
         }
         proceedButtonText={'Ok, got it'}
         onPressProceed={() => setSecondaryDeviceMessageModal( false )}

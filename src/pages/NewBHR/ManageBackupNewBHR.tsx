@@ -614,20 +614,24 @@ class ManageBackupNewBHR extends Component<
     const channelUpdates = []
     // Contact or Device type
     if( contacts ){
-      for( const ck of Object.keys( contacts ) ){
-        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
-          // initiate permanent channel
-          const channelUpdate =  {
-            contactInfo: {
-              channelKey: ck,
-            }
-          }
-          channelUpdates.push( channelUpdate )
-        }
-      }
+      // for( const ck of Object.keys( contacts ) ){
+      //   if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
+      //     // initiate permanent channel
+      //     const channelUpdate =  {
+      //       contactInfo: {
+      //         channelKey: ck,
+      //       }
+      //     }
+      //     channelUpdates.push( channelUpdate )
+      //   }
+      // }
+      // this.props.syncPermanentChannels( {
+      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      //   channelUpdates: channelUpdates,
+      //   metaSync: true
+      // } )
       this.props.syncPermanentChannels( {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-        channelUpdates: channelUpdates,
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
         metaSync: true
       } )
     }
