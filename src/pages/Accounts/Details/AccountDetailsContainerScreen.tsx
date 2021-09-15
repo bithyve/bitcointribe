@@ -47,6 +47,7 @@ import ErrorModalContents from '../../../components/ErrorModalContents'
 import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
+import { markReadTx } from '../../../store/actions/accounts'
 
 export type Props = {
   navigation: any;
@@ -100,6 +101,13 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   useEffect( ()=>{
     if( !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ){
       setSecureAccountAlert( true )
+    }
+  }, [] )
+
+  useEffect( () => {
+    return () => {
+      const unread = accountShell.primarySubAccount.transactions.filter( tx => tx.isNew ).map( tx => tx.txid )
+      if( unread.length > 0 ) dispatch( markReadTx( unread, accountShell.id ) )
     }
   }, [] )
 

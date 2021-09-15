@@ -73,6 +73,18 @@ const createAccount = async ( account ) => {
     if( account.activeAddresses ) {
       data.activeAddresses = getActiveAddresses( account.activeAddresses )
     }
+    if( account.transactionsNote && Object.keys( account.transactionsNote ).length > 0 ) {
+      const notes = []
+      for ( const [ key, value ] of Object.entries( account.transactionsNote ) ) {
+        notes.push( {
+          txId: key,
+          note: value
+        } )
+      }
+      data.transactionsNote = notes
+    } else {
+      data.transactionsNote = []
+    }
     if( data.txIdMap ){
       if( Object.keys( data.txIdMap ).length === 0 ) {
         delete data.txIdMap
@@ -103,6 +115,18 @@ const updateAccount = async ( accountId, account ) => {
     }
     if( account.activeAddresses ) {
       data.activeAddresses = getActiveAddresses( account.activeAddresses )
+    }
+    if( Object.keys( account.transactionsNote ).length > 0 ) {
+      const notes = []
+      for ( const [ key, value ] of Object.entries( account.transactionsNote ) ) {
+        notes.push( {
+          txId: key,
+          note: value
+        } )
+      }
+      data.transactionsNote = notes
+    } else {
+      data.transactionsNote = []
     }
     if( data.txIdMap ){
       if( Object.keys( data.txIdMap ).length === 0 ) {
@@ -195,6 +219,24 @@ const updateTransaction = async ( txId: string, params: object ) => {
         for ( const [ key, value ] of Object.entries( params ) ) {
           txRef[ 0 ][ key ] = value
         }
+      } )
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+const updateTransactions = async ( txIds: string[], params: object ) => {
+  try {
+    const idsQuery = txIds.map( id => `txid = "${id}"` ).join( ' OR ' )
+    const txRef = db.objects( schema.Transaction ).filtered( idsQuery.toString() )
+    if( txRef.length > 0 ) {
+      db.write( ()=> {
+        txRef.forEach( tx => {
+          for ( const [ key, value ] of Object.entries( params ) ) {
+            tx[ key ] = value
+          }
+        } )
       } )
     }
   } catch ( error ) {
@@ -312,4 +354,5 @@ export default {
   updateBHR,
   markAccountChecked,
   updateTransaction,
+  updateTransactions
 }

@@ -61,7 +61,8 @@ import {
   setIsKeeperTypeBottomSheetOpen,
   ON_PRESS_KEEPER,
   retrieveMetaShares,
-  setAllowSecureAccount
+  setAllowSecureAccount,
+  UPDATE_SECONDARY_SHARD
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -122,6 +123,7 @@ import LevelStatus from '../../common/data/enums/LevelStatus'
 import secrets from 'secrets.js-grempe'
 import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 import { setVersionHistory } from '../actions/versionHistory'
+import Toast from '../../components/Toast'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -725,6 +727,14 @@ function* updateWalletImageWorker( { payload } ) {
         } )
         data.transactions = []
         data.transactionsMeta = txns
+        const transactionsNote = {
+        }
+        if( data.transactionsNote.length > 0 ) {
+          data.transactionsNote.forEach( txNote => {
+            transactionsNote[ txNote.txId ] = txNote.note
+          } )
+        }
+        data.transactionsNote = transactionsNote
         acc[ account.id ] = {
           encryptedData: BHROperations.encryptWithAnswer( JSON.stringify( data ), encryptionKey ).encryptedData
         }
@@ -1384,10 +1394,6 @@ function* createChannelAssetsWorker( { payload } ) {
       const wallet: Wallet = yield select(
         ( state ) => state.storage.wallet
       )
-      let secondaryShare: string = encryptedSecondaryShares && encryptedSecondaryShares.length &&  encryptedSecondaryShares[ 1 ] ? encryptedSecondaryShares[ 1 ] : ''
-      if( secondaryShareDownloadedVar ) {
-        secondaryShare = secondaryShareDownloadedVar
-      }
       const primaryMnemonicShardTemp = {
         shareId: MetaShares.find( value=>value.shareId==shareId ).shareId,
         meta: MetaShares.find( value=>value.shareId==shareId ).meta,
@@ -1395,10 +1401,12 @@ function* createChannelAssetsWorker( { payload } ) {
       }
       const channelAssets: ChannelAssets = {
         primaryMnemonicShard: primaryMnemonicShardTemp,
-        secondaryMnemonicShard: secondaryShare,
         keeperInfo: keeperInfo,
-        bhXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
         shareId
+      }
+      if( secondaryShareDownloadedVar ) {
+        channelAssets.secondaryMnemonicShard = secondaryShareDownloadedVar
+        channelAssets.bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
       }
       yield put( setChannelAssets( channelAssets ) )
       yield put( setApprovalStatus( false ) )
@@ -1500,10 +1508,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           walletName,
           relationType: TrustedContactRelationTypes.EXISTING_CONTACT,
         }
-        const secondaryData: SecondaryStreamData = {
-          secondaryMnemonicShard: channelAssets.secondaryMnemonicShard,
-          bhXpub: channelAssets.bhXpub
-        }
+
         const backupData: BackupStreamData = {
           primaryMnemonicShard: channelAssets.primaryMnemonicShard,
           keeperInfo
@@ -1511,7 +1516,6 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
         const streamUpdates: UnecryptedStreamData = {
           streamId: TrustedContactsOperations.getStreamId( walletId ),
           primaryData,
-          secondaryData,
           backupData,
           metaData: {
             flags:{
@@ -1521,6 +1525,13 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
             },
             version: DeviceInfo.getVersion()
           }
+        }
+        if( channelAssets.secondaryMnemonicShard && channelAssets.bhXpub ) {
+          const secondaryData: SecondaryStreamData = {
+            secondaryMnemonicShard: channelAssets.secondaryMnemonicShard,
+            bhXpub: channelAssets.bhXpub
+          }
+          streamUpdates.secondaryData = secondaryData
         }
         // initiate permanent channel
         const channelUpdate =  {
@@ -2293,4 +2304,75 @@ function* onPressKeeperChannelWorker( { payload } ) {
 export const onPressKeeperChannelWatcher = createWatcher(
   onPressKeeperChannelWorker,
   ON_PRESS_KEEPER
+)
+
+function* updateSecondaryShardWorker( { payload } ) {
+  try {
+    console.log( 'payload update SS', payload )
+    yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
+    const { scannedData } = payload
+    if( scannedData ) {
+      const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+      const walletId = wallet.walletId
+      const qrDataObj = JSON.parse( scannedData )
+      const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+      let trustedContact: TrustedContact
+      if( contacts ){
+        for( const ck of Object.keys( contacts ) ){
+          if( contacts[ ck ].walletID == qrDataObj.walletId ){
+            trustedContact = contacts[ ck ]
+          }
+        }
+      }
+      if( trustedContact ) {
+        const res = yield call( TrustedContactsOperations.retrieveFromStream, {
+          walletId, PermanentChannelAddress: qrDataObj.channelId, StreamId: qrDataObj.streamId, options: {
+            retrieveSecondaryData: true,
+          }, secondaryChannelKey: qrDataObj.secondaryChannelKey
+        } )
+        if( res.secondaryData.secondaryMnemonicShard ) {
+          const secondaryData: SecondaryStreamData = {
+            secondaryMnemonicShard: res.secondaryData.secondaryMnemonicShard,
+            bhXpub: res.secondaryData.bhXpub
+          }
+
+          const streamUpdates: UnecryptedStreamData = {
+            streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+            secondaryData,
+            metaData: {
+              flags:{
+                active: true,
+                newData: true,
+                lastSeen: Date.now(),
+              },
+              version: DeviceInfo.getVersion()
+            }
+          }
+          const response = yield call(
+            TrustedContactsOperations.syncPermanentChannels,
+            [ {
+              channelKey: trustedContact.channelKey,
+              streamId: streamUpdates.streamId,
+              unEncryptedOutstreamUpdates: streamUpdates,
+              secondaryChannelKey: qrDataObj.secondaryChannelKey,
+              contactDetails: trustedContact.contactDetails,
+            } ]
+          )
+
+          if( response.updated ) {
+            Toast( 'Approved Successfully' )
+          }
+        }
+      } else Toast( 'First scan qr from primary device to setup keeper' )
+    }
+    yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
+    console.log( 'Error UPDATE_SECONDARY_SHARD', error )
+  }
+}
+
+export const updateSecondaryShardWatcher = createWatcher(
+  updateSecondaryShardWorker,
+  UPDATE_SECONDARY_SHARD
 )

@@ -35,6 +35,7 @@ const Receiver = 'Receiver'
 const SenderInfo = 'SenderInfo'
 const RecipientInfo = 'RecipientInfo'
 const Recipient = 'Recipient'
+const TransactionsNote = 'TransactionsNote'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -118,7 +119,22 @@ export const AccountSchema: ObjectSchema = {
     },
     isUsable: {
       type: 'bool', default: true
+    },
+    transactionsNote: {
+      type: 'list', objectType: TransactionsNote, default: []
     }
+  },
+}
+
+export const TransactionsNoteSchema: ObjectSchema = {
+  name: TransactionsNote,
+  properties: {
+    txId: {
+      type: 'string', optional: true
+    },
+    note: {
+      type: 'string', optional: true
+    },
   },
 }
 

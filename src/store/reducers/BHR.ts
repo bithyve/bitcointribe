@@ -61,6 +61,7 @@ const initialState: {
     setupPasswordStatus: boolean;
     updateWIStatus: boolean;
     generateMetaShareStatus: boolean;
+    updateSecondaryShardStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -130,6 +131,7 @@ const initialState: {
     setupPasswordStatus: false,
     updateWIStatus: false,
     generateMetaShareStatus: false,
+    updateSecondaryShardStatus: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,

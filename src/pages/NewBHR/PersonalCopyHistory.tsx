@@ -640,8 +640,8 @@ const PersonalCopyHistory = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            sendApprovalRequestToPK( )
-            setIsChangeClicked( true )
+            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            else onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           selectedLevelId={selectedLevelId}

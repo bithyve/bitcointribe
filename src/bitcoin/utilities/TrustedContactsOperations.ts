@@ -442,29 +442,33 @@ export default class TrustedContactsOperations {
 
    static retrieveFromStream = async ( {
      walletId,
-     channelKey,
      options,
      secondaryChannelKey,
+     channelKey,
+     StreamId,
+     PermanentChannelAddress
    }: {
     walletId: string;
-    channelKey: string;
     options: {
       retrievePrimaryData?: boolean;
       retrieveBackupData?: boolean;
       retrieveSecondaryData?: boolean;
     };
     secondaryChannelKey?: string;
+    channelKey?: string;
+    StreamId?: string;
+    PermanentChannelAddress?: string;
   } ): Promise<{
     primaryData?: PrimaryStreamData;
     backupData?: BackupStreamData;
     secondaryData?: SecondaryStreamData;
   }> => {
      try {
-       const permanentChannelAddress = crypto
+       const permanentChannelAddress = PermanentChannelAddress ? PermanentChannelAddress : crypto
          .createHash( 'sha256' )
          .update( channelKey )
          .digest( 'hex' )
-       const streamId = TrustedContactsOperations.getStreamId( walletId )
+       const streamId = StreamId ? StreamId : TrustedContactsOperations.getStreamId( walletId )
 
        const res: AxiosResponse = await BH_AXIOS.post( 'retrieveFromStream', {
          HEXA_ID,
