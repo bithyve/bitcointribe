@@ -46,7 +46,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
-import {  addNewGift, exchangeRatesCalculated, setAverageTxFee, updateAccountShells } from '../actions/accounts'
+import { exchangeRatesCalculated, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
@@ -67,7 +67,6 @@ import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import { generateDeepLink } from '../../common/CommonFunctions'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -137,7 +136,7 @@ function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
             giftImportedToAccount = true
             gift.receiver.accountId = defaultCheckingAccount.id
 
-            yield put( addNewGift( gift ) )
+            yield put( updateGift( gift ) )
           }
         }
       }
@@ -488,8 +487,8 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {
-  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string }} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -518,7 +517,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     contactInfo.channelAssets = channelAssets
   }
 
-  let testReceivingAddress, checkingReceivingAddress, defaultCheckingAccountId
+  let testReceivingAddress, checkingReceivingAddress
   const assigneeInfo: ActiveAddressAssignee = {
     type: AccountType.FNF_ACCOUNT,
     id: contactInfo.channelKey,
@@ -537,7 +536,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
             break
 
           case AccountType.CHECKING_ACCOUNT:
-            defaultCheckingAccountId = primarySubAccount.id
             checkingReceivingAddress = yield call( getNextFreeAddressWorker, account, assigneeInfo )
             break
       }
@@ -557,51 +555,21 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
   }
 
-  // TODO: prepare gift based on CTA
-  let generatedGift: Gift
+  let gift: Gift
   if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
-    try{
-      const amounts = [ 2000 ] // amount in sats
-      const defaultAccount = accounts[ defaultCheckingAccountId ]
-      const averageTxFeeByNetwork = accountsState.averageTxFees[ defaultAccount.networkType ]
-      const walletDetails = {
-        walletId: wallet.walletId,
-        walletName: wallet.walletName
+    const giftToSend = accountsState.gifts[ giftId ]
+    if( giftToSend.status !== GiftStatus.SENT ){
+      const permanentChannelAddress = crypto
+        .createHash( 'sha256' )
+        .update( contactInfo.channelKey )
+        .digest( 'hex' )
+
+      gift.status = GiftStatus.SENT,
+      gift.receiver = {
+        contactId: permanentChannelAddress
       }
-      const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, defaultAccount, amounts, averageTxFeeByNetwork )
-
-      if( txid ) {
-        const permanentChannelAddress = crypto
-          .createHash( 'sha256' )
-          .update( contactInfo.channelKey )
-          .digest( 'hex' )
-
-        generatedGift = gifts[ 0 ]
-        generatedGift.status = GiftStatus.SENT,
-        generatedGift.receiver = {
-          contactId: permanentChannelAddress
-        }
-        yield put( addNewGift( gifts[ 0 ] ) )
-
-        // const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-        // const res = yield call( Relay.updateTemporaryChannel, encryptionKey, gifts[ 0 ] )
-        // const deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
-        // const deepLink = yield call( generateDeepLink, {
-        //   deepLinkKind: DeepLinkKind.GIFT,
-        //   encryptionType: DeepLinkEncryptionType.OTP,
-        //   encryptionKey: deepLinkEncryptionOTP,
-        //   walletName: 'DAN',
-        //   keysToEncrypt: encryptionKey
-        // } )
-        // console.log( {
-        //   res, deepLink, encryptionKey, deepLinkEncryptionOTP
-        // } )
-        // return
-      }
-    } catch( err ) {
-      console.log( 'Failed to generate gift', {
-        err
-      } )
+      yield put( updateGift( gift ) )
+      gift = giftToSend
     }
   }
 
@@ -612,8 +580,8 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     relationType,
     FCM,
     paymentAddresses,
-    gifts: generatedGift? {
-      [ generatedGift.id ]: generatedGift
+    gifts: gift? {
+      [ gift.id ]: gift
     }: null,
     contactDetails: contactInfo.contactDetails
   }
