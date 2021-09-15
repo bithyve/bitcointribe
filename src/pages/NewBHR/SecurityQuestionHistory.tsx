@@ -31,25 +31,28 @@ import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import ModalContainer from '../../components/home/ModalContainer'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import { translations } from '../../common/content/LocContext'
 
 const SecurityQuestionHistory = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+
   const [ securityQuestionsHistory, setSecuirtyQuestionHistory ] = useState( [
     {
       id: 1,
-      title: 'Security Questions created',
+      title: strings.Questionscreated,
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Security Password confirmed',
+      title: strings.Passwordconfirmed,
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Security Questions unconfirmed',
+      title: strings.Questionsunconfirmed,
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
@@ -110,10 +113,10 @@ const SecurityQuestionHistory = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
-        title={'Health Check Successful'}
-        info={'Password backed up successfully'}
+        title={strings.HealthCheckSuccessful}
+        info={strings.Passwordbackedupsuccessfully}
         note={''}
-        proceedButtonText={'View Health'}
+        proceedButtonText={strings.ViewHealth}
         isIgnoreButton={false}
         onPressProceed={() => {
           // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
@@ -219,7 +222,7 @@ const SecurityQuestionHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Encryption Password'}
+        selectedTitle={strings.EncryptionPassword}
         selectedTime={props.navigation.state.params.selectedTime}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_password.png' )}
@@ -228,8 +231,8 @@ const SecurityQuestionHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={'Password History'}
-          infoBoxInfo={'The history of your Password will appear here'}
+          infoBoxTitle={strings.PasswordHistory}
+          infoBoxInfo={strings.Thehistory}
           type={'security'}
           IsReshare
           onPressConfirm={() => {
@@ -237,8 +240,8 @@ const SecurityQuestionHistory = ( props ) => {
             showQuestionModal( true )
           }}
           data={sortedHistory( securityQuestionsHistory )}
-          confirmButtonText={'Confirm Password'}
-          reshareButtonText={'Confirm Password'}
+          confirmButtonText={strings.ConfirmPassword}
+          reshareButtonText={strings.ConfirmPassword}
           // changeButtonText={'Change Question'}
           disableChange={true}
           onPressReshare={() => {

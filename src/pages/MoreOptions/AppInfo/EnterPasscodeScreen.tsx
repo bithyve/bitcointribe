@@ -16,8 +16,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, credsAuthenticated, switchReLogin } from '../../../store/actions/setupAndAuth'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
+import { translations } from '../../../common/content/LocContext'
 
 export default function EnterPasscodeScreen( props ) {
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
+  const login = translations[ 'login' ]
   const [ pin, setPin ] = useState( '' )
   const [ pinFlag ] = useState( true )
   function onPressNumber( text ) {
@@ -81,13 +85,13 @@ export default function EnterPasscodeScreen( props ) {
         <View style={{
           marginLeft: wp( 6 ),
         }}>
-          <Text style={styles.modalTitleText}>Edit Wallet Name</Text>
+          <Text style={styles.modalTitleText}>{strings.EditWalletName}</Text>
           <Text style={{
             ...styles.modalInfoText,
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
             paddingRight: wp( 10 )
-          }}>Change your wallet's name</Text>
+          }}>{strings.Changeyourwallet}</Text>
         </View>
         <View style={{
           marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 3 )
@@ -95,7 +99,7 @@ export default function EnterPasscodeScreen( props ) {
           <Text style={styles.modalBoldText}>Step 2</Text>
           <Text style={{
             ...styles.modalInfoText,
-          }}>: Confirm Wallet Pin</Text>
+          }}>{`: ${strings.ConfirmWalletPin}`}</Text>
         </View>
         <View>
           <View style={styles.passcodeTextInputView}>
@@ -229,7 +233,7 @@ export default function EnterPasscodeScreen( props ) {
             marginLeft: 'auto'
           }}>
             <Text style={styles.errorText}>
-              Incorrect passcode, try again!
+              {login.Incorrect}
             </Text>
           </View>
         ) : null}
@@ -251,7 +255,7 @@ export default function EnterPasscodeScreen( props ) {
                 pin.length == 4 ? Colors.blue : Colors.lightBlue,
             }}
           >
-            <Text style={styles.proceedButtonText}>Proceed</Text>
+            <Text style={styles.proceedButtonText}>{common.proceed}</Text>
           </TouchableOpacity>
         </View>
       ) : (

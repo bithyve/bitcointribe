@@ -11,9 +11,11 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import QRCode from '../../components/QRCode'
-
+import { translations } from '../../common/content/LocContext'
 
 export default function SecondaryDeviceModelContents( props ) {
+  const strings  = translations[ 'bhr' ]
+
   return (
     <View
       style={{
@@ -32,7 +34,7 @@ export default function SecondaryDeviceModelContents( props ) {
           marginLeft: 20,
         }}
       >
-        <Text style={NavStyles.modalHeaderTitleText}>Scan QR Code</Text>
+        <Text style={NavStyles.modalHeaderTitleText}>{strings.ScanQRCode}</Text>
       </View>
 
       <Text style={{
@@ -42,7 +44,7 @@ export default function SecondaryDeviceModelContents( props ) {
         marginLeft: 20,
         marginRight: 20
       }}>
-  Open the QR scanner at the top right of the home screen on another Personal Device running Hexa app and scan this QR
+        {strings.OpentheQRscanner}
       </Text>
       <View style={NavStyles.modalContentView}>
         {!props.secondaryQR ? (
@@ -74,7 +76,7 @@ export default function SecondaryDeviceModelContents( props ) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Yes, I have scanned
+            {strings.Ihavescanned}
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>
