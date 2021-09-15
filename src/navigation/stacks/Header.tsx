@@ -108,6 +108,7 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import {
   updateLastSeen
 } from '../../store/actions/preferences'
+import Relay from '../../bitcoin/utilities/Relay'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -139,8 +140,8 @@ interface HomeStateTypes {
   currencyCode: string;
   notificationDataChange: boolean;
   trustedContactRequest: any;
+  giftRequest: any;
   recoveryRequest: any;
-  custodyRequest: any;
   isLoadContacts: boolean;
   notificationTitle: string | null;
   notificationInfo: string | null;
@@ -268,8 +269,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currencyCode: 'USD',
       notificationDataChange: false,
       trustedContactRequest: null,
+      giftRequest: null,
       recoveryRequest: null,
-      custodyRequest: null,
       isLoadContacts: false,
       notificationLoading: true,
       notificationTitle: null,
@@ -629,10 +630,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
-    const { trustedContactRequest, swanRequest } = await processDeepLink( url )
-    if( trustedContactRequest ){
+    const { trustedContactRequest, swanRequest, giftRequest } = await processDeepLink( url )
+    if( trustedContactRequest || giftRequest ){
+      // if( giftRequest ){
+      //   console.log( {
+      //     giftRequest
+      //   } )
+      //   console.log( 'xyz' )
+      //   const decryptedKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, 'LQIESB' )
+      //   console.log( {
+      //     decryptedKey
+      //   } )
+      //   const res = await Relay.fetchTemporaryChannel( decryptedKey )
+      //   console.log( {
+      //     res
+      //   } )
+      //   return
+      // }
+
       this.setState( {
-        trustedContactRequest
+        trustedContactRequest,
+        giftRequest
       },
       () => {
         this.openBottomSheetOnLaunch(
@@ -641,8 +659,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         )
       }
       )
-    }
-    else if ( swanRequest ) {
+    } else if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
@@ -771,6 +788,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   handleDeepLinkModal = () => {
     const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
     const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const giftRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.giftRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
     const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
     const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
     if ( swanRequest ) {
@@ -784,11 +802,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     }
 
-    if ( recoveryRequest || trustedContactRequest ) {
+    if ( recoveryRequest || trustedContactRequest || giftRequest ) {
       this.setState(
         {
           recoveryRequest,
           trustedContactRequest,
+          giftRequest,
         },
         () => {
           this.openBottomSheetOnLaunch(
@@ -819,35 +838,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.firebaseNotificationListener()
     }
   }
-  // handleDeepLinking = async ( url ) => {
-  //   const { trustedContactRequest } = await processDeepLink( url )
-  //   if( trustedContactRequest )
-  //     this.setState( {
-  //       trustedContactRequest
-  //     },
-  //     () => {
-  //       this.openBottomSheetOnLaunch(
-  //         BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-  //         1
-  //       )
-  //     }
-  //     )
-  // }
-
-  // handleDeepLinkEvent = async ( { url } ) => {
-  //   const { navigation, isFocused } = this.props
-  //   // If the user is on one of Home's nested routes, and a
-  //   // deep link is opened, we will navigate back to Home first.
-  //   if ( !isFocused ) {
-  //     navigation.dispatch(
-  //       resetToHomeAction( {
-  //         unhandledDeepLinkURL: url,
-  //       } )
-  //     )
-  //   } else {
-  //     this.handleDeepLinking( url )
-  //   }
-  // };
 
   componentWillUnmount() {
     this.cleanupListeners()
@@ -1102,8 +1092,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   renderBottomSheetContent() {
-    const { UNDER_CUSTODY, navigation } = this.props
-    const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
+    const { navigation } = this.props
+    const { notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
     // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.TAB_BAR_BUY_MENU:

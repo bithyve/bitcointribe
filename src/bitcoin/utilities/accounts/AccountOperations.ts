@@ -1,5 +1,6 @@
 import * as bitcoinJS from 'bitcoinjs-lib'
 import * as bip32 from 'bip32'
+import crypto from 'crypto'
 import coinselect from 'coinselect'
 import {
   Transaction,
@@ -16,6 +17,9 @@ import {
   ActiveAddresses,
   ActiveAddressAssignee,
   Balances,
+  Gift,
+  GiftType,
+  GiftStatus,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
@@ -84,6 +88,17 @@ export default class AccountOperations {
     }
   };
 
+  static importAddress = async ( account: Account | MultiSigAccount, privateKey: string, address: string, requester: ActiveAddressAssignee ) => {
+    account.importedAddresses[ address ] = {
+      address,
+      privateKey
+    }
+    account.activeAddresses.external[ address ] = {
+      index: -1,
+      assignee: requester
+    }
+  }
+
   static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
     txsFound: Transaction[],
@@ -143,6 +158,12 @@ export default class AccountOperations {
         externalAddresses[ address ] = itr
         ownedAddresses.push( address )
       }
+
+      // include imported external addresses
+      Object.keys( account.importedAddresses ).forEach( address => {
+        externalAddresses[ address ] = -1
+        ownedAddresses.push( address )
+      } )
 
       const internalAddresses :{[address: string]: number}  = {
       }// all internal addresses(till closingIntIndex)
@@ -978,4 +999,67 @@ export default class AccountOperations {
       txid
     }
   };
+
+  static generateGifts = async (
+    walletDetails: {
+      walletId: string,
+      walletName: string,
+    },
+    account: Account | MultiSigAccount,
+    amounts: number[],
+    averageTxFees: AverageTxFees,
+  ): Promise<{
+    txid: string;
+    gifts: Gift[];
+   }> => {
+
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+
+    const recipients = []
+    const gifts: Gift[] = []
+    amounts.forEach( amount => {
+      const keyPair = bitcoinJS.ECPair.makeRandom( {
+        network: network
+      } )
+
+      const privateKey = keyPair.toWIF()
+      const address = AccountUtilities.deriveAddressFromKeyPair(
+        keyPair,
+        config.DPATH_PURPOSE,
+        network
+      )
+
+      recipients.push( {
+        address,
+        amount,
+        name: 'Gift',
+      } )
+
+      const createdGift: Gift = {
+        id: crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' ),
+        privateKey,
+        address,
+        amount,
+        type: GiftType.SENT,
+        status: GiftStatus.CREATED,
+        sender: {
+          walletId: walletDetails.walletId,
+          walletName: walletDetails.walletName,
+          accountId: account.id,
+        },
+        receiver: {
+        }
+      }
+
+      gifts.push( createdGift )
+    } )
+
+
+    const { txPrerequisites } = await AccountOperations.transferST1( account, recipients, averageTxFees )
+    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, TxPriority.LOW, network, recipients )
+
+    return {
+      txid, gifts
+    }
+  }
 }

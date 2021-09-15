@@ -47,7 +47,7 @@ import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
-import { generateDeepLink } from '../../common/CommonFunctions'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -208,7 +208,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       }
 
       if( !encryption_key ){
-        const { encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( DeepLinkEncryptionType.DEFAULT, encryption_key, currentContact, wallet.walletName )
+        const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+        const { encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+          deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+          encryptionType: DeepLinkEncryptionType.DEFAULT,
+          encryptionKey: encryption_key,
+          walletName: wallet.walletName,
+          keysToEncrypt,
+        } )
         const QRData = JSON.stringify( {
           type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
           encryptedChannelKeys: encryptedChannelKeys,

@@ -45,6 +45,8 @@ import {
   autoSyncShells,
   setResetTwoFALoader,
   recomputeNetBalance,
+  updateGift,
+  GENERATE_GIFTS,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -1072,4 +1074,53 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
 export const restoreAccountShellsWatcher = createWatcher(
   restoreAccountShellsWorker,
   RESTORE_ACCOUNT_SHELLS,
+)
+
+export function* generateGiftWorker( { payload } : {payload: { accountId: string, amounts: number[] }} ) {
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const accounts: Accounts = accountsState.accounts
+
+  let accountId = payload.accountId
+  if( !accountId ){
+    for( const id in accounts ){
+      const account = accounts[ id ]
+      if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
+        accountId = id
+        break
+      }
+    }
+  }
+
+  const account = accounts[ accountId ]
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
+  const walletDetails = {
+    walletId: wallet.walletId,
+    walletName: wallet.walletName
+  }
+
+  const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork )
+
+  if( txid ) {
+    for( const giftId in gifts ){
+      yield put( updateGift( gifts[ giftId ] ) )
+    }
+    // const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    // const res = yield call( Relay.updateTemporaryChannel, encryptionKey, gifts[ 0 ] )
+    // const deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+    // const deepLink = yield call( generateDeepLink, {
+    //   deepLinkKind: DeepLinkKind.GIFT,
+    //   encryptionType: DeepLinkEncryptionType.OTP,
+    //   encryptionKey: deepLinkEncryptionOTP,
+    //   walletName: 'DAN',
+    //   keysToEncrypt: encryptionKey
+    // } )
+  } else {
+    console.log( 'Gifts generation failed' )
+  }
+}
+
+export const generateGiftWatcher = createWatcher(
+  generateGiftWorker,
+  GENERATE_GIFTS,
 )

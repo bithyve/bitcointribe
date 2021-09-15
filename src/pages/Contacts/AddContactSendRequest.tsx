@@ -23,7 +23,7 @@ import NavStyles from '../../common/Styles/NavStyles'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import SendViaLink from '../../components/SendViaLink'
-import { generateDeepLink, isEmpty } from '../../common/CommonFunctions'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType, isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
@@ -214,7 +214,14 @@ export default function AddContactSendRequest( props ) {
             break
       }
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
+    const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+      deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      encryptionType: encryptLinkWith,
+      encryptionKey: encryption_key,
+      walletName: wallet.walletName,
+      keysToEncrypt,
+    } )
     setTrustedLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(

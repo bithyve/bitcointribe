@@ -529,11 +529,13 @@ export interface PrimaryStreamData {
   walletName?: string,
   relationType?: TrustedContactRelationTypes,
   FCM?: string,
+  contactDetails?: ContactDetails,
   paymentAddresses?: {
     [accountType: string]: string
   },
-  contactDetails?: ContactDetails,
-
+  gifts? : {
+    [id: string]: Gift
+  }
   // primary keeper exclusives
   secondarySetupData? :{
     secondaryXpub: string
@@ -788,8 +790,12 @@ export interface UTXO {
   status?: any;
 }
 
+
+export enum ActiveAddressAssigneeType  {
+    GIFT = 'GIFT'
+}
 export interface ActiveAddressAssignee{
-    type: AccountType;
+    type: AccountType | ActiveAddressAssigneeType;
     id?: string;
     senderInfo?: {
       name: string,
@@ -863,6 +869,12 @@ export interface Account {
   hasNewTxn?: boolean;                  // indicates new txns
   transactionsNote : {
     [txId: string]: string
+  },
+  importedAddresses: {                  // non-xpub/imported addresses
+    [address: string]: {
+      address: string,
+      privateKey: string
+    }
   }
 }
 export interface MultiSigAccount extends Account {
@@ -916,7 +928,8 @@ export enum DeepLinkKind {
   KEEPER = 'KEEPER',
   PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
-  EXISTING_CONTACT = 'EXISTING_CONTACT'
+  EXISTING_CONTACT = 'EXISTING_CONTACT',
+  GIFT = 'GIFT'
 }
 
 export enum DeepLinkEncryptionType {
@@ -924,6 +937,38 @@ export enum DeepLinkEncryptionType {
   NUMBER = 'NUM',
   EMAIL = 'EMAIL',
   OTP = 'OTP'
+}
+
+
+export enum GiftType {
+  SENT = 'SENT',
+  RECEIVED = 'RECEIVED'
+}
+
+export enum GiftStatus {
+  CREATED = 'CREATED',
+  SENT = 'SENT',
+  CLAIMED = 'CLAIMED',
+  EXPIRED = 'EXPIRED'
+}
+export interface Gift {
+  id: string,
+  privateKey: string,
+  address: string,
+  amount: number,
+  type: GiftType,
+  status: GiftStatus,
+  sender: {
+    walletId: string,
+    accountId: string,
+    walletName: string
+  },
+  receiver: {
+    walletId?: string,
+    accountId?: string,
+    walletName?: string,
+    contactId?: string
+  },
 }
 
 export interface cloudDataInterface {

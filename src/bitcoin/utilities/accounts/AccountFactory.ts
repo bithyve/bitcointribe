@@ -70,6 +70,8 @@ export function generateAccount(
       }
     },
     transactionsNote: {
+    },
+    importedAddresses: {
     }
   }
 
@@ -171,6 +173,8 @@ export function generateMultiSigAccount(
       }
     },
     transactionsNote: {
+    },
+    importedAddresses: {
     }
   }
 

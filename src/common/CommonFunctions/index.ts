@@ -323,29 +323,9 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
   return levelHealthVar[ currentLevel - 1 ].levelInfo
 }
 
-export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryptionKey: string, correspondingTrustedContact: TrustedContact, walletName: string ) => {
-  const keysToEncrypt = correspondingTrustedContact.channelKey + '-' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' )
-  let encryptedChannelKeys: string
-  let encryptionHint: string
-  switch ( encryptionType ) {
-      case DeepLinkEncryptionType.DEFAULT:
-        encryptionHint = ''
-        encryptedChannelKeys = keysToEncrypt
-        break
-
-      case DeepLinkEncryptionType.NUMBER:
-      case DeepLinkEncryptionType.EMAIL:
-      case DeepLinkEncryptionType.OTP:
-        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
-        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
-          keysToEncrypt,
-          encryptionKey
-        )
-        break
-  }
-
+export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: TrustedContactRelationTypes ) => {
   let deepLinkKind: DeepLinkKind
-  switch( correspondingTrustedContact.relationType ){
+  switch( contactRelationType ){
       case TrustedContactRelationTypes.CONTACT:
         deepLinkKind = DeepLinkKind.CONTACT
         break
@@ -366,6 +346,30 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
         deepLinkKind = DeepLinkKind.EXISTING_CONTACT
   }
 
+  return deepLinkKind
+}
+
+export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string } ) => {
+
+  let encryptedChannelKeys: string
+  let encryptionHint: string
+  switch ( encryptionType ) {
+      case DeepLinkEncryptionType.DEFAULT:
+        encryptionHint = ''
+        encryptedChannelKeys = keysToEncrypt
+        break
+
+      case DeepLinkEncryptionType.NUMBER:
+      case DeepLinkEncryptionType.EMAIL:
+      case DeepLinkEncryptionType.OTP:
+        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
+        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+          keysToEncrypt,
+          encryptionKey
+        )
+        break
+  }
+
   const appType = config.APP_STAGE
   const appVersion = DeviceInfo.getVersion()
 
@@ -383,44 +387,64 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
   }
 }
 
-export const processDeepLink = async ( deepLink: string ) =>{
+export const processDeepLink = ( deepLink: string ) => {
   try {
     const splits = deepLink.split( '/' )
-    if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
-      if ( splits[ 3 ] !== config.APP_STAGE ) {
-        Alert.alert(
-          'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[ 3 ]
-          }`,
-        )
-      } else {
-        const version = splits.pop().slice( 1 )
-        const encryptionMetaSplits = splits[ 7 ].split( '-' )
-        const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
-        const encryptionHint = encryptionMetaSplits[ 1 ]
 
-        const trustedContactRequest = {
-          walletName: splits[ 5 ],
-          encryptedChannelKeys: splits[ 6 ],
-          encryptionType,
-          encryptionHint,
-          isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
-          isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
-          isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-          isQR: false,
-          version,
-        }
-        return {
-          trustedContactRequest
-        }
-      }
-    } else if ( splits.includes( 'swan' ) )
+    // swan link(external)
+    if ( splits.includes( 'swan' ) )
       return {
         swanRequest: {
           deepLink
         }
       }
+
+    // hexa links
+    if ( splits[ 3 ] !== config.APP_STAGE )
+      Alert.alert(
+        'Invalid deeplink',
+        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+          splits[ 3 ]
+        }`,
+      )
+
+    const version = splits.pop().slice( 1 )
+    const encryptionMetaSplits = splits[ 7 ].split( '-' )
+    const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
+    const encryptionHint = encryptionMetaSplits[ 1 ]
+
+    switch( splits[ 4 ] as DeepLinkKind ){
+        case DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT:
+          const trustedContactRequest = {
+            walletName: splits[ 5 ],
+            encryptedChannelKeys: splits[ 6 ],
+            encryptionType,
+            encryptionHint,
+            isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
+            isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+            isQR: false,
+            deepLinkKind: splits[ 4 ],
+            version,
+          }
+          return {
+            trustedContactRequest
+          }
+
+        case DeepLinkKind.GIFT:
+          const giftRequest = {
+            walletName: splits[ 5 ],
+            encryptedChannelKeys: splits[ 6 ],
+            encryptionType,
+            encryptionHint,
+            isQR: false,
+            deepLinkKind: splits[ 4 ],
+            version,
+          }
+          return {
+            giftRequest
+          }
+    }
   }
   catch ( error ) {
     Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
