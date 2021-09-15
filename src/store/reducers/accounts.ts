@@ -64,6 +64,7 @@ export type AccountsState = {
   gifts : {
     [id: string]: Gift
   }
+  selectedGiftId: string,
 
   isGeneratingNewAccountShell: boolean;
   hasNewAccountShellGenerationSucceeded: boolean;
@@ -109,6 +110,8 @@ const initialState: AccountsState = {
   },
   gifts: {
   },
+  selectedGiftId: null,
+
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
   hasNewAccountShellGenerationFailed: false,
@@ -541,7 +544,8 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           gifts: {
             ...state.gifts,
             [ gift.id ]: gift
-          }
+          },
+          selectedGiftId: gift.id
         }
 
       default:

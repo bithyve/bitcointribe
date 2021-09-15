@@ -55,6 +55,7 @@ import {
   restoreAccountShellsWatcher,
   accountCheckWatcher,
   txnReadWatcher,
+  generateGiftsWatcher
 } from './sagas/accounts'
 
 import {
@@ -190,6 +191,7 @@ const rootSaga = function* () {
     validateTwoFAWatcher,
     createSmNResetTFAOrXPrivWatcher,
     updateAccountSettingsWatcher,
+    generateGiftsWatcher,
 
     //fBTC
     accountSyncWatcher,

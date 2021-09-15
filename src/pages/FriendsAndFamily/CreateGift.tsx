@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import {
   View,
   StyleSheet,
@@ -32,15 +32,29 @@ import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import { generateGifts } from '../../store/actions/accounts'
+import { AccountsState } from '../../store/reducers/accounts'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
+  const accountsState: AccountsState = useSelector( state => state.accounts )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
+  const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( true )
   const [ giftModal, setGiftModal ] =useState( false )
+  const [ createdGift, setCreatedGift ] = useState( null )
+
+  useEffect( () => {
+    if( accountsState.selectedGiftId && initGiftCreation ) {
+      const createdGift = accountsState.gifts[ accountsState.selectedGiftId ]
+      if( createdGift ){
+        setCreatedGift( createdGift )
+        setGiftModal( true )
+      }
+    }
+  }, [ accountsState.selectedGiftId ] )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
@@ -63,7 +77,7 @@ const CreateGift = ( { navigation } ) => {
         onPress={()=>{
           if( text === 'Create Gift' ){
             dispatch( generateGifts( [ Number( amount ) ] ) )
-            setGiftModal( true )
+            setInitGiftCreation( true )
           }
           else if ( text === 'Send Gift' ) {
             closeModal( true )
@@ -112,7 +126,7 @@ const CreateGift = ( { navigation } ) => {
           <DashedContainer
             titleText={'Available Gift'}
             subText={'Lorem ipsum dolor sit amet'}
-            amt={numberWithCommas( 50000 )}
+            amt={numberWithCommas( createdGift.amount )}
             date={new Date()}
             image={<GiftCard />}
           />
