@@ -519,7 +519,7 @@ class ContactDetails extends PureComponent<
       qrTitle = 'Approval Key'
       qrSubTitleText = 'approve'
       qrString = JSON.stringify( {
-        type: QRCodeTypes.RECOVERY_REQUEST,
+        type: QRCodeTypes.APPROVE_KEEPER,
         walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
         channelId: contacts.permanentChannelAddress,
         streamId: instream.streamId,
@@ -650,6 +650,7 @@ class ContactDetails extends PureComponent<
         subHeaderText={`Scan the QR to ${this.state.qrSubTitle}`}
         contactText={''}
         contact={this.contact}
+        qrTitle={this.state.qrSubTitle}
         QR={this.state.trustedQR}
         contactEmail={''}
         onPressBack={() => {

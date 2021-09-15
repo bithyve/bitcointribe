@@ -22,6 +22,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { useSelector } from 'react-redux'
 import { withNavigation } from 'react-navigation'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -31,7 +32,7 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 function SecurityQuestion( props ) {
-  const { security } = useSelector(
+  const { security }: Wallet = useSelector(
     ( state ) => state.storage.wallet,
   )
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
@@ -115,7 +116,7 @@ function SecurityQuestion( props ) {
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
-                Specify the answer{'\n'}as you did at
+                Specify the password{'\n'}as you did at
                 the time of setting up the wallet
               </Text>
             </View>
@@ -124,7 +125,9 @@ function SecurityQuestion( props ) {
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
           }}>
             <View style={styles.dropdownBox}>
-              <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
+              {parseInt( security.questionId ) > 0 ? <Text style={styles.dropdownBoxText}>{securityQuestion}</Text> :
+                <Text style={styles.dropdownBoxText}>Hint: {securityQuestion}</Text>
+              }
             </View>
             <KeyboardAwareScrollView
               resetScrollToCoords={{
@@ -276,7 +279,7 @@ const styles = StyleSheet.create( {
     height: 50,
     paddingLeft: 15,
     paddingRight: 15,
-    alignItems: 'center',
+    // alignItems: 'center',
   },
   questionConfirmButton: {
     height: wp( '13%' ),

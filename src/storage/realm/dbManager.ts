@@ -226,6 +226,24 @@ const updateTransaction = async ( txId: string, params: object ) => {
   }
 }
 
+const updateTransactions = async ( txIds: string[], params: object ) => {
+  try {
+    const idsQuery = txIds.map( id => `txid = "${id}"` ).join( ' OR ' )
+    const txRef = db.objects( schema.Transaction ).filtered( idsQuery.toString() )
+    if( txRef.length > 0 ) {
+      db.write( ()=> {
+        txRef.forEach( tx => {
+          for ( const [ key, value ] of Object.entries( params ) ) {
+            tx[ key ] = value
+          }
+        } )
+      } )
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
 const markAccountChecked = async ( accountId: string ) => {
   try {
     const acccountRef = db.objects( schema.Account ).filtered( `id = "${accountId}"` )
@@ -336,4 +354,5 @@ export default {
   updateBHR,
   markAccountChecked,
   updateTransaction,
+  updateTransactions
 }
