@@ -42,7 +42,7 @@ import {
   READ_TRANSACTION,
   ACCOUNT_CHECKED,
   RECOMPUTE_NET_BALANCE,
-  ADD_NEW_GIFT,
+  UPDATE_GIFT,
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -534,13 +534,13 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           resetTwoFALoader: action.payload.flag,
         }
 
-      case ADD_NEW_GIFT:
-        const newGift: Gift = action.payload.newGift
+      case UPDATE_GIFT:
+        const gift: Gift = action.payload.gift
         return {
           ...state,
           gifts: {
             ...state.gifts,
-            [ newGift.id ]: newGift
+            [ gift.id ]: gift
           }
         }
 

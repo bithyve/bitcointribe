@@ -65,6 +65,8 @@ export const SET_SHOW_ALL_ACCOUNT = 'SET_SHOW_ALL_ACCOUNT'
 export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
 export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
 
+export const GENERATE_GIFTS = 'GENERATE_GIFTS'
+
 export const getAllAccountsData = () => {
   return {
     type: GET_ALL_ACCOUNTS_DATA
@@ -551,6 +553,15 @@ export const accountShellOrderedToFront = (
   }
 }
 
+export const generateGifts = ( accountId: string, amounts: number[] ) => {
+  return {
+    type: GENERATE_GIFTS,
+    payload: {
+      accountId, amounts
+    }
+  }
+}
+
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED'
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED'
@@ -573,7 +584,7 @@ export const TRANSACTION_REASSIGNMENT_FAILED =
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 export const BLIND_REFRESH_STARTED = 'BLIND_REFRESH_STARTED'
-export const ADD_NEW_GIFT = 'ADD_NEW_GIFT'
+export const UPDATE_GIFT = 'UPDATE_GIFT'
 
 export const testcoinsReceived = ( ) => {
   return {
@@ -803,11 +814,11 @@ export const setResetTwoFALoader = ( flag ) => {
   }
 }
 
-export const addNewGift = ( newGift: Gift ) => {
+export const updateGift = ( gift: Gift ) => {
   return {
-    type: ADD_NEW_GIFT,
+    type: UPDATE_GIFT,
     payload: {
-      newGift
+      gift
     }
   }
 }
