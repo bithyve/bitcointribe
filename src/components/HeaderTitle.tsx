@@ -16,7 +16,7 @@ export default function HeaderTitle( props ) {
 
   return ( <View>
     <View style={{
-      flexDirection: 'row', alignItems: 'center'
+      flexDirection: 'row', alignItems: 'center',
     }}>
       <Text style={CommonStyles.headerTitles} >
         {props.firstLineTitle}
@@ -26,7 +26,7 @@ export default function HeaderTitle( props ) {
       flexDirection: 'row', alignItems: 'center',
     }}>
       <Text style={[ CommonStyles.subHeaderTitles, {
-        fontWeight: '500', width: wp( 75 )
+        fontWeight: '500', width: wp( 65 )
       } ]} >
         {props.secondLineBoldTitle}
         <Text style={[ CommonStyles.subHeaderTitles, {
@@ -47,5 +47,6 @@ export default function HeaderTitle( props ) {
       {props.infoTextNormal}
     </Text>
   </View>
+
   )
 }
