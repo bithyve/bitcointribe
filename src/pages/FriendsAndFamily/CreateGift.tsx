@@ -42,7 +42,7 @@ const CreateGift = ( { navigation } ) => {
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
-  const [ includeFees, setFees ] = useState( true )
+  const [ includeFees, setFees ] = useState( false )
   const [ giftModal, setGiftModal ] =useState( false )
   const [ createdGift, setCreatedGift ] = useState( null )
 
@@ -52,9 +52,10 @@ const CreateGift = ( { navigation } ) => {
       if( createdGift ){
         setCreatedGift( createdGift )
         setGiftModal( true )
+        setInitGiftCreation( false )
       }
     }
-  }, [ accountsState.selectedGiftId ] )
+  }, [ accountsState.selectedGiftId, initGiftCreation ] )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''

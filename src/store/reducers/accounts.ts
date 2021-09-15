@@ -43,6 +43,7 @@ import {
   ACCOUNT_CHECKED,
   RECOMPUTE_NET_BALANCE,
   UPDATE_GIFT,
+  GENERATE_GIFTS,
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -535,6 +536,12 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
           resetTwoFALoader: action.payload.flag,
+        }
+
+      case GENERATE_GIFTS:
+        return {
+          ...state,
+          selectedGiftId: null
         }
 
       case UPDATE_GIFT:

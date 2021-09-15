@@ -1105,6 +1105,14 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     for( const giftId in gifts ){
       yield put( updateGift( gifts[ giftId ] ) )
     }
+
+    // refersh the account
+    let shellToSync: AccountShell
+    for( const accountShell of accountsState.accountShells ){
+      if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
+    }
+    yield put( refreshAccountShells( [ shellToSync ], {
+    } ) )
     // const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     // const res = yield call( Relay.updateTemporaryChannel, encryptionKey, gifts[ 0 ] )
     // const deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
