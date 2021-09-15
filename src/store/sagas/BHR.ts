@@ -96,7 +96,8 @@ import {
   NewWalletImage,
   cloudDataInterface,
   Accounts,
-  AccountType
+  AccountType,
+  ContactDetails
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -1858,6 +1859,7 @@ function* updateKeeperInfoToChannelWorker( ) {
       channelKey: string,
       streamId: string,
       unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+      contactDetails?: ContactDetails
     }[] = []
     if( levelHealth[ 0 ] ) {
       for ( let i = 2; i < levelHealth[ 0 ].levelInfo.length; i++ ) {
@@ -1893,6 +1895,7 @@ function* updateKeeperInfoToChannelWorker( ) {
           channelKey,
           streamId: streamUpdates.streamId,
           unEncryptedOutstreamUpdates: streamUpdates,
+          contactDetails: contacts[ channelKey ].contactDetails,
         } )
       }
     }

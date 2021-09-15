@@ -423,6 +423,23 @@ class ManageBackupNewBHR extends Component<
         },
         isSetup: true,
       }
+      if( this.state.selectedKeeperType == 'pdf' ){
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+        }, () => {
+          this.sendApprovalRequestToPK( )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
+      } else {
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+          showLoader: false,
+          selectedLevelId: 2
+        }, () => {
+          this.goToHistory( obj )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
+      }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
       } )
