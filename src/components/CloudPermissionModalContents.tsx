@@ -9,11 +9,13 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import DeviceInfo from 'react-native-device-info'
+import { translations } from '../common/content/LocContext'
 
 export default function CloudPermissionModalContents( props ) {
   const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
   const [ timeLeft, setTimeLeft ] = useState( null )
   const [ intervalRef, setIntervalRef ] = useState( null )
+  const strings  = translations[ 'common' ]
 
   const getElusiveTimer = () =>{
     return timerArray.map( ( value, key )=>{
@@ -147,7 +149,7 @@ export default function CloudPermissionModalContents( props ) {
                 : Colors.white,
             }}
           >
-            {'Backup'}
+            {strings.backup}
           </Text>
         </AppBottomSheetTouchableWrapper>
 
@@ -169,7 +171,7 @@ export default function CloudPermissionModalContents( props ) {
                 : Colors.blue,
             }}
           >
-            {'Skip'}
+            {strings.skip}
           </Text>
         </AppBottomSheetTouchableWrapper>
         <Image

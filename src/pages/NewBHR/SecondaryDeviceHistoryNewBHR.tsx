@@ -48,8 +48,11 @@ import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
 import { generateDeepLink } from '../../common/CommonFunctions'
+import { translations } from '../../common/content/LocContext'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+  const common  = translations[ 'common' ]
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
   // const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ reshareModal, setReshareModal ] = useState( false )
@@ -269,9 +272,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         modalRef={secondaryDeviceMessageBottomSheet}
         title={'Keeper Device'}
         note={
-          'For confirming your Recovery Key on the Keeper Device, simply open the app on that device and log in'
+          strings.confirmingyourRecovery
         }
-        proceedButtonText={'Ok, got it'}
+        proceedButtonText={strings.ok}
         onPressProceed={() => setSecondaryDeviceMessageModal( false )}
         onPressIgnore={() => setSecondaryDeviceMessageModal( false )}
         isBottomImage={false}
@@ -332,7 +335,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         modalRef={ErrorModal}
         title={errorMessageHeader}
         info={errorMessage}
-        proceedButtonText={'Try again'}
+        proceedButtonText={common.tryAgain}
         onPressProceed={() => setErrorModal( false )}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/errorImage.png' )}
@@ -343,9 +346,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   useEffect( () => {
     if ( isErrorSendingFailed ) {
       setTimeout( () => {
-        setErrorMessageHeader( 'Error sending Recovery Key' )
+        setErrorMessageHeader( strings.ErrorsendingRecovery )
         setErrorMessage(
-          'There was an error while sending your Recovery Key, please try again in a little while',
+          strings.errorwhilesendingyourRecovery,
         )
       }, 2 )
       setErrorModal( true )
@@ -358,12 +361,12 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
         title={'Change your\nKeeper'}
-        info={'Having problems with your Keeper'}
+        info={strings.problemswithyourKeeper}
         note={
-          'You can change the Keeper you selected to send your Recovery Key'
+          strings.changetheKeeper
         }
-        proceedButtonText={'Change'}
-        cancelButtonText={'Back'}
+        proceedButtonText={common.change}
+        cancelButtonText={common.back}
         isIgnoreButton={true}
         onPressProceed={() => {
           setIsChange( true )
@@ -402,9 +405,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   if ( isErrorSendingFailed ) {
     setTimeout( () => {
-      setErrorMessageHeader( 'Error sending Recovery Key' )
+      setErrorMessageHeader( strings.ErrorsendingRecovery )
       setErrorMessage(
-        'There was an error while sending your Recovery Key, please try again in a little while',
+        strings.errorwhilesendingyourRecovery,
       )
     }, 2 )
     setErrorModal( true )
@@ -421,10 +424,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     return (
       <QRModal
         isFromKeeperDeviceHistory={false}
-        QRModalHeader={'QR scanner'}
-        title={'Note'}
+        QRModalHeader={strings.QRscanner}
+        title={common.note}
         infoText={
-          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+          strings.approvethisrequest
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
@@ -572,15 +575,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <ModalContainer visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
         <ErrorModalContents
           // modalRef={ReshareBottomSheet}
-          title={'Reshare with the same device?'}
+          title={strings.Resharewithsamedevice}
           info={
-            'Proceed if you want to reshare the link/ QR with the same device'
+            strings.ifyouwanttoreshare
           }
           note={
-            'For a different device, please go back and choose ‘Change device'
+            strings.differentdevice
           }
-          proceedButtonText={'Reshare'}
-          cancelButtonText={'Back'}
+          proceedButtonText={strings.reshare}
+          cancelButtonText={common.back}
           isIgnoreButton={true}
           onPressProceed={() => {
             // ( ReshareBottomSheet as any ).current.snapTo( 0 )
@@ -605,8 +608,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       </ModalContainer>
       <ModalContainer visible={keeperTypeModal} closeBottomSheet={()=>{setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
-          headerText={'Change backup method'}
-          subHeader={'Share your Recovery Key with a new contact or a different device'}
+          headerText={strings.Changebackupmethod}
+          subHeader={strings.withanewcontact}
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
