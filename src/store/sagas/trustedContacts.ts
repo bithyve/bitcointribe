@@ -41,6 +41,8 @@ import {
   GiftStatus,
   GiftType,
   ActiveAddressAssigneeType,
+  DeepLinkKind,
+  DeepLinkEncryptionType,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -65,6 +67,7 @@ import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import { generateDeepLink } from '../../common/CommonFunctions'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -577,6 +580,21 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
           contactId: permanentChannelAddress
         }
         yield put( addNewGift( gifts[ 0 ] ) )
+
+        // const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+        // const res = yield call( Relay.updateTemporaryChannel, encryptionKey, gifts[ 0 ] )
+        // const deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+        // const deepLink = yield call( generateDeepLink, {
+        //   deepLinkKind: DeepLinkKind.GIFT,
+        //   encryptionType: DeepLinkEncryptionType.OTP,
+        //   encryptionKey: deepLinkEncryptionOTP,
+        //   walletName: 'DAN',
+        //   keysToEncrypt: encryptionKey
+        // } )
+        // console.log( {
+        //   res, deepLink, encryptionKey, deepLinkEncryptionOTP
+        // } )
+        // return
       }
     } catch( err ) {
       console.log( 'Failed to generate gift', {
