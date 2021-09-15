@@ -17,6 +17,7 @@ import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { AccountType } from '../../bitcoin/utilities/Interface'
+import { translations } from '../../common/content/LocContext'
 
 export type Props = {
   accountShell: AccountShell;
@@ -75,6 +76,8 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
 const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const totalBalance = AccountShell.getTotalBalance( accountShell )
   // const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   const balanceTextStyle = useMemo( () => {
@@ -92,20 +95,20 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
       return(
         <Text style={styles.subtitleText} numberOfLines={3}>
           <Text style={styles.boldItalicText}>
-            {'Register '}
+            {`${strings.Register}`}
           </Text>
-          {'and\nclaim $10'}
+          {strings.andclaim}
         </Text>
       )
     }
     if ( text.includes( 'Level 2' ) ) {
       return(
         <Text style={styles.subtitleText} numberOfLines={3}>
-          {'Available after\n'}
+          {`${strings.Availableafter}\n`}
           <Text style={styles.boldItalicText}>
           Level 2
           </Text>
-          {' Backup'}
+          {` ${common.backup}`}
         </Text>
       )
     }

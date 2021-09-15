@@ -568,7 +568,7 @@ const styles = StyleSheet.create( {
 
   textBeta: {
     marginHorizontal: 10,
-    backgroundColor: 'tomato',
+    backgroundColor: Colors.blue,
     color: 'white',
     paddingHorizontal: 5,
     paddingVertical: 1,

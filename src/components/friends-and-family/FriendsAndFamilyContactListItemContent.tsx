@@ -22,9 +22,10 @@ export type Props = {
 };
 
 const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, index }: Props ) => {
-  const { translations, appLanguage } = useContext( LocalizationContext )
+  const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
+  const lastSeenDays = agoTextForLastSeen( contact.lastSeenActive )
   const firstNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' )[ 0 ] + ' '
   }, [ contact ] )
@@ -76,7 +77,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
             <Text style={{
               fontFamily: Fonts.FiraSansMediumItalic
             }}>
-              {agoTextForLastSeen( contact.lastSeenActive, appLanguage ) === 'today' ? strings.today : agoTextForLastSeen( contact.lastSeenActive, appLanguage )}
+              {lastSeenDays === 'today'? common.today : lastSeenDays}
             </Text>
           ) : (
             <Text style={{
