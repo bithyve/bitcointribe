@@ -977,8 +977,30 @@ class ManageBackupNewBHR extends Component<
                   this.state.metaSharesKeeper.length != 5
                   ) {
                     this.props.generateMetaShare( selectedLevelId )
-                  } else {
+                  } else if( type == 'pdf' ){
                     this.sendApprovalRequestToPK( )
+                  } else {
+                    const obj = {
+                      id: selectedLevelId,
+                      selectedKeeper: {
+                        shareType: type,
+                        name: name,
+                        reshareVersion: 0,
+                        status: 'notSetup',
+                        updatedAt: 0,
+                        shareId: this.state.selectedKeeper.shareId,
+                        data: {
+                        },
+                      },
+                      isSetup: true,
+                    }
+                    this.setState( {
+                      selectedKeeper: obj.selectedKeeper,
+                      showLoader: false,
+                      selectedLevelId: 2
+                    }, () => {
+                      this.goToHistory( obj )
+                    } )
                   }
                 } catch( err ){
                   console.log( 'err', err )

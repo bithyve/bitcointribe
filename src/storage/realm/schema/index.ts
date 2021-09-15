@@ -33,6 +33,7 @@ import {
   SenderInfoSchema,
   RecipientInfoSchema,
   RecipientSchema,
+  TransactionsNoteSchema,
 } from './Schema'
 
 export default
@@ -71,4 +72,5 @@ export default
   SenderInfoSchema,
   RecipientInfoSchema,
   RecipientSchema,
+  TransactionsNoteSchema
 ]

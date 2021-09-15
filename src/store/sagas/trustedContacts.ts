@@ -412,8 +412,10 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               notification,
             )
         }
-        if( relationType === TrustedContactRelationTypes.KEEPER )
+        if( relationType === TrustedContactRelationTypes.PRIMARY_KEEPER )
           Toast( 'You have been successfully added as a Keeper' )
+        else if( relationType === TrustedContactRelationTypes.KEEPER )
+          Toast( 'You have been successfully added as a Keeper. Now Please Approve keeper by scanning QR from Primary Keeper' )
         else if ( relationType === TrustedContactRelationTypes.CONTACT )
           Toast( 'Contact successfully added to Friends & Family' )
       }
@@ -644,11 +646,12 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       wallet = yield call( setup2FADetails, wallet )
       primaryData.bhXpub = wallet.details2FA.bithyveXpub
     }
-    else
+    else if( secondaryMnemonicShard ){
       secondaryData = {
         secondaryMnemonicShard,
         bhXpub: wallet.details2FA.bithyveXpub,
       }
+    }
     const secondaryChannelKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     contactInfo.secondaryChannelKey = secondaryChannelKey
   }
@@ -656,7 +659,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const streamUpdates: UnecryptedStreamData = {
     streamId: TrustedContactsOperations.getStreamId( walletId ),
     primaryData,
-    secondaryData,
     backupData,
     metaData: {
       flags:{
@@ -667,6 +669,8 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       version: DeviceInfo.getVersion()
     }
   }
+
+  if( secondaryData ) streamUpdates.secondaryData = secondaryData
 
   const channelUpdate =  {
     contactInfo, streamUpdates
