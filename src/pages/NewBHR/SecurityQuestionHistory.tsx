@@ -69,6 +69,7 @@ const SecurityQuestionHistory = ( props ) => {
     successModal,
     showSuccessModal,
   ] = useState( false )
+  const [ showAnswer, setShowAnswer ] = useState( false )
   const [
     HealthCheckSuccessBottomSheet,
     setHealthCheckSuccessBottomSheet,
@@ -99,15 +100,14 @@ const SecurityQuestionHistory = ( props ) => {
           Keyboard.dismiss()
           saveConfirmationHistory()
           updateHealthForSQ()
-          // ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
           showQuestionModal( false )
-          // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 1 )
           showSuccessModal( true )
         }}
+        onPasscodeVerify={()=>{ showQuestionModal( true ); setShowAnswer( true ) }}
+        showAnswer={showAnswer}
       />
     )
-  }, [] )
-
+  }, [ showAnswer, questionModal ] )
 
   const renderHealthCheckSuccessModalContent = useCallback( () => {
     return (

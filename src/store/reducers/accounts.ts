@@ -453,9 +453,12 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case ACCOUNT_SHELLS_REFRESH_STARTED:
         const shellsRefreshing: AccountShell[] = action.payload
         shellsRefreshing.forEach( refreshingShell => {
-          state.accountShells.find(
-            ( shell ) => shell.id == refreshingShell.id
-          ).syncStatus = SyncStatus.IN_PROGRESS
+          state.accountShells.forEach(
+            ( shell ) => {
+              if( shell.id == refreshingShell.id ) shell.syncStatus = SyncStatus.IN_PROGRESS
+              else shell.syncStatus = SyncStatus.COMPLETED
+            }
+          )
         } )
         return {
           ...state,

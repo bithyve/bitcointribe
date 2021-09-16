@@ -1356,8 +1356,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
-
-
         default:
           break
     }

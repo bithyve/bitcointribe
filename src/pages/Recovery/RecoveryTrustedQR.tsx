@@ -16,6 +16,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import QRCode from '../../components/QRCode'
 import { translations } from '../../common/content/LocContext'
+import CopyThisText from '../../components/CopyThisText'
 
 export default function RecoveryTrustedQR( props ) {
   const strings  = translations[ 'bhr' ]
@@ -54,6 +55,12 @@ export default function RecoveryTrustedQR( props ) {
         ) : (
           <QRCode value={props.trustedQR} size={hp( '27%' )} />
         )}
+        {props.trustedOR?<CopyThisText
+          backgroundColor={Colors.backgroundColor}
+          text={props.trustedQR}
+          width={'20%'}
+          height={'15%'}
+        /> : null}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
           style={{
