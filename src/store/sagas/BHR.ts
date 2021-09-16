@@ -907,7 +907,7 @@ function* sharePDFWorker( { payload } ) {
               Mailer.mail,
               {
                 subject: 'Recovery Key  '+walletName,
-                body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
+                body: `<b>Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.</b>`,
                 isHTML: true,
                 attachments: [ {
                   path:
@@ -928,7 +928,7 @@ function* sharePDFWorker( { payload } ) {
           } else {
             const shareOptions = {
               title: 'Recovery Key  '+walletName,
-              message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+              message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
               url:
               Platform.OS == 'android'
                 ? 'file://' + pdfInfo.filePath
@@ -990,7 +990,7 @@ function* sharePDFWorker( { payload } ) {
         case 'Other':
           const shareOptions = {
             title: 'Recovery Key  '+walletName,
-            message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+            message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
             url:
             Platform.OS == 'android'
               ? 'file://' + pdfInfo.filePath

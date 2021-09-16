@@ -22,7 +22,6 @@ import com.peel.react.TcpSocketsModule;
 import com.peel.react.rnos.RNOSModule;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.horcrux.svg.SvgPackage;
-import com.kishanjvaghela.cardview.RNCardViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.bitgo.randombytes.RandomBytesPackage;
