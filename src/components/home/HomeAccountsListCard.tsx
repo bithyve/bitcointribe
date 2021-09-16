@@ -116,16 +116,14 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
     }
     return (
       <Text style={styles.subtitleText} numberOfLines={3}>
-        {text.length > 20 ? text.substr( 0, 35 )+'...' : text}
+        {text}
       </Text>
     )
   }
   return (
     <View style={styles.bodyContainer}>
       <Text style={styles.titleText} numberOfLines={2}>
-        {primarySubAccount.type == AccountType.DONATION_ACCOUNT ? 'Donation Account' :
-          primarySubAccount.customDisplayName ?? primarySubAccount.defaultTitle
-        }
+        {primarySubAccount.customDisplayName ?? primarySubAccount.defaultTitle}
       </Text>
 
 

@@ -142,8 +142,8 @@ const HomeBuyCard = ( {
         //   />
         // }
         buttonStyle={{
-          borderRadius: wp( 3 ),
-          paddingVertical: wp( 2 ),
+          borderRadius: wp( 2 ),
+          paddingVertical: wp( 2.5 ),
           paddingHorizontal: wp( 4 ),
           backgroundColor: Colors.blue,
           shadowColor: Colors.shadowBlue,
