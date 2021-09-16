@@ -431,6 +431,23 @@ class ManageBackupNewBHR extends Component<
         },
         isSetup: true,
       }
+      if( this.state.selectedKeeperType == 'pdf' ){
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+        }, () => {
+          this.sendApprovalRequestToPK( )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
+      } else {
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+          showLoader: false,
+          selectedLevelId: 2
+        }, () => {
+          this.goToHistory( obj )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
+      }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
       } )
@@ -605,20 +622,24 @@ class ManageBackupNewBHR extends Component<
     const channelUpdates = []
     // Contact or Device type
     if( contacts ){
-      for( const ck of Object.keys( contacts ) ){
-        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
-          // initiate permanent channel
-          const channelUpdate =  {
-            contactInfo: {
-              channelKey: ck,
-            }
-          }
-          channelUpdates.push( channelUpdate )
-        }
-      }
+      // for( const ck of Object.keys( contacts ) ){
+      //   if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
+      //     // initiate permanent channel
+      //     const channelUpdate =  {
+      //       contactInfo: {
+      //         channelKey: ck,
+      //       }
+      //     }
+      //     channelUpdates.push( channelUpdate )
+      //   }
+      // }
+      // this.props.syncPermanentChannels( {
+      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      //   channelUpdates: channelUpdates,
+      //   metaSync: true
+      // } )
       this.props.syncPermanentChannels( {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-        channelUpdates: channelUpdates,
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
         metaSync: true
       } )
     }

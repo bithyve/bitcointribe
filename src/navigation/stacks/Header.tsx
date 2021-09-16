@@ -108,6 +108,7 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import {
   updateLastSeen
 } from '../../store/actions/preferences'
+import QRModal from '../../pages/Accounts/QRModal'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -126,6 +127,7 @@ export enum BottomSheetKind {
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
+  APPROVE_KEEPER_REQUEST,
 }
 
 interface HomeStateTypes {
@@ -165,6 +167,7 @@ interface HomeStateTypes {
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
   releaseNotes: string;
+  showQRModal: boolean;
 }
 
 interface HomePropsTypes {
@@ -239,6 +242,7 @@ interface HomePropsTypes {
   syncPermanentChannels: any;
   updateLastSeen: any;
   updateSecondaryShard: any;
+  openApproval: boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -295,6 +299,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       wyreFromBuyMenu: null,
       wyreFromDeepLink: null,
       releaseNotes: '',
+      showQRModal: false,
     }
     this.currentNotificationId= ''
   }
@@ -305,20 +310,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         console.log( 'qrData', qrData )
         const trustedContactRequest = processFriendsAndFamilyQR( qrData )
         if( trustedContactRequest ){
-          if( JSON.parse( qrData ).type == QRCodeTypes.APPROVE_KEEPER ){
-            this.props.updateSecondaryShard( qrData )
-          } else {
-            this.setState( {
-              trustedContactRequest
-            },
-            () => {
-              this.openBottomSheetOnLaunch(
-                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                1
-              )
-            }
+          this.setState( {
+            trustedContactRequest
+          },
+          () => {
+            this.openBottomSheetOnLaunch(
+              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+              1
             )
           }
+          )
         }
       },
     } )
@@ -764,6 +765,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.messages
     ) {
       this.updateBadgeCounter()
+    }
+    if( prevProps.openApproval != this.props.openApproval ){
+      if( this.props.openApproval ){
+        this.setState( {
+          showQRModal: true
+        } )
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.APPROVE_KEEPER_REQUEST,
+          1
+        )
+      } else {
+        this.setState( {
+          showQRModal: false
+        } )
+        this.closeBottomSheet()
+      }
     }
 
   };
@@ -1310,6 +1327,37 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+        case BottomSheetKind.APPROVE_KEEPER_REQUEST:
+          return (
+            <QRModal
+              isFromKeeperDeviceHistory={true}
+              QRModalHeader={'QR scanner'}
+              title={'Note'}
+              infoText={
+                'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+              }
+              isOpenedFlag={this.state.showQRModal}
+              onQrScan={async( qrScannedData ) => {
+                this.props.updateSecondaryShard( qrScannedData )
+              }}
+              onBackPress={() => {
+                this.setState( {
+                  showQRModal: false
+                } )
+                this.openBottomSheetOnLaunch(
+                  BottomSheetKind.APPROVE_KEEPER_REQUEST,
+                  0
+                )
+              }}
+              onPressContinue={async() => {
+                const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Fsf","channelId":"b2c3e80cd18ebb3cbf614897adaba91bd5a240b58663cfe31d98279699018ceb","streamId":"2fe62cb5b","secondaryChannelKey":"MYyBiSAX6mADy1k8T6KpMPXv","version":"2.0","walletId":"e681bea2840fb5b9e805755fb1ead8bb8c9d910f5d5bdd0fde5a8574e9d166ce"}'
+                this.props.updateSecondaryShard( qrScannedData )
+              }}
+            />
+          )
+
+
+
         default:
           break
     }
@@ -1416,6 +1464,7 @@ const mapStateToProps = ( state ) => {
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     messages: state.notifications.messages,
     existingFCMToken: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
+    openApproval: idx( state, ( _ ) => _.trustedContacts.openApproval ),
   }
 }
 

@@ -270,7 +270,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={secondaryDeviceMessageBottomSheet}
-        title={'Keeper Device'}
+        title={'Personal Device'}
         note={
           strings.confirmingyourRecovery
         }
