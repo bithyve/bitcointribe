@@ -33,6 +33,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import { generateGifts } from '../../store/actions/accounts'
 import { AccountsState } from '../../store/reducers/accounts'
+import { Gift } from '../../bitcoin/utilities/Interface'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -65,7 +66,7 @@ const CreateGift = ( { navigation } ) => {
     setGiftModal( false )
     if ( navigate ) {
       navigation.navigate( 'AddContact', {
-        fromScreen: 'Gift'
+        giftId: ( createdGift as Gift ).id
       } )
     } else {
       navigation.goBack()

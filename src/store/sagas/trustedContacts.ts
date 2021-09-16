@@ -566,11 +566,11 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
         .update( contactInfo.channelKey )
         .digest( 'hex' )
 
-      gift.status = GiftStatus.SENT,
-      gift.receiver = {
+      giftToSend.status = GiftStatus.SENT,
+      giftToSend.receiver = {
         contactId: permanentChannelAddress
       }
-      yield put( updateGift( gift ) )
+      yield put( updateGift( giftToSend ) )
       gift = giftToSend
     }
   }

@@ -71,6 +71,7 @@ export default function AddContactSendRequest( props ) {
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
+  const giftId = props.navigation.getParam( 'giftId' )
 
   const headerText = props.navigation.getParam( 'headerText' )
     ? props.navigation.getParam( 'headerText' )
@@ -123,6 +124,7 @@ export default function AddContactSendRequest( props ) {
       // await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
     } )
   }
+
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
 
@@ -138,11 +140,12 @@ export default function AddContactSendRequest( props ) {
     // } else {
     dispatch( initializeTrustedContact( {
       contact: Contact,
-      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
+      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+      giftId
     } ) )
     // }
 
-  }, [ Contact ] )
+  }, [ Contact, giftId ] )
 
   useEffect( () => {
     getContact()

@@ -296,18 +296,10 @@ export default function AddContactAddressBook( props ) {
         props.navigation.navigate( 'ContactDetails', {
           contact: selectedContacts[ 0 ],
         } )
-
-      } else if ( props.navigation.state.params?.fromScreen === 'Gift' ){
-        props.navigation.navigate( 'SendGift', {
-          SelectedContact: selectedContacts,
-          headerText: strings.addContact,
-          subHeaderText:strings.send,
-          contactText:strings.adding,
-          showDone:true,
-        } )
       } else {
         props.navigation.navigate( 'AddContactSendRequest', {
           SelectedContact: selectedContacts,
+          giftId: props.navigation.state.params?.giftId,
           headerText: strings.addContact,
           subHeaderText:strings.send,
           contactText:strings.adding,
