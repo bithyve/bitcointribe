@@ -277,6 +277,7 @@
         "l1": "Level 1 Cloud Backup is complete",
         "l2": "Level 2 Double Backup is complete",
         "l3": "Level 3 Multi-key Backup is complete",
+        "needAttention": " needs your attention.",
         "wallet": "Wallet"
     },
     "stackTitle": {

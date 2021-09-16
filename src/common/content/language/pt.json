@@ -287,6 +287,7 @@
     "l1": "O backup na nuvem de nível 1 está completo",
     "l2": "O backup duplo de nível 2 está completo",
     "l3": "O Backup Multi-key de nível 3 está completo",
+    "needAttention": " precisa de sua atenção.",
     "wallet": "Carteira"
   },
   "stackTitle": {

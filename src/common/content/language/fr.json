@@ -287,6 +287,7 @@
     "l1": "La sauvegarde cloud de niveau 1 est terminée",
     "l2": "La double sauvegarde de niveau 2 est terminée",
     "l3": "La sauvegarde multi-clés de niveau 3 est terminée",
+    "needAttention": " a besoin de votre attention.",
     "wallet": "Portefeuille"
   },
   "stackTitle": {
