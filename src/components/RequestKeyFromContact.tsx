@@ -124,7 +124,7 @@ export default function RequestKeyFromContact( props ) {
       </View> */}
       <HeaderTitle
         firstLineTitle={strings.scanQR}
-        secondLineTitle={strings.withHexa}
+        secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
