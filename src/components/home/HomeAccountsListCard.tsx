@@ -49,7 +49,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         source={getAvatarForSubAccount( primarySubAccount, false, true )}
       />
       {
-        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited ) && (
+        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited && !primarySubAccount.isUsable ) && (
           <View style={styles.dot}/>
         )
       }
