@@ -66,6 +66,7 @@ const CreateGift = ( { navigation } ) => {
     setGiftModal( false )
     if ( navigate ) {
       navigation.navigate( 'AddContact', {
+        fromScreen: 'Gift',
         giftId: ( createdGift as Gift ).id
       } )
     } else {
