@@ -19,6 +19,7 @@ import {
 } from '../common/constants/wallet-service-types'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ContactRecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
+import CopyThisText from './CopyThisText'
 
 export default function SendViaQR( props ) {
   const [ contactName, setContactName ] = useState( '' )
@@ -391,6 +392,12 @@ export default function SendViaQR( props ) {
               />
             )}
           </View>
+          {props.OR?<CopyThisText
+            backgroundColor={Colors.backgroundColor}
+            text={props.OR}
+            width={'20%'}
+            height={'15%'}
+          /> : null}
           {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressDone()}
             style={{

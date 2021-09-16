@@ -124,7 +124,7 @@ export default function RequestKeyFromContact( props ) {
       </View> */}
       <HeaderTitle
         firstLineTitle={strings.scanQR}
-        secondLineTitle={strings.withHexa}
+        secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -149,7 +149,12 @@ export default function RequestKeyFromContact( props ) {
               size={hp( '27%' )} />
           )}
         </View>
-
+        {props.OR?<CopyThisText
+          backgroundColor={Colors.backgroundColor}
+          text={props.OR}
+          width={'20%'}
+          height={'15%'}
+        /> : null}
       </View>
       <HeaderTitle
         firstLineTitle={strings.orShare}
