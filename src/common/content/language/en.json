@@ -12,6 +12,7 @@
         "search": "Search",
         "share": "Share",
         "note": "Note",
+        "optional": "Optional",
         "tryAgain": "Try again",
         "today": "Today",
         "unknown": "Unknown",
@@ -72,7 +73,7 @@
               "subText": ""
             },
             {
-              "heading": "Non-custodial buys",
+              "heading": "Self-custody buys",
               "text":
                 "Get sats directly in your wallet from compatible exchanges",
               "subText": ""
