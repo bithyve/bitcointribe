@@ -96,7 +96,8 @@ import {
   NewWalletImage,
   cloudDataInterface,
   Accounts,
-  AccountType
+  AccountType,
+  ContactDetails
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -111,7 +112,7 @@ import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, setOpenToApproval, syncPermanentChannels } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker, restoreTrustedContactsWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -1858,6 +1859,7 @@ function* updateKeeperInfoToChannelWorker( ) {
       channelKey: string,
       streamId: string,
       unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+      contactDetails?: ContactDetails
     }[] = []
     if( levelHealth[ 0 ] ) {
       for ( let i = 2; i < levelHealth[ 0 ].levelInfo.length; i++ ) {
@@ -1893,6 +1895,7 @@ function* updateKeeperInfoToChannelWorker( ) {
           channelKey,
           streamId: streamUpdates.streamId,
           unEncryptedOutstreamUpdates: streamUpdates,
+          contactDetails: contacts[ channelKey ].contactDetails,
         } )
       }
     }
@@ -2362,6 +2365,7 @@ function* updateSecondaryShardWorker( { payload } ) {
           if( response.updated ) {
             Toast( 'Approved Successfully' )
           }
+          yield put ( setOpenToApproval( false ) )
         }
       } else Toast( 'First scan qr from primary device to setup keeper' )
     }

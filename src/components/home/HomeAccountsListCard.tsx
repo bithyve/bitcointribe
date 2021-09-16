@@ -17,6 +17,7 @@ import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { AccountType } from '../../bitcoin/utilities/Interface'
+import { translations } from '../../common/content/LocContext'
 
 export type Props = {
   accountShell: AccountShell;
@@ -30,7 +31,7 @@ type BodyProps = Props;
 const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: HeaderProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
-  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
 
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo( () => {
     return secondarySubAccounts
@@ -47,7 +48,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         {getAvatarForSubAccount( primarySubAccount, false, true )}
       </View>
       {
-        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration ) && (
+        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited && !primarySubAccount.isUsable ) && (
           <View style={styles.dot}/>
         )
       }
@@ -74,6 +75,8 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
 const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const totalBalance = AccountShell.getTotalBalance( accountShell )
   // const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   const balanceTextStyle = useMemo( () => {
@@ -91,20 +94,20 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
       return(
         <Text style={styles.subtitleText} numberOfLines={3}>
           <Text style={styles.boldItalicText}>
-            {'Register\n'}
+            {`${strings.Register}`}
           </Text>
-          {'and claim $10'}
+          {strings.andclaim}
         </Text>
       )
     }
     if ( text.includes( 'Level 2' ) ) {
       return(
         <Text style={styles.subtitleText} numberOfLines={3}>
-          {'Available after\n'}
+          {`${strings.Availableafter}\n`}
           <Text style={styles.boldItalicText}>
           Level 2
           </Text>
-          {' Backup'}
+          {` ${common.backup}`}
         </Text>
       )
     }
@@ -128,7 +131,7 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
         primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ) && !primarySubAccount.isUsable
           ?
           <View style={{
-            height: heightPercentageToDP( 3 )
+            height: heightPercentageToDP( 2 )
           }} />
           :
           <LabeledBalanceDisplay
@@ -168,7 +171,7 @@ const styles = StyleSheet.create( {
   },
   rootContainer: {
     width: widthPercentageToDP( 43 ),
-    height: heightPercentageToDP( 21 ),
+    height: heightPercentageToDP( 20 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,

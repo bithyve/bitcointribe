@@ -15,6 +15,7 @@ import {
   RESTORE_TRUSTED_CONTACTS,
   UPDATE_WALLET_NAME_TO_CHANNEL,
   UPDATE_WALLET_NAME,
+  setOpenToApproval,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -413,9 +414,10 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         }
         if( relationType === TrustedContactRelationTypes.PRIMARY_KEEPER )
           Toast( 'You have been successfully added as a Keeper' )
-        else if( relationType === TrustedContactRelationTypes.KEEPER )
+        else if( relationType === TrustedContactRelationTypes.KEEPER ){
+          yield put( setOpenToApproval( true ) )
           Toast( 'You have been successfully added as a Keeper. Now Please Approve keeper by scanning QR from Primary Keeper' )
-        else if ( relationType === TrustedContactRelationTypes.CONTACT )
+        } else if ( relationType === TrustedContactRelationTypes.CONTACT )
           Toast( 'Contact successfully added to Friends & Family' )
       }
 

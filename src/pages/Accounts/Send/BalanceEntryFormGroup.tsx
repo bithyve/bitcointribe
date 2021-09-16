@@ -249,8 +249,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             placeholder={
               currencyKindForEntry == CurrencyKind.BITCOIN
                 ? subAccountKind == SubAccountKind.TEST_ACCOUNT
-                  ? `${strings.Enteramountin} in t-sats`
-                  : `${strings.Enteramountin} in sats`
+                  ? `${strings.Enteramountin} t-sats`
+                  : `${strings.Enteramountin} sats`
                 : subAccountKind == SubAccountKind.TEST_ACCOUNT
                   ? `${strings.ConvertedIn} t-sats`
                   : `${strings.ConvertedIn} sats`

@@ -31,6 +31,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import { translations } from '../../common/content/LocContext'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -43,6 +44,8 @@ export enum BottomSheetState {
 }
 
 const CloudBackupHistory = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+  const common  = translations[ 'common' ]
   const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
   const [ confirmationModal, setConfirmationModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
@@ -93,7 +96,7 @@ const CloudBackupHistory = ( props ) => {
   const renderCloudErrorContent = useCallback( () => {
     return (
       <ErrorModalContents
-        title={'Cloud Backup Error'}
+        title={strings.CloudBackupError}
         //info={cloudErrorMessage}
         note={errorMsg}
         onPressProceed={()=>{
@@ -108,8 +111,8 @@ const CloudBackupHistory = ( props ) => {
         isIgnoreButton={true}
         isBottomImage={true}
         isBottomImageStyle={{
-          width: wp( '30%' ),
-          height: wp( '25%' ),
+          width: wp( '27%' ),
+          height: wp( '27%' ),
           marginLeft: 'auto',
           resizeMode: 'stretch',
           marginBottom: hp( '-3%' ),
@@ -122,8 +125,8 @@ const CloudBackupHistory = ( props ) => {
   const renderCloudPermissionContent = useCallback( () => {
     return ( <CloudPermissionModalContents
       modalRef={bottomSheetRef}
-      title={'Automated Cloud Backup'}
-      info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+      title={strings.AutomatedCloudBackup}
+      info={strings.Thisisthefirstlevel}
       note={''}
       onPressProceed={( flag )=>{
         // if ( ( bottomSheetRef as any ).current )
@@ -165,10 +168,10 @@ const CloudBackupHistory = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
-        title={'Health Check Successful'}
-        info={'Question Successfully Backed Up'}
+        title={strings.HealthCheckSuccessful}
+        info={strings.QuestionBackedUp}
         note={''}
-        proceedButtonText={'View Health'}
+        proceedButtonText={strings.ViewHealth}
         isIgnoreButton={false}
         onPressProceed={() => {
           ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
@@ -211,16 +214,16 @@ const CloudBackupHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={'Backup History'}
-          infoBoxInfo={'The history of your backup will appear here'}
+          infoBoxTitle={strings.BackupHistory}
+          infoBoxInfo={strings.historyofyourbackup}
           type={'security'}
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
             setConfirmationModal( true )
           }}
           data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
-          confirmButtonText={'Backup'}
-          reshareButtonText={'Backup'}
+          confirmButtonText={common.backup}
+          reshareButtonText={common.backup}
           disableChange={true}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )

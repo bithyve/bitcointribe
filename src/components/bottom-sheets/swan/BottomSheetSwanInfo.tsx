@@ -154,9 +154,13 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           {showNote &&
             <BottomInfoBox
               // backgroundColor={Colors.white}
+              containerStyle={{
+                marginTop: hp( 6 ),
+                marginRight: wp( '1%' ),
+              }}
               title={'Note'}
               infoText={
-                'Please login/register your Swan Bitcoin Account to use this wallet'
+                'Once you complete the registration process or login in to your Swan Bitcoin account, you can use this wallet'
               }
             />
           }
@@ -175,6 +179,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       <View style={{
         flexDirection: 'row',
         marginBottom: wp( 5 ),
+        marginLeft: wp( 4 )
       }}>
         <Image
           source={require( '../../../assets/images/icons/swan.png' )}

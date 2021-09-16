@@ -15,9 +15,11 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import QRCode from '../../components/QRCode'
-
+import { translations } from '../../common/content/LocContext'
 
 export default function RecoveryTrustedQR( props ) {
+  const strings  = translations[ 'bhr' ]
+
   return (
     <View
       style={{
@@ -37,9 +39,8 @@ export default function RecoveryTrustedQR( props ) {
               alignSelf: 'center', flex: 1, justifyContent: 'center'
             }}
           >
-            <Text style={NavStyles.modalHeaderTitleText}>
-              contact QR code
-            </Text>
+            <Text style={NavStyles.modalHeaderTitleText}>{strings.ScanQRCode}</Text>
+
           </View>
         </View>
       </View>
@@ -73,15 +74,13 @@ export default function RecoveryTrustedQR( props ) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Yes, I have shared
+            {strings.Ihavescanned}
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
         title={'Send your Recovery Key'}
-        infoText={
-          'Open the QR scanner at the top right of the home screen on your Keeper Device and scan this QR'
-        }
+        infoText={strings.OpentheQRscanner}
       />
     </View>
   )

@@ -96,7 +96,8 @@ const HomeBuyCard = ( {
           fontSize: RFValue( 10 ),
           // marginLeft: 2,
           fontFamily: Fonts.FiraSansRegular,
-          alignSelf: 'flex-start'
+          alignSelf: 'flex-start',
+          letterSpacing: 0.33
         }}>
           {formatString( strings.btcTo, fiatCurrencyCode )}
         </Text>
@@ -141,10 +142,16 @@ const HomeBuyCard = ( {
         //   />
         // }
         buttonStyle={{
-          borderRadius: wp( 1.5 ),
+          borderRadius: wp( 3 ),
           paddingVertical: wp( 2 ),
-          paddingHorizontal: wp( 3 ),
-          backgroundColor: Colors.blue
+          paddingHorizontal: wp( 4 ),
+          backgroundColor: Colors.blue,
+          shadowColor: Colors.shadowBlue,
+          shadowOpacity: 1,
+          shadowOffset: {
+            width: 15, height: 15
+          },
+          elevation: 15
         }}
         titleStyle={{
           ...ButtonStyles.floatingActionButtonText,
@@ -157,14 +164,24 @@ const HomeBuyCard = ( {
     </View>
   )
 }
-const styles = StyleSheet.create( {
-  cardBitCoinImage: {
-    width: wp( '3.5%' ),
-    height: wp( '3.5%' ),
-    marginRight: 5,
-    resizeMode: 'contain',
-    marginBottom: wp( '0.7%' ),
-  },
-} )
+// const styles = StyleSheet.create( {
+//   titleStyle: {
+//     color: Colors.blue,
+//     fontSize: RFValue( 11 ),
+//     letterSpacing: 0.33,
+//     fontFamily: Fonts.FiraSansRegular,
+//   },
+//   subTitleStyle: {
+//     color: Colors.gray8,
+//     fontSize: RFValue( 9 ),
+//   },
+//   cardBitCoinImage: {
+//     width: wp( '3.5%' ),
+//     height: wp( '3.5%' ),
+//     marginRight: 5,
+//     resizeMode: 'contain',
+//     marginBottom: wp( '0.7%' ),
+//   },
+// } )
 
 export default HomeBuyCard

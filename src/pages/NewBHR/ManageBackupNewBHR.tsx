@@ -71,6 +71,7 @@ import dbManager from '../../storage/realm/dbManager'
 import realm from '../../storage/realm/realm'
 import schema from '../../storage/realm/schema/Schema'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import { LocalizationContext, translations } from '../../common/content/LocContext'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -102,6 +103,8 @@ interface ManageBackupNewBHRStateTypes {
   knwowMoreModal: boolean;
   metaSharesKeeper: MetaShare[];
   onKeeperButtonClick: boolean;
+  strings: object;
+  common: object;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -167,7 +170,10 @@ class ManageBackupNewBHR extends Component<
   loaderBottomSheet: any
   knowMoreBottomSheet: any
 
-  constructor( props ) {
+  static contextType = LocalizationContext
+
+  constructor( props, context ) {
+    super( props, context )
     super( props )
     this.focusListener = null
     this.NoInternetBottomSheet = React.createRef()
@@ -175,7 +181,7 @@ class ManageBackupNewBHR extends Component<
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
     const s3 = dbManager.getBHR()
-    console.log( 's3', typeof s3, s3 )
+    console.log( 's3', this.context )
 
     const obj = {
       shareType: '',
@@ -210,7 +216,9 @@ class ManageBackupNewBHR extends Component<
       loaderModal: false,
       knwowMoreModal: false,
       metaSharesKeeper: [ ...s3.metaSharesKeeper  ],
-      onKeeperButtonClick: false
+      onKeeperButtonClick: false,
+      strings: translations [ 'bhr' ],
+      common: translations [ 'common' ],
     }
   }
 
@@ -423,6 +431,23 @@ class ManageBackupNewBHR extends Component<
         },
         isSetup: true,
       }
+      if( this.state.selectedKeeperType == 'pdf' ){
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+        }, () => {
+          this.sendApprovalRequestToPK( )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
+      } else {
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+          showLoader: false,
+          selectedLevelId: 2
+        }, () => {
+          this.goToHistory( obj )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
+      }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
       } )
@@ -597,20 +622,24 @@ class ManageBackupNewBHR extends Component<
     const channelUpdates = []
     // Contact or Device type
     if( contacts ){
-      for( const ck of Object.keys( contacts ) ){
-        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
-          // initiate permanent channel
-          const channelUpdate =  {
-            contactInfo: {
-              channelKey: ck,
-            }
-          }
-          channelUpdates.push( channelUpdate )
-        }
-      }
+      // for( const ck of Object.keys( contacts ) ){
+      //   if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
+      //     // initiate permanent channel
+      //     const channelUpdate =  {
+      //       contactInfo: {
+      //         channelKey: ck,
+      //       }
+      //     }
+      //     channelUpdates.push( channelUpdate )
+      //   }
+      // }
+      // this.props.syncPermanentChannels( {
+      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      //   channelUpdates: channelUpdates,
+      //   metaSync: true
+      // } )
       this.props.syncPermanentChannels( {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-        channelUpdates: channelUpdates,
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
         metaSync: true
       } )
     }
@@ -661,9 +690,11 @@ class ManageBackupNewBHR extends Component<
       <QRModal
         isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
-        title={'Note'}
+        title={this.state.common[ 'note' ]}
         infoText={
-          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+          this.state.strings[
+            'Pleaseapprovethis'
+          ]
         }
         isOpenedFlag={this.state.showQRModal}
         onQrScan={async( qrScannedData ) => {
@@ -711,8 +742,10 @@ class ManageBackupNewBHR extends Component<
   renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Generating your Recovery Keys'}
-        messageText={'It may take a little while as the wallet creates Recovery Keys. Do not close the app or go back'}
+        headerText={`${this.state.strings[
+          'Generatingyour'
+        ]} Recovery Keys`}
+        messageText={this.state.strings[ 'Itmaytake' ]}
         messageText2={''}
         showGif={false}
       />
@@ -765,7 +798,7 @@ class ManageBackupNewBHR extends Component<
   onKeeperButtonPress = ( value, keeperNumber ) =>{
     requestAnimationFrame( () => {
       if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-        this.props.setLevelCompletionError( 'Please set password', 'It seems you have not set passward to backup. Please set password first to proceed', LevelStatus.FAILED )
+        this.props.setLevelCompletionError( this.state.strings[ 'Pleasesetpassword' ], LevelStatus.FAILED )
         return
       }
       if( value.id == 1 && keeperNumber == 2 ){
@@ -801,25 +834,27 @@ class ManageBackupNewBHR extends Component<
 
   getHeaderMessage = () => {
     const { levelData, currentLevel } = this.props
+    const { strings } = this.state
+
     if( levelData ){
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
         if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
-          return element.keeper1.name+' needs your attention.'
+          return element.keeper1.name+ ` ${strings[ 'needsyourattention' ]}.`
         }
         if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
-          return  element.keeper2.name+' needs your attention.'
+          return  element.keeper2.name+ ` ${strings[ 'needsyourattention' ]}.`
         }
       }
     }
     if( currentLevel == 0 ){
-      return 'Cloud backup incomplete, please complete Level 1'
+      return strings[ 'incompletelevel1' ]
     } else if( currentLevel === 1 ){
-      return 'Cloud backup complete, upgrade backup to Level 2'
+      return strings[ 'incompletelevel2' ]
     } else if( currentLevel === 2 ){
-      return 'Double backup complete, upgrade backup to Level 3'
+      return strings[ 'incompletelevel3' ]
     } else if( currentLevel == 3 ){
-      return 'Multi-Key backup complete'
+      return strings[ 'complete' ]
     }
   }
 
@@ -836,6 +871,7 @@ class ManageBackupNewBHR extends Component<
       errorModal,
       showQRModal,
       loaderModal,
+      strings,
       knwowMoreModal
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
@@ -855,7 +891,7 @@ class ManageBackupNewBHR extends Component<
             marginHorizontal: wp( 4 ),
             paddingBottom: hp( 1 )
           }}>
-            Security & Privacy
+            {strings[ 'SecurityPrivacy' ]}
           </Text>
           <ScrollView
             refreshControl={
@@ -878,7 +914,7 @@ class ManageBackupNewBHR extends Component<
                   color: Colors.blue,
                   fontSize: RFValue( 12 ),
                   fontFamily: Fonts.FiraSansRegular
-                }}>Wallet Backup</Text>
+                }}>{strings[ 'WalletBackup' ]}</Text>
                 <Text style={styles.headerMessageText}>{this.getHeaderMessage()}</Text>
               </View>
               <ImageBackground
@@ -924,7 +960,7 @@ class ManageBackupNewBHR extends Component<
             }}>
               <Text style={styles.pageTitle}>I am the Keeper of</Text>
               <Text style={styles.pageInfoText}>
-               Contacts whose wallets I can help restore
+                {strings[ 'Contactswhose' ]}
               </Text>
               <View style={{
                 marginBottom: 15
@@ -951,8 +987,8 @@ class ManageBackupNewBHR extends Component<
                       marginTop: hp( 2.5 ),
                       backgroundColor: Colors.white
                     }}
-                    title="Note"
-                    infoText="When you have Friends & Family who you can help with wallet recovery, they will be listed here"
+                    title={this.state.common[ 'note' ]}
+                    infoText={strings[ 'Whenyouhave' ]}
                   />
                 }
               </View>
@@ -962,7 +998,7 @@ class ManageBackupNewBHR extends Component<
           <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
-              subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
+              subHeader={strings[ 'saveyourRecovery' ]}
               onPressSetup={async ( type, name ) => {
                 try{
                   this.setState( {
