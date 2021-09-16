@@ -116,7 +116,7 @@
         "Hexaencrypts": "Hexa encrypts and secures all the data on the app and any communication that goes out",
         "creatingbackup": "Automatically creating backup on the cloud",
         "preloading": "Preloading the Test Account with test sats",
-        "multi": "Setting up multi-accounts",
+        "multi": "Setting up multiple accounts",
         "Answersdonotmatch":"Answers do not match",
         "Answersmust": "Answers must only contain lowercase characters (a-z) and digits (0-9)",
         "Passworddonotmatch": "Password do not match",
