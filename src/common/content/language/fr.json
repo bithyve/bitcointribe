@@ -361,7 +361,7 @@
     "sendRecoveryKey": "Envoyer la clé de récupération",
     "Nocontacts1": "Aucun contact",
     "Selectfromaddressbook": "Sélectionner dans le carnet d'adresses",
-    "sendRecoveryKeyTo": "Envoyez la clé de récupération à vos amis et à votre famille ou sélectionnez un nouveau contact dans le carnet d'adresses",
+    "sendRecoveryKeyTo": "Envoyez la clé de récupération à un contact existant ou choisissez-en un nouveau dans le carnet d'adresses.",
     "Weneither": "Nous ne stockons pas ces données et ne les transmettons à personne d'autre. Ceci est pour votre commodité seulement",
     "Nocontacts": "Aucun contact trouvé. Veuillez ajouter des contacts à votre carnet d'adresses et réessayer",
     "Ifyouwantto": "Si vous souhaitez associer un contact du carnet d'adresses à vos amis & famille dans Hexa, vous devrez donner accès à votre carnet d'adresses\n\nC'est un bon moyen de se rappeler qui sont les contacts avec leur nom et leur image",
