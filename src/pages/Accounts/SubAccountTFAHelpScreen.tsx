@@ -34,11 +34,11 @@ import {
   getSMAndReSetTFAOrGenerateSXpriv,
   setResetTwoFALoader,
 } from '../../store/actions/accounts'
-import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
+import { resetStackToAccountDetails, resetStackToAccountDetailsSendScreen } from '../../navigation/actions/NavigationActions'
 import idx from 'idx'
 import { AccountsState } from '../../store/reducers/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { resetSendState } from '../../store/actions/sending'
+import { resetSendState, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import SecurityQuestion from '../../pages/NewBHR/SecurityQuestion'
 import Loader from '../../components/loader'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
@@ -207,6 +207,13 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
           showServerNotRespondingModal( false )
+          dispatch( sourceAccountSelectedForSending( sourceAccountShell ) )
+          navigation.dispatch(
+            resetStackToAccountDetailsSendScreen( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
+
         }}
         isIgnoreButton={true}
         cancelButtonText={'Sweep Funds'}
