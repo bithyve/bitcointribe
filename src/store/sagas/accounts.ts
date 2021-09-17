@@ -58,7 +58,10 @@ import {
   ActiveAddressAssignee,
   ActiveAddresses,
   ContactInfo,
+  DeepLinkEncryptionType,
+  DeepLinkKind,
   DonationAccount,
+  Gift,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -95,6 +98,7 @@ import { syncPermanentChannelsWorker } from './trustedContacts'
 import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import { generateDeepLink } from '../../common/CommonFunctions'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -124,6 +128,24 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   } ) )
   yield call( dbManager.updateAccount, ( updatedAccount as Account ).id, updatedAccount )
   return receivingAddress
+}
+
+export function generateGiftLink( giftToSend: Gift, walletName: string,  ) {
+  const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+  try{
+    Relay.updateTemporaryChannel( encryptionKey, giftToSend ) // non-awaited upload
+    const deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+    const { deepLink } = generateDeepLink( {
+      deepLinkKind: DeepLinkKind.GIFT,
+      encryptionType: DeepLinkEncryptionType.OTP,
+      encryptionKey: deepLinkEncryptionOTP,
+      walletName: walletName,
+      keysToEncrypt: encryptionKey
+    } )
+    return deepLink
+  } catch( err ){
+    return ''
+  }
 }
 
 function* updatePaymentAddressesToChannels( activeAddressesWithNewTxsMap: {
@@ -1113,16 +1135,6 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     }
     yield put( refreshAccountShells( [ shellToSync ], {
     } ) )
-    // const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-    // const res = yield call( Relay.updateTemporaryChannel, encryptionKey, gifts[ 0 ] )
-    // const deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
-    // const deepLink = yield call( generateDeepLink, {
-    //   deepLinkKind: DeepLinkKind.GIFT,
-    //   encryptionType: DeepLinkEncryptionType.OTP,
-    //   encryptionKey: deepLinkEncryptionOTP,
-    //   walletName: 'DAN',
-    //   keysToEncrypt: encryptionKey
-    // } )
   } else {
     console.log( 'Gifts generation failed' )
   }

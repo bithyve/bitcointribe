@@ -34,6 +34,7 @@ import DeviceInfo from 'react-native-device-info'
 import QRCode from '../../components/QRCode'
 import config from '../../bitcoin/HexaConfig'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import CopyThisText from '../../components/CopyThisText'
 
 export default function RestoreWalletBySecondaryDevice( props ) {
   const [ secondaryQR, setSecondaryQR ] = useState( '' )
@@ -218,6 +219,12 @@ export default function RestoreWalletBySecondaryDevice( props ) {
               <QRCode title="Recovery key" value={secondaryQR} size={hp( '27%' )} />
             )}
           </View>
+          {secondaryQR?<CopyThisText
+            backgroundColor={Colors.backgroundColor}
+            text={secondaryQR}
+            width={'20%'}
+            height={'15%'}
+          /> : null}
 
           {REQUEST_DETAILS ? (
             <View

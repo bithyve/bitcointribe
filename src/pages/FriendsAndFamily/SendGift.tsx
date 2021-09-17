@@ -14,58 +14,35 @@ import {
 } from 'react-native-responsive-screen'
 import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
-import * as ExpoContacts from 'expo-contacts'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { AccountsState } from '../../store/reducers/accounts'
+import { generateGiftLink } from '../../store/sagas/accounts'
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-
-  const [ encryptionKey, setEncryptKey ] = useState( '' )
-
-  const [ trustedLink, setTrustedLink ] = useState( '' )
-  const [ trustedQR, setTrustedQR ] = useState( '' )
-
-  const SelectedContact = props.navigation.getParam( 'SelectedContact' )
-    ? props.navigation.getParam( 'SelectedContact' )
-    : []
-
-
-  const [ Contact ] = useState(
-    SelectedContact ? SelectedContact[ 0 ] : {
-    },
-  )
-  const [ contactInfo, setContact ] = useState( SelectedContact ? SelectedContact[ 0 ] : {
-  } )
-
-  const wallet: Wallet = useSelector(
-    ( state ) => state.storage.wallet,
-  )
-  const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 
-  const getContact = () => {
-    ExpoContacts.getContactsAsync().then( async ( { data } ) => {
-      const filteredData = data.find( item => item.id === contactInfo.id )
-      setContact( filteredData )
-    } )
-  }
+  const giftId = props.navigation.getParam( 'giftId' )
+  const accountsState: AccountsState = useSelector( state => state.accounts )
+  const wallet: Wallet = useSelector( state => state.storage.wallet )
+  const giftToSend = accountsState.gifts[ giftId ]
 
-  useEffect( () => {
-    getContact()
-  }, [] )
-
+  const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
+  const [ giftQR, setGiftQR ] = useState( '' )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
+
+  useEffect( () => {
+    setGiftDeepLink( generateGiftLink( giftToSend, wallet.walletName ) )
+    setGiftQR( JSON.stringify( giftToSend ) )
+  }, [ giftId ] )
 
   return (
     <ScrollView style={{
@@ -101,9 +78,10 @@ export default function AddContactSendRequest( props ) {
         subHeaderText={'You can choose to send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
-        contact={Contact}
-        QR={trustedQR}
-        link={trustedLink}
+        contact={{
+        }}
+        QR={giftQR}
+        link={giftDeepLink}
         contactEmail={''}
         onPressBack={() => {
           props.navigation.goBack()
@@ -111,7 +89,7 @@ export default function AddContactSendRequest( props ) {
         onPressDone={() => {
           // openTimer()
         }}
-        amt={numberWithCommas( 50000 )}
+        amt={numberWithCommas( giftToSend.amount )}
         onPressShare={() => {
         }}
       />

@@ -77,7 +77,7 @@ export default function RequestKeyFromContact( props ) {
   return (
     <View style={styles.modalContainer}>
       <HeaderTitle
-        firstLineTitle={props.headerText ? props.headerText : strings.scanQR}
+        firstLineTitle={strings.scanQR}
         secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
         infoTextNormal={''}
         infoTextBold={''}
@@ -194,7 +194,12 @@ export default function RequestKeyFromContact( props ) {
               size={hp( '27%' )} />
           )}
         </View>
-
+        {props.OR?<CopyThisText
+          backgroundColor={Colors.backgroundColor}
+          text={props.OR}
+          width={'20%'}
+          height={'15%'}
+        /> : null}
       </View>
       {!props.isGift &&
       <HeaderTitle
