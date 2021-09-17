@@ -23,6 +23,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import BottomInfoBox from '../../../components/BottomInfoBox'
+import { translations } from '../../../common/content/LocContext'
 
 
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -35,6 +36,9 @@ function SecurityQuestion( props ) {
   const { security } = useSelector(
     ( state ) => state.storage.wallet,
   )
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
+  const login = translations[ 'login' ]
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const [ showNote, setShowNote ] = useState( true )
   const [ height, setHeight ] = useState( 12 )
@@ -58,7 +62,7 @@ function SecurityQuestion( props ) {
         setErrorText( '' )
         return
       }
-      setErrorText( 'Answer is incorrect' )
+      setErrorText( login.Answerisincorrect )
     } else {
       setErrorText( '' )
     }
@@ -111,10 +115,10 @@ function SecurityQuestion( props ) {
           <View style={{
             marginLeft: wp( 6 ),
           }}>
-            <Text style={styles.modalTitleText}>Edit Wallet Name</Text>
+            <Text style={styles.modalTitleText}>{strings.EditWalletName}</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>Change your wallet's name</Text>
+            }}>{strings.Changeyourwallet}</Text>
           </View>
           <View style={{
             marginLeft: wp( 6 ), flexDirection: 'row', marginVertical: hp( 3 ), alignItems: 'center'
@@ -122,7 +126,7 @@ function SecurityQuestion( props ) {
             <Text style={styles.modalBoldText}>Step 1</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>: Confirm Security Question</Text>
+            }}>{` ${strings.ConfirmSecurityQuestion}`}</Text>
           </View>
           <View style={{
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
@@ -138,11 +142,11 @@ function SecurityQuestion( props ) {
                   width: '100%',
                   marginBottom: hp( '1%' ),
                   borderColor:
-                    errorText == 'Answer is incorrect'
+                    errorText == strings.Answerisincorrect
                       ? Colors.red
                       : Colors.white,
                 }}
-                placeholder={'Enter your answer'}
+                placeholder={login.Enteryouranswer}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 textContentType="none"
@@ -159,7 +163,7 @@ function SecurityQuestion( props ) {
                 onBlur={() => {
                   // setShowNote( true )
                   if ( validateAllowedCharacters( answer ) == false ) {
-                    setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
+                    setErrorText( login.Answersmust )
                   }
                 }}
                 keyboardType={
@@ -241,9 +245,9 @@ function SecurityQuestion( props ) {
                   props.onPressConfirm()
                 } )
               } else if ( validateAllowedCharacters( answer ) == false ) {
-                setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
+                setErrorText( login.Answersmust )
               } else {
-                setErrorText( 'Answer is incorrect' )
+                setErrorText( login.Answerisincorrect )
               }
               setIsDisabled( false )
             }}

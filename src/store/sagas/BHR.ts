@@ -96,7 +96,8 @@ import {
   NewWalletImage,
   cloudDataInterface,
   Accounts,
-  AccountType
+  AccountType,
+  ContactDetails
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -111,7 +112,7 @@ import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, setOpenToApproval, syncPermanentChannels } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker, restoreTrustedContactsWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -906,7 +907,7 @@ function* sharePDFWorker( { payload } ) {
               Mailer.mail,
               {
                 subject: 'Recovery Key  '+walletName,
-                body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
+                body: `<b>Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.</b>`,
                 isHTML: true,
                 attachments: [ {
                   path:
@@ -927,7 +928,7 @@ function* sharePDFWorker( { payload } ) {
           } else {
             const shareOptions = {
               title: 'Recovery Key  '+walletName,
-              message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+              message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
               url:
               Platform.OS == 'android'
                 ? 'file://' + pdfInfo.filePath
@@ -989,7 +990,7 @@ function* sharePDFWorker( { payload } ) {
         case 'Other':
           const shareOptions = {
             title: 'Recovery Key  '+walletName,
-            message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+            message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
             url:
             Platform.OS == 'android'
               ? 'file://' + pdfInfo.filePath
@@ -1858,6 +1859,7 @@ function* updateKeeperInfoToChannelWorker( ) {
       channelKey: string,
       streamId: string,
       unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+      contactDetails?: ContactDetails
     }[] = []
     if( levelHealth[ 0 ] ) {
       for ( let i = 2; i < levelHealth[ 0 ].levelInfo.length; i++ ) {
@@ -1893,6 +1895,7 @@ function* updateKeeperInfoToChannelWorker( ) {
           channelKey,
           streamId: streamUpdates.streamId,
           unEncryptedOutstreamUpdates: streamUpdates,
+          contactDetails: contacts[ channelKey ].contactDetails,
         } )
       }
     }
@@ -2362,6 +2365,7 @@ function* updateSecondaryShardWorker( { payload } ) {
           if( response.updated ) {
             Toast( 'Approved Successfully' )
           }
+          yield put ( setOpenToApproval( false ) )
         }
       } else Toast( 'First scan qr from primary device to setup keeper' )
     }

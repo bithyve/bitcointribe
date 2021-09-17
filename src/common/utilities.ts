@@ -1,5 +1,5 @@
 import { Platform } from 'react-native'
-import { KeeperInfoInterface, LevelData, LevelHealthInterface, LevelInfo, Trusted_Contacts } from '../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelData, LevelDataObj, LevelHealthInterface, LevelInfo, Trusted_Contacts } from '../bitcoin/utilities/Interface'
 import { makeContactRecipientDescription } from '../utils/sending/RecipientFactories'
 import ContactTrustKind from './data/enums/ContactTrustKind'
 
@@ -102,7 +102,19 @@ export const checkLevelHealth = (
           const element0 = elements0[ j ] ? elements0[ j ] : null
           const element1 = elements1[ j ]
           levelData[ j ].keeper1 = element0 && element0[ 0 ] ? element0[ 0 ] : levelData[ j ].keeper1
-          levelData[ j ].keeper2 = element0 && element0[ 1 ] ? element0[ 1 ] : levelData[ j ].keeper2
+          if( j == 0 && ( elements1.length == 2 && elements1[ 1 ][ 0 ].updatedAt > 0 && elements1[ 1 ][ 1 ].updatedAt > 0 ) || ( elements1.length == 3 && elements1[ 1 ][ 0 ].updatedAt > 0 && elements1[ 1 ][ 1 ].updatedAt > 0 && elements1[ 2 ][ 0 ].updatedAt > 0 && levelInfo1[ 2 ][ 1 ].updatedAt > 0 ) ) {
+            const object: LevelDataObj = {
+              shareId: elements1[ 0 ][ 1 ].shareId,
+              name: elements1[ 0 ][ 1 ].name,
+              updatedAt: elements0[ 0 ][ 1 ].updatedAt,
+              status: 'notAccessible',
+              shareType: elements1[ 0 ][ 1 ].shareType,
+              reshareVersion: elements1[ 0 ][ 1 ].reshareVersion
+            }
+            levelData[ 0 ].keeper2 = levelInfo1[ 1 ] ? object : levelData[ j ].keeper2
+          } else {
+            levelData[ j ].keeper2 = element0 && element0[ 1 ] ? element0[ 1 ] : levelData[ j ].keeper2
+          }
           levelData[ j ].status = checkStatus( levelInfo1 )
           if( elements1.length == 3 && j == 2 ) {
             levelData[ j ].keeper1 = element1[ 0 ]

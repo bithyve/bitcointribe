@@ -66,9 +66,9 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
 
   function handleProceedButtonPress() {
     setShowLoader( true )
-    currentSubAccount.customDisplayName = accountName
+    currentSubAccount.customDisplayName = 'Donation Account'
     currentSubAccount.doneeName = doneeName
-    currentSubAccount.customDescription = accountDescription
+    currentSubAccount.customDescription = accountName
     currentSubAccount.isTFAEnabled = isTFAEnabled
     currentSubAccount.sourceKind = currentSubAccount.isTFAEnabled
       ? SourceAccountKind.SECURE_ACCOUNT
@@ -77,8 +77,8 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
     const newAccountInfo: newAccountsInfo = {
       accountType: AccountType.DONATION_ACCOUNT,
       accountDetails: {
-        name: accountName,
-        description: accountDescription,
+        name: 'Donation Account',
+        description: accountName,
         is2FAEnabled: isTFAEnabled,
         doneeName: doneeName
       }

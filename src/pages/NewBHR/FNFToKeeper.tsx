@@ -480,7 +480,7 @@ const FNFToKeeper = ( props ) => {
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-        {contacts.length ? <View>
+        {/* {contacts.length ? <View>
           <Text style={{
             marginHorizontal: wp( 2 ),
             color: Colors.blue,
@@ -513,7 +513,7 @@ const FNFToKeeper = ( props ) => {
               }
             </ScrollView>
           </View>
-        </View> : null}
+        </View> : null} */}
         <Text style={{
           marginHorizontal: wp( 2 ),
           color: Colors.blue,
@@ -525,29 +525,29 @@ const FNFToKeeper = ( props ) => {
         }}>{strings.Selectfromaddressbook} </Text>
         <View style={{
         }}>
+          {contact.length > 0 && !contact[ 0 ].isExisting &&
           <View style={styles.selectedContactContainer}>
-            {contact.length > 0 && !contact[ 0 ].isExisting
-              ? contact.map( ( value, index ) => {
-                return (
-                  <View key={index} style={styles.selectedContactView}>
-                    <Text style={styles.selectedContactNameText}>
-                      {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
-                      <Text style={{
-                        fontFamily: Fonts.FiraSansMedium
-                      }}>
-                        {value.name ? value.name.split( ' ' )[ 1 ] : ''}
-                      </Text>
+            {contact.map( ( value, index ) => {
+              return (
+                <View key={index} style={styles.selectedContactView}>
+                  <Text style={styles.selectedContactNameText}>
+                    {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
+                    <Text style={{
+                      fontFamily: Fonts.FiraSansMedium
+                    }}>
+                      {value.name ? value.name.split( ' ' )[ 1 ] : ''}
                     </Text>
-                    <AppBottomSheetTouchableWrapper
-                      onPress={() => onCancel( value )}
-                    >
-                      <AntDesign name="close" size={17} color={Colors.white} />
-                    </AppBottomSheetTouchableWrapper>
-                  </View>
-                )
-              } )
-              : null}
+                  </Text>
+                  <AppBottomSheetTouchableWrapper
+                    onPress={() => onCancel( value )}
+                  >
+                    <AntDesign name="close" size={17} color={Colors.white} />
+                  </AppBottomSheetTouchableWrapper>
+                </View>
+              )
+            } )}
           </View>
+          }
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -580,7 +580,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '45%' ) : hp( '65%' ),
+            height: DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
           }}>
             {filterContactData ? (
               <FlatList
@@ -612,7 +612,6 @@ const FNFToKeeper = ( props ) => {
                         color={Colors.lightBlue}
                         borderColor={Colors.borderColor}
                         isChecked={item.checked}
-                        onpress={() => onContactSelect( index )}
                       />
                       <Text style={styles.contactText}>
                         {item.name && item.name.split( ' ' )[ 0 ]

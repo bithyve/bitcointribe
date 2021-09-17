@@ -143,7 +143,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <HomeBuyCard
             cardContainer={{
               backgroundColor: 'white',
-              marginHorizontal: wp( 4 ),
+              marginLeft: wp( 4 ),
+              marginRight: wp( 6 ),
               height: hp( '13%' ),
               alignItems: 'center',
               justifyContent: 'space-between',

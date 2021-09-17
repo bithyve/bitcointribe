@@ -22,6 +22,7 @@ import ModalContainer from '../../../components/home/ModalContainer'
 import ErrorModalContents from '../../../components/ErrorModalContents'
 import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -31,41 +32,6 @@ export enum SectionKind {
 
 const sectionListItemKeyExtractor = ( index ) => index
 
-function titleForSectionHeader( kind: SectionKind ) {
-  switch ( kind ) {
-      case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-        return 'Add a Hexa Account'
-      case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Create a Shared Account'
-      case SectionKind.IMPORT_WALLET:
-        return 'Import a Wallet'
-  }
-}
-function titleForSectionSubHeader( kind: SectionKind ) {
-  switch ( kind ) {
-      case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-        return 'Your keys, your coins, manage them your way'
-      case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Bitcoin is for everyone, share an account'
-      case SectionKind.IMPORT_WALLET:
-        return 'Have your sats somewhere else? Import them to Hexa'
-  }
-}
-
-function renderSectionHeader( { section } ) {
-  const kind: SectionKind = section.kind
-
-  return (
-    <>
-      <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
-        {titleForSectionHeader( kind )}
-      </Text>
-      <Text style={styles.listSubSectionHeading}>
-        {titleForSectionSubHeader( kind )}
-      </Text>
-    </>
-  )
-}
 
 export interface Props {
   navigation: any;
@@ -81,10 +47,47 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   const AllowSecureAccount = useSelector(
     ( state ) => state.bhr.AllowSecureAccount,
   )
-
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const canProceed = useMemo( () => {
     return selectedChoice !== null
   }, [ selectedChoice ] )
+
+  function titleForSectionHeader( kind: SectionKind ) {
+    switch ( kind ) {
+        case SectionKind.ADD_NEW_HEXA_ACCOUNT:
+          return strings.AddaHexaAccount
+        case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
+          return strings.CreateaSharedAccount
+        case SectionKind.IMPORT_WALLET:
+          return strings.ImportaWallet
+    }
+  }
+  function titleForSectionSubHeader( kind: SectionKind ) {
+    switch ( kind ) {
+        case SectionKind.ADD_NEW_HEXA_ACCOUNT:
+          return strings.Yourkeys
+        case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
+          return strings.shareanaccount
+        case SectionKind.IMPORT_WALLET:
+          return strings.somewhereelse
+    }
+  }
+
+  function renderSectionHeader( { section } ) {
+    const kind: SectionKind = section.kind
+
+    return (
+      <>
+        <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
+          {titleForSectionHeader( kind )}
+        </Text>
+        <Text style={styles.listSubSectionHeading}>
+          {titleForSectionSubHeader( kind )}
+        </Text>
+      </>
+    )
+  }
 
   function handleProceedButtonPress() {
     switch ( selectedChoice.kind ) {
@@ -132,7 +135,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
     return (
       <View style={styles.listFooterSection}>
         <ButtonBlue
-          buttonText="Proceed"
+          buttonText={common.proceed}
           handleButtonPress={handleProceedButtonPress}
           buttonDisable={canProceed === false}
         />
@@ -143,8 +146,8 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   const renderSecureAccountAlertContent = useCallback( () => {
     return (
       <ErrorModalContents
-        title={'Complete Level 2'}
-        info={'You can only add a Savings Account when you have completed Level 2'}
+        title={strings.CompleteLevel2}
+        info={strings.Level2}
         isIgnoreButton={true}
         onPressProceed={() => {
           setSecureAccountAlert( false )
@@ -153,8 +156,8 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           setSecureAccountKnowMore( true )
           setSecureAccountAlert( false )
         }}
-        proceedButtonText={'Ok'}
-        cancelButtonText={'Learn More'}
+        proceedButtonText={common.ok}
+        cancelButtonText={common.learnMore}
         isBottomImage={true}
         bottomImage={require( '../../../assets/images/icons/errorImage.png' )}
       />
@@ -206,7 +209,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
               letterSpacing: 0.01
             }}
           >
-                Add Accounts
+            {strings.AddAccounts}
           </Text>
           {/* <Text
             style={{

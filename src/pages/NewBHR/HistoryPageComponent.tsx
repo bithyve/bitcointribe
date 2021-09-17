@@ -14,8 +14,11 @@ import {
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import { translations } from '../../common/content/LocContext'
 
 const HistoryPageComponent = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const SelectOption = ( Id ) => {
     if ( Id == SelectedOption ) {
@@ -89,7 +92,7 @@ const HistoryPageComponent = ( props ) => {
               infoText={
                 props.infoBoxInfo
                   ? props.infoBoxInfo
-                  : 'The history of your Recovery Key will appear here'
+                  : strings.historyofyourRecovery
               }
             />
           )}
@@ -115,11 +118,11 @@ const HistoryPageComponent = ( props ) => {
           }}>
             <BottomInfoBox
               backgroundColor={Colors.white}
-              title={props.infoBoxTitle ? props.infoBoxTitle : 'No history'}
+              title={props.infoBoxTitle ? props.infoBoxTitle : strings.Nohistory}
               infoText={
                 props.infoBoxInfo
                   ? props.infoBoxInfo
-                  : 'The history of your Recovery Key will appear here'
+                  : strings.historyofyourRecovery
               }
             />
           </View>

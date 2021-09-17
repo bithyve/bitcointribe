@@ -250,7 +250,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         >
           <TextInput
             style={styles.modalInputBox}
-            placeholder={common.note}
+            placeholder={`${common.note} (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
             keyboardType={

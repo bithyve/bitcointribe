@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
-import CardView from 'react-native-cardview'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
@@ -20,7 +19,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
   const add_new = translations[ 'home' ].add_new
   return (
     <TouchableOpacity onPress={onPress} style={containerStyle}>
-      <CardView cornerRadius={10} style={styles.cardContainer}>
+      <View style={styles.cardContainer}>
         <View
           style={{
             flex: 1,
@@ -44,7 +43,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
             {add_new}
           </Text>
         </View>
-      </CardView>
+      </View>
     </TouchableOpacity>
   )
 }
@@ -54,9 +53,9 @@ const styles = StyleSheet.create( {
   cardContainer: {
     backgroundColor: Colors.white,
     width: widthPercentageToDP( 43 ),
-    height: heightPercentageToDP( 21 ),
+    height: heightPercentageToDP( 20 ),
     // borderColor: Colors.borderColor,
-    // borderWidth: 1,
+    borderRadius: 10,
     shadowColor: Colors.shadowColor,
     shadowOpacity: 1,
     shadowOffset: {

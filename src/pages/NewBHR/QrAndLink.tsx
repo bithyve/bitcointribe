@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useContext } from 'react'
 import {
   View,
   StyleSheet,
@@ -36,9 +36,11 @@ import Toast from '../../components/Toast'
 import idx from 'idx'
 import { generateDeepLink } from '../../common/CommonFunctions'
 import DeviceInfo from 'react-native-device-info'
-
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function QrAndLink( props ) {
+  const { translations, formatString } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
@@ -157,7 +159,7 @@ export default function QrAndLink( props ) {
               const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
               encryption_key = number.slice( number.length - 10 ) // last 10 digits only
               setEncryptKey( encryption_key )
-            } else { Toast( 'F&F contact number missing' ); return }
+            } else { Toast( strings.numberMissing ); return }
             break
 
           case DeepLinkEncryptionType.EMAIL:
@@ -165,7 +167,7 @@ export default function QrAndLink( props ) {
             if( email ){
               encryption_key = email // last 10 digits only
               setEncryptKey( encryption_key )
-            } else { Toast( 'F&F contact email missing' ); return }
+            } else { Toast( strings.emailMissing ); return }
             break
 
           case DeepLinkEncryptionType.OTP:
@@ -299,8 +301,8 @@ export default function QrAndLink( props ) {
         <RequestKeyFromContact
           isModal={false}
           // headerText={'Request Recovery Secret from trusted contact'}
-          // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
-          contactText={'Adding to Friends & Family:'}
+          subHeaderText={formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name )}
+          contactText={strings.addingAs}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
@@ -329,16 +331,16 @@ export default function QrAndLink( props ) {
           }}>
           <BottomInfoBox
             icon={true}
-            title={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'Secure with additional factor' :
+            title={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? strings.secure :
               `Secure with contacts ${encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number' : encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email' : 'OTP' }`
             }
-            infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? 'You can optionally add a second factor when you are sending the link/QR through an unencrypted channel'
+            infoText={encryptLinkWith === DeepLinkEncryptionType.DEFAULT ? strings.optionally
               :
-              encryptLinkWith === DeepLinkEncryptionType.NUMBER ? `Your contact will have to verify their phone number '${encryptionKey}' to accept the request`
+              encryptLinkWith === DeepLinkEncryptionType.NUMBER ? formatString( strings.number, encryptionKey )
                 :
-                encryptLinkWith === DeepLinkEncryptionType.EMAIL ? `Your contact will have to verify their email '${encryptionKey}' to accept the request`
+                encryptLinkWith === DeepLinkEncryptionType.EMAIL ? formatString( strings.email, encryptionKey )
                   :
-                  `Your contact will have to confirm the OTP '${encryptionKey}' to accept the request`
+                  formatString( strings.otp, encryptionKey )
             }
             backgroundColor={Colors.white}
           />

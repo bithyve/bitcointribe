@@ -38,7 +38,8 @@ function SecurityQuestion( props ) {
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question ? security.question : ''
   const securityAnswer = security.answer ? security.answer : ''
-  const [ showAnswer, setShowAnswer ] = useState( false )
+  const showAnswerProp = props.showAnswer
+  const [ showAnswer, setShowAnswer ] = useState( props.showAnswer ? props.showAnswer : false )
   const [ answer, setAnswer ] = useState( '' )
   const [ errorText, setErrorText ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -48,10 +49,11 @@ function SecurityQuestion( props ) {
         AnswerCounter++
         setAnswerCounter( AnswerCounter )
       } else {
-        props.navigation.navigate( 'ReLogin', {
-          isPasscodeCheck: true
-        } )
         props.onClose()
+        props.navigation.navigate( 'ReLogin', {
+          isPasscodeCheck: true,
+          onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
+        } )
         setShowAnswer( true )
         setErrorText( '' )
         return
@@ -61,6 +63,11 @@ function SecurityQuestion( props ) {
       setErrorText( '' )
     }
   }
+
+  useEffect( ()=>{
+    setShowAnswer( showAnswerProp )
+    if( showAnswerProp ) setErrorText( '' )
+  }, [ showAnswerProp ] )
 
   const setBackspace = ( event ) => {
     if ( event.nativeEvent.key == 'Backspace' ) {

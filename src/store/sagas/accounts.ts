@@ -736,7 +736,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.SAVINGS_ACCOUNT,
           instanceNum: savingsInstanceCount,
           accountName: accountName? accountName: 'Savings Account',
-          accountDescription: accountDescription? accountDescription: 'Available after\nLevel 2 Backup',
+          accountDescription: accountDescription? accountDescription: 'MultiSig Wallet',
           primarySeed,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.secondaryXpub,
