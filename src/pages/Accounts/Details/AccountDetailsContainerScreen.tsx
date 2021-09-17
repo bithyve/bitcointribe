@@ -280,7 +280,13 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       dispatch( fetchFeeAndExchangeRates() )
   }, [] )
 
+  const onSendBittonPress = () => {
+    dispatch( sourceAccountSelectedForSending( accountShell ) )
 
+    navigation.navigate( 'Send', {
+      subAccountKind: primarySubAccount.kind,
+    } )
+  }
   const sections = useMemo( () => {
     return [
       {
@@ -328,11 +334,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
               <View style={styles.footerSection}>
                 <SendAndReceiveButtonsFooter
                   onSendPressed={() => {
-                    dispatch( sourceAccountSelectedForSending( accountShell ) )
-
-                    navigation.navigate( 'Send', {
-                      subAccountKind: primarySubAccount.kind,
-                    } )
+                    onSendBittonPress()
                   }}
                   onReceivePressed={() => {
                     navigation.navigate( 'Receive', {
