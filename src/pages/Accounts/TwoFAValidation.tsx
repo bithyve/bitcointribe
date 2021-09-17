@@ -148,7 +148,7 @@ export default function TwoFAValidation( props ) {
             ...styles.otpRequestHeaderView
           }}>
             <Text style={styles.modalTitleText}>
-              {'Enter OTP to authenticateeee'}
+              {'Enter OTP to authenticate'}
             </Text>
             <Text style={{
               ...styles.modalInfoText, marginTop: hp( '1.5%' )
