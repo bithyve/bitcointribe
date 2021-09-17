@@ -207,6 +207,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
           showServerNotRespondingModal( false )
+          navigation.popToTop()
         }}
         isIgnoreButton={true}
         cancelButtonText={'Sweep Funds'}

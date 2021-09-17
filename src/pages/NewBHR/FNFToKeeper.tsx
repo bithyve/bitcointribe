@@ -480,7 +480,7 @@ const FNFToKeeper = ( props ) => {
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-        {contacts.length ? <View>
+        {/* {contacts.length ? <View>
           <Text style={{
             marginHorizontal: wp( 2 ),
             color: Colors.blue,
@@ -513,7 +513,7 @@ const FNFToKeeper = ( props ) => {
               }
             </ScrollView>
           </View>
-        </View> : null}
+        </View> : null} */}
         <Text style={{
           marginHorizontal: wp( 2 ),
           color: Colors.blue,
@@ -580,7 +580,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '45%' ) : hp( '65%' ),
+            height: DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
           }}>
             {filterContactData ? (
               <FlatList
