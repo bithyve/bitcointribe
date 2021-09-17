@@ -30,7 +30,9 @@ const TwoFASetup = props => {
       flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={CommonStyles.headerContainer}>
+      <View style={[ CommonStyles.headerContainer, {
+        backgroundColor: Colors.white
+      } ]}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={
