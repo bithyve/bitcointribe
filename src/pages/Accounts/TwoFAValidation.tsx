@@ -118,7 +118,9 @@ export default function TwoFAValidation( props ) {
       flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={commonStyle.headerContainer}>
+      <View style={[ commonStyle.headerContainer, {
+        backgroundColor: Colors.white
+      } ]}>
         <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
           onPress={() => {
@@ -146,7 +148,7 @@ export default function TwoFAValidation( props ) {
             ...styles.otpRequestHeaderView
           }}>
             <Text style={styles.modalTitleText}>
-              {'Enter OTP to authenticate'}
+              {'Enter OTP to authenticateeee'}
             </Text>
             <Text style={{
               ...styles.modalInfoText, marginTop: hp( '1.5%' )
