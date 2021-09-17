@@ -12,6 +12,7 @@
         "search": "Search",
         "share": "Share",
         "note": "Note",
+        "optional": "Optional",
         "tryAgain": "Try again",
         "today": "Today",
         "unknown": "Unknown",
@@ -73,7 +74,7 @@
               "subText": ""
             },
             {
-              "heading": "Non-custodial buys",
+              "heading": "Self-custody buys",
               "text":
                 "Get sats directly in your wallet from compatible exchanges",
               "subText": ""
@@ -116,7 +117,7 @@
         "Hexaencrypts": "Hexa encrypts and secures all the data on the app and any communication that goes out",
         "creatingbackup": "Automatically creating backup on the cloud",
         "preloading": "Preloading the Test Account with test sats",
-        "multi": "Setting up multi-accounts",
+        "multi": "Setting up multiple accounts",
         "Answersdonotmatch":"Answers do not match",
         "Answersmust": "Answers must only contain lowercase characters (a-z) and digits (0-9)",
         "Passworddonotmatch": "Password do not match",
@@ -319,6 +320,7 @@
       "otherText": "\n\nWe neither store this data nor pass it to anyone else. This is for your convenience only",
       "send": "Send a Friends & Family request",
       "adding": "Adding to Friends & Family:",
+      "addingAs": "Adding as Keeper",
       "numberMissing": "F&F contact number missing",
       "emailMissing": "F&F contact email missing",
       "sendTo": "Send to your contact",
@@ -335,7 +337,7 @@
       "subText": "An alphanumeric code will be generated",
       "infoText": "If the communication channel is not encrypted / secure, the second factor sent through a different channel improves the security guarantees",
       "scanQR": "Scan QR",
-      "withHexa": "With your contact's Hexa app",
+      "withHexa": "With {0}'s Hexa app",
       "orShare": "or Share link",
       "WithContact": "With the contact",
       "Creating": "Creating Link....",

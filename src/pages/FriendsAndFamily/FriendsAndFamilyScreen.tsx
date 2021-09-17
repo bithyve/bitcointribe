@@ -187,7 +187,7 @@ class FriendsAndFamilyScreen extends React.Component<
       const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
       if( contact.isActive ){
         if( isGuardian || isWard ){
-          if( isGuardian && keeperInfo.findIndex( value=> value.channelKey == channelKey && ( value.type == 'device' || value.type == 'primaryKeeper' ) ) === -1 ) keepers.push(  makeContactRecipientDescription(
+          if( isGuardian && keeperInfo.findIndex( value=> value.channelKey == channelKey && ( value.type == 'device' || value.type == 'primaryKeeper' || value.type == 'pdf' ) ) === -1 ) keepers.push(  makeContactRecipientDescription(
             channelKey,
             contact,
             ContactTrustKind.KEEPER_OF_USER,

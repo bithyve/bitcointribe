@@ -389,7 +389,7 @@ export default function AddContactSendRequest( props ) {
         <RequestKeyFromContact
           isModal={false}
           // headerText={'Request Recovery Secret from trusted contact'}
-          // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
+          subHeaderText={formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name )}
           contactText={strings.adding}
           contact={Contact}
           QR={trustedQR}
