@@ -696,12 +696,17 @@ export default class AccountOperations {
     customTxFeePerByte: number,
   ): TransactionPrerequisiteElements => {
     const inputUTXOs = account.confirmedUTXOs
+    console.log( {
+      inputUTXOs, outputUTXOs, customTxFeePerByte
+    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
       customTxFeePerByte,
     )
-
+    console.log( {
+      inputs, outputs, fee
+    } )
     if ( !inputs ) return {
       fee
     }
@@ -722,7 +727,7 @@ export default class AccountOperations {
   }> => {
     try {
       let inputs, outputs
-      if ( txnPriority === 'custom' && customTxPrerequisites ) {
+      if ( txnPriority === TxPriority.CUSTOM && customTxPrerequisites ) {
         inputs = customTxPrerequisites.inputs
         outputs = customTxPrerequisites.outputs
       } else {
@@ -1008,12 +1013,14 @@ export default class AccountOperations {
     account: Account | MultiSigAccount,
     amounts: number[],
     averageTxFees: AverageTxFees,
+    includeFee?: boolean,
   ): Promise<{
     txid: string;
     gifts: Gift[];
    }> => {
 
     const network = AccountUtilities.getNetworkByType( account.networkType )
+    const txPriority = TxPriority.LOW
 
     const recipients = []
     const gifts: Gift[] = []
@@ -1054,9 +1061,33 @@ export default class AccountOperations {
       gifts.push( createdGift )
     } )
 
-
     const { txPrerequisites } = await AccountOperations.transferST1( account, recipients, averageTxFees )
-    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, TxPriority.LOW, network, recipients )
+    let feeDeductedFromAddress: string
+    const priorityBasedTxPrerequisites = txPrerequisites[ txPriority ]
+
+    if( includeFee ){
+      priorityBasedTxPrerequisites.outputs.forEach( output => {
+        if( !output.address ){
+          output.value += priorityBasedTxPrerequisites.fee
+        } else {
+          output.value -= priorityBasedTxPrerequisites.fee
+          if( output.value <= 0 ) throw new Error( 'Failed to generate gifts, inclusion fee is greater than gift amount' )
+          feeDeductedFromAddress = output.address
+        }
+      } )
+    }
+
+    if( feeDeductedFromAddress ){
+      recipients.forEach( recipient => {
+        if( recipient.address === feeDeductedFromAddress ) recipient.amount -= priorityBasedTxPrerequisites.fee
+      } )
+
+      gifts.forEach( gift => {
+        if( gift.address === feeDeductedFromAddress ) gift.amount -= priorityBasedTxPrerequisites.fee
+      } )
+    }
+
+    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, txPriority, network, recipients )
 
     return {
       txid, gifts

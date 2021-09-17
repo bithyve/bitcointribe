@@ -553,11 +553,11 @@ export const accountShellOrderedToFront = (
   }
 }
 
-export const generateGifts = ( amounts: number[], accountId?: string ) => {
+export const generateGifts = ( { amounts, accountId, includeFee }:{amounts: number[], accountId?: string, includeFee?: boolean } ) => {
   return {
     type: GENERATE_GIFTS,
     payload: {
-      accountId, amounts
+      accountId, amounts, includeFee
     }
   }
 }
