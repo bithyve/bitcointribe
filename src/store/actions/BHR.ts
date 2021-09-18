@@ -616,6 +616,8 @@ export const NAVIGATING_HISTORY_PAGE = 'NAVIGATING_HISTORY_PAGE'
 export const TYPE_BOTTOMSHEET_OPEN = 'TYPE_BOTTOMSHEET_OPEN'
 export const ALLOW_SECURE_ACCOUNT = 'ALLOW_SECURE_ACCOUNT'
 export const UPDATE_SECONDARY_SHARD = 'UPDATE_SECONDARY_SHARD'
+export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
+export const GET_APPROVAL_FROM_KEEPER = 'GET_APPROVAL_FROM_KEEPER'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -669,6 +671,22 @@ export const updateSecondaryShard = ( scannedData ) => {
     type: UPDATE_SECONDARY_SHARD,
     payload: {
       scannedData
+    }
+  }
+}
+
+export const setOpenToApproval = ( flag, availableKeepers, contactData ) => {
+  return {
+    type: OPEN_CLOSE_APPROVAL, payload: {
+      flag, availableKeepers, contactData
+    }
+  }
+}
+
+export const getApprovalFromKeepers = ( flag, contact ) => {
+  return {
+    type: GET_APPROVAL_FROM_KEEPER, payload: {
+      flag, contact
     }
   }
 }

@@ -520,6 +520,70 @@ export default class TrustedContactsOperations {
      }
    };
 
+   static checkSecondaryUpdated = async ( {
+     walletId,
+     options,
+     secondaryChannelKey,
+     channelKey,
+     StreamId,
+     PermanentChannelAddress
+   }: {
+   walletId: string;
+   options: {
+     retrieveSecondaryData?: boolean;
+   };
+   secondaryChannelKey?: string;
+   channelKey?: string;
+   StreamId?: string;
+   PermanentChannelAddress?: string;
+ } ) => {
+     try {
+       const permanentChannelAddress = PermanentChannelAddress ? PermanentChannelAddress : crypto
+         .createHash( 'sha256' )
+         .update( channelKey )
+         .digest( 'hex' )
+       const streamId = StreamId ? StreamId : TrustedContactsOperations.getStreamId( walletId )
+
+       const res: AxiosResponse = await BH_AXIOS.post( 'retrieveFromStream', {
+         HEXA_ID,
+         permanentChannelAddress,
+         streamId,
+         options,
+       } )
+
+       const streamData: {
+       secondaryEncryptedData?: string;
+     } = res.data.streamData
+
+       const unencryptedStreamData: {
+       secondaryData?: SecondaryStreamData;
+     } = {
+     }
+
+       if (
+         options.retrieveSecondaryData &&
+       streamData.secondaryEncryptedData &&
+       secondaryChannelKey
+       )
+         unencryptedStreamData[ 'secondaryData' ] =
+         TrustedContactsOperations.decryptData(
+           secondaryChannelKey,
+           streamData.secondaryEncryptedData
+         ).data
+
+       if( unencryptedStreamData.secondaryData ) return {
+         status: true
+       }
+       else return {
+         status: false
+       }
+     } catch ( err ) {
+       return {
+         status: false
+       }
+     }
+   };
+
    static updateStream = async ( {
      channelKey,
      streamUpdates,

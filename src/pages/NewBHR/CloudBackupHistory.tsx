@@ -1,20 +1,16 @@
 import React, { useState, useEffect, useCallback, createRef } from 'react'
 import {
   View,
-  StyleSheet,
   SafeAreaView,
   StatusBar,
   Platform,
-  Keyboard,
 } from 'react-native'
-import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch } from 'react-redux'
 import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
 import moment from 'moment'
 import _ from 'underscore'
 import HistoryPageComponent from './HistoryPageComponent'
@@ -25,11 +21,9 @@ import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { getLevelInfo } from '../../common/CommonFunctions'
 import { updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { translations } from '../../common/content/LocContext'
 

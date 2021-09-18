@@ -74,6 +74,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   useEffect( () => {
     const resettedTwoFA = idx( accountsState.twoFAHelpFlags, ( _ ) => _.twoFAResetted )
     if ( resettedTwoFA ) {
+      showQRModel( false )
       dispatch( setResetTwoFALoader( false ) )
       navigation.navigate( 'TwoFASetup', {
         twoFASetup: {
