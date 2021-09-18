@@ -15,7 +15,6 @@ import {
   RESTORE_TRUSTED_CONTACTS,
   UPDATE_WALLET_NAME_TO_CHANNEL,
   UPDATE_WALLET_NAME,
-  setOpenToApproval,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -50,7 +49,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
-import { updateWalletImageHealth } from '../actions/BHR'
+import { updateWalletImageHealth, getApprovalFromKeepers } from '../actions/BHR'
 import { getNextFreeAddressWorker, setup2FADetails } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { updateWalletNameToChannel } from '../actions/trustedContacts'
@@ -350,7 +349,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         if( relationType === TrustedContactRelationTypes.PRIMARY_KEEPER )
           Toast( 'You have been successfully added as a Keeper' )
         else if( relationType === TrustedContactRelationTypes.KEEPER ){
-          yield put( setOpenToApproval( true ) )
+          yield put( getApprovalFromKeepers( true, contact ) )
           Toast( 'You have been successfully added as a Keeper. Now Please Approve keeper by scanning QR from Primary Keeper' )
         } else if ( relationType === TrustedContactRelationTypes.CONTACT )
           Toast( 'Contact successfully added to Friends & Family' )

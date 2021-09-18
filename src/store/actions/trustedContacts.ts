@@ -15,7 +15,6 @@ export const RESTORE_TRUSTED_CONTACTS = 'RESTORE_TRUSTED_CONTACTS'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
 export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
-export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
 
 export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
@@ -172,14 +171,6 @@ export const updateWalletName = ( walletName: string ) => {
   return {
     type: UPDATE_WALLET_NAME, payload: {
       walletName
-    }
-  }
-}
-
-export const setOpenToApproval = ( flag ) => {
-  return {
-    type: OPEN_CLOSE_APPROVAL, payload: {
-      flag
     }
   }
 }
