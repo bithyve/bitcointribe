@@ -46,7 +46,8 @@
         "setup": "Setup",
         "manage": "Manage",
         "backup": "Backup",
-        "change": "Change"
+        "change": "Change",
+        "save": "Save"
     },
     "noInternet": {
       "no": "No Internet",

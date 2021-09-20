@@ -113,7 +113,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           flexDirection: 'row',
           justifyContent: 'space-between',
           marginTop: hp( 3 ),
-          marginHorizontal: wp( 4 ),
+          marginLeft: wp( 4 ),
+          marginRight: wp( 6 ),
           // alignItems: 'center',
           // backgroundColor: 'red'
         }}>
