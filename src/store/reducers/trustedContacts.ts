@@ -3,7 +3,6 @@ import {
   EXISTING_PERMANENT_CHANNELS_SYNCHED,
   PermanentChannelsSyncKind,
   UPDATE_TRUSTED_CONTACTS,
-  OPEN_CLOSE_APPROVAL
 } from '../actions/trustedContacts'
 import {
   TrustedContactRelationTypes,
@@ -20,7 +19,6 @@ export type TrustedContactsState = {
     existingPermanentChannelsSynching: boolean;
   };
   trustedContactRecipients: ContactRecipientDescribing[];
-  openApproval: boolean;
 };
 
 
@@ -31,7 +29,6 @@ const initialState: TrustedContactsState = {
     existingPermanentChannelsSynching: false,
   },
   trustedContactRecipients: [],
-  openApproval: false
 }
 
 
@@ -70,11 +67,6 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
           },
         }
 
-      case OPEN_CLOSE_APPROVAL:
-        return {
-          ...state,
-          openApproval: action.payload.flag
-        }
   }
 
   return state

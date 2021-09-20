@@ -8,11 +8,9 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import QRCode from '../../components/QRCode'
 import { translations } from '../../common/content/LocContext'
-import CopyThisText from '../../components/CopyThisText'
 
 export default function SecondaryDeviceModelContents( props ) {
   const strings  = translations[ 'bhr' ]
@@ -60,12 +58,6 @@ export default function SecondaryDeviceModelContents( props ) {
         {!props.secondaryQR?<Text style={{
           fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 13 ), color: Colors.textColorGrey, marginTop: 5
         }}>Generating your Recovery Key. Hold on.</Text>: null}
-        {props.secondaryQR?<CopyThisText
-          backgroundColor={Colors.backgroundColor}
-          text={props.secondaryQR}
-          width={'20%'}
-          height={'15%'}
-        /> : null}
         <AppBottomSheetTouchableWrapper
           disabled={props.secondaryQR ? false : true}
           onPress={() => props.onPressOk()}
