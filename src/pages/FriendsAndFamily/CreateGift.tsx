@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useMemo } from 'react'
 import {
   View,
   StyleSheet,
@@ -33,7 +33,14 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import { generateGifts } from '../../store/actions/accounts'
 import { AccountsState } from '../../store/reducers/accounts'
-import { Gift } from '../../bitcoin/utilities/Interface'
+import { AccountType, Gift } from '../../bitcoin/utilities/Interface'
+import idx from 'idx'
+import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import AccountShell from '../../common/data/models/AccountShell'
+import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -46,6 +53,29 @@ const CreateGift = ( { navigation } ) => {
   const [ includeFees, setFees ] = useState( false )
   const [ giftModal, setGiftModal ] =useState( false )
   const [ createdGift, setCreatedGift ] = useState( null )
+  const [ defaultAccount ] = useState( AccountType.CHECKING_ACCOUNT )
+  const sourceAccountShell = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
+  const sendingAccount = sourceAccountShell.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
+  const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
+  console.log( 'spendableBalance', spendableBalance )
+
+  const formattedUnitText = useFormattedUnitText( {
+    bitcoinUnit: BitcoinUnit.SATS,
+  } )
+  const availableBalance = useMemo( () => {
+    return AccountShell.getSpendableBalance( sendingAccount )
+  }, [ sendingAccount ] )
+
+  // const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
+
+  const sourceAccountHeadlineText = useMemo( () => {
+    const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
+
+    return `${title}`
+    // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+
+  }, [ sourcePrimarySubAccount ] )
 
   useEffect( () => {
     if( accountsState.selectedGiftId && initGiftCreation ) {
@@ -75,8 +105,10 @@ const CreateGift = ( { navigation } ) => {
   }
 
   const renderButton = ( text ) => {
+    const isDisabled = spendableBalance <= 0 && ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance )
     return(
       <TouchableOpacity
+        disabled={isDisabled}
         onPress={()=>{
           if( text === 'Create Gift' ){
             dispatch( generateGifts( [ Number( amount ) ] ) )
@@ -86,9 +118,12 @@ const CreateGift = ( { navigation } ) => {
             closeModal( true )
           }
         }}
-        style={{
+        style={isDisabled ? {
+          ...styles.disabledButtonView
+        } : {
           ...styles.buttonView
-        }}
+        }
+        }
       >
         <Text style={styles.buttonText}>{text}</Text>
       </TouchableOpacity>
@@ -232,11 +267,11 @@ const CreateGift = ( { navigation } ) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-                    Checking Account
+              {sourceAccountHeadlineText}
             </Text>
             <Text style={styles.availableToSpendText}>
             Available to spend
-              <Text style={styles.balanceText}> 23000</Text>
+              <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
             </Text>
           </View>
         </TouchableOpacity>
@@ -354,6 +389,19 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
+  },
+  disabledButtonView: {
+    height: wp( '12%' ),
+    width: wp( '27%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+    backgroundColor: Colors.lightBlue,
   },
   imageView: {
     width: 18,
