@@ -46,7 +46,8 @@
     "setup": "Configurar",
     "manage": "Gerenciar",
     "backup": "Cópia de segurança",
-    "change": "Mudar"
+    "change": "Mudar",
+    "save": "Salve"
   },
   "noInternet": {
     "no": "Sem internet",

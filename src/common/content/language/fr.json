@@ -46,7 +46,8 @@
     "setup": "Installer",
     "manage": "Faire en sorte",
     "backup": "Sauvegarde",
-    "change": "Changer"
+    "change": "Changer",
+    "save": "Enregistrer"
   },
   "noInternet": {
     "no": "Sans Internet",
