@@ -1079,7 +1079,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa;
+				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa2;
 				PRODUCT_NAME = Hexa;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
@@ -1109,7 +1109,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa;
+				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa2;
 				PRODUCT_NAME = Hexa;
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dist";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
