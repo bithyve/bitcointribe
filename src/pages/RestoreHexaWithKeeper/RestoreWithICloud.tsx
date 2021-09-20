@@ -277,7 +277,7 @@ class RestoreWithICloud extends Component<
     }
     this.bottomTextMessage = 'Hexa encrypts and secures all the data on the app and any communication that goes out'
     this.subPoints = [
-      'Setting up multi-accounts',
+      'Setting up multiple accounts',
       'Automatically creating backup on the cloud',
       'Preloading the Test Account with test sats',
     ]

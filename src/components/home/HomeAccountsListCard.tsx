@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native'
-import CardView from 'react-native-cardview'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -75,6 +74,9 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
 
 const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
   const accountsState = useAccountsState()
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
@@ -101,7 +103,7 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
         </Text>
       )
     }
-    if ( text.includes( 'Level 2' ) ) {
+    if ( !AllowSecureAccount && text.includes( 'MultiSig Wallet' ) ) {
       return(
         <Text style={styles.subtitleText} numberOfLines={3}>
           {`${strings.Availableafter}\n`}
@@ -154,12 +156,12 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
 
   return (
-    <CardView cornerRadius={10} style={opacityChange ? {
+    <View style={opacityChange ? {
       ...styles.rootContainer, opacity:0.3
     } : styles.rootContainer}>
       <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
       <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
-    </CardView>
+    </View>
   )
 }
 
@@ -171,6 +173,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
   },
   rootContainer: {
+    borderRadius: 10,
     width: widthPercentageToDP( 43 ),
     height: heightPercentageToDP( 20 ),
     // borderColor: Colors.borderColor,

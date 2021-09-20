@@ -48,7 +48,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import ModalHeader from '../../components/ModalHeader'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import { setCloudData, updateCloudData } from '../../store/actions/cloud'
+import { setCloudData, updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
 import ApproveSetup from './ApproveSetup'
 import QRModal from '../Accounts/QRModal'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
@@ -105,6 +105,8 @@ interface ManageBackupNewBHRStateTypes {
   onKeeperButtonClick: boolean;
   strings: object;
   common: object;
+  cloudErrorModal: boolean;
+  errorMsg: string;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -154,6 +156,8 @@ interface ManageBackupNewBHRPropsTypes {
   isKeeperInfoUpdated2: boolean;
   isKeeperInfoUpdated3: boolean;
   generateMetaShareStatus: boolean;
+  cloudErrorMessage: string;
+  setCloudErrorMessage: any;
 }
 
 // const HeaderComponent = React.lazy( () => import( '../../navigation/stacks/Header' ) )
@@ -219,6 +223,8 @@ class ManageBackupNewBHR extends Component<
       onKeeperButtonClick: false,
       strings: translations [ 'bhr' ],
       common: translations [ 'common' ],
+      cloudErrorModal: false,
+      errorMsg: ''
     }
   }
 
@@ -537,6 +543,13 @@ class ManageBackupNewBHR extends Component<
         this.props.autoShareToLevel2Keepers()
       }
     }
+
+    if( prevProps.cloudErrorMessage != this.props.cloudErrorMessage && this.props.cloudErrorMessage != '' ){
+      this.setState( {
+        cloudErrorModal: true, errorMsg: this.props.cloudErrorMessage
+      } )
+      this.props.setCloudErrorMessage( '' )
+    }
   };
 
   componentWillUnmount() {
@@ -778,6 +791,39 @@ class ManageBackupNewBHR extends Component<
     /> )
   }
 
+  renderCloudErrorContent = () => {
+    return (
+      <ErrorModalContents
+        title={this.state.strings[ 'CloudBackupError' ]}
+        //info={cloudErrorMessage}
+        note={this.state.errorMsg}
+        onPressProceed={()=>{
+          this.setState( {
+            cloudErrorModal: false
+          } )
+          this.autoCloudUpload()
+        }}
+        onPressIgnore={()=> {
+          this.setState( {
+            cloudErrorModal: false
+          } )
+        }}
+        proceedButtonText={'Try Again'}
+        cancelButtonText={'ok'}
+        isIgnoreButton={true}
+        isBottomImage={true}
+        isBottomImageStyle={{
+          width: wp( '27%' ),
+          height: wp( '27%' ),
+          marginLeft: 'auto',
+          resizeMode: 'stretch',
+          marginBottom: hp( '-3%' ),
+        }}
+        bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+      />
+    )
+  }
+
   renderKnowMoreModalHeader = () => {
     return (
       <ModalHeader
@@ -868,7 +914,8 @@ class ManageBackupNewBHR extends Component<
       showQRModal,
       loaderModal,
       strings,
-      knwowMoreModal
+      knwowMoreModal,
+      cloudErrorModal
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
@@ -1079,6 +1126,11 @@ class ManageBackupNewBHR extends Component<
           <ModalContainer visible={knwowMoreModal} closeBottomSheet={() => {}} >
             {this.renderKnowMoreModalContent()}
           </ModalContainer>
+          <ModalContainer visible={cloudErrorModal} closeBottomSheet={() => {this.setState( {
+            cloudErrorModal: false
+          } )}}>
+            {this.renderCloudErrorContent()}
+          </ModalContainer>
         </View>
         {this.state.showLoader ? <Loader /> : null}
       </View>
@@ -1116,6 +1168,7 @@ const mapStateToProps = ( state ) => {
     approvalStatus: idx( state, ( _ ) => _.bhr.approvalStatus ),
     isKeeperInfoUpdated2: idx( state, ( _ ) => _.bhr.isKeeperInfoUpdated2 ),
     generateMetaShareStatus: idx( state, ( _ ) => _.bhr.loading.generateMetaShareStatus ),
+    cloudErrorMessage: idx( state, ( _ ) => _.cloud.cloudErrorMessage ),
   }
 }
 
@@ -1139,6 +1192,7 @@ export default withNavigationFocus(
     setApprovalStatus,
     downloadSMShare,
     updateKeeperInfoToChannel,
+    setCloudErrorMessage
   } )( ManageBackupNewBHR )
 )
 

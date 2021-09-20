@@ -62,7 +62,9 @@ import {
   ON_PRESS_KEEPER,
   retrieveMetaShares,
   setAllowSecureAccount,
-  UPDATE_SECONDARY_SHARD
+  UPDATE_SECONDARY_SHARD,
+  GET_APPROVAL_FROM_KEEPER,
+  setOpenToApproval
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -112,7 +114,7 @@ import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, setOpenToApproval, syncPermanentChannels } from '../actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker, restoreTrustedContactsWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -125,6 +127,8 @@ import secrets from 'secrets.js-grempe'
 import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 import { setVersionHistory } from '../actions/versionHistory'
 import Toast from '../../components/Toast'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -907,7 +911,7 @@ function* sharePDFWorker( { payload } ) {
               Mailer.mail,
               {
                 subject: 'Recovery Key  '+walletName,
-                body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
+                body: `<b>Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.</b>`,
                 isHTML: true,
                 attachments: [ {
                   path:
@@ -928,7 +932,7 @@ function* sharePDFWorker( { payload } ) {
           } else {
             const shareOptions = {
               title: 'Recovery Key  '+walletName,
-              message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+              message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
               url:
               Platform.OS == 'android'
                 ? 'file://' + pdfInfo.filePath
@@ -990,7 +994,7 @@ function* sharePDFWorker( { payload } ) {
         case 'Other':
           const shareOptions = {
             title: 'Recovery Key  '+walletName,
-            message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
+            message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
             url:
             Platform.OS == 'android'
               ? 'file://' + pdfInfo.filePath
@@ -1644,10 +1648,22 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
         const currentContact: TrustedContact = contacts[ element.channelKey ]
         if ( currentContact ) {
           const instream: StreamData = useStreamFromContact( currentContact, wallet.walletId, true )
-          console.log( 'instream', instream )
-          if( instream ){
-            levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'notAccessible' : Math.round( Math.abs( Date.now() - instream.metaData.flags.lastSeen ) / ( 60 * 1000 ) ) > config.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 ? 'notAccessible' : 'accessible'
-            levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
+          if( levelInfo[ j ].updatedAt == 0 && instream ){
+            const res = yield call( TrustedContactsOperations.checkSecondaryUpdated, {
+              walletId: wallet.walletId, channelKey: element.channelKey, options: {
+                retrieveSecondaryData: true,
+              }, secondaryChannelKey: currentContact.secondaryChannelKey
+            } )
+            if( res.status ) {
+              levelInfo[ j ].status = 'accessible'
+              levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
+            }
+          } else {
+            console.log( 'instream', instream )
+            if( instream ) {
+              levelInfo[ j ].status = Math.round( Math.abs( Date.now() - instream.metaData.flags.lastSeen ) / ( 60 * 1000 ) ) > config.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 ? 'notAccessible' : 'accessible'
+              levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
+            }
           }
         }
       }
@@ -2202,8 +2218,7 @@ function* retrieveMetaSharesWorker( { payload } ) {
           ...Rk[ 0 ].meta, index: 0
         },
         encryptedShare: {
-          pmShare: BHROperations.encryptShares( temp, wallet.security.answer ).encryptedPrimarySecrets[ 0 ],
-          smShare:'', bhXpub:''
+          pmShare: BHROperations.encryptShares( temp, wallet.security.answer ).encryptedPrimarySecrets[ 0 ]
         }
       }
     }
@@ -2338,39 +2353,29 @@ function* updateSecondaryShardWorker( { payload } ) {
             secondaryMnemonicShard: res.secondaryData.secondaryMnemonicShard,
             bhXpub: res.secondaryData.bhXpub
           }
+          const instream: StreamData = useStreamFromContact( trustedContact, wallet.walletId, true )
 
-          const streamUpdates: UnecryptedStreamData = {
-            streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
-            secondaryData,
-            metaData: {
-              flags:{
-                active: true,
-                newData: true,
-                lastSeen: Date.now(),
-              },
-              version: DeviceInfo.getVersion()
-            }
+          const instreamUpdates = {
+            streamId: instream.streamId,
+            secondaryEncryptedData: TrustedContactsOperations.encryptData(
+              trustedContact.contactsSecondaryChannelKey,
+              secondaryData
+            ).encryptedData
           }
-          const response = yield call(
-            TrustedContactsOperations.syncPermanentChannels,
-            [ {
-              channelKey: trustedContact.channelKey,
-              streamId: streamUpdates.streamId,
-              unEncryptedOutstreamUpdates: streamUpdates,
-              secondaryChannelKey: qrDataObj.secondaryChannelKey,
-              contactDetails: trustedContact.contactDetails,
-            } ]
-          )
 
-          if( response.updated ) {
-            Toast( 'Approved Successfully' )
-          }
-          yield put ( setOpenToApproval( false ) )
+          yield call( TrustedContactsOperations.updateStream, {
+            channelKey: trustedContact.channelKey, streamUpdates: instreamUpdates
+          } )
+
+          Toast( 'Approved Successfully' )
+          yield put ( setOpenToApproval( false, [], null ) )
         }
       } else Toast( 'First scan qr from primary device to setup keeper' )
     }
     yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
   } catch ( error ) {
+    yield put ( setOpenToApproval( false, [], null ) )
+    Toast( 'Scan correct QR or Try again in some time' )
     yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
     console.log( 'Error UPDATE_SECONDARY_SHARD', error )
   }
@@ -2379,4 +2384,29 @@ function* updateSecondaryShardWorker( { payload } ) {
 export const updateSecondaryShardWatcher = createWatcher(
   updateSecondaryShardWorker,
   UPDATE_SECONDARY_SHARD
+)
+
+function* getApprovalFromKeeperWorker( { payload } ) {
+  const { flag, contact } : { flag: boolean, contact: TrustedContact} = payload
+  const res = yield call( TrustedContactsOperations.retrieveFromStream, {
+    walletId: contact.walletID, channelKey: contact.channelKey, options: {
+      retrieveBackupData: true,
+      retrieveSecondaryData: true
+    }, secondaryChannelKey: contact.contactsSecondaryChannelKey
+  } )
+  if( res.backupData && res.backupData.keeperInfo && ( !res.secondaryData || !res.secondaryData.secondaryMnemonicShard ) ){
+    if( res.backupData.keeperInfo ) {
+      const contactData = makeContactRecipientDescription(
+        contact.channelKey,
+        contact,
+        ContactTrustKind.KEEPER_OF_USER,
+      )
+      yield put( setOpenToApproval( true, res.backupData.keeperInfo, contactData ) )
+    }
+  } else yield put( setOpenToApproval( false, [], null ) )
+}
+
+export const getApprovalFromKeeperWatcher = createWatcher(
+  getApprovalFromKeeperWorker,
+  GET_APPROVAL_FROM_KEEPER,
 )

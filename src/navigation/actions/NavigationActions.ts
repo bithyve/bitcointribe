@@ -39,6 +39,24 @@ export const resetStackToAccountDetails = ( params ) => {
   } )
 }
 
+export const resetStackToAccountDetailsSendScreen = ( params ) => {
+  return StackActions.reset( {
+    index: 0,
+    actions: [
+      NavigationActions.navigate( {
+        routeName: 'Landing',
+        action: NavigationActions.navigate( {
+          routeName: 'AccountDetails',
+          action: NavigationActions.navigate( {
+            routeName: 'Send',
+            params,
+          } ),
+        } ),
+      } ),
+    ],
+  } )
+}
+
 export const resetStackToSend = ( params ) => {
   return StackActions.reset( {
     index: 0,
