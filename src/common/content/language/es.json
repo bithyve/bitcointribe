@@ -46,7 +46,8 @@
     "setup": "Configuración",
     "manage": "Administrar",
     "backup": "Respaldo",
-    "change": "Cambio"
+    "change": "Cambio",
+    "save": "Ahorrar"
   },
   "noInternet": {
     "no": "No Internet",
@@ -315,6 +316,7 @@
     "add": "Agregar amigos y familiares",
     "f&f": "Amigos de la familia",
     "addContact": "Añade un contacto",
+    "addKeeper": "Agregar como guardián",
     "addressbook": "Puede elegir de la libreta de direcciones de su teléfono",
     "AddNew": "Agregar nuevo",
     "appear": "Tus contactos aparecen aquí cuando\nagregado a la billetera Hexa",

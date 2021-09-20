@@ -46,7 +46,8 @@
         "setup": "Setup",
         "manage": "Manage",
         "backup": "Backup",
-        "change": "Change"
+        "change": "Change",
+        "save": "Save"
     },
     "noInternet": {
       "no": "No Internet",
@@ -305,6 +306,7 @@
       "add": "Add Friends & Family",
       "f&f": "Friends & Family",
       "addContact": "Add a Contact",
+      "addKeeper": "Add as keeper",
       "addressbook": "You can choose from your phone's address book",
       "AddNew": "Add New",
       "appear": "Your contacts appear here when\nadded to Hexa wallet",
