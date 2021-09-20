@@ -289,6 +289,7 @@
     "l1": "La sauvegarde cloud de niveau 1 est terminée",
     "l2": "La double sauvegarde de niveau 2 est terminée",
     "l3": "La sauvegarde multi-clés de niveau 3 est terminée",
+    "needAttention": " a besoin de votre attention.",
     "wallet": "Portefeuille"
   },
   "stackTitle": {
@@ -492,7 +493,8 @@
     "incompletelevel2": "Sauvegarde cloud terminée, mise à niveau de la sauvegarde au niveau 2",
     "incompletelevel3": "Double sauvegarde terminée, mise à niveau de la sauvegarde au niveau 3",
     "complete": "Sauvegarde multi-clés terminée",
-    "Pleasesetpassword": "Veuillez définir le mot de passe', 'Il semble que vous n'ayez pas défini le mot de passe pour la sauvegarde. Veuillez d'abord définir le mot de passe pour continuer.",
+    "PleaseSetPasswordTitle": "Veuillez définir le mot de passe",
+    "PleaseSetPasswordInfo": "Il semble que vous n'ayez pas défini le mot de passe pour la sauvegarde. Veuillez d'abord définir le mot de passe pour continuer.",
     "saveyourRecovery": "Vous pouvez enregistrer votre clé de récupération avec une personne, sur un appareil exécutant Hexa ou simplement dans un document PDF",
     "Questionscreated": "Questions de sécurité créées",
     "Passwordconfirmed": "Mot de passe de sécurité confirmé",
