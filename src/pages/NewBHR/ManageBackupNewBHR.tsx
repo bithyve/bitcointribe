@@ -840,7 +840,7 @@ class ManageBackupNewBHR extends Component<
   onKeeperButtonPress = ( value, keeperNumber ) =>{
     requestAnimationFrame( () => {
       if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-        this.props.setLevelCompletionError( this.state.strings[ 'Pleasesetpassword' ], LevelStatus.FAILED )
+        this.props.setLevelCompletionError( this.state.strings[ 'PleaseSetPasswordTitle' ], this.state.strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED )
         return
       }
       if( value.id == 1 && keeperNumber == 2 ){
