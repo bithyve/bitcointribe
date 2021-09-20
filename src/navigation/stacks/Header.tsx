@@ -22,6 +22,7 @@ import {
   InitTrustedContactFlowKind,
   PermanentChannelsSyncKind,
   syncPermanentChannels,
+  fetchGiftFromTemporaryChannel,
 } from '../../store/actions/trustedContacts'
 import {
   getCurrencyImageByRegion, processFriendsAndFamilyQR,
@@ -183,6 +184,7 @@ interface HomePropsTypes {
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
   initializeTrustedContact: any;
+  fetchGiftFromTemporaryChannel: any,
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   currentLevel: number;
@@ -1018,6 +1020,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  onGiftRequestAccepted = ( key ) => {
+    try {
+      this.closeBottomSheet()
+      const { navigation } = this.props
+      const { giftRequest } = this.state
+
+      let decryptionKey: string
+      try{
+        switch( giftRequest.encryptionType ){
+            case DeepLinkEncryptionType.OTP:
+              decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, key )
+              break
+        }
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+
+      this.props.fetchGiftFromTemporaryChannel( decryptionKey )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  };
+
   onPhoneNumberChange = () => {};
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
@@ -1427,6 +1453,7 @@ export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
     initializeTrustedContact,
+    fetchGiftFromTemporaryChannel,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,

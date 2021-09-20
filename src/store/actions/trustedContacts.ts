@@ -15,6 +15,8 @@ export const RESTORE_TRUSTED_CONTACTS = 'RESTORE_TRUSTED_CONTACTS'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
 export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
+export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
+export const FETCH_GIFT_FROM_TEMPORARY_CHANNEL = 'FETCH_GIFT_FROM_TEMPORARY_CHANNEL'
 
 export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
@@ -137,6 +139,15 @@ export const walletCheckIn = ( currencyCode?: string ) => {
     type: WALLET_CHECK_IN,
     payload: {
       currencyCode
+    },
+  }
+}
+
+export const fetchGiftFromTemporaryChannel = ( decryptionKey: string ) => {
+  return {
+    type: FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+    payload: {
+      decryptionKey
     },
   }
 }
