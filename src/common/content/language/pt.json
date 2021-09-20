@@ -409,7 +409,7 @@
     "saving5": "A conta precisa que você configure um sistema 2 Factor Authentication (2FA) com seu software autenticador favorito. Este método torna extremamente difícil para qualquer pessoa, exceto você, acessar seu bitcoin",
     "saving6": "Seu código 2FA deve ser recuperado de seu dispositivo Keeper - nunca configure a autenticação de 2 fatores para sua conta poupança em seu dispositivo de carteira, pois isso é um risco de segurança",
     "saving7": "Sua conta poupança é uma conta com várias assinaturas 2 de 3 em que você mantém duas chaves (uma neste dispositivo e a outra no dispositivo Keeper)",
-    "saving8": "BitHyve contém a terceira chave, que é usada apenas quando você assina primeiro e apresenta o código 2FA correto. O BitHyve nunca guarda nenhum de seus fundos. A chave mantida no Dispositivo Keeper pode ser usada para migrar seus fundos do Hexa, mesmo se pararmos de oferecer suporte ao aplicativo!",
+    "saving8": "BitHyve contém a terceira chave, que é usada apenas quando você assina primeiro e apresenta o código 2FA correto. O BitHyve nunca guarda nenhum de seus fundos. A chave mantida no Dispositivo Pessoal pode ser usada para migrar seus fundos do Hexa, mesmo se pararmos de oferecer suporte ao aplicativo!",
     "CompleteLevel2": "Nível 2 completo",
     "Level2": "Você só pode adicionar uma conta poupança quando tiver concluído o nível 2",
     "NameDescription": "Nome e Descrição",
