@@ -171,7 +171,8 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     }
   }
 
-  const gift: Gift = yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
+  const res = yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
+  const gift: Gift = res.data
   if( !storedGifts[ gift.id ] ){
     gift.status = GiftStatus.CLAIMED
     gift.type = GiftType.RECEIVED

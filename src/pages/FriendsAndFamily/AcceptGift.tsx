@@ -21,11 +21,14 @@ import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 
 export type Props = {
   navigation: any;
-  closeModal: () => void
+  closeModal: () => void;
+  onGiftRequestAccepted: () => void;
+  walletName: string;
+  giftAmount: string;
 };
 
 
-const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
+const AcceptGift: React.FC<Props> = ( { navigation, closeModal, onGiftRequestAccepted, walletName, giftAmount }: Props ) => {
   const [ acceptGift, setAcceptGiftModal ] = useState( true )
   const [ giftAccepted, setGiftAcceptedModel ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
@@ -55,7 +58,8 @@ const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
             navigation.navigate( 'AccountDetails', {
               accountShellID: sourcePrimarySubAccount.accountShellID,
             } )
-          } else {
+          } else if( text === 'Accept Gift' ) {
+            onGiftRequestAccepted()
             setAcceptGiftModal( false )
             setGiftAcceptedModel( true )
           }
@@ -106,7 +110,7 @@ const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
         <DashedContainer
           titleText={'Gift Accepted'}
           subText={'Lorem ipsum dolor sit amet'}
-          amt={numberWithCommas( 50000 )}
+          amt={numberWithCommas( giftAmount )}
           image={<GiftCard width={63} height={63} />}
         />
         <BottomInfoBox
@@ -182,7 +186,7 @@ const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
                     color: Colors.textColorGrey,
                     fontSize: RFValue( 13 ),
                     // fontFamily: Fonts.FiraSansRegular,
-                  }}>{'WalletName'}</Text>
+                  }}>{walletName}</Text>
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 12 ),
@@ -210,7 +214,7 @@ const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
                   fontSize: RFValue( 24 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}>
-                  {numberWithCommas( 50000 )}
+                  {numberWithCommas( giftAmount )}
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),

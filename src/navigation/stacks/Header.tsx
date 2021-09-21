@@ -683,8 +683,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
-    this.openBottomSheetOnLaunch( BottomSheetKind.GIFT_REQUEST )
-
     const {
       navigation,
       initializeHealthSetup,
@@ -1043,15 +1041,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  onGiftRequestAccepted = ( key ) => {
+  onGiftRequestAccepted = ( key? ) => {
     try {
       this.closeBottomSheet()
-      const { navigation } = this.props
       const { giftRequest } = this.state
 
       let decryptionKey: string
       try{
         switch( giftRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              decryptionKey = giftRequest.encryptedChannelKeys
+              break
+
             case DeepLinkEncryptionType.OTP:
               decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, key )
               break
@@ -1401,7 +1402,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         case BottomSheetKind.GIFT_REQUEST:
           return (
-            <AcceptGift navigation={this.props.navigation} closeModal={() => this.closeBottomSheet()}/>
+            <AcceptGift
+              navigation={this.props.navigation}
+              closeModal={() => this.closeBottomSheet()}
+              onGiftRequestAccepted={this.onGiftRequestAccepted}
+              walletName={this.state.giftRequest.walletName}
+              giftAmount={this.state.giftRequest.amount}/>
           )
 
         default:
