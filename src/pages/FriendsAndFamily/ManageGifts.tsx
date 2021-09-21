@@ -31,7 +31,8 @@ const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
-  const giftArr = Object.values( gifts )
+  const giftArr = Object.values( gifts?? {
+  } )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
