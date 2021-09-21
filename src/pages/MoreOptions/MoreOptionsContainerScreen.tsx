@@ -323,7 +323,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 <Text style={styles.addModalTitleText}>
                   {strings.Language}
                 </Text>
-                <Text style={styles.textBeta}>Beta</Text>
+                <View style={styles.containerBeta}>
+                  <Text style={styles.textBeta}>Beta</Text>
+                </View>
               </View>
               <Text style={styles.addModalInfoText}>
                 {strings.changeLanguage }
@@ -567,14 +569,19 @@ const styles = StyleSheet.create( {
   },
 
   textBeta: {
+    color: 'white',
+    fontSize: 12,
+  },
+
+  containerBeta: {
     marginHorizontal: 10,
     backgroundColor: Colors.blue,
-    color: 'white',
-    paddingHorizontal: 5,
+    paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 5,
-    fontSize: 12,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   addModalInfoText: {
