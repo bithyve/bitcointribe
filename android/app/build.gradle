@@ -59,7 +59,7 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 349
+        versionCode 350
         versionName "2.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
@@ -98,7 +98,7 @@ android {
     productFlavors {
         production {
             minSdkVersion rootProject.ext.minSdkVersion
-            applicationId "io.hexawallet.hexa"
+            applicationId "io.hexawallet.hexa2"
             targetSdkVersion rootProject.ext.targetSdkVersion
             resValue "string", "build_config_package", "io.hexawallet.hexa"
         }

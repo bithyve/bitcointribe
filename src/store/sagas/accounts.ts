@@ -1098,7 +1098,7 @@ export const restoreAccountShellsWatcher = createWatcher(
   RESTORE_ACCOUNT_SHELLS,
 )
 
-export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string }} ) {
+export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean }} ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -1121,7 +1121,7 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     walletName: wallet.walletName
   }
 
-  const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork )
+  const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
 
   if( txid ) {
     for( const giftId in gifts ){

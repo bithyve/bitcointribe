@@ -111,7 +111,10 @@ const CreateGift = ( { navigation } ) => {
         disabled={isDisabled}
         onPress={()=>{
           if( text === 'Create Gift' ){
-            dispatch( generateGifts( [ Number( amount ) ] ) )
+            dispatch( generateGifts( {
+              amounts: [ Number( amount ) ],
+              includeFee: includeFees
+            } ) )
             setInitGiftCreation( true )
           }
           else if ( text === 'Send Gift' ) {

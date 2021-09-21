@@ -308,7 +308,7 @@ export default function QrAndLink( props ) {
         <RequestKeyFromContact
           isModal={false}
           // headerText={'Request Recovery Secret from trusted contact'}
-          subHeaderText={formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name )}
+          subHeaderText={Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addKeeper}
           contactText={strings.addingAs}
           contact={Contact}
           QR={trustedQR}

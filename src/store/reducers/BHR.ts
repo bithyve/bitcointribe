@@ -1,6 +1,7 @@
 import { BackupStreamData, ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 import { LevelDataVar } from '../../common/CommonVars/commonVars'
 import LevelStatus from '../../common/data/enums/LevelStatus'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
   HEALTH_CHECK_INITIALIZE,
@@ -37,7 +38,8 @@ import {
   LEVEL_COMPLETION_ERROR,
   NAVIGATING_HISTORY_PAGE,
   TYPE_BOTTOMSHEET_OPEN,
-  ALLOW_SECURE_ACCOUNT
+  ALLOW_SECURE_ACCOUNT,
+  OPEN_CLOSE_APPROVAL
 } from '../actions/BHR'
 
 const initialState: {
@@ -110,6 +112,9 @@ const initialState: {
   status: LevelStatus,
   isTypeBottomSheetOpen: boolean,
   AllowSecureAccount: boolean;
+  openApproval: boolean;
+  availableKeepers: KeeperInfoInterface[]
+  approvalContactData: ContactRecipientDescribing
 } = {
   mnemonic: '',
   loading: {
@@ -173,7 +178,10 @@ const initialState: {
   errorInfo: null,
   status: LevelStatus.PENDING,
   isTypeBottomSheetOpen: false,
-  AllowSecureAccount: false
+  AllowSecureAccount: false,
+  openApproval: false,
+  availableKeepers: [],
+  approvalContactData: null
 }
 
 export default ( state = initialState, action ) => {
@@ -415,6 +423,13 @@ export default ( state = initialState, action ) => {
           AllowSecureAccount: action.payload.flag,
         }
 
+      case OPEN_CLOSE_APPROVAL:
+        return {
+          ...state,
+          openApproval: action.payload.flag,
+          availableKeepers: action.payload.availableKeepers,
+          approvalContactData: action.payload.contactData
+        }
 
   }
   return state

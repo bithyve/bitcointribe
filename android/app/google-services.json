@@ -39,6 +39,14 @@
           }
         },
         {
+          "client_id": "1002970291557-cqk2sfsh66pts6pqqttgs4403ctptd85.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa",
+            "certificate_hash": "8333fee0f3ba9a4d696eb15f2fabf05585512bce"
+          }
+        },
+        {
           "client_id": "1002970291557-n9ifs1lr6eimukhtefi1i10r11165gn2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -115,6 +123,22 @@
           }
         },
         {
+          "client_id": "1002970291557-iasa925p1u7903g9n815kislvrb17omf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.development",
+            "certificate_hash": "8333fee0f3ba9a4d696eb15f2fabf05585512bce"
+          }
+        },
+        {
+          "client_id": "1002970291557-muaiooova6koiijlormqf3a151lnj1o2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.development",
+            "certificate_hash": "7a209602b775ae9db085834a22d2bfb473b398fa"
+          }
+        },
+        {
           "client_id": "1002970291557-p35djt8iddkip2e4hf6ng77sut8i5df7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -167,6 +191,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1002970291557-grd0rj1l6lpprpdtuvlvi4ko89rhgtrr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.hexawallet.hexa.staging",
+            "certificate_hash": "8333fee0f3ba9a4d696eb15f2fabf05585512bce"
+          }
+        },
+        {
           "client_id": "1002970291557-iqkmrcos90unftiphh5r194mdi0sjc0m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -206,6 +238,42 @@
             "certificate_hash": "38550726f4c6c43ea287cf16117ce6a566e1cbc1"
           }
         },
+        {
+          "client_id": "1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHVmzhfp_Yo0oeDpzfQKX7WMwys6vqioI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1002970291557-0e398pi2o589p757crs15s170i06vjrc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.hexawallet.hexa.development"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002970291557:android:6c5ef33496b014a52f558c",
+        "android_client_info": {
+          "package_name": "io.hexawallet.hexa2"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com",
           "client_type": 3
