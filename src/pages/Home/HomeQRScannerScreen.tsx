@@ -32,6 +32,7 @@ import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import { NavigationActions, StackActions } from 'react-navigation'
+import AcceptGift from '../FriendsAndFamily/AcceptGift'
 
 export type Props = {
   navigation: any;
@@ -369,7 +370,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }
   return (
     <View style={styles.rootContainer}>
-      {acceptGift &&
+      {/* {acceptGift &&
         <ModalContainer visible={acceptGift} closeBottomSheet={() => { }} >
           {renderAcceptModal()}
         </ModalContainer>
@@ -378,7 +379,11 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         <ModalContainer visible={giftAccepted} closeBottomSheet={() => { }} >
           {renderGiftAcceptedtModal()}
         </ModalContainer>
-      }
+      } */}
+      <ModalContainer visible={acceptGift} closeBottomSheet={() => { }} >
+        <AcceptGift navigation={navigation} closeModal={() => setAcceptGiftModal( false )}/>
+      </ModalContainer>
+
       <ScrollView>
         <KeyboardAwareScrollView
           resetScrollToCoords={{

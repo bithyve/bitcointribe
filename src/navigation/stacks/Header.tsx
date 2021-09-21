@@ -1357,6 +1357,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+        case BottomSheetKind.GIFT_REQUEST:
+          return (
+            <AcceptGift navigation={this.props.navigation} closeModal={() => this.closeBottomSheet()}/>
+          )
+
         default:
           break
     }
