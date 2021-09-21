@@ -46,7 +46,8 @@
     "setup": "Configuración",
     "manage": "Administrar",
     "backup": "Respaldo",
-    "change": "Cambio"
+    "change": "Cambio",
+    "save": "Ahorrar"
   },
   "noInternet": {
     "no": "No Internet",
@@ -288,6 +289,7 @@
     "l1": "La copia de seguridad en la nube de nivel 1 está completa",
     "l2": "La copia de seguridad doble de nivel 2 está completa",
     "l3": "La copia de seguridad multin clave de nivel 3 está completa",
+    "needAttention": " necesita tu atención.",
     "wallet": "Billetera"
   },
   "stackTitle": {
@@ -407,9 +409,9 @@
     "saving3": "Utilice esta cuenta para almacenar o mantener bitcoin y sats a largo plazo",
     "saving4": "Tenga cuidado: si termina enviando sats desde su cuenta corriente a su cuenta de ahorros y luego decide gastar sats desde su cuenta de ahorros, le costará mucho más en tarifas de transacción cada vez",
     "saving5": "La cuenta necesita que configure un sistema de autenticación de 2 factores (2FA) con su software de autenticación favorito. Este método hace que sea extremadamente difícil para cualquiera que no sea usted acceder a su bitcoin.",
-    "saving6": "Su código 2FA debe recuperarse de su dispositivo Keeper; nunca configure la autenticación de 2 factores para su cuenta de ahorros en su dispositivo billetera, ya que esto es un riesgo de seguridad",
-    "saving7": "Su cuenta de ahorros es una cuenta de firmas múltiples 2 de 3 en la que tiene dos llaves (una en este dispositivo y la otra en su dispositivo Keeper)",
-    "saving8": "BitHyve tiene la tercera clave que se usa solo cuando firma primero y presenta el código 2FA correcto. BitHyve nunca custodia ninguno de sus fondos. La clave que se encuentra en el dispositivo Keeper se puede usar para migrar sus fondos desde Hexa, ¡incluso si dejamos de admitir la aplicación!",
+    "saving6": "Su código 2FA debe recuperarse de su Dispositivo personal; nunca configure la autenticación de 2 factores para su cuenta de ahorros en su dispositivo billetera, ya que esto es un riesgo de seguridad",
+    "saving7": "Su cuenta de ahorros es una cuenta de firmas múltiples 2 de 3 en la que tiene dos llaves (una en este dispositivo y la otra en su Dispositivo personal)",
+    "saving8": "BitHyve tiene la tercera clave que se usa solo cuando firma primero y presenta el código 2FA correcto. BitHyve nunca custodia ninguno de sus fondos. La clave que se encuentra en el Dispositivo personal se puede usar para migrar sus fondos desde Hexa, ¡incluso si dejamos de admitir la aplicación!",
     "CompleteLevel2": "Completa el nivel 2",
     "Level2": "Solo puede agregar una cuenta de ahorros cuando haya completado el nivel 2",
     "NameDescription": "Nombre y descripción",
@@ -491,7 +493,8 @@
     "incompletelevel2": "Copia de seguridad en la nube completa, actualice la copia de seguridad al nivel 2",
     "incompletelevel3": "Copia de seguridad doble completa, mejora la copia de seguridad al nivel 3",
     "complete": "Copia de seguridad de varias claves completa",
-    "Pleasesetpassword": "Por favor, establezca la contraseña ',' Parece que no ha establecido una contraseña para la copia de seguridad. Primero configure la contraseña para continuar.",
+    "PleaseSetPasswordTitle": "Por favor, establezca la contraseña",
+    "PleaseSetPasswordInfo": "Parece que no ha establecido una contraseña para la copia de seguridad. Primero configure la contraseña para continuar.",
     "saveyourRecovery": "Puede guardar su clave de recuperación con una persona, en un dispositivo que ejecute Hexa o simplemente en un documento PDF",
     "Questionscreated": "Preguntas de seguridad creadas",
     "Passwordconfirmed": "Contraseña de seguridad confirmada",
@@ -512,7 +515,7 @@
     "historyofyourbackup": "El historial de su copia de seguridad aparecerá aquí.",
     "historyofyourRecovery": "El historial de su clave de recuperación aparecerá aquí",
     "Nohistory": "No historia",
-    "confirmingyourRecovery": "Para confirmar su clave de recuperación en el dispositivo Keeper, simplemente abra la aplicación en ese dispositivo e inicie sesión",
+    "confirmingyourRecovery": "Para confirmar su clave de recuperación en el Dispositivo personal, simplemente abra la aplicación en ese dispositivo e inicie sesión",
     "ok": "Ok lo tengo",
     "errorwhilesendingyourRecovery": "Hubo un error al enviar su clave de recuperación. Vuelva a intentarlo en un momento.",
     "ErrorsendingRecovery": "Error al enviar la clave de recuperación",

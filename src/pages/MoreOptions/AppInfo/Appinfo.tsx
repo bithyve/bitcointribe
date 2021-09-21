@@ -33,7 +33,7 @@ import EnterPasscodeScreen from './EnterPasscodeScreen'
 import EditWalletName from './EditWalletName'
 import EditWalletSuccess from './EditWalletSuccess'
 import { updateWalletName } from '../../../store/actions/trustedContacts'
-import { LevelHealthInterface } from '../../../bitcoin/utilities/Interface'
+import { LevelHealthInterface, Wallet } from '../../../bitcoin/utilities/Interface'
 import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
 import { updateCloudData } from '../../../store/actions/cloud'
 import { NavigationActions, StackActions } from 'react-navigation'
@@ -67,6 +67,9 @@ const AppInfo = ( props ) => {
   )
   const walletId = useSelector(
     ( state ) => state.storage.wallet?.walletId,
+  )
+  const { security }: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
 
   const dispatch = useDispatch()
@@ -105,8 +108,8 @@ const AppInfo = ( props ) => {
   }, [] )
 
   const showModal = () => {
-    showSecurityQuestion( true )
-
+    if( security && security.question && security.answer ) showSecurityQuestion( true )
+    else showSecurityPin( true )
   }
 
   const handleOptionSelection = ( menuOption: MenuOption ) => {

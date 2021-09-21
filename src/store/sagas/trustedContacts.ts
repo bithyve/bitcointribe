@@ -429,9 +429,9 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         if( contactsFCM && contactsWalletId ){
           let notifType, notifBody
           switch( contact.relationType ){
-              case TrustedContactRelationTypes.KEEPER:
+              case TrustedContactRelationTypes.WARD:
                 notifType = notificationType.FNF_KEEPER_REQUEST_ACCEPTED
-                notifBody = `F&F keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
+                notifBody = `Keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
                 break
 
               default:
