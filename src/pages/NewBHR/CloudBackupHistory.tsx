@@ -40,6 +40,9 @@ export enum BottomSheetState {
 const CloudBackupHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
+  const iCloudErrors  = translations[ 'iCloudErrors' ]
+  const driveErrors  = translations[ 'driveErrors' ]
+
   const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
   const [ confirmationModal, setConfirmationModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
@@ -81,7 +84,11 @@ const CloudBackupHistory = ( props ) => {
 
   useEffect( () => {
     if ( cloudErrorMessage !== '' ) {
-      setErrorMsg( cloudErrorMessage )
+      const message = Platform.select( {
+        ios: iCloudErrors[ cloudErrorMessage ],
+        android: driveErrors[ cloudErrorMessage ],
+      } )
+      setErrorMsg( message )
       setErrorModal( true )
       dispatch( setCloudErrorMessage( '' ) )
     }
@@ -100,8 +107,8 @@ const CloudBackupHistory = ( props ) => {
         onPressIgnore={()=> {
           setErrorModal( false )
         }}
-        proceedButtonText={'Try Again'}
-        cancelButtonText={'Skip'}
+        proceedButtonText={common.tryAgain}
+        cancelButtonText={common.skip}
         isIgnoreButton={true}
         isBottomImage={true}
         isBottomImageStyle={{
