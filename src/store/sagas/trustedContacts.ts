@@ -15,6 +15,7 @@ import {
   RESTORE_TRUSTED_CONTACTS,
   UPDATE_WALLET_NAME_TO_CHANNEL,
   UPDATE_WALLET_NAME,
+  FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -156,6 +157,52 @@ function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
     } ) )
   }
 }
+
+function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKey: string } } ) {
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const accounts: Accounts = accountsState.accounts
+  let defaultCheckingAccount: Account
+  for( const accountId in accounts ){
+    const account = accounts[ accountId ]
+    if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
+      defaultCheckingAccount= account
+      break
+    }
+  }
+
+  const gift: Gift = yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
+  if( !storedGifts[ gift.id ] ){
+    gift.status = GiftStatus.CLAIMED
+    gift.type = GiftType.RECEIVED
+
+    AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address, {
+      type: ActiveAddressAssigneeType.GIFT,
+      id: gift.id,
+      senderInfo: {
+        name: gift.sender.walletName
+      }
+    } )
+    gift.receiver.accountId = defaultCheckingAccount.id
+
+    yield put( updateGift( gift ) )
+    yield put( updateAccountShells( {
+      accounts: {
+        [ defaultCheckingAccount.id ]: defaultCheckingAccount
+      }
+    } ) )
+    yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
+    yield put( updateWalletImageHealth( {
+      updateAccounts: true,
+      accountIds: [ defaultCheckingAccount.id ]
+    } ) )
+  }
+}
+
+export const fetchTemporaryChannelGiftWatcher = createWatcher(
+  fetchTemporaryChannelGiftWorker,
+  FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+)
 
 export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, updateWI?: boolean, }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -382,9 +429,9 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         if( contactsFCM && contactsWalletId ){
           let notifType, notifBody
           switch( contact.relationType ){
-              case TrustedContactRelationTypes.KEEPER:
+              case TrustedContactRelationTypes.WARD:
                 notifType = notificationType.FNF_KEEPER_REQUEST_ACCEPTED
-                notifBody = `F&F keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
+                notifBody = `Keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
                 break
 
               default:

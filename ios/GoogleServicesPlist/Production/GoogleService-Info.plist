@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1002970291557-udh1a1k7v9vrhpu889k2u6n9il5947kv.apps.googleusercontent.com</string>
+	<string>1002970291557-8ouqe8l1g7jv6i4a39gv9vgcp2286eb5.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1002970291557-udh1a1k7v9vrhpu889k2u6n9il5947kv</string>
+	<string>com.googleusercontent.apps.1002970291557-8ouqe8l1g7jv6i4a39gv9vgcp2286eb5</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1002970291557-7r0ak6i0fp4rl20h6b59vctkc3lhajit.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDFCX1bjO9DWD0WdNc6kG54ByR9wAMD5VI</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>io.hexawallet.hexa</string>
+	<string>io.hexawallet.hexa2</string>
 	<key>PROJECT_ID</key>
 	<string>hexa-3f8a1</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1002970291557:ios:e523bc364ec5deb82f558c</string>
+	<string>1:1002970291557:ios:96ece95ec2c173072f558c</string>
 	<key>DATABASE_URL</key>
 	<string>https://hexa-3f8a1.firebaseio.com</string>
 </dict>

@@ -572,9 +572,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={SecondaryDeviceMessageModal}
-        title={'Keeper Device'}
+        title={'Keeper Contact'}
         note={
-          'For confirming your Recovery Key on the Keeper Device, simply open the app on that device and log in'
+          'For confirming your Recovery Key on the Keeper Contact, simply open the app on that device and log in'
         }
         proceedButtonText={'Ok, got it'}
         onPressProceed={() => setSecondaryDeviceMessageModal( false )}
