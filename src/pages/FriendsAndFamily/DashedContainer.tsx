@@ -1,7 +1,8 @@
 import React, { useContext } from 'react'
 import {
   View,
-  Text
+  Text,
+  TouchableOpacity
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -18,7 +19,9 @@ const DashedContainer = ( props ) => {
   const strings = translations[ 'f&f' ]
 
   return(
-    <View
+    <TouchableOpacity
+      onPress={() => props.onPress() ? props.onPress() : () => {}}
+      key={props.key}
       style={{
         width: '90%',
         backgroundColor: Colors.gray7,
@@ -30,7 +33,7 @@ const DashedContainer = ( props ) => {
         // elevation: 2,
         alignSelf: 'center',
         borderRadius: wp( 2 ),
-        marginTop: hp( 3 ),
+        marginTop: hp( 1 ),
         marginBottom: hp( 1 ),
         paddingVertical: wp( 1 ),
         paddingHorizontal: wp( 1 ),
@@ -100,7 +103,7 @@ const DashedContainer = ( props ) => {
         </View>
 
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, } from 'react'
 import {
   View,
   StyleSheet,
@@ -12,6 +12,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import { useSelector } from 'react-redux'
 import moment from 'moment'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -24,10 +25,14 @@ import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from './DashedContainer'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
+import idx from 'idx'
 
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
+  const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
+  const giftArr = Object.values( gifts?? {
+  } )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
@@ -88,21 +93,24 @@ const ManageGifts = ( { navigation } ) => {
 
         </TouchableOpacity>
       </View>
-      <DashedContainer
-        titleText={'Available Gift'}
-        subText={'Lorem ipsum dolor sit amet'}
-        amt={numberWithCommas( 20000 )}
-        date={new Date()}
-        image={<GiftCard />}
-      />
-
-      <DashedContainer
-        titleText={'Available Gift'}
-        subText={'Lorem ipsum dolor sit amet'}
-        amt={numberWithCommas( 50000 )}
-        date={new Date()}
-        image={<GiftCard />}
-      />
+      {giftArr.length > 0 &&
+      giftArr.map( ( item, index ) => {
+        return (
+          <DashedContainer
+            key={index}
+            titleText={'Available Gift'}
+            subText={'Lorem ipsum dolor sit amet'}
+            amt={numberWithCommas( item.amount )}
+            date={new Date()}
+            image={<GiftCard />}
+            onPress={() => {navigation.navigate( 'AddContact', {
+              fromScreen: 'Gift',
+              giftId: item.id
+            } )}}
+          />
+        )
+      } )
+      }
       <View style={{
         marginHorizontal: wp( 6 ), marginTop: hp( 1 )
       }}>

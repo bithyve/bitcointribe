@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
@@ -32,94 +32,62 @@ import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import { NavigationActions, StackActions } from 'react-navigation'
-import AcceptGift from '../FriendsAndFamily/AcceptGift'
+import idx from 'idx'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import AccountShell from '../../common/data/models/AccountShell'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 
 export type Props = {
   navigation: any;
+  closeModal: () => void
 };
 
-const HeaderSection: React.FC = ( { title } ) => {
-  return (
-    <View style={styles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderSubtitleText}>
-        {title}
-      </Text>
-    </View>
-  )
-}
 
-const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
   const dispatch = useDispatch()
   const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
-  const [ acceptGift, setAcceptGiftModal ] = useState( false )
+  const [ acceptGift, setAcceptGiftModal ] = useState( true )
   const [ giftAccepted, setGiftAcceptedModel ] = useState( false )
+  const [ defaultAccount ] = useState( AccountType.CHECKING_ACCOUNT )
+  const sourceAccountShell = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
+  const sendingAccount = sourceAccountShell.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+  console.log( 'sendingAccount', sendingAccount )
+
+  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
+  const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
+  console.log( 'spendableBalance', spendableBalance )
+
+  const formattedUnitText = useFormattedUnitText( {
+    bitcoinUnit: BitcoinUnit.SATS,
+  } )
+  const availableBalance = useMemo( () => {
+    return AccountShell.getSpendableBalance( sendingAccount )
+  }, [ sendingAccount ] )
+
+  // const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
+
+  const sourceAccountHeadlineText = useMemo( () => {
+    const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
+
+    return `${title}`
+    // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+
+  }, [ sourcePrimarySubAccount ] )
   const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
   const common = translations[ 'common' ]
   const strings = translations[ 'accounts' ]
-  function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    console.log( 'scannedData', scannedData )
-    const networkType: NetworkType = AccountUtilities.networkType( scannedData )
-    if ( networkType ) {
-      const network = AccountUtilities.getNetworkByType( networkType )
-      const { type } = AccountUtilities.addressDiff( scannedData, network )
-      if ( type === ScannedAddressKind.ADDRESS ) {
-        onSend( scannedData, 0 )
-      } else if ( type === ScannedAddressKind.PAYMENT_URI ) {
-        const res = AccountUtilities.decodePaymentURI( scannedData )
-        const address = res.address
-        const options = res.options
-
-        onSend( address, options.amount )
-      }
-      return
-    }
-
-    const onCodeScanned = navigation.getParam( 'onCodeScanned' )
-    if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
-    navigation.goBack( null )
-  }
-
-  function onSend( address: string, amount: Satoshis ) {
-    const recipient = makeAddressRecipientDescription( {
-      address
-    } )
-
-    dispatch( sourceAccountSelectedForSending(
-      defaultSourceAccount
-    ) )
-    dispatch( addRecipientForSending( recipient ) )
-    dispatch( recipientSelectedForAmountSetting( recipient ) )
-    dispatch( amountForRecipientUpdated( {
-      recipient,
-      amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
-    } ) )
-
-    navigation.dispatch(
-      resetStackToSend( {
-        selectedRecipientID: recipient.id,
-      } )
-    )
-  }
 
   const renderButton = ( text ) => {
     return (
       <TouchableOpacity
         onPress={() => {
           if ( text === 'View Account' ) {
-            setGiftAcceptedModel( true )
-            const resetAction = StackActions.reset( {
-              index: 0,
-              actions: [
-                NavigationActions.navigate( {
-                  routeName: 'Landing'
-                } )
-              ],
+            setGiftAcceptedModel( false )
+            navigation.navigate( 'AccountDetails', {
+              accountShellID: sourcePrimarySubAccount.accountShellID,
             } )
-
-            navigation.dispatch( resetAction )
-            // navigation.navigate( 'AccountDetails', {
-            //   accountShellID: primarySubAccount.accountShellID,
-            // } )
           } else {
             setAcceptGiftModal( false )
             setGiftAcceptedModel( true )
@@ -140,7 +108,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   const renderGiftAcceptedtModal = () => {
     return (
-      <View style={styles.modalContentContainer}>
+      <>
         <View style={{
           marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
         }}>
@@ -148,7 +116,9 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         </View>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => { setGiftAcceptedModel( false )}}
+          onPress={() => {
+            setGiftAcceptedModel( false )
+            closeModal()}}
           style={{
             width: widthPercentageToDP( 7 ), height: widthPercentageToDP( 7 ), borderRadius: widthPercentageToDP( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -156,9 +126,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             marginTop: widthPercentageToDP( 3 ), marginRight: widthPercentageToDP( 3 )
           }}
         >
-          <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
-          }} />
+          <FontAwesome name="close" color={Colors.white} size={19}/>
         </TouchableOpacity>
         <View style={{
           marginLeft: widthPercentageToDP( 6 ),
@@ -186,15 +154,15 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         }}>
           {renderButton( 'View Account' )}
         </View>
-      </View>
+      </>
     )
   }
   const renderAcceptModal = () => {
     return (
-      <View style={styles.modalContentContainer}>
+      <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => { setAcceptGiftModal( false )}}
+          onPress={() => { setAcceptGiftModal( false ); closeModal()}}
           style={{
             width: widthPercentageToDP( 7 ), height: widthPercentageToDP( 7 ), borderRadius: widthPercentageToDP( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -329,11 +297,11 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                   marginVertical: heightPercentageToDP( 0.3 )
                 }}
               >
-                Checking Account
+                {sourceAccountHeadlineText}
               </Text>
               <Text style={styles.availableToSpendText}>
                 Available to spend
-                <Text style={styles.balanceText}> 23000</Text>
+                <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
               </Text>
             </View>
           </TouchableOpacity>
@@ -365,120 +333,17 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </>
     )
   }
   return (
-    <View style={styles.rootContainer}>
-      {/* {acceptGift &&
-        <ModalContainer visible={acceptGift} closeBottomSheet={() => { }} >
-          {renderAcceptModal()}
-        </ModalContainer>
+    <View style={styles.modalContentContainer}>
+      {acceptGift &&
+          renderAcceptModal()
       }
       {giftAccepted &&
-        <ModalContainer visible={giftAccepted} closeBottomSheet={() => { }} >
-          {renderGiftAcceptedtModal()}
-        </ModalContainer>
-      } */}
-      <ModalContainer visible={acceptGift} closeBottomSheet={() => { }} >
-        <AcceptGift navigation={navigation} closeModal={() => setAcceptGiftModal( false )}/>
-      </ModalContainer>
-
-      <ScrollView>
-        <KeyboardAwareScrollView
-          resetScrollToCoords={{
-            x: 0, y: 0
-          }}
-          scrollEnabled={false}
-          style={styles.rootContainer}
-        >
-          <HeaderSection title={strings.ScanaBitcoinaddress} />
-
-          <CoveredQRCodeScanner
-            onCodeScanned={handleBarcodeRecognized}
-            containerStyle={{
-              marginBottom: 16
-            }}
-          />
-          <Text onPress={() => setAcceptGiftModal( true )}>{'<<<<< accept gift >>>>>'} </Text>
-
-          <View style={styles.viewSectionContainer}>
-            <RecipientAddressTextInputSection
-              containerStyle={{
-                margin: 0, padding: 0
-              }}
-              placeholder={strings.Enteraddressmanually}
-              accountShell={defaultSourceAccount}
-              onAddressEntered={( address ) => {
-                onSend( address, 0 )
-              }}
-              onPaymentURIEntered={( uri ) => {
-                const decodingResult = AccountUtilities.decodePaymentURI( uri )
-
-                const address = decodingResult.address
-                const options = decodingResult.options
-
-                let amount = 0
-                if ( options?.amount )
-                  amount = options.amount
-
-                onSend( address, amount )
-              }}
-            />
-          </View>
-
-          <View
-            style={styles.floatingActionButtonContainer}
-          >
-            <Button
-              raised
-              title={strings.Receivebitcoin}
-              icon={
-                <Image
-                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                  style={{
-                    width: widthPercentageToDP( 4 ),
-                    height: widthPercentageToDP( 4 ),
-                    resizeMode: 'contain',
-                  }}
-                />
-              }
-              buttonStyle={{
-                ...ButtonStyles.floatingActionButton,
-                borderRadius: 9999,
-                paddingHorizontal: widthPercentageToDP( 5 )
-              }}
-              titleStyle={{
-                ...ButtonStyles.floatingActionButtonText,
-                marginLeft: 8,
-              }}
-              onPress={() => { navigation.navigate( 'ReceiveQR' ) }}
-            />
-          </View>
-          {
-            __DEV__ && (
-              <TouchableOpacity onPress={() => {
-                const qrScannedData = {
-                  data: '{"type":"KEEPER_REQUEST","channelKey":"nBeLSFNLxhRmuq4JWNQTBWgv","walletName":"Scas","secondaryChannelKey":"HcB1rVJrYMss0QjlyDD1KRPA","version":"1.9.0"}'
-                }
-                handleBarcodeRecognized( qrScannedData )
-              }} >
-                <Text>Continue</Text>
-              </TouchableOpacity>
-            )
-          }
-
-          <View style={{
-            marginTop: 'auto'
-          }}>
-            <BottomInfoBox
-              style
-              title={strings.Whatcanyouscan}
-              infoText={strings.scan}
-            />
-          </View>
-        </KeyboardAwareScrollView>
-      </ScrollView>
+            renderGiftAcceptedtModal()
+      }
     </View>
   )
 }
@@ -529,7 +394,7 @@ const styles = StyleSheet.create( {
   },
   modalContentContainer: {
     // height: '100%',
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.white,
     paddingBottom: heightPercentageToDP( 4 ),
   },
   rootContainer: {
@@ -550,6 +415,6 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default HomeQRScannerScreen
+export default AcceptGift
 
 

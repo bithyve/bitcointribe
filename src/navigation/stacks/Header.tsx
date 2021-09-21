@@ -6,7 +6,9 @@ import {
   ImageBackground,
   AppState,
   Alert,
-  StyleSheet
+  StyleSheet,
+  TouchableOpacity,
+  Text
 } from 'react-native'
 import {
   heightPercentageToDP, widthPercentageToDP,
@@ -15,6 +17,7 @@ import {
 import DeviceInfo from 'react-native-device-info'
 import * as RNLocalize from 'react-native-localize'
 import { connect } from 'react-redux'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import messaging from '@react-native-firebase/messaging'
 import {
   initializeTrustedContact,
@@ -110,8 +113,10 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import {
   updateLastSeen
 } from '../../store/actions/preferences'
-import Relay from '../../bitcoin/utilities/Relay'
 import QRModal from '../../pages/Accounts/QRModal'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
+import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
@@ -131,6 +136,7 @@ export enum BottomSheetKind {
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
+  GIFT_REQUEST
 }
 
 interface HomeStateTypes {
@@ -677,6 +683,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
   componentDidMount = async() => {
+    this.openBottomSheetOnLaunch( BottomSheetKind.GIFT_REQUEST )
     const {
       navigation,
       initializeHealthSetup,
@@ -1095,6 +1102,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
 
 
   onBackPress = () => {
@@ -1130,6 +1140,42 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
   };
+  renderButton = ( text ) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          if ( text === 'View Account' ) {
+            // setGiftAcceptedModel( true )
+            const resetAction = StackActions.reset( {
+              index: 0,
+              actions: [
+                NavigationActions.navigate( {
+                  routeName: 'Landing'
+                } )
+              ],
+            } )
+
+            this.props.navigation.dispatch( resetAction )
+            // navigation.navigate( 'AccountDetails', {
+            //   accountShellID: primarySubAccount.accountShellID,
+            // } )
+          } else {
+            // setAcceptGiftModal( false )
+            // setGiftAcceptedModel( true )
+          }
+        }}
+        style={{
+          ...styles.buttonView
+        }}
+      >
+        <Text style={styles.buttonText}>{text}</Text>
+      </TouchableOpacity>
+    )
+  }
+
+  renderAcceptModal = () => {
+
+  }
 
 
   renderBottomSheetContent() {
@@ -1341,6 +1387,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+        case BottomSheetKind.GIFT_REQUEST:
+          return (
+            <AcceptGift navigation={this.props.navigation} closeModal={() => this.closeBottomSheet()}/>
+          )
+
         default:
           break
     }
@@ -1426,6 +1477,54 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 }
 
 const styles = StyleSheet.create( {
+  buttonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  buttonView: {
+    height: widthPercentageToDP( '12%' ),
+    width: widthPercentageToDP( '35%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+    backgroundColor: Colors.blue,
+  },
+  availableToSpendText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
+    lineHeight: 15,
+  },
+  balanceText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
+  },
+  modalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  modalInfoText: {
+    // marginTop: hp( '3%' ),
+    marginTop: heightPercentageToDP( 0.5 ),
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: widthPercentageToDP( 12 ),
+    letterSpacing: 0.6
+  },
+  modalContentContainer: {
+    // height: '100%',
+    backgroundColor: Colors.backgroundColor,
+    paddingBottom: heightPercentageToDP( 4 ),
+  },
   cloudErrorModalImage: {
     width: widthPercentageToDP( '27%' ),
     height: widthPercentageToDP( '27%' ),
