@@ -105,7 +105,7 @@ const CreateGift = ( { navigation } ) => {
   }
 
   const renderButton = ( text ) => {
-    const isDisabled = spendableBalance <= 0 && ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance )
+    const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance )
     return(
       <TouchableOpacity
         disabled={isDisabled}
@@ -328,7 +328,7 @@ const CreateGift = ( { navigation } ) => {
 
           {renderButton( 'Create Gift' )}
           <TouchableOpacity
-            onPress={() => {}}
+            onPress={() => {navigation.goBack()}}
             style={{
               height: wp( '12%' ),
               width: wp( '27%' ),
