@@ -25,7 +25,7 @@ import {
   fetchGiftFromTemporaryChannel,
 } from '../../store/actions/trustedContacts'
 import {
-  getCurrencyImageByRegion, processFriendsAndFamilyQR,
+  getCurrencyImageByRegion, processRequestQR,
 } from '../../common/CommonFunctions/index'
 import NotificationListContent from '../../components/NotificationListContent'
 // import AddContactAddressBook from '../Contacts/AddContactAddressBook'
@@ -311,8 +311,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
       onCodeScanned:  ( qrData )=>{
-        console.log( 'qrData', qrData )
-        const trustedContactRequest = processFriendsAndFamilyQR( qrData )
+        const { trustedContactRequest, giftRequest } = processRequestQR( qrData )
         if( trustedContactRequest ){
           this.setState( {
             trustedContactRequest
@@ -324,6 +323,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             )
           }
           )
+        }
+        if( giftRequest ){
+          this.setState( {
+            giftRequest
+          } )
         }
       },
     } )
