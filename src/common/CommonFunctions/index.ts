@@ -451,68 +451,71 @@ export const processDeepLink = ( deepLink: string ) => {
   }
 }
 
-export const processFriendsAndFamilyQR = ( qrData: string ) => {
+export const processRequestQR = ( qrData: string ) => {
   try {
-    const scannedData = JSON.parse( qrData )
-    // disabled check version compatibility
-    // if ( scannedData.version ) {
-    //   const isAppVersionCompatible = await checkAppVersionCompatibility( {
-    //     relayCheckMethod: scannedData.type,
-    //     version: scannedData.ver,
-    //   } )
+    const parsedData = JSON.parse( qrData )
 
-    //   if ( !isAppVersionCompatible ) {
-    //     return
-    //   }
-    // }
-
-    let trustedContactRequest
-    switch ( scannedData.type ) {
+    let trustedContactRequest, giftRequest
+    switch ( parsedData.type ) {
         case QRCodeTypes.CONTACT_REQUEST:
         case QRCodeTypes.PRIMARY_KEEPER_REQUEST:
         case QRCodeTypes.KEEPER_REQUEST:
           trustedContactRequest = {
-            walletName: scannedData.walletName,
-            encryptedChannelKeys: scannedData.encryptedChannelKeys,
-            encryptionType: scannedData.encryptionType,
-            encryptionHint: scannedData.encryptionHint,
-            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST || scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
-            isPrimaryKeeper: scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
+            walletName: parsedData.walletName,
+            encryptedChannelKeys: parsedData.encryptedChannelKeys,
+            encryptionType: parsedData.encryptionType,
+            encryptionHint: parsedData.encryptionHint,
+            isKeeper: parsedData.type === QRCodeTypes.KEEPER_REQUEST || parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
             isExistingContact: false,
             isQR: true,
-            version: scannedData.version,
-            type: scannedData.type,
+            version: parsedData.version,
+            type: parsedData.type,
           }
           break
 
         case QRCodeTypes.EXISTING_CONTACT:
           trustedContactRequest = {
-            walletName: scannedData.walletName,
-            channelKey: scannedData.channelKey,
-            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            walletName: parsedData.walletName,
+            channelKey: parsedData.channelKey,
+            contactsSecondaryChannelKey: parsedData.secondaryChannelKey,
             isKeeper: true,
             isQR: true,
-            version: scannedData.version,
-            type: scannedData.type,
+            version: parsedData.version,
+            type: parsedData.type,
             isExistingContact: true
           }
           break
 
         case QRCodeTypes.APPROVE_KEEPER:
           trustedContactRequest = {
-            walletName: scannedData.walletName,
-            channelKey: scannedData.channelKey,
-            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            walletName: parsedData.walletName,
+            channelKey: parsedData.channelKey,
+            contactsSecondaryChannelKey: parsedData.secondaryChannelKey,
             isKeeper: false,
             isQR: true,
-            version: scannedData.version,
-            type: scannedData.type,
+            version: parsedData.version,
+            type: parsedData.type,
             isExistingContact: false
+          }
+          break
+
+        case QRCodeTypes.GIFT:
+          giftRequest = {
+            walletName: parsedData.walletName,
+            encryptedChannelKeys: parsedData.encryptedChannelKeys,
+            encryptionType: parsedData.encryptionType,
+            encryptionHint: parsedData.encryptionHint,
+            isQR: true,
+            version: parsedData.version,
+            type: parsedData.type,
           }
           break
     }
 
-    return trustedContactRequest
+    return {
+      trustedContactRequest, giftRequest
+    }
   } catch ( err ) {
     Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
   }

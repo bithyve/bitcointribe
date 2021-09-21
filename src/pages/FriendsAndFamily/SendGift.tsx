@@ -16,10 +16,11 @@ import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
+import DeviceInfo from 'react-native-device-info'
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
@@ -40,8 +41,17 @@ export default function AddContactSendRequest( props ) {
   }
 
   useEffect( () => {
-    setGiftDeepLink( generateGiftLink( giftToSend, wallet.walletName ) )
-    setGiftQR( JSON.stringify( giftToSend ) )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateGiftLink( giftToSend, wallet.walletName )
+    setGiftDeepLink( deepLink )
+    setGiftQR( JSON.stringify( {
+      type: QRCodeTypes.GIFT,
+      encryptedChannelKeys: encryptedChannelKeys,
+      encryptionType,
+      encryptionHint,
+      walletName: wallet.walletName,
+      version: DeviceInfo.getVersion(),
+    } ) )
+
   }, [ giftId ] )
 
   return (

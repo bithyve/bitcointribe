@@ -83,6 +83,7 @@ import {
   restoreTrustedContactsWatcher,
   updateWalletNameToChannelWatcher,
   updateWalletWatcher,
+  fetchTemporaryChannelGiftWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -222,6 +223,8 @@ const rootSaga = function* () {
     restoreTrustedContactsWatcher,
     updateWalletNameToChannelWatcher,
     updateWalletWatcher,
+    fetchTemporaryChannelGiftWatcher,
+
     // bhr
     initHealthWatcher,
     updateSharesHealthWatcher,

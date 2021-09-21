@@ -135,16 +135,18 @@ export function generateGiftLink( giftToSend: Gift, walletName: string,  ) {
   try{
     Relay.updateTemporaryChannel( encryptionKey, giftToSend ) // non-awaited upload
     const deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
-    const { deepLink } = generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
       deepLinkKind: DeepLinkKind.GIFT,
       encryptionType: DeepLinkEncryptionType.OTP,
       encryptionKey: deepLinkEncryptionOTP,
       walletName: walletName,
       keysToEncrypt: encryptionKey
     } )
-    return deepLink
+    return {
+      deepLink, encryptedChannelKeys, encryptionType, encryptionHint
+    }
   } catch( err ){
-    return ''
+    console.log( 'An error occured while generating gift: ', err )
   }
 }
 
