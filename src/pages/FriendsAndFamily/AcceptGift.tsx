@@ -1,28 +1,9 @@
 import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
-import ListStyles from '../../common/Styles/ListStyles'
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
-import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
-import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { useDispatch, useSelector } from 'react-redux'
-import { clearTransfer } from '../../store/actions/accounts'
-import { resetStackToSend } from '../../navigation/actions/NavigationActions'
-import { Button } from 'react-native-elements'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
+import {  useSelector } from 'react-redux'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
-import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
-import { Satoshis } from '../../common/data/enums/UnitAliases'
 import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { AccountsState } from '../../store/reducers/accounts'
-import { translations } from '../../common/content/LocContext'
-import ModalContainer from '../../components/home/ModalContainer'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -31,7 +12,6 @@ import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
-import { NavigationActions, StackActions } from 'react-navigation'
 import idx from 'idx'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
@@ -46,27 +26,17 @@ export type Props = {
 
 
 const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
-  const dispatch = useDispatch()
-  const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
   const [ acceptGift, setAcceptGiftModal ] = useState( true )
   const [ giftAccepted, setGiftAcceptedModel ] = useState( false )
-  const [ defaultAccount ] = useState( AccountType.CHECKING_ACCOUNT )
-  const sourceAccountShell = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
-  const sendingAccount = sourceAccountShell.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
-  console.log( 'sendingAccount', sendingAccount )
+  const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
+  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
 
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
-  console.log( 'spendableBalance', spendableBalance )
 
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
-  const availableBalance = useMemo( () => {
-    return AccountShell.getSpendableBalance( sendingAccount )
-  }, [ sendingAccount ] )
-
-  // const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
@@ -75,9 +45,6 @@ const AcceptGift: React.FC<Props> = ( { navigation, closeModal }: Props ) => {
     // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
 
   }, [ sourcePrimarySubAccount ] )
-  const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
-  const common = translations[ 'common' ]
-  const strings = translations[ 'accounts' ]
 
   const renderButton = ( text ) => {
     return (

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   View,
   StyleSheet,
@@ -6,7 +6,6 @@ import {
   SafeAreaView,
   Text,
   StatusBar,
-  Platform,
   TextInput,
   KeyboardAvoidingView,
   ScrollView
@@ -22,7 +21,6 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { LocalizationContext } from '../../common/content/LocContext'
 import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
 import Dollar from '../../assets/images/svgs/icon_dollar.svg'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
@@ -40,34 +38,24 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import AccountShell from '../../common/data/models/AccountShell'
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
   const accountsState: AccountsState = useSelector( state => state.accounts )
-  const { translations } = useContext( LocalizationContext )
-  const strings = translations[ 'f&f' ]
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
   const [ giftModal, setGiftModal ] =useState( false )
   const [ createdGift, setCreatedGift ] = useState( null )
-  const [ defaultAccount ] = useState( AccountType.CHECKING_ACCOUNT )
-  const sourceAccountShell = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
-  const sendingAccount = sourceAccountShell.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+  const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
+  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
-  console.log( 'spendableBalance', spendableBalance )
 
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
-  const availableBalance = useMemo( () => {
-    return AccountShell.getSpendableBalance( sendingAccount )
-  }, [ sendingAccount ] )
-
-  // const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle

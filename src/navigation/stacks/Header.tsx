@@ -333,6 +333,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         if( giftRequest ){
           this.setState( {
             giftRequest
+          },  () => {
+            this.openBottomSheetOnLaunch(
+              BottomSheetKind.GIFT_REQUEST,
+              1
+            )
           } )
         }
       },
@@ -645,30 +650,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
     const { trustedContactRequest, swanRequest, giftRequest } = await processDeepLink( url )
-    if( trustedContactRequest || giftRequest ){
-      // if( giftRequest ){
-      //   console.log( {
-      //     giftRequest
-      //   } )
-      //   console.log( 'xyz' )
-      //   const decryptedKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, 'LQIESB' )
-      //   console.log( {
-      //     decryptedKey
-      //   } )
-      //   const res = await Relay.fetchTemporaryChannel( decryptedKey )
-      //   console.log( {
-      //     res
-      //   } )
-      //   return
-      // }
-
+    if( trustedContactRequest ){
       this.setState( {
         trustedContactRequest,
-        giftRequest
       },
       () => {
         this.openBottomSheetOnLaunch(
           BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+          1
+        )
+      }
+      )
+    } else if ( giftRequest ) {
+      this.setState( {
+        giftRequest,
+      },
+      () => {
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.GIFT_REQUEST,
           1
         )
       }
@@ -682,8 +681,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     }
   }
+
   componentDidMount = async() => {
     this.openBottomSheetOnLaunch( BottomSheetKind.GIFT_REQUEST )
+
     const {
       navigation,
       initializeHealthSetup,
@@ -826,16 +827,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     }
 
-    if ( recoveryRequest || trustedContactRequest || giftRequest ) {
+    if ( trustedContactRequest || recoveryRequest ) {
       this.setState(
         {
           recoveryRequest,
           trustedContactRequest,
-          giftRequest,
         },
         () => {
           this.openBottomSheetOnLaunch(
             BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
+        }
+      )
+    } else if( giftRequest ){
+      this.setState(
+        {
+          giftRequest,
+        },
+        () => {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
             1
           )
         }
