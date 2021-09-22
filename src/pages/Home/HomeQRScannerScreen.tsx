@@ -18,7 +18,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
 import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
-import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import { AccountType, DeepLinkEncryptionType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { AccountsState } from '../../store/reducers/accounts'
 import { translations } from '../../common/content/LocContext'
@@ -381,7 +381,14 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         </ModalContainer>
       } */}
       <ModalContainer visible={acceptGift} closeBottomSheet={() => { }} >
-        <AcceptGift navigation={navigation} closeModal={() => setAcceptGiftModal( false )}/>
+        <AcceptGift
+          navigation={navigation}
+          closeModal={() => setAcceptGiftModal( false )}
+          walletName={'ASDF'}
+          giftAmount={'100'}
+          inputType={DeepLinkEncryptionType.OTP}
+          hint={'@HEXA'}
+        />
       </ModalContainer>
 
       <ScrollView>
