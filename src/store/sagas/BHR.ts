@@ -1659,7 +1659,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
               levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
             }
           } else {
-            console.log( 'instream', instream )
+            // console.log( 'instream', instream )
             if( instream ) {
               levelInfo[ j ].status = Math.round( Math.abs( Date.now() - instream.metaData.flags.lastSeen ) / ( 60 * 1000 ) ) > config.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 ? 'notAccessible' : 'accessible'
               levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen

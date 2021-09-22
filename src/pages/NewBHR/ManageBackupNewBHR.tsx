@@ -168,8 +168,6 @@ class ManageBackupNewBHR extends Component<
   ManageBackupNewBHRStateTypes
 > {
   focusListener: any;
-  NoInternetBottomSheet: any;
-  unsubscribe: any;
   ErrorBottomSheet: any;
   keeperTypeBottomSheet: any;
   QrBottomSheet: any;
@@ -182,8 +180,6 @@ class ManageBackupNewBHR extends Component<
     super( props, context )
     super( props )
     this.focusListener = null
-    this.NoInternetBottomSheet = React.createRef()
-    this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
     const s3 = dbManager.getBHR()
