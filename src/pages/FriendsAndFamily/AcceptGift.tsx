@@ -25,10 +25,11 @@ export type Props = {
   onGiftRequestAccepted: () => void;
   walletName: string;
   giftAmount: string;
+  note: string;
 };
 
 
-const AcceptGift: React.FC<Props> = ( { navigation, closeModal, onGiftRequestAccepted, walletName, giftAmount }: Props ) => {
+const AcceptGift: React.FC<Props> = ( { navigation, closeModal, onGiftRequestAccepted, walletName, giftAmount, note }: Props ) => {
   const [ acceptGift, setAcceptGiftModal ] = useState( true )
   const [ giftAccepted, setGiftAcceptedModel ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )

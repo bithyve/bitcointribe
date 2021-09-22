@@ -1049,6 +1049,7 @@ export default class AccountOperations {
         amount,
         type: GiftType.SENT,
         status: GiftStatus.CREATED,
+        createdAt: Date.now(),
         sender: {
           walletId: walletDetails.walletId,
           walletName: walletDetails.walletName,

@@ -959,6 +959,7 @@ export interface Gift {
   amount: number,
   type: GiftType,
   status: GiftStatus,
+  createdAt: number,
   sender: {
     walletId: string,
     accountId: string,

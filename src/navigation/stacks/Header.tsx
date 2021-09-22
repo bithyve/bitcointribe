@@ -1407,7 +1407,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               closeModal={() => this.closeBottomSheet()}
               onGiftRequestAccepted={this.onGiftRequestAccepted}
               walletName={this.state.giftRequest.walletName}
-              giftAmount={this.state.giftRequest.amount}/>
+              giftAmount={this.state.giftRequest.amount}
+              note={this.state.giftRequest.note}/>
           )
 
         default:
