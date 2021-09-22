@@ -31,7 +31,7 @@ export default function SendGift( props ) {
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const giftToSend = accountsState.gifts[ giftId ]
   const [ note, setNote ] = useState( '' )
-
+  const [ encryptWithOTP, setEncryptWithOTP ] = useState( false )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
 
@@ -40,7 +40,7 @@ export default function SendGift( props ) {
   }
 
   useEffect( () => {
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateGiftLink( giftToSend, wallet.walletName, note )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP } = generateGiftLink( giftToSend, wallet.walletName, note, encryptWithOTP )
     setGiftDeepLink( deepLink )
     setGiftQR( JSON.stringify( {
       type: QRCodeTypes.GIFT,

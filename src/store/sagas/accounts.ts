@@ -150,7 +150,7 @@ export function generateGiftLink( giftToSend: Gift, walletName: string, note?: s
       }
     } )
     return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint
+      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )

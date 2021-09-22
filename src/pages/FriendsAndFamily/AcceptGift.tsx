@@ -25,7 +25,7 @@ import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 export type Props = {
   navigation: any;
   closeModal: () => void;
-  onGiftRequestAccepted: () => void;
+  onGiftRequestAccepted: ( otp ) => void;
   walletName: string;
   giftAmount: string;
   inputType: string;
@@ -295,7 +295,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               accountShellID: sourcePrimarySubAccount.accountShellID,
             } )
           } else if( text === 'Accept Gift' ) {
-            onGiftRequestAccepted()
+            onGiftRequestAccepted( passcode )
             setAcceptGiftModal( false )
             setGiftAcceptedModel( true )
           }
