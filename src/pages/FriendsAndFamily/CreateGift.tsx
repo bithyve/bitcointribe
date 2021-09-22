@@ -171,9 +171,10 @@ const CreateGift = ( { navigation } ) => {
 
         </View>
         <View style={{
-          marginLeft: wp( 6 ),
+          marginLeft: wp( 4 ), flexDirection: 'row'
         }}>
           {renderButton( 'Send Gift' )}
+          {renderButton( 'Add F&F and Send' )}
         </View>
       </View>
     )
@@ -370,7 +371,8 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     height: wp( '12%' ),
-    width: wp( '27%' ),
+    // width: wp( '27%' ),
+    paddingHorizontal: wp( 2 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -380,6 +382,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
+    marginLeft: wp( 2 )
   },
   disabledButtonView: {
     height: wp( '12%' ),
@@ -393,6 +396,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.lightBlue,
+    marginLeft: wp( 2 )
   },
   imageView: {
     width: 18,

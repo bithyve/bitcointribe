@@ -350,7 +350,7 @@ export default function AddContactAddressBook( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack()
+            props.navigation.pop( props.navigation.state.params?.fromScreen === 'Gift' ? 2 : 1 )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>

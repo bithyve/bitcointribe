@@ -104,7 +104,7 @@ const ManageGifts = ( { navigation } ) => {
             date={new Date()}
             image={<GiftCard />}
             onPress={() => {navigation.navigate( 'AddContact', {
-              fromScreen: 'Gift',
+              fromScreen: ' ManageGift',
               giftId: item.id
             } )}}
           />
