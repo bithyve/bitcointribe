@@ -333,7 +333,7 @@
       "optionally": "Du kannst optional eine Zwei-Faktor-Authentifizierung hinzufügen, wenn Du den Link/QR über einen unverschlüsselten Kanal sendest",
       "number": "Dein Kontakt muss seine Telefonnummer {0} bestätigen, um die Anfrage zu akzeptieren",
       "email": "Dein Kontakt muss seine E-Mail-Adresse {0} bestätigen, um die Anfrage zu akzeptieren",
-      "otp": "Ihr Kontakt muss das Einmalkennwort ${0} bestätigen, um die Anfrage zu akzeptieren",
+      "otp": "Ihr Kontakt muss das Einmalkennwort {0} bestätigen, um die Anfrage zu akzeptieren",
       "SelectSecond": "Wähle Zwei-Faktor-\nAuthentifizierung",
       "select1": "Wähle einen der folgenden Punkte aus, um ihn als Zwei-Faktor-Authentifizierung zu deinem Link/QR hinzuzufügen",
       "ConfirmPhone": "Telefonnummer bestätigen",

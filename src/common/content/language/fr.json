@@ -333,7 +333,7 @@
       "optionally": "Vous pouvez également ajouter un deuxième facteur lorsque vous envoyez le lien/ QR via un canal non chiffré",
       "number": "Votre contact devra valider son numéro de téléphone {0} pour accepter la demande",
       "email": "Votre contact devra valider son email {0} pour accepter la demande",
-      "otp": "Votre contact devra confirmer l'OTP ${0} pour accepter la demande",
+      "otp": "Votre contact devra confirmer l'OTP {0} pour accepter la demande",
       "SelectSecond": "Sélectionnez le\ndeuxième facteur",
       "select1": "Sélectionnez l'une des options ci-dessous pour l'ajouter comme deuxième facteur à votre lien / QR",
       "ConfirmPhone": "Confirmer le numéro de téléphone",

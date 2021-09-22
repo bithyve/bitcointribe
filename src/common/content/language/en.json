@@ -327,7 +327,7 @@
       "optionally": "You can optionally add a second factor when you are sending the link/ QR through an unencrypted channel",
       "number": "Your contact will have to verify their phone number {0} to accept the request",
       "email": "Your contact will have to verify their email {0} to accept the request",
-      "otp": "Your contact will have to confirm the OTP ${0} to accept the request",
+      "otp": "Your contact will have to confirm the OTP {0} to accept the request",
       "SelectSecond": "Select the\nsecond factor",
       "select1": "Select one of the below to add as a second factor to your link/QR",
       "ConfirmPhone": "Confirm phone number",
