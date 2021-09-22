@@ -16,11 +16,12 @@ import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import { GiftStatus, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
 import DeviceInfo from 'react-native-device-info'
+import { updateGift } from '../../store/actions/accounts'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -34,6 +35,7 @@ export default function SendGift( props ) {
   const [ encryptWithOTP, setEncryptWithOTP ] = useState( false )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
+  const dispatch = useDispatch()
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
@@ -52,6 +54,9 @@ export default function SendGift( props ) {
       note,
       version: DeviceInfo.getVersion(),
     } ) )
+
+    giftToSend.status = GiftStatus.SENT
+    dispatch( updateGift( giftToSend ) )
   }, [ giftId, note ] )
 
   return (
