@@ -488,7 +488,7 @@
       "incompletelevel3": "Double backup complete, upgrade backup to Level 3",
       "complete": "Multi-Key backup complete",
       "PleaseSetPasswordTitle": "Please set password",
-      "PleaseSetPasswordInfo": "It seems you have not set passward to backup. Please set password first to proceed.",
+      "PleaseSetPasswordInfo": "It seems you have not set password to backup. Please set password first to proceed.",
       "saveyourRecovery": "You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document",
       "Questionscreated": "Security Questions created",
       "Passwordconfirmed": "Security Password confirmed",
