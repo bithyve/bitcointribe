@@ -26,17 +26,31 @@ import DashedContainer from './DashedContainer'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import idx from 'idx'
+import { Gift, GiftStatus } from '../../bitcoin/utilities/Interface'
 
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
-  const giftArr = Object.values( gifts?? {
+  const giftArr: Gift[] = Object.values( gifts?? {
   } )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
+
+  const processGift = ( selectedGift: Gift ) => {
+
+    switch( selectedGift.status ){
+        case GiftStatus.CREATED:
+          navigation.navigate( 'AddContact', {
+            fromScreen: 'Gift',
+            giftId: selectedGift.id
+          } )
+          break
+    }
+  }
+
   return (
     <ScrollView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -101,12 +115,11 @@ const ManageGifts = ( { navigation } ) => {
             titleText={'Available Gift'}
             subText={'Lorem ipsum dolor sit amet'}
             amt={numberWithCommas( item.amount )}
-            date={new Date()}
+            date={item.createdAt}
             image={<GiftCard />}
-            onPress={() => {navigation.navigate( 'AddContact', {
-              fromScreen: 'Gift',
-              giftId: item.id
-            } )}}
+            onPress={()=> {
+              processGift( item )
+            }}
           />
         )
       } )

@@ -22,17 +22,16 @@ import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
 import DeviceInfo from 'react-native-device-info'
 
-export default function AddContactSendRequest( props ) {
-  const { translations, formatString } = useContext( LocalizationContext )
+export default function SendGift( props ) {
+  const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
-  const common = translations[ 'common' ]
-  const dispatch = useDispatch()
 
   const giftId = props.navigation.getParam( 'giftId' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const giftToSend = accountsState.gifts[ giftId ]
-
+  const [ note, setNote ] = useState( '' )
+  const [ encryptWithOTP, setEncryptWithOTP ] = useState( false )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
 
@@ -41,7 +40,7 @@ export default function AddContactSendRequest( props ) {
   }
 
   useEffect( () => {
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateGiftLink( giftToSend, wallet.walletName )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP } = generateGiftLink( giftToSend, wallet.walletName, note, encryptWithOTP )
     setGiftDeepLink( deepLink )
     setGiftQR( JSON.stringify( {
       type: QRCodeTypes.GIFT,
@@ -49,10 +48,11 @@ export default function AddContactSendRequest( props ) {
       encryptionType,
       encryptionHint,
       walletName: wallet.walletName,
+      amount: giftToSend.amount,
+      note,
       version: DeviceInfo.getVersion(),
     } ) )
-
-  }, [ giftId ] )
+  }, [ giftId, note ] )
 
   return (
     <ScrollView style={{
@@ -102,6 +102,7 @@ export default function AddContactSendRequest( props ) {
         amt={numberWithCommas( giftToSend.amount )}
         onPressShare={() => {
         }}
+        onSetNote={setNote}
       />
     </ScrollView>
   )

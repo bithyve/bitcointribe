@@ -1405,15 +1405,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.GIFT_REQUEST:
+          const giftRequest = this.state.giftRequest
           return (
             <AcceptGift
               navigation={this.props.navigation}
               closeModal={() => this.closeBottomSheet()}
               onGiftRequestAccepted={this.onGiftRequestAccepted}
-              walletName={this.state.giftRequest.walletName}
-              giftAmount={this.state.giftRequest.amount}
-              inputType={DeepLinkEncryptionType.OTP}
-              hint={'@HEXA'}
+              walletName={giftRequest.walletName}
+              giftAmount={giftRequest.amount}
+              inputType={giftRequest.encryptionType}
+              hint={giftRequest.encryptionHint}
+              note={giftRequest.note}
             />
           )
 

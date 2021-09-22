@@ -171,6 +171,9 @@ export default function RequestKeyFromContact( props ) {
             onChangeText={( text ) => {
               setNote( text )
             }}
+            onEndEditing={()=> {
+              if( props.onSetNote ) props.onSetNote( note )
+            }}
           />
         </View>
       </>
