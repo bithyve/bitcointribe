@@ -472,7 +472,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                     letterSpacing: 0.6,
                     marginTop: hp( 1 )
                   }}>
-                    This is to get you started! Welcome to the world of Bitcoin
+                    {note? note: 'This is to get you started! Welcome to the world of Bitcoin'}
                   </Text>
                 </View>
 
