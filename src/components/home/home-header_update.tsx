@@ -124,7 +124,7 @@ const HomeHeader = ( {
         </View>
       }
       {isFirstMessageBold ? <Text style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageOne}</Text>{messageTwo}</Text> : <Text style={{
@@ -150,21 +150,45 @@ const HomeHeader = ( {
         isFirstMessageBold: false, messageOne: strings.init, messageTwo: '', isError: false, isInit: true
       }
     }
-    if( currentLevel == 0 ){
-      return {
-        isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
+    if( levelData ){
+      for ( let i = 0; i < levelData.length; i++ ) {
+        const element = levelData[ i ]
+        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
+          return {
+            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: strings.needAttention, isError: true
+          }
+        }
+        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
+          return {
+            isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: strings.needAttention, isError: true
+          }
+        }
       }
-    } else if( currentLevel === 1 ){
+      if( currentLevel == 0 ){
+        return {
+          isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
+        }
+      } else if( currentLevel === 1 ){
+        return {
+          isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
+        }
+      } else if( currentLevel === 2 ){
+        return {
+          isFirstMessageBold: false, messageOne: strings.l2, messageTwo: '', isError: false
+        }
+      } else if( currentLevel == 3 ){
+        return {
+          isFirstMessageBold: true, messageOne: strings.l3, messageTwo: '', isError: false
+        }
+      }
+    }
+    if( currentLevel === 1 ){
       return {
         isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
       }
-    } else if( currentLevel === 2 ){
+    } else {
       return {
-        isFirstMessageBold: false, messageOne: strings.l2, messageTwo: '', isError: false
-      }
-    } else if( currentLevel == 3 ){
-      return {
-        isFirstMessageBold: true, messageOne: strings.l3, messageTwo: '', isError: false
+        isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
       }
     }
   }

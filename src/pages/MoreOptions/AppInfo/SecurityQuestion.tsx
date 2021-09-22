@@ -24,6 +24,7 @@ import { withNavigation } from 'react-navigation'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
+import { Wallet } from '../../../bitcoin/utilities/Interface'
 
 
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -33,7 +34,7 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 function SecurityQuestion( props ) {
-  const { security } = useSelector(
+  const { security }: Wallet = useSelector(
     ( state ) => state.storage.wallet,
   )
   const strings  = translations[ 'settings' ]
@@ -42,8 +43,8 @@ function SecurityQuestion( props ) {
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const [ showNote, setShowNote ] = useState( true )
   const [ height, setHeight ] = useState( 12 )
-  const securityQuestion = security.question
-  const securityAnswer = security.answer
+  const securityQuestion = security && security.question ? security.question : ''
+  const securityAnswer = security && security.answer ? security.answer : ''
   const [ showAnswer, setShowAnswer ] = useState( false )
   const [ answer, setAnswer ] = useState( '' )
   const [ errorText, setErrorText ] = useState( '' )

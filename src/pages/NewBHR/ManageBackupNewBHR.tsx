@@ -8,7 +8,7 @@ import {
   ScrollView,
   RefreshControl,
   ImageBackground,
-  Image,
+  Platform,
   InteractionManager
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -105,6 +105,8 @@ interface ManageBackupNewBHRStateTypes {
   onKeeperButtonClick: boolean;
   strings: object;
   common: object;
+  iCloudErrors: object;
+  driveErrors: object;
   cloudErrorModal: boolean;
   errorMsg: string;
 }
@@ -223,6 +225,8 @@ class ManageBackupNewBHR extends Component<
       onKeeperButtonClick: false,
       strings: translations [ 'bhr' ],
       common: translations [ 'common' ],
+      iCloudErrors: translations [ 'iCloudErrors' ],
+      driveErrors: translations [ 'driveErrors' ],
       cloudErrorModal: false,
       errorMsg: ''
     }
@@ -545,8 +549,12 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.cloudErrorMessage != this.props.cloudErrorMessage && this.props.cloudErrorMessage != '' ){
+      const message = Platform.select( {
+        ios: this.state.iCloudErrors[ this.props.cloudErrorMessage ],
+        android: this.state.driveErrors[ this.props.cloudErrorMessage ],
+      } )
       this.setState( {
-        cloudErrorModal: true, errorMsg: this.props.cloudErrorMessage
+        cloudErrorModal: true, errorMsg: message
       } )
       this.props.setCloudErrorMessage( '' )
     }
@@ -808,8 +816,8 @@ class ManageBackupNewBHR extends Component<
             cloudErrorModal: false
           } )
         }}
-        proceedButtonText={'Try Again'}
-        cancelButtonText={'ok'}
+        proceedButtonText={this.state.common[ 'tryAgain' ]}
+        cancelButtonText={this.state.common[ 'ok' ]}
         isIgnoreButton={true}
         isBottomImage={true}
         isBottomImageStyle={{
@@ -840,7 +848,7 @@ class ManageBackupNewBHR extends Component<
   onKeeperButtonPress = ( value, keeperNumber ) =>{
     requestAnimationFrame( () => {
       if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-        this.props.setLevelCompletionError( this.state.strings[ 'Pleasesetpassword' ], LevelStatus.FAILED )
+        this.props.setLevelCompletionError( this.state.strings[ 'PleaseSetPasswordTitle' ], this.state.strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED )
         return
       }
       if( value.id == 1 && keeperNumber == 2 ){

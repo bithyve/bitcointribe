@@ -40,12 +40,12 @@ export default [
     country_code: 'pt',
   },
   {
-    language: 'Marathi',
-    displayTitle: 'मराठी',
-    iso: 'mr',
-    flag: '🇮🇳',
-    country: 'India',
-    country_code: 'mr',
+    language: 'Russian',
+    displayTitle: 'Pусский',
+    iso: 'ru',
+    flag: '🇷🇺',
+    country: 'Russia',
+    country_code: 'ru',
   },
   {
     language: 'Hindi',
@@ -55,7 +55,14 @@ export default [
     country: 'India',
     country_code: 'hi',
   },
-  {
+  /*{
+    language: 'Marathi',
+    displayTitle: 'मराठी',
+    iso: 'mr',
+    flag: '🇮🇳',
+    country: 'India',
+    country_code: 'mr',
+  },{
     language: 'Gujarati',
     displayTitle: 'ગુજરાતી',
     iso: 'gu',
@@ -70,6 +77,6 @@ export default [
     flag: '🇮🇳',
     country: 'India',
     country_code: 'bn',
-  },
+  },*/
 ]
 

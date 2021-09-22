@@ -13,6 +13,7 @@
   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
   <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
+
   <!-- These require runtime permissions on M -->
   <uses-permission android:name="android.permission.CAMERA" />
   <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -24,6 +25,11 @@
         android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
     <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+
+    <queries>
+        <package android:name="com.google.android.gms"/>
+        <package android:name="com.android.chrome"/>
+    </queries>
     <!-- < Only if you're using GCM or localNotificationSchedule() > -->
   <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:theme="@style/AppTheme" android:networkSecurityConfig="@xml/network_security_config" android:requestLegacyExternalStorage="true">
     <activity
