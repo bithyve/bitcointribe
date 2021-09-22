@@ -409,7 +409,7 @@
       "saving7": "Sua conta poupança é uma conta com várias assinaturas 2 de 3 em que você mantém duas chaves (uma neste dispositivo e a outra no dispositivo Keeper)",
       "saving8": "BitHyve contém a terceira chave, que é usada apenas quando você assina primeiro e apresenta o código 2FA correto. O BitHyve nunca guarda nenhum de seus fundos. A chave mantida no Dispositivo Keeper pode ser usada para migrar seus fundos do Hexa, mesmo se pararmos de oferecer suporte ao aplicativo!",
       "CompleteLevel2": "Nível 2 completo",
-      "Level2": "Você só pode adicionar uma conta poupança quando tiver concluído o nível 2",
+      "Level2": "Você pode usar a conta poupança depois de atualizar seu backup para o nível 2",
       "NameDescription": "Nome e Descrição",
       "NameDescriptionSub": "Personalize propriedades de exibição",
       "ShowxPub": "Mostrar xPub",

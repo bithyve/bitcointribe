@@ -409,7 +409,7 @@
       "saving7": "Dein Sparkonto ist mit 2 von 3 Signaturen geschützt, bei dem du zwei Schlüssel besitzt (einen auf diesem Gerät und den anderen auf deinem Keeper-Gerät)",
       "saving8": "BitHyve besitzt den dritten Schlüssel, der nur verwendet wird, wenn Du nach der Authentifizierung den korrekten 2FA-Code angibst. BitHyve verwahrt keine Guthaben. Der Schlüssel, der auf dem Keeper Device gespeichert ist, kann verwendet werden, um dein Guthaben von Hexa zu migrieren, selbst wenn wir den Support für die App einstellen!",
       "CompleteLevel2": "Schließe Level 2 ab",
-      "Level2": "Du kannst nur ein Sparkonto hinzufügen, wenn Level 2 abgeschlossen ist",
+      "Level2": "Puede usar la cuenta de ahorros una vez que haya actualizado su copia de seguridad al nivel 2",
       "NameDescription": "Name und Beschreibung",
       "NameDescriptionSub": "Anzeigeeigenschaften anpassen",
       "ShowxPub": "xPub anzeigen",

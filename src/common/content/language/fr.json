@@ -409,7 +409,7 @@
       "saving7": "Votre compte d'épargne est un compte multi-signatures 2 sur 3 dont vous détenez deux clés (une sur cet appareil et l'autre sur votre appareil Keeper)",
       "saving8": "BitHyve détient la troisième clé qui n'est utilisée que lorsque vous vous connectez et présentez le bon code 2FA. BitHyve ne conserve jamais vos fonds. La clé détenue sur l'appareil Keeper peut être utilisée pour migrer vos fonds depuis Hexa, même si nous cessons de prendre en charge l'application !",
       "CompleteLevel2": "Complétez le niveau 2",
-      "Level2": "Vous ne pourrez ajouter un compte d'épargne qu'après avoir complété le niveau 2",
+      "Level2": "Vous pouvez utiliser le compte d'épargne une fois que vous avez mis à niveau votre sauvegarde au niveau 2",
       "NameDescription": "Nom & Description",
       "NameDescriptionSub": "Personnaliser les propriétés d'affichage",
       "ShowxPub": "Afficher le xPub",
