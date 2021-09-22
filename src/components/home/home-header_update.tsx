@@ -124,7 +124,7 @@ const HomeHeader = ( {
         </View>
       }
       {isFirstMessageBold ? <Text style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageOne}</Text>{messageTwo}</Text> : <Text style={{
