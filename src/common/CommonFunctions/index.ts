@@ -349,7 +349,7 @@ export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: Tr
   return deepLinkKind
 }
 
-export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string } ) => {
+export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, extraData?: any } ) => {
 
   let encryptedChannelKeys: string
   let encryptionHint: string
@@ -373,14 +373,29 @@ export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey,
   const appType = config.APP_STAGE
   const appVersion = DeviceInfo.getVersion()
 
-  const deepLink =
-      `https://hexawallet.io
-      /${appType}
-      /${deepLinkKind}` +
-      `/${walletName}` +
-      `/${encryptedChannelKeys}` +
-      `/${encryptionType}-${encryptionHint}` +
-      `/v${appVersion}`
+  let deepLink: string
+
+  if( deepLinkKind === DeepLinkKind.GIFT ){
+    deepLink =
+    `https://hexawallet.io
+    /${appType}
+    /${deepLinkKind}` +
+    `/${walletName}` +
+    `/${encryptedChannelKeys}` +
+    `/${encryptionType}-${encryptionHint}` +
+    `/${extraData.amount}`+
+    `/${extraData.note}` +
+    `/v${appVersion}`
+  } else {
+    deepLink =
+    `https://hexawallet.io
+    /${appType}
+    /${deepLinkKind}` +
+    `/${walletName}` +
+    `/${encryptedChannelKeys}` +
+    `/${encryptionType}-${encryptionHint}` +
+    `/v${appVersion}`
+  }
 
   return {
     deepLink, encryptedChannelKeys, encryptionType, encryptionHint
@@ -439,6 +454,8 @@ export const processDeepLink = ( deepLink: string ) => {
             encryptionHint,
             isQR: false,
             deepLinkKind: splits[ 4 ],
+            amount: splits[ 8 ],
+            note: splits[ 9 ],
             version,
           }
           return {
@@ -507,6 +524,8 @@ export const processRequestQR = ( qrData: string ) => {
             encryptionType: parsedData.encryptionType,
             encryptionHint: parsedData.encryptionHint,
             isQR: true,
+            amount: parsedData.amount,
+            note: parsedData.note,
             version: parsedData.version,
             type: parsedData.type,
           }
