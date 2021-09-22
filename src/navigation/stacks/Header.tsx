@@ -683,6 +683,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
+    // this.openBottomSheetOnLaunch(
+    //   BottomSheetKind.GIFT_REQUEST,
+    //   1
+    // )
     const {
       navigation,
       initializeHealthSetup,
@@ -1401,14 +1405,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.GIFT_REQUEST:
+          const giftRequest = this.state.giftRequest
           return (
             <AcceptGift
               navigation={this.props.navigation}
               closeModal={() => this.closeBottomSheet()}
               onGiftRequestAccepted={this.onGiftRequestAccepted}
-              walletName={this.state.giftRequest.walletName}
-              giftAmount={this.state.giftRequest.amount}
-              note={this.state.giftRequest.note}/>
+              walletName={giftRequest.walletName}
+              giftAmount={giftRequest.amount}
+              inputType={giftRequest.encryptionType}
+              hint={giftRequest.encryptionHint}
+              note={giftRequest.note}
+            />
           )
 
         default:
