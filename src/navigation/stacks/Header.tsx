@@ -683,6 +683,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
+    this.openBottomSheetOnLaunch(
+      BottomSheetKind.GIFT_REQUEST,
+      1
+    )
     const {
       navigation,
       initializeHealthSetup,
@@ -1407,7 +1411,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               closeModal={() => this.closeBottomSheet()}
               onGiftRequestAccepted={this.onGiftRequestAccepted}
               walletName={this.state.giftRequest.walletName}
-              giftAmount={this.state.giftRequest.amount}/>
+              giftAmount={this.state.giftRequest.amount}
+              inputType={DeepLinkEncryptionType.NUMBER}
+              hint={'dndnadna'}
+            />
           )
 
         default:
