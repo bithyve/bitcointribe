@@ -80,33 +80,36 @@ const CreateGift = ( { navigation } ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-  const closeModal = ( navigate ) => {
-    setGiftModal( false )
-    if ( navigate ) {
-      navigation.navigate( 'AddContact', {
-        fromScreen: 'Gift',
-        giftId: ( createdGift as Gift ).id
-      } )
-    } else {
-      navigation.goBack()
-    }
-  }
-
   const renderButton = ( text ) => {
     const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance )
     return(
       <TouchableOpacity
         disabled={isDisabled}
         onPress={()=>{
-          if( text === 'Create Gift' ){
-            dispatch( generateGifts( {
-              amounts: [ Number( amount ) ],
-              includeFee: includeFees
-            } ) )
-            setInitGiftCreation( true )
-          }
-          else if ( text === 'Send Gift' ) {
-            closeModal( true )
+
+          switch( text ){
+              case 'Create Gift':
+                dispatch( generateGifts( {
+                  amounts: [ Number( amount ) ],
+                  includeFee: includeFees
+                } ) )
+                setInitGiftCreation( true )
+                break
+
+              case 'Add F&F and Send':
+                setGiftModal( false )
+                navigation.navigate( 'AddContact', {
+                  fromScreen: 'Gift',
+                  giftId: ( createdGift as Gift ).id
+                } )
+                break
+
+              case 'Send Gift':
+                setGiftModal( false )
+                navigation.navigate( 'SendGift', {
+                  giftId: ( createdGift as Gift ).id,
+                } )
+                break
           }
         }}
         style={isDisabled ? {
@@ -131,7 +134,10 @@ const CreateGift = ( { navigation } ) => {
         </View>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {closeModal( false )}}
+          onPress={() => {
+            setGiftModal( false )
+            navigation.goBack()
+          }}
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
             alignSelf: 'flex-end',

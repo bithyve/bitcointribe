@@ -84,6 +84,7 @@ import {
   updateWalletNameToChannelWatcher,
   updateWalletWatcher,
   fetchTemporaryChannelGiftWatcher,
+  syncGiftsStatusWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -224,6 +225,7 @@ const rootSaga = function* () {
     updateWalletNameToChannelWatcher,
     updateWalletWatcher,
     fetchTemporaryChannelGiftWatcher,
+    syncGiftsStatusWatcher,
 
     // bhr
     initHealthWatcher,

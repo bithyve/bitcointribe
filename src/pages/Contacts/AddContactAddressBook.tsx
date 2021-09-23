@@ -319,25 +319,14 @@ export default function AddContactAddressBook( props ) {
     const skippedContact = {
       id: uuid(),
     }
-
-    if ( props.navigation.state.params?.fromScreen === 'Gift' ){
-      props.navigation.navigate( 'SendGift', {
-        SelectedContact: selectedContacts,
-        giftId: props.navigation.state.params?.giftId,
-        headerText: strings.addContact,
-        subHeaderText:strings.send,
-        contactText:strings.adding,
-        showDone:true,
-      } )
-    } else {
-      props.navigation.navigate( 'AddContactSendRequest', {
-        SelectedContact: [ skippedContact ],
-        headerText: strings.addContact,
-        subHeaderText:strings.send,
-        contactText:strings.adding,
-        showDone:true,
-      } )
-    }
+    props.navigation.navigate( 'AddContactSendRequest', {
+      SelectedContact: [ skippedContact ],
+      giftId: props.navigation.state.params?.giftId,
+      headerText: strings.addContact,
+      subHeaderText:strings.send,
+      contactText:strings.adding,
+      showDone:true,
+    } )
   }
 
   return (

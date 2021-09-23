@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState, } from 'react'
+import React, { useCallback, useContext, useEffect, useState, } from 'react'
 import {
   View,
   StyleSheet,
@@ -12,7 +12,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -28,6 +28,7 @@ import ImageStyles from '../../common/Styles/ImageStyles'
 import idx from 'idx'
 import { Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
+import { syncGiftsStatus } from '../../store/actions/trustedContacts'
 
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
@@ -35,19 +36,26 @@ const ManageGifts = ( { navigation } ) => {
   const [ giftDetails, showGiftDetails ] = useState( false )
   const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
-  const giftArr: Gift[] = Object.values( gifts?? {
-  } )
-  console.log( 'giftArr', giftArr )
+  const [ availableGifts, setAvailableGifts ] = useState( [] )
+  const [ otherGifts, setOtherGifts ] = useState( [] )
+  const dispatch = useDispatch()
 
-  const createdList = []
-  const otherList = []
-  giftArr.forEach( ( item ) => {
-    if ( item.status === GiftStatus.CREATED ) {
-      createdList.push( item )
-    } else {
-      otherList.push( item )
-    }
-  } )
+  useEffect( ()=> {
+    const availableGifts = []
+    const otherGifts = []
+    Object.values( gifts ).forEach( ( gift: Gift ) => {
+      if ( gift.status === GiftStatus.CREATED ) availableGifts.push( gift )
+      else otherGifts.push( gift )
+    } )
+
+    setAvailableGifts( availableGifts )
+    setOtherGifts( otherGifts )
+  }, [ gifts ] )
+
+  useEffect( () => {
+    dispatch( syncGiftsStatus() )
+  }, [] )
+
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
@@ -152,8 +160,8 @@ const ManageGifts = ( { navigation } ) => {
 
         </TouchableOpacity>
       </View>
-      {createdList.length > 0 &&
-      createdList.map( ( item, index ) => {
+      {availableGifts.length > 0 &&
+      availableGifts.map( ( item, index ) => {
         return (
           <DashedContainer
             key={index}
@@ -173,8 +181,8 @@ const ManageGifts = ( { navigation } ) => {
         style={{
           marginHorizontal: wp( 6 ), marginTop: hp( 1 )
         }}>
-        {otherList.length > 0 &&
-          otherList.map( ( item, index ) => {
+        {otherGifts.length > 0 &&
+          otherGifts.map( ( item, index ) => {
             return(
               <TouchableOpacity
                 key={index}

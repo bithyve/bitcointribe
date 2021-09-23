@@ -16,6 +16,7 @@ import {
   UPDATE_WALLET_NAME_TO_CHANNEL,
   UPDATE_WALLET_NAME,
   FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+  SYNC_GIFTS_STATUS,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -203,6 +204,55 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
 export const fetchTemporaryChannelGiftWatcher = createWatcher(
   fetchTemporaryChannelGiftWorker,
   FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+)
+
+
+
+function* syncGiftsStatusWorker() {
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const accounts: Accounts = accountsState.accounts
+  const trustedContacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
+  )
+
+  for( const giftId in storedGifts ){
+    const gift = storedGifts[ giftId ]
+    if( gift.type === GiftType.SENT ){
+      if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ) {
+
+        if( gift.receiver?.contactId ){
+          // sent to F&F
+          const permanentChannelAddress = gift.receiver.contactId
+          for( const channelKey in  trustedContacts ){
+            const contact = trustedContacts[ channelKey ]
+            if( contact.permanentChannelAddress === permanentChannelAddress ){
+              if( contact.streamId ) {
+                // contact approved & established(implies gift acceptance)
+                gift.status = GiftStatus.CLAIMED
+                yield put( updateGift( gift ) )
+              } else {
+                if( !contact.isActive ){
+                  // contact rejected(implies gift rejection)
+                  gift.status = GiftStatus.REJECTED
+                  yield put( updateGift( gift ) )
+                }
+              }
+            }
+          }
+
+        } else {
+          // sent independently
+        }
+      }
+    }
+  }
+
+}
+
+export const syncGiftsStatusWatcher = createWatcher(
+  syncGiftsStatusWorker,
+  SYNC_GIFTS_STATUS,
 )
 
 export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, updateWI?: boolean, }} ) {

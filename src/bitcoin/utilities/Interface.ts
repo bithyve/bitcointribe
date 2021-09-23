@@ -950,7 +950,8 @@ export enum GiftStatus {
   CREATED = 'CREATED',
   SENT = 'SENT',
   CLAIMED = 'CLAIMED',
-  EXPIRED = 'EXPIRED'
+  EXPIRED = 'EXPIRED',
+  REJECTED = 'REJECTED'
 }
 export interface Gift {
   id: string,

@@ -17,6 +17,7 @@ export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
 export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
 export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
 export const FETCH_GIFT_FROM_TEMPORARY_CHANNEL = 'FETCH_GIFT_FROM_TEMPORARY_CHANNEL'
+export const SYNC_GIFTS_STATUS = 'SYNC_GIFTS_STATUS'
 
 export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
@@ -149,6 +150,12 @@ export const fetchGiftFromTemporaryChannel = ( decryptionKey: string ) => {
     payload: {
       decryptionKey
     },
+  }
+}
+
+export const syncGiftsStatus = () => {
+  return {
+    type: SYNC_GIFTS_STATUS
   }
 }
 
