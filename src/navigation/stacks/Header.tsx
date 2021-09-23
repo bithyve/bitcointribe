@@ -570,9 +570,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // smallIcon:'ic_notification',
       onNotification: ( notification ) => {
         this.props.getMessages()
-        const { content } = notification.data
-        const notificationId = JSON.parse( content ).notificationId
-        this.currentNotificationId = notificationId
+        if( notification.data && notification.data.content ){
+          const { content } = notification.data
+          const notificationId = JSON.parse( content ).notificationId
+          this.currentNotificationId = notificationId
+        } else if( notification.data[ 'google.message_id' ] ){
+          const notificationId = notification.data[ 'google.message_id' ]
+          this.currentNotificationId = notificationId
+        }
         this.notificationCheck()
         // process the notification
         if ( notification.data ) {
@@ -1405,15 +1410,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.GIFT_REQUEST:
+          const giftRequest = this.state.giftRequest
           return (
             <AcceptGift
               navigation={this.props.navigation}
               closeModal={() => this.closeBottomSheet()}
               onGiftRequestAccepted={this.onGiftRequestAccepted}
-              walletName={this.state.giftRequest.walletName}
-              giftAmount={this.state.giftRequest.amount}
-              inputType={DeepLinkEncryptionType.OTP}
-              hint={'@HEXA'}
+              walletName={giftRequest.walletName}
+              giftAmount={giftRequest.amount}
+              inputType={giftRequest.encryptionType}
+              hint={giftRequest.encryptionHint}
+              note={giftRequest.note}
             />
           )
 

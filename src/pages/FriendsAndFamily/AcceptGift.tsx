@@ -25,15 +25,16 @@ import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 export type Props = {
   navigation: any;
   closeModal: () => void;
-  onGiftRequestAccepted: () => void;
+  onGiftRequestAccepted: ( otp ) => void;
   walletName: string;
   giftAmount: string;
   inputType: string;
   hint: string;
+  note: string,
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, walletName, giftAmount, inputType, hint }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, walletName, giftAmount, inputType, hint, note }: Props ) {
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
@@ -294,7 +295,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               accountShellID: sourcePrimarySubAccount.accountShellID,
             } )
           } else if( text === 'Accept Gift' ) {
-            onGiftRequestAccepted()
+            onGiftRequestAccepted( passcode )
             setAcceptGiftModal( false )
             setGiftAcceptedModel( true )
           }
@@ -471,7 +472,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                     letterSpacing: 0.6,
                     marginTop: hp( 1 )
                   }}>
-                    This is to get you started! Welcome to the world of Bitcoin
+                    {note? note: 'This is to get you started! Welcome to the world of Bitcoin'}
                   </Text>
                 </View>
 

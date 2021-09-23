@@ -130,7 +130,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export function generateGiftLink( giftToSend: Gift, walletName: string, shouldEncrypt?: boolean  ) {
+export function generateGiftLink( giftToSend: Gift, walletName: string, note?: string, shouldEncrypt?: boolean  ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     Relay.updateTemporaryChannel( encryptionKey, giftToSend ) // non-awaited upload
@@ -143,10 +143,14 @@ export function generateGiftLink( giftToSend: Gift, walletName: string, shouldEn
       encryptionType: shouldEncrypt? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT,
       encryptionKey: deepLinkEncryptionOTP,
       walletName: walletName,
-      keysToEncrypt: encryptionKey
+      keysToEncrypt: encryptionKey,
+      extraData: {
+        amount: giftToSend.amount,
+        note
+      }
     } )
     return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint
+      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )
