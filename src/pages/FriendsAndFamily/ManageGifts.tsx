@@ -1,4 +1,4 @@
-import React, { useContext, } from 'react'
+import React, { useCallback, useContext, useState, } from 'react'
 import {
   View,
   StyleSheet,
@@ -26,15 +26,28 @@ import DashedContainer from './DashedContainer'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import idx from 'idx'
-import { Gift, GiftStatus } from '../../bitcoin/utilities/Interface'
+import { Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
+  const [ giftDetails, showGiftDetails ] = useState( false )
+  const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
   const giftArr: Gift[] = Object.values( gifts?? {
   } )
+  console.log( 'giftArr', giftArr )
 
+  const createdList = []
+  const otherList = []
+  giftArr.forEach( ( item ) => {
+    if ( item.status === GiftStatus.CREATED ) {
+      createdList.push( item )
+    } else {
+      otherList.push( item )
+    }
+  } )
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
@@ -44,12 +57,39 @@ const ManageGifts = ( { navigation } ) => {
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
           navigation.navigate( 'AddContact', {
-            fromScreen: 'Gift',
+            fromScreen: 'ManageGift',
             giftId: selectedGift.id
           } )
           break
     }
   }
+  const renderGiftDetailsModel = useCallback( () => {
+    return(
+      <View style={{
+        backgroundColor: Colors.white,
+        height: hp( 30 ),
+        paddingHorizontal: wp( 6 )
+      }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {showGiftDetails( false )}}
+          style={{
+            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+            marginTop: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} style={{
+          // marginTop: hp( 0.5 )
+          }} />
+        </TouchableOpacity>
+        <Text style={styles.modalTitleText}>{giftInfo.type === GiftType.SENT ? giftInfo.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift' }</Text>
+        <Text></Text>
+        <Text>Amount: {giftInfo.amount}</Text>
+      </View>
+    )
+  }, [ giftInfo ] )
 
   return (
     <ScrollView style={{
@@ -61,6 +101,11 @@ const ManageGifts = ( { navigation } ) => {
         }}
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      {giftDetails &&
+      <ModalContainer visible={giftDetails} closeBottomSheet={() => {}} >
+        {renderGiftDetailsModel()}
+      </ModalContainer>
+      }
       <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor
       } ]}>
@@ -107,8 +152,8 @@ const ManageGifts = ( { navigation } ) => {
 
         </TouchableOpacity>
       </View>
-      {giftArr.length > 0 &&
-      giftArr.map( ( item, index ) => {
+      {createdList.length > 0 &&
+      createdList.map( ( item, index ) => {
         return (
           <DashedContainer
             key={index}
@@ -124,66 +169,80 @@ const ManageGifts = ( { navigation } ) => {
         )
       } )
       }
-      <View style={{
-        marginHorizontal: wp( 6 ), marginTop: hp( 1 )
-      }}>
-        {[ 1, 2, 3, 4 ].map( ( item ) => {
-          return(
-            <>
-              {/* <View style={{
+      <View
+        style={{
+          marginHorizontal: wp( 6 ), marginTop: hp( 1 )
+        }}>
+        {otherList.length > 0 &&
+          otherList.map( ( item, index ) => {
+            return(
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  showGiftDetails( true )
+                  setGiftInfo( item )
+                }
+                }
+              >
+                {/* <View style={{
                 backgroundColor: Colors.backgroundColor1, borderRadius: wp( 2 )
               }}>
 
               </View> */}
-              <View style={{
-                flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 )
-              }}>
-                <Text style={{
-                  color: Colors.lightTextColor,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontWeight: '600'
-                }}>Sent to recipient</Text>
-                <Text style={{
-                  color: Colors.lightTextColor,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  alignSelf: 'flex-end'
-                }}>
-                  {moment(  ).format( 'lll' )}
-                </Text>
-              </View>
-
-              <TouchableOpacity style={{
-                ...styles.listItem
-              }}
-              >
-                <View style={styles.avatarContainer}>
-                  {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-                </View>
                 <View style={{
-                  alignItems: 'flex-start', marginHorizontal: wp( 2 )
+                  flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 )
                 }}>
                   <Text style={{
-                    textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
-                  }}>Uraiah Cabe
-
-                  </Text>
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontWeight: '600'
+                  }}>{item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift' } </Text>
                   <Text style={{
-                    ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
-                  }}>Lorem ipsum dolor sit amet</Text>
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    alignSelf: 'flex-end'
+                  }}>
+                    {moment( item.createdAt ).format( 'lll' )}
+                  </Text>
+                </View>
+
+                <View style={{
+                  ...styles.listItem
+                }}
+                >
+                  <View style={styles.avatarContainer}>
+                    {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
+                  </View>
+                  <View style={{
+                    alignItems: 'flex-start', marginHorizontal: wp( 2 )
+                  }}>
+                    <Text style={{
+                      textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                    }}>{item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 35 ? `${item.receiver?.contactId.substr( 0, 32 )}...` : item.receiver?.contactId}
+
+                    </Text>
+                    <Text style={{
+                      ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
+                    }}>Lorem ipsum dolor sit amet</Text>
+                  </View>
                 </View>
               </TouchableOpacity>
-            </>
-          )
+            )
 
-        } )}
+          } )}
       </View>
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
+  modalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
   secondNamePieceText: {
     fontSize: RFValue( 10 ),
     color: Colors.lightTextColor
