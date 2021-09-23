@@ -208,7 +208,7 @@ export const fetchTemporaryChannelGiftWatcher = createWatcher(
 
 
 
-function* syncGiftsStatusWorker( { payload }: { payload: {decryptionKey: string } } ) {
+function* syncGiftsStatusWorker() {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
