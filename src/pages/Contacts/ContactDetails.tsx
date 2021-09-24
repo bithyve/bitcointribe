@@ -32,7 +32,7 @@ import DeviceInfo from 'react-native-device-info'
 import {
   ErrorSending, updateSecondaryShard, getApprovalFromKeepers, setOpenToApproval
 } from '../../store/actions/BHR'
-import { UploadSMSuccessfully } from '../../store/actions/BHR'
+import { UploadSMSuccessfully, setSecondaryDataInfoStatus } from '../../store/actions/BHR'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
@@ -58,6 +58,7 @@ import CardWithArrow from '../../components/CardWithArrow'
 import More from '../../assets/images/svgs/icon_more.svg'
 import { translations } from '../../common/content/LocContext'
 import QRModal from '../Accounts/QRModal'
+import Loader from '../../components/loader'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -113,6 +114,9 @@ interface ContactDetailsPropTypes {
   updateSecondaryShard: any;
   getApprovalFromKeepers: any;
   setOpenToApproval: any;
+  updateSecondaryShardStatus: boolean;
+  getSecondaryDataInfoStatus: boolean;
+  setSecondaryDataInfoStatus: any;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -137,6 +141,8 @@ interface ContactDetailsStateTypes {
   showContactDetails: boolean;
   availableKeepersName: string;
   showQRScanner: boolean;
+  showQRClicked: boolean;
+  showLoader: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -218,6 +224,8 @@ class ContactDetails extends PureComponent<
       showContactDetails: false,
       availableKeepersName: '',
       showQRScanner: false,
+      showQRClicked: false,
+      showLoader: false,
     }
 
     this.contact = this.props.navigation.state.params.contact
@@ -229,6 +237,10 @@ class ContactDetails extends PureComponent<
   }
 
   componentDidMount() {
+    this.props.setSecondaryDataInfoStatus( false )
+    this.setState( {
+      showLoader: false
+    } )
     const { trustedContacts } = this.props
     this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
     this.setIsSendDisabledListener = this.props.navigation.addListener(
@@ -241,7 +253,7 @@ class ContactDetails extends PureComponent<
         } )
         if( this.isFromApproval ) {
           this.setState( {
-            showQRScanner: true
+            showQRClicked: true
           } )
         }
         this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
@@ -281,31 +293,48 @@ class ContactDetails extends PureComponent<
       ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
       this.props.ErrorSending( null )
     }
-
-    if( prevProps.openApproval != this.props.openApproval && this.contactsType == 'I am the Keeper of' ){
-      if( this.props.openApproval ){
-        if( availableKeepers.length ){
-          const availableKeepersName = ( ()=>{
-            if( availableKeepers.length > 3 ){
-              return availableKeepers.slice( 2, availableKeepers.length-1 ).map( ( value )=> {
-                if( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' '+value.name
-              } ).join()
-            } else if( availableKeepers.length == 3 ){
-              return availableKeepers.slice( 2, availableKeepers.length ).map( ( value )=> {
-                if( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' '+value.name
-              } ).join()
-            } else return ''
-          } )()
-          this.setState( {
-            availableKeepersName: availableKeepersName
-          } )
-        }
+    console.log( 'openApproval', this.props.openApproval )
+    if( prevProps.availableKeepers != this.props.availableKeepers && this.contactsType == 'I am the Keeper of' ) {
+      if( availableKeepers.length ) {
+        const availableKeepersName = ( ()=>{
+          if( availableKeepers.length > 3 ) {
+            return availableKeepers.slice( 2, availableKeepers.length-1 ).map( ( value )=> {
+              if( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' '+value.name
+            } ).join()
+          } else if( availableKeepers.length == 3 ) {
+            return availableKeepers.slice( 2, availableKeepers.length ).map( ( value )=> {
+              if( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' '+value.name
+            } ).join()
+          } else return ''
+        } )()
         this.setState( {
-          showQRScanner: true
+          availableKeepersName: availableKeepersName
         } )
       }
       else this.setState( {
-        showQRScanner: false, availableKeepersName: ''
+        availableKeepersName: ''
+      } )
+    }
+
+    console.log( 'this.props.getSecondaryDataInfoStatus', this.props.getSecondaryDataInfoStatus )
+    console.log( 'this.props.openApproval', this.props.openApproval )
+    if( prevProps.getSecondaryDataInfoStatus != this.props.getSecondaryDataInfoStatus ){
+      if( this.props.getSecondaryDataInfoStatus ) this.setState( {
+        showLoader: true
+      } )
+      else {
+        this.setState( {
+          showLoader: false
+        } )
+      }
+    }
+
+    if( prevProps.openApproval != this.props.openApproval || prevState.showQRClicked != this.state.showQRClicked ){
+      if( this.props.openApproval && this.state.showQRClicked ) this.setState( {
+        showQRScanner: true
+      } )
+      else this.setState( {
+        showQRScanner: false, showQRClicked: false
       } )
     }
 
@@ -1196,9 +1225,9 @@ class ContactDetails extends PureComponent<
             )}
           </View>
         )}
-        {this.contactsType == 'I am the Keeper of' && !this.props.openApproval && (
+        { this.contactsType == 'I am the Keeper of' && !this.props.openApproval && this.props.availableKeepers.length == 0 && (
           <View style={styles.keeperViewStyle}>
-            {!this.props.openApproval && <TouchableOpacity
+            {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
               disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING )}
               style={{
                 ...styles.bottomButton,
@@ -1216,7 +1245,7 @@ class ContactDetails extends PureComponent<
               <Text style={styles.buttonText}>Show Recovery Key</Text>
               <Text style={styles.buttonSubText}>During wallet recovery process</Text>
             </TouchableOpacity>}
-            {!this.props.openApproval && <TouchableOpacity
+            {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
               style={{
                 ...styles.bottomButton,
                 // justifyContent: 'space-around',
@@ -1267,15 +1296,17 @@ class ContactDetails extends PureComponent<
             ) : null}
           </View>
         )}
-        {this.props.openApproval && <View style={{
+        {this.props.openApproval && this.props.availableKeepers.length && <View style={{
           ...styles.keeperViewStyle, justifyContent: 'flex-start', paddingLeft: wp( 5 )
         }}><TouchableOpacity
             style={{
               ...styles.bottomButton,
             }}
             onPress={() => {
+              this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
+
               this.setState( {
-                showQRScanner: true
+                showQRClicked: true
               } )
             }}
           >
@@ -1375,10 +1406,10 @@ class ContactDetails extends PureComponent<
           {this.SendShareModalFunction}
         </ModalContainer>
         <ModalContainer visible={this.state.showQRScanner} closeBottomSheet={() => this.setState( {
-          showQRScanner: false
+          showQRScanner: false, showQRClicked: false
         } )}>
           <QRModal
-            isFromKeeperDeviceHistory={false}
+            isFromKeeperDeviceHistory={true}
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
@@ -1390,11 +1421,11 @@ class ContactDetails extends PureComponent<
             }}
             onBackPress={() => {
               this.setState( {
-                showQRScanner: false
+                showQRScanner: false, showQRClicked: false
               } )
             }}
             onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Vb","channelId":"512bb7333ad41a23ba020094a353dd1d68bd1be308d034ae34d4093bda6df77d","streamId":"4b2d7a09c","secondaryChannelKey":"3tL5w2bYwDXgefH0Pn3Dq7CS","version":"2.0","walletId":"9fae1e28434d386e10eb79d78cc8d7f7f3f11aad36ae5ade97e1f89334a55041"}'
+              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Saaaaaaaa","channelId":"1033c8a86e92232fd979cfa3ca0108c6c9e172dfc27380e31d04c6ed9280a8d6","streamId":"ae1d2a9b5","secondaryChannelKey":"zFtHWgh0NbCYRDxGJiTkKdOW","version":"2.0.0","walletId":"5c4da7520f27cea7689956531ca7bae5ea5c8fe819c68336ad04a1b63fad2276"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />
@@ -1412,6 +1443,7 @@ class ContactDetails extends PureComponent<
           renderContent={this.SendShareModalFunction}
           renderHeader={this.SendModalFunction}
         /> */}
+        {this.state.showLoader ? <Loader /> : null}
       </View>
     )
   }
@@ -1441,6 +1473,8 @@ const mapStateToProps = ( state ) => {
     availableKeepers: idx( state, ( _ ) => _.bhr.availableKeepers ),
     openApproval: idx( state, ( _ ) => _.bhr.openApproval ),
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
+    updateSecondaryShardStatus: idx( state, ( _ ) => _.bhr.loading.updateSecondaryShardStatus ),
+    getSecondaryDataInfoStatus: idx( state, ( _ ) => _.bhr.loading.getSecondaryDataInfoStatus ),
   }
 }
 export default connect( mapStateToProps, {
@@ -1454,7 +1488,8 @@ export default connect( mapStateToProps, {
   UploadSMSuccessfully,
   updateSecondaryShard,
   getApprovalFromKeepers,
-  setOpenToApproval
+  setOpenToApproval,
+  setSecondaryDataInfoStatus,
 } )( ContactDetails )
 
 const styles = StyleSheet.create( {

@@ -367,6 +367,12 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
+    if( ( prevProps.trustedContacts != this.props.trustedContacts ) || ( prevProps.levelData != this.props.levelData ) ){
+      this.setState( {
+        refreshControlLoader: false
+      } )
+    }
+
     if( prevProps.isLevelToNotSetupStatus != this.props.isLevelToNotSetupStatus && this.props.isLevelToNotSetupStatus ){
       this.setState( {
         showLoader: false
@@ -635,25 +641,32 @@ class ManageBackupNewBHR extends Component<
   };
 
   onRefresh = async () => {
+    this.setState( {
+      refreshControlLoader: true
+    } )
     const contacts: Trusted_Contacts = this.props.trustedContacts
     const channelUpdates = []
     // Contact or Device type
     if( contacts ){
-      for( const ck of Object.keys( contacts ) ){
-        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
-          // initiate permanent channel
-          const channelUpdate =  {
-            contactInfo: {
-              channelKey: ck,
-            }
-          }
-          channelUpdates.push( channelUpdate )
-        }
-      }
+      // for( const ck of Object.keys( contacts ) ){
+      //   if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
+      //     // initiate permanent channel
+      //     const channelUpdate =  {
+      //       contactInfo: {
+      //         channelKey: ck,
+      //       }
+      //     }
+      //     channelUpdates.push( channelUpdate )
+      //   }
+      // }
+      // this.props.syncPermanentChannels( {
+      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      //   channelUpdates: channelUpdates,
+      //   metaSync: true
+      // } )
       this.props.syncPermanentChannels( {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-        channelUpdates: channelUpdates,
-        metaSync: true
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true,
       } )
     }
     this.props.modifyLevelData( )

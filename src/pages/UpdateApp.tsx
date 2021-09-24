@@ -39,7 +39,7 @@ export default function UpdateApp( props ) {
     : ''
 
   const [ releaseNotes, setReleaseNotes ] = useState( [] )
-  const [ isUpdateMandotary, setIsUpdateMandotary ] = useState( false )
+  const [ isUpdateMandatory, setIsUpdateMandatory ] = useState( false )
   const [ releaseData, setReleaseData ] = useState( {
   } )
   const [ isUpdateInValid, setIsUpdateInValid ] = useState( false )
@@ -61,8 +61,8 @@ export default function UpdateApp( props ) {
       }
 
       if ( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit == 0 ) {
-        setIsUpdateMandotary( true )
-      }
+        setIsUpdateMandatory( true )
+      } else if( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit < 0 ) setIsUpdateMandatory( true )
 
       setReleaseData( releaseDataObj[ 0 ] )
     }
@@ -72,9 +72,8 @@ export default function UpdateApp( props ) {
     */
     if ( !isOpenFromNotificationList ) {
       ( async () => {
-        let releaseData
         const releaseDataOld = releaseCasesValue
-        //console.log( 'releaseDataOld', releaseDataOld )
+        let releaseData = releaseDataOld
         if ( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit > 0 ) {
           if ( !releaseDataOld ) {
             releaseData = {
@@ -102,7 +101,9 @@ export default function UpdateApp( props ) {
           ( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit == 0 ) ||
           ( releaseDataOld && releaseDataOld.reminderLimit == 0 )
         ) {
-          setIsUpdateMandotary( true )
+          setIsUpdateMandatory( true )
+        } else if( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit < 0 ){
+          setIsUpdateMandatory( true )
         }
         setReleaseData( releaseData )
 
@@ -206,7 +207,7 @@ export default function UpdateApp( props ) {
               {isUpdateInValid ? 'Your app is already updated' :
                 'We’re better than ever\nTime to update'}
             </Text>
-            {!isUpdateMandotary && !isUpdateInValid ? (
+            {!isUpdateMandatory && !isUpdateInValid ? (
               <TouchableOpacity
                 style={{
                   height: wp( '8%' ),
@@ -222,15 +223,13 @@ export default function UpdateApp( props ) {
                 }}
                 onPress={() => {
                   if ( isOpenFromNotificationList ) props.navigation.goBack()
-                  else
-                    onClick( true, false )
+                  else onClick( true, false )
                 }}
               >
                 <Text
                   onPress={() => {
                     if ( isOpenFromNotificationList ) props.navigation.goBack()
-                    else
-                      onClick( true, false )
+                    else onClick( true, false )
                   }}
                   style={{
                     color: Colors.white,
@@ -315,7 +314,7 @@ export default function UpdateApp( props ) {
                 <Text style={styles.proceedButtonText}>Update Now</Text>
               </TouchableOpacity> ) : null}
 
-            {!isUpdateMandotary && !isUpdateInValid ? (
+            {!isUpdateMandatory && !isUpdateInValid ? (
               <TouchableOpacity
                 onPress={() => {
                   if ( isOpenFromNotificationList ) props.navigation.goBack()

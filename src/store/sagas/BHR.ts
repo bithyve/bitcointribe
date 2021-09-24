@@ -2363,14 +2363,22 @@ function* updateSecondaryShardWorker( { payload } ) {
             ).encryptedData
           }
 
-          yield call( TrustedContactsOperations.updateStream, {
+          const response = yield call( TrustedContactsOperations.updateStream, {
             channelKey: trustedContact.channelKey, streamUpdates: instreamUpdates
           } )
 
-          Toast( 'Approved Successfully' )
-          yield put ( setOpenToApproval( false, [], null ) )
+          if( response && response.updated ){
+            Toast( 'Approved Successfully' )
+            yield put( setOpenToApproval( false, [], null ) )
+          } else {
+            Toast( 'Network Error' )
+            yield put( setOpenToApproval( false, [], null ) )
+          }
         }
-      } else Toast( 'First scan qr from primary device to setup keeper' )
+      } else {
+        yield put( setOpenToApproval( false, [], null ) )
+        Toast( 'First scan qr from primary device to setup keeper' )
+      }
     }
     yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
   } catch ( error ) {
@@ -2387,6 +2395,7 @@ export const updateSecondaryShardWatcher = createWatcher(
 )
 
 function* getApprovalFromKeeperWorker( { payload } ) {
+  yield put( switchS3LoaderKeeper( 'getSecondaryDataInfoStatus' ) )
   const { flag, contact } : { flag: boolean, contact: TrustedContact} = payload
   const res = yield call( TrustedContactsOperations.retrieveFromStream, {
     walletId: contact.walletID, channelKey: contact.channelKey, options: {
@@ -2394,7 +2403,7 @@ function* getApprovalFromKeeperWorker( { payload } ) {
       retrieveSecondaryData: true
     }, secondaryChannelKey: contact.contactsSecondaryChannelKey
   } )
-  if( res.backupData && res.backupData.keeperInfo && ( !res.secondaryData || !res.secondaryData.secondaryMnemonicShard ) ){
+  if( res.backupData && res.backupData.keeperInfo && !res.secondaryData ){
     if( res.backupData.keeperInfo ) {
       const contactData = makeContactRecipientDescription(
         contact.channelKey,
@@ -2403,7 +2412,8 @@ function* getApprovalFromKeeperWorker( { payload } ) {
       )
       yield put( setOpenToApproval( true, res.backupData.keeperInfo, contactData ) )
     }
-  } else yield put( setOpenToApproval( false, [], null ) )
+  } else { yield put( setOpenToApproval( false, [], null ) ) }
+  yield put( switchS3LoaderKeeper( 'getSecondaryDataInfoStatus' ) )
 }
 
 export const getApprovalFromKeeperWatcher = createWatcher(
