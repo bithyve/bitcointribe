@@ -36,6 +36,7 @@ const SenderInfo = 'SenderInfo'
 const RecipientInfo = 'RecipientInfo'
 const Recipient = 'Recipient'
 const TransactionsNote = 'TransactionsNote'
+const ContactImage = 'ContactImage'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -694,7 +695,16 @@ export const ContactDetailsSchema: ObjectSchema = {
       type: 'string', optional: true,
     },
     image: {
-      type: 'string', optional: true,
+      type: ContactImage, optional: true,
+    },
+  },
+}
+
+export const ContactImageSchema: ObjectSchema = {
+  name: ContactImage,
+  properties: {
+    uri: {
+      type: 'string', optional: true
     },
   },
 }
