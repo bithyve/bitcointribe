@@ -42,7 +42,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
   const accountsState: AccountsState = useSelector( state => state.accounts )
-  const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
+  const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
@@ -275,7 +275,7 @@ const CreateGift = ( { navigation } ) => {
         </TouchableOpacity>
         <KeyboardAvoidingView
           style={{
-            ...pswdInputStyle,
+            ...inputStyle,
             flexDirection: 'row',
             alignItems: 'center',
             borderColor: Colors.white,
