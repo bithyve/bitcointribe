@@ -1062,7 +1062,7 @@ class ContactDetails extends PureComponent<
                   <Text style={[ styles.lastSeenText, {
                     fontFamily: Fonts.FiraSansMediumItalic,
                   } ]}>
-                    {agoTextForLastSeen( this.contact.lastSeenActive ) === 'today' ? this.strings[ 'today' ] : agoTextForLastSeen( this.contact.lastSeenActive )}
+                    {agoTextForLastSeen( this.contact.lastSeenActive ) === 'today' ? this.common[ 'today' ] : agoTextForLastSeen( this.contact.lastSeenActive )}
                   </Text>
                 ) : (
                   <Text style={[ styles.lastSeenText, {
