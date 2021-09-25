@@ -385,6 +385,7 @@ export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey,
     `/${encryptionType}-${encryptionHint}` +
     `/${extraData.amount}`+
     `/${extraData.note}` +
+    `/${extraData.fcmToken}` +
     `/v${appVersion}`
   } else {
     deepLink =
@@ -456,6 +457,7 @@ export const processDeepLink = ( deepLink: string ) => {
             deepLinkKind: splits[ 4 ],
             amount: splits[ 8 ],
             note: splits[ 9 ],
+            fcmToken: splits[ 10 ],
             version,
           }
           return {
@@ -526,6 +528,7 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             amount: parsedData.amount,
             note: parsedData.note,
+            fcmToken: parsedData.fcmToken,
             version: parsedData.version,
             type: parsedData.type,
           }

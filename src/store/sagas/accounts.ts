@@ -130,7 +130,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export function generateGiftLink( giftToSend: Gift, walletName: string, note?: string, shouldEncrypt?: boolean  ) {
+export function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     Relay.updateTemporaryChannel( encryptionKey, giftToSend ) // non-awaited upload
@@ -146,7 +146,8 @@ export function generateGiftLink( giftToSend: Gift, walletName: string, note?: s
       keysToEncrypt: encryptionKey,
       extraData: {
         amount: giftToSend.amount,
-        note
+        note,
+        fcmToken,
       }
     } )
     return {

@@ -144,11 +144,11 @@ export const walletCheckIn = ( currencyCode?: string ) => {
   }
 }
 
-export const fetchGiftFromTemporaryChannel = ( decryptionKey: string ) => {
+export const fetchGiftFromTemporaryChannel = ( decryptionKey: string, sendersFCM: string ) => {
   return {
     type: FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
     payload: {
-      decryptionKey
+      decryptionKey, sendersFCM
     },
   }
 }
