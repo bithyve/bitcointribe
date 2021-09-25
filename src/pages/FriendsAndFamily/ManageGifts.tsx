@@ -117,11 +117,11 @@ const ManageGifts = ( { navigation } ) => {
           }}
         />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-        {giftDetails &&
+        {/* {giftDetails &&
       <ModalContainer visible={giftDetails} closeBottomSheet={() => {}} >
         {renderGiftDetailsModel()}
       </ModalContainer>
-        }
+        } */}
         <View style={[ CommonStyles.headerContainer, {
           backgroundColor: Colors.backgroundColor
         } ]}>
@@ -191,11 +191,15 @@ const ManageGifts = ( { navigation } ) => {
           }}>
           {otherGifts.length > 0 &&
           otherGifts.map( ( item, index ) => {
+            const title = item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
+            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 35 ? `${item.receiver?.contactId.substr( 0, 32 )}...` : item.receiver?.contactId
             return(
               <TouchableOpacity
                 key={index}
                 onPress={() => {
-                  showGiftDetails( true )
+                  navigation.navigate( 'GiftDetails', {
+                    title, walletName, createdAt: item.createdAt, amount: item.amount
+                  } )
                   setGiftInfo( item )
                 }
                 }
@@ -213,7 +217,9 @@ const ManageGifts = ( { navigation } ) => {
                     fontSize: RFValue( 10 ),
                     fontFamily: Fonts.FiraSansRegular,
                     fontWeight: '600'
-                  }}>{item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift' } </Text>
+                  }}>
+                    {title}
+                  </Text>
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
@@ -236,13 +242,31 @@ const ManageGifts = ( { navigation } ) => {
                   }}>
                     <Text style={{
                       textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
-                    }}>{item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 35 ? `${item.receiver?.contactId.substr( 0, 32 )}...` : item.receiver?.contactId}
-
+                    }}>
+                      {walletName}
                     </Text>
                     <Text style={{
                       ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
                     }}>Lorem ipsum dolor sit amet</Text>
                   </View>
+                  <View style={{
+                    marginLeft: 'auto'
+                  }}>
+                    <Text style={{
+                      color: Colors.black,
+                      fontSize: RFValue( 18 ),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}>
+                      {numberWithCommas( item.amount )}
+                      <Text style={{
+                        color: Colors.lightTextColor,
+                        fontSize: RFValue( 10 ),
+                        fontFamily: Fonts.FiraSansRegular
+                      }}> sats
+                      </Text>
+                    </Text>
+                  </View>
+
                 </View>
               </TouchableOpacity>
             )
