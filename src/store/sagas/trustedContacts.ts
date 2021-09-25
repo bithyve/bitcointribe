@@ -285,11 +285,27 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
       case PermanentChannelsSyncKind.SUPPLIED_CONTACTS:
         if( !channelUpdates.length ) throw new Error( 'Sync permanent channels failed: supplied channel updates missing' )
         for( const { contactInfo, streamUpdates } of channelUpdates ){
+          let fullySyncContact = false
+
           const contact = trustedContacts[ contactInfo.channelKey ]
           if( contact ) {
             if( !contact.isActive || ( !streamUpdates && !contact.hasNewData && !hardSync ) )
               continue
-            if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) synchingPrimaryKeeperChannelKey = contactInfo.channelKey
+            if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) {
+              // sync primary keeper if the contact has been approved
+              const instreamId = contact.streamId
+              if( instreamId ) {
+                const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+                const primaryData = idx( instream, ( _ ) => _.primaryData )
+                if( !primaryData ) {
+                  fullySyncContact = true
+                  synchingPrimaryKeeperChannelKey = contactInfo.channelKey
+                }
+              } else {
+                fullySyncContact = true
+                synchingPrimaryKeeperChannelKey = contactInfo.channelKey
+              }
+            }
           }
 
           channelSyncUpdates.push( {
@@ -300,7 +316,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
             secondaryChannelKey: contactInfo.secondaryChannelKey,
             unEncryptedOutstreamUpdates: streamUpdates,
             contactsSecondaryChannelKey: contactInfo.contactsSecondaryChannelKey,
-            metaSync
+            metaSync: fullySyncContact? false: metaSync
           } )
           flowKind = contactInfo.flowKind
           contactIdentifier = contactInfo.channelKey
