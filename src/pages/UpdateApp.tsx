@@ -144,7 +144,7 @@ export default function UpdateApp( props ) {
     const url =
       Platform.OS == 'ios'
         ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
-        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en'
+        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en'
     Linking.canOpenURL( url ).then( ( supported ) => {
       if ( supported ) {
         Linking.openURL( url )
