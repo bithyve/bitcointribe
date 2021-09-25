@@ -30,6 +30,7 @@ import Intermediate from '../../../pages/Intermediate'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
 import SendGift from '../../../pages/FriendsAndFamily/SendGift'
+import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -52,6 +53,7 @@ const FriendsAndFamily = createStackNavigator(
       },
     },
     ManageGifts,
+    GiftDetails,
     CreateGift,
     SendGift,
     Login,
