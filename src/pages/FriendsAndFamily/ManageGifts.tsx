@@ -29,6 +29,7 @@ import idx from 'idx'
 import { Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
 import { syncGiftsStatus } from '../../store/actions/trustedContacts'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
@@ -43,7 +44,8 @@ const ManageGifts = ( { navigation } ) => {
   useEffect( ()=> {
     const availableGifts = []
     const otherGifts = []
-    Object.values( gifts ).forEach( ( gift: Gift ) => {
+    Object.values( gifts?? {
+    } ).forEach( ( gift: Gift ) => {
       if ( gift.status === GiftStatus.CREATED ) availableGifts.push( gift )
       else otherGifts.push( gift )
     } )
@@ -100,67 +102,73 @@ const ManageGifts = ( { navigation } ) => {
   }, [ giftInfo ] )
 
   return (
-    <ScrollView style={{
-      flex: 1, backgroundColor: Colors.backgroundColor
+    <View style={{
+      height: '100%',
+      backgroundColor: Colors.backgroundColor,
+      alignSelf: 'center',
+      width: '100%',
     }}>
-      <SafeAreaView
-        style={{
-          backgroundColor: Colors.backgroundColor
-        }}
-      />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      {giftDetails &&
+      <ScrollView style={{
+        flex: 1, backgroundColor: Colors.backgroundColor
+      }}>
+        <SafeAreaView
+          style={{
+            backgroundColor: Colors.backgroundColor
+          }}
+        />
+        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+        {giftDetails &&
       <ModalContainer visible={giftDetails} closeBottomSheet={() => {}} >
         {renderGiftDetailsModel()}
       </ModalContainer>
-      }
-      <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
-      }}>
-        <HeaderTitle
-          firstLineTitle={'Manage Gifts'}
-          secondLineTitle={'View and manage created Gifts'}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
-        <TouchableOpacity
-          onPress={() => navigation.navigate( 'CreateGift' )}
-          style={{
-            ...styles.selectedContactsView,
-          }}
-        >
-          <Text style={[ styles.contactText, {
-            fontSize: RFValue( 24 ),
-          } ]}>+</Text>
-          {/* <Image
+        }
+        <View style={[ CommonStyles.headerContainer, {
+          backgroundColor: Colors.backgroundColor
+        } ]}>
+          <TouchableOpacity
+            style={CommonStyles.headerLeftIconContainer}
+            onPress={() => {
+              navigation.goBack()
+            }}
+          >
+            <View style={CommonStyles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
+        }}>
+          <HeaderTitle
+            firstLineTitle={'Manage Gifts'}
+            secondLineTitle={'View and manage created Gifts'}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
+          <TouchableOpacity
+            onPress={() => navigation.navigate( 'CreateGift' )}
+            style={{
+              ...styles.selectedContactsView,
+            }}
+          >
+            <Text style={[ styles.contactText, {
+              fontSize: RFValue( 24 ),
+            } ]}>+</Text>
+            {/* <Image
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/icon_add_grey.png' )}
                   /> */}
-          <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
+            <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
 
-        </TouchableOpacity>
-      </View>
-      {availableGifts.length > 0 &&
+          </TouchableOpacity>
+        </View>
+        {availableGifts.length > 0 &&
       availableGifts.map( ( item, index ) => {
         return (
           <DashedContainer
@@ -176,12 +184,12 @@ const ManageGifts = ( { navigation } ) => {
           />
         )
       } )
-      }
-      <View
-        style={{
-          marginHorizontal: wp( 6 ), marginTop: hp( 1 )
-        }}>
-        {otherGifts.length > 0 &&
+        }
+        <View
+          style={{
+            marginHorizontal: wp( 6 ), marginTop: hp( 1 )
+          }}>
+          {otherGifts.length > 0 &&
           otherGifts.map( ( item, index ) => {
             return(
               <TouchableOpacity
@@ -240,8 +248,17 @@ const ManageGifts = ( { navigation } ) => {
             )
 
           } )}
-      </View>
-    </ScrollView>
+        </View>
+
+      </ScrollView>
+      <BottomInfoBox
+        backgroundColor={Colors.white}
+        title={'Note'}
+        infoText={
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+        }
+      />
+    </View>
   )
 }
 
