@@ -39,7 +39,8 @@ import {
   NAVIGATING_HISTORY_PAGE,
   TYPE_BOTTOMSHEET_OPEN,
   ALLOW_SECURE_ACCOUNT,
-  OPEN_CLOSE_APPROVAL
+  OPEN_CLOSE_APPROVAL,
+  SET_SECONDARY_DATA_INFO_STATUS
 } from '../actions/BHR'
 
 const initialState: {
@@ -64,6 +65,7 @@ const initialState: {
     updateWIStatus: boolean;
     generateMetaShareStatus: boolean;
     updateSecondaryShardStatus: boolean;
+    getSecondaryDataInfoStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -137,6 +139,7 @@ const initialState: {
     updateWIStatus: false,
     generateMetaShareStatus: false,
     updateSecondaryShardStatus: false,
+    getSecondaryDataInfoStatus: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -429,6 +432,15 @@ export default ( state = initialState, action ) => {
           openApproval: action.payload.flag,
           availableKeepers: action.payload.availableKeepers,
           approvalContactData: action.payload.contactData
+        }
+
+      case SET_SECONDARY_DATA_INFO_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            getSecondaryDataInfoStatus: action.payload.flag,
+          },
         }
 
   }
