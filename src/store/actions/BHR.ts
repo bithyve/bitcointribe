@@ -70,6 +70,7 @@ export const SETUP_LEVEL_HEALTH = 'SETUP_LEVEL_HEALTH'
 export const GENERATE_LEVEL1_SHARES = 'GENERATE_LEVEL1_SHARES'
 export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
 export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
+export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -687,6 +688,14 @@ export const getApprovalFromKeepers = ( flag, contact ) => {
   return {
     type: GET_APPROVAL_FROM_KEEPER, payload: {
       flag, contact
+    }
+  }
+}
+
+export const setSecondaryDataInfoStatus = ( flag ) =>{
+  return {
+    type: SET_SECONDARY_DATA_INFO_STATUS, payload: {
+      flag
     }
   }
 }

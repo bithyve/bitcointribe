@@ -168,8 +168,6 @@ class ManageBackupNewBHR extends Component<
   ManageBackupNewBHRStateTypes
 > {
   focusListener: any;
-  NoInternetBottomSheet: any;
-  unsubscribe: any;
   ErrorBottomSheet: any;
   keeperTypeBottomSheet: any;
   QrBottomSheet: any;
@@ -182,8 +180,6 @@ class ManageBackupNewBHR extends Component<
     super( props, context )
     super( props )
     this.focusListener = null
-    this.NoInternetBottomSheet = React.createRef()
-    this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
     const s3 = dbManager.getBHR()
@@ -369,6 +365,12 @@ class ManageBackupNewBHR extends Component<
         if( ( this.props.currentLevel == 2 && !this.props.isKeeperInfoUpdated2 ) || this.props.currentLevel == 3 && !this.props.isKeeperInfoUpdated3 )
           this.props.updateKeeperInfoToChannel()
       }
+    }
+
+    if( ( prevProps.trustedContacts != this.props.trustedContacts ) || ( prevProps.levelData != this.props.levelData ) ){
+      this.setState( {
+        refreshControlLoader: false
+      } )
     }
 
     if( prevProps.isLevelToNotSetupStatus != this.props.isLevelToNotSetupStatus && this.props.isLevelToNotSetupStatus ){
@@ -639,25 +641,32 @@ class ManageBackupNewBHR extends Component<
   };
 
   onRefresh = async () => {
+    this.setState( {
+      refreshControlLoader: true
+    } )
     const contacts: Trusted_Contacts = this.props.trustedContacts
     const channelUpdates = []
     // Contact or Device type
     if( contacts ){
-      for( const ck of Object.keys( contacts ) ){
-        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
-          // initiate permanent channel
-          const channelUpdate =  {
-            contactInfo: {
-              channelKey: ck,
-            }
-          }
-          channelUpdates.push( channelUpdate )
-        }
-      }
+      // for( const ck of Object.keys( contacts ) ){
+      //   if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
+      //     // initiate permanent channel
+      //     const channelUpdate =  {
+      //       contactInfo: {
+      //         channelKey: ck,
+      //       }
+      //     }
+      //     channelUpdates.push( channelUpdate )
+      //   }
+      // }
+      // this.props.syncPermanentChannels( {
+      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      //   channelUpdates: channelUpdates,
+      //   metaSync: true
+      // } )
       this.props.syncPermanentChannels( {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-        channelUpdates: channelUpdates,
-        metaSync: true
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true,
       } )
     }
     this.props.modifyLevelData( )
