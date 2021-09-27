@@ -1640,7 +1640,6 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     let isError = false
     const abc = JSON.stringify( levelHealth ? levelHealth : levelHealthState )
     const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ), contacts ) ]
-    console.log( 'levelHealthVar', levelHealthVar )
     for ( let i = 0; i < levelHealthVar.length; i++ ) {
       const levelInfo = levelHealthVar[ i ].levelInfo
       for ( let j = 0; j < levelInfo.length; j++ ) {
@@ -1652,7 +1651,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
             const res = yield call( TrustedContactsOperations.checkSecondaryUpdated, {
               walletId: wallet.walletId, channelKey: element.channelKey, options: {
                 retrieveSecondaryData: true,
-              }, secondaryChannelKey: currentContact.secondaryChannelKey
+              }
             } )
             if( res.status ) {
               levelInfo[ j ].status = 'accessible'
