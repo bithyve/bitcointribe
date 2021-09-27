@@ -159,9 +159,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={( qrData ) => {
-          if ( QRModalHeader == 'Sweep Funds' ) {
-            showQRModel( false )
-          }
+          showQRModel( false )
           getQrCodeData( qrData )
         }}
         onBackPress={() => {
@@ -170,9 +168,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         onPressContinue={async() => {
           const qrData = '{"type":"APPROVE_KEEPER","walletName":"Sfds","channelId":"d0926718fd1ac3ea9459bdfee1fe5020ae1b012293a755e41c3f2b4b3173aefc","streamId":"1a28214d4","secondaryChannelKey":"7k1DPsBhjk0qIiBKzlz2eExl","version":"2.0.0","walletId":"1acc5378bfb653ebe3dfb2ff0b9099aca7430c3e1a0c06e2bb790d4c80fd1c9d"}'
           if ( qrData ) {
-            if ( QRModalHeader == 'Sweep Funds' ) {
-              showQRModel( false )
-            }
+            showQRModel( false )
             getQrCodeData( qrData )
           }
         }}
