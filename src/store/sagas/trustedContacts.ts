@@ -291,19 +291,19 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           if( contact ) {
             if( !contact.isActive || ( !streamUpdates && !contact.hasNewData && !hardSync ) )
               continue
-            if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) {
-              // sync primary keeper if the contact has been approved
+            if( [ TrustedContactRelationTypes.PRIMARY_KEEPER, TrustedContactRelationTypes.KEEPER ].includes( contact.relationType ) ) {
+              // full-sync keepers if the contact has been just approved
               const instreamId = contact.streamId
               if( instreamId ) {
                 const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
                 const primaryData = idx( instream, ( _ ) => _.primaryData )
                 if( !primaryData ) {
                   fullySyncContact = true
-                  synchingPrimaryKeeperChannelKey = contactInfo.channelKey
+                  if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) synchingPrimaryKeeperChannelKey = contactInfo.channelKey
                 }
               } else {
                 fullySyncContact = true
-                synchingPrimaryKeeperChannelKey = contactInfo.channelKey
+                if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) synchingPrimaryKeeperChannelKey = contactInfo.channelKey
               }
             }
           }
@@ -344,7 +344,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
                 const walletName = idx( instream, ( _ ) => _.primaryData.walletName )
                 if( !walletName ) fullySyncContact = true
               } else fullySyncContact = true
-            } else if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) {
+            } else if( [ TrustedContactRelationTypes.PRIMARY_KEEPER, TrustedContactRelationTypes.KEEPER ].includes( contact.relationType ) ) {
             // sync primary keeper if the contact has been approved
               const instreamId = contact.streamId
               if( instreamId ) {
@@ -352,11 +352,11 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
                 const primaryData = idx( instream, ( _ ) => _.primaryData )
                 if( !primaryData ) {
                   fullySyncContact = true
-                  synchingPrimaryKeeperChannelKey = channelKey
+                  if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) synchingPrimaryKeeperChannelKey = channelKey
                 }
               } else {
                 fullySyncContact = true
-                synchingPrimaryKeeperChannelKey = channelKey
+                if( contact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER ) synchingPrimaryKeeperChannelKey = channelKey
               }
             }
 
