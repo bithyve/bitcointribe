@@ -941,7 +941,6 @@ export enum DeepLinkEncryptionType {
   OTP = 'OTP'
 }
 
-
 export enum GiftType {
   SENT = 'SENT',
   RECEIVED = 'RECEIVED'
@@ -973,6 +972,22 @@ export interface Gift {
     walletName?: string,
     contactId?: string
   },
+}
+
+export interface GiftMetaData {
+  type: TemporaryChannelMetaDataType.GIFT,
+  status: GiftStatus,
+  notificationInfo: {
+    walletId: string,
+    FCM: string,
+  }
+}
+
+export enum TemporaryChannelMetaDataType {
+  GIFT = 'GIFT'
+}
+export interface TemporaryChannelMetaData {
+  [metaDataType: string]: GiftMetaData
 }
 
 export interface cloudDataInterface {
