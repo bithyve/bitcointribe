@@ -103,62 +103,6 @@ function* updateWalletWorker( { payload } ) {
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
-function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
-  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const accounts: Accounts = accountsState.accounts
-  let defaultCheckingAccount: Account
-  for( const accountId in accounts ){
-    const account = accounts[ accountId ]
-    if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
-      defaultCheckingAccount= account
-      break
-    }
-  }
-
-  let giftImportedToAccount = false
-  for ( const channelKey of  Object.keys( trustedContacts ) ){
-    const contact = trustedContacts[ channelKey ]
-    const instreamId = contact.streamId
-    if( instreamId ){
-      const giftsFromContact = idx( contact, _ => _.unencryptedPermanentChannel[ instreamId ].primaryData.gifts )
-      if( giftsFromContact ){
-        for( const gift of Object.values( giftsFromContact ) ){
-          if( !storedGifts[ gift.id ] ){
-            gift.status = GiftStatus.CLAIMED
-            gift.type = GiftType.RECEIVED
-
-            AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address, {
-              type: ActiveAddressAssigneeType.GIFT,
-              id: gift.id,
-              senderInfo: {
-                name: gift.sender.walletName
-              }
-            } )
-            giftImportedToAccount = true
-            gift.receiver.accountId = defaultCheckingAccount.id
-
-            yield put( updateGift( gift ) )
-          }
-        }
-      }
-    }
-  }
-
-  if( giftImportedToAccount ){
-    yield put( updateAccountShells( {
-      accounts: {
-        [ defaultCheckingAccount.id ]: defaultCheckingAccount
-      }
-    } ) )
-    yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
-    yield put( updateWalletImageHealth( {
-      updateAccounts: true,
-      accountIds: [ defaultCheckingAccount.id ]
-    } ) )
-  }
-}
-
 function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKey: string, sendersFCM: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
   const accountsState: AccountsState = yield select( state => state.accounts )
@@ -471,8 +415,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         yield call( dbManager.updateContact, value )
       }
 
-      yield call( updateGiftsWorker, updatedContacts ) // update gifts(if there are new)
-
       let shouldUpdateSmShare = false
       // update secondary setup data on inital primary keeper sync
       if( synchingPrimaryKeeperChannelKey && !wallet.secondaryXpub ){
@@ -687,24 +629,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
   }
 
-  let gift: Gift
-  if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
-    const giftToSend = accountsState.gifts[ giftId ]
-    if( giftToSend && giftToSend.status !== GiftStatus.SENT ){
-      const permanentChannelAddress = crypto
-        .createHash( 'sha256' )
-        .update( contactInfo.channelKey )
-        .digest( 'hex' )
-
-      giftToSend.status = GiftStatus.SENT,
-      giftToSend.receiver = {
-        contactId: permanentChannelAddress
-      }
-      yield put( updateGift( giftToSend ) )
-      gift = giftToSend
-    }
-  }
-
   // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
@@ -712,9 +636,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     relationType,
     FCM,
     paymentAddresses,
-    gifts: gift? {
-      [ gift.id ]: gift
-    }: null,
     contactDetails: contactInfo.contactDetails
   }
 

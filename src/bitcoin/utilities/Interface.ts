@@ -534,9 +534,7 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
-  gifts? : {
-    [id: string]: Gift
-  }
+
   // primary keeper exclusives
   secondarySetupData? :{
     secondaryXpub: string
