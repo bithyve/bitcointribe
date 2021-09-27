@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, NewWalletImage } from './Interface'
+import { INotification, NewWalletImage, TemporaryChannelMetaData } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
 import crypto from 'crypto'
@@ -358,7 +358,7 @@ export default class Relay {
     }
   };
 
-  public static updateTemporaryChannel = async ( encryptionKey: string, data: any ): Promise<{
+  public static updateTemporaryChannel = async ( encryptionKey: string, data: any, metaData: TemporaryChannelMetaData ): Promise<{
     updated: boolean;
   }> => {
     try {
@@ -374,7 +374,8 @@ export default class Relay {
         res = await BH_AXIOS.post( 'updateTemporaryChannel', {
           HEXA_ID,
           temporaryChannelAddress,
-          encryptedData
+          encryptedData,
+          metaData
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
@@ -391,6 +392,7 @@ export default class Relay {
 
   public static fetchTemporaryChannel = async ( decryptionKey: string ): Promise<{
     data: any;
+    metaData: TemporaryChannelMetaData;
   }> => {
     try {
 
@@ -409,11 +411,11 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { encryptedData } = res.data
+      const { encryptedData, metaData } = res.data
       const decryptedData = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedData, decryptionKey ) )
 
       return {
-        data: decryptedData
+        data: decryptedData, metaData
       }
     } catch ( err ) {
       throw new Error( 'Failed to fetch temporary channel' )
