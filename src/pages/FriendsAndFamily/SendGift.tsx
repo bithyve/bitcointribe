@@ -54,7 +54,6 @@ export default function SendGift( props ) {
       walletName: wallet.walletName,
       amount: giftToSend.amount,
       note,
-      fcmToken,
       version: DeviceInfo.getVersion(),
     } ) )
 

@@ -161,7 +161,6 @@ export function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken
       extraData: {
         amount: giftToSend.amount,
         note,
-        fcmToken,
       }
     } )
     return {

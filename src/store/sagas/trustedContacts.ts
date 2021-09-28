@@ -103,7 +103,7 @@ function* updateWalletWorker( { payload } ) {
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
-function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKey: string, sendersFCM: string } } ) {
+function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKey: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -139,21 +139,21 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     } ) )
     yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
 
-    if( payload.sendersFCM ){
-      const wallet: Wallet = yield select( state => state.storage.wallet )
-      const notification: INotification = {
-        notificationType: notificationType.GIFT_ACCEPTED,
-        title: 'Gift notification',
-        body: `Gift accepted by ${wallet.walletName}`,
-        data: {
-        },
-        tag: notificationTag.IMP,
-      }
-      Relay.sendNotifications( [ {
-        walletId: gift.sender.walletId,
-        FCMs: [ payload.sendersFCM ],
-      } ], notification )
-    }
+    // if( payload.sendersFCM ){
+    //   const wallet: Wallet = yield select( state => state.storage.wallet )
+    //   const notification: INotification = {
+    //     notificationType: notificationType.GIFT_ACCEPTED,
+    //     title: 'Gift notification',
+    //     body: `Gift accepted by ${wallet.walletName}`,
+    //     data: {
+    //     },
+    //     tag: notificationTag.IMP,
+    //   }
+    //   Relay.sendNotifications( [ {
+    //     walletId: gift.sender.walletId,
+    //     FCMs: [ payload.sendersFCM ],
+    //   } ], notification )
+    // }
 
     yield put( updateWalletImageHealth( {
       updateAccounts: true,
