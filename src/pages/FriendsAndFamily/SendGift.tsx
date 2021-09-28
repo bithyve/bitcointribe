@@ -43,8 +43,7 @@ export default function SendGift( props ) {
   }
 
   useEffect( () => {
-    giftToSend.status = GiftStatus.SENT
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP } = generateGiftLink( giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP } = generateGiftLink( dispatch, giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
     setGiftDeepLink( deepLink )
     setGiftQR( JSON.stringify( {
       type: QRCodeTypes.GIFT,
@@ -56,8 +55,6 @@ export default function SendGift( props ) {
       note,
       version: DeviceInfo.getVersion(),
     } ) )
-
-    dispatch( updateGift( giftToSend ) )
   }, [ giftId, note ] )
 
   return (

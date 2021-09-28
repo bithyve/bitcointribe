@@ -360,6 +360,7 @@ export default class Relay {
 
   public static updateTemporaryChannel = async ( encryptionKey: string, data: any, metaData: TemporaryChannelMetaData ): Promise<{
     updated: boolean;
+    temporaryChannelAddress: string;
   }> => {
     try {
 
@@ -383,7 +384,8 @@ export default class Relay {
       }
       const { updated } = res.data
       return {
-        updated
+        updated,
+        temporaryChannelAddress
       }
     } catch ( err ) {
       throw new Error( 'Failed to update temporary channel' )
@@ -422,4 +424,38 @@ export default class Relay {
     }
   };
 
+  public static syncTemporaryChannelsMetaData = async (
+    temporaryChannelsToSync: {
+      [channelAddress: string]: {
+      metaDataUpdates?: TemporaryChannelMetaData
+    }
+  } ): Promise<{
+    synchedTemporaryChannels:  {
+      [channelAddress: string]: {
+        metaData: TemporaryChannelMetaData
+    }
+  } }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'syncTemporaryChannelsMetaData', {
+          HEXA_ID,
+          temporaryChannelsToSync,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { synchedTemporaryChannels }: { synchedTemporaryChannels: {
+        [channelAddress: string]: {
+          metaData: TemporaryChannelMetaData
+      } }} = res.data
+
+      return {
+        synchedTemporaryChannels
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to sync temporary channels meta-data' )
+    }
+  };
 }

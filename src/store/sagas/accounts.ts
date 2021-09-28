@@ -63,6 +63,7 @@ import {
   DonationAccount,
   Gift,
   GiftMetaData,
+  GiftStatus,
   MultiSigAccount,
   NetworkType,
   TemporaryChannelMetaData,
@@ -133,7 +134,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
+export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     const giftMetaData: GiftMetaData = {
@@ -147,7 +148,11 @@ export function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken
     const temporaryChannelMetaData: TemporaryChannelMetaData = {
       [ giftMetaData.type ]: giftMetaData,
     }
-    Relay.updateTemporaryChannel( encryptionKey, giftToSend, temporaryChannelMetaData ) // non-awaited upload
+    Relay.updateTemporaryChannel( encryptionKey, giftToSend, temporaryChannelMetaData ).then( ( { temporaryChannelAddress } ) =>{
+      giftToSend.status = GiftStatus.SENT
+      giftToSend.channelAddress = temporaryChannelAddress
+      dispatch( updateGift( giftToSend ) )
+    } ) // non-awaited upload
 
     let deepLinkEncryptionOTP
     if( shouldEncrypt ) deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()

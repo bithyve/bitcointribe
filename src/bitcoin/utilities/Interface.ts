@@ -970,6 +970,7 @@ export interface Gift {
     walletName?: string,
     contactId?: string
   },
+  channelAddress?: string,
 }
 
 export interface GiftMetaData {
