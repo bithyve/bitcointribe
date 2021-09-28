@@ -73,6 +73,8 @@ export default function ManageBackup( props ) {
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const strings  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
+  const iCloudErrors  = translations[ 'iCloudErrors' ]
+  const driveErrors  = translations[ 'driveErrors' ]
   const defaultKeeperObj: {
     shareType: string
     updatedAt: number;
@@ -345,8 +347,13 @@ export default function ManageBackup( props ) {
 
   useEffect( ()=>{
     if( cloudErrorMessage != '' ){
+      const message = Platform.select( {
+        ios: iCloudErrors[ cloudErrorMessage ],
+        android: driveErrors[ cloudErrorMessage ],
+      } )
+      setErrorMsg( message )
       setCloudErrorModal( true )
-      setErrorMsg( cloudErrorMessage )
+      //setErrorMsg( cloudErrorMessage )
       dispatch( setCloudErrorMessage( '' ) )
     }
   }, [ cloudErrorMessage ] )
@@ -814,8 +821,8 @@ export default function ManageBackup( props ) {
               autoCloudUpload()
             }}
             onPressIgnore={()=> setCloudErrorModal( false )}
-            proceedButtonText={'Try Again'}
-            cancelButtonText={'ok'}
+            proceedButtonText={common.tryAgain}
+            cancelButtonText={common.ok}
             isIgnoreButton={true}
             isBottomImage={true}
             isBottomImageStyle={{
