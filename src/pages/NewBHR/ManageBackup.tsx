@@ -127,7 +127,7 @@ export default function ManageBackup( props ) {
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
 
-  // After Mount
+  // After Mount didMount
   useEffect( ()=>{
 
     InteractionManager.runAfterInteractions( async() => {
@@ -247,7 +247,6 @@ export default function ManageBackup( props ) {
         },
         isSetup: true,
       }
-      console.log( 'onKeeperButtonClick 3', obj )
       setSelectedKeeper( obj.selectedKeeper )
       setShowLoader( false )
       setSelectedLevelId( 2 )
@@ -272,9 +271,6 @@ export default function ManageBackup( props ) {
         },
         isSetup: true,
       }
-      console.log( 'onKeeperButtonClick 5', obj )
-      console.log( 'onKeeperButtonClick selectedKeeperType', selectedKeeperType )
-      console.log( 'onKeeperButtonClick metaSharesKeeper[ 3 ].shareId', metaSharesKeeper[ 3 ].shareId )
       setSelectedKeeper( obj.selectedKeeper )
       dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
       setShowLoader( false )
@@ -304,24 +300,25 @@ export default function ManageBackup( props ) {
   }, [ status ] )
 
   useEffect( ()=>{
-    console.log( 'navigationObj', navigationObj )
     if( navigationObj.selectedKeeper && onKeeperButtonClick ){
       setSelectedKeeper( navigationObj.selectedKeeper )
       setSelectedLevelId( navigationObj.id )
       if( navigationObj.selectedKeeper.shareType && navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
         goToHistory( navigationObj, 'navigationObjIF' )
       } else {
-        setKeeperTypeModal( true )
-        goToHistory( navigationObj, 'navigationObj' )
+        setTimeout( () => {
+          setKeeperTypeModal( true )
+        }, 1000 )
       }
     }
   }, [ navigationObj ] )
 
-  useEffect( ()=>{
-    console.log( 'isTypeBottomSheetOpen', isTypeBottomSheetOpen )
-    if( isTypeBottomSheetOpen === true ){
+  useEffect( () => {
+    if( isTypeBottomSheetOpen === true && onKeeperButtonClick ){
       setShowLoader( false )
-      setKeeperTypeModal( true )
+      setTimeout( () => {
+        setKeeperTypeModal( true )
+      }, 1000 )
       dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
     }
   }, [ isTypeBottomSheetOpen ] )
@@ -330,7 +327,6 @@ export default function ManageBackup( props ) {
     if( approvalStatus && isLevel3Started ) {
       setShowLoader( false )
       setShowQRModal( false )
-      console.log( 'APPROVe MB' )
       const obj = {
         id: selectedLevelId,
         selectedKeeper: {
@@ -472,7 +468,6 @@ export default function ManageBackup( props ) {
   }
 
   const onKeeperButtonPress = ( value, keeperNumber ) =>{
-    console.log( 'value, keeperNumber', value, keeperNumber )
     // requestAnimationFrame( () => {
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
@@ -499,8 +494,6 @@ export default function ManageBackup( props ) {
         }
       )
     } else {
-      console.log( 'ELSEEE', value, keeperNumber )
-      console.log( 'ELSEEE', value, value.keeper1 )
       setShowLoader( true )
       setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
       onPressKeeperButton( value, keeperNumber )
@@ -509,7 +502,6 @@ export default function ManageBackup( props ) {
   }
 
   let onPressKeeperButton = ( value, number ) => {
-    console.log( 'onPressKeeperButton', value, number )
     setSelectedLevelId( value.id )
     setOnKeeperButtonClick( true )
     dispatch( onPressKeeper( value, number ) )
@@ -521,13 +513,7 @@ export default function ManageBackup( props ) {
     setKeeperTypeModal( false )
   }
 
-  useEffect( ()=>{
-    console.log( 'keeperTypeModal', keeperTypeModal )
-  }, [ keeperTypeModal ] )
-
   const goToHistory = ( value, test ) => {
-    console.log( 'test', test )
-    console.log( 'value', value )
     const { id, selectedKeeper, isSetup, isChangeKeeperAllow } = value
     setShowLoader( false )
     const navigationParams = {
