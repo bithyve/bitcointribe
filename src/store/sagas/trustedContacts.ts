@@ -171,48 +171,45 @@ export const fetchTemporaryChannelGiftWatcher = createWatcher(
   FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
 )
 
-
-
 function* syncGiftsStatusWorker() {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const accounts: Accounts = accountsState.accounts
-  const trustedContacts: Trusted_Contacts = yield select(
-    ( state ) => state.trustedContacts.contacts,
-  )
 
+  const temporaryChannelsToSyncForGift = {
+  }
+  const tempChannelToGiftIdMap = {
+  }
   for( const giftId in storedGifts ){
     const gift = storedGifts[ giftId ]
-    if( gift.type === GiftType.SENT ){
-      if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ) {
-
-        if( gift.receiver?.contactId ){
-          // sent to F&F
-          const permanentChannelAddress = gift.receiver.contactId
-          for( const channelKey in  trustedContacts ){
-            const contact = trustedContacts[ channelKey ]
-            if( contact.permanentChannelAddress === permanentChannelAddress ){
-              if( contact.streamId ) {
-                // contact approved & established(implies gift acceptance)
-                gift.status = GiftStatus.CLAIMED
-                yield put( updateGift( gift ) )
-              } else {
-                if( !contact.isActive ){
-                  // contact rejected(implies gift rejection)
-                  gift.status = GiftStatus.REJECTED
-                  yield put( updateGift( gift ) )
-                }
-              }
-            }
-          }
-
-        } else {
-          // sent independently
+    if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
+      if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ){
+        tempChannelToGiftIdMap[ gift.channelAddress ] = giftId
+        temporaryChannelsToSyncForGift[ gift.channelAddress ] = {
         }
       }
     }
   }
 
+  if( Object.keys( temporaryChannelsToSyncForGift ).length === 0 ) {
+    console.log( 'No gifts to sync' )
+    return
+  }
+
+  const { synchedTemporaryChannels }: { synchedTemporaryChannels: {
+    [channelAddress: string]: {
+        metaData: TemporaryChannelMetaData;
+    };
+  };
+  } = yield call( Relay.syncTemporaryChannelsMetaData, temporaryChannelsToSyncForGift )
+
+  for( const channelAddress in synchedTemporaryChannels ){
+    const { metaData } = synchedTemporaryChannels[ channelAddress ]
+    const giftMetaData = metaData[ TemporaryChannelMetaDataType.GIFT ]
+    if( giftMetaData ){
+      const giftToUpdate = storedGifts[ tempChannelToGiftIdMap[ channelAddress ] ]
+      giftToUpdate.status = giftMetaData.status
+      yield updateGift( giftToUpdate )
+    }
+  }
 }
 
 export const syncGiftsStatusWatcher = createWatcher(
@@ -565,8 +562,8 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string }} ) {
-  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string }} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
