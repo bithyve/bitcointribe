@@ -45,6 +45,9 @@ import {
   ActiveAddressAssigneeType,
   DeepLinkKind,
   DeepLinkEncryptionType,
+  GiftMetaData,
+  TemporaryChannelMetaData,
+  TemporaryChannelMetaDataType,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -116,8 +119,7 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     }
   }
 
-  const res = yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
-  const gift: Gift = res.data
+  const { data: gift, metaData: temporaryChannelMetaData }: { data: Gift, metaData: TemporaryChannelMetaData} = yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
   if( !storedGifts[ gift.id ] ){
     gift.status = GiftStatus.CLAIMED
     gift.type = GiftType.RECEIVED
@@ -139,21 +141,23 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     } ) )
     yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
 
-    // if( payload.sendersFCM ){
-    //   const wallet: Wallet = yield select( state => state.storage.wallet )
-    //   const notification: INotification = {
-    //     notificationType: notificationType.GIFT_ACCEPTED,
-    //     title: 'Gift notification',
-    //     body: `Gift accepted by ${wallet.walletName}`,
-    //     data: {
-    //     },
-    //     tag: notificationTag.IMP,
-    //   }
-    //   Relay.sendNotifications( [ {
-    //     walletId: gift.sender.walletId,
-    //     FCMs: [ payload.sendersFCM ],
-    //   } ], notification )
-    // }
+    const giftMetaData = temporaryChannelMetaData[ TemporaryChannelMetaDataType.GIFT ]
+    if( giftMetaData && giftMetaData.notificationInfo.FCM ){
+      const wallet: Wallet = yield select( state => state.storage.wallet )
+      const notification: INotification = {
+        notificationType: notificationType.GIFT_ACCEPTED,
+        title: 'Gift notification',
+        body: `Gift accepted by ${wallet.walletName}`,
+        data: {
+        },
+        tag: notificationTag.IMP,
+      }
+
+      Relay.sendNotifications( [ {
+        walletId: giftMetaData.notificationInfo.walletId,
+        FCMs: [ giftMetaData.notificationInfo.FCM ],
+      } ], notification )
+    }
 
     yield put( updateWalletImageHealth( {
       updateAccounts: true,
