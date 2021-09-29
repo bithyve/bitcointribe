@@ -407,7 +407,6 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               marginBottom: 16
             }}
           />
-          <Text onPress={() => setAcceptGiftModal( true )}>{'<<<<< accept gift >>>>>'} </Text>
 
           <View style={styles.viewSectionContainer}>
             <RecipientAddressTextInputSection

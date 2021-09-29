@@ -192,7 +192,7 @@ const ManageGifts = ( { navigation } ) => {
           {otherGifts.length > 0 &&
           otherGifts.map( ( item, index ) => {
             const title = item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
-            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 35 ? `${item.receiver?.contactId.substr( 0, 32 )}...` : item.receiver?.contactId
+            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
             return(
               <TouchableOpacity
                 key={index}

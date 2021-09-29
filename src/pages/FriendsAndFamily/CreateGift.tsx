@@ -305,19 +305,28 @@ const CreateGift = ( { navigation } ) => {
         }}>
           <TouchableOpacity
             onPress={() => setFees( !includeFees )}
-            style={styles.imageView}>
-            {includeFees &&
-            <CheckMark />
-            }
-          </TouchableOpacity>
-          <Text style={{
-            color: Colors.textColorGrey,
-            fontSize: RFValue( 12 ),
-            fontFamily: Fonts.FiraSansRegular,
-            marginHorizontal: wp( 3 )
-          }}>
+            style={{
+              flexDirection: 'row'
+            }}
+          >
+
+            <View style={styles.imageView}>
+              {includeFees &&
+              <CheckMark style={{
+                marginLeft: 6,
+                marginTop: 6
+              }}/>
+              }
+            </View>
+            <Text style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue( 12 ),
+              fontFamily: Fonts.FiraSansRegular,
+              marginHorizontal: wp( 3 )
+            }}>
           Include fee in amount
-          </Text>
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )

@@ -65,6 +65,7 @@ export default function Secure2FA( props ) {
             isSelected={activeType === DeepLinkEncryptionType.NUMBER}
             setActiveIndex={setActiveType}
             index={DeepLinkEncryptionType.NUMBER}
+            geticon={''}
           />
           : null}
         {emails && emails.length && emails[ 0 ].email ?
@@ -74,6 +75,7 @@ export default function Secure2FA( props ) {
             isSelected={activeType === DeepLinkEncryptionType.EMAIL}
             setActiveIndex={setActiveType}
             index={DeepLinkEncryptionType.EMAIL}
+            geticon={''}
           />
           : null }
         <CardWithRadioBtn
@@ -82,6 +84,7 @@ export default function Secure2FA( props ) {
           isSelected={activeType === DeepLinkEncryptionType.OTP}
           setActiveIndex={setActiveType}
           index={DeepLinkEncryptionType.OTP}
+          geticon={''}
         />
       </View>
       <BottomInfoBox

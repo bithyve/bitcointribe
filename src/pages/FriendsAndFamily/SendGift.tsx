@@ -5,7 +5,8 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Text
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -22,6 +23,8 @@ import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
 import DeviceInfo from 'react-native-device-info'
 import { updateGift } from '../../store/actions/accounts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -70,7 +73,9 @@ export default function SendGift( props ) {
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor
+        backgroundColor: Colors.backgroundColor,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
       } ]}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
@@ -85,6 +90,30 @@ export default function SendGift( props ) {
               size={17}
             />
           </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => props.navigation.pop( 3 )}
+          style={{
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+            backgroundColor: Colors.blue,
+            paddingHorizontal: wp( 2 ),
+            paddingVertical: wp( 1 ),
+            marginRight: wp( 5 ),
+            borderRadius: wp( 2 )
+          }}
+        >
+          <Text
+            style={{
+              ...{
+                color: Colors.white,
+                fontSize: RFValue( 13 ),
+                fontFamily: Fonts.FiraSansRegular,
+              }
+            }}
+          >
+            Done
+          </Text>
         </TouchableOpacity>
       </View>
       <RequestKeyFromContact
