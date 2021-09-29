@@ -197,6 +197,55 @@ export const fetchTemporaryChannelGiftWatcher = createWatcher(
   FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
 )
 
+function* rejectGiftWorker( { payload }: {payload: { channelAddress: string}} ) {
+  const { channelAddress } = payload
+  const temporaryChannelsToSyncForGift = {
+    [ channelAddress ]: {
+      metaDataUpdates: {
+        [ TemporaryChannelMetaDataType.GIFT ]: {
+          type: TemporaryChannelMetaDataType.GIFT,
+          status: GiftStatus.REJECTED
+        },
+      },
+    }
+  }
+
+  const { synchedTemporaryChannels }: { synchedTemporaryChannels: {
+    [channelAddress: string]: {
+        metaData: TemporaryChannelMetaData;
+    };
+  };
+  } = yield call( Relay.syncTemporaryChannelsMetaData, temporaryChannelsToSyncForGift )
+
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  for( const channelAddress in synchedTemporaryChannels ){
+    const { metaData } = synchedTemporaryChannels[ channelAddress ]
+    const giftMetaData = metaData[ TemporaryChannelMetaDataType.GIFT ]
+    if( giftMetaData ){
+      if( giftMetaData.notificationInfo.FCM ){
+        const notification: INotification = {
+          notificationType: notificationType.GIFT_REJECTED,
+          title: 'Gift notification',
+          body: `Gift rejected by ${wallet.walletName}`,
+          data: {
+          },
+          tag: notificationTag.IMP,
+        }
+
+        Relay.sendNotifications( [ {
+          walletId: giftMetaData.notificationInfo.walletId,
+          FCMs: [ giftMetaData.notificationInfo.FCM ],
+        } ], notification )
+      }
+    }
+  }
+}
+
+export const rejectGiftWatcher = createWatcher(
+  rejectGiftWorker,
+  REJECT_GIFT
+)
+
 function* syncGiftsStatusWorker() {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
 

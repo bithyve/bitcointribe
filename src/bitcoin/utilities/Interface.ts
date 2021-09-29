@@ -360,7 +360,8 @@ export enum notificationType {
   FNF_KEEPER_REQUEST='FNF_KEEPER_REQUEST',
   FNF_KEEPER_REQUEST_ACCEPTED='FNF_KEEPER_REQUEST_ACCEPTED',
   FNF_KEEPER_REQUEST_REJECTED='FNF_KEEPER_REQUEST_REJECTED',
-  GIFT_ACCEPTED = 'GIFT_ACCEPTED'
+  GIFT_ACCEPTED = 'GIFT_ACCEPTED',
+  GIFT_REJECTED = 'GIFT_REJECTED'
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -976,7 +977,7 @@ export interface Gift {
 export interface GiftMetaData {
   type: TemporaryChannelMetaDataType.GIFT,
   status: GiftStatus,
-  notificationInfo: {
+  notificationInfo?: {
     walletId: string,
     FCM: string,
   }
