@@ -494,20 +494,22 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const relationType: TrustedContactRelationTypes = idx( instream, ( _ ) => _.primaryData.relationType )
 
         if( contactsFCM && contactsWalletId ){
-          let notifType, notifBody
+          let notifType, notifBody, notifTitle
           switch( contact.relationType ){
               case TrustedContactRelationTypes.WARD:
                 notifType = notificationType.FNF_KEEPER_REQUEST_ACCEPTED
+                notifTitle = 'Wallet Security'
                 notifBody = `Keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
                 break
 
               default:
                 notifType = notificationType.FNF_REQUEST_ACCEPTED
+                notifTitle = 'Friends & Family notification'
                 notifBody = `F&F request accepted by ${nameAssociatedByContact || wallet.walletName}`
           }
           const notification: INotification = {
             notificationType: notifType,
-            title: 'Friends & Family notification',
+            title: notifTitle,
             body: notifBody,
             data: {
             },

@@ -42,8 +42,9 @@ import { resetSendState, sourceAccountSelectedForSending } from '../../store/act
 import SecurityQuestion from '../../pages/NewBHR/SecurityQuestion'
 import Loader from '../../components/loader'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 
 export type Props = {
   navigation: any;
@@ -68,8 +69,20 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const sourceAccountShell = useAccountShellForID( navigation.getParam( 'accountShellID' ) )
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
+  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
   const resetTwoFALoader: boolean = accountsState.resetTwoFALoader
   const [ showLoader, setShowLoader ] = useState( true )
+  const availableKeepersName = ( ()=>{
+    if( keeperInfo.length > 3 ){
+      return keeperInfo.slice( 2, keeperInfo.length-1 ).map( ( value )=> {
+        if( value.type != 'cloud' && value.type != 'securityQuestion' ) return ' '+value.name
+      } ).join()
+    } else if( keeperInfo.length == 3 ){
+      return keeperInfo.slice( 2, keeperInfo.length-1 ).map( ( value )=> {
+        if( value.type != 'cloud' && value.type != 'securityQuestion' ) return ' '+value.name
+      } ).join()
+    } else return ''
+  } )()
 
   useEffect( () => {
     const resettedTwoFA = idx( accountsState.twoFAHelpFlags, ( _ ) => _.twoFAResetted )
@@ -131,7 +144,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       setQrBottomSheetsFlag( false )
     }, 2 )
     if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
-    dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, sourceAccountShell ) )
+    if( qrData && qrData.includes( '{' ) && JSON.parse( qrData ).type == QRCodeTypes.APPROVE_KEEPER ){
+      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, sourceAccountShell ) )
+    } else { Toast( 'You have scanned wrong QR' ) }
   }
 
   const renderQrContent = useCallback( () => {
@@ -139,25 +154,21 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       <QRModal
         isFromKeeperDeviceHistory={false}
         QRModalHeader={QRModalHeader}
-        title={'Scan the Regenerate/Exit Key'}
-        infoText={'This can be found on the last page of your PDF personal copy'}
+        title={'Scan the Approval/Exit Key'}
+        infoText={`This can be found on the last page of your PDF personal copy ${availableKeepersName ? 'or from'+availableKeepersName : '' }`}
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={( qrData ) => {
-          if ( QRModalHeader == 'Sweep Funds' ) {
-            showQRModel( false )
-          }
+          showQRModel( false )
           getQrCodeData( qrData )
         }}
         onBackPress={() => {
           showQRModel( false )
         }}
         onPressContinue={async() => {
-          const qrData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          const qrData = '{"type":"APPROVE_KEEPER","walletName":"Sfds","channelId":"d0926718fd1ac3ea9459bdfee1fe5020ae1b012293a755e41c3f2b4b3173aefc","streamId":"1a28214d4","secondaryChannelKey":"7k1DPsBhjk0qIiBKzlz2eExl","version":"2.0.0","walletId":"1acc5378bfb653ebe3dfb2ff0b9099aca7430c3e1a0c06e2bb790d4c80fd1c9d"}'
           if ( qrData ) {
-            if ( QRModalHeader == 'Sweep Funds' ) {
-              showQRModel( false )
-            }
+            showQRModel( false )
             getQrCodeData( qrData )
           }
         }}
