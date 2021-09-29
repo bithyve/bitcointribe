@@ -1629,7 +1629,6 @@ export const createOrChangeGuardianWatcher = createWatcher(
 
 function* modifyLevelDataWorker( ss?:{ payload } ) {
   try {
-    const { levelHealth, currentLevel } = ss.payload
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     const levelHealthState: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const currentLevelState: number = yield select( ( state ) => state.bhr.currentLevel )
@@ -1638,7 +1637,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     let isError = false
-    const abc = JSON.stringify( levelHealth ? levelHealth : levelHealthState )
+    const abc = JSON.stringify( ss && ss.payload.levelHealth ? ss.payload.levelHealth : levelHealthState )
     const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ), contacts ) ]
     for ( let i = 0; i < levelHealthVar.length; i++ ) {
       const levelInfo = levelHealthVar[ i ].levelInfo
@@ -1671,8 +1670,8 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     if ( levelData && levelData.length && levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }
-    yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
-    const levelDataUpdated = getLevelInfoStatus( levelData, currentLevel ? currentLevel : currentLevelState )
+    yield put( updateHealth( levelHealthVar, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
+    const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState )
     yield put ( updateLevelData( levelDataUpdated, isError ) )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
   } catch ( error ) {
