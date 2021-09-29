@@ -307,7 +307,7 @@ export default function ManageBackup( props ) {
       setSelectedLevelId( navigationObj.id )
       if( navigationObj.selectedKeeper.shareType && navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
         goToHistory( navigationObj, 'navigationObjIF' )
-      } else if( navigationObj.selectedKeeper && navigationObj.selectedKeeper.shareId && navigationObj.selectedKeeper.updatedAt > 0 ){
+      } else if( navigationObj.selectedKeeper && navigationObj.selectedKeeper.shareId && navigationObj.selectedKeeper.status !== 'notSetup' ){
         goToHistory( navigationObj, 'navigationObjIF' )
       } else {
         setTimeout( () => {
