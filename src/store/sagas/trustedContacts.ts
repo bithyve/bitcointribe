@@ -17,6 +17,7 @@ import {
   UPDATE_WALLET_NAME,
   FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
   SYNC_GIFTS_STATUS,
+  REJECT_GIFT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -119,7 +120,17 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     }
   }
 
-  const { data: gift, metaData: temporaryChannelMetaData }: { data: Gift, metaData: TemporaryChannelMetaData} = yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
+  let gift: Gift, temporaryChannelMetaData:TemporaryChannelMetaData
+  try{
+    const { data, metaData }= yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
+    gift = data
+    temporaryChannelMetaData = metaData
+    if( !gift || !gift.id ) throw new Error( 'Gift not found' )
+  } catch( err ){
+    Toast( 'Gift expired/unavailable' )
+    return
+  }
+
   if( !storedGifts[ gift.id ] ){
     gift.status = GiftStatus.CLAIMED
     gift.type = GiftType.RECEIVED
@@ -142,21 +153,36 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
 
     const giftMetaData = temporaryChannelMetaData[ TemporaryChannelMetaDataType.GIFT ]
-    if( giftMetaData && giftMetaData.notificationInfo.FCM ){
-      const wallet: Wallet = yield select( state => state.storage.wallet )
-      const notification: INotification = {
-        notificationType: notificationType.GIFT_ACCEPTED,
-        title: 'Gift notification',
-        body: `Gift accepted by ${wallet.walletName}`,
-        data: {
-        },
-        tag: notificationTag.IMP,
-      }
+    if( giftMetaData ){
+      giftMetaData.status = GiftStatus.CLAIMED
 
-      Relay.sendNotifications( [ {
-        walletId: giftMetaData.notificationInfo.walletId,
-        FCMs: [ giftMetaData.notificationInfo.FCM ],
-      } ], notification )
+      const temporaryChannelsToSyncForGift = {
+        [ gift.channelAddress ]: {
+          metaDataUpdates: {
+            [ TemporaryChannelMetaDataType.GIFT ]: giftMetaData,
+          },
+        }
+      }
+      yield call( Relay.syncTemporaryChannelsMetaData, temporaryChannelsToSyncForGift )
+
+      if( giftMetaData.notificationInfo.FCM ){
+        const wallet: Wallet = yield select( state => state.storage.wallet )
+        const notification: INotification = {
+          notificationType: notificationType.GIFT_ACCEPTED,
+          title: 'Gift notification',
+          body: `Gift accepted by ${wallet.walletName}`,
+          data: {
+          },
+          tag: notificationTag.IMP,
+        }
+
+        Relay.sendNotifications( [ {
+          walletId: giftMetaData.notificationInfo.walletId,
+          FCMs: [ giftMetaData.notificationInfo.FCM ],
+        } ], notification )
+      }
+    } else {
+      console.log( 'Meta data update failed for gift:', gift.id )
     }
 
     yield put( updateWalletImageHealth( {
@@ -174,7 +200,12 @@ export const fetchTemporaryChannelGiftWatcher = createWatcher(
 function* syncGiftsStatusWorker() {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
 
-  const temporaryChannelsToSyncForGift = {
+  const temporaryChannelsToSyncForGift: {
+      [channelAddress: string]: {
+          creator?: boolean;
+          metaDataUpdates?: TemporaryChannelMetaData;
+      };
+  } = {
   }
   const tempChannelToGiftIdMap = {
   }
@@ -184,6 +215,7 @@ function* syncGiftsStatusWorker() {
       if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ){
         tempChannelToGiftIdMap[ gift.channelAddress ] = giftId
         temporaryChannelsToSyncForGift[ gift.channelAddress ] = {
+          creator: true
         }
       }
     }
@@ -206,8 +238,10 @@ function* syncGiftsStatusWorker() {
     const giftMetaData = metaData[ TemporaryChannelMetaDataType.GIFT ]
     if( giftMetaData ){
       const giftToUpdate = storedGifts[ tempChannelToGiftIdMap[ channelAddress ] ]
-      giftToUpdate.status = giftMetaData.status
-      yield updateGift( giftToUpdate )
+      if( giftToUpdate.status !== giftMetaData.status ){
+        giftToUpdate.status = giftMetaData.status
+        yield put( updateGift( giftToUpdate ) )
+      }
     }
   }
 }

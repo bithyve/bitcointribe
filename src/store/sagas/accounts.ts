@@ -137,6 +137,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
 export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
+    giftToSend.status = GiftStatus.SENT
     const giftMetaData: GiftMetaData = {
       type: TemporaryChannelMetaDataType.GIFT,
       status: giftToSend.status,
@@ -148,9 +149,14 @@ export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: st
     const temporaryChannelMetaData: TemporaryChannelMetaData = {
       [ giftMetaData.type ]: giftMetaData,
     }
-    Relay.updateTemporaryChannel( encryptionKey, giftToSend, temporaryChannelMetaData ).then( ( { temporaryChannelAddress } ) =>{
-      giftToSend.status = GiftStatus.SENT
-      giftToSend.channelAddress = temporaryChannelAddress
+
+    const temporaryChannelAddress = crypto
+      .createHash( 'sha256' )
+      .update( encryptionKey )
+      .digest( 'hex' ).slice( 0, 10 )
+    giftToSend.channelAddress = temporaryChannelAddress
+
+    Relay.updateTemporaryChannel( encryptionKey, giftToSend, temporaryChannelMetaData ).then( ( ) => {
       dispatch( updateGift( giftToSend ) )
     } ) // non-awaited upload
 
@@ -164,12 +170,13 @@ export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: st
       walletName: walletName,
       keysToEncrypt: encryptionKey,
       extraData: {
+        channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
         note,
       }
     } )
     return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP
+      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )
