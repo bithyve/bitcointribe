@@ -117,9 +117,9 @@ const TransactionListItemContent: React.FC<Props> = ( {
       /> */}
 
       <View style={styles.containerImg}>
-        <View style={styles.avatarImage} >
-          {getAvatarForSubAccount( primarySubAccount, false, true )}
-        </View>
+        {/* <View style={styles.avatarImage} > */}
+        {getAvatarForSubAccount( primarySubAccount, false, true )}
+        {/* </View> */}
 
 
         {

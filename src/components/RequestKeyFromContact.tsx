@@ -192,7 +192,7 @@ export default function RequestKeyFromContact( props ) {
             <ActivityIndicator size="large" color={Colors.babyGray} />
           ) : (
             <QRCode
-              title="F&F request"
+              title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
               value={props.QR}
               size={hp( '27%' )} />
           )}
