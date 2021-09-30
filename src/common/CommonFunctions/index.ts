@@ -430,7 +430,11 @@ export const processDeepLink = ( deepLink: string ) => {
     const encryptionHint = encryptionMetaSplits[ 1 ]
 
     switch( splits[ 4 ] as DeepLinkKind ){
-        case DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT:
+        case DeepLinkKind.CONTACT:
+        case DeepLinkKind.KEEPER:
+        case DeepLinkKind.PRIMARY_KEEPER:
+        case DeepLinkKind.RECIPROCAL_KEEPER:
+        case DeepLinkKind.EXISTING_CONTACT:
           const trustedContactRequest = {
             walletName: splits[ 5 ],
             encryptedChannelKeys: splits[ 6 ],

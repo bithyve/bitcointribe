@@ -34,8 +34,8 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
-  const [ giftDetails, showGiftDetails ] = useState( false )
-  const [ giftInfo, setGiftInfo ] = useState( null )
+  // const [ giftDetails, showGiftDetails ] = useState( false )
+  // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
   const [ availableGifts, setAvailableGifts ] = useState( [] )
   const [ otherGifts, setOtherGifts ] = useState( [] )
@@ -62,44 +62,47 @@ const ManageGifts = ( { navigation } ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-  const processGift = ( selectedGift: Gift ) => {
+  const processGift = ( selectedGift: Gift, title, walletName ) => {
 
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
-          navigation.navigate( 'AddContact', {
-            fromScreen: 'ManageGift',
-            giftId: selectedGift.id
+          navigation.navigate( 'GiftDetails', {
+            title, walletName, createdAt: selectedGift.createdAt, amount: selectedGift.amount
           } )
+          // navigation.navigate( 'AddContact', {
+          //   fromScreen: 'ManageGift',
+          //   giftId: selectedGift.id
+          // } )
           break
     }
   }
-  const renderGiftDetailsModel = useCallback( () => {
-    return(
-      <View style={{
-        backgroundColor: Colors.white,
-        height: hp( 30 ),
-        paddingHorizontal: wp( 6 )
-      }}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {showGiftDetails( false )}}
-          style={{
-            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-            alignSelf: 'flex-end',
-            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-            marginTop: wp( 3 ),
-          }}
-        >
-          <FontAwesome name="close" color={Colors.white} size={19} style={{
-          // marginTop: hp( 0.5 )
-          }} />
-        </TouchableOpacity>
-        <Text style={styles.modalTitleText}>{giftInfo.type === GiftType.SENT ? giftInfo.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift' }</Text>
-        <Text></Text>
-        <Text>Amount: {giftInfo.amount}</Text>
-      </View>
-    )
-  }, [ giftInfo ] )
+  // const renderGiftDetailsModel = useCallback( () => {
+  //   return(
+  //     <View style={{
+  //       backgroundColor: Colors.white,
+  //       height: hp( 30 ),
+  //       paddingHorizontal: wp( 6 )
+  //     }}>
+  //       <TouchableOpacity
+  //         activeOpacity={1}
+  //         onPress={() => {showGiftDetails( false )}}
+  //         style={{
+  //           width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+  //           alignSelf: 'flex-end',
+  //           backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+  //           marginTop: wp( 3 ),
+  //         }}
+  //       >
+  //         <FontAwesome name="close" color={Colors.white} size={19} style={{
+  //         // marginTop: hp( 0.5 )
+  //         }} />
+  //       </TouchableOpacity>
+  //       <Text style={styles.modalTitleText}>{giftInfo.type === GiftType.SENT ? giftInfo.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift' }</Text>
+  //       <Text></Text>
+  //       <Text>Amount: {giftInfo.amount}</Text>
+  //     </View>
+  //   )
+  // }, [ giftInfo ] )
 
   return (
     <View style={{
@@ -170,6 +173,8 @@ const ManageGifts = ( { navigation } ) => {
         </View>
         {availableGifts.length > 0 &&
       availableGifts.map( ( item, index ) => {
+        const title = 'Available Gift'
+        const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
         return (
           <DashedContainer
             key={index}
@@ -178,9 +183,7 @@ const ManageGifts = ( { navigation } ) => {
             amt={numberWithCommas( item.amount )}
             date={item.createdAt}
             image={<GiftCard />}
-            onPress={()=> {
-              processGift( item )
-            }}
+            onPress={ () => processGift( item, title, walletName )}
           />
         )
       } )
@@ -192,7 +195,7 @@ const ManageGifts = ( { navigation } ) => {
           {otherGifts.length > 0 &&
           otherGifts.map( ( item, index ) => {
             const title = item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
-            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 35 ? `${item.receiver?.contactId.substr( 0, 32 )}...` : item.receiver?.contactId
+            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
             return(
               <TouchableOpacity
                 key={index}
@@ -200,7 +203,6 @@ const ManageGifts = ( { navigation } ) => {
                   navigation.navigate( 'GiftDetails', {
                     title, walletName, createdAt: item.createdAt, amount: item.amount
                   } )
-                  setGiftInfo( item )
                 }
                 }
               >
@@ -275,6 +277,7 @@ const ManageGifts = ( { navigation } ) => {
         </View>
 
       </ScrollView>
+      {availableGifts.length == 0 && otherGifts.length === 0 &&
       <BottomInfoBox
         backgroundColor={Colors.white}
         title={'Note'}
@@ -282,6 +285,7 @@ const ManageGifts = ( { navigation } ) => {
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
         }
       />
+      }
     </View>
   )
 }

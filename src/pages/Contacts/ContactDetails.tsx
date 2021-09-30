@@ -607,13 +607,14 @@ class ContactDetails extends PureComponent<
       } )
     }
     console.log( 'qrString', qrString )
-    this.setState( {
-      qrModalTitle: qrTitle,
-      qrSubTitle: qrSubTitleText,
-      trustedQR: qrString,
-      sendViaQRModel: true
-    } )
-
+    setTimeout( () => {
+      this.setState( {
+        qrModalTitle: qrTitle,
+        qrSubTitle: qrSubTitleText,
+        trustedQR: qrString,
+        sendViaQRModel: true
+      } )
+    }, 1000 )
   };
 
   createDeepLink = ( contact ) => {
@@ -1409,7 +1410,7 @@ class ContactDetails extends PureComponent<
           showQRScanner: false, showQRClicked: false
         } )}>
           <QRModal
-            isFromKeeperDeviceHistory={true}
+            isFromKeeperDeviceHistory={false}
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
