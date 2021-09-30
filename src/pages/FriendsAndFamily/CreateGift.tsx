@@ -334,25 +334,6 @@ const CreateGift = ( { navigation } ) => {
 
 
           {renderButton( 'Create Gift' )}
-          <TouchableOpacity
-            onPress={() => {navigation.goBack()}}
-            style={{
-              height: wp( '12%' ),
-              width: wp( '27%' ),
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingLeft: wp( '8%' ),
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: Fonts.FiraSansMedium,
-                color: Colors.blue
-              }}
-            >
-              {'Cancel'}
-            </Text>
-          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </ScrollView>

@@ -212,19 +212,21 @@ const ManageGifts = ( { navigation } ) => {
 
               </View> */}
                 <View style={{
-                  flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 )
+                  flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
                 }}>
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
+                    letterSpacing: 0.7,
                     fontFamily: Fonts.FiraSansRegular,
-                    fontWeight: '600'
+                    fontWeight: '700'
                   }}>
                     {title}
                   </Text>
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
+                    letterSpacing: 0.1,
                     fontFamily: Fonts.FiraSansRegular,
                     alignSelf: 'flex-end'
                   }}>
@@ -315,7 +317,7 @@ const styles = StyleSheet.create( {
     borderRadius: wp( 2 ),
     padding: wp( 3 ),
     // justifyContent:'center',
-    // alignItems:'center',
+    alignItems:'center',
     backgroundColor: Colors.backgroundColor1,
     flexDirection: 'row'
   },

@@ -58,7 +58,7 @@ const DashedContainer = ( props ) => {
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
-              fontWeight: '500',
+              fontWeight: '700',
               letterSpacing: 0.8
             }}>
               {props.titleText}
