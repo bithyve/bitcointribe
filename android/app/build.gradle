@@ -59,7 +59,7 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 357
+        versionCode 360
         versionName "2.0.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
