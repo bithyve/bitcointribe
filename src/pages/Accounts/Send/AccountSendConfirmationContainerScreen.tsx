@@ -6,7 +6,7 @@ import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import AccountShell from '../../../common/data/models/AccountShell'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
@@ -28,10 +28,11 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
-import { TxPriority } from '../../../bitcoin/utilities/Interface'
+import { NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
+import { AccountsState } from '../../../store/reducers/accounts'
 
 export type NavigationParams = {
 };
@@ -54,6 +55,10 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  const accountState: AccountsState = useSelector(
+    ( state ) => state.accounts,
+  )
+  const account = accountState.accounts[ sourcePrimarySubAccount.id ]
   const sendingState = useSendingState()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
@@ -84,7 +89,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <SendConfirmationContent
         title={strings.SentSuccessfully}
         info={strings.Transactionsubmitted}
-        infoText={strings.tsatsSent}
+        infoText={ account.networkType === NetworkType.TESTNET ? strings.tsatsSent: strings.satsSent }
         recipients={sendingState.selectedRecipients}
         isFromContact={false}
         okButtonText={strings.ViewAccount}
