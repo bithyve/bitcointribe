@@ -595,6 +595,7 @@ const PersonalCopyHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
+          showButton={true}
           type={'copy'}
           IsReshare={isReshare}
           data={sortedHistory( personalCopyHistory )}

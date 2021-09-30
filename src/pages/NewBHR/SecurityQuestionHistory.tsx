@@ -231,6 +231,7 @@ const SecurityQuestionHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
+          showButton={true}
           infoBoxTitle={strings.PasswordHistory}
           infoBoxInfo={strings.Thehistory}
           type={'security'}

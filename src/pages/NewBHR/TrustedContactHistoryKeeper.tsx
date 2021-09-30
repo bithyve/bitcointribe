@@ -608,6 +608,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
+          showButton={true}
           type={'contact'}
           IsReshare={isReshare}
           data={sortedHistory( trustedContactHistory )}
