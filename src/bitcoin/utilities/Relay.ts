@@ -412,6 +412,7 @@ export default class Relay {
         if ( err.code ) throw new Error( err.code )
       }
       const { encryptedData, metaData } = res.data
+      if( !encryptedData ) throw new Error( 'Temporary Channel: no data found' )
       const decryptedData = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedData, decryptionKey ) )
 
       return {
