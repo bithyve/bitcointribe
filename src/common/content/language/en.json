@@ -478,6 +478,7 @@
       "Contactswhose": "Contacts whose wallets I can help restore",
       "Whenyouhave": "When you have Friends & Family who you can help with wallet recovery, they will be listed here",
       "WalletBackup": "Wallet Backup",
+      "WalletBackupInfo": "Manage Recovery Keys and Backup Levels",
       "needsyourattention": "needs your attention",
       "incompletelevel1": "Cloud backup incomplete, please complete Level 1",
       "incompletelevel2" : "Cloud backup complete, upgrade backup to Level 2",
