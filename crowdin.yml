@@ -1,0 +1,3 @@
+files:
+  - source: /src/common/content/language/en.json
+    translation: /src/common/content/language/%two_letters_code%.json
