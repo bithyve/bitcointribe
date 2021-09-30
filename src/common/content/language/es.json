@@ -381,6 +381,7 @@
       "ChangeAccount": "Cambiar cuenta",
       "Transactionsubmitted": "Transacciones enviadas correctamente",
       "tsatsSent": "t-sats enviado con éxito desde su cuenta",
+      "satsSent": "sats enviado con éxito desde su cuenta",
       "ConfirmSend": "Confirmar y enviar",
       "test1": "Nos damos cuenta de que el mundo de Bitcoin puede parecer abrumador al principio. Hemos diseñado la cuenta de prueba para ayudar a desmitificar Bitcoin sin arriesgar sus propios fondos",
       "test2": "Aprenda a usar Hexa y bitcoin con la cuenta de prueba. ¡Piense en esta cuenta como las ruedas de entrenamiento de la billetera!",
