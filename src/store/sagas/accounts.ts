@@ -1145,9 +1145,10 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
   }
 
   const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
-
   if( txid ) {
+    const giftIds = []
     for( const giftId in gifts ){
+      giftIds.push( gifts[ giftId ].id )
       yield put( updateGift( gifts[ giftId ] ) )
     }
 
@@ -1157,6 +1158,11 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
     }
     yield put( refreshAccountShells( [ shellToSync ], {
+    } ) )
+    yield call( dbManager.createGifts, gifts )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: giftIds
     } ) )
   } else {
     console.log( 'Gifts generation failed' )
