@@ -26,6 +26,7 @@ export type Props = {
   navigation: any;
   closeModal: () => void;
   onGiftRequestAccepted: ( otp ) => void;
+  onGiftRequestRejected: () => void;
   walletName: string;
   giftAmount: string;
   inputType: string;
@@ -34,7 +35,7 @@ export type Props = {
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, walletName, giftAmount, inputType, hint, note }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note }: Props ) {
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
@@ -575,7 +576,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         }}>
           {renderButton( 'Accept Gift' )}
           <TouchableOpacity
-            onPress={() => { }}
+            onPress={() => {
+              onGiftRequestRejected()
+            }}
             style={{
               height: wp( '12%' ),
               width: wp( '27%' ),

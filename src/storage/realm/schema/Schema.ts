@@ -37,6 +37,8 @@ const RecipientInfo = 'RecipientInfo'
 const Recipient = 'Recipient'
 const TransactionsNote = 'TransactionsNote'
 const ContactImage = 'ContactImage'
+const Gifts = 'Gifts'
+const GiftSenderReceiver = 'GiftSenderReceiver'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -786,6 +788,55 @@ export const BHRSchemaSchema: ObjectSchema = {
   },
 }
 
+export const GiftSenderReceiverSchema: ObjectSchema = {
+  name: GiftSenderReceiver,
+  properties: {
+    accountId: {
+      type: 'string', optional: true
+    },
+    walletId: {
+      type: 'string', optional: true
+    },
+    walletName: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const GiftsSchema: ObjectSchema = {
+  name: Gifts,
+  primaryKey: 'id',
+  properties: {
+    id: {
+      type: 'string', indexed: true
+    },
+    address: {
+      type: 'string', optional: true
+    },
+    amount: {
+      type: 'int', optional: true
+    },
+    createdAt: {
+      type: 'int', optional: true
+    },
+    privateKey: {
+      type: 'string', optional: true
+    },
+    status: {
+      type: 'string', optional: true
+    },
+    type: {
+      type: 'string', optional: true
+    },
+    sender: {
+      type: GiftSenderReceiver, optional: true
+    },
+    receiver: {
+      type: GiftSenderReceiver, optional: true
+    }
+  },
+}
+
 export default {
   Wallet,
   UTXO,
@@ -812,4 +863,5 @@ export default {
   WalletSecurity,
   BHR,
   S3MetaShare,
+  Gifts,
 }

@@ -62,6 +62,8 @@ import {
   DeepLinkKind,
   DonationAccount,
   Gift,
+  GiftMetaData,
+  GiftStatus,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -130,10 +132,21 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export function generateGiftLink( giftToSend: Gift, walletName: string, note?: string, shouldEncrypt?: boolean  ) {
+export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
-    Relay.updateTemporaryChannel( encryptionKey, giftToSend ) // non-awaited upload
+    giftToSend.status = GiftStatus.SENT
+    const giftMetaData: GiftMetaData = {
+      status: giftToSend.status,
+      notificationInfo: {
+        walletId: giftToSend.sender.walletId,
+        FCM: fcmToken,
+      }
+    }
+
+    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ).then( ( ) => {
+      dispatch( updateGift( giftToSend ) )
+    } ) // non-awaited upload
 
     let deepLinkEncryptionOTP
     if( shouldEncrypt ) deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
@@ -145,12 +158,13 @@ export function generateGiftLink( giftToSend: Gift, walletName: string, note?: s
       walletName: walletName,
       keysToEncrypt: encryptionKey,
       extraData: {
+        channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
-        note
+        note,
       }
     } )
     return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP
+      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )
@@ -1131,9 +1145,10 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
   }
 
   const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
-
   if( txid ) {
+    const giftIds = []
     for( const giftId in gifts ){
+      giftIds.push( gifts[ giftId ].id )
       yield put( updateGift( gifts[ giftId ] ) )
     }
 
@@ -1143,6 +1158,11 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
     }
     yield put( refreshAccountShells( [ shellToSync ], {
+    } ) )
+    yield call( dbManager.createGifts, gifts )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: giftIds
     } ) )
   } else {
     console.log( 'Gifts generation failed' )

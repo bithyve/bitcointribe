@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, NewWalletImage } from './Interface'
+import { Gift, GiftMetaData, INotification, NewWalletImage } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
 import crypto from 'crypto'
@@ -358,23 +358,18 @@ export default class Relay {
     }
   };
 
-  public static updateTemporaryChannel = async ( encryptionKey: string, data: any ): Promise<{
+  public static updateGiftChannel = async ( encryptionKey: string, gift: Gift, metaData: GiftMetaData ): Promise<{
     updated: boolean;
   }> => {
     try {
-
-      const temporaryChannelAddress = crypto
-        .createHash( 'sha256' )
-        .update( encryptionKey )
-        .digest( 'hex' )
-      const encryptedData = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( data ), encryptionKey )
-
+      const encryptedGift = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( gift ), encryptionKey )
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateTemporaryChannel', {
+        res = await BH_AXIOS.post( 'updateGiftChannel', {
           HEXA_ID,
-          temporaryChannelAddress,
-          encryptedData
+          channelAddress: gift.channelAddress,
+          encryptedGift,
+          metaData
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
@@ -382,42 +377,77 @@ export default class Relay {
       }
       const { updated } = res.data
       return {
-        updated
+        updated,
       }
     } catch ( err ) {
-      throw new Error( 'Failed to update temporary channel' )
+      throw new Error( 'Failed to update gift channel' )
     }
   };
 
-  public static fetchTemporaryChannel = async ( decryptionKey: string ): Promise<{
-    data: any;
+  public static fetchGiftChannel = async ( channelAddress: string, decryptionKey: string ): Promise<{
+    gift: Gift,
+    metaData: GiftMetaData;
   }> => {
     try {
 
-      const temporaryChannelAddress = crypto
-        .createHash( 'sha256' )
-        .update( decryptionKey )
-        .digest( 'hex' )
-
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'fetchTemporaryChannel', {
+        res = await BH_AXIOS.post( 'fetchGiftChannel', {
           HEXA_ID,
-          temporaryChannelAddress,
+          channelAddress,
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { encryptedData } = res.data
-      const decryptedData = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedData, decryptionKey ) )
+      const { encryptedGift, metaData } = res.data
+
+      let gift: Gift
+      if( encryptedGift )
+        gift = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedGift, decryptionKey ) )
 
       return {
-        data: decryptedData
+        gift,
+        metaData
       }
     } catch ( err ) {
-      throw new Error( 'Failed to fetch temporary channel' )
+      throw new Error( 'Failed to fetch gift channel' )
     }
   };
 
+  public static syncGiftChannelsMetaData = async (
+    giftChannelsToSync: {
+      [channelAddress: string]: {
+        creator?: boolean,
+        metaDataUpdates?: GiftMetaData,
+    }
+  } ): Promise<{
+    synchedGiftChannels:  {
+      [channelAddress: string]: {
+        metaData: GiftMetaData
+    }
+  } }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'syncGiftChannelsMetaData', {
+          HEXA_ID,
+          giftChannelsToSync,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { synchedGiftChannels }: { synchedGiftChannels: {
+        [channelAddress: string]: {
+          metaData: GiftMetaData
+      } }} = res.data
+
+      return {
+        synchedGiftChannels
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to sync gift channels meta-data' )
+    }
+  };
 }

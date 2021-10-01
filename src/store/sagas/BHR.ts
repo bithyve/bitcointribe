@@ -688,7 +688,9 @@ function* updateWalletImageWorker( { payload } ) {
     updateSmShare,
     update2fa,
     updateAccounts,
-    accountIds
+    accountIds,
+    updateGifts,
+    giftIds,
   } = payload
   yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
   const wallet = yield call( dbManager.getWallet )
@@ -758,6 +760,16 @@ function* updateWalletImageWorker( { payload } ) {
   if( updateVersion ) {
     const STATE_DATA = yield call( stateDataToBackup )
     walletImage.versionHistory = BHROperations.encryptWithAnswer( JSON.stringify( STATE_DATA.versionHistory ), encryptionKey ).encryptedData
+  }
+  if( updateGifts ) {
+    const gitfsRef = yield call( dbManager.getGifts, giftIds )
+    const gitfs = gitfsRef.toJSON()
+    const data = {
+    }
+    gitfs.forEach( gitf => {
+      data[ gitf.id ] = BHROperations.encryptWithAnswer( JSON.stringify( gitf ), encryptionKey ).encryptedData
+    } )
+    walletImage.gifts = data
   }
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
@@ -1464,6 +1476,7 @@ function* downloadSMShareWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
+    Toast( 'Network Error' )
     console.log( 'Error DOWNLOAD_SM_SHARE', error )
   }
 }
@@ -1653,6 +1666,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
                 retrieveSecondaryData: true,
               }
             } )
+            if( !levelInfo[ j ].name ) levelInfo[ j ].name = currentContact.contactDetails && currentContact.contactDetails.contactName ? currentContact.contactDetails.contactName : currentContact.unencryptedPermanentChannel[ instream.streamId ] && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName ? currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName : ''
             if( res.status ) {
               levelInfo[ j ].status = 'accessible'
               levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
@@ -1660,6 +1674,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
           } else {
             // console.log( 'instream', instream )
             if( instream ) {
+              if( !levelInfo[ j ].name ) levelInfo[ j ].name = currentContact.contactDetails && currentContact.contactDetails.contactName ? currentContact.contactDetails.contactName : currentContact.unencryptedPermanentChannel[ instream.streamId ] && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName ? currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName : ''
               levelInfo[ j ].status = Math.round( Math.abs( Date.now() - instream.metaData.flags.lastSeen ) / ( 60 * 1000 ) ) > config.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 ? 'notAccessible' : 'accessible'
               levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
             }

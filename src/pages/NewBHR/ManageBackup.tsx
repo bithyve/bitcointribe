@@ -307,6 +307,8 @@ export default function ManageBackup( props ) {
       setSelectedLevelId( navigationObj.id )
       if( navigationObj.selectedKeeper.shareType && navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
         goToHistory( navigationObj, 'navigationObjIF' )
+      } else if( navigationObj.selectedKeeper && navigationObj.selectedKeeper.shareId && navigationObj.selectedKeeper.status !== 'notSetup' ){
+        goToHistory( navigationObj, 'navigationObjIF' )
       } else {
         setTimeout( () => {
           setKeeperTypeModal( true )
@@ -767,7 +769,7 @@ export default function ManageBackup( props ) {
         </ModalContainer>
         <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
           <QRModal
-            isFromKeeperDeviceHistory={true}
+            isFromKeeperDeviceHistory={false}
             QRModalHeader={'QR scanner'}
             title={common[ 'note' ]}
             infoText={strings[ 'Pleaseapprovethis' ]}

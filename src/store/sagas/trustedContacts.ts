@@ -15,8 +15,10 @@ import {
   RESTORE_TRUSTED_CONTACTS,
   UPDATE_WALLET_NAME_TO_CHANNEL,
   UPDATE_WALLET_NAME,
-  FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+  FETCH_GIFT_FROM_CHANNEL,
   SYNC_GIFTS_STATUS,
+  REJECT_GIFT,
+  ASSOCIATE_GIFT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -45,6 +47,7 @@ import {
   ActiveAddressAssigneeType,
   DeepLinkKind,
   DeepLinkEncryptionType,
+  GiftMetaData,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -103,151 +106,215 @@ function* updateWalletWorker( { payload } ) {
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
-function* updateGiftsWorker( trustedContacts: Trusted_Contacts ) {
+function* associateGiftWorker( { payload }: { payload: { giftId: string, accountId?: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const gift: Gift = storedGifts[ payload.giftId ]
+
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
-  let defaultCheckingAccount: Account
-  for( const accountId in accounts ){
-    const account = accounts[ accountId ]
-    if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
-      defaultCheckingAccount= account
-      break
-    }
-  }
 
-  let giftImportedToAccount = false
-  for ( const channelKey of  Object.keys( trustedContacts ) ){
-    const contact = trustedContacts[ channelKey ]
-    const instreamId = contact.streamId
-    if( instreamId ){
-      const giftsFromContact = idx( contact, _ => _.unencryptedPermanentChannel[ instreamId ].primaryData.gifts )
-      if( giftsFromContact ){
-        for( const gift of Object.values( giftsFromContact ) ){
-          if( !storedGifts[ gift.id ] ){
-            gift.status = GiftStatus.CLAIMED
-            gift.type = GiftType.RECEIVED
+  let associationAccount: Account
 
-            AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address, {
-              type: ActiveAddressAssigneeType.GIFT,
-              id: gift.id,
-              senderInfo: {
-                name: gift.sender.walletName
-              }
-            } )
-            giftImportedToAccount = true
-            gift.receiver.accountId = defaultCheckingAccount.id
-
-            yield put( updateGift( gift ) )
-          }
-        }
+  if( payload.accountId ){
+    associationAccount = accounts[ payload.accountId ]
+  } else {
+    for( const accountId in accounts ){
+      const account = accounts[ accountId ]
+      if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
+        associationAccount = account
+        break
       }
     }
   }
 
-  if( giftImportedToAccount ){
-    yield put( updateAccountShells( {
-      accounts: {
-        [ defaultCheckingAccount.id ]: defaultCheckingAccount
-      }
-    } ) )
-    yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
-    yield put( updateWalletImageHealth( {
-      updateAccounts: true,
-      accountIds: [ defaultCheckingAccount.id ]
-    } ) )
-  }
+  AccountOperations.importAddress( associationAccount, gift.privateKey, gift.address, {
+    type: ActiveAddressAssigneeType.GIFT,
+    id: gift.id,
+    senderInfo: {
+      name: gift.sender.walletName
+    }
+  } )
+  gift.receiver.accountId = associationAccount.id
+  yield put( updateGift( gift ) )
+  yield put( updateAccountShells( {
+    accounts: {
+      [ associationAccount.id ]: associationAccount
+    }
+  } ) )
+  yield call( dbManager.updateAccount, associationAccount.id, associationAccount )
+  yield put( updateWalletImageHealth( {
+    updateAccounts: true,
+    accountIds: [ associationAccount.id ]
+  } ) )
 }
 
-function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKey: string } } ) {
+export const associateGiftWatcher = createWatcher(
+  associateGiftWorker,
+  ASSOCIATE_GIFT,
+)
+
+function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const accounts: Accounts = accountsState.accounts
-  let defaultCheckingAccount: Account
-  for( const accountId in accounts ){
-    const account = accounts[ accountId ]
-    if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
-      defaultCheckingAccount= account
-      break
+
+  let gift: Gift, giftMetaData :GiftMetaData
+  try{
+    const res = yield call( Relay.fetchGiftChannel, payload.channelAddress, payload.decryptionKey )
+    gift = res.gift
+    giftMetaData = res.metaData
+    if( !gift ){
+      if( !giftMetaData ) throw new Error( 'Gift data unavailable' )
+      else {
+        if( giftMetaData.status === GiftStatus.CLAIMED )
+          Toast( 'Gift already claimed' )
+        else if( giftMetaData.status === GiftStatus.REJECTED )
+          Toast( 'Gift already rejected' )
+        return
+      }
     }
+  } catch( err ){
+    Toast( 'Gift expired/unavailable' )
+    return
   }
 
-  const res = yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
-  const gift: Gift = res.data
   if( !storedGifts[ gift.id ] ){
     gift.status = GiftStatus.CLAIMED
     gift.type = GiftType.RECEIVED
 
-    AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address, {
-      type: ActiveAddressAssigneeType.GIFT,
-      id: gift.id,
-      senderInfo: {
-        name: gift.sender.walletName
+    yield put( updateGift( gift ) )
+    yield call( associateGiftWorker, {
+      payload: {
+        giftId: gift.id
       }
     } )
-    gift.receiver.accountId = defaultCheckingAccount.id
 
-    yield put( updateGift( gift ) )
-    yield put( updateAccountShells( {
-      accounts: {
-        [ defaultCheckingAccount.id ]: defaultCheckingAccount
+    if( giftMetaData ){
+      giftMetaData.status = GiftStatus.CLAIMED
+
+      const giftChannelsToSync = {
+        [ gift.channelAddress ]: {
+          metaDataUpdates: giftMetaData
+        }
       }
-    } ) )
-    yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
-    yield put( updateWalletImageHealth( {
-      updateAccounts: true,
-      accountIds: [ defaultCheckingAccount.id ]
-    } ) )
+      yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
+
+      if( giftMetaData.notificationInfo.FCM ){
+        const wallet: Wallet = yield select( state => state.storage.wallet )
+        const notification: INotification = {
+          notificationType: notificationType.GIFT_ACCEPTED,
+          title: 'Gift notification',
+          body: `Gift accepted by ${wallet.walletName}`,
+          data: {
+          },
+          tag: notificationTag.IMP,
+        }
+
+        Relay.sendNotifications( [ {
+          walletId: giftMetaData.notificationInfo.walletId,
+          FCMs: [ giftMetaData.notificationInfo.FCM ],
+        } ], notification )
+      }
+    } else {
+      console.log( 'Meta data update failed for gift:', gift.id )
+    }
   }
 }
 
-export const fetchTemporaryChannelGiftWatcher = createWatcher(
-  fetchTemporaryChannelGiftWorker,
-  FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+export const fetchGiftFromChannelWatcher = createWatcher(
+  fetchGiftFromChannelWorker,
+  FETCH_GIFT_FROM_CHANNEL,
 )
 
+function* rejectGiftWorker( { payload }: {payload: { channelAddress: string}} ) {
+  const { channelAddress } = payload
+  const giftChannelsToSync = {
+    [ channelAddress ]: {
+      metaDataUpdates: {
+        status: GiftStatus.REJECTED
+      },
+    }
+  }
 
+  const { synchedGiftChannels }: { synchedGiftChannels: {
+    [channelAddress: string]: {
+        metaData: GiftMetaData;
+    };
+  };
+  } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
+
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  for( const channelAddress in synchedGiftChannels ){
+    const { metaData: giftMetaData } = synchedGiftChannels[ channelAddress ]
+    if( giftMetaData ){
+      if( giftMetaData.notificationInfo.FCM ){
+        const notification: INotification = {
+          notificationType: notificationType.GIFT_REJECTED,
+          title: 'Gift notification',
+          body: `Gift rejected by ${wallet.walletName}`,
+          data: {
+          },
+          tag: notificationTag.IMP,
+        }
+
+        Relay.sendNotifications( [ {
+          walletId: giftMetaData.notificationInfo.walletId,
+          FCMs: [ giftMetaData.notificationInfo.FCM ],
+        } ], notification )
+      }
+    }
+  }
+}
+
+export const rejectGiftWatcher = createWatcher(
+  rejectGiftWorker,
+  REJECT_GIFT
+)
 
 function* syncGiftsStatusWorker() {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const accounts: Accounts = accountsState.accounts
-  const trustedContacts: Trusted_Contacts = yield select(
-    ( state ) => state.trustedContacts.contacts,
-  )
 
+  const giftChannelsToSync: {
+      [channelAddress: string]: {
+          creator?: boolean;
+          metaDataUpdates?: GiftMetaData;
+      };
+  } = {
+  }
+  const giftChannelToGiftIdMap = {
+  }
   for( const giftId in storedGifts ){
     const gift = storedGifts[ giftId ]
-    if( gift.type === GiftType.SENT ){
-      if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ) {
-
-        if( gift.receiver?.contactId ){
-          // sent to F&F
-          const permanentChannelAddress = gift.receiver.contactId
-          for( const channelKey in  trustedContacts ){
-            const contact = trustedContacts[ channelKey ]
-            if( contact.permanentChannelAddress === permanentChannelAddress ){
-              if( contact.streamId ) {
-                // contact approved & established(implies gift acceptance)
-                gift.status = GiftStatus.CLAIMED
-                yield put( updateGift( gift ) )
-              } else {
-                if( !contact.isActive ){
-                  // contact rejected(implies gift rejection)
-                  gift.status = GiftStatus.REJECTED
-                  yield put( updateGift( gift ) )
-                }
-              }
-            }
-          }
-
-        } else {
-          // sent independently
+    if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
+      if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ){
+        giftChannelToGiftIdMap[ gift.channelAddress ] = giftId
+        giftChannelsToSync[ gift.channelAddress ] = {
+          creator: true
         }
       }
     }
   }
 
+  if( Object.keys( giftChannelsToSync ).length === 0 ) {
+    console.log( 'No gifts to sync' )
+    return
+  }
+
+  const { synchedGiftChannels }: { synchedGiftChannels: {
+    [channelAddress: string]: {
+        metaData: GiftMetaData;
+    };
+  };
+  } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
+
+  for( const channelAddress in synchedGiftChannels ){
+    const { metaData: giftMetaData } = synchedGiftChannels[ channelAddress ]
+    if( giftMetaData ){
+      const giftToUpdate = storedGifts[ giftChannelToGiftIdMap[ channelAddress ] ]
+      if( giftToUpdate.status !== giftMetaData.status ){
+        giftToUpdate.status = giftMetaData.status
+        yield put( updateGift( giftToUpdate ) )
+      }
+    }
+  }
 }
 
 export const syncGiftsStatusWatcher = createWatcher(
@@ -454,8 +521,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         yield call( dbManager.updateContact, value )
       }
 
-      yield call( updateGiftsWorker, updatedContacts ) // update gifts(if there are new)
-
       let shouldUpdateSmShare = false
       // update secondary setup data on inital primary keeper sync
       if( synchingPrimaryKeeperChannelKey && !wallet.secondaryXpub ){
@@ -604,8 +669,8 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string }} ) {
-  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string }} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -672,24 +737,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
   }
 
-  let gift: Gift
-  if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
-    const giftToSend = accountsState.gifts[ giftId ]
-    if( giftToSend && giftToSend.status !== GiftStatus.SENT ){
-      const permanentChannelAddress = crypto
-        .createHash( 'sha256' )
-        .update( contactInfo.channelKey )
-        .digest( 'hex' )
-
-      giftToSend.status = GiftStatus.SENT,
-      giftToSend.receiver = {
-        contactId: permanentChannelAddress
-      }
-      yield put( updateGift( giftToSend ) )
-      gift = giftToSend
-    }
-  }
-
   // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
@@ -697,9 +744,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     relationType,
     FCM,
     paymentAddresses,
-    gifts: gift? {
-      [ gift.id ]: gift
-    }: null,
     contactDetails: contactInfo.contactDetails
   }
 

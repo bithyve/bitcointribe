@@ -89,6 +89,8 @@ export default class AccountOperations {
   };
 
   static importAddress = async ( account: Account | MultiSigAccount, privateKey: string, address: string, requester: ActiveAddressAssignee ) => {
+    if( !account.importedAddresses ) account.importedAddresses = {
+    }
     account.importedAddresses[ address ] = {
       address,
       privateKey
@@ -160,6 +162,8 @@ export default class AccountOperations {
       }
 
       // include imported external addresses
+      if( !account.importedAddresses ) account.importedAddresses = {
+      }
       Object.keys( account.importedAddresses ).forEach( address => {
         externalAddresses[ address ] = -1
         ownedAddresses.push( address )
@@ -1042,10 +1046,12 @@ export default class AccountOperations {
         name: 'Gift',
       } )
 
+      const id = crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' )
       const createdGift: Gift = {
-        id: crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' ),
+        id,
         privateKey,
         address,
+        channelAddress: id.slice( 0, 10 ),
         amount,
         type: GiftType.SENT,
         status: GiftStatus.CREATED,
