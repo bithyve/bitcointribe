@@ -688,7 +688,9 @@ function* updateWalletImageWorker( { payload } ) {
     updateSmShare,
     update2fa,
     updateAccounts,
-    accountIds
+    accountIds,
+    updateGifts,
+    giftIds,
   } = payload
   yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
   const wallet = yield call( dbManager.getWallet )
@@ -758,6 +760,16 @@ function* updateWalletImageWorker( { payload } ) {
   if( updateVersion ) {
     const STATE_DATA = yield call( stateDataToBackup )
     walletImage.versionHistory = BHROperations.encryptWithAnswer( JSON.stringify( STATE_DATA.versionHistory ), encryptionKey ).encryptedData
+  }
+  if( updateGifts ) {
+    const gitfsRef = yield call( dbManager.getGifts, giftIds )
+    const gitfs = gitfsRef.toJSON()
+    const data = {
+    }
+    gitfs.forEach( gitf => {
+      data[ gitf.id ] = BHROperations.encryptWithAnswer( JSON.stringify( gitf ), encryptionKey ).encryptedData
+    } )
+    walletImage.gifts = data
   }
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
