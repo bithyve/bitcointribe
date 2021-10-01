@@ -144,13 +144,7 @@ export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: st
       }
     }
 
-    const channelAddress = crypto
-      .createHash( 'sha256' )
-      .update( encryptionKey )
-      .digest( 'hex' ).slice( 0, 10 )
-    giftToSend.channelAddress = channelAddress
-
-    Relay.updateGiftChannel( channelAddress, encryptionKey, giftToSend, giftMetaData ).then( ( ) => {
+    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ).then( ( ) => {
       dispatch( updateGift( giftToSend ) )
     } ) // non-awaited upload
 

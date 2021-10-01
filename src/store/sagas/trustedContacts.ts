@@ -153,17 +153,14 @@ export const associateGiftWatcher = createWatcher(
   ASSOCIATE_GIFT,
 )
 
-function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: string } } ) {
+function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
 
   let gift: Gift, giftMetaData :GiftMetaData
   try{
-    const res = yield call( Relay.fetchGiftChannel, payload.decryptionKey )
+    const res = yield call( Relay.fetchGiftChannel, payload.channelAddress, payload.decryptionKey )
     gift = res.gift
     giftMetaData = res.metaData
-    console.log( {
-      res
-    } )
     if( !gift ){
       if( !giftMetaData ) throw new Error( 'Gift data unavailable' )
       else {
@@ -175,9 +172,6 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: st
       }
     }
   } catch( err ){
-    console.log( {
-      err
-    } )
     Toast( 'Gift expired/unavailable' )
     return
   }

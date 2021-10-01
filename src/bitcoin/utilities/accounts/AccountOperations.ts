@@ -1046,10 +1046,12 @@ export default class AccountOperations {
         name: 'Gift',
       } )
 
+      const id = crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' )
       const createdGift: Gift = {
-        id: crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' ),
+        id,
         privateKey,
         address,
+        channelAddress: id.slice( 0, 10 ),
         amount,
         type: GiftType.SENT,
         status: GiftStatus.CREATED,

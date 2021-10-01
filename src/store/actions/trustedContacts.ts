@@ -153,10 +153,11 @@ export const associateGift = ( giftId: string, accountId?: string ) => {
   }
 }
 
-export const fetchGiftFromTemporaryChannel = ( decryptionKey: string ) => {
+export const fetchGiftFromTemporaryChannel = ( channelAddress: string, decryptionKey: string ) => {
   return {
     type: FETCH_GIFT_FROM_CHANNEL,
     payload: {
+      channelAddress,
       decryptionKey
     },
   }

@@ -1073,7 +1073,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         return
       }
 
-      this.props.fetchGiftFromTemporaryChannel( decryptionKey )
+      this.props.fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey )
     } catch ( error ) {
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
