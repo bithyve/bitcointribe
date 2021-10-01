@@ -16,6 +16,7 @@ export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
 export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
 export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
+export const ASSOCIATE_GIFT = 'ASSOCIATE_GIFT'
 export const FETCH_GIFT_FROM_CHANNEL = 'FETCH_GIFT_FROM_CHANNEL'
 export const SYNC_GIFTS_STATUS = 'SYNC_GIFTS_STATUS'
 export const REJECT_GIFT = 'REJECT_GIFT'
@@ -138,6 +139,16 @@ export const walletCheckIn = ( currencyCode?: string ) => {
     type: WALLET_CHECK_IN,
     payload: {
       currencyCode
+    },
+  }
+}
+
+export const associateGift = ( giftId: string, accountId?: string ) => {
+  return {
+    type: ASSOCIATE_GIFT,
+    payload: {
+      giftId,
+      accountId
     },
   }
 }

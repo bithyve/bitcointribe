@@ -18,6 +18,7 @@ import {
   FETCH_GIFT_FROM_CHANNEL,
   SYNC_GIFTS_STATUS,
   REJECT_GIFT,
+  ASSOCIATE_GIFT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -105,24 +106,64 @@ function* updateWalletWorker( { payload } ) {
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
-function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: string } } ) {
+function* associateGiftWorker( { payload }: { payload: { giftId: string, accountId?: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const gift: Gift = storedGifts[ payload.giftId ]
+
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
-  let defaultCheckingAccount: Account
-  for( const accountId in accounts ){
-    const account = accounts[ accountId ]
-    if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
-      defaultCheckingAccount= account
-      break
+
+  let associationAccount: Account
+
+  if( payload.accountId ){
+    associationAccount = accounts[ payload.accountId ]
+  } else {
+    for( const accountId in accounts ){
+      const account = accounts[ accountId ]
+      if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
+        associationAccount = account
+        break
+      }
     }
   }
+
+  AccountOperations.importAddress( associationAccount, gift.privateKey, gift.address, {
+    type: ActiveAddressAssigneeType.GIFT,
+    id: gift.id,
+    senderInfo: {
+      name: gift.sender.walletName
+    }
+  } )
+  gift.receiver.accountId = associationAccount.id
+  yield put( updateGift( gift ) )
+  yield put( updateAccountShells( {
+    accounts: {
+      [ associationAccount.id ]: associationAccount
+    }
+  } ) )
+  yield call( dbManager.updateAccount, associationAccount.id, associationAccount )
+  yield put( updateWalletImageHealth( {
+    updateAccounts: true,
+    accountIds: [ associationAccount.id ]
+  } ) )
+}
+
+export const associateGiftWatcher = createWatcher(
+  associateGiftWorker,
+  ASSOCIATE_GIFT,
+)
+
+function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: string } } ) {
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
 
   let gift: Gift, giftMetaData :GiftMetaData
   try{
     const res = yield call( Relay.fetchGiftChannel, payload.decryptionKey )
     gift = res.gift
     giftMetaData = res.metaData
+    console.log( {
+      res
+    } )
     if( !gift ){
       if( !giftMetaData ) throw new Error( 'Gift data unavailable' )
       else {
@@ -134,6 +175,9 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: st
       }
     }
   } catch( err ){
+    console.log( {
+      err
+    } )
     Toast( 'Gift expired/unavailable' )
     return
   }
@@ -142,22 +186,12 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: st
     gift.status = GiftStatus.CLAIMED
     gift.type = GiftType.RECEIVED
 
-    AccountOperations.importAddress( defaultCheckingAccount, gift.privateKey, gift.address, {
-      type: ActiveAddressAssigneeType.GIFT,
-      id: gift.id,
-      senderInfo: {
-        name: gift.sender.walletName
+    yield put( updateGift( gift ) )
+    yield call( associateGiftWorker, {
+      payload: {
+        giftId: gift.id
       }
     } )
-    gift.receiver.accountId = defaultCheckingAccount.id
-
-    yield put( updateGift( gift ) )
-    yield put( updateAccountShells( {
-      accounts: {
-        [ defaultCheckingAccount.id ]: defaultCheckingAccount
-      }
-    } ) )
-    yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
 
     if( giftMetaData ){
       giftMetaData.status = GiftStatus.CLAIMED
@@ -188,11 +222,6 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: st
     } else {
       console.log( 'Meta data update failed for gift:', gift.id )
     }
-
-    yield put( updateWalletImageHealth( {
-      updateAccounts: true,
-      accountIds: [ defaultCheckingAccount.id ]
-    } ) )
   }
 }
 

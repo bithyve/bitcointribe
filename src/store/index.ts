@@ -86,6 +86,7 @@ import {
   fetchGiftFromChannelWatcher,
   syncGiftsStatusWatcher,
   rejectGiftWatcher,
+  associateGiftWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -225,6 +226,7 @@ const rootSaga = function* () {
     restoreTrustedContactsWatcher,
     updateWalletNameToChannelWatcher,
     updateWalletWatcher,
+    associateGiftWatcher,
     fetchGiftFromChannelWatcher,
     syncGiftsStatusWatcher,
     rejectGiftWatcher,
