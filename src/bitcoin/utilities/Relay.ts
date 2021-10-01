@@ -406,8 +406,10 @@ export default class Relay {
         if ( err.code ) throw new Error( err.code )
       }
       const { encryptedGift, metaData } = res.data
-      if( !encryptedGift ) throw new Error( 'Gift not found' )
-      const gift: Gift = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedGift, decryptionKey ) )
+
+      let gift: Gift
+      if( encryptedGift )
+        gift = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedGift, decryptionKey ) )
 
       return {
         gift,

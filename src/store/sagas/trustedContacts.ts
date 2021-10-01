@@ -120,10 +120,19 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: st
 
   let gift: Gift, giftMetaData :GiftMetaData
   try{
-    const res= yield call( Relay.fetchGiftChannel, payload.decryptionKey )
+    const res = yield call( Relay.fetchGiftChannel, payload.decryptionKey )
     gift = res.gift
     giftMetaData = res.metaData
-    if( !gift || !gift.id ) throw new Error( 'Gift not found' )
+    if( !gift ){
+      if( !giftMetaData ) throw new Error( 'Gift data unavailable' )
+      else {
+        if( giftMetaData.status === GiftStatus.CLAIMED )
+          Toast( 'Gift already claimed' )
+        else if( giftMetaData.status === GiftStatus.REJECTED )
+          Toast( 'Gift already rejected' )
+        return
+      }
+    }
   } catch( err ){
     Toast( 'Gift expired/unavailable' )
     return
