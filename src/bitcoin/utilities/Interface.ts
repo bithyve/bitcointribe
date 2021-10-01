@@ -956,6 +956,7 @@ export interface Gift {
   id: string,
   privateKey: string,
   address: string,
+  channelAddress: string,
   amount: number,
   type: GiftType,
   status: GiftStatus,
@@ -971,7 +972,6 @@ export interface Gift {
     walletName?: string,
     contactId?: string
   },
-  channelAddress?: string,
 }
 
 export interface GiftMetaData {

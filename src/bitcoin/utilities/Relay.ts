@@ -358,7 +358,7 @@ export default class Relay {
     }
   };
 
-  public static updateGiftChannel = async ( channelAddress: string, encryptionKey: string, gift: Gift, metaData: GiftMetaData ): Promise<{
+  public static updateGiftChannel = async ( encryptionKey: string, gift: Gift, metaData: GiftMetaData ): Promise<{
     updated: boolean;
   }> => {
     try {
@@ -367,7 +367,7 @@ export default class Relay {
       try {
         res = await BH_AXIOS.post( 'updateGiftChannel', {
           HEXA_ID,
-          channelAddress,
+          channelAddress: gift.channelAddress,
           encryptedGift,
           metaData
         } )
@@ -384,16 +384,11 @@ export default class Relay {
     }
   };
 
-  public static fetchGiftChannel = async ( decryptionKey: string ): Promise<{
+  public static fetchGiftChannel = async ( channelAddress: string, decryptionKey: string ): Promise<{
     gift: Gift,
     metaData: GiftMetaData;
   }> => {
     try {
-
-      const channelAddress = crypto
-        .createHash( 'sha256' )
-        .update( decryptionKey )
-        .digest( 'hex' ).slice( 0, 10 )
 
       let res: AxiosResponse
       try {
