@@ -48,7 +48,11 @@ import {
   ChannelAssets,
   TrustedContactRelationTypes,
   Wallet,
-  DeepLinkEncryptionType
+  DeepLinkEncryptionType,
+  INotification,
+  notificationType,
+  notificationTag,
+  LevelInfo
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
@@ -70,6 +74,8 @@ import idx from 'idx'
 import Toast from '../../components/Toast'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Loader from '../../components/loader'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import Relay from '../../bitcoin/utilities/Relay'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
@@ -353,17 +359,53 @@ const TrustedContactHistoryKeeper = ( props ) => {
     dispatch( ErrorSending( null ) )
   }
 
+  const sendNotificationForExistingContact = async() =>{
+    const appVersion = DeviceInfo.getVersion()
+    const contact = trustedContacts[ channelKey ]
+    const instream = useStreamFromContact( contact, wallet.walletId, true )
+    const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+    const notification: INotification = {
+      notificationType: notificationType.FNF_KEEPER_REQUEST,
+      title: 'Friends & Family notification',
+      body: `You have new keeper request ${contact.contactDetails.contactName}`,
+      data: {
+        walletName: wallet.walletName,
+        channelKey: channelKey,
+        contactsSecondaryChannelKey: contact.secondaryChannelKey,
+        version: appVersion
+      },
+      tag: notificationTag.IMP,
+    }
+    const notifReceivers = []
+    notifReceivers.push( {
+      walletId: instream.primaryData.walletID,
+      FCMs: [ fcmToken ],
+    } )
+    if( notifReceivers.length ) {
+      await Relay.sendNotifications(
+        notifReceivers,
+        notification,
+      )
+      if( fcmToken ) Toast( 'Notification Sent' )
+    }
+  }
+
   const onPressReshare = useCallback( async () => {
     setReshareModal( false )
-    props.navigation.navigate( 'QrAndLink', {
-      contact: chosenContact,
-      selectedKeeper: selectedKeeper,
-      isChange: isChange,
-      shareType,
-      isReshare,
-      oldChannelKey,
-      channelKey: channelKey
-    } )
+    if( selectedKeeper.shareType == 'existingContact' ){
+      sendNotificationForExistingContact()
+    } else {
+      props.navigation.navigate( 'QrAndLink', {
+        contact: chosenContact,
+        selectedKeeper: selectedKeeper,
+        isChange: isChange,
+        shareType,
+        isReshare,
+        oldChannelKey,
+        channelKey: channelKey
+      } )
+    }
+
   }, [ selectedTitle, chosenContact, getContacts ] )
 
   const renderChangeContent = useCallback( () => {
@@ -473,7 +515,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const channelKeyTemp: string = payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     setChannelKey( channelKeyTemp )
 
-    props.navigation.navigate( 'QrAndLink', {
+    if( payload.shareType == 'existingContact' ){
+      console.log( 'payload.shareType', payload.shareType )
+      const obj: KeeperInfoInterface = {
+        shareId: selectedKeeper.shareId,
+        name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
+        type: shareType,
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        currentLevel: currentLevel,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        data: {
+          ...Contact, index
+        },
+        channelKey: channelKeyTemp
+      }
+      console.log( 'obj', obj )
+
+      dispatch( updatedKeeperInfo( obj ) )
+      dispatch( createChannelAssets( selectedKeeper.shareId ) )
+    } else props.navigation.navigate( 'QrAndLink', {
       contact: Contact,
       selectedKeeper: selectedKeeper,
       isChange: isChangeKeeper,
@@ -483,6 +544,47 @@ const TrustedContactHistoryKeeper = ( props ) => {
       channelKey: channelKeyTemp
     } )
   }
+
+  useEffect( ()=> {
+    if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
+      dispatch( createOrChangeGuardian( {
+        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
+      } ) )
+    }
+  }, [ createChannelAssetsStatus, channelAssets, chosenContact, keeperInfo ] )
+
+  useEffect( () => {
+    // capture the contact
+    if( !chosenContact ) return
+    const contacts: Trusted_Contacts = trustedContacts
+    let currentContact: TrustedContact
+
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === chosenContact.id ){
+          currentContact = contacts[ ck ]
+          break
+        }
+      }
+
+    if ( !currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) return
+
+    if( isGuardianCreationClicked ) {
+      const shareObj: LevelInfo = {
+        walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+        shareId: selectedKeeper.shareId,
+        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+        shareType: shareType,
+        status: 'notAccessible',
+        name: chosenContact && chosenContact.name ? chosenContact.name : ''
+      }
+      if( shareType == 'existingContact' ) shareObj.updatedAt = 0
+      dispatch( updateMSharesHealth( shareObj, isChange ) )
+      dispatch( setChannelAssets( {
+      } ) )
+      // saveInTransitHistory()
+    }
+  }, [ chosenContact, trustedContacts, encryptLinkWith ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )

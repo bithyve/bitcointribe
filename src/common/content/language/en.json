@@ -506,7 +506,7 @@
       "historyofyourbackup": "The history of your backup will appear here",
       "cloudBackupSuccessInfo":"Your have successfully backed up on the cloud. You don't have to do anything.",
       "cloudBackupNotSetupInfo": "You can backup on the cloud and use the Recovery Key from the cloud when restoring.",
-      "cloudBackupInAccessibleInfo": "You need to confirm your cloud connection, to ensure backup is accessible when you need it.",
+      "cloudBackupInAccessibleInfo": "You need to confirm your cloud connection, to ensure changes to your backup scheme.",
       "historyofyourRecovery": "The history of your Recovery Key will appear here",
       "Nohistory": "No history",
       "confirmingyourRecovery": "For confirming your Recovery Key on the Personal Device, simply open the app on that device and log in",

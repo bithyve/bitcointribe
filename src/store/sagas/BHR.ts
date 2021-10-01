@@ -1504,17 +1504,12 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     if( MetaShares && MetaShares.length ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       if( existingContact ){
-        const contactInfo = {
-          channelKey: channelKey,
-          secondaryChannelKey: BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-        }
         const primaryData: PrimaryStreamData = {
           contactDetails: contacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
-          relationType: TrustedContactRelationTypes.EXISTING_CONTACT,
+          relationType: TrustedContactRelationTypes.KEEPER,
         }
-
         const backupData: BackupStreamData = {
           primaryMnemonicShard: channelAssets.primaryMnemonicShard,
           keeperInfo
@@ -1532,46 +1527,60 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
             version: DeviceInfo.getVersion()
           }
         }
-        if( channelAssets.secondaryMnemonicShard && channelAssets.bhXpub ) {
-          const secondaryData: SecondaryStreamData = {
-            secondaryMnemonicShard: channelAssets.secondaryMnemonicShard,
-            bhXpub: channelAssets.bhXpub
+
+        const channelSyncDetails = {
+          channelKey: channelKey,
+          streamId: TrustedContactsOperations.getStreamId( walletId ),
+          contact: contacts[ channelKey ],
+          contactDetails: contacts[ channelKey ].contactDetails,
+          secondaryChannelKey: BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
+          metaSync: true,
+          unEncryptedOutstreamUpdates: streamUpdates
+        }
+        console.log( 'channelSyncDetails', channelSyncDetails )
+
+        const { updated }: {
+          updated: boolean;
+        } = yield call(
+          TrustedContactsOperations.syncPermanentChannels,
+          [ channelSyncDetails ]
+        )
+        console.log( 'UPDATED', updated )
+
+        if( updated ){
+          yield put( setChannelAssets( {
+          } ) )
+          const appVersion = DeviceInfo.getVersion()
+          const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
+          const instream = useStreamFromContact( temporaryContact, walletId, true )
+          const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+          const notification: INotification = {
+            notificationType: notificationType.FNF_KEEPER_REQUEST,
+            title: 'Friends & Family request',
+            body: `You have a Keeper request from ${temporaryContact.contactDetails.contactName}`,
+            data: {
+              walletName: walletName,
+              channelKey: channelKey,
+              contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
+              version: appVersion
+            },
+            tag: notificationTag.IMP,
           }
-          streamUpdates.secondaryData = secondaryData
+          const notifReceivers = []
+          notifReceivers.push( {
+            walletId: instream.primaryData.walletID,
+            FCMs: [ fcmToken ],
+          } )
+          if( notifReceivers.length ){
+            yield call(
+              Relay.sendNotifications,
+              notifReceivers,
+              notification,
+            )
+            Toast( 'Keeper successfully updated and Keeper notification sent successfully.' )
+          }
+
         }
-        // initiate permanent channel
-        const channelUpdate =  {
-          contactInfo, streamUpdates
-        }
-        yield put( syncPermanentChannels( {
-          permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-          channelUpdates: [ channelUpdate ],
-        } ) )
-        const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
-        const instream = useStreamFromContact( temporaryContact, walletId, true )
-        const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
-        const notification: INotification = {
-          notificationType: notificationType.FNF_KEEPER_REQUEST,
-          title: 'Friends & Family Request',
-          body: `You have new keeper request ${temporaryContact.contactDetails.contactName}`,
-          data: {
-            walletName: walletName,
-            channelKey: channelKey,
-            contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
-          },
-          tag: notificationTag.IMP,
-        }
-        const notifReceivers = []
-        notifReceivers.push( {
-          walletId: instream.primaryData.walletID,
-          FCMs: [ fcmToken ],
-        } )
-        if( notifReceivers.length )
-          yield call(
-            Relay.sendNotifications,
-            notifReceivers,
-            notification,
-          )
       } else {
         yield put( initializeTrustedContact( {
           contact: contact,
@@ -1961,15 +1970,11 @@ function* acceptExistingContactRequestWorker( { payload } ) {
     yield put( putKeeperInfo( keeperInfo ) )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const { walletName, walletId } = yield select( ( state ) => state.storage.wallet )
-    const contactInfo = {
-      channelKey,
-      contactsSecondaryChannelKey
-    }
     const primaryData: PrimaryStreamData = {
       contactDetails: contacts[ channelKey ].contactDetails,
       walletID: walletId,
       walletName,
-      relationType: TrustedContactRelationTypes.KEEPER,
+      relationType: TrustedContactRelationTypes.WARD,
     }
     const streamUpdates: UnecryptedStreamData = {
       streamId: TrustedContactsOperations.getStreamId( walletId ),
@@ -1983,14 +1988,55 @@ function* acceptExistingContactRequestWorker( { payload } ) {
         version: DeviceInfo.getVersion()
       }
     }
-    // initiate permanent channel
-    const channelUpdate =  {
-      contactInfo, streamUpdates
+
+    const channelSyncDetails = {
+      channelKey: channelKey,
+      streamId: TrustedContactsOperations.getStreamId( walletId ),
+      contact: contacts[ channelKey ],
+      contactDetails: contacts[ channelKey ].contactDetails,
+      contactsSecondaryChannelKey,
+      metaSync: true,
+      unEncryptedOutstreamUpdates: streamUpdates
     }
-    yield put( syncPermanentChannels( {
-      permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-      channelUpdates: [ channelUpdate ],
-    } ) )
+
+    const { updated }: {
+      updated: boolean;
+    } = yield call(
+      TrustedContactsOperations.syncPermanentChannels,
+      [ channelSyncDetails ]
+    )
+    if( updated ){
+      yield put( getApprovalFromKeepers( true, contacts[ channelKey ] ) )
+      const appVersion = DeviceInfo.getVersion()
+      const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
+      const instream = useStreamFromContact( temporaryContact, walletId, true )
+      const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+      const notification: INotification = {
+        notificationType: notificationType.FNF_KEEPER_REQUEST,
+        title: 'Friends & Family request',
+        body: `Your Keeper request to ${temporaryContact.contactDetails.contactName} has been accepted`,
+        data: {
+          walletName: walletName,
+          channelKey: channelKey,
+          contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
+          version: appVersion
+        },
+        tag: notificationTag.IMP,
+      }
+      const notifReceivers = []
+      notifReceivers.push( {
+        walletId: instream.primaryData.walletID,
+        FCMs: [ fcmToken ],
+      } )
+      if( notifReceivers.length ){
+        yield call(
+          Relay.sendNotifications,
+          notifReceivers,
+          notification,
+        )
+        Toast( 'Keeper successfully updated and Keeper notification sent successfully.' )
+      }
+    }
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )

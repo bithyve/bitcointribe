@@ -91,6 +91,7 @@ import {
   DeepLinkEncryptionType,
   KeeperInfoInterface,
   LevelHealthInterface,
+  notificationType,
   QRCodeTypes,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
@@ -397,11 +398,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.FNF_KEEPER_REQUEST:
           this.setState( {
             trustedContactRequest: {
-              ...message.additionalInfo,
+              walletName: message.additionalInfo.walletName,
+              encryptedChannelKeys: message.additionalInfo.channelKey+'-'+message.additionalInfo.contactsSecondaryChannelKey,
               isExistingContact: true,
               isQR: true,
               type: QRCodeTypes.EXISTING_CONTACT,
               isKeeper: true,
+              encryptionType: DeepLinkEncryptionType.DEFAULT,
+              encryptionHint: ''
             }
           }, () => {
             this.openBottomSheet( BottomSheetKind.TRUSTED_CONTACT_REQUEST )
@@ -727,6 +731,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const unread = messages.filter( msg => msg.status === 'unread' )
     if ( Platform.OS === 'ios' ) {
       PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
+    }
+    const notification = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST && value.status == 'unread' )
+    if( notification ){
+      this.setState( {
+        trustedContactRequest: {
+          walletName: notification.additionalInfo.walletName,
+          encryptedChannelKeys: notification.additionalInfo.channelKey+'-'+notification.additionalInfo.contactsSecondaryChannelKey,
+          isExistingContact: true,
+          isQR: true,
+          type: QRCodeTypes.EXISTING_CONTACT,
+          isKeeper: true,
+          encryptionType: DeepLinkEncryptionType.DEFAULT,
+          encryptionHint: ''
+        }
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.TRUSTED_CONTACT_REQUEST )
+      } )
     }
   }
 

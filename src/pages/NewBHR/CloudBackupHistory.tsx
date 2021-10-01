@@ -86,11 +86,12 @@ const CloudBackupHistory = ( props ) => {
 
   const setInfoOnBackup = () =>{
     if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
-      setShowButton( false )
-      setButtonText( '' )
+      setButtonText( common.backup )
+      setShowButton( true )
       setBackupInfo( strings.cloudBackupSuccessInfo )
     } else if( currentLevel == 0 ) {
       setButtonText( common.backup )
+      setShowButton( true )
       setBackupInfo( strings.cloudBackupNotSetupInfo )
     } else if( currentLevel > 0 && levelHealth[ 0 ].levelInfo[ 1 ].status == 'notAccessible' ) {
       setButtonText( common.confirm )
