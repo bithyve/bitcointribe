@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, NewWalletImage, TemporaryChannelMetaData } from './Interface'
+import { Gift, GiftMetaData, INotification, NewWalletImage } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
 import crypto from 'crypto'
@@ -358,23 +358,17 @@ export default class Relay {
     }
   };
 
-  public static updateTemporaryChannel = async ( encryptionKey: string, data: any, metaData: TemporaryChannelMetaData ): Promise<{
+  public static updateGiftChannel = async ( channelAddress: string, encryptionKey: string, gift: Gift, metaData: GiftMetaData ): Promise<{
     updated: boolean;
   }> => {
     try {
-
-      const temporaryChannelAddress = crypto
-        .createHash( 'sha256' )
-        .update( encryptionKey )
-        .digest( 'hex' ).slice( 0, 10 )
-      const encryptedData = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( data ), encryptionKey )
-
+      const encryptedGift = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( gift ), encryptionKey )
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateTemporaryChannel', {
+        res = await BH_AXIOS.post( 'updateGiftChannel', {
           HEXA_ID,
-          temporaryChannelAddress,
-          encryptedData,
+          channelAddress,
+          encryptedGift,
           metaData
         } )
       } catch ( err ) {
@@ -386,77 +380,77 @@ export default class Relay {
         updated,
       }
     } catch ( err ) {
-      throw new Error( 'Failed to update temporary channel' )
+      throw new Error( 'Failed to update gift channel' )
     }
   };
 
-  public static fetchTemporaryChannel = async ( decryptionKey: string ): Promise<{
-    data: any;
-    metaData: TemporaryChannelMetaData;
+  public static fetchGiftChannel = async ( decryptionKey: string ): Promise<{
+    gift: Gift,
+    metaData: GiftMetaData;
   }> => {
     try {
 
-      const temporaryChannelAddress = crypto
+      const channelAddress = crypto
         .createHash( 'sha256' )
         .update( decryptionKey )
         .digest( 'hex' ).slice( 0, 10 )
 
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'fetchTemporaryChannel', {
+        res = await BH_AXIOS.post( 'fetchGiftChannel', {
           HEXA_ID,
-          temporaryChannelAddress,
+          channelAddress,
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { encryptedData, metaData } = res.data
-      if( !encryptedData ) throw new Error( 'Temporary Channel: no data found' )
-      const decryptedData = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedData, decryptionKey ) )
+      const { encryptedGift, metaData } = res.data
+      if( !encryptedGift ) throw new Error( 'Gift not found' )
+      const gift: Gift = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedGift, decryptionKey ) )
 
       return {
-        data: decryptedData,
+        gift,
         metaData
       }
     } catch ( err ) {
-      throw new Error( 'Failed to fetch temporary channel' )
+      throw new Error( 'Failed to fetch gift channel' )
     }
   };
 
-  public static syncTemporaryChannelsMetaData = async (
-    temporaryChannelsToSync: {
+  public static syncGiftChannelsMetaData = async (
+    giftChannelsToSync: {
       [channelAddress: string]: {
         creator?: boolean,
-        metaDataUpdates?: TemporaryChannelMetaData
+        metaDataUpdates?: GiftMetaData,
     }
   } ): Promise<{
-    synchedTemporaryChannels:  {
+    synchedGiftChannels:  {
       [channelAddress: string]: {
-        metaData: TemporaryChannelMetaData
+        metaData: GiftMetaData
     }
   } }> => {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'syncTemporaryChannelsMetaData', {
+        res = await BH_AXIOS.post( 'syncGiftChannelsMetaData', {
           HEXA_ID,
-          temporaryChannelsToSync,
+          giftChannelsToSync,
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { synchedTemporaryChannels }: { synchedTemporaryChannels: {
+      const { synchedGiftChannels }: { synchedGiftChannels: {
         [channelAddress: string]: {
-          metaData: TemporaryChannelMetaData
+          metaData: GiftMetaData
       } }} = res.data
 
       return {
-        synchedTemporaryChannels
+        synchedGiftChannels
       }
     } catch ( err ) {
-      throw new Error( 'Failed to sync temporary channels meta-data' )
+      throw new Error( 'Failed to sync gift channels meta-data' )
     }
   };
 }

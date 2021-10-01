@@ -975,19 +975,11 @@ export interface Gift {
 }
 
 export interface GiftMetaData {
-  type: TemporaryChannelMetaDataType.GIFT,
   status: GiftStatus,
   notificationInfo?: {
     walletId: string,
     FCM: string,
   }
-}
-
-export enum TemporaryChannelMetaDataType {
-  GIFT = 'GIFT'
-}
-export interface TemporaryChannelMetaData {
-  [metaDataType: string]: GiftMetaData
 }
 
 export interface cloudDataInterface {

@@ -66,8 +66,6 @@ import {
   GiftStatus,
   MultiSigAccount,
   NetworkType,
-  TemporaryChannelMetaData,
-  TemporaryChannelMetaDataType,
   TrustedContact,
   Trusted_Contacts,
   UnecryptedStreamData,
@@ -139,24 +137,20 @@ export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: st
   try{
     giftToSend.status = GiftStatus.SENT
     const giftMetaData: GiftMetaData = {
-      type: TemporaryChannelMetaDataType.GIFT,
       status: giftToSend.status,
       notificationInfo: {
         walletId: giftToSend.sender.walletId,
         FCM: fcmToken,
       }
     }
-    const temporaryChannelMetaData: TemporaryChannelMetaData = {
-      [ giftMetaData.type ]: giftMetaData,
-    }
 
-    const temporaryChannelAddress = crypto
+    const channelAddress = crypto
       .createHash( 'sha256' )
       .update( encryptionKey )
       .digest( 'hex' ).slice( 0, 10 )
-    giftToSend.channelAddress = temporaryChannelAddress
+    giftToSend.channelAddress = channelAddress
 
-    Relay.updateTemporaryChannel( encryptionKey, giftToSend, temporaryChannelMetaData ).then( ( ) => {
+    Relay.updateGiftChannel( channelAddress, encryptionKey, giftToSend, giftMetaData ).then( ( ) => {
       dispatch( updateGift( giftToSend ) )
     } ) // non-awaited upload
 

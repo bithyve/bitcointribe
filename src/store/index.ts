@@ -83,7 +83,7 @@ import {
   restoreTrustedContactsWatcher,
   updateWalletNameToChannelWatcher,
   updateWalletWatcher,
-  fetchTemporaryChannelGiftWatcher,
+  fetchGiftFromChannelWatcher,
   syncGiftsStatusWatcher,
   rejectGiftWatcher,
 } from './sagas/trustedContacts'
@@ -225,7 +225,7 @@ const rootSaga = function* () {
     restoreTrustedContactsWatcher,
     updateWalletNameToChannelWatcher,
     updateWalletWatcher,
-    fetchTemporaryChannelGiftWatcher,
+    fetchGiftFromChannelWatcher,
     syncGiftsStatusWatcher,
     rejectGiftWatcher,
 

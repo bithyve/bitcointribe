@@ -15,7 +15,7 @@ import {
   RESTORE_TRUSTED_CONTACTS,
   UPDATE_WALLET_NAME_TO_CHANNEL,
   UPDATE_WALLET_NAME,
-  FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+  FETCH_GIFT_FROM_CHANNEL,
   SYNC_GIFTS_STATUS,
   REJECT_GIFT,
 } from '../actions/trustedContacts'
@@ -47,8 +47,6 @@ import {
   DeepLinkKind,
   DeepLinkEncryptionType,
   GiftMetaData,
-  TemporaryChannelMetaData,
-  TemporaryChannelMetaDataType,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -107,7 +105,7 @@ function* updateWalletWorker( { payload } ) {
 
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
-function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKey: string } } ) {
+function* fetchGiftFromChannelWorker( { payload }: { payload: {decryptionKey: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -120,11 +118,11 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     }
   }
 
-  let gift: Gift, temporaryChannelMetaData:TemporaryChannelMetaData
+  let gift: Gift, giftMetaData :GiftMetaData
   try{
-    const { data, metaData }= yield call( Relay.fetchTemporaryChannel, payload.decryptionKey )
-    gift = data
-    temporaryChannelMetaData = metaData
+    const res= yield call( Relay.fetchGiftChannel, payload.decryptionKey )
+    gift = res.gift
+    giftMetaData = res.metaData
     if( !gift || !gift.id ) throw new Error( 'Gift not found' )
   } catch( err ){
     Toast( 'Gift expired/unavailable' )
@@ -152,18 +150,15 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
     } ) )
     yield call( dbManager.updateAccount, defaultCheckingAccount.id, defaultCheckingAccount )
 
-    const giftMetaData = temporaryChannelMetaData[ TemporaryChannelMetaDataType.GIFT ]
     if( giftMetaData ){
       giftMetaData.status = GiftStatus.CLAIMED
 
-      const temporaryChannelsToSyncForGift = {
+      const giftChannelsToSync = {
         [ gift.channelAddress ]: {
-          metaDataUpdates: {
-            [ TemporaryChannelMetaDataType.GIFT ]: giftMetaData,
-          },
+          metaDataUpdates: giftMetaData
         }
       }
-      yield call( Relay.syncTemporaryChannelsMetaData, temporaryChannelsToSyncForGift )
+      yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
 
       if( giftMetaData.notificationInfo.FCM ){
         const wallet: Wallet = yield select( state => state.storage.wallet )
@@ -192,35 +187,31 @@ function* fetchTemporaryChannelGiftWorker( { payload }: { payload: {decryptionKe
   }
 }
 
-export const fetchTemporaryChannelGiftWatcher = createWatcher(
-  fetchTemporaryChannelGiftWorker,
-  FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+export const fetchGiftFromChannelWatcher = createWatcher(
+  fetchGiftFromChannelWorker,
+  FETCH_GIFT_FROM_CHANNEL,
 )
 
 function* rejectGiftWorker( { payload }: {payload: { channelAddress: string}} ) {
   const { channelAddress } = payload
-  const temporaryChannelsToSyncForGift = {
+  const giftChannelsToSync = {
     [ channelAddress ]: {
       metaDataUpdates: {
-        [ TemporaryChannelMetaDataType.GIFT ]: {
-          type: TemporaryChannelMetaDataType.GIFT,
-          status: GiftStatus.REJECTED
-        },
+        status: GiftStatus.REJECTED
       },
     }
   }
 
-  const { synchedTemporaryChannels }: { synchedTemporaryChannels: {
+  const { synchedGiftChannels }: { synchedGiftChannels: {
     [channelAddress: string]: {
-        metaData: TemporaryChannelMetaData;
+        metaData: GiftMetaData;
     };
   };
-  } = yield call( Relay.syncTemporaryChannelsMetaData, temporaryChannelsToSyncForGift )
+  } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
 
   const wallet: Wallet = yield select( state => state.storage.wallet )
-  for( const channelAddress in synchedTemporaryChannels ){
-    const { metaData } = synchedTemporaryChannels[ channelAddress ]
-    const giftMetaData = metaData[ TemporaryChannelMetaDataType.GIFT ]
+  for( const channelAddress in synchedGiftChannels ){
+    const { metaData: giftMetaData } = synchedGiftChannels[ channelAddress ]
     if( giftMetaData ){
       if( giftMetaData.notificationInfo.FCM ){
         const notification: INotification = {
@@ -249,44 +240,43 @@ export const rejectGiftWatcher = createWatcher(
 function* syncGiftsStatusWorker() {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
 
-  const temporaryChannelsToSyncForGift: {
+  const giftChannelsToSync: {
       [channelAddress: string]: {
           creator?: boolean;
-          metaDataUpdates?: TemporaryChannelMetaData;
+          metaDataUpdates?: GiftMetaData;
       };
   } = {
   }
-  const tempChannelToGiftIdMap = {
+  const giftChannelToGiftIdMap = {
   }
   for( const giftId in storedGifts ){
     const gift = storedGifts[ giftId ]
     if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
       if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ){
-        tempChannelToGiftIdMap[ gift.channelAddress ] = giftId
-        temporaryChannelsToSyncForGift[ gift.channelAddress ] = {
+        giftChannelToGiftIdMap[ gift.channelAddress ] = giftId
+        giftChannelsToSync[ gift.channelAddress ] = {
           creator: true
         }
       }
     }
   }
 
-  if( Object.keys( temporaryChannelsToSyncForGift ).length === 0 ) {
+  if( Object.keys( giftChannelsToSync ).length === 0 ) {
     console.log( 'No gifts to sync' )
     return
   }
 
-  const { synchedTemporaryChannels }: { synchedTemporaryChannels: {
+  const { synchedGiftChannels }: { synchedGiftChannels: {
     [channelAddress: string]: {
-        metaData: TemporaryChannelMetaData;
+        metaData: GiftMetaData;
     };
   };
-  } = yield call( Relay.syncTemporaryChannelsMetaData, temporaryChannelsToSyncForGift )
+  } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
 
-  for( const channelAddress in synchedTemporaryChannels ){
-    const { metaData } = synchedTemporaryChannels[ channelAddress ]
-    const giftMetaData = metaData[ TemporaryChannelMetaDataType.GIFT ]
+  for( const channelAddress in synchedGiftChannels ){
+    const { metaData: giftMetaData } = synchedGiftChannels[ channelAddress ]
     if( giftMetaData ){
-      const giftToUpdate = storedGifts[ tempChannelToGiftIdMap[ channelAddress ] ]
+      const giftToUpdate = storedGifts[ giftChannelToGiftIdMap[ channelAddress ] ]
       if( giftToUpdate.status !== giftMetaData.status ){
         giftToUpdate.status = giftMetaData.status
         yield put( updateGift( giftToUpdate ) )
