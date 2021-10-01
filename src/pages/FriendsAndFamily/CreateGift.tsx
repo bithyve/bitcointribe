@@ -8,7 +8,8 @@ import {
   StatusBar,
   TextInput,
   KeyboardAvoidingView,
-  ScrollView
+  ScrollView,
+  Image
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -38,10 +39,29 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import AccountShell from '../../common/data/models/AccountShell'
+import ToggleContainer from '../../pages/Home/ToggleContainer'
+import MaterialCurrencyCodeIcon, {
+  materialIconCurrencyCodes,
+} from '../../components/MaterialCurrencyCodeIcon'
+import {
+  getCurrencyImageByRegion, processRequestQR,
+} from '../../common/CommonFunctions/index'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import { UsNumberFormat } from '../../common/utilities'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
+  const currencyKind: CurrencyKind = useCurrencyKind()
+
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+  const fiatCurrencyCode = useCurrencyCode()
   const accountsState: AccountsState = useSelector( state => state.accounts )
+  const currencyCode =  useSelector( state => state.preferences.currencyCode )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
@@ -81,7 +101,13 @@ const CreateGift = ( { navigation } ) => {
   }
 
   const renderButton = ( text ) => {
-    const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance )
+    const actualAmount = ( ( spendableBalance / SATOSHIS_IN_BTC ) *
+    accountsState.exchangeRates[ currencyCode ].last
+    ).toFixed( 2 )
+    console.log( 'actualAmount', spendableBalance, actualAmount )
+
+
+    const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance || parseInt( amount ? amount :  '0' ) > actualAmount )
     return(
       <TouchableOpacity
         disabled={isDisabled}
@@ -185,6 +211,40 @@ const CreateGift = ( { navigation } ) => {
       </View>
     )
   }
+
+  const BalanceCurrencyIcon = () => {
+    const style = {
+      height: RFValue( 14 ), width: RFValue( 14 ), resizeMode: 'contain'
+    }
+
+    if ( prefersBitcoin ) {
+      return <Image style={{
+        ...style
+      }} source={require( '../../assets/images/currencySymbols/icon_bitcoin_gray.png' )} />
+    }
+
+    if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
+      return (
+        <MaterialCurrencyCodeIcon
+          currencyCode={fiatCurrencyCode}
+          color={Colors.gray2}
+          size={RFValue( 16 )}
+          style={{
+          }}
+        />
+      )
+    } else {
+      return (
+        <Image
+          style={style}
+          source={getCurrencyImageByRegion( fiatCurrencyCode, 'gray' )}
+        />
+      )
+    }
+  }
+
+  console.log( 'prefersBitcoin', currencyCode, accountsState.netBalance, accountsState.exchangeRates[ currencyCode ] )
+
   return (
     <ScrollView contentContainerStyle={{
       flexGrow: 1
@@ -199,7 +259,8 @@ const CreateGift = ( { navigation } ) => {
       </ModalContainer>
         }
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor,
+          marginRight: wp( 4 )
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -215,6 +276,7 @@ const CreateGift = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
+          <ToggleContainer />
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginRight: wp( 4 )
@@ -268,8 +330,20 @@ const CreateGift = ( { navigation } ) => {
               {sourceAccountHeadlineText}
             </Text>
             <Text style={styles.availableToSpendText}>
-            Available to spend
-              <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
+              {'Available to spend '}
+              <Text style={styles.balanceText}>
+                {prefersBitcoin
+                  ? UsNumberFormat( accountsState.netBalance )
+                  : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
+                    ? (
+                      ( accountsState.netBalance / SATOSHIS_IN_BTC ) *
+                      accountsState.exchangeRates[ currencyCode ].last
+                    ).toFixed( 2 )
+                    : 0}
+              </Text>
+              <Text style={styles.homeHeaderAmountUnitText}>
+                {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
+              </Text>
             </Text>
           </View>
         </TouchableOpacity>
@@ -284,7 +358,7 @@ const CreateGift = ( { navigation } ) => {
             paddingHorizontal: wp( 3 )
           }}
         >
-          <Dollar />
+          <BalanceCurrencyIcon />
 
           <View style={{
             width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
@@ -341,6 +415,13 @@ const CreateGift = ( { navigation } ) => {
 }
 
 const styles = StyleSheet.create( {
+  cardBitCoinImage: {
+    width: wp( '3.5%' ),
+    height: wp( '3.5%' ),
+    marginRight: 5,
+    resizeMode: 'contain',
+    // marginBottom: wp( '0.7%' ),
+  },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
