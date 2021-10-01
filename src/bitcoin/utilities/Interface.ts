@@ -360,6 +360,8 @@ export enum notificationType {
   FNF_KEEPER_REQUEST='FNF_KEEPER_REQUEST',
   FNF_KEEPER_REQUEST_ACCEPTED='FNF_KEEPER_REQUEST_ACCEPTED',
   FNF_KEEPER_REQUEST_REJECTED='FNF_KEEPER_REQUEST_REJECTED',
+  GIFT_ACCEPTED = 'GIFT_ACCEPTED',
+  GIFT_REJECTED = 'GIFT_REJECTED'
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -533,9 +535,7 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
-  gifts? : {
-    [id: string]: Gift
-  }
+
   // primary keeper exclusives
   secondarySetupData? :{
     secondaryXpub: string
@@ -940,7 +940,6 @@ export enum DeepLinkEncryptionType {
   OTP = 'OTP'
 }
 
-
 export enum GiftType {
   SENT = 'SENT',
   RECEIVED = 'RECEIVED'
@@ -972,6 +971,15 @@ export interface Gift {
     walletName?: string,
     contactId?: string
   },
+  channelAddress?: string,
+}
+
+export interface GiftMetaData {
+  status: GiftStatus,
+  notificationInfo?: {
+    walletId: string,
+    FCM: string,
+  }
 }
 
 export interface cloudDataInterface {

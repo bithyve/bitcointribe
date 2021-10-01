@@ -16,8 +16,10 @@ export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
 export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
 export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
-export const FETCH_GIFT_FROM_TEMPORARY_CHANNEL = 'FETCH_GIFT_FROM_TEMPORARY_CHANNEL'
+export const ASSOCIATE_GIFT = 'ASSOCIATE_GIFT'
+export const FETCH_GIFT_FROM_CHANNEL = 'FETCH_GIFT_FROM_CHANNEL'
 export const SYNC_GIFTS_STATUS = 'SYNC_GIFTS_STATUS'
+export const REJECT_GIFT = 'REJECT_GIFT'
 
 export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
@@ -69,7 +71,6 @@ export const initializeTrustedContact = (
     channelKey,
     contactsSecondaryChannelKey,
     shareId,
-    giftId
   }:{
       contact: any,
       flowKind: InitTrustedContactFlowKind,
@@ -78,7 +79,6 @@ export const initializeTrustedContact = (
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
       shareId?: string,
-      giftId?: string
     },
 ) => {
   return {
@@ -91,7 +91,6 @@ export const initializeTrustedContact = (
       channelKey,
       contactsSecondaryChannelKey,
       shareId,
-      giftId
     },
   }
 }
@@ -144,12 +143,31 @@ export const walletCheckIn = ( currencyCode?: string ) => {
   }
 }
 
+export const associateGift = ( giftId: string, accountId?: string ) => {
+  return {
+    type: ASSOCIATE_GIFT,
+    payload: {
+      giftId,
+      accountId
+    },
+  }
+}
+
 export const fetchGiftFromTemporaryChannel = ( decryptionKey: string ) => {
   return {
-    type: FETCH_GIFT_FROM_TEMPORARY_CHANNEL,
+    type: FETCH_GIFT_FROM_CHANNEL,
     payload: {
       decryptionKey
     },
+  }
+}
+
+export const rejectGift = ( channelAddress: string ) => {
+  return {
+    type: REJECT_GIFT,
+    payload: {
+      channelAddress
+    }
   }
 }
 

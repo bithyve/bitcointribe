@@ -383,6 +383,7 @@ export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey,
     `/${walletName}` +
     `/${encryptedChannelKeys}` +
     `/${encryptionType}-${encryptionHint}` +
+    `/${extraData.channelAddress}` +
     `/${extraData.amount}`+
     `/${extraData.note}` +
     `/v${appVersion}`
@@ -458,8 +459,9 @@ export const processDeepLink = ( deepLink: string ) => {
             encryptionHint,
             isQR: false,
             deepLinkKind: splits[ 4 ],
-            amount: splits[ 8 ],
-            note: splits[ 9 ],
+            channelAddress: splits[ 8 ],
+            amount: splits[ 9 ],
+            note: splits[ 10 ],
             version,
           }
           return {
@@ -527,11 +529,12 @@ export const processRequestQR = ( qrData: string ) => {
             encryptedChannelKeys: parsedData.encryptedChannelKeys,
             encryptionType: parsedData.encryptionType,
             encryptionHint: parsedData.encryptionHint,
-            isQR: true,
+            channelAddress: parsedData.channelAddress,
             amount: parsedData.amount,
             note: parsedData.note,
             version: parsedData.version,
             type: parsedData.type,
+            isQR: true,
           }
           break
     }
