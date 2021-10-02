@@ -1054,7 +1054,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onGiftRequestAccepted = ( key? ) => {
     try {
-      this.closeBottomSheet()
+      // this.closeBottomSheet()
       const { giftRequest } = this.state
 
       let decryptionKey: string
