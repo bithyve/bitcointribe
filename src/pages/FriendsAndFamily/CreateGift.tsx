@@ -51,11 +51,14 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { UsNumberFormat } from '../../common/utilities'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { translations } from '../../common/content/LocContext'
+import FormStyles from '../../common/Styles/FormStyles'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
 
+  const strings  = translations[ 'accounts' ]
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
@@ -72,6 +75,15 @@ const CreateGift = ( { navigation } ) => {
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
+
+
+  const currentSatsAmountFormValue = useMemo( () => {
+    return Number( amount )
+  }, [ amount ] )
+
+  const isAmountInvalid = useMemo( () => {
+    return currentSatsAmountFormValue > spendableBalance
+  }, [ currentSatsAmountFormValue, spendableBalance ] )
 
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
@@ -107,12 +119,11 @@ const CreateGift = ( { navigation } ) => {
     console.log( 'actualAmount', spendableBalance, actualAmount )
 
 
-    const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance || parseInt( amount ? amount :  '0' ) > actualAmount )
+    const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
     return(
       <TouchableOpacity
         disabled={isDisabled}
         onPress={()=>{
-
           switch( text ){
               case 'Create Gift':
                 dispatch( generateGifts( {
@@ -371,6 +382,13 @@ const CreateGift = ( { navigation } ) => {
             keyboardType={'numeric'}
             onChangeText={( text ) => {setAmount( text )}}
           />
+          {isAmountInvalid && (
+            <View style={{
+              marginLeft: 'auto'
+            }}>
+              <Text style={FormStyles.errorText}>{strings.Insufficient}</Text>
+            </View>
+          )}
         </KeyboardAvoidingView>
         <View style={{
           marginVertical: hp( 5 ),
@@ -448,7 +466,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     height: wp( '12%' ),
-    // width: wp( '27%' ),
+    width: wp( '27%' ),
     paddingHorizontal: wp( 2 ),
     justifyContent: 'center',
     alignItems: 'center',

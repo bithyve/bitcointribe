@@ -138,202 +138,215 @@ const ManageGifts = ( { navigation } ) => {
   return (
     <View style={{
       // height: '50%',
-      // flex: 1,
+      flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
 
-      <SafeAreaView
-        style={{
-          backgroundColor: Colors.backgroundColor
-        }}
-      />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      {/* {giftDetails &&
+
+      <View style={{
+        height: 'auto',
+        backgroundColor: Colors.backgroundColor,
+      }}>
+
+        <SafeAreaView
+          style={{
+            backgroundColor: Colors.backgroundColor
+          }}
+        />
+        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+        {/* {giftDetails &&
       <ModalContainer visible={giftDetails} closeBottomSheet={() => {}} >
         {renderGiftDetailsModel()}
       </ModalContainer>
         } */}
-      <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
-      }}>
-        <HeaderTitle
-          firstLineTitle={'Manage Gifts'}
-          secondLineTitle={'View and manage created Gifts'}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
-        <TouchableOpacity
-          onPress={() => navigation.navigate( 'CreateGift' )}
-          style={{
-            ...styles.selectedContactsView,
-          }}
-        >
-          <Text style={[ styles.contactText, {
-            fontSize: RFValue( 24 ),
-          } ]}>+</Text>
-          {/* <Image
+        <View style={[ CommonStyles.headerContainer, {
+          backgroundColor: Colors.backgroundColor
+        } ]}>
+          <TouchableOpacity
+            style={CommonStyles.headerLeftIconContainer}
+            onPress={() => {
+              navigation.goBack()
+            }}
+          >
+            <View style={CommonStyles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
+        }}>
+          <HeaderTitle
+            firstLineTitle={'Manage Gifts'}
+            secondLineTitle={'View and manage created Gifts'}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
+          <TouchableOpacity
+            onPress={() => navigation.navigate( 'CreateGift' )}
+            style={{
+              ...styles.selectedContactsView,
+            }}
+          >
+            <Text style={[ styles.contactText, {
+              fontSize: RFValue( 24 ),
+            } ]}>+</Text>
+            {/* <Image
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/icon_add_grey.png' )}
                   /> */}
-          <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
+            <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
 
-        </TouchableOpacity>
-      </View>
-      <ScrollView
-        style={{
-          marginHorizontal: wp( 4 )
-        }}
-        horizontal>
-        {
-          Object.keys( giftsArr?? {
-          } ).map( ( item ) => {
-            return(
-              <TouchableOpacity
-                key={item}
-                style={[ styles.buttonNavigator, {
-                  backgroundColor: active === item ? Colors.blue : Colors.borderColor
-                } ]}
-                onPress={() =>buttonPress( item )}
-              >
-                <Text style={[ styles.buttonText, {
-                  color: active === item ? Colors.white : Colors.gray2
-                } ]}>
-                  {item === GiftStatus.CREATED && 'Available' }
-                  {item === GiftStatus.EXPIRED && 'Expired' }
-                  {item === GiftStatus.SENT && 'Sent' }
-                  {item === GiftType.RECEIVED && 'Received' }
-                </Text>
-              </TouchableOpacity>
-            )
-          } )
-        }
-      </ScrollView>
-      <FlatList
-        // extraData={selectedDestinationID}
-        data={giftsArr?.[ `${active}` ]}
-        keyExtractor={listItemKeyExtractor}
-        renderItem={( { item, index } ) => {
-          console.log( 'item', item.type === GiftType.RECEIVED )
-          const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
-          const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
-          return(
-            <>
-              {active === GiftStatus.CREATED ?
-                <DashedContainer
-                  titleText={'Available Gift'}
-                  subText={'Lorem ipsum dolor sit amet'}
-                  amt={numberWithCommas( item.amount )}
-                  date={item.createdAt}
-                  image={<GiftCard />}
-                  onPress={ () => processGift( item, title, walletName )}
-                />
-                :
-                <View
-                  style={{
-                    marginHorizontal: wp( 6 ), marginTop: hp( 1 )
-                  }}>
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => {
-                      navigation.navigate( 'GiftDetails', {
-                        title, walletName, createdAt: item.createdAt, amount: item.amount
-                      } )
-                    }
-                    }
-                  >
-                    <View style={{
-                      flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
-                    }}>
-                      <Text style={{
-                        color: Colors.lightTextColor,
-                        fontSize: RFValue( 10 ),
-                        letterSpacing: 0.7,
-                        fontFamily: Fonts.FiraSansRegular,
-                        fontWeight: '700'
-                      }}>
-                        {title}
-                      </Text>
-                      <Text style={{
-                        color: Colors.lightTextColor,
-                        fontSize: RFValue( 10 ),
-                        letterSpacing: 0.1,
-                        fontFamily: Fonts.FiraSansRegular,
-                        alignSelf: 'flex-end'
-                      }}>
-                        {moment( item.createdAt ).format( 'lll' )}
-                      </Text>
-                    </View>
+          </TouchableOpacity>
+        </View>
+        <ScrollView
+          style={{
+            marginHorizontal: wp( 4 )
+          }}
+          horizontal>
+          {
+            Object.keys( giftsArr?? {
+            } ).map( ( item ) => {
+              return(
+                <TouchableOpacity
+                  key={item}
+                  style={[ styles.buttonNavigator, {
+                    backgroundColor: active === item ? Colors.blue : Colors.borderColor
+                  } ]}
+                  onPress={() =>buttonPress( item )}
+                >
+                  <Text style={[ styles.buttonText, {
+                    color: active === item ? Colors.white : Colors.gray2
+                  } ]}>
+                    {item === GiftStatus.CREATED && 'Available' }
+                    {item === GiftStatus.EXPIRED && 'Expired' }
+                    {item === GiftStatus.SENT && 'Sent' }
+                    {item === GiftType.RECEIVED && 'Received' }
+                  </Text>
+                </TouchableOpacity>
+              )
+            } )
+          }
+        </ScrollView>
+        <View style={{
+          height: 'auto'
+        }}>
 
-                    <View style={{
-                      ...styles.listItem
-                    }}
-                    >
-                      <View style={styles.avatarContainer}>
-                        {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-                      </View>
-                      <View style={{
-                        alignItems: 'flex-start', marginHorizontal: wp( 2 )
+
+          <FlatList
+            // extraData={selectedDestinationID}
+            data={giftsArr?.[ `${active}` ]}
+            keyExtractor={listItemKeyExtractor}
+            renderItem={( { item, index } ) => {
+              console.log( 'item', item.type === GiftType.RECEIVED )
+              const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
+              const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
+              return(
+                <>
+                  {active === GiftStatus.CREATED ?
+                    <DashedContainer
+                      titleText={'Available Gift'}
+                      subText={'Lorem ipsum dolor sit amet'}
+                      amt={numberWithCommas( item.amount )}
+                      date={item.createdAt}
+                      image={<GiftCard />}
+                      onPress={ () => processGift( item, title, walletName )}
+                    />
+                    :
+                    <View
+                      style={{
+                        marginHorizontal: wp( 6 ), marginTop: hp( 1 )
                       }}>
-                        <Text style={{
-                          textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                          navigation.navigate( 'GiftDetails', {
+                            title, walletName, createdAt: item.createdAt, amount: item.amount
+                          } )
+                        }
+                        }
+                      >
+                        <View style={{
+                          flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
                         }}>
-                          {walletName}
-                        </Text>
-                        <Text style={{
-                          ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
-                        }}>Lorem ipsum dolor sit amet</Text>
-                      </View>
-                      <View style={{
-                        marginLeft: 'auto',
-                        marginRight: wp( 2 ),
-                      }}>
-                        <Text style={{
-                          color: Colors.black,
-                          fontSize: RFValue( 18 ),
-                          fontFamily: Fonts.FiraSansRegular,
-                        }}>
-                          {numberWithCommas( item.amount )}
                           <Text style={{
                             color: Colors.lightTextColor,
                             fontSize: RFValue( 10 ),
-                            fontFamily: Fonts.FiraSansRegular
-                          }}> sats
+                            letterSpacing: 0.7,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontWeight: '700'
+                          }}>
+                            {title}
                           </Text>
-                        </Text>
-                      </View>
-                      <RightArrow />
+                          <Text style={{
+                            color: Colors.lightTextColor,
+                            fontSize: RFValue( 10 ),
+                            letterSpacing: 0.1,
+                            fontFamily: Fonts.FiraSansRegular,
+                            alignSelf: 'flex-end'
+                          }}>
+                            {moment( item.createdAt ).format( 'lll' )}
+                          </Text>
+                        </View>
+
+                        <View style={{
+                          ...styles.listItem
+                        }}
+                        >
+                          <View style={styles.avatarContainer}>
+                            {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
+                          </View>
+                          <View style={{
+                            alignItems: 'flex-start', marginHorizontal: wp( 2 )
+                          }}>
+                            <Text style={{
+                              textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                            }}>
+                              {walletName}
+                            </Text>
+                            <Text style={{
+                              ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
+                            }}>Lorem ipsum dolor sit amet</Text>
+                          </View>
+                          <View style={{
+                            marginLeft: 'auto',
+                            marginRight: wp( 2 ),
+                          }}>
+                            <Text style={{
+                              color: Colors.black,
+                              fontSize: RFValue( 18 ),
+                              fontFamily: Fonts.FiraSansRegular,
+                            }}>
+                              {numberWithCommas( item.amount )}
+                              <Text style={{
+                                color: Colors.lightTextColor,
+                                fontSize: RFValue( 10 ),
+                                fontFamily: Fonts.FiraSansRegular
+                              }}> sats
+                              </Text>
+                            </Text>
+                          </View>
+                          <RightArrow />
+                        </View>
+
+                      </TouchableOpacity>
                     </View>
+                  }
+                </>
 
-                  </TouchableOpacity>
-                </View>
-              }
-            </>
-          )
+              )
 
-        }}
-      />
-      {Object.values( gifts?? {
-      } ).length === 0 &&
+            }}
+          />
+        </View>
+        {Object.values( gifts?? {
+        } ).length === 0 &&
       <BottomInfoBox
         backgroundColor={Colors.white}
         title={'Note'}
@@ -341,7 +354,8 @@ const ManageGifts = ( { navigation } ) => {
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
         }
       />
-      }
+        }
+      </View>
     </View>
   )
 }
