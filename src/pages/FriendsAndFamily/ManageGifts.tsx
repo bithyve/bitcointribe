@@ -55,8 +55,8 @@ const ManageGifts = ( { navigation } ) => {
     const sentAndClaimed = []
     const expiredArr = []
     const sortedGifts = Object.values( gifts?? {
-    } ).sort( function ( left, right ) {
-      return moment.utc( right.createdAt ).unix() - moment.utc( left.createdAt ).unix()
+    } ).sort( function ( left: Gift, right: Gift ) {
+      return moment.utc( right.timeStamps.created ).unix() - moment.utc( left.timeStamps.created ).unix()
     } )
 
     sortedGifts.forEach( ( gift: Gift ) => {
@@ -64,7 +64,7 @@ const ManageGifts = ( { navigation } ) => {
         receivedArr.push( gift )
       } else {
         if ( gift.status === GiftStatus.CREATED ) availableGifts.push( gift )
-        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.CLAIMED ) sentAndClaimed.push( gift )
+        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
       }
     } )
@@ -94,7 +94,7 @@ const ManageGifts = ( { navigation } ) => {
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
           navigation.navigate( 'GiftDetails', {
-            title, walletName, createdAt: selectedGift.createdAt, amount: selectedGift.amount
+            title, walletName, createdAt: selectedGift.timeStamps.created, amount: selectedGift.amount
           } )
           // navigation.navigate( 'AddContact', {
           //   fromScreen: 'ManageGift',

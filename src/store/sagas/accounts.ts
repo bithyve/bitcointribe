@@ -136,6 +136,7 @@ export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: st
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
+    giftToSend.timeStamps.sent = Date.now()
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
       notificationInfo: {

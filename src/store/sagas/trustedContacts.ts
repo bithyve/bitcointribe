@@ -164,7 +164,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     if( !gift ){
       if( !giftMetaData ) throw new Error( 'Gift data unavailable' )
       else {
-        if( giftMetaData.status === GiftStatus.CLAIMED )
+        if( giftMetaData.status === GiftStatus.ACCEPTED )
           Toast( 'Gift already claimed' )
         else if( giftMetaData.status === GiftStatus.REJECTED )
           Toast( 'Gift already rejected' )
@@ -177,8 +177,9 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
   }
 
   if( !storedGifts[ gift.id ] ){
-    gift.status = GiftStatus.CLAIMED
     gift.type = GiftType.RECEIVED
+    gift.status = GiftStatus.ACCEPTED
+    gift.timeStamps.accepted = Date.now()
 
     yield put( updateGift( gift ) )
     yield call( associateGiftWorker, {
@@ -188,7 +189,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     } )
 
     if( giftMetaData ){
-      giftMetaData.status = GiftStatus.CLAIMED
+      giftMetaData.status = GiftStatus.ACCEPTED
 
       const giftChannelsToSync = {
         [ gift.channelAddress ]: {
@@ -284,7 +285,7 @@ function* syncGiftsStatusWorker() {
   for( const giftId in storedGifts ){
     const gift = storedGifts[ giftId ]
     if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
-      if( gift.status !== GiftStatus.CLAIMED && gift.status !== GiftStatus.REJECTED ){
+      if( gift.status !== GiftStatus.ACCEPTED && gift.status !== GiftStatus.REJECTED ){
         giftChannelToGiftIdMap[ gift.channelAddress ] = giftId
         giftChannelsToSync[ gift.channelAddress ] = {
           creator: true

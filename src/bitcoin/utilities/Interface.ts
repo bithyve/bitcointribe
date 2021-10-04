@@ -949,9 +949,10 @@ export enum GiftType {
 export enum GiftStatus {
   CREATED = 'CREATED',
   SENT = 'SENT',
-  CLAIMED = 'CLAIMED',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  RECLAIMED = 'RECLAIMED',
   EXPIRED = 'EXPIRED',
-  REJECTED = 'REJECTED'
 }
 export interface Gift {
   id: string,
@@ -961,7 +962,12 @@ export interface Gift {
   amount: number,
   type: GiftType,
   status: GiftStatus,
-  createdAt: number,
+  timeStamps: {
+    created: number,
+    sent?: number,
+    accepted?: number,
+    reclaimed?: number,
+  }
   sender: {
     walletId: string,
     accountId: string,
