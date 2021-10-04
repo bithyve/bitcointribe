@@ -120,6 +120,10 @@ export default function QrAndLink( props ) {
   }
 
   useEffect( ()=> {
+    generate()
+  }, [ Contact, trustedContacts, encryptLinkWith ] )
+
+  const generate =async () => {
     if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
@@ -182,14 +186,15 @@ export default function QrAndLink( props ) {
       }
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } =await generateDeepLink( {
       deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
       keysToEncrypt,
     } )
-    setTrustedLink( deepLink )
+    const link = shortLink !== '' ? shortLink: deepLink
+    setTrustedLink( link )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
       JSON.stringify( {
@@ -228,7 +233,7 @@ export default function QrAndLink( props ) {
       } ) )
       // saveInTransitHistory()
     }
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
+  }
 
   const openTimer = async () => {
     setTimeout( () => {
