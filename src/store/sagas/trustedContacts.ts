@@ -179,7 +179,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
   if( !storedGifts[ gift.id ] ){
     gift.type = GiftType.RECEIVED
     gift.status = GiftStatus.ACCEPTED
-    gift.timeStamps.accepted = Date.now()
+    gift.timestamps.accepted = Date.now()
 
     yield put( updateGift( gift ) )
     yield call( associateGiftWorker, {

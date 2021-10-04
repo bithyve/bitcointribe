@@ -56,7 +56,7 @@ const ManageGifts = ( { navigation } ) => {
     const expiredArr = []
     const sortedGifts = Object.values( gifts?? {
     } ).sort( function ( left: Gift, right: Gift ) {
-      return moment.utc( right.timeStamps.created ).unix() - moment.utc( left.timeStamps.created ).unix()
+      return moment.utc( right.timestamps.created ).unix() - moment.utc( left.timestamps.created ).unix()
     } )
 
     sortedGifts.forEach( ( gift: Gift ) => {
@@ -94,7 +94,7 @@ const ManageGifts = ( { navigation } ) => {
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
           navigation.navigate( 'GiftDetails', {
-            title, walletName, createdAt: selectedGift.timeStamps.created, amount: selectedGift.amount
+            title, walletName, createdAt: selectedGift.timestamps.created, amount: selectedGift.amount
           } )
           // navigation.navigate( 'AddContact', {
           //   fromScreen: 'ManageGift',

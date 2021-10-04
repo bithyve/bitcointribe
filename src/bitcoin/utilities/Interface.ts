@@ -962,7 +962,7 @@ export interface Gift {
   amount: number,
   type: GiftType,
   status: GiftStatus,
-  timeStamps: {
+  timestamps: {
     created: number,
     sent?: number,
     accepted?: number,

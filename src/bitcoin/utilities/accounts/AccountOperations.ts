@@ -1055,7 +1055,7 @@ export default class AccountOperations {
         amount,
         type: GiftType.SENT,
         status: GiftStatus.CREATED,
-        timeStamps: {
+        timestamps: {
           created: Date.now(),
         },
         sender: {
