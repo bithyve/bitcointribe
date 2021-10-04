@@ -19,6 +19,7 @@ import {
   SYNC_GIFTS_STATUS,
   REJECT_GIFT,
   ASSOCIATE_GIFT,
+  fetchGiftFromTemporaryChannel,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -62,7 +63,7 @@ import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth, getApprovalFromKeepers } from '../actions/BHR'
-import { getNextFreeAddressWorker, setup2FADetails } from './accounts'
+import { generateGiftLink, getNextFreeAddressWorker, setup2FADetails } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { updateWalletNameToChannel } from '../actions/trustedContacts'
 import { updateWallet } from '../actions/storage'
@@ -72,6 +73,7 @@ import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import { processDeepLink } from '../../common/CommonFunctions'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -670,8 +672,8 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string }} ) {
-  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string }} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -738,6 +740,17 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
   }
 
+  // prepare gift data
+  let giftDeepLink
+  if( giftId && flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
+    const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+    const giftToSend = gifts[ giftId ]
+
+    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, wallet.walletName, FCM, '' )
+    yield put( updateGift( updatedGift ) )
+    giftDeepLink = deepLink
+  }
+
   // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
@@ -745,6 +758,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     relationType,
     FCM,
     paymentAddresses,
+    giftDeepLink,
     contactDetails: contactInfo.contactDetails
   }
 
@@ -813,32 +827,55 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     }
   } )
 
-  if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && isPrimaryKeeper && contactsSecondaryChannelKey ){
-    // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
+  if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
     yield delay( 1000 ) // delaying to make sure the primary ward's instream is updated in the reducer
     const contacts: Trusted_Contacts = yield select(
       ( state ) => state.trustedContacts.contacts,
     )
-    const primaryWard = contacts[ channelKey ]
-    const instreamId = primaryWard.streamId
-    const instream: UnecryptedStreamData = idx( primaryWard, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
-    const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )
+    const approvedContact = contacts[ channelKey ]
+    const instreamId = approvedContact.streamId
+    const instream: UnecryptedStreamData = idx( approvedContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
 
-    const instreamSecondaryData: SecondaryStreamData = {
-      secondaryMnemonicShard: wardsSecondaryShards[ 1 ],
-      bhXpub
-    }
-    const instreamUpdates = {
-      streamId: instreamId,
-      secondaryEncryptedData: TrustedContactsOperations.encryptData(
-        primaryWard.contactsSecondaryChannelKey,
-        instreamSecondaryData
-      ).encryptedData
+    if( instream.primaryData?.giftDeepLink ){
+      // process incoming gift
+      console.log( 'link', instream.primaryData.giftDeepLink )
+      const { giftRequest } = yield call( processDeepLink, instream.primaryData.giftDeepLink )
+      let decryptionKey
+      try{
+        switch( giftRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              decryptionKey = giftRequest.encryptedChannelKeys
+              break
+        }
+      } catch( err ){
+        Toast( 'Unable to process gift' )
+        return
+      }
+
+      yield put( fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey ) )
     }
 
-    yield call( TrustedContactsOperations.updateStream, {
-      channelKey, streamUpdates: instreamUpdates
-    } )
+    if( isPrimaryKeeper && contactsSecondaryChannelKey ){
+      // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
+      const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )
+
+      const instreamSecondaryData: SecondaryStreamData = {
+        secondaryMnemonicShard: wardsSecondaryShards[ 1 ],
+        bhXpub
+      }
+      const instreamUpdates = {
+        streamId: instreamId,
+        secondaryEncryptedData: TrustedContactsOperations.encryptData(
+          approvedContact.contactsSecondaryChannelKey,
+          instreamSecondaryData
+        ).encryptedData
+      }
+
+      yield call( TrustedContactsOperations.updateStream, {
+        channelKey, streamUpdates: instreamUpdates
+      } )
+    }
+
   }
 }
 

@@ -535,6 +535,7 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
+  giftDeepLink?: string,
 
   // primary keeper exclusives
   secondarySetupData? :{
