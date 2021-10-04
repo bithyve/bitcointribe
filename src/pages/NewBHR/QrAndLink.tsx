@@ -120,10 +120,6 @@ export default function QrAndLink( props ) {
   }
 
   useEffect( ()=> {
-    generate()
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
-
-  const generate =async () => {
     if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
@@ -132,6 +128,10 @@ export default function QrAndLink( props ) {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
+    generate()
+  }, [ Contact, trustedContacts, encryptLinkWith ] )
+
+  const generate = async () => {
     console.log( 'useEffect Contact', Contact )
     // capture the contact
     if( !Contact ) return
@@ -186,15 +186,14 @@ export default function QrAndLink( props ) {
       }
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } =await generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
       deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
       keysToEncrypt,
     } )
-    const link = shortLink !== '' ? shortLink: deepLink
-    setTrustedLink( link )
+    setTrustedLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
       JSON.stringify( {
