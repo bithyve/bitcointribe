@@ -64,7 +64,8 @@ import {
   setAllowSecureAccount,
   UPDATE_SECONDARY_SHARD,
   GET_APPROVAL_FROM_KEEPER,
-  setOpenToApproval
+  setOpenToApproval,
+  getApprovalFromKeepers
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
