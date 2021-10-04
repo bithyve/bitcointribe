@@ -377,25 +377,10 @@ export const generateDeepLink = ( { deepLinkKind, encryptionType, encryptionKey,
 
   if( deepLinkKind === DeepLinkKind.GIFT ){
     deepLink =
-    `https://hexawallet.io
-    /${appType}
-    /${deepLinkKind}` +
-    `/${walletName}` +
-    `/${encryptedChannelKeys}` +
-    `/${encryptionType}-${encryptionHint}` +
-    `/${extraData.channelAddress}` +
-    `/${extraData.amount}`+
-    `/${extraData.note}` +
-    `/v${appVersion}`
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/v${appVersion}`
   } else {
     deepLink =
-    `https://hexawallet.io
-    /${appType}
-    /${deepLinkKind}` +
-    `/${walletName}` +
-    `/${encryptedChannelKeys}` +
-    `/${encryptionType}-${encryptionHint}` +
-    `/v${appVersion}`
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
   }
 
   return {
@@ -416,13 +401,16 @@ export const processDeepLink = ( deepLink: string ) => {
       }
 
     // hexa links
-    if ( splits[ 3 ] !== config.APP_STAGE )
+    if ( splits[ 3 ] !== config.APP_STAGE ){
       Alert.alert(
         'Invalid deeplink',
         `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[ 3 ]
+          splits[ 3 ].toUpperCase()
         }`,
       )
+      return
+    }
+
 
     const version = splits.pop().slice( 1 )
     const encryptionMetaSplits = splits[ 7 ].split( '-' )
