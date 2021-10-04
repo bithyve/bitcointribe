@@ -930,7 +930,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   upgradeNow () {
     const url =
       Platform.OS == 'ios'
-        ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
+        ? 'https://apps.apple.com/us/app/bitcoin-wallet-hexa-2-0/id1586334138'
         : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en'
     Linking.canOpenURL( url ).then( ( supported ) => {
       if ( supported ) {

@@ -60,7 +60,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like to use your camera for scanning QR codes.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Address book details are only stored locally</string>
+	<string>Your contact details are stored locally and not on the server. It is used when you send a request from the wallet to another wallet</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Allow HEXA to use your location</string>
 	<key>NSLocationAlwaysUsageDescription</key>
