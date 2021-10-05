@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import {
   StyleSheet,
   Text,
@@ -7,10 +7,8 @@ import {
   StatusBar,
   Platform,
   BackHandler,
-  Alert,
   Linking
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
@@ -27,12 +25,7 @@ import LoaderModal from '../components/LoaderModal'
 import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
-import ModalHeader from '../components/ModalHeader'
-import RelayServices from '../bitcoin/services/RelayService'
-import { initMigration, updateLastSeen } from '../store/actions/preferences'
-import openLink from '../utils/OpenLink'
-import content from '../common/content'
-import { processDL } from '../common/CommonFunctions'
+import { processDeepLink } from '../common/CommonFunctions'
 import ModalContainer from '../components/home/ModalContainer'
 import firebase from '@react-native-firebase/app'
 import {
@@ -44,50 +37,27 @@ import {
   updateFCMTokens,
 } from '../store/actions/notifications'
 import { autoSyncShells } from '../store/actions/accounts'
-
-const LOADER_MESSAGE_TIME = 2000
-const loaderMessages = [
-  {
-    heading: 'Non-custodial buys',
-    text: 'Get sats directly in your wallet with compatible exchanges vouchers',
-    subText: '',
-  },
-  {
-    heading: 'Friends & Family',
-    text:
-      'Add contacts to Hexa and send sats w/o asking for address every time',
-    subText: '',
-  },
-  {
-    heading: 'Hexa Savings Account',
-    text: 'Don’t forget to set up your 2FA code on an authenticator app',
-    subText: '',
-  },
-  {
-    heading: 'Donation Accounts',
-    text:
-      'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
-    subText: '',
-  },
-  {
-    heading: 'Satoshis or Sats',
-    text: '1 bitcoin = 100 million satoshis or sats',
-    subText: 'Hexa uses sats to make using bitcoin easier',
-  },
-  {
-    heading: 'Hexa Test Account',
-    text: 'Test Account comes preloaded with test-sats',
-    subText: 'Best place to start if you are new to Bitcoin',
-  },
-]
-
-const getRandomMessage = () => {
-  const randomIndex = Math.floor( Math.random() * 6 )
-  return loaderMessages[ randomIndex ]
-}
+import Relay from '../bitcoin/utilities/Relay'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function Login( props ) {
+  // const subPoints = [
+  //   'Setting up multi-accounts',
+  //   'Fetching test sats & balances',
+  //   'Generating shares for back-up',
+  //   'Getting the latest details'
+  // ]
+  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
+  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  // )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
+  const getRandomMessage = () => {
+    const randomIndex = Math.floor( Math.random() * 5 )
+    return strings.loaderMessages[ randomIndex ]
+  }
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
   const [ subTextMessage1 ] = useState( initialMessage.text )
@@ -110,7 +80,7 @@ export default function Login( props ) {
   const releaseCasesValue = useSelector(
     ( state ) => state.preferences.releaseCasesValue,
   )
-  const fcmTokenValue = useSelector(
+  const existingFCMToken = useSelector(
     ( state ) => state.preferences.fcmTokenValue,
   )
   const [ requestName, setRequestName ] = useState( null )
@@ -139,7 +109,6 @@ export default function Login( props ) {
   }, [] )
 
   useEffect( () => {
-    dispatch( updateLastSeen( null ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
@@ -160,7 +129,7 @@ export default function Login( props ) {
       return
     }
     setCreationFlag( true )
-    const requestName = await processDL( url )
+    const requestName = await processDeepLink( url )
     setRequestName( requestName )
   }
 
@@ -175,6 +144,7 @@ export default function Login( props ) {
   const { isAuthenticated, authenticationFailed } = useSelector(
     ( state ) => state.setupAndAuth,
   )
+  const { walletExists } = useSelector( ( state ) => state.storage )
 
   useEffect( () => {
     if ( JailMonkey.isJailBroken() ) {
@@ -210,24 +180,24 @@ export default function Login( props ) {
       }
     } )
 
-    RelayServices.fetchReleases( DeviceInfo.getBuildNumber() )
+    Relay.fetchReleases( DeviceInfo.getBuildNumber() )
       .then( async ( res ) => {
         // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
 
         if (
-          res.data.releases.length &&
-          res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
+          res.releases.length &&
+          res.releases[ 0 ].build > DeviceInfo.getBuildNumber()
         ) {
           if (
             releaseCases &&
-            releaseCases.build == res.data.releases[ 0 ].build &&
+            releaseCases.build == res.releases[ 0 ].build &&
             releaseCases.ignoreClick &&
             releaseCases.reminderLimit < 0
           )
             return
           props.navigation.navigate( 'UpdateApp', {
-            releaseData: res.data.releases,
+            releaseData: res.releases,
           } )
         }
         return
@@ -240,49 +210,32 @@ export default function Login( props ) {
 
   useEffect( () => {
     if ( isAuthenticated ) {
-      // migrate async keys
-      if ( !isMigrated ) {
-        dispatch( initMigration() )
-      }
-
-      bootStrapNotifications()
-
-      AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
-        if ( exists ) {
-          dispatch( autoSyncShells() )
-
-          setTimeout( () => {
-            // if ( loaderBottomSheet.current ) {
-            //   loaderBottomSheet.current.snapTo( 0 )
-            // }
-            setloaderModal( false )
-            //console.log( 'requestName**', requestName )
-            //console.log( 'creationFlag**', creationFlag )
-
-            if( !creationFlag ) {
-              props.navigation.navigate( 'Home', {
-                screen: 'Home',
-              }
-              )
-            } else if( requestName ){
-              props.navigation.navigate( 'Home', {
-                screen: 'Home',
-                params: {
-                  custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-                  recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-                  trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                  userKey: requestName && requestName.userKey ? requestName.userKey : null,
-                  swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
-                }
-              } )
+      if( !walletExists ) {
+        props.navigation.replace( 'WalletInitialization' )
+      } else {
+        setloaderModal( false )
+        if( !creationFlag ) {
+          props.navigation.navigate( 'Home', {
+            screen: 'Home'
+          } )
+        } else if( requestName ){
+          props.navigation.navigate( 'Home', {
+            screen: 'Home',
+            params: {
+              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+              userKey: requestName && requestName.userKey ? requestName.userKey : null,
+              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
             }
-          }, LOADER_MESSAGE_TIME )
-        } else {
-          props.navigation.replace( 'WalletInitialization' )
+          } )
         }
-      } )
+
+        bootStrapNotifications()
+        dispatch( autoSyncShells() )
+      }
     }
-  }, [ isAuthenticated, requestName ] )
+  }, [ isAuthenticated, walletExists, requestName ] )
 
   const bootStrapNotifications = async () => {
     dispatch( setIsPermissionGiven( true ) )
@@ -321,16 +274,9 @@ export default function Login( props ) {
 
   const storeFCMToken = async () => {
     const fcmToken = await messaging().getToken()
-    console.log( 'TOKEN', fcmToken )
-    const fcmArray = [ fcmToken ]
-    const fcmTokenFromAsync = fcmTokenValue
-    console.log( 'fcmTokenFromAsync', fcmTokenFromAsync )
-
-    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
+    if ( !existingFCMToken || existingFCMToken != fcmToken ) {
       dispatch( setFCMToken( fcmToken ) )
-
-      await AsyncStorage.setItem( 'fcmToken', fcmToken )
-      dispatch( updateFCMTokens( fcmArray ) )
+      dispatch( updateFCMTokens( [ fcmToken ] ) )
     }
   }
 
@@ -347,6 +293,8 @@ export default function Login( props ) {
         messageText={subTextMessage1}
         messageText2={subTextMessage2}
         showGif={false}
+        // subPoints={subPoints}
+        // bottomText={bottomTextMessage}
       />
     )
   }, [ message, subTextMessage1, subTextMessage2 ] )
@@ -378,7 +326,7 @@ export default function Login( props ) {
         <View style={{
           marginLeft: 'auto'
         }}>
-          <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
+          <Text style={styles.errorText}>{strings.Incorrect}</Text>
         </View>
       )
     }
@@ -407,6 +355,7 @@ export default function Login( props ) {
         }}
         isBottomImage={true}
         bottomImage={require( '../assets/images/icons/errorImage.png' )}
+        type={'small'}
       />
     )
   }, [ JailBrokenTitle ] )
@@ -431,11 +380,11 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>{content.login.welcome}</Text>
+          <Text style={styles.headerTitleText}>{strings.welcome}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              {content.login.enter_your}{' '}
-              <Text style={styles.boldItalicText}>{content.login.passcode}</Text>
+              {strings.enter_your}{' '}
+              <Text style={styles.boldItalicText}>{strings.passcode}</Text>
             </Text>
             <View style={{
               alignSelf: 'baseline'
@@ -596,7 +545,7 @@ export default function Login( props ) {
                     : Colors.blue,
                 }}
               >
-                <Text style={styles.proceedButtonText}>Proceed</Text>
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
               </TouchableOpacity>
             </View>
           ) : null}
@@ -825,7 +774,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp( '6%' ),
+    marginTop: hp( '15%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
@@ -849,9 +798,10 @@ const styles = StyleSheet.create( {
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.red,
-    fontSize: RFValue( 11 ),
+    color: Colors.tomatoRed,
+    fontSize: RFValue( 10 ),
     fontStyle: 'italic',
+    letterSpacing: 0.5
   },
   headerTitleText: {
     color: Colors.blue,

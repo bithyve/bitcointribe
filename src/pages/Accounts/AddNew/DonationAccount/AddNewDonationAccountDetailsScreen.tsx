@@ -5,7 +5,7 @@ import Colors from '../../../../common/Colors'
 import Fonts from '../../../../common/Fonts'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import { Input } from 'react-native-elements'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addNewAccountShells } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
@@ -24,7 +24,8 @@ import {
 } from 'react-native-responsive-screen'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { newAccountsInfo } from '../../../../store/sagas/accounts'
-import { AccountType } from '../../../../bitcoin/utilities/Interface'
+import { AccountType, Wallet } from '../../../../bitcoin/utilities/Interface'
+import Toast from '../../../../components/Toast'
 
 export type Props = {
   navigation: any;
@@ -33,11 +34,13 @@ export type Props = {
 const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
-
   const currentSubAccount: DonationSubAccountDescribing = useMemo( () => {
     return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
 
+  const wallet: Wallet = useSelector(
+    ( state ) => state.storage.wallet
+  )
   const [ accountName, setAccountName ] = useState( '' )
   const [ doneeName, setDoneeName ] = useState( currentSubAccount.doneeName )
   const [ accountDescription, setAccountDescription ] = useState( '' )
@@ -45,6 +48,9 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
     currentSubAccount.isTFAEnabled,
   )
   const [ showLoader, setShowLoader ] = useState( false )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
 
   const canProceed = useMemo( () => {
     return accountName.length > 0 && accountDescription.length > 0
@@ -55,15 +61,14 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   }, [] )
 
   useAccountShellCreationCompletionEffect( () => {
-    console.log( 'dispatching resetToHomeAction' )
     navigation.dispatch( resetToHomeAction() )
   } )
 
   function handleProceedButtonPress() {
     setShowLoader( true )
-    currentSubAccount.customDisplayName = accountName
+    currentSubAccount.customDisplayName = 'Donation Account'
     currentSubAccount.doneeName = doneeName
-    currentSubAccount.customDescription = accountDescription
+    currentSubAccount.customDescription = accountName
     currentSubAccount.isTFAEnabled = isTFAEnabled
     currentSubAccount.sourceKind = currentSubAccount.isTFAEnabled
       ? SourceAccountKind.SECURE_ACCOUNT
@@ -72,8 +77,8 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
     const newAccountInfo: newAccountsInfo = {
       accountType: AccountType.DONATION_ACCOUNT,
       accountDetails: {
-        name: accountName,
-        description: accountDescription,
+        name: 'Donation Account',
+        description: accountName,
         is2FAEnabled: isTFAEnabled,
         doneeName: doneeName
       }
@@ -151,8 +156,9 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
 
             <TouchableOpacity
               style={styles.tfaSelectionField}
-              onPress={() => setIsTFAEnabled( !isTFAEnabled )}
+              onPress={() =>  !AllowSecureAccount ? Toast( 'Upgrade backup to Level 2 to use this feature' ) : setIsTFAEnabled( !isTFAEnabled )}
               activeOpacity={1}
+              // disabled={( !wallet.secondaryXpub && !wallet.details2FA )}
             >
               <View style={styles.tfaSelectionFieldContentContainer}>
                 <Text style={{
@@ -169,15 +175,6 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
                     />
                   )}
                 </View>
-                {/* <CheckBox
-                  checkedIcon="check"
-                  uncheckedIcon="square-o"
-                  size={24}
-                  checkedColor={Colors.darkGreen}
-                  checked={isTFAEnabled}
-                  containerStyle={{backgroundColor: Colors.white,}}
-                  disabled
-                /> */}
               </View>
             </TouchableOpacity>
 

@@ -19,12 +19,10 @@ RCT_EXPORT_METHOD(startBackup:(NSString*) json
                   rejecter:(RCTPromiseRejectBlock)reject){
   NSLog(@"into native startBackup %@",json);
   iCloudBackup *backup = [[iCloudBackup alloc]init];
-  [backup startBackupWithJson:json callback:^(BOOL isUploaded) {
-    if (isUploaded) {
-      resolve(@"true");
-    }else{
-      resolve(@"false");
-    }
+  [backup startBackupWithJson:json callback:^(NSString * _Nonnull isUploaded) {
+    NSLog(@"isUploaded",isUploaded);
+
+    resolve(isUploaded);
   }];
   
 }

@@ -11,7 +11,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from './QRCode'
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
@@ -19,11 +19,14 @@ import {
 } from '../common/constants/wallet-service-types'
 import CopyThisText from '../components/CopyThisText'
 import UserDetails from './UserDetails'
+import BottomInfoBox from './BottomInfoBox'
+import HeaderTitle from './HeaderTitle'
+import { translations } from '../common/content/LocContext'
 
 export default function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
-  // console.log('props.QR RequestKeyFromContact > ', props.QR);
-
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const contact = props.contact
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
@@ -33,7 +36,7 @@ export default function RequestKeyFromContact( props ) {
   } )
 
   useEffect( () => {
-    setShareLink( props.link )
+    setShareLink( props.link.replace( /\s+/g, '' ) )
     // if ( props.infoText ) setInfoText( props.infoText )
   }, [ props.link ] )
 
@@ -75,13 +78,13 @@ export default function RequestKeyFromContact( props ) {
 
     }
   }
-
   return (
     <View style={styles.modalContainer}>
-      <View
-        style={styles.mainView}
-      >
-        {props.isModal &&
+      {/* <ScrollView> */}
+      {/* <View
+          style={styles.mainView}
+        > */}
+      {/* {props.isModal &&
           <View style={styles.topSubView}>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
@@ -108,9 +111,9 @@ export default function RequestKeyFromContact( props ) {
               }
             </View>
           </View>
-        }
-      </View>
-      <View style={[ styles.topContainer, {
+        } */}
+      {/* </View> */}
+      {/* <View style={[ styles.topContainer, {
         marginTop: !props.isModal ? 0 : hp( '1.7%' ),
         marginBottom: !props.isModal ? 0 : hp( '1.7%' ),
       } ]}>
@@ -118,33 +121,57 @@ export default function RequestKeyFromContact( props ) {
           titleStyle={styles.titleStyle}
           contactText={props.contactText}
           Contact={Contact} />
-      </View>
-      <ScrollView contentContainerStyle={{
-        flex: 1
-      }}>
-        <View
-          style={[ styles.mainContainer,
-            {
-              marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-              marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-            } ]}
-        >
-          <View style={[ styles.qrContainer, {
-            marginTop: !props.isModal ? 0 : hp( '4%' )
-          } ]}>
-            {!props.QR ? (
-              <ActivityIndicator size="large" color={Colors.babyGray} />
-            ) : (
-              <QRCode value={props.QR} size={hp( '27%' )} />
-            )}
-          </View>
-          <CopyThisText
-            openLink={shareLink ? shareOption : () => { }}
-            backgroundColor={Colors.backgroundColor1}
-            text={shareLink ? shareLink : 'Creating Link....'}
-          />
+      </View> */}
+      <HeaderTitle
+        firstLineTitle={strings.scanQR}
+        secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <View
+        style={[ styles.mainContainer,
+          {
+            marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+            marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+          } ]}
+      >
+        <View style={[ styles.qrContainer, {
+          marginVertical: hp( '4%' )
+        } ]}>
+          {!props.QR ? (
+            <ActivityIndicator size="large" color={Colors.babyGray} />
+          ) : (
+            <QRCode
+              title="F&F request"
+              value={props.QR}
+              size={hp( '27%' )} />
+          )}
         </View>
-      </ScrollView>
+        {props.OR?<CopyThisText
+          backgroundColor={Colors.backgroundColor}
+          text={props.OR}
+          width={'20%'}
+          height={'15%'}
+        /> : null}
+      </View>
+      <HeaderTitle
+        firstLineTitle={strings.orShare}
+        secondLineTitle={strings.WithContact}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <CopyThisText
+        openLink={shareLink ? shareOption : () => { }}
+        backgroundColor={Colors.white}
+        text={shareLink ? shareLink : strings.Creating}
+        width={'22%'}
+        height={'22%'}
+      />
+      {/* </ScrollView> */}
 
     </View>
   )
@@ -162,8 +189,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
     alignSelf: 'center',
     width: '100%',
   },
@@ -173,6 +199,22 @@ const styles = StyleSheet.create( {
     marginLeft: 20,
     marginRight: 20,
     alignItems: 'center',
+  },
+  containerQrCode: {
+    backgroundColor: 'gray',
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+  },
+  textQr: {
+    color: 'white',
+    fontSize: 17,
+    textAlign: 'center',
+    paddingVertical: 5,
+  },
+  containerTextQr: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5, paddingHorizontal:5,
   },
   mainContainer: {
     marginLeft: 20,

@@ -238,6 +238,7 @@ export default class CloudBackup {
         question: this.dataObject.question,
         walletId: data.walletId,
         data: this.dataObject.encryptedCloudDataJson,
+        seed: this.dataObject.seed,
         shares: this.dataObject.shares,
         keeperData: this.dataObject.keeperData,
         dateTime: moment( new Date() ),
@@ -340,6 +341,7 @@ export default class CloudBackup {
             question: this.dataObject.question,
             walletId: data.walletId,
             data: this.dataObject.encryptedCloudDataJson,
+            seed: this.dataObject.seed,
             shares: this.dataObject.shares,
             keeperData: this.dataObject.keeperData,
             dateTime: moment( new Date() ),
@@ -351,6 +353,7 @@ export default class CloudBackup {
           newArray[ index ].levelStatus = this.dataObject.levelStatus
           newArray[ index ].data = this.dataObject.encryptedCloudDataJson
           newArray[ index ].shares = this.dataObject.shares ? this.dataObject.shares : newArray[ index ].shares
+          newArray[ index ].seed = this.dataObject.seed
           newArray[ index ].keeperData = this.dataObject.keeperData
           newArray[ index ].dateTime = moment( new Date() )
         }

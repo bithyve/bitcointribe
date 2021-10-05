@@ -4,12 +4,15 @@ import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   visibilityOption: AccountVisibility;
 };
 
 const VisibilityOptionsListItemContent: React.FC<Props> = ( { visibilityOption, }: Props ) => {
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
 
   const avatarImageSource = useMemo( () => {
     switch ( visibilityOption ) {
@@ -25,22 +28,22 @@ const VisibilityOptionsListItemContent: React.FC<Props> = ( { visibilityOption, 
   const titleText = useMemo( () => {
     switch ( visibilityOption ) {
         case AccountVisibility.DEFAULT:
-          return 'Visible'
+          return common.visible
         case AccountVisibility.HIDDEN:
-          return 'Hidden'
+          return common.hidden
         case AccountVisibility.DURESS:
-          return 'Duress'
+          return common.duress
     }
   }, [ visibilityOption ] )
 
   const subtitleText = useMemo( () => {
     switch ( visibilityOption ) {
         case AccountVisibility.DEFAULT:
-          return 'Always show this account'
+          return strings.Alwaysshow
         case AccountVisibility.HIDDEN:
-          return 'Only show when manually revealing all accounts'
+          return strings.Onlyshow
         case AccountVisibility.DURESS:
-          return 'Only show in Duress mode -- or when manually revealing all accounts'
+          return strings.Duressmode
         default:
           return ''
     }

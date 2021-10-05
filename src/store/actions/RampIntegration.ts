@@ -36,26 +36,24 @@ export const clearRampCache = ( ) => {
 export interface RampReservationFetchAction extends Action {
   type: typeof FETCH_RAMP_RESERVATION;
   payload: {
+    address: string,
     amount?: number;
     currencyCode?: string;
     country?: string;
-    instance?: number;
-    sourceKind?: SourceAccountKind;
   };
 }
 
 
 export const fetchRampReservation = (
+  address: string,
   amount?: number,
   currencyCode?: string,
   country?: string,
-  instance?: number,
-  sourceKind?: SourceAccountKind,
 ): RampReservationFetchAction => {
   return {
     type: FETCH_RAMP_RESERVATION,
     payload: {
-      amount, currencyCode, country, instance, sourceKind
+      address, amount, currencyCode, country
     },
   }
 }

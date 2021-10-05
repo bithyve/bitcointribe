@@ -17,7 +17,9 @@ import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs'
 import getActiveRouteName from './src/utils/navigation/GetActiveRouteName'
 import { LogBox } from 'react-native'
 import ModalContainer from './src/components/home/ModalContainer'
+import { RootSiblingParent } from 'react-native-root-siblings'
 
+import { LocalizationProvider } from './src/common/content/LocContext'
 LogBox.ignoreAllLogs( true )
 
 export const URI_PREFIX = 'hexa://'
@@ -37,6 +39,10 @@ export default function AppWrapper() {
   // context can have access to it. (see: https://stackoverflow.com/a/60329482/8859365)
   const store = makeStore()
 
+  function updare() {
+
+  }
+
   useEffect( () => {
     ( async () => {
       configureAPIHeaders()
@@ -46,13 +52,19 @@ export default function AppWrapper() {
   }, [] )
 
   return (
-    <Provider store={store} uriPrefix={URI_PREFIX}>
-      <BottomSheetModalProvider>
-        <AppContent />
-      </BottomSheetModalProvider>
-    </Provider>
+    <RootSiblingParent>
+      <Provider store={store} uriPrefix={URI_PREFIX}>
+        <BottomSheetModalProvider>
+          <LocalizationProvider>
+            <AppContent />
+          </LocalizationProvider>
+        </BottomSheetModalProvider>
+      </Provider>
+    </RootSiblingParent>
+
   )
 }
+
 
 function AppContent() {
   const dispatch = useDispatch()
@@ -61,7 +73,12 @@ function AppContent() {
   const preferencesState = usePreferencesState()
   const [ previousScreenName, setPreviousScreenName ] = useState<string | null>()
   const [ currentScreenName, setCurrentScreenName ] = useState<string | null>()
+  const forceUpdate = useState()[ 1 ].bind( null, {
+  } )
 
+  function update() {
+    forceUpdate()
+  }
   const canShowNoInternetWarning = useMemo( () => {
     return (
       currentScreenName != 'Login' &&
@@ -151,3 +168,4 @@ function AppContent() {
     </>
   )
 }
+

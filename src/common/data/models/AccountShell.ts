@@ -36,7 +36,7 @@ export default class AccountShell {
    * Indicates if the account has completed syncing this happens once per session.
    * A sync icon is diplayed on the home screen tile if this has not be done
    */
-  syncStatus: SyncStatus | null;
+  syncStatus: SyncStatus | SyncStatus.COMPLETED;
 
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: { [id: string]: SubAccountDescribing };
@@ -130,21 +130,27 @@ export default class AccountShell {
    */
   static updatePrimarySubAccountDetails(
     shell: AccountShell,
+    isUsable: boolean,
     newbalance: Balances,
     newTransactions: TransactionDescribing[],
     accountDetails?: {
       accountName?: string,
       accountDescription?: string,
       accountXpub?: string,
+      accountVisibility?: AccountVisibility,
+      hasNewTxn: boolean
     }
   ) {
+    shell.primarySubAccount.isUsable = isUsable
     shell.primarySubAccount.balances = newbalance
     shell.primarySubAccount.transactions = newTransactions
     if( accountDetails ){
-      const { accountName, accountDescription, accountXpub } = accountDetails
+      const { accountName, accountDescription, accountXpub, accountVisibility, hasNewTxn } = accountDetails
       if( accountName ) shell.primarySubAccount.customDisplayName = accountName
       if( accountDescription ) shell.primarySubAccount.customDescription = accountDescription
       if( accountXpub ) shell.primarySubAccount.xPub = accountXpub
+      if( accountVisibility ) shell.primarySubAccount.visibility = accountVisibility
+      if( hasNewTxn ) shell.primarySubAccount.hasNewTxn = hasNewTxn
     }
   }
 

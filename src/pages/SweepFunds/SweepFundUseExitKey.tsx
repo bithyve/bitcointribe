@@ -29,7 +29,7 @@ import ConfirmSweepFunds from './ConfirmSweepFunds'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import { recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/health'
+import { recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/BHR'
 import { generateSecondaryXpriv, clearTransfer, secondaryXprivGenerated } from '../../store/actions/accounts'
 import ResetTwoFASuccess from '../Accounts/ResetTwoFASuccess'
 import LoaderModal from '../../components/LoaderModal'
@@ -185,7 +185,7 @@ SweepFundUseExitKeyPropsTypes,
 
     if( prevProps.mnemonic != this.props.mnemonic ){
       // console.log("mnemonic",this.props.mnemonic);
-      if( this.props.mnemonic ) this.props.generateSecondaryXpriv( SECURE_ACCOUNT, this.props.mnemonic.split( '_' )[ 0 ] )
+      if( this.props.mnemonic ) this.props.generateSecondaryXpriv( this.props.mnemonic.split( '_' )[ 0 ] )
     }
 
     if( this.props.twoFAHelpFlags && prevProps.twoFAHelpFlags.xprivGenerated != this.props.twoFAHelpFlags.xprivGenerated ){
@@ -480,13 +480,13 @@ const mapStateToProps = ( state ) => {
   return {
     keeper: idx( state, ( _ ) => _.keeper.service ),
     decentralizedBackup: idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP ),
-    secondaryShareDownloaded: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
-    security: idx( state, ( _ ) => _.storage.database.WALLET_SETUP.security ) || '',
-    mnemonic: idx( state, ( _ ) => _.health.mnemonic ),
+    secondaryShareDownloaded: idx( state, ( _ ) => _.bhr.secondaryShareDownloaded ),
+    security: idx( state, ( _ ) => _.storage.wallet.security ) || '',
+    mnemonic: idx( state, ( _ ) => _.bhr.mnemonic ),
     twoFAHelpFlags: idx( state, ( _ ) => _.accounts.twoFAHelpFlags ),
     service: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
+    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
   }
 }
 

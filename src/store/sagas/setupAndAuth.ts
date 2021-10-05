@@ -19,24 +19,26 @@ import {
   initializeRecoveryCompleted,
   completedWalletSetup,
   WALLET_SETUP_COMPLETION,
+  updateApplication,
+  UPDATE_APPLICATION,
 } from '../actions/setupAndAuth'
-import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
-import { Database } from '../../common/interfaces/Interfaces'
-import { insertDBWorker } from './storage'
+import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup } from '../actions/health'
+import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { Wallet } from '../../bitcoin/utilities/Interface'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
-import { addNewAccountShells } from '../actions/accounts'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
+import { newAccountShellCreationCompleted } from '../actions/accounts'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+
+
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, selectedAccounts, security } = payload
+  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
   const primaryMnemonic = bip39.generateMnemonic( 256 )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
@@ -44,16 +46,20 @@ function* setupWalletWorker( { payload } ) {
   const wallet: Wallet = {
     walletId,
     walletName,
+    security,
     primaryMnemonic,
+    primarySeed: primarySeed.toString( 'hex' ),
     accounts: {
-    }
+    },
+    version: DeviceInfo.getVersion()
   }
 
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
-
-  const accountsInfo: newAccountsInfo[] = []
-  selectedAccounts.forEach( ( accountType ) => {
+  yield call( dbManager.createWallet, wallet )
+  // prepare default accounts for the wallet
+  const accountsInfo: newAccountsInfo[] = [];
+  [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ].forEach( ( accountType ) => {
     const accountInfo: newAccountsInfo = {
       accountType
     }
@@ -63,53 +69,12 @@ function* setupWalletWorker( { payload } ) {
   yield call( addNewAccountShellsWorker, {
     payload: accountsInfo
   } )
+  yield put( newAccountShellCreationCompleted() )
+  if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
   yield put( completedWalletSetup( ) )
-  yield call( dbManager.createWallet, wallet )
-  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
-
-  // TODO: remove legacy DB post S3 service functionalization
-  const initialDatabase: Database = {
-    WALLET_SETUP:{
-      walletName: wallet.walletName,
-      security,
-    },
-    SERVICES: {
-      S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
-    },
-    VERSION: DeviceInfo.getVersion(),
-  }
-
-  yield call( insertDBWorker, {
-    payload: initialDatabase
-  } )
-
-  // initialize health-check schema on relay
-  yield put( initializeHealthSetup() )
 }
+
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
-
-function* initRecoveryWorker( { payload } ) {
-  const { walletName, security } = payload
-
-  const initialDatabase: Database = {
-    WALLET_SETUP: {
-      walletName, security
-    },
-    VERSION: DeviceInfo.getVersion(),
-  }
-
-  yield call( insertDBWorker, {
-    payload: initialDatabase
-  } )
-  yield put( initializeRecoveryCompleted( true ) )
-  // yield call(AsyncStorage.setItem, "walletExists", "true");
-  // yield put(setupInitialized());
-}
-
-export const initRecoveryWatcher = createWatcher(
-  initRecoveryWorker,
-  INIT_RECOVERY,
-)
 
 function* credentialsStorageWorker( { payload } ) {
   yield put( switchSetupLoader( 'storingCreds' ) )
@@ -150,9 +115,6 @@ function* credentialsAuthWorker( { payload } ) {
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
-    console.log( {
-      err
-    } )
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
     return
@@ -166,12 +128,15 @@ function* credentialsAuthWorker( { payload } ) {
     // t.stop()
     yield put( keyFetched( key ) )
 
+    // check if the app has been upgraded
+    const wallet: Wallet = yield select( state => state.storage.wallet )
+    const storedVersion = wallet.version
+    const currentVersion = DeviceInfo.getVersion()
+    if( currentVersion !== storedVersion ) yield put( updateApplication( currentVersion, storedVersion ) )
+
     // initialize configuration file
     const { activePersonalNode } = yield select( state => state.nodeSettings )
     if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
-
-    // TODO -- this need to be done on
-    yield put( fetchFromDB() )
   }
 }
 
@@ -215,4 +180,53 @@ function* changeAuthCredWorker( { payload } ) {
 export const changeAuthCredWatcher = createWatcher(
   changeAuthCredWorker,
   CHANGE_AUTH_CRED,
+)
+
+
+function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, previousVersion: string }} ) {
+  const { newVersion } = payload
+
+  // update wallet version
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  yield put( updateWallet( {
+    ...wallet,
+    version: newVersion
+  } ) )
+  yield call( dbManager.updateWallet, {
+    version: newVersion
+  } )
+
+  // update permanent channels w/ new version
+  const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+  const streamUpdates: UnecryptedStreamData = {
+    streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+    metaData: {
+      version: newVersion
+    }
+  }
+  const channelUpdates = []
+  for( const channelKey of Object.keys( trustedContacts ) ){
+    if( !trustedContacts[ channelKey ].isActive ) continue
+    const contactInfo: ContactInfo = {
+      channelKey
+    }
+    const channelUpdate =  {
+      contactInfo, streamUpdates
+    }
+    channelUpdates.push( channelUpdate )
+  }
+
+  yield put( syncPermanentChannels( {
+    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+    channelUpdates,
+    metaSync: true
+  } ) )
+  yield put( updateWalletImageHealth( {
+    updateVersion: true
+  } ) )
+}
+
+export const applicationUpdateWatcher = createWatcher(
+  applicationUpdateWorker,
+  UPDATE_APPLICATION,
 )

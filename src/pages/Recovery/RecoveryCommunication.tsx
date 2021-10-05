@@ -24,14 +24,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { textWithoutEncoding, email } from 'react-native-communications'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import commonStyle from '../../common/Styles/Styles'
-import { requestShare, downloadMShare } from '../../store/actions/sss'
 import { nameToInitials } from '../../common/CommonFunctions'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
 import RecoveryTrustedQR from './RecoveryTrustedQR'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import Toast from '../../components/Toast'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 export default function RecoveryCommunication( props ) {
   const contact = props.navigation.getParam( 'contact' )
@@ -74,8 +74,11 @@ export default function RecoveryCommunication( props ) {
     }
   }
 
-  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+  const { DECENTRALIZED_BACKUP } = useSelector(
     ( state ) => state.storage.database,
+  )
+  const wallet: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
@@ -87,7 +90,8 @@ export default function RecoveryCommunication( props ) {
 
   const dispatch = useDispatch()
   useEffect( () => {
-    if ( !REQUEST_DETAILS ) dispatch( requestShare( index ) )
+    // Removed sss file
+    // if ( !REQUEST_DETAILS ) dispatch( requestShare( index ) )
 
     const contactInfoTemp = communicationInfo.map( ( { number, email }, index ) => {
       if ( number || email ) {
@@ -126,7 +130,7 @@ export default function RecoveryCommunication( props ) {
     ? setTrustedQR(
       JSON.stringify( {
         ...REQUEST_DETAILS,
-        requester: WALLET_SETUP.walletName,
+        requester: wallet.walletName,
         type: 'recoveryQR',
         ver: DeviceInfo.getVersion(),
       } ),
@@ -134,7 +138,7 @@ export default function RecoveryCommunication( props ) {
     : null
 
   const communicate = async ( selectedContactMode ) => {
-    const requester = WALLET_SETUP.walletName
+    const requester = wallet.walletName
     const appVersion = DeviceInfo.getVersion()
     switch ( selectedContactMode.type ) {
         case 'number':
@@ -142,11 +146,11 @@ export default function RecoveryCommunication( props ) {
           number = number.slice( number.length - 10 ) // last 10 digits only
           const numHintType = 'num'
           const numHint = number[ 0 ] + number.slice( number.length - 2 )
-          const numberEncKey = TrustedContactsService.encryptPub(
+          const numberEncKey = TrustedContactsOperations.encryptData(
           // using TCs encryption mech
             REQUEST_DETAILS.KEY,
             number,
-          ).encryptedPub
+          ).encryptedData
 
           const numberDL =
           `https://hexawallet.io/${config.APP_STAGE}/rk` +
@@ -157,8 +161,8 @@ export default function RecoveryCommunication( props ) {
           `/v${appVersion}`
 
           const smsInfoText = `Click here to help ${
-            WALLET_SETUP.walletName
-          } restore their Hexa wallet- link will expire in ${
+            wallet.walletName
+          } recover their Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`
 
@@ -178,10 +182,10 @@ export default function RecoveryCommunication( props ) {
           const trucatedEmail = Email.replace( '.com', '' )
           const emailHint =
           Email[ 0 ] + trucatedEmail.slice( trucatedEmail.length - 2 )
-          const emailEncPubKey = TrustedContactsService.encryptPub(
+          const emailEncPubKey = TrustedContactsOperations.encryptData(
             REQUEST_DETAILS.KEY,
             Email,
-          ).encryptedPub
+          ).encryptedData
           const emailDL =
           `https://hexawallet.io/${config.APP_STAGE}/rk` +
           `/${requester}` +
@@ -191,8 +195,8 @@ export default function RecoveryCommunication( props ) {
           `/v${appVersion}`
 
           const emailInfoText = `Click here to help ${
-            WALLET_SETUP.walletName
-          } restore their Hexa wallet- link will expire in ${
+            wallet.walletName
+          } recover their Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`
 
@@ -263,7 +267,8 @@ export default function RecoveryCommunication( props ) {
         shareIndex, key
       } )
       if ( shareIndex && key ) {
-        dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
+        // Removed this method
+        // dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
       } else if ( shareIndex ) {
         const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[ shareIndex ]
 
@@ -272,7 +277,8 @@ export default function RecoveryCommunication( props ) {
           console.log( {
             KEY
           } )
-          dispatch( downloadMShare( KEY, null, 'recovery' ) )
+          // Removed this method
+          // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
           Alert.alert(
             'Key Exists',
@@ -281,7 +287,8 @@ export default function RecoveryCommunication( props ) {
         }
       } else if ( key ) {
         // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
-        dispatch( downloadMShare( key, null, 'recovery' ) )
+        // Removed this method
+        // dispatch( downloadMShare( key, null, 'recovery' ) )
       }
     },
     [ RECOVERY_SHARES ],

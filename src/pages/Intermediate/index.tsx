@@ -8,15 +8,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   getMessages,
 } from '../../store/actions/notifications'
-import { processDL } from '../../common/CommonFunctions'
+import { processDeepLink } from '../../common/CommonFunctions'
 
 interface IntermediatePropsTypes {
-  initializeDB: any;
   navigation: any;
   lastSeen: any;
   databaseInitialized: Boolean;
   getMessages: any;
   walletId: any;
+  walletExists: Boolean;
 }
 
 interface IntermediateStateTypes {
@@ -53,11 +53,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
     handleAppStateChange = async ( nextAppState ) => {
       // no need to trigger login screen if accounts are not synced yet
       // which means user hasn't logged in yet
-      const walletExists = await AsyncStorage.getItem( 'walletExists' )
-      //const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
-      if ( !walletExists ) {
-        return
-      }
+      if ( !this.props.walletExists ) return
     };
 
     handleDeepLinkEvent = async ( { url } ) => {
@@ -83,9 +79,6 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 
         const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
 
-        // initiates the SQL DB
-        if( !this.props.databaseInitialized ) this.props.initializeDB()
-
         // scenario based navigation
         if ( hasCreds ) {
           const now: any = new Date()
@@ -98,14 +91,11 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
                 screen: 'Home',
               } )
             } else {
-              const requestName = await processDL( this.url )
+              const requestName = await processDeepLink( this.url )
               this.props.navigation.replace( 'Home', {
                 screen: 'Home',
                 params: {
-                  custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-                  recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
                   trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                  userKey: requestName && requestName.userKey ? requestName.userKey : null,
                   swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
                 }
               } )
@@ -113,12 +103,9 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
           } else if ( !this.url ){
             this.props.navigation.replace( 'Login' )
           } else {
-            const requestName = await processDL( this.url )
+            const requestName = await processDeepLink( this.url )
             this.props.navigation.replace( 'Login', {
-              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
               trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-              userKey: requestName && requestName.userKey ? requestName.userKey : null,
               swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
             } )
           }
@@ -207,7 +194,8 @@ const mapStateToProps = ( state ) => {
   return {
     databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
     lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
-    walletId: idx( state, ( _ ) => _.preferences.walletId )
+    walletId: idx( state, ( _ ) => _.preferences.walletId ),
+    walletExists: idx( state, ( _ ) => _.storage.walletExists )
   }
 }
 

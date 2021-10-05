@@ -23,6 +23,6 @@ export default function useFormattedUnitText( {
   if ( prefersBitcoin ) {
     return displayNameForBitcoinUnit( bitcoinUnit )
   } else {
-    return fiatCurrencyCode.toLocaleLowerCase()
+    return fiatCurrencyCode
   }
 }

@@ -20,6 +20,12 @@ import ReLogin from '../../../pages/ReLogin'
 import Login from '../../../pages/Login'
 import Intermediate from '../../../pages/Intermediate'
 import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
+import AppInfo from '../../../pages/MoreOptions/AppInfo/Appinfo'
+import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -37,6 +43,7 @@ const MoreOptionsStack = createStackNavigator(
       screen: ReLogin,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null,
       },
     },
     AccountManagement: {
@@ -55,7 +62,7 @@ const MoreOptionsStack = createStackNavigator(
     FriendsAndFamily: {
       screen: FriendsAndFamilyScreen,
       navigationOptions: {
-        title: 'Friends and Family',
+        title: 'Friends & Family',
       },
     },
     NodeSettings: {
@@ -97,6 +104,25 @@ const MoreOptionsStack = createStackNavigator(
         header: null,
       },
     },
+    AppInfo: {
+      screen: AppInfo,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    VersionHistory: {
+      screen: VersionHistoryScreen,
+      navigationOptions: {
+        title: 'Version History',
+      },
+    },
+    AccountDetails: {
+      screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
   },
   {
     initialRouteName: 'Home',
@@ -113,14 +139,14 @@ const MoreOptionsStack = createStackNavigator(
         tabBarVisible,
       }
     },
-    // defaultNavigationOptions: ( { navigation } ) => {
-    //   return {
-    //     ...defaultStackScreenNavigationOptions,
-    //     headerLeft: () => {
-    //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-    //     },
-    //   }
-    // },
+    defaultNavigationOptions: ( { navigation } ) => {
+      return {
+        ...defaultStackScreenNavigationOptions,
+        headerLeft: () => {
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+        },
+      }
+    },
   },
 )
 

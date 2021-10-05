@@ -1,39 +1,31 @@
 import React, { useState, useEffect, useCallback, createRef } from 'react'
 import {
   View,
-  StyleSheet,
   SafeAreaView,
   StatusBar,
   Platform,
-  Keyboard,
 } from 'react-native'
-import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch } from 'react-redux'
 import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
 import moment from 'moment'
 import _ from 'underscore'
 import HistoryPageComponent from './HistoryPageComponent'
 import ModalHeader from '../../components/ModalHeader'
-import { updateCloudPermission } from '../../store/actions/health'
+import { updateCloudPermission } from '../../store/actions/BHR'
 import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import {
-  checkMSharesHealth,
-} from '../../store/actions/health'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { getLevelInfo } from '../../common/CommonFunctions'
-import { setCloudData } from '../../store/actions/cloud'
+import { updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import { translations } from '../../common/content/LocContext'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -46,47 +38,26 @@ export enum BottomSheetState {
 }
 
 const CloudBackupHistory = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+  const common  = translations[ 'common' ]
+  const iCloudErrors  = translations[ 'iCloudErrors' ]
+  const driveErrors  = translations[ 'driveErrors' ]
+
   const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
   const [ confirmationModal, setConfirmationModal ] = useState( false )
+  const [ errorModal, setErrorModal ] = useState( false )
   const [
     bottomSheetRef,
     setBottomSheetRef,
   ] = useState( React.createRef() )
   const HealthCheckSuccessBottomSheet = createRef<BottomSheet>()
-
   const cloudBackupHistoryArray = useSelector( ( state ) => state.cloud.cloudBackupHistory )
 
-  const s3Service = useSelector( ( state ) => state.health.service )
+  const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
+  const [ errorMsg, setErrorMsg ] = useState( '' )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
-
-  const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
-
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-
-  const next = props.navigation.getParam( 'next' )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const dispatch = useDispatch()
-
-  const updateCloudData = () => {
-    console.log( 'cloudBackupStatus', cloudBackupStatus, currentLevel )
-    if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
-    let share = levelHealth[ 0 ].levelInfo[ 0 ]
-    if( levelHealth[ 0 ] && !levelHealth[ 1 ] ){
-      share = levelHealth[ 0 ].levelInfo[ 0 ]
-    } else if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
-      if( levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 ){
-        share = levelHealth[ 1 ].levelInfo[ 0 ]
-      } else if( levelHealth[ 1 ].levelInfo.length == 6 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 ){
-        share = levelHealth[ 1 ].levelInfo[ 0 ]
-      }
-    }
-    console.log( 'share', share )
-    dispatch( setCloudData(
-      keeperInfo,
-      currentLevel === 0 ? currentLevel + 1 : currentLevel,
-      share
-    ) )
-  }
 
   const sortedHistory = ( history ) => {
     if( !history ) return
@@ -111,11 +82,52 @@ const CloudBackupHistory = ( props ) => {
     if ( cloudBackupHistoryArray ) setCloudBackupHistory( cloudBackupHistoryArray )
   }, [ cloudBackupHistoryArray ] )
 
+  useEffect( () => {
+    if ( cloudErrorMessage !== '' ) {
+      const message = Platform.select( {
+        ios: iCloudErrors[ cloudErrorMessage ],
+        android: driveErrors[ cloudErrorMessage ],
+      } )
+      setErrorMsg( message )
+      setErrorModal( true )
+      dispatch( setCloudErrorMessage( '' ) )
+    }
+  }, [ cloudErrorMessage ] )
+
+  const renderCloudErrorContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        title={strings.CloudBackupError}
+        //info={cloudErrorMessage}
+        note={errorMsg}
+        onPressProceed={()=>{
+          setErrorModal( false )
+          setConfirmationModal( true )
+        }}
+        onPressIgnore={()=> {
+          setErrorModal( false )
+        }}
+        proceedButtonText={common.tryAgain}
+        cancelButtonText={common.skip}
+        isIgnoreButton={true}
+        isBottomImage={true}
+        isBottomImageStyle={{
+          width: wp( '27%' ),
+          height: wp( '27%' ),
+          marginLeft: 'auto',
+          resizeMode: 'stretch',
+          marginBottom: hp( '-3%' ),
+        }}
+        bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+      />
+    )
+  }, [ errorMsg ] )
+
   const renderCloudPermissionContent = useCallback( () => {
     return ( <CloudPermissionModalContents
       modalRef={bottomSheetRef}
-      title={'Automated Cloud Backup'}
-      info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+      title={strings.AutomatedCloudBackup}
+      info={strings.Thisisthefirstlevel}
       note={''}
       onPressProceed={( flag )=>{
         // if ( ( bottomSheetRef as any ).current )
@@ -123,7 +135,7 @@ const CloudBackupHistory = ( props ) => {
         setConfirmationModal( false )
         console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
-        updateCloudData()
+        dispatch( updateCloudData() )
       }}
       onPressIgnore={( flag )=> {
         // if ( ( bottomSheetRef as any ).current )
@@ -157,14 +169,13 @@ const CloudBackupHistory = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
-        title={'Health Check Successful'}
-        info={'Question Successfully Backed Up'}
+        title={strings.HealthCheckSuccessful}
+        info={strings.QuestionBackedUp}
         note={''}
-        proceedButtonText={'View Health'}
+        proceedButtonText={strings.ViewHealth}
         isIgnoreButton={false}
         onPressProceed={() => {
           ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
-          dispatch( checkMSharesHealth() )
           props.navigation.goBack()
         }}
         isBottomImage={true}
@@ -204,16 +215,16 @@ const CloudBackupHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={'Backup History'}
-          infoBoxInfo={'The history of your backup will appear here'}
+          infoBoxTitle={strings.BackupHistory}
+          infoBoxInfo={strings.historyofyourbackup}
           type={'security'}
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
             setConfirmationModal( true )
           }}
           data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
-          confirmButtonText={'Backup'}
-          reshareButtonText={'Backup'}
+          confirmButtonText={common.backup}
+          reshareButtonText={common.backup}
           disableChange={true}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
@@ -225,6 +236,9 @@ const CloudBackupHistory = ( props ) => {
       </View>
       <ModalContainer visible={confirmationModal} closeBottomSheet={() => {}}>
         {renderCloudPermissionContent()}
+      </ModalContainer>
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {setErrorModal( false )}}>
+        {renderCloudErrorContent()}
       </ModalContainer>
       {/* <BottomSheet
         enabledInnerScrolling={true}

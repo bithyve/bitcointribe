@@ -1,12 +1,12 @@
 import { TrustedContact, UnecryptedStreamData, UnecryptedStreams } from '../../../bitcoin/utilities/Interface'
-import TrustedContacts from '../../../bitcoin/utilities/TrustedContacts'
+import TrustedContactsOperations from '../../../bitcoin/utilities/TrustedContactsOperations'
 
 export default function useStreamFromContact(
   contact: TrustedContact,
   walletId: string,
   instream?: boolean
 ): UnecryptedStreamData {
-  const usersStreamId = TrustedContacts.getStreamId( walletId )
+  const usersStreamId = TrustedContactsOperations.getStreamId( walletId )
   const channel: UnecryptedStreams = contact.unencryptedPermanentChannel
 
   if( instream ){

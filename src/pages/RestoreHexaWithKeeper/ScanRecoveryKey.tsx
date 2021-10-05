@@ -125,7 +125,7 @@ class ScanRecoveryKey extends Component<
               }}>
                 Recovering Wallet
               </Text>
-              <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.navigation.state.params.walletName ? this.props.navigation.state.params.walletName : ''}` + '’s Wallet'}</Text>
+              { this.props.walletName || this.props.navigation.state.params.walletName ? <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.navigation.state.params.walletName ? this.props.navigation.state.params.walletName : ''}` + '’s Wallet'}</Text> : null }
 
             </View>
           </View>
@@ -323,9 +323,7 @@ class ScanRecoveryKey extends Component<
 const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
-    walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
-    s3Service: idx( state, ( _ ) => _.sss.service ),
+    walletName: idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
   }

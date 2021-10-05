@@ -2,7 +2,7 @@ import {
   SYNC_PERMANENT_CHANNELS,
   EXISTING_PERMANENT_CHANNELS_SYNCHED,
   PermanentChannelsSyncKind,
-  UPDATE_TRUSTED_CONTACTS
+  UPDATE_TRUSTED_CONTACTS,
 } from '../actions/trustedContacts'
 import {
   TrustedContactRelationTypes,
@@ -66,6 +66,7 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
             existingPermanentChannelsSynching: false,
           },
         }
+
   }
 
   return state

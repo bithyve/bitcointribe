@@ -11,9 +11,11 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { ScrollView } from 'react-native-gesture-handler'
+import { translations } from '../../common/content/LocContext'
 
 export default function SavingsAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
@@ -67,7 +69,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
             <Text
               style={styles.infoText}
             >
-          Use this account to store, or hodl bitcoin and sats long term
+              {strings.saving3}
             </Text>
             <View
               style={{
@@ -91,7 +93,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
                 ...styles.infoText, marginBottom: hp( '8%' ),
               }}
             >
-            Be careful: If you end up sending sats from your Checking Account to your Savings Account and then decide to spend sats from your Savings Account, it will cost you much more in transaction fees every time
+              {strings.saving4}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -128,7 +130,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
             <Text
               style={styles.infoText}
             >
-            The account needs you to set up a 2 Factor Authentication (2FA) system with your favorite authenticator software. This method makes it extremely hard for anyone but you to access your bitcoin
+              {strings.saving5}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -145,7 +147,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
             <Text
               style={styles.infoText}
             >
-            Your 2FA code must be retrieved from your Keeper Device - do not ever set up 2 Factor Authentication for your Savings account on your wallet device, as this is a security risk
+              {strings.saving6}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
@@ -180,7 +182,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
             <Text
               style={styles.infoText}
             >
-            Your Savings Account is a 2-of-3 multi-signature account where you hold two keys (one on this device and the other on your Keeper Device)
+              {strings.saving7}
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center', marginTop: hp( '6%' ), marginBottom: hp( '6%' )
@@ -197,7 +199,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
             <Text
               style={styles.infoText}
             >
-            BitHyve holds the third key which is used only when you sign first and present the correct 2FA code. BitHyve never custodies any of your funds. The key held on the Keeper Device can be used to migrate your funds from Hexa, even if we stop supporting the app!
+              {strings.saving8}
             </Text>
 
           </View>

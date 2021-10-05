@@ -41,7 +41,6 @@ import SecurityQuestion from '../NewBHR/SecurityQuestion'
 import UpgradingKeeperContact from './UpgradingKeeperContact'
 import UpgradePdfKeeper from './UpgradePdfKeeper'
 import Dash from 'react-native-dash'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import {
   initializeHealthSetup,
   updateMSharesHealth,
@@ -52,29 +51,27 @@ import {
   generateSMMetaShares,
   getPDFData,
   checkMSharesHealth,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { KeeperInfoInterface, LevelHealthInterface, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { initNewBHRFlow } from '../../store/actions/health'
+import { initNewBHRFlow } from '../../store/actions/BHR'
 import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setCloudDataForLevel, autoUploadSecondaryShare, autoShareContactKeeper, setUpgradeProcessStatus, setAvailableKeeperData, updateLevelToSetup, updateAvailableKeeperData, confirmPDFSharedFromUpgrade } from '../../store/actions/upgradeToNewBhr'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
 import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import QRModal from '../Accounts/QRModal'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
+import dbManager from '../../storage/realm/dbManager'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -86,7 +83,6 @@ interface UpgradeBackupStateTypes {
     status: String;
   }[];
   selectedContact: any[];
-  encryptedCloudDataJson: any;
   isCloudBackupProcessing: Boolean;
   showLoader: boolean;
   totalKeeper: number;
@@ -108,10 +104,8 @@ interface UpgradeBackupStateTypes {
 
 interface UpgradeBackupPropsTypes {
   navigation: any;
-  s3Service: S3Service;
   initializeHealthSetup: any;
   walletName: string;
-  regularAccount: RegularAccount;
   database: any;
   updateHealthForCloud: any;
   cloudBackupStatus: CloudBackupStatus;
@@ -129,12 +123,11 @@ interface UpgradeBackupPropsTypes {
   setCloudData: any;
   overallHealth: any[];
   generateMetaShare: any;
-  metaSharesKeeper: MetaShare[],
   initLevelTwo: any;
   healthCheckInitializedKeeper: boolean;
   setCloudDataForLevel: any;
   addNewSecondarySubAccount: any;
-  trustedContacts: TrustedContactsService
+  trustedContacts: any;
   SHARES_TRANSFER_DETAILS: any;
   keeperProcessStatus: any;
   updatedKeeperInfo: any;
@@ -177,6 +170,7 @@ class UpgradeBackup extends Component<
   storagePermissionBottomSheet = createRef<BottomSheet>()
   QrBottomSheet = createRef<BottomSheet>();
   ProcessInfoBottomSheet = createRef<BottomSheet>();
+  metaSharesKeeper: MetaShare[];
 
   constructor( props ) {
     super( props )
@@ -190,11 +184,13 @@ class UpgradeBackup extends Component<
     this.storagePermissionBottomSheet
     this.QrBottomSheet
     this.ProcessInfoBottomSheet
+    const s3 = dbManager.getBHR()
+    console.log( 's3', typeof s3, s3 )
+    this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
 
     this.state = {
       isCloudBackupProcessing: false,
       selectedIds: [],
-      encryptedCloudDataJson: [],
       listData: [
         {
           title: 'Wallet Backup',
@@ -253,7 +249,7 @@ class UpgradeBackup extends Component<
   }
 
   componentDidMount = () => {
-    this.props.checkMSharesHealth()
+    // this.props.checkMSharesHealth()
     const { trustedContactsInfo, overallHealth } = this.props
     let TotalKeeper = 1
     let keepersInfo: {shareId: string; type: string; count: number; contactDetails?: any; status?: boolean}[] = [ {
@@ -307,7 +303,8 @@ class UpgradeBackup extends Component<
       this.props.updateLevelToSetup( this.props.currentLevel + 1 )
       this.props.generateMetaShare( this.props.currentLevel + 1 )
       if( !this.props.isSmMetaSharesCreatedFlag ){
-        this.props.generateSMMetaShares()
+        // REMOVED from SAGA and action
+        // this.props.generateSMMetaShares()
       }
     }
     this.ProcessInfoBottomSheet.current.snapTo( 1 )
@@ -544,7 +541,8 @@ class UpgradeBackup extends Component<
       updateLevelToSetup( currentLevel + 1 )
       generateMetaShare( currentLevel + 1 )
       if( !isSmMetaSharesCreatedFlag ){
-        generateSMMetaShares()
+        // REMOVED from SAGA and action
+        // generateSMMetaShares()
       }
     }
 
@@ -601,7 +599,8 @@ class UpgradeBackup extends Component<
     } else {
       this.props.generateMetaShare( levelToSetup, true )
       if( !this.props.isSmMetaSharesCreatedFlag ){
-        this.props.generateSMMetaShares( this.state.secondaryMnemonics )
+        // REMOVED from SAGA and action
+        // this.props.generateSMMetaShares( this.state.secondaryMnemonics )
       }
     }
   };
@@ -612,9 +611,9 @@ class UpgradeBackup extends Component<
         this.setState( {
           isGuardianCreationClicked: true
         } )
-        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount, metaSharesKeeper } = this.props
+        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
         const firstName = 'Personal'
-        const lastName = 'Device1'
+        const lastName = 'Device 1'
 
         const contactName = `${firstName} ${lastName ? lastName : ''}`
           .toLowerCase()
@@ -633,10 +632,10 @@ class UpgradeBackup extends Component<
           shareId: shareId,
           name: contactName,
           type: 'device',
-          scheme: metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+          scheme: this.metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
           currentLevel: this.props.levelToSetup,
           createdAt: moment( new Date() ).valueOf(),
-          sharePosition: metaSharesKeeper.findIndex( value => value.shareId == shareId ),
+          sharePosition: this.metaSharesKeeper.findIndex( value => value.shareId == shareId ),
           data: {
             name: contactName, index: 0
           }
@@ -718,9 +717,9 @@ class UpgradeBackup extends Component<
 
       const firstName = 'Personal'
       let lastName = 'Device'
-      if( index === 0 ) lastName = 'Device1'
-      else if( index === 3 ) lastName = 'Device2'
-      else lastName = 'Device3'
+      if( index === 0 ) lastName = 'Device 1'
+      else if( index === 3 ) lastName = 'Device 2'
+      else lastName = 'Device 3'
       const contactName = `${firstName} ${lastName ? lastName : ''}`
         .toLowerCase()
         .trim()
@@ -775,12 +774,12 @@ class UpgradeBackup extends Component<
     const index = 0
     if( this.props.levelHealth[ this.props.levelToSetup-1 ] && this.props.levelHealth[ this.props.levelToSetup-1 ].levelInfo[ 2 ].updatedAt > 0 ) return
     let contactName = 'Personal Device'
-    if( index === 0 ) contactName = 'Personal Device1'
-    else if( index === 3 ) contactName = 'Personal Device2'
-    else contactName = 'Personal Device3'
+    if( index === 0 ) contactName = 'Personal Device 1'
+    else if( index === 3 ) contactName = 'Personal Device 2'
+    else contactName = 'Personal Device 3'
     const shareObj =
       {
-        walletId: this.props.s3Service.getWalletId().data.walletId,
+        walletId: this.props.wallet.walletId,
         shareId: this.state.selectedShareId[ 0 ],
         reshareVersion: 0,
         updatedAt: moment( new Date() ).valueOf(),
@@ -1490,37 +1489,34 @@ const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
     walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
+      idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
-    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
-    isLevel2Initialized: idx( state, ( _ ) => _.health.isLevel2Initialized ),
-    isLevel3Initialized: idx( state, ( _ ) => _.health.isLevel3Initialized ),
+    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
+    isLevel2Initialized: idx( state, ( _ ) => _.bhr.isLevel2Initialized ),
+    isLevel3Initialized: idx( state, ( _ ) => _.bhr.isLevel3Initialized ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     activePersonalNode: idx( state, ( _ ) => _.nodeSettings.activePersonalNode ),
     isBackupProcessing: idx( state, ( _ ) => _.preferences.isBackupProcessing ) || false,
     versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
-    metaSharesKeeper: idx( state, ( _ ) => _.health.service.levelhealth.metaSharesKeeper ),
-    healthCheckInitializedKeeper: idx( state, ( _ ) => _.health.service.levelhealth.healthCheckInitializedKeeper ),
+    healthCheckInitializedKeeper: idx( state, ( _ ) => _.bhr.service.levelhealth.healthCheckInitializedKeeper ),
     SHARES_TRANSFER_DETAILS:  idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS ),
-    uploadMetaShare: idx( state, ( _ ) => _.health.loading.uploadMetaShare ),
+    uploadMetaShare: idx( state, ( _ ) => _.bhr.loading.uploadMetaShare ),
     updateEphemeralChannelLoader: idx( state, ( _ ) => _.trustedContacts.loading.updateEphemeralChannel ),
-    keeperProcessStatusFlag: idx( state, ( _ ) => _.state.health.keeperProcessStatus ),
-    isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.health.isSmMetaSharesCreatedFlag ),
+    keeperProcessStatusFlag: idx( state, ( _ ) => _.state.bhr.keeperProcessStatus ),
+    isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.bhr.isSmMetaSharesCreatedFlag ),
     trustedContactsInfo: idx( state, ( _ ) => _.trustedContacts.trustedContactsInfo ),
     upgradeProcessStatus: idx( state, ( _ ) => _.upgradeToNewBhr.upgradeProcessStatus ),
     availableKeeperData: idx( state, ( _ ) => _.upgradeToNewBhr.availableKeeperData ),
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
     isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
-    pdfInfo: idx( state, ( _ ) => _.health.pdfInfo ),
+    pdfInfo: idx( state, ( _ ) => _.bhr.pdfInfo ),
     wallet: idx( state, ( _ ) => _.storage.wallet ),
   }
 }
@@ -1554,7 +1550,7 @@ export default withNavigationFocus(
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    height: hp( '68.5%' ),
+    height: hp( '70.83%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

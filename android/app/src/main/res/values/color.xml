@@ -1,3 +1,4 @@
 <resources>
- <color name="white">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="notification">#00A300</color>
 </resources>

@@ -6,15 +6,16 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses, TransactionType } from '../Interface'
 import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
+import idx from 'idx'
 
 
 const { REQUEST_TIMEOUT } = config
-let accAxios: AxiosInstance = axios.create( {
+const accAxios: AxiosInstance = axios.create( {
   timeout: REQUEST_TIMEOUT
 } )
 
@@ -142,6 +143,18 @@ export default class AccountUtilities {
     return xKey
   };
 
+  static generateExtendedKeyPairFromSeed = ( seed: string, network: bitcoinJS.networks.Network, derivationPath: string ) => {
+    const root = bip32.fromSeed( Buffer.from( seed, 'hex' ), network )
+    const raw_xPriv = root.derivePath( derivationPath )
+    const raw_xPub = raw_xPriv.neutered()
+
+    const xpriv = raw_xPriv.toBase58()
+    const xpub = raw_xPub.toBase58()
+    return {
+      xpriv, xpub
+    }
+  };
+
   static generateChildFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean, shouldNotDerive?: boolean ) => {
     const xKey = bip32.fromBase58( extendedKey, network )
     let childXKey
@@ -231,18 +244,21 @@ export default class AccountUtilities {
   }
 
   static signingEssentialsForMultiSig = ( account: MultiSigAccount, address: string ) => {
-    const { xpubs, xprivs, networkType } = account
+    const { networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
 
     const closingExtIndex = account.nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
     for ( let itr = 0; itr <= closingExtIndex; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, false )
+      const multiSig = AccountUtilities.createMultiSig( {
+        primary: account.xpub,
+        ...( account as MultiSigAccount ).xpubs
+      }, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, false ),
-          secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, false, true )
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( account.xpriv, network, itr, false ),
+          secondaryPriv: account.xprivs.secondary
+            ? AccountUtilities.generateChildFromExtendedKey( account.xprivs.secondary, network, itr, false, true )
             : null,
           childIndex: itr,
         }
@@ -251,13 +267,16 @@ export default class AccountUtilities {
 
     const closingIntIndex = account.nextFreeChangeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT_INTERNAL : config.GAP_LIMIT )
     for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, true )
+      const multiSig = AccountUtilities.createMultiSig( {
+        primary: account.xpub,
+        ...( account as MultiSigAccount ).xpubs
+      }, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, true ),
-          secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, true, true )
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( account.xpriv, network, itr, true ),
+          secondaryPriv: account.xprivs.secondary
+            ? AccountUtilities.generateChildFromExtendedKey( account.xprivs.secondary, network, itr, true, true )
             : null,
           childIndex: itr,
           internal: true
@@ -338,7 +357,10 @@ export default class AccountUtilities {
         let changeAddress: string
 
         if( ( account as MultiSigAccount ).is2FA )
-          changeAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, nextFreeChangeAddressIndex, true ).address
+          changeAddress = AccountUtilities.createMultiSig( {
+            primary: account.xpub,
+            ...( account as MultiSigAccount ).xpubs
+          }, 2, network, nextFreeChangeAddressIndex, true ).address
         else
           changeAddress = AccountUtilities.getAddressByIndex(
             account.xpub,
@@ -367,8 +389,7 @@ export default class AccountUtilities {
 
   static fetchBalanceTransactionsByAccounts = async (
     accounts: {[id: string]: {
-    externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
-    internalAddressSet:  {[address: string]: number}, // internal range set (soft/hard)
+    activeAddresses: ActiveAddresses,
     externalAddresses: {[address: string]: number},  // all external addresses(till nextFreeAddressIndex)
     internalAddresses:  {[address: string]: number},  // all internal addresses(till nextFreeChangeAddressIndex)
     ownedAddresses: string[],
@@ -385,11 +406,15 @@ export default class AccountUtilities {
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
+    transactionsNote: {
+      [txId: string]: string
+    },
     contactName?: string,
     primaryAccType?: string,
     accountName?: string,
     }},
-    network: bitcoinJS.Network
+    network: bitcoinJS.Network,
+    hardRefresh?: boolean
   ): Promise<
   {
     synchedAccounts: {
@@ -401,12 +426,14 @@ export default class AccountUtilities {
         address: string;
         status?: any;
       }>;
-      balances: { confirmed: number; unconfirmed: number };
       txIdMap:  {[txid: string]: string[]},
       transactions: Transaction[];
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
+      activeAddresses: ActiveAddresses;
+      activeAddressesWithNewTxs: ActiveAddresses,
+      hasNewTxn: boolean
     }
    }
   }> => {
@@ -423,36 +450,24 @@ export default class AccountUtilities {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs, cachedTxIdMap } = accounts[ accountId ]
+        const { activeAddresses, externalAddresses, internalAddresses, ownedAddresses, cachedTxs } = accounts[ accountId ]
         const upToDateTxs: Transaction[] = []
         const txsToUpdate: Transaction[] = []
         const newTxs : Transaction[] = []
 
-        // hydrate AQL & split txs(conf & unconf(<=6))
         cachedTxs.forEach( ( tx ) => {
           if( tx.confirmations <= 6 ){
             txsToUpdate.push( tx )
-            if( tx.address ){
-              // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
-              if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
-                if( externalAddresses[ tx.address ] !== undefined ) cachedAQL.external[ tx.address ] = true
-                else cachedAQL.internal[ tx.address ] = true
-              }
-            }
           } else upToDateTxs.push( tx )
-
-          if( !cachedTxIdMap[ tx.txid ] ) // backward compatibility (for versions w/o txIdMaps)
-            cachedTxIdMap[ tx.txid ] = [ tx.address ]
-
         } )
 
         accountsTemp[ accountId ] = {
           upToDateTxs, txsToUpdate, newTxs
         }
 
-        const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( cachedAQL.external ) ]
-        const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( cachedAQL.internal ) ]
-        const ownedArray = [ ...ownedAddresses, ...Object.keys( cachedAQL.external ), ...Object.keys( cachedAQL.internal ) ]
+        const externalArray = Object.keys( hardRefresh? externalAddresses: activeAddresses.external )
+        const internalArray = Object.keys( hardRefresh? internalAddresses: activeAddresses.internal )
+        const ownedArray = ownedAddresses
 
         accountToAddressMapping[ accountId ] = {
           External: externalArray,
@@ -462,9 +477,6 @@ export default class AccountUtilities {
       }
 
       let usedFallBack = false
-      accAxios = axios.create( {
-        timeout: 7 * REQUEST_TIMEOUT // accounting for blind refresh
-      } )
       try{
         if ( network === bitcoinJS.networks.testnet ) {
           res = await accAxios.post(
@@ -503,15 +515,11 @@ export default class AccountUtilities {
       const accountToResponseMapping = res.data
       const synchedAccounts = {
       }
-      for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
-        const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
+      for( const accountId of Object.keys( accountToResponseMapping ) ){
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName, transactionsNote } = accounts[ accountId ]
+        const { Utxos, Txs } = accountToResponseMapping[ accountId ]
         const UTXOs = cachedUTXOs
-        const balances: Balances = {
-          confirmed: 0,
-          unconfirmed: 0,
-        }
 
         // (re)categorise UTXOs
         if ( Utxos )
@@ -521,63 +529,26 @@ export default class AccountUtilities {
               let include = true
               UTXOs.forEach( ( utxo ) => {
                 if( utxo.txId === txid ) {
-                  if( status.confirmed && !utxo.status.confirmed ){
-                    // cached utxo status change(unconf to conf)
-                    utxo.status = status
-                  }
+                  if( status.confirmed && !utxo.status.confirmed ) utxo.status = status
                   include = false
                 }
               } )
 
-              if( include )
-              {
-                UTXOs.push( {
-                  txId: txid,
-                  vout,
-                  value,
-                  address: Address,
-                  status,
-                } )
-              }
+              if( include ) UTXOs.push( {
+                txId: txid, vout, value, address: Address, status
+              } )
             }
           }
 
-        // calculate balance
-        for( const utxo of UTXOs ){
-          if (
-            accountType === AccountType.TEST_ACCOUNT &&
-            externalAddresses[ utxo.address ] === 0
-          ) {
-            balances.confirmed += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
-            continue
-          }
-
-          if ( utxo.status && utxo.status.confirmed ) balances.confirmed += utxo.value
-          else if (
-            internalAddressSet[ utxo.address ] !== undefined
-          )
-            balances.confirmed += utxo.value
-          else balances.unconfirmed += utxo.value
-        }
-
         // process txs
         const addressesInfo = Txs
-        const txIdMap = cachedTxIdMap? cachedTxIdMap: {
-        }
+        const txIdMap = cachedTxIdMap
         let { lastUsedAddressIndex, lastUsedChangeAddressIndex } = accounts[ accountId ]
         const { upToDateTxs, txsToUpdate, newTxs } = accountsTemp[ accountId ]
 
         if ( addressesInfo )
           for ( const addressInfo of addressesInfo ) {
-            if ( addressInfo.TotalTransactions === 0 ) {
-              continue
-            }
-            // TODO: remove totalTransactions, confirmedTransactions & unconfirmedTransactions
-            // transactions.totalTransactions += addressInfo.TotalTransactions
-            // transactions.confirmedTransactions +=
-            //   addressInfo.ConfirmedTransactions
-            // transactions.unconfirmedTransactions +=
-            //   addressInfo.UnconfirmedTransactions
+            if ( addressInfo.TotalTransactions === 0 ) continue
 
             addressInfo.Transactions.forEach( ( tx ) => {
               if ( !txIdMap[ tx.txid ] ) {
@@ -585,7 +556,7 @@ export default class AccountUtilities {
                 txIdMap[ tx.txid ] = [ addressInfo.Address ]
 
                 if ( tx.transactionType === 'Self' ) {
-                  const outgoingTx = {
+                  const outgoingTx: Transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
                     status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -593,7 +564,7 @@ export default class AccountUtilities {
                     date: tx.Status.block_time
                       ? new Date( tx.Status.block_time * 1000 ).toUTCString()
                       : new Date( Date.now() ).toUTCString(),
-                    transactionType: 'Sent',
+                    transactionType: TransactionType.SENT,
                     amount: tx.SentAmount,
                     accountType:
                     accountType === SUB_PRIMARY_ACCOUNT
@@ -602,10 +573,12 @@ export default class AccountUtilities {
                     primaryAccType,
                     recipientAddresses: tx.RecipientAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
-                    address: addressInfo.Address
+                    address: addressInfo.Address,
+                    isNew: true,
+                    notes: transactionsNote[ tx.txid ]
                   }
 
-                  const incomingTx = {
+                  const incomingTx: Transaction = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
                     status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -613,7 +586,7 @@ export default class AccountUtilities {
                     date: tx.Status.block_time
                       ? new Date( tx.Status.block_time * 1000 ).toUTCString()
                       : new Date( Date.now() ).toUTCString(),
-                    transactionType: 'Received',
+                    transactionType: TransactionType.RECEIVED,
                     amount: tx.ReceivedAmount,
                     accountType:
                     accountType === SUB_PRIMARY_ACCOUNT
@@ -622,8 +595,10 @@ export default class AccountUtilities {
                     primaryAccType,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
+                    isNew: true,
+                    notes: transactionsNote[ tx.txid ]
                   }
-                  // console.log({ outgoingTx, incomingTx });
+
                   newTxs.push(
                     ...[ outgoingTx, incomingTx ],
                   )
@@ -644,7 +619,9 @@ export default class AccountUtilities {
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
-                    address: addressInfo.Address
+                    address: addressInfo.Address,
+                    isNew: true,
+                    notes: transactionsNote[ tx.txid ]
                   }
 
                   newTxs.push( transaction )
@@ -673,16 +650,44 @@ export default class AccountUtilities {
               }
             }
           }
-
         const transactions: Transaction[] = [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
 
-        // pop addresses from the query list if tx-conf > 6
+        const activeAddressesWithNewTxs: ActiveAddresses = {
+          external: {
+          },
+          internal: {
+          }
+        }
+
+        newTxs.forEach( tx => {
+          const addresses = txIdMap[ tx.txid ]
+          addresses.forEach( address => {
+            if( activeAddresses.external[ address ] ){
+              activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
+              if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.name )
+              else if( tx.transactionType === TransactionType.SENT ) {
+                const recipientInfo = idx( activeAddresses.external[ address ], _ => _.assignee.recipientInfo )
+                if( recipientInfo ) tx.receivers =  recipientInfo[ tx.txid ]
+              }
+            } else if( activeAddresses.internal[ address ] ){
+              activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
+              if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.internal[ address ], _ => _.assignee.senderInfo.name )
+              else if( tx.transactionType === TransactionType.SENT ) {
+                const recipientInfo = idx( activeAddresses.internal[ address ], _ => _.assignee.recipientInfo )
+                if( recipientInfo ) tx.receivers =  recipientInfo[ tx.txid ]
+              }
+            } } )
+        } )
+
+        // pop addresses from the activeAddresses if tx-conf > 6
         txsToUpdate.forEach( tx => {
           if( tx.confirmations > 6 ){
             const addresses = txIdMap[ tx.txid ]
             addresses.forEach( address => {
-              if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
-              else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
+              // if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
+              // else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
+              if( activeAddresses.external[ address ] ) delete activeAddresses.external[ address ]
+              else if( activeAddresses.internal[ address ] ) delete activeAddresses.internal[ address ]
             } )
           }
         } )
@@ -694,18 +699,19 @@ export default class AccountUtilities {
 
         synchedAccounts[ accountId ] =  {
           UTXOs,
-          balances,
           txIdMap,
           transactions,
           addressQueryList: cachedAQL,
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
+          activeAddresses,
+          activeAddressesWithNewTxs,
+          hasNewTxn: newTxs.length > 0
         }
       }
 
       if( usedFallBack )
         Toast( 'We could not connect to your own node.\nRefreshed using the BitHyve node....' )
-
       return {
         synchedAccounts
       }
@@ -763,7 +769,7 @@ export default class AccountUtilities {
     newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
 
     if( newTxIds.length ){
-      transactions.transactionDetails.forEach( tx => {
+      transactions.forEach( tx => {
         if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
       } )
     }
@@ -774,9 +780,9 @@ export default class AccountUtilities {
   static setNewTransactions = ( transactions: Transaction[], lastSynched: number ) => {
     const lastSynced = lastSynched
     let latestSync = lastSynced
-    const newTransactions = [] // delta transactions
+    const newTransactions: Transaction[] = [] // delta transactions
     for ( const tx of transactions ) {
-      if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
+      if ( tx.status === 'Confirmed' && tx.transactionType === TransactionType.RECEIVED ) {
         if ( tx.blockTime > lastSynced ) newTransactions.push( tx )
         if ( tx.blockTime > latestSync ) latestSync = tx.blockTime
       }
@@ -889,19 +895,17 @@ export default class AccountUtilities {
   }
 
   // 2FA-account specific utilities
-  static registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
+  static setupTwoFA = async ( walletID: string ): Promise<{
     setupData: {
-      qrData: string;
       secret: string;
       bhXpub: string;
     };
   }> => {
     let res: AxiosResponse
     try {
-      res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
+      res = await SIGNING_AXIOS.post( 'setup2FA', {
         HEXA_ID: config.HEXA_ID,
         walletID,
-        secondaryID,
       } )
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -909,7 +913,7 @@ export default class AccountUtilities {
     }
 
     const { setupSuccessful, setupData } = res.data
-    if ( !setupSuccessful ) throw new Error( 'Secure account setup failed' )
+    if ( !setupSuccessful ) throw new Error( '2FA setup failed' )
     return {
       setupData
     }
@@ -938,6 +942,49 @@ export default class AccountUtilities {
     }
   }
 
+  static resetTwoFA = async (
+    walletID: string,
+    secondaryMnemonic: string,
+    secondaryXpub: string,
+    network: bitcoinJS.networks.Network
+  ): Promise<{
+    secret: any;
+  }> => {
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 ) )
+    if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
+
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'resetTwoFAv2', {
+        HEXA_ID: config.HEXA_ID,
+        walletID: walletID,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+    const { secret } = res.data
+    return {
+      secret
+    }
+  };
+
+  static generateSecondaryXpriv = (
+    secondaryMnemonic: string,
+    secondaryXpub: string,
+    network: bitcoinJS.networks.Network
+  ): {
+    secondaryXpriv: string
+  } => {
+    const derivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, derivationPath )
+    if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
+
+    const secondaryXpriv = AccountUtilities.generateExtendedKey( secondaryMnemonic, true, network, derivationPath )
+    return {
+      secondaryXpriv
+    }
+  };
 
   static getSecondSignature = async (
     walletId: string,
@@ -1017,6 +1064,8 @@ export default class AccountUtilities {
       disableAccount?: boolean;
       configuration?: {
         displayBalance: boolean;
+        displayIncomingTxs: boolean;
+        displayOutgoingTxs: boolean;
       };
       accountDetails?: {
         donee: string;

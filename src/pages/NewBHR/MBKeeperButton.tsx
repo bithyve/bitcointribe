@@ -18,7 +18,7 @@ function MBKeeperButton( props ) {
         <View style={styles.imageBackground}>
           {chosenContact.avatarImageSource ? <Image
             source={{
-              uri: chosenContact.avatarImageSource
+              uri: chosenContact.avatarImageSource.uri ? chosenContact.avatarImageSource.uri : chosenContact.avatarImageSource
             }}
             style={styles.contactImage}
           /> : <Text
@@ -65,7 +65,7 @@ function MBKeeperButton( props ) {
       {keeper.shareType == 'securityQuestion'?
         value.status == 'notSetup'
           ? <Image
-            source={require( '../../assets/images/icons/questionMark.png' )}
+            source={require( '../../assets/images/icons/icon_password.png' )}
             style={{
               ...styles.resetImage,
               position: 'relative',
@@ -73,7 +73,7 @@ function MBKeeperButton( props ) {
             }}
           /> :
           <ImageBackground
-            source={require( '../../assets/images/icons/questionMark.png' )}
+            source={require( '../../assets/images/icons/icon_password_light.png' )}
             style={{
               ...styles.resetImage,
               position: 'relative',
@@ -101,10 +101,10 @@ function MBKeeperButton( props ) {
               tintColor: value.status == 'notSetup' ? Colors.deepBlue : Colors.secondaryBackgroundColor
             }}
           />
-          :keeper.status == 'accessible' && keeper.shareType == 'device' ? (
+          :keeper.status == 'accessible' && ( keeper.shareType == 'device' || keeper.shareType == 'primaryKeeper' ) ? (
             <Image
               source={
-                keeper.shareType == 'device'
+                ( keeper.shareType == 'device' || keeper.shareType == 'primaryKeeper' )
                   ? require( '../../assets/images/icons/icon_ipad_blue.png' )
                   : require( '../../assets/images/icons/pexels-photo.png' )
               }
@@ -119,7 +119,8 @@ function MBKeeperButton( props ) {
             getImageIcon( keeper.data )
           ) : keeper.shareType == 'pdf' && keeper.status == 'accessible' ? (
             <Image
-              source={require( '../../assets/images/icons/doc.png' )}
+              source={value.status == 'notSetup'
+                ? require( '../../assets/images/icons/doc-blue.png' ) : require( '../../assets/images/icons/doc.png' )}
               style={{
                 width: wp( '5%' ),
                 height: wp( '6%' ),

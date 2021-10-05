@@ -21,10 +21,9 @@ import {
   ACCOUNT_SHELL_MERGE_FAILED,
   ACCOUNT_SHELLS_ORDER_UPDATED,
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
-  ACCOUNT_SHELL_REFRESH_COMPLETED,
-  ACCOUNT_SHELL_REFRESH_STARTED,
+  ACCOUNT_SHELLS_REFRESH_STARTED,
+  ACCOUNT_SHELLS_REFRESH_COMPLETED,
   CLEAR_ACCOUNT_SYNC_CACHE,
-  RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
   BLIND_REFRESH_STARTED,
@@ -38,38 +37,24 @@ import {
   RESET_ACCOUNT_UPDATE_FLAG,
   RESET_TWO_FA_LOADER,
   NEW_ACCOUNT_SHELLS_ADDED,
-  UPDATE_ACCOUNT_SHELLS
+  UPDATE_ACCOUNT_SHELLS,
+  UPDATE_ACCOUNTS,
+  READ_TRANSACTION,
+  ACCOUNT_CHECKED,
+  RECOMPUTE_NET_BALANCE,
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import { Accounts } from '../../bitcoin/utilities/Interface'
-
-export type AccountVars = {
-  service: any;
-}
-
-// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
-const ACCOUNT_VARS: AccountVars  = {
-  service: null,
-}
+import { Account, Accounts } from '../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 export type AccountsState = {
-  servicesEnriched: boolean;
   accountsSynched: boolean;
-  testCoinsReceived: boolean,
-
   accounts: Accounts,
   accountShells: AccountShell[];
-
-  // TODO: Consider removing these in favor of just looking
-  // up account data from `activeAccounts` using a UUID.
-  REGULAR_ACCOUNT: AccountVars;
-  TEST_ACCOUNT: AccountVars;
-  SECURE_ACCOUNT: AccountVars;
-
+  netBalance: number;
   exchangeRates?: any;
   averageTxFees: any;
-
   twoFAHelpFlags: {
       xprivGenerated: boolean | null;
       twoFAValid: boolean | null;
@@ -95,11 +80,8 @@ export type AccountsState = {
   accountShellMergeSource: AccountShell | null;
   accountShellMergeDestination: AccountShell | null;
 
-  // currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  // currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-  // currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
-
   refreshed: boolean;
+  testCoinsReceived: boolean,
 
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
@@ -108,20 +90,14 @@ export type AccountsState = {
 };
 
 const initialState: AccountsState = {
-  servicesEnriched: false,
   accountsSynched: false,
   exchangeRates: null,
-  testCoinsReceived: false,
-
-  REGULAR_ACCOUNT: ACCOUNT_VARS,
-  TEST_ACCOUNT: ACCOUNT_VARS,
-  SECURE_ACCOUNT: ACCOUNT_VARS,
 
   averageTxFees: null,
   accounts: {
   },
   accountShells: [],
-
+  netBalance: 0,
   twoFAHelpFlags: {
     xprivGenerated: null,
     twoFAValid: null,
@@ -152,6 +128,7 @@ const initialState: AccountsState = {
   // currentSwanSubAccount: null,
 
   refreshed: false,
+  testCoinsReceived: false,
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,
@@ -232,6 +209,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           twoFAHelpFlags: {
             ...state.twoFAHelpFlags,
             twoFAResetted: action.payload.resetted,
+            twoFAValid: false,
           },
         }
 
@@ -251,7 +229,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case NEW_ACCOUNT_SHELLS_ADDED:
-        // TODO: restrict wyre/ramp/swan to single instance(disable add)
         return {
           ...state,
           isGeneratingNewAccountShell: false,
@@ -279,20 +256,50 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           hasNewAccountShellGenerationFailed: false,
         }
 
+      case UPDATE_ACCOUNTS:
+        return {
+          ...state,
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts,
+          },
+        }
+
+      case READ_TRANSACTION: {
+        const { accountShells, accounts } = action.payload
+        return {
+          ...state,
+          accountShells: accountShells,
+          accounts: accounts,
+        }
+      }
+
+      case ACCOUNT_CHECKED: {
+        const { accountShells, accounts } = action.payload
+        return {
+          ...state,
+          accountShells: accountShells,
+          accounts: accounts,
+        }
+      }
+
       case UPDATE_ACCOUNT_SHELLS:
         const accounts = action.payload.accounts
         const shells = state.accountShells
         shells.forEach( ( shell )=>{
-          const account = accounts[ shell.primarySubAccount.id ]
+          const account: Account = accounts[ shell.primarySubAccount.id ]
           if( !account ) return shell
 
           const accountDetails = {
             accountName: account.accountName,
             accountDescription: account.accountDescription,
-            accountXpub: account.xpub
+            accountXpub: account.xpub,
+            accountVisibility: account.accountVisibility,
+            hasNewTxn: account.hasNewTxn
           }
           AccountShell.updatePrimarySubAccountDetails(
             shell,
+            account.isUsable,
             account.balances,
             account.transactions,
             accountDetails
@@ -309,10 +316,18 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accountShells: shells,
         }
 
-      case RESTORED_ACCOUNT_SHELLS:
+      case RECOMPUTE_NET_BALANCE:
+        let netBalance = 0
+        state.accountShells.forEach( ( accountShell: AccountShell ) => {
+          if (
+            accountShell.primarySubAccount.sourceKind !==
+          SourceAccountKind.TEST_ACCOUNT
+          )
+            netBalance += AccountShell.getTotalBalance( accountShell )
+        } )
         return {
           ...state,
-          accountShells: action.payload.accountShells,
+          netBalance
         }
 
       case ACCOUNT_SETTINGS_UPDATED:
@@ -435,31 +450,41 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
         }
 
-      case ACCOUNT_SHELL_REFRESH_STARTED:
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).syncStatus = SyncStatus.IN_PROGRESS
-        return {
-          ...state,
-        }
-      case ACCOUNT_SHELL_REFRESH_COMPLETED:
-        // Updating Account Sync State to shell data model
-        // This will be used to display sync icon on Home Screen
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).syncStatus = SyncStatus.COMPLETED
+      case ACCOUNT_SHELLS_REFRESH_STARTED:
+        const shellsRefreshing: AccountShell[] = action.payload
+        shellsRefreshing.forEach( refreshingShell => {
+          state.accountShells.forEach(
+            ( shell ) => {
+              if( shell.id == refreshingShell.id ) shell.syncStatus = SyncStatus.IN_PROGRESS
+              else shell.syncStatus = SyncStatus.COMPLETED
+            }
+          )
+        } )
         return {
           ...state,
         }
 
-      case CLEAR_ACCOUNT_SYNC_CACHE:
-        // This will clear the sync state at the start of each login session
-        // This is required in order to ensure sync icon is shown again for each session
-        state.accountShells.map(
-          ( shell ) => shell.syncStatus = SyncStatus.COMPLETED )
+      case ACCOUNT_SHELLS_REFRESH_COMPLETED:
+        // Updating Account Sync State to shell data model
+        // This will be used to display sync icon on Home Screen
+        const shellsRefreshed: AccountShell[] = action.payload
+        shellsRefreshed.forEach( refreshedShell => {
+          state.accountShells.find(
+            ( shell ) => shell.id == refreshedShell.id
+          ).syncStatus = SyncStatus.COMPLETED
+        } )
         return {
           ...state,
         }
+
+        // case CLEAR_ACCOUNT_SYNC_CACHE:
+        //   // This will clear the sync state at the start of each login session
+        //   // This is required in order to ensure sync icon is shown again for each session
+        //   state.accountShells.map(
+        //     ( shell ) => shell.syncStatus = SyncStatus.PENDING )
+        //   return {
+        //     ...state,
+        //   }
 
       case BLIND_REFRESH_STARTED:
         return {

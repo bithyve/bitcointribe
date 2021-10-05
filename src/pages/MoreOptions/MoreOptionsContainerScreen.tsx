@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, ImageBackground, StatusBar, ImageSourcePropType, Switch } from 'react-native'
+import React, { useMemo, useState, useContext } from 'react'
+import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
@@ -12,8 +12,16 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { useSelector, useDispatch } from 'react-redux'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { ScrollView } from 'react-native-gesture-handler'
+import { LocalizationContext } from '../../common/content/LocContext'
+import Languages from '../../common/content/availableLanguages'
+
+import ModalContainer from '../../components/home/ModalContainer'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation: any;
@@ -25,11 +33,29 @@ interface MenuOption {
   subtitle: string;
   imageSource: ImageSourcePropType;
   screenName?: string;
+  name ?: string,
   onOptionPressed?: () => void;
   // isSwitch: boolean;
 }
 
-const menuOptions: MenuOption[] = [
+const listItemKeyExtractor = ( item: MenuOption ) => item.title
+
+const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  const {
+    translations,
+    appLanguage,
+    setAppLanguage,
+  } = useContext( LocalizationContext )
+  // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
+  const [ isEnabled, setIsEnabled ] = useState( false )
+  const [ showLangModal, setShowLangModal ] = useState( false )
+  const toggleSwitch = () => setIsEnabled( previousState => !previousState )
+  const currencyCode = useSelector(
+    ( state ) => state.preferences.currencyCode,
+  )
+  const strings = translations[ 'settings' ]
+  const common = translations[ 'common' ]
+  const menuOptions: MenuOption[] = [
   // {
   //   title: 'Use FaceId',
   //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
@@ -44,30 +70,30 @@ const menuOptions: MenuOption[] = [
   //   // screenName: 'FriendsAndFamily',
   //   isSwitch: true
   // },
-  {
-    title: 'Account Management',
-    imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
-    subtitle: 'View and manage your accounts',
-    screenName: 'AccountManagement',
-  },
-  /*
+    {
+      title: strings.accountManagement,
+      imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
+      subtitle: strings.accountManagementSub,
+      screenName: 'AccountManagement',
+    },
+    /*
   Commenting this out as per https://github.com/bithyve/hexa/issues/2560
   leaving the option here so that it can be enabled in a future release.
 
   {
-    title: 'Friends and Family',
+    title: 'Friends & Family',
     imageSource: require( '../../assets/images/icons/addressbook.png' ),
     subtitle: 'View and manage your contacts',
     screenName: 'FriendsAndFamily',
   },
   */
-  {
-    title: 'Node Settings',
-    imageSource: require( '../../assets/images/icons/own-node.png' ),
-    subtitle: 'Connect Hexa wallet to your own node',
-    screenName: 'NodeSettings',
-  },
-  /*
+    {
+      title: strings.node,
+      imageSource: require( '../../assets/images/icons/own-node.png' ),
+      subtitle: strings.nodeSub,
+      screenName: 'NodeSettings',
+    },
+    /*
   Commenting this out as per https://github.com/bithyve/hexa/issues/2560
   leaving the option here so that it can be enabled in a future release.
 
@@ -78,37 +104,33 @@ const menuOptions: MenuOption[] = [
     screenName: 'FundingSources',
   },
   */
-  // {
-  //   title: 'Hexa Community (Telegram)',
-  //   imageSource: require( '../../assets/images/icons/telegram.png' ),
-  //   subtitle: 'Questions, feedback and more',
-  //   onOptionPressed: () => {
-  //     Linking.openURL( 'https://t.me/HexaWallet' )
-  //       .then( ( _data ) => { } )
-  //       .catch( ( _error ) => {
-  //         alert( 'Make sure Telegram installed on your device' )
-  //       } )
-  //   },
-  // },
-  {
-    title: 'Wallet Settings',
-    imageSource: require( '../../assets/images/icons/settings.png' ),
-    subtitle: 'Your wallet settings & preferences',
-    screenName: 'WalletSettings',
-  },
-]
+    // {
+    //   title: 'Hexa Community (Telegram)',
+    //   imageSource: require( '../../assets/images/icons/telegram.png' ),
+    //   subtitle: 'Questions, feedback and more',
+    //   onOptionPressed: () => {
+    //     Linking.openURL( 'https://t.me/HexaWallet' )
+    //       .then( ( _data ) => { } )
+    //       .catch( ( _error ) => {
+    //         alert( 'Make sure Telegram installed on your device' )
+    //       } )
+    //   },
+    // },
+    {
+      imageSource: require( '../../assets/images/icons/settings.png' ),
+      subtitle: strings.walletSettingsSub,
+      title: strings.walletSettings,
+      screenName: 'WalletSettings',
+    },
+    {
+      title: strings.AppInfo,
+      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      subtitle: strings.AppInfoSub,
+      screenName: 'AppInfo',
+    },
+  ]
 
-const listItemKeyExtractor = ( item: MenuOption ) => item.title
-
-const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-  const [ isEnabled, setIsEnabled ] = useState( false )
-  const toggleSwitch = () => setIsEnabled( previousState => !previousState )
-  const currencyCode = useSelector(
-    ( state ) => state.preferences.currencyCode,
-  )
-  console.log( 'currencyCode>>>>>>>. ', currencyCode )
-
+  //const [ strings, setstrings ] = useState( content.settings )
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
@@ -125,33 +147,67 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [ currencyKind ] )
 
   return (
-    <ImageBackground
-      source={require( '../../assets/images/home-bg.png' )}
-      style={{
-        width: '100%',
-        height: '100%',
-        flex: 1,
-      }}
-      imageStyle={{
-        resizeMode: 'stretch',
-      }}
-    >
+    <View style={{
+      backgroundColor: Colors.blue
+    }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      <Header from={'More'} />
+      {/* <Header from={'More'} /> */}
       <View style={styles.accountCardsSectionContainer}>
-        <ScrollView>
-          <Text style={{
-            color: Colors.blue,
-            fontSize: RFValue( 16 ),
-            marginLeft: 2,
-            fontFamily: Fonts.FiraSansMedium,
-            paddingTop: widthPercentageToDP( 8 ),
-            paddingLeft: widthPercentageToDP( 8 ),
-            paddingBottom: heightPercentageToDP( 3 )
-          }}>
-            Settings & More
-          </Text>
-          {/* <View style={{
+        <ModalContainer visible={showLangModal} closeBottomSheet={() => {setShowLangModal( false )}} >
+          <View style={styles.modalContentContainer}>
+            <Text
+              style={{
+                color:Colors.blue,
+                fontSize: RFValue( 18 ),
+                fontFamily: Fonts.FiraSansRegular,
+                marginVertical: wp( 2 ),
+              }}
+              numberOfLines={1}
+            >
+              {strings.changeLanguage}
+            </Text>
+            <FlatList
+              data={Languages}
+              contentContainerStyle={styles.list}
+              renderItem={( { item, } ) => (
+                <TouchableOpacity
+                  key={item.iso}
+                  activeOpacity={0.6}
+                  style={appLanguage === item.iso ? styles.containerItemSelected : styles.containerItem}
+                  onPress={() => setAppLanguage( item.iso )}>
+                  <Text style={styles.flag}>{item.flag}</Text>
+                  <Text style={styles.textLanName}>{item.displayTitle}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => setShowLangModal( false )}
+              style={{
+                height: 45, borderRadius: wp( 7/2 ),
+                backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+                margin: wp( 3 ),
+              }}
+            >
+              <Text style={{
+                color: 'white'
+              }}>{common.done}</Text>
+            </TouchableOpacity>
+          </View>
+        </ModalContainer>
+        <Text style={{
+          color: Colors.blue,
+          fontSize: RFValue( 18 ),
+          letterSpacing: 0.54,
+          // marginLeft: 2,
+          fontFamily: Fonts.FiraSansMedium,
+          paddingTop: heightPercentageToDP( 4 ),
+          paddingLeft: widthPercentageToDP( 4 ),
+          paddingBottom: heightPercentageToDP( 1 )
+        }}>
+          {strings.settingsAndMore}
+        </Text>
+        {/* <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
           }}>
             <Image
@@ -181,6 +237,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               isOn={prefersBitcoin}
             />
           </View> */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingVertical: heightPercentageToDP( 3 ),
+          }}>
           <FlatList
             data={menuOptions}
             keyExtractor={listItemKeyExtractor}
@@ -232,38 +293,66 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 </View>
                 <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
                   style={{
-                    width: widthPercentageToDP( '2%' ),
-                    height: widthPercentageToDP( '2%' ),
-                    alignSelf: 'center'
+                    width: widthPercentageToDP( '2.5%' ),
+                    height: widthPercentageToDP( '2.5%' ),
+                    alignSelf: 'center',
+                    resizeMode: 'contain'
                   }}
                 />
 
               </AppBottomSheetTouchableWrapper>
             }}
           />
-          {/* <TouchableOpacity
+          <TouchableOpacity
+            onPress={() => setShowLangModal( true )}
+            style={[ styles.otherCards, styles.extraHeight ]}
+          >
+            <Image
+              source={require( '../../assets/images/icons/translate.png' )}
+              style={{
+                width: widthPercentageToDP( 8 ),
+                height: widthPercentageToDP( 8 ),
+              }}
+            />
+            <View style={{
+              marginLeft: 10
+            }}>
+              <View style={{
+                flexDirection: 'row'
+              }}>
+                <Text style={styles.addModalTitleText}>
+                  {strings.Language}
+                </Text>
+                {/* <View style={styles.containerBeta}>
+                  <Text style={styles.textBeta}>Beta</Text>
+                </View> */}
+              </View>
+              <Text style={styles.addModalInfoText}>
+                {strings.changeLanguage }
+              </Text>
+            </View>
+            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+              style={{
+                width: widthPercentageToDP( '2.5%' ),
+                height: widthPercentageToDP( '2.5%' ),
+                alignSelf: 'center',
+                marginLeft: 'auto',
+                resizeMode: 'contain'
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://t.me/HexaWallet' )
+              Linking.openURL( 'https://hexawallet.io/faq/' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
                 } )
             }}
-            // style={styles.addModalView}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              width: '90%',
-              alignSelf: 'center',
-              borderRadius: widthPercentageToDP( '2' ),
-              backgroundColor: Colors.white,
-              paddingVertical: heightPercentageToDP( 2 ),
-              paddingHorizontal: widthPercentageToDP( 4 ),
-              marginTop: heightPercentageToDP( '10%' )
-            }}
+            style={[ styles.otherCards, styles.extraHeight ]}
           >
             <Image
-              source={require( '../../assets/images/icons/telegram.png' )}
+              source={require( '../../assets/images/icons/question_active.png' )}
               style={{
                 width: widthPercentageToDP( 8 ),
                 height: widthPercentageToDP( 8 ),
@@ -273,13 +362,22 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               marginLeft: 10
             }}>
               <Text style={styles.addModalTitleText}>
-              App Info
+                {strings.FAQ}
               </Text>
               <Text style={styles.addModalInfoText}>
-              Questions, feedback and more
+                {strings.yourQuestions}
               </Text>
             </View>
-          </TouchableOpacity> */}
+            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+              style={{
+                width: widthPercentageToDP( '2.5%' ),
+                height: widthPercentageToDP( '2.5%' ),
+                alignSelf: 'center',
+                marginLeft: 'auto',
+                resizeMode: 'contain'
+              }}
+            />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               Linking.openURL( 'https://t.me/HexaWallet' )
@@ -288,36 +386,36 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   alert( 'Make sure Telegram installed on your device' )
                 } )
             }}
-            // style={styles.addModalView}
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              width: '90%',
-              alignSelf: 'center',
-              borderRadius: widthPercentageToDP( '2' ),
-              backgroundColor: Colors.white,
-              paddingVertical: heightPercentageToDP( 2 ),
-              paddingHorizontal: widthPercentageToDP( 4 ),
-              marginTop: heightPercentageToDP( '18%' )
-            }}
+            style={styles.otherCards}
           >
             <Image
-              source={require( '../../assets/images/icons/telegram.png' )}
+              source={require( '../../assets/images/icons/icon_telegram.png' )}
               style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
+                width: widthPercentageToDP( 7 ),
+                height: widthPercentageToDP( 7 ),
+                resizeMode: 'contain'
               }}
             />
             <View style={{
               marginLeft: 10
             }}>
               <Text style={styles.addModalTitleText}>
-              Hexa Community Telegram Group
+                {strings.hexaCommunity}
               </Text>
               <Text style={styles.addModalInfoText}>
-              Questions, feedback and more
+                {strings.questionsFeedback}
               </Text>
+
             </View>
+            <Image
+              source={require( '../../assets/images/icons/link.png' )}
+              style={{
+                width: widthPercentageToDP( 4 ),
+                height: widthPercentageToDP( 4 ),
+                resizeMode: 'contain',
+                marginLeft: 'auto'
+              }}
+            />
           </TouchableOpacity>
           {/* </View> */}
 
@@ -356,15 +454,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         </View> */}
         </ScrollView>
       </View>
-    </ImageBackground>
+    </View>
   )
 }
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    height: heightPercentageToDP( '68.5%' ),
+    height: heightPercentageToDP( '71.46%' ),
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
@@ -376,8 +474,44 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-around'
   },
   modalContentContainer: {
+    backgroundColor: Colors.white,
+    padding: 10,
+    maxHeight: '80%',
+    minHeight: '60%',
+  },
+
+  list: {
+    marginTop: 20,
+    flexGrow: 1,
+    paddingBottom: 40,
+  },
+
+  containerItem: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: 'center',
+  },
+
+  containerItemSelected: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: 'center',
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+  },
+
+  textLanName: {
+    fontSize: 18,
     flex: 1,
-    justifyContent: 'space-between',
+    color: 'black',
+  },
+
+  flag: {
+    fontSize: 35,
+    paddingRight: 15,
+    color: 'black',
   },
 
   separatorView: {
@@ -386,25 +520,68 @@ const styles = StyleSheet.create( {
     height: 2,
     backgroundColor: Colors.backgroundColor,
   },
-
-  addModalView: {
+  otherCards: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
     backgroundColor: Colors.white,
+    paddingVertical: heightPercentageToDP( 2 ),
+    paddingHorizontal: widthPercentageToDP( 4 ),
+    marginTop: heightPercentageToDP( '1.2%' ),
+    alignItems: 'center',
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  extraHeight: {
+    marginTop: heightPercentageToDP( '3%' ),
+  },
+  addModalView: {
+    backgroundColor: Colors.gray7,
     paddingVertical: 4,
-    paddingHorizontal: 18,
+    paddingHorizontal: widthPercentageToDP( 5 ),
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-between',
     width: '90%',
     alignSelf: 'center',
     borderRadius: widthPercentageToDP( '2' ),
-
-    marginBottom: heightPercentageToDP( '1' )
+    marginBottom: heightPercentageToDP( '1.2' ),
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
   },
 
   addModalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular
+  },
+
+  textBeta: {
+    color: 'white',
+    fontSize: 12,
+  },
+
+  containerBeta: {
+    marginHorizontal: 10,
+    backgroundColor: Colors.blue,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 5,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   addModalInfoText: {

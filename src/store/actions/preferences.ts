@@ -1,6 +1,5 @@
 import { createAction } from 'redux-actions'
 import { UPDATE_APP_PREFERENCE } from '../constants'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Action } from 'redux'
 
@@ -19,9 +18,9 @@ export const INIT_ASYNC_MIGRATION_REQUEST = 'INIT_ASYNC_MIGRATION_REQUEST'
 export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS'
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED'
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS'
-export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
 export const IS_PERMISSION_SET = 'IS_PERMISSION_SET'
 export const SET_WALLET_ID = 'SET_WALLET_ID'
+export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -118,43 +117,6 @@ export const setSavingWarning = ( data ) => {
 const updatePereferenceRequest = createAction( UPDATE_APP_PREFERENCE )
 export const updatePreference = ( payload ) => ( dispatch ) =>
   dispatch( updatePereferenceRequest( payload ) )
-
-const initAsyncMigrationRequest = createAction( INIT_ASYNC_MIGRATION_REQUEST )
-const initAsyncMigrationSuccess = createAction( INIT_ASYNC_MIGRATION_SUCCESS )
-const initAsyncMigrationFailed = createAction( INIT_ASYNC_MIGRATION_FAILED )
-
-export const initMigration = () => {
-  return async ( dispatch ) => {
-    dispatch( initAsyncMigrationRequest() )
-    const data = await AsyncStorage.multiGet( [
-      'TrustedContactsInfo',
-      'currencyCode',
-    ] )
-    if ( data && data[ 0 ] && data[ 0 ][ 1 ] ) {
-      const trustedContacts = data[ 0 ][ 1 ]
-      // dispatch( updateTrustedContactsInfoLocally( JSON.parse( trustedContacts ) ) )
-    }
-    if ( data && data[ 1 ] ) {
-      const currencyCode = JSON.parse( data[ 1 ][ 1 ] ) || 'USD'
-      dispatch(
-        updatePreference( {
-          key: 'currencyCode',
-          value: currencyCode,
-        } ),
-      )
-    } else {
-      const currencyCode = 'USD'
-      dispatch(
-        updatePreference( {
-          key: 'currencyCode',
-          value: currencyCode,
-        } ),
-      )
-    }
-
-    dispatch( initAsyncMigrationSuccess() )
-  }
-}
 
 export const updateApplicationStatus = ( data ) => {
   return {

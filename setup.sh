@@ -2,6 +2,7 @@
 cp mods/source-map-support/source-map-support.js node_modules/source-map-support/source-map-support.js
 cp mods/bunyan/bunyan.js node_modules/bunyan/lib/bunyan.js
 # cp mods/react-native-mail/RNMailModule.java node_modules/react-native-mail/android/src/main/java/com/chirag/RNMail/RNMailModule.java
+cp mods/react-native-safe-area-view/index.js node_modules/react-native-safe-area-view/index.js
 
 # enabling node core modules
 rn-nodeify --install --hack --yarn

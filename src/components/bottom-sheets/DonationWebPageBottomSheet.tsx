@@ -16,121 +16,121 @@ import config from '../../bitcoin/HexaConfig'
 import CopyThisText from '../CopyThisText'
 import { ScrollView } from 'react-native-gesture-handler'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
 
 export default function DonationWebPageBottomSheet( props ) {
   return (
     <View style={styles.modalContentContainer}>
-      <ScrollView style={styles.modalContainer}>
-        <View style={{
-          height: '100%', marginHorizontal: wp( '7%' )
-        }}>
-          <View
-            style={{
-              ...styles.successModalHeaderView, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue( 18 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Donation web view
-              </Text>
-              <Text
-                style={{
-                  ...styles.modalInfoText,
-                  marginTop: wp( '1.5%' ),
-                  color: Colors.lightTextColor,
-                }}
-              >
-                Use one of the options below to publish
-              </Text>
-            </View>
-            <AppBottomSheetTouchableWrapper
+      <View style={{
+        marginHorizontal: wp( '7%' ), marginBottom: hp( '5' )
+      }}>
+        <View
+          style={{
+            ...styles.successModalHeaderView, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'
+          }}
+        >
+          <View>
+            <Text
               style={{
-                marginLeft: 'auto',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: wp( '1.5%' ),
-              }}
-              onPress={() => {
-                props.onClickSetting()
+                color: Colors.blue,
+                fontSize: RFValue( 18 ),
+                fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              <Image
-                source={require( '../../assets/images/icons/settings.png' )}
-                style={styles.image}
-              />
-            </AppBottomSheetTouchableWrapper>
+                Donation web view
+            </Text>
+            <Text
+              style={{
+                ...styles.modalInfoText,
+                marginTop: wp( '1.5%' ),
+                color: Colors.lightTextColor,
+              }}
+            >
+                Use one of the options below to publish
+            </Text>
           </View>
-          <View style={styles.infoTextContainer}>
-            <Text style={styles.titleTextStyle}>Donation Link</Text>
-            <Text style={styles.modalInfoText}>
+          <AppBottomSheetTouchableWrapper
+            style={{
+              marginLeft: 'auto',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: wp( '1.5%' ),
+            }}
+            onPress={() => {
+              props.onClickSetting()
+              props.closeModal()
+            }}
+          >
+            <Image
+              source={require( '../../assets/images/icons/settings.png' )}
+              style={styles.image}
+            />
+          </AppBottomSheetTouchableWrapper>
+        </View>
+        <View style={[ styles.infoTextContainer, {
+          marginTop: hp( 1 )
+        } ]}>
+          <Text style={styles.titleTextStyle}>Donation Link</Text>
+          <Text style={styles.modalInfoText}>
               When someone wants to donate, they can simply click on this link
               which will serve up the donation page
-            </Text>
-          </View>
-          <View
-            style={{
-              marginTop: -20,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginLeft: 40,
-              marginRight: 40,
-            }}
-          >
-            <CopyThisText
-              text={
-                `https://hexawallet.io/${config.APP_STAGE === 'app'
-                  ? 'donate'
-                  : config.APP_STAGE === 'sta'
-                    ? 'donate-stage'
-                    : 'donate-test'
-                }/?donationid=` + props.account.id.slice( 0, 15 )
-              }
-            />
-          </View>
-          <View style={styles.infoTextContainer}>
-            <Text style={styles.titleTextStyle}>Embed Code</Text>
-            <Text style={styles.modalInfoText}>
+          </Text>
+        </View>
+        <View
+          style={{
+            // marginTop: -20,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: 40,
+            marginRight: 40,
+          }}
+        >
+          <CopyThisText
+            text={
+              `https://hexawallet.io/${config.APP_STAGE === APP_STAGE.PRODUCTION
+                ? 'donation'
+                : config.APP_STAGE === APP_STAGE.STAGING
+                  ? 'donation-stage'
+                  : 'donation-test'
+              }/?donationid=` + props.account.id.slice( 0, 15 )
+            }
+          />
+        </View>
+        <View style={styles.infoTextContainer}>
+          <Text style={styles.titleTextStyle}>Embed Code</Text>
+          <Text style={styles.modalInfoText}>
               If you have a website, simply copy this code on your site to start
               receiving donations
-            </Text>
-          </View>
-          <View
-            style={{
-              marginTop: -20,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginLeft: 40,
-              marginRight: 40,
-            }}
-          >
-            <CopyThisText
-              text={`<iframe src="https://hexawallet.io/${config.APP_STAGE === 'app'
-                ? 'donate'
-                : config.APP_STAGE === 'sta'
-                  ? 'donate-stage'
-                  : 'donate-test'
-              }/?donationid=${props.account.id.slice( 0, 15 )
-              }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
-            />
-          </View>
+          </Text>
         </View>
-      </ScrollView>
+        <View
+          style={{
+            // marginTop: -20,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: 40,
+            marginRight: 40,
+          }}
+        >
+          <CopyThisText
+            text={`<iframe src="https://hexawallet.io/${config.APP_STAGE === APP_STAGE.PRODUCTION
+              ? 'donation'
+              : config.APP_STAGE === APP_STAGE.STAGING
+                ? 'donation-stage'
+                : 'donation-test'
+            }/?donationid=${props.account.id.slice( 0, 15 )
+            }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
+          />
+        </View>
+      </View>
     </View>
   )
 }
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
   },
   modalContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
     width: '100%',
   },
@@ -159,7 +159,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: hp( '1.2%' ),
   },
   infoTextContainer: {
-    marginTop: 20,
+    // marginTop: hp( 1 ),
     marginHorizontal: hp( '1.5%' ),
   },
   buttonStyle: {

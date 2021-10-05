@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../../components/QRCode'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CopyThisText from '../../../components/CopyThisText'
@@ -33,7 +33,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
 
       <View>
         <View style={styles.qrCodeContainer}>
-          <QRCode value={xPub} size={heightPercentageToDP( 33 )} />
+          <QRCode title="xPub" value={xPub} size={heightPercentageToDP( 33 )} />
         </View>
 
         <CopyThisText text={xPub} />

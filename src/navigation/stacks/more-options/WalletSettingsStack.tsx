@@ -7,7 +7,11 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import ReLogin from '../../../pages/ReLogin'
+import SettingGetNewPin from '../../../pages/SettingGetNewPin'
+import { translations } from '../../../common/content/LocContext'
 
+const strings  = translations[ 'stackTitle' ]
 
 const WalletSettingsStack = createStackNavigator(
   {
@@ -31,25 +35,38 @@ const WalletSettingsStack = createStackNavigator(
         title: 'Change Currency',
       },
     },
-    VersionHistory: {
-      screen: VersionHistoryScreen,
+    ReLogin: {
+      screen: ReLogin,
       navigationOptions: {
-        title: 'Version History',
+        gesturesEnabled: false,
       },
     },
+    // VersionHistory: {
+    //   screen: VersionHistoryScreen,
+    //   navigationOptions: {
+    //     title: 'Version History',
+    //   },
+    // },
     TransactionDetails: {
       screen: TransactionDetailsContainerScreen,
       navigationOptions: {
         title: 'Transaction Details',
       },
-    }
+    },
+    SettingGetNewPin: {
+      screen: SettingGetNewPin,
+      navigationOptions: {
+        title: 'Manage Passcode',
+      },
+    },
   },
   {
     defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+          return <SmallNavHeaderBackButton onPress={() => {
+            navigation.popToTop() }} />
         },
       }
     },

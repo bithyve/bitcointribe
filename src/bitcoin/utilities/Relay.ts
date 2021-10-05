@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, EncryptedImage } from './Interface'
+import { INotification, EncryptedImage, NewWalletImage } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
 
@@ -73,10 +73,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { updated } = res.data
-      return {
-        updated
-      }
+      return res.data
     } catch ( err ) {
       throw new Error( 'Failed to fetch GetBittr Details' )
     }
@@ -142,6 +139,34 @@ export default class Relay {
       }
     } catch ( err ) {
       throw new Error( 'Failed to deliver notification' )
+    }
+  };
+
+  public static sendDonationNote = async (
+    donationId: string,
+    txNote: { txId: string; note: string }
+  ): Promise<{
+    added: boolean;
+  }> => {
+    try {
+
+      if ( !txNote || !txNote.txId || !txNote.note )
+        throw new Error( 'Failed to send donation note: txid|note missing' )
+
+      const res: AxiosResponse = await BH_AXIOS.post( 'addDonationTxNote', {
+        HEXA_ID,
+        donationId,
+        txNote,
+      } )
+
+      const { added } = res.data
+      if ( !added ) throw new Error()
+
+      return {
+        added
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to send donation note' )
     }
   };
 
@@ -278,6 +303,56 @@ export default class Relay {
     return {
       exchangeRates,
       averageTxFees,
+    }
+  };
+
+  public static updateWalletImage = async (
+    walletImage: NewWalletImage,
+  ): Promise<{
+
+      status: number;
+      data: {
+        updated: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }  > => {
+    try {
+      const res: AxiosResponse = await BH_AXIOS.post( 'v2/updateWalletImage', {
+        HEXA_ID,
+        walletID: walletImage.walletId,
+        walletImage,
+      } )
+      const { updated } = res.data
+      return {
+        status: res.status,
+        data: updated
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to update Wallet Image' )
+    }
+  };
+
+  public static fetchWalletImage = async ( walletId: string ): Promise<{
+    walletImage: NewWalletImage;
+  }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'v2/fetchWalletImage', {
+          HEXA_ID,
+          walletID: walletId,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { walletImage } = res.data
+      return {
+        walletImage
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch Wallet Image' )
     }
   };
 }

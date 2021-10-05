@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   StyleSheet,
   Text,
@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   StatusBar,
   // NativeModules
-} from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+} from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
@@ -19,13 +19,17 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { storeCreds } from '../store/actions/setupAndAuth'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function PasscodeConfirm( props ) {
-  const [ passcode, setPasscode ] = useState( "" );
-  const [ confirmPasscode, setConfirmPasscode ] = useState( "" );
-  const [ passcodeFlag, setPasscodeFlag ] = useState( true );
-  const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 );
-  // const iCloud = NativeModules.iCloud;
+  const [ passcode, setPasscode ] = useState( '' )
+  const [ confirmPasscode, setConfirmPasscode ] = useState( '' )
+  const [ passcodeFlag, setPasscodeFlag ] = useState( true )
+  const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 )
+  // const iCloud = NativeModules.iCloud
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
 
   function onPressNumber( text ) {
     let tmpPasscode = passcode
@@ -81,8 +85,8 @@ export default function PasscodeConfirm( props ) {
       setPasscodeFlag( true )
       setConfirmPasscodeFlag( 0 )
     }
-    // iCloud.startBackup("");
-  }, [ passcode, confirmPasscode ] );
+    // iCloud.startBackup( '' )
+  }, [ passcode, confirmPasscode ] )
 
   const dispatch = useDispatch()
   const { hasCreds } = useSelector( state => state.setupAndAuth )
@@ -90,18 +94,18 @@ export default function PasscodeConfirm( props ) {
 
   return (
     <SafeAreaView style={ {
-      flex: 1 
+      flex: 1
     } }>
       <StatusBar />
       <View style={ {
-        flex: 1 
+        flex: 1
       } }>
         <View style={ {
         } }>
-          <Text style={ styles.headerTitleText }>Hello!</Text>
+          <Text style={ styles.headerTitleText }>{strings.Hello}</Text>
           <View>
             <Text style={ styles.headerInfoText }>
-              Create a login <Text style={ styles.boldItalicText }>passcode</Text>
+              {strings.create} <Text style={ styles.boldItalicText }>{strings.passcode}</Text>
             </Text>
 
             <View>
@@ -158,7 +162,7 @@ export default function PasscodeConfirm( props ) {
                   >
                     { passcode.length >= 2 ? (
                       <Text style={ {
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       } }>
                         <FontAwesome
                           size={ 10 }
@@ -189,7 +193,7 @@ export default function PasscodeConfirm( props ) {
                   >
                     { passcode.length >= 3 ? (
                       <Text style={ {
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       } }>
                         <FontAwesome
                           size={ 10 }
@@ -220,7 +224,7 @@ export default function PasscodeConfirm( props ) {
                   >
                     { passcode.length >= 4 ? (
                       <Text style={ {
-                        fontSize: RFValue( 10 ) 
+                        fontSize: RFValue( 10 )
                       } }>
                         <FontAwesome
                           size={ 10 }
@@ -241,11 +245,18 @@ export default function PasscodeConfirm( props ) {
           { passcode.length == 4 ? (
             <View>
               <Text style={ styles.headerInfoText }>
-                Re-enter the <Text style={ styles.boldItalicText }>passcode</Text>
+                {strings.reEnter}
+                <Text style={styles.boldItalicText}>
+                  {` ${strings.passcode} `}
+                </Text>
+                {strings.to}
+                <Text style={styles.boldItalicText}>
+                  {` ${strings.verifylogin} `}
+                </Text>
               </Text>
               <View>
                 <View style={ {
-                  flexDirection: 'row', marginTop: hp( '4.5%' ), 
+                  flexDirection: 'row', marginTop: hp( '4.5%' ),
                 } }>
                   <View
                     style={ [
@@ -265,14 +276,14 @@ export default function PasscodeConfirm( props ) {
                       style={ [
                         confirmPasscode.length == 0 && confirmPasscodeFlag == 1
                           ? {
-                            ...styles.textFocused 
+                            ...styles.textFocused
                           }
                           : styles.textStyles
                       ] }
                     >
                       { confirmPasscode.length >= 1 ? (
                         <Text style={ {
-                          fontSize: RFValue( 10 ) 
+                          fontSize: RFValue( 10 )
                         } }>
                           <FontAwesome
                             size={ 10 }
@@ -321,7 +332,7 @@ export default function PasscodeConfirm( props ) {
                     >
                       { confirmPasscode.length >= 2 ? (
                         <Text style={ {
-                          fontSize: RFValue( 10 ) 
+                          fontSize: RFValue( 10 )
                         } }>
                           <FontAwesome
                             size={ 10 }
@@ -369,7 +380,7 @@ export default function PasscodeConfirm( props ) {
                     >
                       { confirmPasscode.length >= 3 ? (
                         <Text style={ {
-                          fontSize: RFValue( 10 ) 
+                          fontSize: RFValue( 10 )
                         } }>
                           <FontAwesome
                             size={ 10 }
@@ -417,7 +428,7 @@ export default function PasscodeConfirm( props ) {
                     >
                       { confirmPasscode.length >= 4 ? (
                         <Text style={ {
-                          fontSize: RFValue( 10 ) 
+                          fontSize: RFValue( 10 )
                         } }>
                           <FontAwesome
                             size={ 10 }
@@ -443,13 +454,13 @@ export default function PasscodeConfirm( props ) {
                     passcode == confirmPasscode ? Colors.blue : Colors.lightBlue
                 } }
               >
-                <Text style={ styles.proceedButtonText }>Proceed</Text>
+                <Text style={ styles.proceedButtonText }>{common.proceed}</Text>
               </TouchableOpacity>
             </View>
           ) : null }
         </View>
         <View style={ {
-          marginTop: 'auto' 
+          marginTop: 'auto'
         } }>
           <View style={ styles.keyPadRow }>
             <TouchableOpacity
@@ -559,7 +570,7 @@ export default function PasscodeConfirm( props ) {
           <View style={ styles.keyPadRow }>
             <View style={ styles.keyPadElementTouchable }>
               <Text style={ {
-                flex: 1, padding: 15 
+                flex: 1, padding: 15
               } }></Text>
             </View>
             <TouchableOpacity
@@ -612,7 +623,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     alignItems: 'center',
     justifyContent: 'center',
@@ -659,7 +670,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     }
   },
   proceedButtonText: {
@@ -670,7 +681,8 @@ const styles = StyleSheet.create( {
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     fontWeight: 'bold',
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    fontSize: RFValue( 12 ),
   },
   headerTitleText: {
     color: Colors.blue,
@@ -684,6 +696,12 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
+  },
+  headerInfoBoldText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    fontWeight: '600',
   },
   passcodeTextInputText: {
     color: Colors.blue,

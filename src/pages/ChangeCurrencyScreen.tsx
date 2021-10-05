@@ -17,12 +17,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useDispatch, useSelector } from 'react-redux'
 import { setCurrencyCode } from '../store/actions/preferences'
+import { translations } from '../common/content/LocContext'
 
 export default function ChangeCurrencyScreen( props ) {
   const [ currencyList ] = useState( FiatCurrencies )
   const CurrencyCode = useSelector( ( state ) => state.preferences.currencyCode )
   const dispatch = useDispatch()
-
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
   const [ isVisible, setIsVisible ] = useState( false )
   const [ currency, setCurrency ] = useState( {
     code: 'USD',
@@ -48,7 +50,7 @@ export default function ChangeCurrencyScreen( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <Text
         style={{
@@ -61,7 +63,7 @@ export default function ChangeCurrencyScreen( props ) {
           marginBottom: wp( '7%' ),
         }}
       >
-        Select your local currency
+        {strings.Selectyourlocalcurrency}
       </Text>
       <TouchableOpacity
         onPress={() => {
@@ -101,7 +103,7 @@ export default function ChangeCurrencyScreen( props ) {
         </View>
         <View
           style={{
-            flex: 1, justifyContent: 'center', height: wp( '13%' ) 
+            flex: 1, justifyContent: 'center', height: wp( '13%' )
           }}
         >
           <Text
@@ -135,7 +137,7 @@ export default function ChangeCurrencyScreen( props ) {
         </View>
       </TouchableOpacity>
       <View style={{
-        position: 'relative', flex: 1 
+        position: 'relative', flex: 1
       }}>
         {isVisible && (
           <View
@@ -158,7 +160,7 @@ export default function ChangeCurrencyScreen( props ) {
                       setIsVisible( false )
                     }}
                     style={{
-                      flexDirection: 'row', height: wp( '13%' ) 
+                      flexDirection: 'row', height: wp( '13%' )
                     }}
                   >
                     <View
@@ -233,7 +235,7 @@ export default function ChangeCurrencyScreen( props ) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Save Changes
+            {strings.SaveChanges}
           </Text>
         </TouchableOpacity>
       </View>

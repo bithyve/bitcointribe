@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react'
-import { View, Text, StyleSheet, ImageBackground, Image, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
@@ -8,8 +8,7 @@ import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { refreshAccountShell } from '../../../store/actions/accounts'
+import { refreshAccountShells } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
@@ -68,8 +67,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
 
   useEffect( () => {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: false,
+    dispatch( refreshAccountShells( [ accountShell ], {
       hardRefresh: true,
     } ) )
   }, [] )

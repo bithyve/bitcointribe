@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
+import React, { useState, useEffect, useCallback, createRef, useContext } from 'react'
 import {
   StyleSheet,
   View,
@@ -19,7 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../common/Fonts'
 import Colors from '../common/Colors'
-import QuestionList from '../common/QuestionList'
+//import QuestionList from '../common/QuestionList'
 import CommonStyles from '../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
@@ -36,17 +36,18 @@ import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import { initNewBHRFlow } from '../store/actions/health'
+import { initNewBHRFlow } from '../store/actions/BHR'
 import {  setCloudData } from '../store/actions/cloud'
-import { clearAccountSyncCache } from '../store/actions/accounts'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
-import { updateCloudPermission } from '../store/actions/health'
+import { updateCloudPermission } from '../store/actions/BHR'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
+import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -61,63 +62,33 @@ export enum BottomSheetState {
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 let messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
-const loaderMessages = [
-  {
-    heading: 'Bootstrapping Accounts',
-    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-    subText: '',
-  },
-  {
-    heading: 'Filling Test Account with test sats',
-    text:
-      'Preloaded Test Account is the best place to start your Bitcoin journey',
-    subText: '',
-  },
-  {
-    heading: 'Generating Recovery Keys',
-    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
-    subText: '',
-  },
-  {
-    heading: 'Manage Backup',
-    text:
-      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
-    subText: '',
-  },
-  {
-    heading: 'Level 1 - Automated Cloud Backup',
-    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
-    subText: '',
-  },
-  {
-    heading: 'Level 2 - Double Backup',
-    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
-    subText: '',
-  },
-  {
-    heading: 'Level 3 - Multi-key Backup',
-    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
-    subText: '',
-  }
-]
 
-const getNextMessage = () => {
-  if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
-  return loaderMessages[ messageIndex++ ]
-}
 
 function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
 export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
-  const [ message, setMessage ] = useState( 'Creating your wallet' )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
+  const QuestionList = strings.questionList
+  const loaderMessages = translations[ 'login' ].loaderMessages
+  const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ subTextMessage, setSubTextMessage ] = useState(
-    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
+    strings.Thismay,
   )
+  const [ bottomTextMessage ] = useState(
+    strings.Hexaencrypts,
+  )
+  const subPoints = [
+    strings.multi,
+    strings.creatingbackup,
+    strings.preloading,
+  ]
   const [ Elevation, setElevation ] = useState( 10 )
-  const [ height, setHeight ] = useState( 81 )
-  const [ isLoaderStart, setIsLoaderStart ] = useState( false )
+  // const [ height, setHeight ] = useState( 72 )
+  // const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
@@ -125,6 +96,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     question: '',
   } )
   const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
+  const [ hintInputStyle, setHintInputStyle ] = useState( styles.inputBox )
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
     styles.inputBox,
@@ -140,16 +112,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ pswd, setPswd ] = useState( '' )
   const [ pswdMasked, setPswdMasked ] = useState( '' )
   const [ confirmPswdMasked, setConfirmPswdMasked ] = useState( '' )
-  const [ hintMasked, setHintMasked ] = useState( '' )
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
   const [ hideShowConfirmPswd, setHideShowConfirmPswd ] = useState( true )
-  const [ hideShowHint, setHideShowHint ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
+  const [ isSkipClicked, setIsSkipClicked ] = useState( false )
 
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
-  const selectedAcc = props.navigation.getParam( 'selectedAcc' )
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
@@ -168,38 +138,48 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ securityQue, showSecurityQue ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
-  const s3service = useSelector( ( state ) => state.health.service )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
-  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
+  const cloudPermissionGranted = useSelector( ( state ) => state.bhr.cloudPermissionGranted )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const updateWIStatus: boolean = useSelector( ( state ) => state.bhr.loading.updateWIStatus )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
   const bottomSheetRef = createRef<BottomSheet>()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
 
+  const getNextMessage = () => {
+    if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
+    return loaderMessages[ messageIndex++ ]
+  }
 
-  useEffect( ()=>{
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setHeight( 85 )
-      }
-    )
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setHeight( 81 )
-      }
-    )
-    dispatch( clearAccountSyncCache() )
-    return () => {
-      keyboardDidHideListener.remove()
-      keyboardDidShowListener.remove()
-    }
-  }, [] )
+  // useEffect( ()=>{
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     'keyboardDidShow',
+  //     () => {
+  //       if ( Platform.OS === 'android' ) {
+  //         setHeight( 85 )
+  //       }
+  //     }
+  //   )
+  //   const keyboardDidHideListener = Keyboard.addListener(
+  //     'keyboardDidHide',
+  //     () => {
+  //       setHeight( 72 )
+  //       if ( Platform.OS === 'android' ) {
+  //         setHeight( 72 )
+  //       }
+  //     }
+  //   )
+
+  //   return () => {
+  //     keyboardDidHideListener.remove()
+  //     keyboardDidShowListener.remove()
+  //   }
+  // }, [] )
+
   useEffect( () => {
     // if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
     //   // ( loaderBottomSheet as any ).current.snapTo( 0 )
@@ -208,21 +188,22 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     //     walletName,
     //   } )
     // }
-    if( walletSetupCompleted ){
+    if( walletSetupCompleted ) {
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
     }
-  }, [ walletSetupCompleted ] )
+  }, [ walletSetupCompleted, cloudBackupStatus ] )
 
   const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
-      dispatch( setupWallet( walletName, selectedAcc, security ) )
+      dispatch( setupWallet( walletName, security ) )
       // dispatch( walletSetupCompletion( security ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
+
       const current = Date.now()
       AsyncStorage.setItem(
         'SecurityAnsTimestamp',
@@ -238,15 +219,22 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     } )
   }
 
+  // useEffect( ()=>{
+  //   if( levelHealth.length && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+  //     cloudPermissionGranted === true && !isSkipClicked && updateWIStatus === false ){
+  //     dispatch( setCloudData() )
+  //   }
+  // }, [ cloudPermissionGranted, levelHealth, updateWIStatus, cloudBackupStatus ] )
+
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
     setLoaderModal( true )
-    setLoaderMessages()
+    // setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
     setTimeout( () => {
-      setIsLoaderStart( true )
+      // setIsLoaderStart( true )
       setIsEditable( false )
       setIsDisabled( true )
     }, 2 )
@@ -256,12 +244,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     setConfirmAnswer( tempAns )
 
     if ( answer && confirmAnswer && confirmAnswer != answer ) {
-      setAnswerError( 'Answers do not match' )
+      setAnswerError( strings.Answersdonotmatch )
     } else if (
       validateAllowedCharacters( answer ) == false ||
       validateAllowedCharacters( tempAns ) == false
     ) {
-      setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
+      setAnswerError( strings.Answersmust )
     } else {
       setTimeout( () => {
         setAnswerError( '' )
@@ -273,12 +261,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     setConfirmPswd( tempPswd )
 
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
-      setPswdError( 'Password do not match' )
+      setPswdError( strings.Passworddonotmatch )
     } else if (
       validateAllowedCharacters( pswd ) == false ||
       validateAllowedCharacters( tempPswd ) == false
     ) {
-      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
+      setPswdError( strings.Passwordmust )
     } else {
       // setTimeout( () => {
       //   setPswdError( '' )
@@ -310,12 +298,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       setVisibleButton( false )
 
       if ( answer && confirmAnswer && confirmAnswer != answer ) {
-        setAnswerError( 'Answers do not match' )
+        setAnswerError( strings.Answersdonotmatch )
       } else if (
         validateAllowedCharacters( answer ) == false ||
         validateAllowedCharacters( confirmAnswer ) == false
       ) {
-        setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
+        setAnswerError( strings.Answersmust )
       }
     }
   }, [ confirmAnswer ] )
@@ -327,54 +315,48 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       setVisibleButton( false )
 
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
-        setPswdError( 'Password do not match' )
+        setPswdError( strings.Passworddonotmatch )
       } else if (
         validateAllowedCharacters( pswd ) == false ||
         validateAllowedCharacters( confirmPswd ) == false
       ) {
-        setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
+        setPswdError( strings.Passwordmust )
       }
     }
   }, [ confirmPswd ] )
 
-
+  const onPressProceed = ( isSkip? ) => {
+    showLoader()
+    let security = null
+    if ( activeIndex === 0 ) {
+      security = {
+        questionId: dropdownBoxValue.id,
+        question: dropdownBoxValue.question,
+        answer,
+      }
+    } else {
+      security = {
+        questionId: 0,
+        question: hintText,
+        answer: pswd,
+      }
+    }
+    if( isSkip ) security = null
+    checkCloudLogin( security )
+    showSecurityQue( false )
+    showEncryptionPswd( false )
+  }
 
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={async () => {
-          showLoader()
-          if ( activeIndex === 0 ) {
-            const security = {
-              questionId: dropdownBoxValue.id,
-              question: dropdownBoxValue.question,
-              answer,
-            }
-
-            checkCloudLogin( security )
-            // setIsCloudPermissionRender( true )
-            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
-            dispatch( setCloudData() )
-            showSecurityQue( false )
-          } else {
-            const security = {
-              questionId: 0,
-              question: hintText,
-              answer: pswd,
-            }
-            checkCloudLogin( security )
-            // setIsCloudPermissionRender( true )
-            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
-            dispatch( setCloudData() )
-            showEncryptionPswd( false )
-          }
-        }}
+        onPress={()=>onPressProceed()}
         style={{
           ...styles.buttonView, elevation: Elevation
         }}
       >
         {/* {!loading.initializing ? ( */}
-        <Text style={styles.buttonText}>Proceed</Text>
+        <Text style={styles.buttonText}>{common.proceed}</Text>
         {/* ) : (
           <ActivityIndicator size="small" />
         )} */}
@@ -416,7 +398,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   const renderLoaderModalContent = useCallback( () => {
-    return <LoaderModal headerText={message} messageText={subTextMessage} />
+    return <LoaderModal headerText={message} messageText={subTextMessage} subPoints={subPoints} bottomText={bottomTextMessage} />
   }, [ message, subTextMessage ] )
 
   const renderLoaderModalHeader = () => {
@@ -452,21 +434,18 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const renderEncryptionPswd = () => {
     return(
-      // <ScrollView >
       <KeyboardAwareScrollView
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled
+        scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
-
         }}
       >
         <View style={{
-          flex: 1
+          height: hp( '72%' )
         }}>
           <TouchableOpacity
             activeOpacity={1}
@@ -488,21 +467,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Use your own{'\n'}encryption password</Text>
+          }} >{strings.encryptionpassword}</Text>
           <View
             style={{
-              ...answerInputStyle,
+              ...pswdInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: pswdError ? Colors.red : Colors.borderColor,
+              borderColor: pswdError ? Colors.red : Colors.white,
               marginTop: 10,
               backgroundColor: Colors.white
             }}
           >
             <TextInput
               style={styles.modalInputBox}
-              placeholder={'Enter your password'}
+              placeholder={strings.Enteryourpassword}
               placeholderTextColor={Colors.borderColor}
               value={hideShowPswd ? pswdMasked : pswd}
               autoCompleteType="off"
@@ -520,7 +499,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text )
+                setPswd( text.toLowerCase() )
                 setPswdMasked( text )
                 // setPswdError( '' )
               }}
@@ -565,11 +544,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View>
           <View
             style={{
-              ...answerInputStyle,
+              ...confirmPswdInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: pswdError ? Colors.red : Colors.borderColor,
+              borderColor: pswdError ? Colors.red : Colors.white,
               marginTop: 10,
               backgroundColor: Colors.white
             }}
@@ -577,7 +556,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TextInput
               style={styles.modalInputBox}
               ref={confirmPswdTextInput}
-              placeholder={'Confirm your password'}
+              placeholder={strings.Confirmyourpassword}
               placeholderTextColor={Colors.borderColor}
               value={hideShowConfirmPswd ? confirmPswdMasked : tempPswd}
               autoCompleteType="off"
@@ -646,16 +625,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
               {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              No number or special characters allowed
+              {strings.Numbersorspecial}
             </Text>
           )}
           <View
             style={{
-              ...answerInputStyle,
+              ...hintInputStyle,
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: Colors.borderColor,
+              borderColor: Colors.backgroundColor1,
               marginVertical: 10,
               backgroundColor: Colors.white
             }}
@@ -663,9 +642,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TextInput
               style={styles.modalInputBox}
               ref={hint}
-              placeholder={'Add a hint'}
+              placeholder={strings.Addhint}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowHint ? hintMasked : hintText}
+              value={hintText}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
@@ -679,18 +658,18 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               }
               onChangeText={( text ) => {
                 setHint( text )
-                setHintMasked( text )
-                // setConfirmPswdMasked( text )
+              }}
+              onFocus={() => {
+                setShowNote( false )
+                setHintInputStyle( styles.inputBoxFocused )
               }}
               onBlur={() => {
-                let temp = ''
-                for ( let i = 0; i < hintText.length; i++ ) {
-                  temp += '*'
-                }
-                setHintMasked( temp )
-              }}
+                setShowNote( true )
+                setHintInputStyle( styles.inputBox )
+              }
+              }
             />
-            {hintText ? (
+            {/* {hintText ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowHint( !hideShowHint )
@@ -707,55 +686,59 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   name={hideShowHint ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
-            ) : null}
+            ) : null} */}
           </View>
-        </View>
-        <View
-          style={{
-            marginLeft: 20,
-            marginRight: 20,
-            flexDirection: 'row',
-          }}
-        >
-          <Text
+
+          <View
             style={{
-              color: Colors.red,
-              fontFamily: Fonts.FiraSansMediumItalic,
-              fontSize: RFValue( 10 ),
-              marginLeft: 'auto',
+              marginLeft: 20,
+              marginRight: 20,
+              flexDirection: 'row',
             }}
           >
-            {pswdError}
-          </Text>
-        </View>
-        {showNote ? <View style={{
-          ...styles.bottomButtonView,
-        }}>
-          {(
-            pswd.trim() === confirmPswd.trim() &&
+            <Text
+              style={{
+                color: Colors.red,
+                fontFamily: Fonts.FiraSansMediumItalic,
+                fontSize: RFValue( 10 ),
+                marginLeft: 'auto',
+              }}
+            >
+              {pswdError}
+            </Text>
+          </View>
+          {showNote ? <View style={{
+            ...styles.bottomButtonView,
+          }}>
+            {(
+              pswd.trim() === confirmPswd.trim() &&
             confirmPswd.trim() &&
             pswd.trim() && pswdError.length === 0 && hintText.length > 0
-          ) && (
-            setButtonVisible()
-          ) || null}
-          {/* <View style={styles.statusIndicatorView}>
+            ) && (
+              setButtonVisible()
+            ) || null}
+            {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
-        </View> : null}
+          </View> : null}
+          {showNote &&
         <View style={{
-          marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+          marginTop: showNote ? hp( '0%' ) :hp( '2%' ),
           marginBottom: hp( 1 )
         }}>
+          {/* {pswd.length === 0 && confirmPswd.length === 0 && */}
           <BottomInfoBox
-            title={'Note'}
-            infoText={'Make sure you remember the encryption password and keep it safe'}
+            title={common.note}
+            infoText={strings.Makesure}
             italicText={''}
             backgroundColor={Colors.white}
           />
+          {/* } */}
+        </View>
+          }
         </View>
       </KeyboardAwareScrollView>
-      // </ScrollView>
     )
   }
 
@@ -766,16 +749,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled
+        scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
-          backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
+          backgroundColor: Colors.bgColor,
+          // height: `${height}%`
 
         }}
       >
         <View style={{
-          flex: 1
+          height: hp( '72%' ),
         }}>
           <TouchableOpacity
             activeOpacity={1}
@@ -797,7 +780,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Answer to {'\n'}a Security Question</Text>
+          }} >{strings.AnswerSecurityQuestion}</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -813,7 +796,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <Text style={styles.dropdownBoxText}>
               {dropdownBoxValue.question
                 ? dropdownBoxValue.question
-                : 'Select Question'}
+                : strings.SelectQuestion}
             </Text>
             <Ionicons
               style={{
@@ -886,13 +869,13 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingRight: 15,
-                  borderColor: answerError ? Colors.red : Colors.borderColor,
+                  borderColor: answerError ? Colors.red : Colors.white,
                   backgroundColor: Colors.white
                 }}
               >
                 <TextInput
                   style={styles.modalInputBox}
-                  placeholder={'Enter your answer'}
+                  placeholder={strings.Enteryouranswer}
                   placeholderTextColor={Colors.borderColor}
                   value={hideShowAnswer ? answerMasked : answer}
                   autoCompleteType="off"
@@ -959,14 +942,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   alignItems: 'center',
                   paddingRight: 15,
                   marginTop: 10,
-                  borderColor: answerError ? Colors.red : Colors.borderColor,
+                  borderColor: answerError ? Colors.red : Colors.white,
                   backgroundColor: Colors.white
                 }}
               >
                 <TextInput
                   style={styles.modalInputBox}
                   ref={confirmAnswerTextInput}
-                  placeholder={'Confirm your answer'}
+                  placeholder={strings.Confirmyouranswer}
                   placeholderTextColor={Colors.borderColor}
                   value={
                     hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
@@ -1031,7 +1014,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
               {answerError.length == 0 && (
                 <Text style={styles.helpText}>
-              Answers must contain only lower case alphabets and numbers
+                  {strings.Answersmust1}
                 </Text>
               )}
             </View>
@@ -1106,17 +1089,51 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
           </View> : null}
+          {showNote &&
           <View style={{
-            marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+            marginTop: showNote ? hp( '0%' ) : hp( '2%' ),
             marginBottom: hp( 1 )
           }}>
-            <BottomInfoBox
-              title={'Note'}
-              infoText={'The Answer is used to encrypt the backup. The security Question acts as a hint to remember the same'}
-              italicText={''}
-              backgroundColor={Colors.white}
-            />
+            {answer.length === 0 && confirmAnswer.length === 0 &&
+            <View
+              style={{
+                marginBottom: 10,
+                padding: 20,
+                backgroundColor: Colors.white,
+                marginLeft: 12,
+                marginRight: 20,
+                borderRadius: 10,
+                flexDirection: 'row'
+              }}
+            >
+              <View>
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontSize: RFValue( 13 ),
+                    marginBottom: 2,
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {strings.note}
+                </Text>
+                <Text style={styles.bottomNoteInfoText}>
+                  {strings.TheAnswer}
+                  <Text style={styles.boldItalicText}>
+                    {` ${strings.encrypt} `}
+                  </Text>
+                  {strings.backup} {strings.securityQuestion}
+                  <Text style={styles.boldItalicText}>
+                    {` ${strings.hint} `}
+                  </Text>
+                  {strings.toremember}
+                </Text>
+
+              </View>
+            </View>
+            }
           </View>
+          }
         </View>
       </KeyboardAwareScrollView>
     )
@@ -1229,8 +1246,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Initial Cloud Backup'}
-              secondLineTitle={'Select how you want to encrypt the backup'}
+              firstLineTitle={strings.Step2}
+              secondLineBoldTitle={'New Wallet '}
+              secondLineTitle={strings.creation}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -1238,16 +1256,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             />
             <CardWithRadioBtn
               icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
-              mainText={'Answer to a Security Question'}
-              subText={'Easier to remember. Recommended'}
+              mainText={strings.AnsweraSecurityQuestion}
+              subText={strings.Easiertoremember}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
               index={0}
             />
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
-              mainText={'Use your own encryption password'}
-              subText={'Choose any password. Make sure you remember and keep it safe'}
+              mainText={strings.Useencryptionpassword}
+              subText={strings.Createapassword}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
@@ -1259,7 +1277,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
       <View style={styles.statusIndicatorView}>
         <View style={styles.statusIndicatorInactiveView} />
-        <View style={styles.statusIndicatorInactiveView} />
+        {/* <View style={styles.statusIndicatorInactiveView} /> */}
         <View style={styles.statusIndicatorActiveView} />
       </View>
       {showNote && !visibleButton ? (
@@ -1270,42 +1288,46 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}
         >
           <BottomInfoBox
-            title={'Note'}
-            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the '}
+            title={common.note}
+            infoText={`${strings.Backuplets} `}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />
         </View>
       ) : null}
       <View style={{
-        alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '9%' ),
-        flexDirection: 'row'
+        alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '4%' ),
+        flexDirection: 'row', marginTop: hp( 2 )
       }}>
         <ButtonBlue
-          buttonText="Confirm & Proceed"
+          buttonText={common.confirmProceed}
           handleButtonPress={confirmAction}
           buttonDisable={false}
         />
         <TouchableOpacity
           onPress={() => {
-            dispatch( updateCloudPermission( false ) )}
-          }
+            console.log( 'asfds' )
+            setIsSkipClicked( true )
+            dispatch( updateCloudPermission( false ) )
+            onPressProceed( true )
+          }}
         >
           <Text style={{
+            fontSize: RFValue( 13 ),
             color: Colors.blue,
             fontFamily: Fonts.FiraSansMedium,
             alignSelf: 'center',
             marginLeft: wp( '5%' )
-          }}>Skip Backup</Text>
+          }}>{`${common.skip} Backup`}</Text>
         </TouchableOpacity>
       </View>
       {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
       </ModalContainer> */}
-      <ModalContainer visible={securityQue} closeBottomSheet={() => {showSecurityQue( false ) }} >
+      <ModalContainer visible={securityQue} closeBottomSheet={() => {}} >
         {renderSecurityQuestion()}
       </ModalContainer>
-      <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {showEncryptionPswd( false ) }} >
+      <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {}} >
         {renderEncryptionPswd()}
       </ModalContainer>
       <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
@@ -1326,9 +1348,22 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 }
 
 const styles = StyleSheet.create( {
+  bottomNoteInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    lineHeight: 18
+  },
+  boldItalicText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    fontSize: RFValue( 12 ),
+  },
   dropdownBox: {
     flexDirection: 'row',
-    borderColor: Colors.borderColor,
+    borderColor: Colors.white,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1342,7 +1377,7 @@ const styles = StyleSheet.create( {
   },
   dropdownBoxOpened: {
     flexDirection: 'row',
-    borderColor: Colors.borderColor,
+    borderColor: Colors.white,
     borderWidth: 0.5,
     borderRadius: 10,
     marginTop: 15,
@@ -1424,7 +1459,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2
+      width: 10, height: 10
     },
     backgroundColor: Colors.white,
   },
@@ -1463,11 +1498,13 @@ const styles = StyleSheet.create( {
   },
 
   helpText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansItalic,
     marginRight: wp( 5 ),
     alignSelf: 'flex-end',
-    width: wp( '72%' ),
-    textAlign: 'right'
+    width: wp( '54%' ),
+    textAlign: 'right',
+    marginTop: hp( 0.5 )
   }
 } )

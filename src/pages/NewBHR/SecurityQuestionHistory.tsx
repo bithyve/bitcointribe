@@ -25,31 +25,34 @@ import SecurityQuestion from './SecurityQuestion'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import {
-  checkMSharesHealth,
   updateMSharesHealth,
-} from '../../store/actions/health'
+} from '../../store/actions/BHR'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import ModalContainer from '../../components/home/ModalContainer'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import { translations } from '../../common/content/LocContext'
 
 const SecurityQuestionHistory = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+
   const [ securityQuestionsHistory, setSecuirtyQuestionHistory ] = useState( [
     {
       id: 1,
-      title: 'Security Questions created',
+      title: strings.Questionscreated,
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Security Answer confirmed',
+      title: strings.Passwordconfirmed,
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Security Questions unconfirmed',
+      title: strings.Questionsunconfirmed,
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
@@ -66,6 +69,7 @@ const SecurityQuestionHistory = ( props ) => {
     successModal,
     showSuccessModal,
   ] = useState( false )
+  const [ showAnswer, setShowAnswer ] = useState( false )
   const [
     HealthCheckSuccessBottomSheet,
     setHealthCheckSuccessBottomSheet,
@@ -80,44 +84,43 @@ const SecurityQuestionHistory = ( props ) => {
       reshareVersion?: number;
       name?: string;
     }[];
-  }[] = useSelector( ( state ) => state.health.levelHealth )
+  }[] = useSelector( ( state ) => state.bhr.levelHealth )
   const currentLevel: Number = useSelector(
-    ( state ) => state.health.currentLevel,
+    ( state ) => state.bhr.currentLevel,
   )
-  const s3Service = useSelector( ( state ) => state.health.service )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const next = props.navigation.getParam( 'next' )
   const dispatch = useDispatch()
 
   const renderSecurityQuestionContent = useCallback( () => {
     return (
       <SecurityQuestion
+        onClose={() => showQuestionModal( false )}
         onPressConfirm={async () => {
           Keyboard.dismiss()
           saveConfirmationHistory()
           updateHealthForSQ()
-          // ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
           showQuestionModal( false )
-          // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 1 )
           showSuccessModal( true )
         }}
+        onPasscodeVerify={()=>{ showQuestionModal( true ); setShowAnswer( true ) }}
+        showAnswer={showAnswer}
       />
     )
-  }, [] )
-
+  }, [ showAnswer, questionModal ] )
 
   const renderHealthCheckSuccessModalContent = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
-        title={'Health Check Successful'}
-        info={'Answer backed up successfully'}
+        title={strings.HealthCheckSuccessful}
+        info={strings.Passwordbackedupsuccessfully}
         note={''}
-        proceedButtonText={'View Health'}
+        proceedButtonText={strings.ViewHealth}
         isIgnoreButton={false}
         onPressProceed={() => {
           // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
           showSuccessModal( false )
-          dispatch( checkMSharesHealth() )
           props.navigation.goBack()
         }}
         isBottomImage={true}
@@ -195,12 +198,13 @@ const SecurityQuestionHistory = ( props ) => {
     if ( levelHealth.length > 0 && levelHealth[ 0 ].levelInfo.length > 0 ) {
       const shareObj =
         {
-          walletId: s3Service.getWalletId().data.walletId,
-          shareId: levelHealth[ 0 ].levelInfo[ 1 ].shareId,
-          reshareVersion: levelHealth[ 0 ].levelInfo[ 1 ].reshareVersion,
+          walletId: wallet.walletId,
+          shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
+          reshareVersion: levelHealth[ 0 ].levelInfo[ 0 ].reshareVersion,
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'securityQuestion',
+          name: 'Encryption Password'
         }
       dispatch( updateMSharesHealth( shareObj, true ) )
     }
@@ -218,17 +222,17 @@ const SecurityQuestionHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Security Question'}
+        selectedTitle={strings.EncryptionPassword}
         selectedTime={props.navigation.state.params.selectedTime}
         moreInfo={''}
-        headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
+        headerImage={require( '../../assets/images/icons/icon_password.png' )}
       />
       <View style={{
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={'Security Question History'}
-          infoBoxInfo={'The history of your Security Question will appear here'}
+          infoBoxTitle={strings.PasswordHistory}
+          infoBoxInfo={strings.Thehistory}
           type={'security'}
           IsReshare
           onPressConfirm={() => {
@@ -236,8 +240,8 @@ const SecurityQuestionHistory = ( props ) => {
             showQuestionModal( true )
           }}
           data={sortedHistory( securityQuestionsHistory )}
-          confirmButtonText={'Confirm Answer'}
-          reshareButtonText={'Confirm Answer'}
+          confirmButtonText={strings.ConfirmPassword}
+          reshareButtonText={strings.ConfirmPassword}
           // changeButtonText={'Change Question'}
           disableChange={true}
           onPressReshare={() => {

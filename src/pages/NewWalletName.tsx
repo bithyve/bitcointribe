@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createRef } from 'react'
+import React, { useContext, useState, createRef } from 'react'
 import { useDispatch } from 'react-redux'
 import {
   StyleSheet,
@@ -29,7 +29,7 @@ import DeviceInfo from 'react-native-device-info'
 import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 import Entypo from 'react-native-vector-icons/Entypo'
-import { updateCloudPermission } from '../store/actions/health'
+import { updateCloudPermission } from '../store/actions/BHR'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
@@ -37,6 +37,7 @@ import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
 import { Easing } from 'react-native-reanimated'
 import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
 import ModalContainer from '../components/home/ModalContainer'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -53,12 +54,15 @@ export default function NewWalletName( props ) {
   // const [ intervalRef, setIntervalRef ] = useState( null )
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
+  const [ note, showNote ] = useState( true )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
   const bottomSheetRef = createRef<BottomSheet>()
   const dispatch = useDispatch()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
 
   // useEffect( () => {
   //   if( timeLeft===0 ){
@@ -152,9 +156,9 @@ export default function NewWalletName( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={{
         flex: 1
       }}>
@@ -181,10 +185,13 @@ export default function NewWalletName( props ) {
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <ScrollView>
+          <View style={{
+            flex: 1
+          }} >
             <HeaderTitle
-              firstLineTitle={'Provide a Display Name'}
-              secondLineTitle={'This is used for communication with your contacts'}
+              firstLineTitle={strings.Step1}
+              secondLineBoldTitle={'New Wallet '}
+              secondLineTitle={strings.creation}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -192,7 +199,7 @@ export default function NewWalletName( props ) {
             />
             <TextInput
               style={inputStyle}
-              placeholder={'Enter display name'}
+              placeholder={strings.walletName}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               keyboardType={
@@ -205,6 +212,7 @@ export default function NewWalletName( props ) {
               }}
               onFocus={() => {
                 setInputStyle( styles.inputBoxFocused )
+                showNote( false )
               }}
               onBlur={() => {
                 setInputStyle( styles.inputBox )
@@ -213,17 +221,22 @@ export default function NewWalletName( props ) {
               autoCompleteType="off"
             />
             <View style={{
-              marginRight: 20,
+              marginRight: wp( 6 )
             }}>
               <Text style={{
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
-                  No numbers or special characters allowed</Text>
+                {strings.numbers}</Text>
             </View>
-          </ScrollView>
-
+          </View>
+          {/* </KeyboardAvoidingView> */}
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            {/* <View style={styles.statusIndicatorInactiveView} /> */}
+          </View>
           <View style={styles.bottomButtonView}>
             {walletName.trim() != '' ? (
               <View
@@ -239,38 +252,36 @@ export default function NewWalletName( props ) {
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss()
-                    props.navigation.navigate( 'AccountSelection', {
-                      walletName
+                    props.navigation.navigate( 'NewWalletQuestion', {
+                      walletName,
                     } )
-                    // setIsCloudPermissionRender( true )
-                    // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+                  // setIsCloudPermissionRender( true )
+                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
                   }}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>Next</Text>
+                  <Text style={styles.buttonText}>{strings.Next}</Text>
                 </TouchableOpacity>
               </View>
             ) : null}
-            <View style={styles.statusIndicatorView}>
-              <View style={styles.statusIndicatorActiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
-            </View>
-          </View>
 
-          {walletName.trim() == '' ? (
-            <View style={{
-              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
-            }}>
-              <BottomInfoBox
-                title={'Note: '}
-                infoText={
-                  'We do not store this, it is only for your and your contacts’ eyes'
-                }
-              />
-            </View>
-          ) : null}
+
+          </View>
         </KeyboardAvoidingView>
+        {/* {walletName.trim() == '' ? ( */}
+        {note ? (
+          <View style={{
+            marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
+          }}>
+            <BottomInfoBox
+              title={'Note'}
+              infoText={
+                strings.info
+              }
+            />
+          </View>
+        ) : null}
+
       </View>
       {/* <BottomSheetBackground
         isVisible={bottomSheetState === BottomSheetState.Open}
@@ -298,10 +309,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   inputBox: {
-    borderColor: Colors.borderColor,
-    borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: hp( '5%' ),
+    marginTop: hp( '1%' ),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -309,13 +318,12 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 20,
+    marginBottom: hp( 1 ),
+    backgroundColor: Colors.backgroundColor1,
   },
   inputBoxFocused: {
-    borderColor: Colors.borderColor,
-    borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: hp( '5%' ),
+    marginTop: hp( '1%' ),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -328,9 +336,9 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 2, height: 2
     },
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor1,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 20,
+    marginBottom: hp( 1 ),
   },
   bottomNoteText: {
     color: Colors.blue,
@@ -345,7 +353,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     height: wp( '13%' ),
-    width: wp( '35%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -358,15 +366,15 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flexDirection: 'row',
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
-    paddingTop: 30,
+    paddingHorizontal: hp( 6 ),
+    paddingBottom: DeviceInfo.hasNotch() ? hp( 4 ) : hp( 3 ),
+    // paddin: hp( 9 ),
     alignItems: 'center',
   },
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
+    paddingHorizontal: hp( 3 )
   },
   statusIndicatorActiveView: {
     height: 5,

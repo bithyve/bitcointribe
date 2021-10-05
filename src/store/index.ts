@@ -8,8 +8,7 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import storageReducer from './reducers/storage'
 import setupAndAuthReducer from './reducers/setupAndAuth'
 import accountsReducer from './reducers/accounts'
-import sssReducer from './reducers/sss'
-import healthReducer from './reducers/health'
+import bhr from './reducers/BHR'
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
 import sendingReducer from './reducers/sending'
@@ -31,67 +30,32 @@ const config = {
 }
 
 import {
-  initDBWatcher,
-  initServicesWatcher,
-  fetchDBWatcher,
-  insertDBWatcher,
-  servicesEnricherWatcher,
-} from './sagas/storage'
-
-import {
   setupWalletWatcher,
-  initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
   changeAuthCredWatcher,
+  applicationUpdateWatcher,
 } from './sagas/setupAndAuth'
 
 import {
   testcoinsWatcher,
-  accumulativeTxAndBalWatcher,
-  fetchBalanceTxWatcher,
   syncAccountsWatcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
-  fetchDerivativeAccBalanceTxWatcher,
   updateDonationPreferencesWatcher,
   addNewAccountShellsWatcher,
-  syncViaXpubAgentWatcher,
-  updateAccountSettingsWatcher,
   reassignTransactionsWatcher,
   mergeAccountShellsWatcher,
-  refreshAccountShellWatcher,
+  refreshAccountShellsWatcher,
   feeAndExchangeRatesWatcher,
   autoSyncShellsWatcher,
-  blindRefreshWatcher,
-  getAllAccountsDataWatcher,
-  fetchReceiveAddressWatcher,
   validateTwoFAWatcher,
-  createSmNResetTFAOrXPrivWatcher
+  createSmNResetTFAOrXPrivWatcher,
+  updateAccountSettingsWatcher,
+  restoreAccountShellsWatcher,
+  accountCheckWatcher,
+  txnReadWatcher,
 } from './sagas/accounts'
-
-import {
-  initHCWatcher,
-  uploadEncMetaShareWatcher,
-  downloadMetaShareWatcher,
-  updateMSharesHealthWatcher,
-  checkMSharesHealthWatcher,
-  overallHealthWatcher,
-  uploadRequestedShareWatcher,
-  requestShareWatcher,
-  updateDynamicNonPMDDWatcher,
-  downloadDynamicNonPMDDWatcher,
-  recoverMnemonicWatcher,
-  recoverWalletWatcher,
-  restoreDynamicNonPMDDWatcher,
-  generatePersonalCopyWatcher,
-  checkPDFHealthWatcher,
-  restoreShareFromQRWatcher,
-  shareHistoryUpdateWatcher,
-  updateWalletImageWatcher,
-  fetchWalletImageWatcher,
-  sharePersonalCopyWatcher,
-} from './sagas/sss'
 
 import {
   accountSyncWatcher,
@@ -109,11 +73,15 @@ import {
 } from './sagas/notifications'
 
 import {
-  removeTrustedContactWatcher,
   walletCheckInWatcher,
   syncPermanentChannelsWatcher,
   initializeTrustedContactWatcher,
+  editTrustedContactWatcher,
+  removeTrustedContactWatcher,
   rejectTrustedContactWatcher,
+  restoreTrustedContactsWatcher,
+  updateWalletNameToChannelWatcher,
+  updateWalletWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -137,15 +105,12 @@ import walletRescanningReducer from './reducers/wallet-rescanning'
 
 import {
   initHealthWatcher,
-  checkSharesHealthWatcher,
   updateSharesHealthWatcher,
   generateMetaSharesWatcher,
   updateHealthLevel2Watcher,
   recoverWalletFromIcloudWatcher,
   recoverWalletHealthWatcher,
-  downloadMetaShareHealthWatcher,
   cloudMetaShareHealthWatcher,
-  fetchWalletImageHealthWatcher,
   recoverMnemonicHealthWatcher,
   getPDFDataWatcher,
   sharePDFWatcher,
@@ -153,8 +118,6 @@ import {
   updatedKeeperInfoWatcher,
   updateWalletImageHealthWatcher,
   emptyShareTransferDetailsForContactChangeWatcher,
-  removeUnwantedUnderCustodySharesWatcher,
-  generateSMMetaSharesWatcher,
   deletePrivateDataWatcher,
   autoShareLevel2KeepersWatcher,
   setLevelToNotSetupStatusWatcher,
@@ -166,8 +129,15 @@ import {
   downloadBackupDataWatcher,
   setupHealthWatcher,
   updateKeeperInfoToChannelWatcher,
-  acceptExistingContactRequestWatcher
-} from './sagas/health'
+  acceptExistingContactRequestWatcher,
+  setupPasswordWatcher,
+  setupLevelHealthWatcher,
+  generateLevel1SharesWatcher,
+  retrieveMetaSharesWatcher,
+  onPressKeeperChannelWatcher,
+  updateSecondaryShardWatcher,
+  getApprovalFromKeeperWatcher
+} from './sagas/BHR'
 
 import {
   cloudWatcher,
@@ -194,68 +164,33 @@ import {
 } from './sagas/upgradeToNewBhr'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
-import newBHR from './reducers/newBHR'
-import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
   const sagas = [
-    // database watchers
-    initDBWatcher,
-    fetchDBWatcher,
-    insertDBWatcher,
-    servicesEnricherWatcher,
-
     // wallet setup watcher
-    initServicesWatcher,
     setupWalletWatcher,
-    initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,
     changeAuthCredWatcher,
+    applicationUpdateWatcher,
 
     // accounts watchers
-    fetchBalanceTxWatcher,
     syncAccountsWatcher,
     testcoinsWatcher,
-    accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
-    fetchDerivativeAccBalanceTxWatcher,
-    syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
     updateDonationPreferencesWatcher,
-    refreshAccountShellWatcher,
+    refreshAccountShellsWatcher,
     addNewAccountShellsWatcher,
-    updateAccountSettingsWatcher,
+    restoreAccountShellsWatcher,
+    accountCheckWatcher,
+    txnReadWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
     autoSyncShellsWatcher,
-    blindRefreshWatcher,
-    getAllAccountsDataWatcher,
-    fetchReceiveAddressWatcher,
     validateTwoFAWatcher,
     createSmNResetTFAOrXPrivWatcher,
-
-    // sss watchers
-    initHCWatcher,
-    uploadEncMetaShareWatcher,
-    downloadMetaShareWatcher,
-    generatePersonalCopyWatcher,
-    sharePersonalCopyWatcher,
-    updateMSharesHealthWatcher,
-    checkMSharesHealthWatcher,
-    checkPDFHealthWatcher,
-    overallHealthWatcher,
-    uploadRequestedShareWatcher,
-    requestShareWatcher,
-    updateDynamicNonPMDDWatcher,
-    downloadDynamicNonPMDDWatcher,
-    restoreDynamicNonPMDDWatcher,
-    recoverMnemonicWatcher,
-    recoverWalletWatcher,
-    restoreShareFromQRWatcher,
-    shareHistoryUpdateWatcher,
-    updateWalletImageWatcher,
-    fetchWalletImageWatcher,
+    updateAccountSettingsWatcher,
 
     //fBTC
     accountSyncWatcher,
@@ -278,21 +213,21 @@ const rootSaga = function* () {
     // Trusted Contacts
     initializeTrustedContactWatcher,
     rejectTrustedContactWatcher,
+    editTrustedContactWatcher,
     removeTrustedContactWatcher,
     walletCheckInWatcher,
     syncPermanentChannelsWatcher,
-
-    // Health
+    restoreTrustedContactsWatcher,
+    updateWalletNameToChannelWatcher,
+    updateWalletWatcher,
+    // bhr
     initHealthWatcher,
-    checkSharesHealthWatcher,
     updateSharesHealthWatcher,
     generateMetaSharesWatcher,
     updateHealthLevel2Watcher,
     recoverWalletFromIcloudWatcher,
     recoverWalletHealthWatcher,
-    downloadMetaShareHealthWatcher,
     cloudMetaShareHealthWatcher,
-    fetchWalletImageHealthWatcher,
     updateWalletImageHealthWatcher,
     recoverMnemonicHealthWatcher,
     getPDFDataWatcher,
@@ -300,8 +235,6 @@ const rootSaga = function* () {
     confirmPDFSharedWatcher,
     updatedKeeperInfoWatcher,
     emptyShareTransferDetailsForContactChangeWatcher,
-    removeUnwantedUnderCustodySharesWatcher,
-    generateSMMetaSharesWatcher,
     deletePrivateDataWatcher,
     autoShareLevel2KeepersWatcher,
     setLevelToNotSetupStatusWatcher,
@@ -314,6 +247,14 @@ const rootSaga = function* () {
     setupHealthWatcher,
     updateKeeperInfoToChannelWatcher,
     acceptExistingContactRequestWatcher,
+    setupPasswordWatcher,
+    setupLevelHealthWatcher,
+    generateLevel1SharesWatcher,
+    retrieveMetaSharesWatcher,
+    onPressKeeperChannelWatcher,
+    confirmPDFSharedFromUpgradeWatcher,
+    updateSecondaryShardWatcher,
+    getApprovalFromKeeperWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
@@ -357,9 +298,6 @@ const rootSaga = function* () {
     autoShareContactKeeperWatcher,
     updateAvailableKeeperDataWatcher,
 
-    //newBHR
-    onPressKeeperChannelWatcher,
-    confirmPDFSharedFromUpgradeWatcher,
   ]
 
   yield all(
@@ -382,8 +320,7 @@ const rootReducer = combineReducers( {
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
-  sss: sssReducer,
-  health: healthReducer,
+  bhr: bhr,
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
@@ -397,7 +334,6 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
-  newBHR: newBHR
 } )
 
 export default function makeStore() {

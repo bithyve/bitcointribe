@@ -5,19 +5,20 @@ import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, cus
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { Account, AccountType, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, ActiveAddressAssignee, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
-import RelayServices from '../../bitcoin/services/RelayService'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { updateAccountShells } from '../actions/accounts'
 import dbManager from '../../storage/realm/dbManager'
+import Relay from '../../bitcoin/utilities/Relay'
+import { getNextFreeAddressWorker } from './accounts'
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
@@ -32,12 +33,12 @@ function* processRecipients( accountShell: AccountShell ){
     ( state ) => state.trustedContacts.contacts,
   )
 
-  const recipients: [
+  const recipients:
     {
       address: string;
       amount: number;
-    }?
-  ]  = []
+      name?: string
+    }[]  = []
 
   for( const recipient of selectedRecipients ){
     switch( recipient.kind ){
@@ -51,10 +52,18 @@ function* processRecipients( accountShell: AccountShell ){
         case RecipientKind.ACCOUNT_SHELL:
           const recipientShell = accountShells.find( ( shell ) => shell.id === recipient.id )
           const recipientAccount: Account = accountsState.accounts[ recipientShell.primarySubAccount.id  ]
-
+          const assigneeInfo: ActiveAddressAssignee = {
+            type: accountShell.primarySubAccount.type,
+            id: accountShell.primarySubAccount.id,
+            senderInfo: {
+              name: accountShell.primarySubAccount.customDisplayName
+            },
+          }
+          const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, assigneeInfo )
           recipients.push( {
-            address: recipientAccount.receivingAddress,
+            address: recipientAddress,
             amount: recipient.amount,
+            name: recipientShell.primarySubAccount.customDisplayName
           } )
 
           break
@@ -62,6 +71,7 @@ function* processRecipients( accountShell: AccountShell ){
         case RecipientKind.CONTACT:
           const contact = trustedContacts[ ( recipient as ContactRecipientDescribing ).channelKey ]
           const paymentAddresses = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.paymentAddresses )
+
           if( !paymentAddresses ) throw new Error( `Payment addresses missing for: ${recipient.displayedName}` )
 
           let paymentAddress
@@ -75,10 +85,10 @@ function* processRecipients( accountShell: AccountShell ){
           }
           if( !paymentAddress ) throw new Error( `Payment address missing for: ${recipient.displayedName}` )
 
-          SubAccountKind.TRUSTED_CONTACTS
           recipients.push( {
             address: paymentAddress,
             amount: recipient.amount,
+            name: contact.contactDetails.contactName || idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.walletName ),
           } )
           break
     }
@@ -113,7 +123,8 @@ function* executeSendStage1( { payload }: {payload: {
     if ( txPrerequisites )
       yield put( sendStage1Executed( {
         successful: true, carryOver: {
-          txPrerequisites
+          txPrerequisites,
+          recipients
         }
       } ) )
     else
@@ -139,6 +150,7 @@ function* executeSendStage2( { payload }: {payload: {
   accountShell: AccountShell;
   txnPriority: TxPriority,
   token?: number,
+  note?: string,
 }} ) {
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
@@ -147,14 +159,16 @@ function* executeSendStage2( { payload }: {payload: {
     ( state ) => state.sending
   )
 
-  const { accountShell, txnPriority, token } = payload
+  const { accountShell, txnPriority, token, note } = payload
   const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
+  const recipients = idx( sending, ( _ ) => _.sendST1.carryOver.recipients )
+
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
   const network = AccountUtilities.getNetworkByType( account.networkType )
 
-  const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, token, customTxPrerequisites )
+  const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, recipients, token, customTxPrerequisites )
 
   if ( txid ){
     yield put( sendStage2Executed( {
@@ -162,16 +176,22 @@ function* executeSendStage2( { payload }: {payload: {
       txid,
     } ) )
 
+    if( note ){
+      account.transactionsNote[ txid ] = note
+      if( account.type === AccountType.DONATION_ACCOUNT ) Relay.sendDonationNote( account.id.slice( 0, 15 ), {
+        txId: txid, note
+      } )
+    }
+
     const accounts = {
       [ account.id ]: account
     }
     yield put( updateAccountShells( {
       accounts
     } ) )
-    //TODO: save accounts object into realm
-    const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-    tempDB.accounts[ account.id ] = account
-    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
+    // const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
+    // tempDB.accounts[ account.id ] = account
+    // yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
     yield call( dbManager.updateAccount, account.id, account )
   } else
     yield put( sendStage2Executed( {
@@ -393,7 +413,7 @@ function* sendTxNotificationWorker() {
     ( state ) => state.trustedContacts.contacts,
   )
   const { walletName } = yield select(
-    ( state ) => state.storage.database.WALLET_SETUP,
+    ( state ) => state.storage.wallet,
   )
 
   const { selectedRecipients } = sendingState
@@ -416,7 +436,7 @@ function* sendTxNotificationWorker() {
 
   const notification: INotification = {
     notificationType: notificationType.contact,
-    title: 'Friends and Family notification',
+    title: 'Friends & Family notification',
     body: `You have a new transaction from ${walletName}`,
     data: {
     },
@@ -425,7 +445,7 @@ function* sendTxNotificationWorker() {
 
   if( notifReceivers.length )
     yield call(
-      RelayServices.sendNotifications,
+      Relay.sendNotifications,
       notifReceivers,
       notification,
     )

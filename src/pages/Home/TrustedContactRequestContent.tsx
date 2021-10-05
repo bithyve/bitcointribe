@@ -1,6 +1,7 @@
 import React from 'react'
 import TrustedContactRequest from '../Contacts/TrustedContactRequest'
 import BottomSheet from '@gorhom/bottom-sheet'
+import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
 
 export interface Props {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -18,17 +19,15 @@ const TrustedContactRequestContent: React.FC<Props> = ( {
   onPhoneNumberChange,
 }: Props ) => {
   if ( !trustedContactRequest ) return
-  const { walletName, isKeeper, isQR, hintType, hint } = trustedContactRequest
+  const { walletName, isKeeper, encryptionType, encryptionHint } = trustedContactRequest
 
   return (
     <TrustedContactRequest
-      isQR={isQR}
-      inputType={
-        hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
-      }
+      inputNotRequired={encryptionType === DeepLinkEncryptionType.DEFAULT }
+      inputType={encryptionType}
       isGuardian={isKeeper}
       isRecovery={false}
-      hint={hint}
+      hint={encryptionHint}
       bottomSheetRef={bottomSheetRef}
       trustedContactName={walletName}
       onPressAccept={onPressAccept}

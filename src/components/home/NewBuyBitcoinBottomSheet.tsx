@@ -30,7 +30,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     title: Platform.OS == 'ios' ? 'FastBitcoins' : 'FastBitcoins',
     subtitle: 'Scan FastBitcoin vouchers',
     kind: BuyMenuItemKind.RAMP,
-    imageSource: require( '../../assets/images/icons/fastbitcoin.png' ),
+    imageSource: require( '../../assets/images/icons/fastbitcoins.png' ),
     disabled: false
   },
   {

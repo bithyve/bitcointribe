@@ -1,5 +1,4 @@
 import { call, put, select } from 'redux-saga/effects'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -15,8 +14,8 @@ import {
   UPDATE_MESSAGES_STATUS
 } from '../actions/notifications'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import RelayServices from '../../bitcoin/services/RelayService'
 import moment from 'moment'
+import Relay from '../../bitcoin/utilities/Relay'
 
 
 function* updateFCMTokensWorker( { payload } ) {
@@ -25,27 +24,15 @@ function* updateFCMTokensWorker( { payload } ) {
     if ( FCMs.length === 0 ) {
       throw new Error( 'No FCM token found' )
     }
-
-    const service: RegularAccount = yield select(
-      ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+    const { walletId } = yield select(
+      ( state ) => state.storage.wallet,
     )
-    const { data } = yield call( service.getWalletId )
-    console.log( 'data updateFCMTokensWorker', data )
-
-    const res = yield call(
-      RelayServices.updateFCMTokens,
-      data.walletId,
+    const { updated } = yield call(
+      Relay.updateFCMTokens,
+      walletId,
       payload.FCMs,
     )
-
-    if ( res.status === 200 ) {
-      const { updated } = res.data
-      console.log( {
-        updated
-      } )
-    } else {
-      console.log( 'Failed to update FCMs on the server' )
-    }
+    if ( !updated ) console.log( 'Failed to update FCMs on the server' )
   } catch( err ){
     console.log( 'err', err )
   }
@@ -58,27 +45,13 @@ export const updateFCMTokensWatcher = createWatcher(
 
 export function* fetchNotificationsWorker() {
   yield put( fetchNotificationStarted( true ) )
-  const service: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  const { walletId } = yield select(
+    ( state ) => state.storage.wallet,
   )
-  console.log( 'service', service )
-  const { data } = yield call( service.getWalletId )
-  console.log( 'data', data )
-
-  const res = yield call( RelayServices.fetchNotifications, data.walletId )
-  if ( res.status === 200 ) {
-    const { notifications, DHInfos } = res.data
-    yield call( AsyncStorage.setItem, 'DHInfos', JSON.stringify( DHInfos ) )
-    const payload = {
-      notifications
-    }
-    yield call( notificationsFetched, notifications )
-    //yield call( setupNotificationListWorker )
-    yield put( fetchNotificationStarted( false ) )
-
-  } else {
-    console.log( 'Failed to fetch notification' )
-  }
+  const { notifications } = yield call( Relay.fetchNotifications, walletId )
+  yield call( notificationsFetched, notifications )
+  //yield call( setupNotificationListWorker )
+  yield put( fetchNotificationStarted( false ) )
 }
 
 export const fetchNotificationsWatcher = createWatcher(
@@ -98,22 +71,15 @@ export function* getMessageWorker() {
   )
   console.log( 'messages timeStamp', timeStamp )
 
-  const res = yield call( RelayServices.getMessages, walletId, timeStamp )
-  console.log( 'res', res )
-  if ( res.status === 200 ) {
-    const { messages } = res.data
-    if( !storedMessages ) return
-    const newMessageArray = storedMessages.concat( messages.filter( ( { notificationId } ) => !storedMessages.find( f => f.notificationId == notificationId ) ) )
-    console.log( 'newMessageArray', newMessageArray )
+  const { messages } = yield call( Relay.getMessages, walletId, timeStamp )
+  if( !storedMessages ) return
+  const newMessageArray = storedMessages.concat( messages.filter( ( { notificationId } ) => !storedMessages.find( f => f.notificationId == notificationId ) ) )
+  console.log( 'newMessageArray', newMessageArray )
 
-    yield put( messageFetched( newMessageArray ) )
-    yield put( storeMessagesTimeStamp() )
+  yield put( messageFetched( newMessageArray ) )
+  yield put( storeMessagesTimeStamp() )
 
-    yield put( fetchNotificationStarted( false ) )
-  } else {
-    console.log( 'Failed to fetch notification' )
-  }
-
+  yield put( fetchNotificationStarted( false ) )
 }
 
 export const getMessageWatcher = createWatcher(
@@ -149,23 +115,13 @@ export function* updateMessageStatusWorker( { payload } ) {
       throw new Error( 'No data found' )
     }
     const walletId = yield select( ( state ) => state.preferences.walletId, )
-
-    console.log( 'data updateFCMTokensWorker', data )
-
-    const res = yield call(
-      RelayServices.updateMessageStatus,
+    const { updated } = yield call(
+      Relay.updateMessageStatus,
       walletId,
       data,
     )
+    if ( !updated ) console.log( 'Failed to update messageStatus on the server' )
 
-    if ( res.status === 200 ) {
-      const { updated } = res.data
-      console.log( {
-        updated
-      } )
-    } else {
-      console.log( 'Failed to update messageStatus on the server' )
-    }
   } catch( err ){
     console.log( 'err', err )
   }

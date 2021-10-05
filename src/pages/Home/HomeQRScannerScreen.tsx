@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 import ListStyles from '../../common/Styles/ListStyles'
@@ -21,16 +21,17 @@ import { Satoshis } from '../../common/data/enums/UnitAliases'
 import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { AccountsState } from '../../store/reducers/accounts'
+import { translations } from '../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
 };
 
-const HeaderSection: React.FC = () => {
+const HeaderSection: React.FC = ( { title } ) => {
   return (
     <View style={styles.infoHeaderSection}>
       <Text style={ListStyles.infoHeaderSubtitleText}>
-        Scan a Bitcoin address or any Hexa QR
+        {title}
       </Text>
     </View>
   )
@@ -40,8 +41,10 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
   const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
-
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
   function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
+    console.log( 'scannedData', scannedData )
     const networkType: NetworkType = AccountUtilities.networkType( scannedData )
     if ( networkType ) {
       const network = AccountUtilities.getNetworkByType( networkType )
@@ -95,7 +98,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           scrollEnabled={false}
           style={styles.rootContainer}
         >
-          <HeaderSection />
+          <HeaderSection title={strings.ScanaBitcoinaddress}/>
 
           <CoveredQRCodeScanner
             onCodeScanned={handleBarcodeRecognized}
@@ -109,7 +112,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               containerStyle={{
                 margin: 0, padding: 0
               }}
-              placeholder="Enter address manually"
+              placeholder={strings.Enteraddressmanually}
               accountShell={defaultSourceAccount}
               onAddressEntered={( address ) => {
                 onSend( address, 0 )
@@ -134,7 +137,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           >
             <Button
               raised
-              title="Receive bitcoin"
+              title={strings.Receivebitcoin}
               icon={
                 <Image
                   source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
@@ -157,13 +160,26 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               onPress={() => { navigation.navigate( 'ReceiveQR' )}}
             />
           </View>
+          {
+            __DEV__ && (
+              <TouchableOpacity onPress={()=>{
+                const qrScannedData = {
+                  data: '{"type":"KEEPER_REQUEST","channelKey":"nBeLSFNLxhRmuq4JWNQTBWgv","walletName":"Scas","secondaryChannelKey":"HcB1rVJrYMss0QjlyDD1KRPA","version":"1.9.0"}'
+                }
+                handleBarcodeRecognized( qrScannedData )
+              }} >
+                <Text>Continue</Text>
+              </TouchableOpacity>
+            )
+          }
+
           <View style={{
             marginTop: 'auto'
           }}>
             <BottomInfoBox
               style
-              title="What can you scan?"
-              infoText="Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request, or a restore request"
+              title={strings.Whatcanyouscan}
+              infoText={strings.scan}
             />
           </View>
         </KeyboardAwareScrollView>

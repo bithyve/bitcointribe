@@ -3,6 +3,7 @@ import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interf
 
 export const UPDATE_SWAN_STATUS = 'UPDATE_SWAN_STATUS'
 export const CLEAR_SWAN_CACHE = 'CLEAR_SWAN_CACHE'
+export const IS_VISITED = 'IS_VISITED'
 export const FETCH_SWAN_AUTHENTICATION_URL_STARTED = 'FETCH_SWAN_AUTHENTICATION_URL_STARTED'
 export const FETCH_SWAN_AUTHENTICATION_URL = 'FETCH_SWAN_AUTHENTICATION_URL'
 export const FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED = 'FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED'
@@ -45,7 +46,7 @@ export enum SwanActionKind {
   AUTHENTICATE,
   CREATE_TEMP_SWAN_ACCOUNT_INFO,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
-  SYNC_SWAN_ACCOUNT_DATA
+  SYNC_SWAN_ACCOUNT_DATA,
 }
 
 export const updateSwanStatus = ( data ) => {
@@ -60,6 +61,12 @@ export const updateSwanStatus = ( data ) => {
 export const clearSwanCache = ( ) => {
   return {
     type: CLEAR_SWAN_CACHE,
+  }
+}
+
+export const isSwanVisited = ( ) => {
+  return {
+    type: IS_VISITED,
   }
 }
 

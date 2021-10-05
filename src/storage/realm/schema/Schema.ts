@@ -3,14 +3,40 @@ import { ObjectSchema } from 'realm'
 const UTXO = 'UTXO'
 const UTXOStatus = 'UTXOStatus'
 const Wallet = 'Wallet'
+const WalletSecurity = 'WalletSecurity'
 const Account = 'Account'
+const ActiveAddresses = 'ActiveAddresses'
+const ActiveAddress = 'ActiveAddress'
+const ActiveAddressAssignee = 'ActiveAddressAssignee'
 const Transaction = 'Transaction'
 const Details2FA = 'Details2FA'
 const Balances = 'Balances'
 const Bip32 = 'Bip32'
 const Network = 'Network'
 const XPUB = 'XPUB'
+const TxIdMap = 'TxIdMap'
 const AccountId = 'AccountId'
+const ContactDetails = 'ContactDetails'
+const TrustedContact = 'TrustedContact'
+const Streams = 'Streams'
+const StreamsMetaData = 'StreamsMetaData'
+const StreamsMetaDataFlags = 'StreamsMetaDataFlags'
+const UnecryptedStreamData = 'UnecryptedStreamData'
+const PrimaryStreamData = 'PrimaryStreamData'
+const SecondaryStreamData = 'SecondaryStreamData'
+const BackupStreamData = 'BackupStreamData'
+const MetaShare = 'MetaShare'
+const S3MetaShare = 'S3MetaShare'
+const BHR = 'BHR'
+const EncryptedShare = 'EncryptedShare'
+const Meta = 'Meta'
+const KeeperInfo = 'KeeperInfo'
+const Receiver = 'Receiver'
+const SenderInfo = 'SenderInfo'
+const RecipientInfo = 'RecipientInfo'
+const Recipient = 'Recipient'
+const TransactionsNote = 'TransactionsNote'
+const ContactImage = 'ContactImage'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -23,11 +49,17 @@ export const AccountSchema: ObjectSchema = {
     accountDescription: {
       type: 'string', optional: true
     },
+    hasNewTxn: {
+      type: 'bool', default: false
+    },
+    accountVisibility: {
+      type: 'string', default: 'DEFAULT',
+    },
     type: {
       type: 'string', optional: true
     },
     activeAddresses: {
-      type: 'string?[]', optional: true
+      type: ActiveAddresses, optional: true
     },
     receivingAddress: {
       type: 'string', optional: true
@@ -42,6 +74,9 @@ export const AccountSchema: ObjectSchema = {
       type: 'string', optional: true
     },
     xpub: {
+      type: 'string', optional: true
+    },
+    xpriv: {
       type: 'string', optional: true
     },
     xpubs: {
@@ -72,7 +107,7 @@ export const AccountSchema: ObjectSchema = {
       type: 'list', objectType: Transaction, default: []
     },
     txIdMap: {
-      type: 'string?[]', optional: true
+      type: 'list', objectType: TxIdMap, default: []
     },
     addressQueryList: {
       type: 'string?[]', optional: true
@@ -82,7 +117,115 @@ export const AccountSchema: ObjectSchema = {
     },
     lastSynched: {
       type: 'int', optional: true
+    },
+    isUsable: {
+      type: 'bool', default: true
+    },
+    transactionsNote: {
+      type: 'list', objectType: TransactionsNote, default: []
     }
+  },
+}
+
+export const TransactionsNoteSchema: ObjectSchema = {
+  name: TransactionsNote,
+  properties: {
+    txId: {
+      type: 'string', optional: true
+    },
+    note: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const SenderInfoSchema: ObjectSchema = {
+  name: SenderInfo,
+  properties: {
+    name: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const RecipientSchema: ObjectSchema = {
+  name: Recipient,
+  properties: {
+    name: {
+      type: 'string', optional: true
+    },
+    amount: {
+      type: 'int', optional: true
+    },
+  },
+}
+
+export const RecipientInfoSchema: ObjectSchema = {
+  name: RecipientInfo,
+  properties: {
+    txid: {
+      type: 'string', optional: true
+    },
+    recipient: {
+      type: 'list', objectType: Recipient, default: []
+    },
+  },
+}
+
+export const ActiveAddressAssigneeSchema: ObjectSchema = {
+  name: ActiveAddressAssignee,
+  properties: {
+    id: {
+      type: 'string', optional: true
+    },
+    type: {
+      type: 'string', optional: true
+    },
+    senderInfo: {
+      type: SenderInfo, optional: true
+    },
+    recipientInfo: {
+      type: 'list', objectType: RecipientInfo, default: []
+    }
+  },
+}
+
+export const ActiveAddressSchema: ObjectSchema = {
+  name: ActiveAddress,
+  properties: {
+    address: {
+      type: 'string', optional: true
+    },
+    index: {
+      type: 'int', optional: true
+    },
+    assignee: {
+      type: ActiveAddressAssignee, optional: true
+    },
+  },
+}
+
+export const ActiveAddressesSchema: ObjectSchema = {
+  name: ActiveAddresses,
+  properties: {
+    external: {
+      type: 'list', objectType: ActiveAddress, default: []
+    },
+    internal: {
+      type: 'list', objectType: ActiveAddress, default: []
+    },
+  },
+}
+
+export const TxIdMapSchema: ObjectSchema = {
+  name: TxIdMap,
+  properties: {
+    id: {
+      type: 'string',
+    },
+    txIds: {
+      type: 'string?[]', optional: true
+    },
   },
 }
 
@@ -116,13 +259,13 @@ export const BalancesSchema: ObjectSchema = {
   },
 }
 
-export const AccountIdSchema: ObjectSchema = {
-  name: AccountId,
-  properties: {
-    derivationPath: 'string',
-    accountId: 'string',
-  },
-}
+// export const AccountIdSchema: ObjectSchema = {
+//   name: AccountId,
+//   properties: {
+//     derivationPath: 'string',
+//     accountId: 'string',
+//   },
+// }
 
 export const XPubSchema: ObjectSchema = {
   name: XPUB,
@@ -136,6 +279,18 @@ export const XPubSchema: ObjectSchema = {
     secondary: {
       type: 'string', optional: true
     }
+  },
+}
+
+export const ReceiverSchema: ObjectSchema = {
+  name: Receiver,
+  properties: {
+    name: {
+      type: 'string', optional: true
+    },
+    amount: {
+      type: 'int', optional: true
+    },
   },
 }
 
@@ -189,7 +344,22 @@ export const TransactionSchema: ObjectSchema = {
     address: {
       type: 'string', optional: true
     },
+    type: {
+      type: 'string', optional: true
+    },
+    sender: {
+      type: 'string', optional: true
+    },
+    receivers: {
+      type: 'list', objectType: Receiver, default: []
+    },
+    isNew: {
+      type: 'bool', default: false
+    },
     notes: {
+      type: 'string', optional: true
+    },
+    tags: {
       type: 'string?[]', default: []
     }
   },
@@ -230,6 +400,21 @@ export const UTXOStatusSchema: ObjectSchema = {
   },
 }
 
+export const WalletSecuritySchema: ObjectSchema = {
+  name: WalletSecurity,
+  properties: {
+    questionId: {
+      type: 'string', optional: true,
+    },
+    question: {
+      type: 'string', optional: true,
+    },
+    answer: {
+      type: 'string', optional: true,
+    },
+  },
+}
+
 export const WalletSchema: ObjectSchema = {
   name: Wallet,
   primaryKey: 'walletId',
@@ -237,17 +422,33 @@ export const WalletSchema: ObjectSchema = {
     walletId: {
       type: 'string', indexed: true
     },
+    walletName: {
+      type: 'string', optional: true,
+    },
     primaryMnemonic: {
       type: 'string', optional: true,
     },
-    secondaryMemonic: {
+    primarySeed: {
       type: 'string', optional: true,
     },
+    secondaryXpub: {
+      type: 'string', optional: true,
+    },
+    smShare: {
+      type: 'string', default: '',
+    },
     details2FA: {
-      type: Details2FA
+      type: Details2FA, optional: true
     },
     accountIds: {
-      type: 'list', objectType: AccountId, default: []
+      type: 'string?[]',
+      optional: true
+    },
+    security: {
+      type: WalletSecurity, optional: true
+    },
+    version: {
+      type: 'string', optional: true
     },
     tags: {
       type: 'string?[]',
@@ -260,8 +461,328 @@ export const Details2FASchema: ObjectSchema = {
   name: Details2FA,
   properties: {
     bithyveXpub: 'string',
-    secondaryXpub: 'string',
     twoFAKey: 'string',
+  },
+}
+
+export const PrimaryStreamDataSchema: ObjectSchema = {
+  name: PrimaryStreamData,
+  primaryKey: 'walletID',
+  properties: {
+    walletID: {
+      type: 'string', indexed: true
+    },
+    walletName: {
+      type: 'string', optional: true
+    },
+    FCM : {
+      type: 'string', optional: true
+    },
+    paymentAddresses: {
+      type: 'string?[]', optional: true
+    },
+    contactDetails: {
+      type: ContactDetails, optional: true
+    },
+  },
+}
+
+
+export const MetaSchema: ObjectSchema = {
+  name: Meta,
+  properties: {
+    version: {
+      type: 'string', optional: true
+    },
+    validator: {
+      type: 'string', optional: true
+    },
+    index: {
+      type: 'int', optional: true
+    },
+    walletId: {
+      type: 'string', optional: true
+    },
+    timestamp: {
+      type: 'string', optional: true
+    },
+    reshareVersion: {
+      type: 'int', optional: true
+    },
+    questionId: {
+      type: 'string', optional: true
+    },
+    question: {
+      type: 'string', optional: true
+    },
+    guardian: {
+      type: 'string', optional: true
+    },
+    encryptedKeeperInfo: {
+      type: 'string', optional: true
+    },
+    scheme: {
+      type: 'string', optional: true
+    }
+  },
+}
+
+export const EncryptedShareSchema: ObjectSchema = {
+  name: EncryptedShare,
+  properties: {
+    pmShare: {
+      type: 'string', optional: true
+    },
+    smShare: {
+      type: 'string', optional: true
+    },
+    bhXpub: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const MetaShareSchema: ObjectSchema = {
+  name: MetaShare,
+  properties: {
+    encryptedShare: {
+      type: EncryptedShare, optional: true
+    },
+    shareId: {
+      type: 'string', optional: true
+    },
+    meta: {
+      type: Meta, optional: true
+    }
+  },
+}
+
+export const KeeperInfoSchema: ObjectSchema = {
+  name: KeeperInfo,
+  properties: {
+    shareId: {
+      type: 'string', optional: true
+    },
+    name: {
+      type: 'string', optional: true
+    },
+    type: {
+      type: 'string', optional: true
+    },
+    scheme: {
+      type: 'string', optional: true
+    },
+    currentLevel: {
+      type: 'int', optional: true
+    },
+    createdAt: {
+      type: 'int', optional: true
+    },
+    sharePosition: {
+      type: 'int', optional: true
+    },
+    // data: { TODO add type
+    //   type: 'int', optional: true
+    // },
+    channelKey: {
+      type: 'string', optional: true
+    }
+  },
+}
+
+export const BackupStreamDataSchema: ObjectSchema = {
+  name: BackupStreamData,
+  properties: {
+    primaryMnemonicShard: {
+      type: MetaShare, optional: true
+    },
+    keeperInfo: {
+      type: 'list', objectType: KeeperInfo, default: []
+    },
+  },
+}
+
+export const SecondaryStreamDataSchema: ObjectSchema = {
+  name: SecondaryStreamData,
+  properties: {
+    // secondaryMnemonicShard: { TODO add type
+    //   type: 'string', optional: true
+    // },
+    bhXpub: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const UnecryptedStreamDataSchema: ObjectSchema = {
+  name: UnecryptedStreamData,
+  primaryKey: 'streamId',
+  properties: {
+    streamId: {
+      type: 'string', indexed: true
+    },
+    primaryData: {
+      type: PrimaryStreamData, optional: true
+    }, secondaryData: {
+      type: SecondaryStreamData, optional: true
+    },
+    backupData: {
+      type: BackupStreamData, optional: true
+    },
+    metaData: {
+      type: StreamsMetaData, optional: true
+    }
+  },
+}
+
+export const StreamsMetaDataFlagsSchema: ObjectSchema = {
+  name: StreamsMetaDataFlags,
+  properties: {
+    active: {
+      type: 'bool', optional: true
+    },
+    lastSeen: {
+      type: 'int', optional: true
+    },
+    newData: {
+      type: 'bool', optional: true
+    }
+  },
+}
+
+export const StreamsMetaDataSchema: ObjectSchema = {
+  name: StreamsMetaData,
+  properties: {
+    flags: {
+      type: StreamsMetaDataFlags, optional: true
+    },
+    version: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const StreamsSchema: ObjectSchema = {
+  name: Streams,
+  primaryKey: 'streamId',
+  properties: {
+    streamId: {
+      type: 'string', indexed: true
+    },
+    primaryEncryptedData: {
+      type: 'string', optional: true,
+    },
+    secondaryEncryptedData: {
+      type: 'string', optional: true,
+    },
+    encryptedBackupData: {
+      type: 'string', optional: true,
+    },
+    metaData: {
+      type: StreamsMetaData, optional: true
+    }
+  },
+}
+
+export const ContactDetailsSchema: ObjectSchema = {
+  name: ContactDetails,
+  primaryKey: 'id',
+  properties: {
+    id: {
+      type: 'string', indexed: true
+    },
+    contactName: {
+      type: 'string', optional: true,
+    },
+    image: {
+      type: ContactImage, optional: true,
+    },
+  },
+}
+
+export const ContactImageSchema: ObjectSchema = {
+  name: ContactImage,
+  properties: {
+    uri: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const TrustedContactSchema: ObjectSchema = {
+  name: TrustedContact,
+  primaryKey: 'channelKey',
+  properties: {
+    channelKey: {
+      type: 'string', indexed: true,
+    },
+    contactDetails: {
+      type: ContactDetails, optional: true
+    },
+    relationType: {
+      type: 'string', optional: true,
+    },
+    permanentChannelAddress: {
+      type: 'string', optional: true,
+    },
+    secondaryChannelKey: {
+      type: 'string', optional: true,
+    },
+    streamId: {
+      type: 'string', optional: true,
+    },
+    walletID: {
+      type: 'string', optional: true,
+    },
+    permanentChannel: {
+      type: 'list', objectType: Streams, default: []
+    },
+    unencryptedPermanentChannel: {
+      type: 'list', objectType: UnecryptedStreamData, default: []
+    },
+    contactsSecondaryChannelKey: {
+      type: 'string', optional: true,
+    },
+    isActive: {
+      type: 'bool', optional: true,
+    },
+    hasNewData: {
+      type: 'bool', optional: true,
+    },
+  },
+}
+
+export const S3MetaShareSchema: ObjectSchema = {
+  name: S3MetaShare,
+  //primaryKey: 'shareId',
+  properties: {
+    shareId: {
+      type: 'string', optional: true
+    },
+    encryptedShare: {
+      type: EncryptedShare, optional: true
+    },
+    meta:{
+      type: Meta, optional: true
+    },
+  },
+}
+
+export const BHRSchemaSchema: ObjectSchema = {
+  name: BHR,
+  properties: {
+    encryptedSecretsKeeper: {
+      type: 'string?[]', optional: true
+    },
+    metaSharesKeeper: {
+      type: 'list', objectType: S3MetaShare, default: []
+    },
+    encryptedSMSecretsKeeper: {
+      type: 'string?[]', optional: true
+    },
+    oldMetaSharesKeeper:{
+      type: 'list', objectType: S3MetaShare, default: []
+    },
   },
 }
 
@@ -276,4 +797,19 @@ export default {
   Network,
   XPUB,
   AccountId,
+  ContactDetails,
+  TrustedContact,
+  Streams,
+  StreamsMetaData,
+  UnecryptedStreamData,
+  PrimaryStreamData,
+  SecondaryStreamData,
+  BackupStreamData,
+  MetaShare,
+  EncryptedShare,
+  Meta,
+  KeeperInfo,
+  WalletSecurity,
+  BHR,
+  S3MetaShare,
 }

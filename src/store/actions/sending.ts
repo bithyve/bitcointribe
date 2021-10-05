@@ -139,11 +139,23 @@ export const executeSendStage1 = (
 
 export interface SendStage1ExecutedAction extends Action {
   type: typeof SEND_STAGE1_EXECUTED;
-  payload: {successful: boolean, carryOver?: { txPrerequisites?: TransactionPrerequisite }, err?: string };
+  payload: {successful: boolean, carryOver?: {
+    txPrerequisites?: TransactionPrerequisite,
+    recipients?: {
+    address: string;
+    amount: number;
+    name?: string
+  }[] }, err?: string };
 }
 
 export const sendStage1Executed = (
-  payload: {successful: boolean, carryOver?: { txPrerequisites?: TransactionPrerequisite }, err?: string },
+  payload: {successful: boolean, carryOver?: {
+    txPrerequisites?: TransactionPrerequisite,
+    recipients: {
+    address: string;
+    amount: number;
+    name?: string
+  }[] }, err?: string },
 ): SendStage1ExecutedAction => {
   return {
     type: SEND_STAGE1_EXECUTED,
@@ -193,6 +205,7 @@ export const executeSendStage2 = (
     accountShell: AccountShell;
     txnPriority: TxPriority,
     token?: number,
+    note?: string
     },
 ): ExecuteSendStage2Action => {
   return {

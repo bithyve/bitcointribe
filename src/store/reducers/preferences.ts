@@ -10,11 +10,11 @@ import {
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
   UPDATE_APPLICATION_STATUS,
-  UPDATE_LAST_SEEN,
   CARD_DATA,
   SET_WALLET_ID,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
   IS_PERMISSION_SET,
+  UPDATE_LAST_SEEN,
 } from '../actions/preferences'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import ip, { chain } from 'icepick'

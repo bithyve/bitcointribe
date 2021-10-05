@@ -18,6 +18,7 @@ import TabNavigator from '../../TabNavigator'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import Launch from '../../../pages/Launch'
@@ -25,6 +26,9 @@ import Login from '../../../pages/Login'
 import ReLogin from '../../../pages/ReLogin'
 import Intermediate from '../../../pages/Intermediate'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -61,6 +65,12 @@ const FriendsAndFamily = createStackNavigator(
     },
     AddContactSendRequest: {
       screen: AddContactSendRequest,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    QrAndLink: {
+      screen: QrAndLink,
       navigationOptions: {
         header: null,
       },

@@ -1,36 +1,57 @@
 import { NavigationActions, StackActions } from 'react-navigation'
 
 
-export const goHomeAction = NavigationActions.navigate( {
-  routeName: 'Home',
-} )
+
+export const goHomeAction = ( ) => {
+  const resetAction = StackActions.reset( {
+    index: 0,
+    actions: [
+      NavigationActions.navigate( {
+        routeName: 'Landing'
+      } )
+    ],
+  } )
+
+  return resetAction
+}
 
 
 export const resetToHomeAction = ( params = {
 } ) => {
+  return  NavigationActions.navigate( {
+    routeName: 'Home',
+    params,
+  } )
+}
+
+export const resetStackToAccountDetails = ( params ) => {
   return StackActions.reset( {
-    key: null,
     index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Home',
-        params,
+        routeName: 'Landing',
+        action: NavigationActions.navigate( {
+          routeName: 'AccountDetails',
+          params,
+        } ),
       } ),
     ],
   } )
 }
 
-
-export const resetStackToAccountDetails = ( params ) => {
+export const resetStackToAccountDetailsSendScreen = ( params ) => {
   return StackActions.reset( {
-    index: 1,
+    index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Home'
-      } ),
-      NavigationActions.navigate( {
-        routeName: 'AccountDetails',
-        params,
+        routeName: 'Landing',
+        action: NavigationActions.navigate( {
+          routeName: 'AccountDetails',
+          action: NavigationActions.navigate( {
+            routeName: 'Send',
+            params,
+          } ),
+        } ),
       } ),
     ],
   } )
@@ -38,21 +59,21 @@ export const resetStackToAccountDetails = ( params ) => {
 
 export const resetStackToSend = ( params ) => {
   return StackActions.reset( {
-    index: 1,
+    index: 0,
     actions: [
       NavigationActions.navigate( {
-        routeName: 'Home'
-      } ),
-      NavigationActions.navigate( {
-        routeName: 'AccountDetails',
-        action: NavigationActions.navigate( {
-          routeName: 'Send',
+        routeName: 'Landing',
+        action:NavigationActions.navigate( {
+          routeName: 'AccountDetails',
           action: NavigationActions.navigate( {
-            routeName: 'SentAmountForContactForm',
-            params,
+            routeName: 'Send',
+            action: NavigationActions.navigate( {
+              routeName: 'SentAmountForContactForm',
+              params,
+            } ),
           } ),
         } ),
-      } ),
+      } )
     ]
   } )
 }

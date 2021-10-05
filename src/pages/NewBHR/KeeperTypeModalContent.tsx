@@ -21,12 +21,6 @@ export default function KeeperTypeModalContents( props ) {
       image: require( '../../assets/images/icons/icon_contact.png' ),
     },
     {
-      type: 'existingContact',
-      name: 'Backup with existing contact',
-      info: 'Backup the Recovery Key with a existing contact  ',
-      image: require( '../../assets/images/icons/icon_contact.png' ),
-    },
-    {
       type: 'device',
       name: 'Backup on a device',
       info: 'Use another device running Hexa to secure the Recovery Key',
@@ -44,9 +38,9 @@ export default function KeeperTypeModalContents( props ) {
     name: '',
   } )
   const levelHealth: LevelHealthInterface[] = useSelector(
-    ( state ) => state.health.levelHealth
+    ( state ) => state.bhr.levelHealth
   )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const [ completedKeeperType, setCompletedKeeperType ] = useState( [] )
 
   const restrictChangeToContactType = () => {
@@ -73,14 +67,14 @@ export default function KeeperTypeModalContents( props ) {
         if (
           props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'contact' &&
+          ( element2.shareType == 'contact' || element2.shareType == 'existingContact' ) &&
           props.keeper.shareId != element2.shareId
         ) {
           contactCount++
         } else if (
           !props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'contact'
+          ( element2.shareType == 'contact' || element2.shareType == 'existingContact' )
         )
           contactCount++
         if (
@@ -99,14 +93,14 @@ export default function KeeperTypeModalContents( props ) {
         if (
           props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'device' &&
+          ( element2.shareType == 'device' || element2.shareType == 'primaryDevice' ) &&
           props.keeper.shareId != element2.shareId
         ) {
           deviceCount++
         } else if (
           !props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'device'
+          ( element2.shareType == 'device' || element2.shareType == 'primaryDevice' )
         ) {
           deviceCount++
         }
@@ -114,7 +108,11 @@ export default function KeeperTypeModalContents( props ) {
     }
     if ( contactCount >= 2 ) completedKeeperType.push( 'contact' )
     if ( pdfCount >= 1 ) completedKeeperType.push( 'pdf' )
-    if ( deviceCount >= 2 ) completedKeeperType.push( 'device' )
+    if ( deviceCount >= 3 ) completedKeeperType.push( 'device' )
+    console.log( 'contactCount', contactCount )
+    console.log( 'pdfCount', pdfCount )
+    console.log( 'deviceCount', deviceCount )
+
     setCompletedKeeperType( completedKeeperType )
   }
 

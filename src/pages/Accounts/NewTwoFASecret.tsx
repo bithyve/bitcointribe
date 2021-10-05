@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
   Text,
@@ -8,30 +8,36 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
-} from 'react-native';
-import Fonts from '../../common/Fonts';
+} from 'react-native'
+import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import QRCode from 'react-native-qrcode-svg';
-import CopyThisText from '../../components/CopyThisText';
-import Colors from '../../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import NavStyles from '../../common/Styles/NavStyles';
+} from 'react-native-responsive-screen'
+import QRCode from '../../components/QRCode'
+import CopyThisText from '../../components/CopyThisText'
+import Colors from '../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import NavStyles from '../../common/Styles/NavStyles'
 
 const NewTwoFASecret = props => {
-  const [receivingAddress, setReceivingAddress] = useState('2N6ubBgDNrs9NnJGSF3gQBUwM7SwQtGQs2g');
+  const [ receivingAddress, setReceivingAddress ] = useState( '2N6ubBgDNrs9NnJGSF3gQBUwM7SwQtGQs2g' )
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
 
-      <View style={{ ...NavStyles.modalContainer, backgroundColor: Colors.white, marginTop: 10 }}>
+      <View style={{
+        ...NavStyles.modalContainer, backgroundColor: Colors.white, marginTop: 10
+      }}>
         <ScrollView style={styles.qrModalScrollView}>
           <View style={NavStyles.modalHeaderTitleView}>
             <View
-              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+              style={{
+                flex: 1, flexDirection: 'row', alignItems: 'center'
+              }}
             >
               <Text style={NavStyles.modalHeaderTitleText}>
                 2FA Key
@@ -49,16 +55,16 @@ const NewTwoFASecret = props => {
                   paddingBottom: 5
                 }}
                 onPress={() => {
-                  props.navigation.pop(1);
+                  props.navigation.pop( 1 )
                 }}
               >
                 <Text
                   onPress={() => {
-                    props.navigation.pop(1);
+                    props.navigation.pop( 1 )
                   }}
                   style={{
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue( 12 ),
                     marginLeft: 'auto',
                   }}
                 >
@@ -74,8 +80,8 @@ const NewTwoFASecret = props => {
                 <ActivityIndicator size="large" />
               </View>
             ) : (
-                <QRCode value={receivingAddress} size={hp('27%')} />
-              )}
+              <QRCode title="Two FA key" value={receivingAddress} size={hp( '27%' )} />
+            )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
           </View>
 
@@ -92,13 +98,13 @@ const NewTwoFASecret = props => {
             <Text
               style={{
                 color: Colors.blue,
-                fontSize: RFValue(13),
+                fontSize: RFValue( 13 ),
                 marginBottom: 2,
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
               Scan in Authenticator
-              </Text>
+            </Text>
             {/* <Text style={styles.bottomNoteInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
               </Text> */}
@@ -108,7 +114,7 @@ const NewTwoFASecret = props => {
         <View
           style={{
             marginTop: 'auto',
-            marginBottom: hp('0.2%'),
+            marginBottom: hp( '0.2%' ),
           }}
         >
           {/* <BottomInfoBox
@@ -120,24 +126,28 @@ const NewTwoFASecret = props => {
         </View>
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
-  loader: { height: hp('27%'), justifyContent: 'center' },
+const styles = StyleSheet.create( {
+  loader: {
+    height: hp( '27%' ), justifyContent: 'center'
+  },
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('2%'),
+    paddingBottom: hp( '2%' ),
     elevation: 10,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0, height: 2
+    },
   },
   confirmButtonView: {
-    width: wp('40%'),
-    height: wp('13%'),
+    width: wp( '40%' ),
+    height: wp( '13%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -148,9 +158,9 @@ const styles = StyleSheet.create({
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
-});
+} )
 
-export default NewTwoFASecret;
+export default NewTwoFASecret

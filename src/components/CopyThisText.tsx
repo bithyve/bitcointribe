@@ -1,48 +1,56 @@
-import React from 'react';
+import React from 'react'
 import {
   View,
   Image,
   Text,
-} from 'react-native';
+} from 'react-native'
 import Clipboard from '@react-native-clipboard/clipboard'
-import Colors from '../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Toast from '../components/Toast';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+import Colors from '../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Toast from '../components/Toast'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+} from 'react-native-responsive-screen'
+import { translations } from '../common/content/LocContext'
 
-export default function CopyThisText(props) {
+export default function CopyThisText( props ) {
+  const common  = translations[ 'common' ]
+
   function writeToClipboard() {
-      Clipboard.setString(props.text);
-      Toast('Copied Successfully');
+    Clipboard.setString( props.text )
+    Toast( common.copied )
   }
 
   return (
     <View
       style={{
-        marginTop: 30,
+        marginVertical: hp( 3 ),
+        // marginTop: 30,
         paddingLeft: 25,
         paddingRight: 25,
         marginLeft:25, marginRight:25,
-        alignItems:'center', justifyContent:'center'
+        alignItems:'center', justifyContent:'center',
+        // flex: 1,
+        // width: '90%',
+        alignSelf: 'center'
       }}
     >
       <AppBottomSheetTouchableWrapper
-        onPress={() => (props.openLink ? props.openLink() : writeToClipboard())}
+        onPress={() => ( props.openLink ? props.openLink() : writeToClipboard() )}
         style={{
           flexDirection: 'row',
-          }}
+        }}
       >
         <View
           style={{
-            width:wp('78%'),
+            // flex: 1,
+            width:wp( '70%' ),
             backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.backgroundColor,
-            borderBottomLeftRadius: 8,
-            borderTopLeftRadius: 8,
-            height: wp('13%'),
+            borderBottomLeftRadius: wp( 3 ),
+            borderTopLeftRadius: wp( 3 ),
+            height: wp( props.height ? props.height : '13%' ),
             paddingLeft: 15,
             paddingRight: 15,
             justifyContent: 'center',
@@ -51,7 +59,7 @@ export default function CopyThisText(props) {
           <Text
             numberOfLines={1}
             style={{
-              fontSize: RFValue(13),
+              fontSize: RFValue( 13 ),
               color: Colors.lightBlue,
             }}
           >
@@ -60,25 +68,27 @@ export default function CopyThisText(props) {
         </View>
         <View
           style={{
-            width: wp('12%'),
-            height: wp('13%'),
+            width: wp( props.width ? props.width : '12%' ),
+            height: wp( props.height ? props.height : '13%' ),
             backgroundColor: Colors.borderColor,
-            borderTopRightRadius: 8,
-            borderBottomRightRadius: 8,
+            borderTopRightRadius: wp( 3 ),
+            borderBottomRightRadius: wp( 3 ),
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
           <Image
-            style={{ width: 18, height: props.openLink ? 18 : 20 }}
+            style={{
+              width: props.openLink ? wp( 6 ) : 18, height: props.openLink ? wp( 6 ) : 20
+            }}
             source={
               props.openLink
-                ? require('../assets/images/icons/openlink.png')
-                : require('../assets/images/icons/icon-copy.png')
+                ? require( '../assets/images/icons/openlink.png' )
+                : require( '../assets/images/icons/icon-copy.png' )
             }
           />
         </View>
       </AppBottomSheetTouchableWrapper>
     </View>
-  );
+  )
 }

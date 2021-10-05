@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
@@ -14,6 +14,7 @@ import ImageStyles from '../../common/Styles/ImageStyles'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
 import { agoTextForLastSeen } from '../send/LastSeenActiveUtils'
+import {  LocalizationContext } from '../../common/content/LocContext'
 
 export type Props = {
   contact: ContactRecipientDescribing,
@@ -21,7 +22,10 @@ export type Props = {
 };
 
 const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, index }: Props ) => {
-
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
+  const lastSeenDays = agoTextForLastSeen( contact.lastSeenActive )
   const firstNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' )[ 0 ] + ' '
   }, [ contact ] )
@@ -67,19 +71,19 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
           style={styles.lastSeenText}
           numberOfLines={1}
         >
-          <Text>Last seen </Text>
+          <Text>{`${strings.lastSeen} `}</Text>
           {Number.isFinite( contact.lastSeenActive ) ? (
 
             <Text style={{
               fontFamily: Fonts.FiraSansMediumItalic
             }}>
-              {agoTextForLastSeen( contact.lastSeenActive )}
+              {lastSeenDays === 'today'? common.today : lastSeenDays}
             </Text>
           ) : (
             <Text style={{
               fontFamily: Fonts.FiraSansMediumItalic
             }}>
-              _unknown_
+              {common.unknown}
             </Text>
           )}
         </ListItem.Subtitle>
@@ -115,8 +119,9 @@ const styles = StyleSheet.create( {
   },
 
   avatarImage: {
-    ...ImageStyles.thumbnailImageMedium,
-    borderRadius: widthPercentageToDP( 12 )/2,
+    width: widthPercentageToDP( 13 ),
+    height: widthPercentageToDP( 13 ),
+    borderRadius: widthPercentageToDP( 13 )/2,
   },
 
   listItemTitle: {

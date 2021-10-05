@@ -59,11 +59,15 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 319
-        versionName "1.8.0"
+        versionCode 363
+        versionName "2.0.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false
     }
 
      signingConfigs {
@@ -94,7 +98,7 @@ android {
     productFlavors {
         production {
             minSdkVersion rootProject.ext.minSdkVersion
-            applicationId "io.hexawallet.hexa"
+            applicationId "io.hexawallet.hexa2"
             targetSdkVersion rootProject.ext.targetSdkVersion
             resValue "string", "build_config_package", "io.hexawallet.hexa"
         }
@@ -172,7 +176,6 @@ dependencies {
     implementation project(':react-native-tcp')
     implementation project(':react-native-os')
     implementation project(':react-native-svg')
-    implementation project(':react-native-cardview')
     implementation project(':react-native-video')
     implementation project(':react-native-device-info')
     implementation project(':react-native-randombytes')

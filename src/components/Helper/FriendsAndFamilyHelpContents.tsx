@@ -31,7 +31,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
             marginBottom: hp( '1%' ),
           }}
         >
-          Recovery Key with Friends and Family
+          Recovery Key with Friends & Family
         </Text>
       </AppBottomSheetTouchableWrapper>
       <View

@@ -5,16 +5,8 @@ import {
 } from 'react-navigation-stack'
 import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
 import ReLogin from '../../../pages/ReLogin'
-import ManageBackup from '../../../pages/ManageBackup'
 import CustodianRequestOTP from '../../../pages/CustodianRequest/CustodianRequestOTP'
 import CustodianRequestAccepted from '../../../pages/CustodianRequest/CustodianRequestAccepted'
-import SecondaryDevice from '../../../pages/ManageBackup/SecondaryDevice'
-import TrustedContacts from '../../../pages/ManageBackup/TrustedContacts'
-import HealthCheck from '../../../pages/HealthCheck'
-import SecondaryDeviceHealthCheck from '../../../pages/HealthCheck/SecondaryDeviceHealthCheck'
-import TrustedContactHealthCheck from '../../../pages/HealthCheck/TrustedContactHealthCheck'
-import NoteHealthCheck from '../../../pages/HealthCheck/NoteHealthCheck'
-import CloudHealthCheck from '../../../pages/HealthCheck/CloudHealthCheck'
 import SweepFundsFromExistingAccount from '../../../pages/RegenerateShare/SweepFundsFromExistingAccount'
 import NewWalletNameRegenerateShare from '../../../pages/RegenerateShare/NewWalletNameRegenerateShare'
 import NewWalletQuestionRegenerateShare from '../../../pages/RegenerateShare/NewWalletQuestionRegenerateShare'
@@ -23,11 +15,7 @@ import WalletCreationSuccess from '../../../pages/RegenerateShare/WalletCreation
 import SecureScan from '../../../pages/Accounts/SecureScan'
 import GoogleAuthenticatorOTP from '../../../pages/Accounts/GoogleAuthenticatorOTP'
 import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
-import SecondaryDeviceHistory from '../../../pages/ManageBackup/SecondaryDeviceHistory'
 import SecondaryDeviceHistoryNewBHR from '../../../pages/NewBHR/SecondaryDeviceHistoryNewBHR'
-import TrustedContactHistory from '../../../pages/ManageBackup/TrustedContactHistory'
-import PersonalCopyHistory from '../../../pages/ManageBackup/PersonalCopyHistory'
-import SecurityQuestionHistory from '../../../pages/ManageBackup/SecurityQuestionHistory'
 import SettingGetNewPin from '../../../pages/SettingGetNewPin'
 import ContactsListForAssociateContact from '../../../pages/CustodianRequest/ContactsListForAssociateContact'
 import NewTwoFASecret from '../../../pages/Accounts/NewTwoFASecret'
@@ -36,6 +24,7 @@ import UpdateApp from '../../../pages/UpdateApp'
 import SendRequest from '../../../pages/Contacts/SendRequest'
 import VoucherScanner from '../../../pages/FastBitcoin/VoucherScanner'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Receive from '../../../pages/Accounts/Receive'
 import PairNewWallet from '../../../pages/FastBitcoin/PairNewWallet'
@@ -44,7 +33,6 @@ import NewOwnQuestions from '../../../pages/NewOwnQuestions'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
-
 import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
 import SettingsContents from '../../../pages/SettingsContents'
@@ -55,16 +43,9 @@ import SweepConfirmation from '../../../pages/SweepFunds/SweepConfirmation'
 import ScanRecoveryKey from '../../../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
 import UpgradeBackup from '../../../pages/UpgradeBackupWithKeeper/UpgradeBackup'
 import ConfirmKeys from '../../../pages/UpgradeBackupWithKeeper/ConfirmKeys'
-import ManageBackupUpgradeSecurity from '../../../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity'
-// import ManageBackupKeeper from '../../../pages/Keeper/ManageBackup';
-import ManageBackupNewBHR from '../../../pages/NewBHR/ManageBackupNewBHR'
-// import SecurityQuestionHistoryKeeper from '../../../pages/Keeper/SecurityQuestionHistory';
+import ManageBackupNewBHR from '../../../pages/NewBHR/ManageBackup'
 import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestionHistory'
-// import KeeperFeatures from "../../../pages/Keeper/KeeperFeatures";
-// import TrustedContactHistoryKeeper from '../../../pages/Keeper/TrustedContactHistoryKeeper';
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
-// import KeeperDeviceHistory from '../../../pages/Keeper/KeeperDeviceHistory';
-// import PersonalCopyHistoryKeeper from '../../../pages/Keeper/PersonalCopyHistory';
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
 import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
@@ -72,6 +53,9 @@ import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import Header from '../Header'
 import QRStack from '../home/QRStack'
+import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
+import  FNFToKeeper from '../../../pages/NewBHR/FNFToKeeper'
+import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
@@ -110,16 +94,8 @@ const SecurityStack = createStackNavigator(
         header: null,
       },
     },
-    ManageBackup,
-    SecondaryDevice,
-    TrustedContacts,
     CustodianRequestOTP,
     CustodianRequestAccepted,
-    HealthCheck,
-    SecondaryDeviceHealthCheck,
-    TrustedContactHealthCheck,
-    NoteHealthCheck,
-    CloudHealthCheck,
     SweepFundsFromExistingAccount,
     NewWalletNameRegenerateShare,
     NewWalletQuestionRegenerateShare,
@@ -127,11 +103,7 @@ const SecurityStack = createStackNavigator(
     WalletCreationSuccess,
     SecureScan,
     GoogleAuthenticatorOTP,
-    SecondaryDeviceHistory,
     SecondaryDeviceHistoryNewBHR,
-    TrustedContactHistory,
-    PersonalCopyHistory,
-    SecurityQuestionHistory,
     SettingGetNewPin,
     ContactsListForAssociateContact,
     NewTwoFASecret,
@@ -139,6 +111,7 @@ const SecurityStack = createStackNavigator(
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
+    QrAndLink,
     ContactDetails,
     Receive,
     PairNewWallet,
@@ -151,6 +124,13 @@ const SecurityStack = createStackNavigator(
     TrustedContactHistoryNewBHR,
     // KeeperDeviceHistory,
     // PersonalCopyHistoryKeeper,
+    FNFToKeeper,
+    AddContact: {
+      screen: AddContactAddressBook,
+      navigationOptions: {
+        header: null,
+      },
+    },
     PersonalCopyHistoryNewBHR,
     CloudBackupHistory,
     NewOwnQuestions,
@@ -164,7 +144,6 @@ const SecurityStack = createStackNavigator(
     ScanRecoveryKey,
     UpgradeBackup,
     ConfirmKeys,
-    ManageBackupUpgradeSecurity,
     TwoFAValidation,
     TwoFASetup: {
       screen: TwoFASetup,
@@ -186,6 +165,7 @@ const SecurityStack = createStackNavigator(
     },
     RequestKeyFromContact,
     TrustedContactNewBHR,
+    SetNewPassword
   },
   {
     headerLayoutPreset: 'center',
@@ -193,7 +173,6 @@ const SecurityStack = createStackNavigator(
       header: null
     },
     navigationOptions: ( { navigation } ) => {
-
       let tabBarVisible = false
       if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
         tabBarVisible = true

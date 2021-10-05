@@ -9,7 +9,7 @@
 #import <UMCore/UMModuleRegistry.h>
 #import <UMReactNativeAdapter/UMNativeModulesProxy.h>
 #import <UMReactNativeAdapter/UMModuleRegistryAdapter.h>
-#import "RecentViewController.h"
+#import "BackgroundViewController.h"
 
 // react-native-push-notification-ios
 #import <Firebase.h>
@@ -142,7 +142,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
  
     //UIViewController *blankViewController = [UIViewController new];
     //blankViewController.view.backgroundColor = [UIColor redColor];
-  RecentViewController *blankViewController = [RecentViewController new];
+  BackgroundViewController *blankViewController = [BackgroundViewController new];
   //blankViewController.view.backgroundColor = [UIColor blueColor];
 
     // Pass NO for the animated parameter. Any animation will not complete

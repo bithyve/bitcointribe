@@ -22,6 +22,7 @@ export default class DonationSubAccountInfo
 implements DonationSubAccountDescribing {
   id: string;
   xPub: string;
+  isUsable: boolean;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -53,6 +54,7 @@ implements DonationSubAccountDescribing {
   constructor( {
     id = uuid(),
     xPub = null,
+    isUsable,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = '',
@@ -71,6 +73,7 @@ implements DonationSubAccountDescribing {
   }: ConstructorProps ) {
     this.id = id
     this.xPub = xPub
+    this.isUsable = isUsable
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle

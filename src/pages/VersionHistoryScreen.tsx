@@ -14,22 +14,18 @@ import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native-gesture-handler'
-import DeviceInfo from 'react-native-device-info'
-import { useDispatch, useSelector } from 'react-redux'
-import moment from 'moment'
+import { useSelector } from 'react-redux'
 import idx from 'idx'
-import { type } from 'os'
 import { getVersions } from '../common/utilities'
 
 
 export default function VersionHistoryScreen( props ) {
   const versionHistory = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
- const restoreVersions = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) ) 
- 
- const [ SelectedOption, setSelectedOption ] = useState( 0 );
-  const [ isDataSet, setIsDataSet ] = useState(false)
+  const restoreVersions = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) )
 
-  const dispatch = useDispatch()
+  const [ SelectedOption, setSelectedOption ] = useState( 0 )
+  const [ isDataSet, setIsDataSet ] = useState( false )
+
 
   const SelectOption = ( Id ) => {
     if ( Id == SelectedOption ) {
@@ -38,19 +34,19 @@ export default function VersionHistoryScreen( props ) {
       setSelectedOption( Id )
     }
   }
-  const [ data, setData ] = useState([])
+  const [ data, setData ] = useState( [] )
 
   useEffect( () => {
-    let versions = getVersions(versionHistory, restoreVersions);
-    if(versions.length){
-    setData( versions )
-    setIsDataSet(!isDataSet);
-    SelectOption( versions.length )}
+    // eslint-disable-next-line prefer-const
+    let versions = getVersions( versionHistory, restoreVersions )
+    if( versions.length ){
+      setData( versions )
+      setIsDataSet( !isDataSet )
+      SelectOption( versions.length )}
   }, [] )
 
 
   return (
-    
     <SafeAreaView style={{
       flex: 1
     }}>
@@ -61,7 +57,7 @@ export default function VersionHistoryScreen( props ) {
           }}>
             <ScrollView style={{
             }}>
-              {data.map(value => {
+              {data.map( value => {
                 if ( value && SelectedOption == parseInt( value.id ) ) {
                   return (
                     <TouchableOpacity

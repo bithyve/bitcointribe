@@ -6,6 +6,7 @@ import { Account, AccountType, ScannedAddressKind } from '../../bitcoin/utilitie
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import AccountShell from '../../common/data/models/AccountShell'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 const SAMPLE_ADDRESS = '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8'
 
@@ -32,7 +33,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
 
   function handleTextChange( newValue: string ) {
     const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( newValue.trim(), network )
-
+    setRecipientAddress( newValue )
     switch ( scannedAddressKind ) {
         case ScannedAddressKind.ADDRESS:
           onAddressEntered( newValue )
@@ -66,7 +67,15 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
         }}
         numberOfLines={1}
       />
-
+      {isAddressInvalid && (
+        <View style={{
+          marginLeft: 'auto', marginRight: widthPercentageToDP( 5 )
+        }}>
+          <Text style={FormStyles.errorText}>
+            Enter correct address
+          </Text>
+        </View>
+      )}
       {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT && (
         <TouchableOpacity
           onPress={() => {
@@ -76,21 +85,15 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
             padding: 6, marginLeft: 'auto'
           }}
         >
-          <Text style={FormStyles.hintText}>
+          <Text style={[ FormStyles.hintText, {
+            marginRight: widthPercentageToDP( 4 )
+          } ]}>
             Send it to a sample address!
           </Text>
         </TouchableOpacity>
       )}
 
-      {isAddressInvalid && (
-        <View style={{
-          marginLeft: 'auto'
-        }}>
-          <Text style={FormStyles.errorText}>
-            Enter correct address
-          </Text>
-        </View>
-      )}
+
     </View>
   )
 }

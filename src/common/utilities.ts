@@ -1,4 +1,5 @@
-import { KeeperInfoInterface, LevelData, LevelHealthInterface, LevelInfo, Trusted_Contacts } from '../bitcoin/utilities/Interface'
+import { Platform } from 'react-native'
+import { KeeperInfoInterface, LevelData, LevelDataObj, LevelHealthInterface, LevelInfo, Trusted_Contacts } from '../bitcoin/utilities/Interface'
 import { makeContactRecipientDescription } from '../utils/sending/RecipientFactories'
 import ContactTrustKind from './data/enums/ContactTrustKind'
 
@@ -82,35 +83,49 @@ export const checkLevelHealth = (
   levelHealthVar: LevelHealthInterface[],
 ) => {
   try {
-    if( levelHealthVar.length == 1 ){
-      const levelInfo = levelHealthVar[ 0 ].levelInfo
-      const elements =  arrayChunks( levelInfo, 2 )
-      for ( let j = 0; j < elements.length; j++ ) {
-        const element = elements[ j ]
-        levelData[ j ].keeper1 = element[ 0 ]
-        levelData[ j ].keeper2 = element[ 1 ]
-        levelData[ j ].status = checkStatus( levelInfo )
-      }
-    } else {
-      const levelInfo0 = levelHealthVar[ 0 ].levelInfo
-      const levelInfo1 = levelHealthVar[ 1 ].levelInfo
-      const elements0 =  arrayChunks( levelInfo0, 2 )
-      const elements1 =  arrayChunks( levelInfo1, 2 )
-      for ( let j = elements1.length - 1; j >= 0; j-- ) {
-        const element0 = elements0[ j ] ? elements0[ j ] : null
-        const element1 = elements1[ j ]
-        levelData[ j ].keeper1 = element0 && element0[ 0 ] ? element0[ 0 ] : levelData[ j ].keeper1
-        levelData[ j ].keeper2 = element0 && element0[ 1 ] ? element0[ 1 ] : levelData[ j ].keeper2
-        levelData[ j ].status = checkStatus( levelInfo1 )
-        if( elements1.length == 3 && j == 2 ) {
-          levelData[ j ].keeper1 = element1[ 0 ]
-          levelData[ j ].keeper2 = element1[ 1 ]
-          levelData[ j ].status = checkStatus( levelInfo1 )
+    if( levelHealthVar.length ){
+      if( levelHealthVar.length == 1 ){
+        const levelInfo = levelHealthVar[ 0 ].levelInfo
+        const elements =  arrayChunks( levelInfo, 2 )
+        for ( let j = 0; j < elements.length; j++ ) {
+          const element = elements[ j ]
+          levelData[ j ].keeper1 = element[ 0 ]
+          levelData[ j ].keeper2 = element[ 1 ]
+          levelData[ j ].status = checkStatus( levelInfo )
         }
-        if( elements1.length == 2 && j == 1 ) {
-          levelData[ j ].keeper1 = element1[ 0 ]
-          levelData[ j ].keeper2 = element1[ 1 ]
+      } else {
+        const levelInfo0 = levelHealthVar[ 0 ].levelInfo
+        const levelInfo1 = levelHealthVar[ 1 ].levelInfo
+        const elements0 =  arrayChunks( levelInfo0, 2 )
+        const elements1 =  arrayChunks( levelInfo1, 2 )
+        for ( let j = elements1.length - 1; j >= 0; j-- ) {
+          const element0 = elements0[ j ] ? elements0[ j ] : null
+          const element1 = elements1[ j ]
+          levelData[ j ].keeper1 = element0 && element0[ 0 ] ? element0[ 0 ] : levelData[ j ].keeper1
+          if( j == 0 && ( elements1.length == 2 && elements1[ 1 ][ 0 ].updatedAt > 0 && elements1[ 1 ][ 1 ].updatedAt > 0 ) || ( elements1.length == 3 && elements1[ 1 ][ 0 ].updatedAt > 0 && elements1[ 1 ][ 1 ].updatedAt > 0 && elements1[ 2 ][ 0 ].updatedAt > 0 && levelInfo1[ 2 ][ 1 ].updatedAt > 0 ) ) {
+            const object: LevelDataObj = {
+              shareId: elements1[ 0 ][ 1 ].shareId,
+              name: elements1[ 0 ][ 1 ].name,
+              updatedAt: elements0[ 0 ][ 1 ].updatedAt,
+              status: 'notAccessible',
+              shareType: elements1[ 0 ][ 1 ].shareType,
+              reshareVersion: elements1[ 0 ][ 1 ].reshareVersion
+            }
+            levelData[ 0 ].keeper2 = levelInfo1[ 1 ] ? object : levelData[ j ].keeper2
+          } else {
+            levelData[ j ].keeper2 = element0 && element0[ 1 ] ? element0[ 1 ] : levelData[ j ].keeper2
+          }
           levelData[ j ].status = checkStatus( levelInfo1 )
+          if( elements1.length == 3 && j == 2 ) {
+            levelData[ j ].keeper1 = element1[ 0 ]
+            levelData[ j ].keeper2 = element1[ 1 ]
+            levelData[ j ].status = checkStatus( levelInfo1 )
+          }
+          if( elements1.length == 2 && j == 1 ) {
+            levelData[ j ].keeper1 = element1[ 0 ]
+            levelData[ j ].keeper2 = element1[ 1 ]
+            levelData[ j ].status = checkStatus( levelInfo1 )
+          }
         }
       }
     }
@@ -144,11 +159,11 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
       const elementJ = levelHealthVar[ j ]
       for ( let i = 0; i < elementJ.levelInfo.length; i++ ) {
         const element = elementJ.levelInfo[ i ]
-        const channelKey = element.shareType && ( element.shareType == 'contact' || element.shareType == 'device' ) ? keeperInfo.find( value  => value.shareId == element.shareId ).channelKey : null
-
         const selectedKeeperInfo: KeeperInfoInterface = keeperInfo.find( value  => value.shareId == element.shareId )
+        const channelKey = selectedKeeperInfo && selectedKeeperInfo.channelKey ? selectedKeeperInfo.channelKey : null
         const data = channelKey ? {
-          index: selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length && selectedKeeperInfo.data.index ? selectedKeeperInfo.data.index : -1, ...makeContactRecipientDescription( channelKey, trustedContact[ channelKey ], ContactTrustKind.KEEPER_OF_USER )
+          index: selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length && selectedKeeperInfo.data.index ? selectedKeeperInfo.data.index : -1, ...trustedContact[ channelKey ] ? makeContactRecipientDescription( channelKey, trustedContact[ channelKey ], ContactTrustKind.KEEPER_OF_USER ) : {
+          }
         } : selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length ? selectedKeeperInfo.data : {
         }
         if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
@@ -160,7 +175,7 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
   return levelHealthVar
 }
 
-export const getLevelInfoStatus = ( levelDataTemp ) => {
+export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
   const levelData: LevelData[] = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
@@ -175,33 +190,10 @@ export const getLevelInfoStatus = ( levelDataTemp ) => {
       levelData[ i ].status = 'bad'
     }
 
-    // Not SETUP
-    if( levelData[ i ].status == 'notSetup' ) {
-      levelData[ i ].note= 'Setup level to '+( i+1 )
-    }
-    if( levelData[ i ].status == 'bad' ) {
-      levelData[ i ].note= 'Backup needs your attention'
-    }
-    if( levelData[ i ].status == 'good' ) {
-      levelData[ i ].note= 'Backup Level 1 is secure, \nupgrade to Backup Level 2'
-    }
-    // BOTH ACCESSIBLE
-    if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
-      levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, \nupgrade to Backup Level 3' : 'Level is complete'
-    }
-    // ONLY ONE ACCESSIBLE
-    if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ||
-    ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
-      let name1 = ''; let name2 = ''
-      if( element.keeper1.status == 'notAccessible' ) name1 = element.keeper1.name
-      if( element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name
-      const name = name1 && name2 ? name1 + ' & ' + name2 : name1 && !name2 ? name1 : name2
-      levelData[ i ].note = name + ' need your attention.'
-    }
     const displayName1 = element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.displayedName ? element.keeper1.data.displayedName : ''
     const displayName2 = element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.displayedName ? element.keeper2.data.displayedName : ''
-    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name
-    levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : element.keeper2.name
+    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name ? element.keeper1.name : i == 0 && !element.keeper1.name ? 'Set Password' : ''
+    levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : element.keeper2.name ? element.keeper2.name : i == 0 && !element.keeper2.name ? Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive' : ''
   }
   return levelData
 }

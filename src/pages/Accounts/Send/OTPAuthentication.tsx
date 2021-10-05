@@ -23,7 +23,7 @@ import SendConfirmationContent from '../SendConfirmationContent'
 import { executeSendStage2, sendTxNotification } from '../../../store/actions/sending'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
-import {  refreshAccountShell } from '../../../store/actions/accounts'
+import {  refreshAccountShells } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
@@ -32,6 +32,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 
 export default function OTPAuthenticationScreen( { navigation } ) {
   const txnPriority = navigation.getParam( 'txnPriority' )
+  const note = navigation.getParam( 'note' )
   const [ Elevation, setElevation ] = useState( 10 )
   const [ token, setToken ] = useState( '' )
   const [ tokenArray, setTokenArray ] = useState( [ '' ] )
@@ -79,9 +80,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
         onPressOk={() => {
           dismissBottomSheet()
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          dispatch( refreshAccountShell( sourceAccountShell, {
-            autoSync: false,
-            hardRefresh: false,
+          dispatch( refreshAccountShells( [ sourceAccountShell ], {
           } ) )
           navigation.dispatch(
             resetStackToAccountDetails( {
@@ -369,7 +368,8 @@ export default function OTPAuthenticationScreen( { navigation } ) {
                 dispatch( executeSendStage2( {
                   accountShell: sourceAccountShell,
                   txnPriority,
-                  token: parseInt( token )
+                  token: parseInt( token ),
+                  note
                 } ) )
               }}
               style={{

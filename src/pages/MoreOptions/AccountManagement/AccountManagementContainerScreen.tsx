@@ -1,9 +1,9 @@
-import React, { useState, useMemo, createRef, useCallback, useEffect } from 'react'
-import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Platform, ScrollView } from 'react-native'
+import React, { useState, useMemo, useContext, useCallback, useEffect } from 'react'
+import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform, ScrollView, StatusBar } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
-import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateSubAccountSettings } from '../../../store/actions/accounts'
+import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import ButtonBlue from '../../../components/ButtonBlue'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
@@ -11,6 +11,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -22,7 +23,14 @@ import BottomSheet, { BottomSheetView, useBottomSheetModal } from '@gorhom/botto
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
-
+import ModalContainer from '../../../components/home/ModalContainer'
+import { resetStackToAccountDetails, resetToHomeAction } from '../../../navigation/actions/NavigationActions'
+import { NavigationActions, StackActions } from 'react-navigation'
+import { color } from 'react-native-reanimated'
+import CommonStyles from '../../../common/Styles/Styles'
+import HeaderTitle from '../../../components/HeaderTitle'
+import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -30,8 +38,10 @@ export type Props = {
 
 const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
+  const strings = translations[ 'accManagement' ]
   const originalAccountShells = useActiveAccountShells()
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
+  // const [ tempValue, setTempValue ] = useState( false )
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const [ orderedAccountShells, setOrderedAccountShells ] = useState( originalAccountShells )
   const [ hiddenAccountShells, setHiddenAccountShells ] = useState( [] )
@@ -39,6 +49,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ accountVisibility, setAccountVisibility ] = useState( null )
   const [ hasChangedOrder, setHasChangedOrder ] = useState( false )
   const [ selectedAccount, setSelectedAccount ] = useState( null )
+  const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
+  const [ successModel, showSuccessModel ] = useState( false )
+
+  const [ primarySubAccount, showPrimarySubAccount ] = useState( {
+  } )
+
   const getnewDraggableOrderedAccountShell = useMemo( () => {
     const newDraggableOrderedAccountShell = []
     if( originalAccountShells ){
@@ -96,9 +112,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [ hasChangedOrder ] )
 
   useEffect( () => {
-    if( hasAccountSettingsUpdateSucceeded === true && selectedAccount ){
+    if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
       dispatch( resetAccountUpdateFlag() )
-      showSuccessAccountBottomSheet( selectedAccount )
+      setTimeout( () => {
+        showSuccessModel( true )
+      }, 100 )
+
     }
   }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
 
@@ -109,53 +128,68 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
   useEffect( () => {
     return () => {
-      dismissBottomSheet()
+      showUnHideArchiveModal( false )
     }
   }, [ navigation ] )
 
-  const showUnHideArchiveAccountBottomSheet = useCallback( ( primarySubAccount, visibility ) => {
-    presentBottomSheet(
+  const showUnHideArchiveAccountBottomSheet = useCallback( () => {
+
+    return(
       <UnHideArchiveAccountBottomSheet
-        onProceed={()=>{
-          if( primarySubAccount && ( visibility == AccountVisibility.ARCHIVED || visibility == AccountVisibility.HIDDEN ) )
-            setAccountVisibility( visibility )
-          changeVisisbility( primarySubAccount, AccountVisibility.DEFAULT )
-          dismissBottomSheet()
+        onProceed={( accounShell )=>{
+          if( primarySubAccount && ( primarySubAccount.visibility == AccountVisibility.ARCHIVED || primarySubAccount.visibility == AccountVisibility.HIDDEN ) )
+            setAccountVisibility( primarySubAccount.visibility )
+          changeVisisbility( accounShell, AccountVisibility.DEFAULT )
+
+          showUnHideArchiveModal( false )
         }
         }
         onBack={() =>{
-          dismissBottomSheet()}
+          showUnHideArchiveModal( false )
+        }
         }
         accountInfo={primarySubAccount}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '50%' ],
-        overlayOpacity: 0.9,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet, selectedAccount ] )
+  }, [ primarySubAccount ] )
 
-  const showSuccessAccountBottomSheet = useCallback( ( primarySubAccount ) => {
-    presentBottomSheet(
+  const showSuccessAccountBottomSheet = useCallback( ( ) => {
+    return(
       <UnHideRestoreAccountSuccessBottomSheet
-        onProceed={()=>{
-          dismissBottomSheet()}
+        onProceed={( accounShell )=>{
+          const resetAction = StackActions.reset( {
+            index: 0,
+            actions: [
+              NavigationActions.navigate( {
+                routeName: 'Landing'
+              } )
+            ],
+          } )
+
+          navigation.dispatch( resetAction )
+          navigation.navigate( 'AccountDetails', {
+            accountShellID: primarySubAccount.accountShellID,
+          } )
         }
+        }
+        onClose={() => showSuccessModel( false )}
         accountInfo={primarySubAccount}
         accountVisibility={accountVisibility}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '55%' ],
-        overlayOpacity: 0.9,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet, selectedAccount, accountVisibility ] )
+  }, [ accountVisibility, primarySubAccount ] )
 
-  const changeVisisbility = ( selectedAccount, visibility ) => {
-    selectedAccount.visibility = visibility
-    dispatch( updateSubAccountSettings( selectedAccount ) )
+  const changeVisisbility = ( accountShell, visibility ) => {
+
+    // selectedAccount.visibility = visibility
+    // dispatch( updateSubAccountSettings( selectedAccount ) )
+
+    const settings = {
+      visibility: visibility
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
   }
 
   function hasNewOrder( newlyOrderedAccountShells: AccountShell[] ) {
@@ -186,25 +220,29 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         containerStyle={{
           marginLeft: wp( '4%' ),
           marginRight: wp( '4%' ),
+          backgroundColor: Colors.backgroundColor
         }}
-        bottomDivider
       >
         <Image
-          source={getAvatarForSubAccount( primarySubAccount )}
-          style={ImageStyles.thumbnailImageMedium}
+          source={getAvatarForSubAccount( primarySubAccount, false, true )}
+          style={ImageStyles.thumbnailImageLarge}
           resizeMode="contain"
         />
 
         <ListItem.Content>
           <ListItem.Title
-            style={ListStyles.listItemTitle}
+            style={[ ListStyles.listItemTitle, {
+              fontSize: RFValue( 12 )
+            } ]}
             numberOfLines={1}
           >
             {primarySubAccount.customDisplayName || primarySubAccount.defaultTitle}
           </ListItem.Title>
 
           <ListItem.Subtitle
-            style={ListStyles.listItemSubtitle}
+            style={[ ListStyles.listItemSubtitle, {
+              fontSize: RFValue( 10 )
+            } ]}
             numberOfLines={2}
           >
             {primarySubAccount.customDescription || primarySubAccount.defaultDescription}
@@ -213,9 +251,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         </ListItem.Content>
         {primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ? <TouchableOpacity
           style={{
-            backgroundColor: Colors.backgroundColor,
+            backgroundColor: Colors.lightBlue,
             marginLeft: 'auto',
-            borderRadius: 5,
+            borderRadius: 7,
             justifyContent: 'center',
             alignItems: 'center',
             paddingLeft: 10,
@@ -229,38 +267,76 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             setTimeout( () => {
               setSelectedAccount( primarySubAccount )
             }, 2 )
-
             if( primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
-              showUnHideArchiveAccountBottomSheet( primarySubAccount, primarySubAccount.visibility )
+              showPrimarySubAccount( primarySubAccount )
+              showUnHideArchiveModal( true )
             }
           }}
         >
           <Text
-            onPress={() => {
-              setTimeout( () => {
-                setSelectedAccount( primarySubAccount )
-              }, 2 )
-              if( primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
-                showUnHideArchiveAccountBottomSheet( primarySubAccount, primarySubAccount.visibility )
-              }
-            }}
             style={{
-              color: Colors.textColorGrey,
+              color: Colors.white,
               fontSize: RFValue( 12 ),
               marginLeft: 'auto',
+              fontWeight: '700'
             }}
           >
-            {primarySubAccount.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}
+            {primarySubAccount.visibility === AccountVisibility.HIDDEN ? strings.Unhide :strings.Restore}
           </Text>
         </TouchableOpacity> : null}
       </ListItem>
-
     )
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      <ModalContainer visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
+        {showUnHideArchiveAccountBottomSheet()}
+      </ModalContainer>
+      <ModalContainer visible={successModel} closeBottomSheet={() => {}} >
+        {showSuccessAccountBottomSheet()}
+      </ModalContainer>
       <ScrollView>
+        <View style={[ CommonStyles.headerContainer, {
+          backgroundColor: Colors.backgroundColor
+        } ]}>
+          <TouchableOpacity
+            style={CommonStyles.headerLeftIconContainer}
+            onPress={() => {
+              navigation.pop()
+            }}
+          >
+            <View style={CommonStyles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          backgroundColor: Colors.backgroundColor,
+          marginRight: wp( '3%' ),
+          alignItems: 'flex-start'
+        }}>
+          <HeaderTitle
+            firstLineTitle={strings[ 'AccountManagement' ]}
+            secondLineTitle={strings.Rearrange}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
+          <NavHeaderSettingsButton
+            onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+            accManagement={true}
+          />
+        </View>
+
         {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
           accountShells={orderedAccountShells}
           onDragEnded={handleDragEnd}
@@ -268,7 +344,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
         {getnewOrderedAccountShell && <View>
           <View style={{
-            marginBottom: 15
+            marginBottom: 15, backgroundColor: Colors.backgroundColor
           }}>
             <View style={{
               height: 'auto'
@@ -293,14 +369,14 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         </View>}
 
         {getHiddenAccountShell && hiddenAccountShells.length > 0 ? <View style={{
-          marginTop: wp( '2%' ),
+          marginTop: wp( '2%' ), backgroundColor: Colors.backgroundColor
         }}>
           <View style={{
             width: '100%',
             backgroundColor: Colors.white
           }}>
             <Text style={styles.pageInfoText}>
-              Hidden Accounts
+              {strings.HiddenAccounts}
             </Text>
           </View>
           <View style={{
@@ -321,7 +397,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           marginTop: wp( '2%' ),
         }}>
           <Text style={styles.pageInfoText}>
-              Archived Accounts
+            {strings.ArchivedAccounts}
           </Text>
           <View style={{
             marginBottom: 15
@@ -341,18 +417,19 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       <View style={styles.proceedButtonContainer}>
         {canSaveOrder && (
           <ButtonBlue
-            buttonText="Save New Ordering"
+            buttonText={strings.Save}
             handleButtonPress={handleProceedButtonPress}
           />
         )}
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
+    backgroundColor: Colors.backgroundColor
   },
 
   proceedButtonContainer: {
@@ -363,11 +440,15 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
   },
   pageInfoText: {
-    marginLeft: 30,
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 14 ),
+    paddingLeft: 30,
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
+    fontWeight: '600',
     marginTop: 3,
+    backgroundColor: Colors.white,
+    paddingVertical: hp( 0.5 ),
+    letterSpacing: 0.55
   },
 } )
 

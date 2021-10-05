@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -7,35 +7,45 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-} from 'react-native';
-import NavStyles from '../../common/Styles/NavStyles';
+} from 'react-native'
+import NavStyles from '../../common/Styles/NavStyles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import CopyThisText from '../../components/CopyThisText';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import QRCode from 'react-native-qrcode-svg';
+} from 'react-native-responsive-screen'
+import CopyThisText from '../../components/CopyThisText'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import QRCode from '../../components/QRCode'
 
 
-const SendRequest = (props) => {
-  const [receivingAddress] = useState('test');
+const SendRequest = ( props ) => {
+  const [ receivingAddress ] = useState( 'test' )
   return (
-    <View style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 0 }} />
+    <View style={{
+      flex: 1
+    }}>
+      <SafeAreaView style={{
+        flex: 0
+      }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={NavStyles.modalContainer}>
         <View style={NavStyles.modalHeaderTitleView}>
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{
+            flex: 1, flexDirection: 'row', alignItems: 'center'
+          }}>
             <TouchableOpacity
               onPress={() => {
-                props.navigation.goBack();
+                props.navigation.goBack()
               }}
-              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
+              hitSlop={{
+                top: 20, left: 20, bottom: 20, right: 20
+              }}
+              style={{
+                height: 30, width: 30, justifyContent: 'center'
+              }}
             >
               <FontAwesome
                 name="long-arrow-left"
@@ -43,7 +53,9 @@ const SendRequest = (props) => {
                 size={17}
               />
             </TouchableOpacity>
-            <View style={{ flex: 1 }}>
+            <View style={{
+              flex: 1
+            }}>
               <Text style={NavStyles.modalHeaderTitleText}>
                 Send Request
               </Text>
@@ -51,8 +63,8 @@ const SendRequest = (props) => {
             <TouchableOpacity
               onPress={() => { }}
               style={{
-                height: wp('8%'),
-                width: wp('22%'),
+                height: wp( '8%' ),
+                width: wp( '22%' ),
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: Colors.blue,
@@ -64,12 +76,12 @@ const SendRequest = (props) => {
               <Text
                 style={{
                   color: Colors.white,
-                  fontSize: RFValue(12),
+                  fontSize: RFValue( 12 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
                 Done
-                </Text>
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -87,24 +99,26 @@ const SendRequest = (props) => {
               <ActivityIndicator size="large" />
             </View>
           ) : (
-              <QRCode value={receivingAddress} size={hp('27%')} />
-            )}
+            <QRCode value={receivingAddress} size={hp( '27%' )} />
+          )}
           {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
         </View>
 
         <View
           style={{
-            marginBottom: hp('5%'),
+            marginBottom: hp( '5%' ),
           }}
         >
         </View>
       </View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
-  loader: { height: hp('27%'), justifyContent: 'center' },
-});
+const styles = StyleSheet.create( {
+  loader: {
+    height: hp( '27%' ), justifyContent: 'center'
+  },
+} )
 
-export default SendRequest;
+export default SendRequest

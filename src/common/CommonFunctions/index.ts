@@ -1,19 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
-import SSS from '../../bitcoin/utilities/sss/SSS'
-import AccountShell from '../data/models/AccountShell'
+import { DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
 import { Alert } from 'react-native'
-import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Toast from '../../components/Toast'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import crypto from 'crypto'
+import { getVersions } from '../utilities'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
   const namesArray = fullName.split( ' ' )
   if ( namesArray.length === 1 ) return `${namesArray[ 0 ].charAt( 0 )}`
   else
-    return `${namesArray[ 0 ].charAt( 0 )} ${namesArray[ namesArray.length - 1 ].charAt( 0 )}`
+    return `${namesArray[ 0 ].charAt( 0 )}${namesArray[ namesArray.length - 1 ].charAt( 0 )}`
 }
 
 export const getCurrencyImageName = ( currencyCodeValue ) => {
@@ -106,21 +108,23 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA
 }
 
-export const stateDataToBackup = ( accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) => {
-  // state data to backup
+export const stateDataToBackup = ( accountShells, activePersonalNode, versionHistory, restoreVersions ) => {
+  const versions = getVersions( versionHistory, restoreVersions )
+
   const STATE_DATA = {
   }
+
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if ( trustedContactsInfo && trustedContactsInfo.length )
-    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+  // if ( trustedContactsInfo && trustedContactsInfo.length )
+  //   STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
 
   if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
-  if ( versionHistory && versionHistory.length )
-    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
+  if ( versions && versions.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versions )
 
   return STATE_DATA
 }
@@ -142,7 +146,7 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   // console.log("DATABASE", database);
   let CloudDataJson = {
   }
-  if ( !isEmpty( database ) ) {
+  if ( database && database.SERVICES ) {
     if ( database.SERVICES )
       walletImage.SERVICES = database.SERVICES
     if ( database.DECENTRALIZED_BACKUP )
@@ -152,7 +156,7 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
     walletImage.ASYNC_DATA = await asyncDataToBackup()
     walletImage.STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo )
     // this has to be updated to keep the correct answer
-    const key = 'answer'//SSS.strechKey( database.WALLET_SETUP.security.answer )
+    const key = 'answer'
     CloudDataJson = {
       walletImage,
       keeperInfo: [],
@@ -162,6 +166,59 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
     // console.log('encryptedDatabase', encryptedCloudDataJson);
     return encryptedCloudDataJson
   }
+}
+
+export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer, accountShells,
+  activePersonalNode,
+  versionHistory,
+  restoreVersions, ) => {
+  const acc = {
+  }
+  accounts.forEach( account => {
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      encKey,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update(
+      JSON.stringify( account ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    acc[ account.id ] = {
+      encryptedData: encrypted
+    }
+  } )
+  const STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, restoreVersions )
+  const image : NewWalletImage = {
+    name: walletDB.walletName,
+    walletId : walletDB.walletId,
+    accounts : acc,
+    versionHistory: STATE_DATA.versionHistory,
+    SM_share: walletDB.smShare,
+    details2FA: walletDB.details2FA,
+  }
+  const channelIds = []
+  contacts.forEach( contact => {
+    channelIds.push( contact.channelKey )
+  } )
+  if( channelIds.length > 0 ) {
+    const cipher = crypto.createCipheriv(
+      BHROperations.cipherSpec.algorithm,
+      encKey,
+      BHROperations.cipherSpec.iv,
+    )
+    let encrypted = cipher.update(
+      JSON.stringify( channelIds ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    image.contacts = encrypted
+  }
+  const key = BHROperations.strechKey( answer )
+  return await encrypt( image, key )
 }
 
 export const getCurrencyImageByRegion = (
@@ -266,96 +323,173 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
   return levelHealthVar[ currentLevel - 1 ].levelInfo
 }
 
-export const processDL = async ( url ) =>{
-  const splits = url.split( '/' )
+export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryptionKey: string, correspondingTrustedContact: TrustedContact, walletName: string ) => {
+  const keysToEncrypt = correspondingTrustedContact.channelKey + '-' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' )
+  let encryptedChannelKeys: string
+  let encryptionHint: string
+  switch ( encryptionType ) {
+      case DeepLinkEncryptionType.DEFAULT:
+        encryptionHint = ''
+        encryptedChannelKeys = keysToEncrypt
+        break
 
-  if ( splits.includes( 'swan' ) ) {
-    const swanRequest = {
-      url
-    }
-    return {
-      swanRequest
-    }
+      case DeepLinkEncryptionType.NUMBER:
+      case DeepLinkEncryptionType.EMAIL:
+      case DeepLinkEncryptionType.OTP:
+        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
+        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+          keysToEncrypt,
+          encryptionKey
+        )
+        break
   }
 
-  if ( splits[ 5 ] === 'sss' ) {
-    const requester = splits[ 4 ]
+  let deepLinkKind: DeepLinkKind
+  switch( correspondingTrustedContact.relationType ){
+      case TrustedContactRelationTypes.CONTACT:
+        deepLinkKind = DeepLinkKind.CONTACT
+        break
 
-    if ( splits[ 6 ] === 'ek' ) {
-      const custodyRequest = {
-        requester,
-        ek: splits[ 7 ],
-        uploadedAt: splits[ 8 ],
-      }
-      return custodyRequest
-    } else if ( splits[ 6 ] === 'rk' ) {
-      const recoveryRequest = {
-        requester, rk: splits[ 7 ]
-      }
-      return {
-        recoveryRequest
-      }
-    }
-  } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
-    if ( splits[ 3 ] !== config.APP_STAGE ) {
-      Alert.alert(
-        'Invalid deeplink',
-        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[ 3 ]
-        }`,
-      )
-    } else {
-      const version = splits.pop().slice( 1 )
+      case TrustedContactRelationTypes.KEEPER:
+        deepLinkKind = DeepLinkKind.KEEPER
+        break
 
-      if ( version ) {
-        if ( !( await checkAppVersionCompatibility( {
-          relayCheckMethod: splits[ 4 ],
+      case TrustedContactRelationTypes.PRIMARY_KEEPER:
+        deepLinkKind = DeepLinkKind.PRIMARY_KEEPER
+        break
+
+      case TrustedContactRelationTypes.KEEPER_WARD:
+        deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
+        break
+
+      case TrustedContactRelationTypes.EXISTING_CONTACT:
+        deepLinkKind = DeepLinkKind.EXISTING_CONTACT
+  }
+
+  const appType = config.APP_STAGE
+  const appVersion = DeviceInfo.getVersion()
+
+  const deepLink =
+      `https://hexawallet.io
+      /${appType}
+      /${deepLinkKind}` +
+      `/${walletName}` +
+      `/${encryptedChannelKeys}` +
+      `/${encryptionType}-${encryptionHint}` +
+      `/v${appVersion}`
+
+  return {
+    deepLink, encryptedChannelKeys, encryptionType, encryptionHint
+  }
+}
+
+export const processDeepLink = async ( deepLink: string ) =>{
+  try {
+    const splits = deepLink.split( '/' )
+    if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
+      if ( splits[ 3 ] !== config.APP_STAGE ) {
+        Alert.alert(
+          'Invalid deeplink',
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[ 3 ]
+          }`,
+        )
+      } else {
+        const version = splits.pop().slice( 1 )
+        const encryptionMetaSplits = splits[ 7 ].split( '-' )
+        const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
+        const encryptionHint = encryptionMetaSplits[ 1 ]
+
+        const trustedContactRequest = {
+          walletName: splits[ 5 ],
+          encryptedChannelKeys: splits[ 6 ],
+          encryptionType,
+          encryptionHint,
+          isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
+          isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
+          isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+          isQR: false,
           version,
-        } ) ) ) {
-          return
+        }
+        return {
+          trustedContactRequest
         }
       }
-
-      const trustedContactRequest = {
-        isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
-        approvedTC: splits[ 4 ] === 'atcg' ? true : false,
-        isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-        uploadedAt: splits[ 9 ],
-        version,
-      }
+    } else if ( splits.includes( 'swan' ) )
       return {
-        trustedContactRequest
+        swanRequest: {
+          deepLink
+        }
       }
+  }
+  catch ( error ) {
+    Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
+  }
+}
+
+export const processFriendsAndFamilyQR = ( qrData: string ) => {
+  try {
+    const scannedData = JSON.parse( qrData )
+    // disabled check version compatibility
+    // if ( scannedData.version ) {
+    //   const isAppVersionCompatible = await checkAppVersionCompatibility( {
+    //     relayCheckMethod: scannedData.type,
+    //     version: scannedData.ver,
+    //   } )
+
+    //   if ( !isAppVersionCompatible ) {
+    //     return
+    //   }
+    // }
+
+    let trustedContactRequest
+    switch ( scannedData.type ) {
+        case QRCodeTypes.CONTACT_REQUEST:
+        case QRCodeTypes.PRIMARY_KEEPER_REQUEST:
+        case QRCodeTypes.KEEPER_REQUEST:
+          trustedContactRequest = {
+            walletName: scannedData.walletName,
+            encryptedChannelKeys: scannedData.encryptedChannelKeys,
+            encryptionType: scannedData.encryptionType,
+            encryptionHint: scannedData.encryptionHint,
+            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST || scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
+            isExistingContact: false,
+            isQR: true,
+            version: scannedData.version,
+            type: scannedData.type,
+          }
+          break
+
+        case QRCodeTypes.EXISTING_CONTACT:
+          trustedContactRequest = {
+            walletName: scannedData.walletName,
+            channelKey: scannedData.channelKey,
+            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            isKeeper: true,
+            isQR: true,
+            version: scannedData.version,
+            type: scannedData.type,
+            isExistingContact: true
+          }
+          break
+
+        case QRCodeTypes.APPROVE_KEEPER:
+          trustedContactRequest = {
+            walletName: scannedData.walletName,
+            channelKey: scannedData.channelKey,
+            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            isKeeper: false,
+            isQR: true,
+            version: scannedData.version,
+            type: scannedData.type,
+            isExistingContact: false
+          }
+          break
     }
-  } else if ( splits[ 4 ] === 'rk' ) {
-    const recoveryRequest = {
-      isRecovery: true,
-      requester: splits[ 5 ],
-      encryptedKey: splits[ 6 ],
-      hintType: splits[ 7 ],
-      hint: splits[ 8 ],
-    }
-    return {
-      recoveryRequest
-    }
-  } else if ( splits[ 4 ] === 'rrk' ) {
-    Alert.alert(
-      'Restoration link Identified',
-      'Restoration links only works during restoration mode',
-    )
-  } else if ( url.includes( 'fastbitcoins' ) ) {
-    const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
-    return {
-      userKey
-    }
-  } else {
-    const EmailToken = url.substr( url.lastIndexOf( '/' ) + 1 )
-    return {
-      EmailToken
-    }
+
+    return trustedContactRequest
+  } catch ( err ) {
+    Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
   }
 }

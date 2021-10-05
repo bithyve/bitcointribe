@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, SectionList, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native'
 import NewAccountOptionsSection from './NewAccountOptionsSection'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
@@ -17,6 +17,12 @@ import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import NavStyles from '../../../common/Styles/NavStyles'
 import ButtonBlue from '../../../components/ButtonBlue'
+import { useSelector } from 'react-redux'
+import ModalContainer from '../../../components/home/ModalContainer'
+import ErrorModalContents from '../../../components/ErrorModalContents'
+import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
 
 export enum SectionKind {
   ADD_NEW_HEXA_ACCOUNT,
@@ -26,45 +32,6 @@ export enum SectionKind {
 
 const sectionListItemKeyExtractor = ( index ) => index
 
-function titleForSectionHeader( kind: SectionKind ) {
-  switch ( kind ) {
-      case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-        return 'Add a Hexa Account'
-      case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Create a Shared Account'
-      case SectionKind.IMPORT_WALLET:
-        return 'Import a Wallet'
-  }
-}
-function titleForSectionSubHeader( kind: SectionKind ) {
-  switch ( kind ) {
-      case SectionKind.ADD_NEW_HEXA_ACCOUNT:
-        return 'Your keys, your coins, manage them your way'
-      case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Bitcoin is for everyone, share an account with your Friends & Family'
-      case SectionKind.IMPORT_WALLET:
-        return 'Have your sats somewhere else? Import it in Hexa'
-  }
-}
-
-function renderSectionHeader( { section } ) {
-  const kind: SectionKind = section.kind
-
-  return (
-    <>
-      <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
-        {titleForSectionHeader( kind )}
-      </Text>
-      <Text style={[ styles.listSectionHeading, {
-        color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
-        marginBottom: hp( 1 ),
-
-      } ]}>
-        {titleForSectionSubHeader( kind )}
-      </Text>
-    </>
-  )
-}
 
 export interface Props {
   navigation: any;
@@ -75,13 +42,56 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   const [ selectedChoice, setSelectedChoice ] = useState<SubAccountDescribing>(
     null,
   )
-
+  const [ secureAccountAlert, setSecureAccountAlert ] = useState( false )
+  const [ secureAccountKnowMore, setSecureAccountKnowMore ] = useState( false )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const canProceed = useMemo( () => {
     return selectedChoice !== null
   }, [ selectedChoice ] )
 
+  function titleForSectionHeader( kind: SectionKind ) {
+    switch ( kind ) {
+        case SectionKind.ADD_NEW_HEXA_ACCOUNT:
+          return strings.AddaHexaAccount
+        case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
+          return strings.CreateaSharedAccount
+        case SectionKind.IMPORT_WALLET:
+          return strings.ImportaWallet
+    }
+  }
+  function titleForSectionSubHeader( kind: SectionKind ) {
+    switch ( kind ) {
+        case SectionKind.ADD_NEW_HEXA_ACCOUNT:
+          return strings.Yourkeys
+        case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
+          return strings.shareanaccount
+        case SectionKind.IMPORT_WALLET:
+          return strings.somewhereelse
+    }
+  }
+
+  function renderSectionHeader( { section } ) {
+    const kind: SectionKind = section.kind
+
+    return (
+      <>
+        <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
+          {titleForSectionHeader( kind )}
+        </Text>
+        <Text style={styles.listSubSectionHeading}>
+          {titleForSectionSubHeader( kind )}
+        </Text>
+      </>
+    )
+  }
+
   function handleProceedButtonPress() {
     switch ( selectedChoice.kind ) {
+        case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
           navigation.navigate( 'NewHexaAccountDetails', {
@@ -116,14 +126,16 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   }
 
   function handleChoiceSelection( choice: SubAccountDescribing ) {
-    setSelectedChoice( choice )
+    if( choice.type == AccountType.SAVINGS_ACCOUNT && !AllowSecureAccount ) {
+      setSecureAccountAlert( true )
+    } else setSelectedChoice( choice )
   }
 
   const ListFooter: React.FC = () => {
     return (
       <View style={styles.listFooterSection}>
         <ButtonBlue
-          buttonText="Proceed"
+          buttonText={common.proceed}
           handleButtonPress={handleProceedButtonPress}
           buttonDisable={canProceed === false}
         />
@@ -131,9 +143,40 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
     )
   }
 
+  const renderSecureAccountAlertContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        title={strings.CompleteLevel2}
+        info={strings.Level2}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          setSecureAccountAlert( false )
+        }}
+        onPressIgnore={() => {
+          setSecureAccountKnowMore( true )
+          setSecureAccountAlert( false )
+        }}
+        proceedButtonText={common.ok}
+        cancelButtonText={common.learnMore}
+        isBottomImage={true}
+        bottomImage={require( '../../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }, [ secureAccountAlert ] )
+
+  const renderSecureAccountKnowMoreContent = () => {
+    return (
+      <SavingAccountAlertBeforeLevel2
+        titleClicked={()=>setSecureAccountKnowMore( false )}
+        containerStyle={{
+        }}
+      />
+    )
+  }
+
   return (
     <SafeAreaView style={styles.rootContainer}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={NavStyles.modalContainer}>
         <TouchableOpacity
           onPress={() => {
@@ -162,10 +205,11 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
               fontFamily: Fonts.FiraSansRegular,
               fontSize: RFValue( 25 ),
               marginLeft: wp( '5%' ),
-              marginTop: hp( '2%' )
+              marginTop: hp( '2%' ),
+              letterSpacing: 0.01
             }}
           >
-                Add Accounts
+            {strings.AddAccounts}
           </Text>
           {/* <Text
             style={{
@@ -182,7 +226,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           contentContainerStyle={{
             paddingVertical: 25
           }}
-          ListFooterComponent={<ListFooter />}
+          // ListFooterComponent={<ListFooter />}
           extraData={[ selectedChoice ]}
           sections={[
             {
@@ -235,7 +279,14 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           renderSectionHeader={renderSectionHeader}
           stickySectionHeadersEnabled={false}
         ></SectionList>
+        {<ListFooter />}
       </View>
+      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {setSecureAccountAlert( false )}} >
+        {renderSecureAccountAlertContent()}
+      </ModalContainer>
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {setSecureAccountKnowMore( false )}} >
+        {renderSecureAccountKnowMoreContent()}
+      </ModalContainer>
     </SafeAreaView>
   )
 }
@@ -243,11 +294,22 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
+    backgroundColor: Colors.backgroundColor
   },
 
   listSectionHeading: {
-    fontSize: RFValue( 14 ),
+    fontSize: RFValue( 13 ),
     paddingHorizontal: wp( 6 ),
+    letterSpacing: 0.01,
+  },
+  listSubSectionHeading: {
+    paddingHorizontal: wp( 6 ),
+    letterSpacing: 0.06,
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    marginBottom: hp( 1 ),
+
   },
 
   viewSectionContainer: {
@@ -256,8 +318,8 @@ const styles = StyleSheet.create( {
   },
 
   listFooterSection: {
-    paddingHorizontal: 30,
-    paddingBottom: 40,
+    paddingHorizontal: wp( 5 ),
+    paddingBottom: hp( 1 ),
     alignItems: 'flex-start',
   },
 } )

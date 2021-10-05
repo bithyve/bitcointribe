@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   Platform,
   PermissionsAndroid,
   Linking,
+  SafeAreaView,
+  TouchableOpacity
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useSelector, useDispatch } from 'react-redux'
@@ -20,23 +22,25 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { FlatList } from 'react-native-gesture-handler'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import CommonStyles from '../../common/Styles/Styles'
 import RadioButton from '../../components/RadioButton'
 import * as ExpoContacts from 'expo-contacts'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
-import Contacts from 'react-native-contacts'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalHeader from '../../components/ModalHeader'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
 import * as Permissions from 'expo-permissions'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import Toast from '../../components/Toast'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
 import ModalContainer from '../../components/home/ModalContainer'
+import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { v4 as uuid } from 'uuid'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
+import { editTrustedContact } from '../../store/actions/trustedContacts'
+import HeaderTitle from '../../components/HeaderTitle'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
+  const [ editedContacts, setEditedContacts ] = useState( [ props.navigation.state.params?.contactToEdit ] )
   const [ searchName, setSearchName ] = useState( '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ filterContactData, setFilterContactData ] = useState( [] )
@@ -44,6 +48,9 @@ export default function AddContactAddressBook( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   const [ permissionModal, setModal ] = useState( false )
   const [ permissionErrModal, setErrModal ] = useState( false )
   const [
@@ -62,10 +69,10 @@ export default function AddContactAddressBook( props ) {
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
-          'title': 'Hexa Would Like to Access Your Contacts',
-          'message': 'Address book details are only stored locally',
-          'buttonPositive': 'Allow',
-          'buttonNegative': 'Deny'
+          'title': strings.hexaWould,
+          'message':  strings.Addressbookdetails,
+          buttonPositive: common.allow,
+          buttonNegative: common.deny,
         }
       )
       return result
@@ -86,7 +93,7 @@ export default function AddContactAddressBook( props ) {
     ExpoContacts.getContactsAsync().then( async ( { data } ) => {
       if ( !data.length ) {
         setErrorMessage(
-          'No contacts found. Please add contacts to your Address Book and try again',
+          strings.Nocontacts,
         )
         setErrModal( true )
       }
@@ -110,9 +117,7 @@ export default function AddContactAddressBook( props ) {
       const granted = await requestContactsPermission()
       //console.log('GRANTED', granted);
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         setErrModal( true )
         setContactPermissionAndroid( false )
         return
@@ -128,9 +133,7 @@ export default function AddContactAddressBook( props ) {
       )
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
-        setErrorMessage(
-          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        )
+        setErrorMessage( strings.cannotSelect )
         setErrModal( true )
         return
       } else {
@@ -212,27 +215,27 @@ export default function AddContactAddressBook( props ) {
     }
   }
 
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
+  const trustedContacts: Trusted_Contacts = useSelector(
+    ( state ) => state.trustedContacts.contacts,
   )
   const [ isTC, setIsTC ] = useState( false )
 
-  const isTrustedContact = useCallback(
-    ( selectedContact ) => {
-      const contactName = `${selectedContact.firstName} ${selectedContact.lastName ? selectedContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim()
+  // const isTrustedContact = useCallback(
+  //   ( selectedContact ) => {
+  //     const contactName = `${selectedContact.firstName} ${selectedContact.lastName ? selectedContact.lastName : ''
+  //     }`
+  //       .toLowerCase()
+  //       .trim()
 
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-      if ( trustedContact && trustedContact.symmetricKey ) {
-        // Trusted channel exists
-        return true
-      }
-      return false
-    },
-    [ trustedContacts ],
-  )
+  //     const trustedContact = trustedContacts[ contactName ]
+  //     if ( trustedContact && trustedContact.symmetricKey ) {
+  //       // Trusted channel exists
+  //       return true
+  //     }
+  //     return false
+  //   },
+  //   [ trustedContacts ],
+  // )
 
   async function onContactSelect( index ) {
     const contacts = filterContactData
@@ -254,11 +257,11 @@ export default function AddContactAddressBook( props ) {
     }
     setRadioOnOff( !radioOnOff )
     setFilterContactData( contacts )
-    const isTrustedC = await isTrustedContact( selectedContacts[ 0 ] )
-    setIsTC( isTrustedC )
-    if ( isTrustedC ) {
-      Toast( 'Contact already exists' )
-    }
+    // const isTrustedC = await isTrustedContact( selectedContacts[ 0 ] )
+    // setIsTC( isTrustedC )
+    // if ( isTrustedC ) {
+    //   Toast( 'Contact already exists' )
+    // }
   }
 
   async function onCancel( value ) {
@@ -277,41 +280,32 @@ export default function AddContactAddressBook( props ) {
   }
 
 
-  const renderContactPermissionModalContent = useCallback( () => {
-
-    return (
-      <ErrorModalContents
-        // modalRef={contactPermissionBottomSheet}
-        title={'Hexa needs access to your address book.'}
-        info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-        otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
-        proceedButtonText={'Continue'}
-        isIgnoreButton={false}
-        onPressProceed={() => {
-          getContactPermission()
-          // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
-          // setModal( false )
-        }}
-        onPressIgnore={() => {
-          // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
-          // setModal( false )
-        }}
-        isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
-      />
-    )
-  }, [] )
-
-
   const onPressContinue= () => {
     if ( selectedContacts && selectedContacts.length ) {
-      props.navigation.navigate( 'AddContactSendRequest', {
-        SelectedContact: selectedContacts,
-        headerText:'Add a contact  ',
-        subHeaderText:'Send a Friends and Family request',
-        contactText:'Adding to Friends and Family:',
-        showDone:true,
-      } )
+      if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
+        selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
+        selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
+        selectedContacts[ 0 ].displayedName = selectedContacts[ 0 ].name
+        selectedContacts[ 0 ].avatarImageSource = selectedContacts[ 0 ].image ? selectedContacts[ 0 ].image : props.navigation.state.params?.contactToEdit.avatarImageSource
+        dispatch( editTrustedContact( {
+          channelKey: props.navigation.state.params?.contactToEdit.channelKey,
+          contactName: selectedContacts[ 0 ].name,
+          image: selectedContacts[ 0 ].image
+        } ) )
+        props.navigation.navigate( 'ContactDetails', {
+          contact: selectedContacts[ 0 ],
+        } )
+
+      } else {
+        props.navigation.navigate( 'AddContactSendRequest', {
+          SelectedContact: selectedContacts,
+          headerText: strings.addContact,
+          subHeaderText:strings.send,
+          contactText:strings.adding,
+          showDone:true,
+        } )
+      }
+
     }
   }
 
@@ -321,37 +315,50 @@ export default function AddContactAddressBook( props ) {
   }
 
   const onSkipContinue= () => {
-    let { skippedContactsCount } = trustedContacts.tc
-    let data
-    if ( !skippedContactsCount ) {
-      skippedContactsCount = 1
-      data = {
-        firstName: 'F&F request',
-        lastName: `awaiting ${skippedContactsCount}`,
-        name: `F&F request awaiting ${skippedContactsCount}`,
-      }
-    } else {
-      data = {
-        firstName: 'F&F request',
-        lastName: `awaiting ${skippedContactsCount + 1}`,
-        name: `F&F request awaiting ${skippedContactsCount + 1}`,
-      }
+    const skippedContact = {
+      id: uuid(),
     }
 
     props.navigation.navigate( 'AddContactSendRequest', {
-      SelectedContact: [ data ],
-      headerText:'Add a contact  ',
-      subHeaderText:'Send a Friends and Family request',
-      contactText:'Adding to Friends and Family:',
+      SelectedContact: [ skippedContact ],
+      headerText: strings.addContact,
+      subHeaderText:strings.send,
+      contactText:strings.adding,
       showDone:true,
     } )
   }
-  console.log( 'permissionModal >>>>>  value', permissionModal )
 
   return (
     <View style={styles.modalContentContainer}>
-      <View style={styles.modalHeaderTitleView}>
-        <View style={{
+      <SafeAreaView />
+      {/* <View style={styles.modalHeaderTitleView}> */}
+      <View style={[ CommonStyles.headerContainer, {
+        backgroundColor: Colors.white
+      } ]}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.blue}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={props.modalTitle ? props.modalTitle : strings.Associate}
+        secondLineTitle={strings.Select}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      {/* <View style={{
           flexDirection: 'row'
         }}>
           <AppBottomSheetTouchableWrapper
@@ -396,15 +403,10 @@ export default function AddContactAddressBook( props ) {
             >
               Skip
             </Text>
-            {/* <FontAwesome
-              name="plus"
-              color={Colors.white}
-              size={10}
-              style={{ marginLeft: 5 }}
-            /> */}
           </AppBottomSheetTouchableWrapper>
-        </View>
-      </View>
+        </View> */}
+
+      {/* </View> */}
 
       <View style={{
         flex : 1
@@ -468,7 +470,7 @@ export default function AddContactAddressBook( props ) {
               }
               autoCorrect={false}
               autoFocus={false}
-              placeholder="Search"
+              placeholder={common.search}
               placeholderTextColor={Colors.textColorGrey}
               onChangeText={( nameKeyword ) => {
                 nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
@@ -488,6 +490,9 @@ export default function AddContactAddressBook( props ) {
                 data={filterContactData}
                 extraData={radioOnOff}
                 showsVerticalScrollIndicator={false}
+                contentInset={{
+                  right: 0, top: 0, left: 0, bottom: hp( 24 )
+                }}
                 renderItem={( { item, index } ) => {
                   let selected = false
                   if (
@@ -531,29 +536,55 @@ export default function AddContactAddressBook( props ) {
               />
             ) : null}
           </View>
-          {selectedContacts.length >= 1 && (
-            <View
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                width: wp( '50%' ),
-                alignSelf: 'center',
-              }}
+          {/* {selectedContacts.length >= 1 && ( */}
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: hp( 5 ),
+              width: wp( '50%' ),
+              // alignSelf: 'center',
+              flexDirection: 'row',
+              // alignItems: 'flex-start',
+            }}
+          >
+            <AppBottomSheetTouchableWrapper
+              disabled={isTC || selectedContacts.length == 0}
+              onPress={() => onPressContinue()}
+              style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
+                backgroundColor: Colors.lightBlue
+              } ]}
             >
+              <Text style={styles.buttonText}>{common.confirmProceed}</Text>
+            </AppBottomSheetTouchableWrapper>
+            {props.navigation.state.params?.fromScreen === 'Edit' ?
+              null :
               <AppBottomSheetTouchableWrapper
-                disabled={isTC}
-                onPress={() => onPressContinue()}
-                style={styles.bottomButtonView}
+                onPress={() => onSkipContinue()}
+                style={{
+                // height: wp( '8%' ),
+                  marginTop: hp( 1.8 ),
+                  width: wp( '25%' ),
+                  alignSelf: 'flex-start',
+                  paddingLeft: wp( '8%' ),
+                }}
               >
-                <Text style={styles.buttonText}>Confirm & Proceed..</Text>
+                <Text
+                  style={{
+                    ...styles.proceedButtonText,
+                  }}
+                >
+                  {common.skip}
+                </Text>
               </AppBottomSheetTouchableWrapper>
-            </View>
-          )}
+            }
+          </View>
+          {/* )} */}
           <ModalContainer visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
-              title={'Error while accessing your contacts '}
+              title={strings.erroraAccessing}
               info={errorMessage}
-              proceedButtonText={'Open Setting'}
+              proceedButtonText={strings.openSetting}
               isIgnoreButton={true}
               onPressProceed={() => {
                 Linking.openURL( 'app-settings:' )
@@ -567,13 +598,13 @@ export default function AddContactAddressBook( props ) {
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           </ModalContainer>
-          <ModalContainer visible={permissionModal} closeBottomSheet={() => { setModal( false ) }}>
+          <ModalContainer visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
-              title={'Hexa needs access to your address book.'}
-              info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-              otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
-              proceedButtonText={'Continue'}
+              title={strings.why}
+              info={strings.info}
+              otherText={strings.otherText}
+              proceedButtonText={common.continue}
               isIgnoreButton={false}
               onPressProceed={() => {
                 getContactPermission()
@@ -595,9 +626,14 @@ export default function AddContactAddressBook( props ) {
 }
 
 const styles = StyleSheet.create( {
+  proceedButtonText: {
+    color: Colors.blue,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium
+  },
   modalContentContainer: {
     height: '100%',
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.white,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -605,7 +641,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     flexDirection: 'row',
     paddingBottom: hp( '2%' ),
-    paddingTop: hp( '4%' ),
     marginBottom: wp( '5%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),
@@ -631,8 +666,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
   },
   bottomButtonView: {
-    height: 50,
-    width: wp( '50%' ),
+    height: hp( '6%' ),
+    width: wp( '45%' ),
     backgroundColor: Colors.blue,
     borderRadius: 10,
     justifyContent: 'center',
@@ -644,6 +679,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     marginBottom: 20,
+    marginLeft: wp( 9 ),
   },
   selectedContactView: {
     width: wp( '42%' ),

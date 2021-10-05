@@ -21,6 +21,10 @@ import { Satoshis } from '../common/data/enums/UnitAliases'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../common/data/enums/BitcoinUnit'
 import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin'
 import { UsNumberFormat } from '../common/utilities'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 export type Props = {
   balance: Satoshis;
@@ -52,8 +56,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
   },
   currencyImageStyle = {
   },
-  amountTextStyle = {
-  },
+  amountTextStyle,
   unitTextStyle = {
   },
   isTestAccount = false,
@@ -75,9 +78,9 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
     : useFormattedAmountText( amountToDisplay )
 
   const formattedUnitText = isTestAccount ?
-    displayNameForBitcoinUnit( bitcoinUnit )
+    displayNameForBitcoinUnit( BitcoinUnit.TSATS )
     : useFormattedUnitText( {
-      bitcoinUnit, currencyKind 
+      bitcoinUnit, currencyKind
     } )
 
   const bitcoinIconSource = useMemo( () => {
@@ -109,12 +112,13 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
   const BalanceCurrencyIcon = () => {
     const style = {
       ...defaultStyles.currencyImage,
-      marginRight: iconSpacing,
       ...currencyImageStyle,
     }
 
     if ( prefersBitcoin || isTestAccount ) {
-      return <Image style={style} source={bitcoinIconSource} />
+      return <Image style={{
+        ...style, marginLeft: wp( 1 )
+      }} source={bitcoinIconSource} />
     }
 
     if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
@@ -122,8 +126,9 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
         <MaterialCurrencyCodeIcon
           currencyCode={fiatCurrencyCode}
           color={textColor}
-          size={style.width}
-          style={style}
+          size={RFValue( 16 )}
+          style={{
+          }}
         />
       )
     } else {
@@ -138,10 +143,11 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
 
   return (
     <View style={{
-      ...defaultStyles.rootContainer, ...containerStyle 
+      ...defaultStyles.rootContainer, ...containerStyle
     }}>
       <View style={{
-        marginRight: iconSpacing 
+        marginRight: 4,
+        marginLeft: ( prefersBitcoin || isTestAccount ) ? -wp( 1 ) : [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode  ) ? 0 : -wp( 1 )
       }}>
         <BalanceCurrencyIcon />
       </View>
@@ -155,8 +161,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       >
         {formattedBalanceText}
       </Text>
-
-      <Text style={unitTextStyles}>{formattedUnitText}</Text>
+      <Text style={unitTextStyles}>{`${formattedUnitText}`}</Text>
     </View>
   )
 }
@@ -164,12 +169,13 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
 const defaultStyles = StyleSheet.create( {
   rootContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'baseline',
+    alignItems: 'center'
   },
 
   currencyImage: {
-    width: 14,
-    height: 14,
+    width: wp( 3 ),
+    height: wp( 4 ),
     resizeMode: 'contain',
   },
 
@@ -177,12 +183,14 @@ const defaultStyles = StyleSheet.create( {
     fontFamily: Fonts.OpenSans,
     fontSize: RFValue( 17 ),
     marginRight: 3,
+    // alignItems: 'baseline',
   },
 
   unitText: {
     fontFamily: Fonts.FiraSansRegular,
+    // alignItems: 'baseline',
   },
 } )
 
 export default LabeledBalanceDisplay
-                                                                                 
+

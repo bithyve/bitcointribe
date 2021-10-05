@@ -11,7 +11,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Video from 'react-native-video'
 import Colors from '../common/Colors'
-import { initializeDB } from '../store/actions/storage'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
@@ -21,23 +20,26 @@ import {
 } from 'react-native-responsive-screen'
 import { connect } from 'react-redux'
 import idx from 'idx'
-import { processDL } from '../common/CommonFunctions'
+import { processDeepLink } from '../common/CommonFunctions'
 import {
   getMessages,
 } from '../store/actions/notifications'
+import { LocalizationContext } from '../common/content/LocContext'
 
 type LaunchScreenProps = {
-  initializeDB: any;
   navigation: any;
   lastSeen: any;
   databaseInitialized: Boolean;
   getMessages: any;
   walletId: any;
+  walletExists: Boolean,
 }
 
 type LaunchScreenState = { }
 
 class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
+  static contextType = LocalizationContext
+
   errorBottomSheet: any;
   url: any;
   constructor( props ) {
@@ -55,6 +57,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     setTimeout( ()=>{
       this.postSplashScreenActions()
     }, 4000 )
+    this.context.initializeAppLanguage()
   };
 
    handleDeepLinkEvent = async ( { url } ) => {
@@ -75,15 +78,10 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
   };
 
-
-  handleAppStateChange = async ( nextAppState ) => {
+  handleAppStateChange = ( nextAppState ) => {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
-    const walletExists = await AsyncStorage.getItem( 'walletExists' )
-    //const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
-    if ( !walletExists ) {
-      return
-    }
+    if ( !this.props.walletExists ) return
   };
 
   postSplashScreenActions = async () => {
@@ -97,9 +95,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
       const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
 
-      // initiates the SQL DB
-      if( !this.props.databaseInitialized ) this.props.initializeDB()
-
       // scenario based navigation
       if ( hasCreds ) {
         const now: any = new Date()
@@ -112,14 +107,11 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
               screen: 'Home',
             } )
           } else {
-            const requestName = await processDL( this.url )
+            const requestName = await processDeepLink( this.url )
             this.props.navigation.replace( 'Home', {
               screen: 'Home',
               params: {
-                custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-                recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
                 trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                userKey: requestName && requestName.userKey ? requestName.userKey : null,
                 swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
               }
             } )
@@ -127,12 +119,9 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
         } else if ( !this.url ){
           this.props.navigation.replace( 'Login' )
         } else {
-          const requestName = await processDL( this.url )
+          const requestName = await processDeepLink( this.url )
           this.props.navigation.replace( 'Login', {
-            custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-            recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
             trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-            userKey: requestName && requestName.userKey ? requestName.userKey : null,
             swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
           } )
         }
@@ -216,13 +205,12 @@ const styles = StyleSheet.create( {
 
 const mapStateToProps = ( state ) => {
   return {
-    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
     lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
-    walletId: idx( state, ( _ ) => _.preferences.walletId )
+    walletId: idx( state, ( _ ) => _.preferences.walletId ),
+    walletExists: idx( state, ( _ ) => _.storage.walletExists )
   }
 }
 
 export default connect( mapStateToProps, {
-  initializeDB,
   getMessages
 } )( Launch )

@@ -1,6 +1,6 @@
 import React, { ReactElement, useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import BottomInfoBox from '../../../components/BottomInfoBox'
@@ -14,6 +14,7 @@ import { KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-vie
 import { makeAccountRecipientDescription } from '../../../utils/sending/RecipientFactories'
 import RecipientKind from '../../../common/data/enums/RecipientKind'
 import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   accountShell: AccountShell;
@@ -34,16 +35,6 @@ export enum SectionKind {
 
 const sectionListItemKeyExtractor = ( index ) => String( index )
 
-function renderSectionHeader(
-  sectionKind: SectionKind,
-): ReactElement | null {
-  switch ( sectionKind ) {
-      case SectionKind.SELECT_CONTACTS:
-        return <Text style={styles.listSectionHeading}>Send to contact</Text>
-      case SectionKind.SELECT_ACCOUNT_SHELLS:
-        return <Text style={styles.listSectionHeading}>Send to account</Text>
-  }
-}
 
 const AccountSendScreen: React.FC<Props> = ( {
   accountShell,
@@ -55,7 +46,8 @@ const AccountSendScreen: React.FC<Props> = ( {
   onRecipientSelected,
 }: Props ) => {
   const selectedRecipients = useSelectedRecipientsForSending()
-
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
   const accountRecipients = useMemo( () => {
     return sendableAccountShells.map( makeAccountRecipientDescription )
   }, [ sendableAccountShells ] )
@@ -71,6 +63,17 @@ const AccountSendScreen: React.FC<Props> = ( {
   const selectedAccountRecipients = useMemo( () => {
     return selectedRecipients.filter( recipient => recipient.kind == RecipientKind.ACCOUNT_SHELL )
   }, [ selectedRecipients ] )
+
+  function renderSectionHeader(
+    sectionKind: SectionKind,
+  ): ReactElement | null {
+    switch ( sectionKind ) {
+        case SectionKind.SELECT_CONTACTS:
+          return <Text style={styles.listSectionHeading}>{strings.Sendtocontact}</Text>
+        case SectionKind.SELECT_ACCOUNT_SHELLS:
+          return <Text style={styles.listSectionHeading}>{strings.Sendtoaccount}</Text>
+    }
+  }
 
   const sections = useMemo( () => {
     return [
@@ -97,9 +100,10 @@ const AccountSendScreen: React.FC<Props> = ( {
               <View style={styles.viewSectionContainer}>
                 <RecipientAddressTextInputSection
                   containerStyle={{
-                    ...styles.viewSectionContentContainer, margin: 0
+                    width: widthPercentageToDP( 95 ),
+                    alignSelf: 'center'
                   }}
-                  placeholder="Enter address manually"
+                  placeholder={strings.Enteraddressmanually}
                   accountShell={accountShell}
                   onAddressEntered={onAddressSubmitted}
                   onPaymentURIEntered={onPaymentURIEntered}
@@ -125,8 +129,8 @@ const AccountSendScreen: React.FC<Props> = ( {
                   ) ) || (
                     <BottomInfoBox
                       containerStyle={styles.infoBoxContainer}
-                      title="You have not added any Contacts"
-                      infoText="Add a Contact to send them sats without having to scan an address"
+                      title={strings.YouhavenotaddedanyContacts}
+                      infoText={strings.AddaContact}
                     />
                   )}
                 </View>
@@ -192,7 +196,7 @@ const styles = StyleSheet.create( {
   },
 
   viewSectionContentContainer: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 20,
   },
 
   listSectionHeading: {
@@ -203,8 +207,8 @@ const styles = StyleSheet.create( {
   },
 
   qrScannerContainer: {
-    width: '100%',
-    maxWidth: qrScannerHeight * ( 1.31 ),
+    // width: '100%',
+    // maxWidth: qrScannerHeight * ( 1.40 ),
     height: qrScannerHeight,
     marginBottom: 9,
   },

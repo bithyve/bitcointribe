@@ -11,6 +11,9 @@ import SourceAccountKind from '../../enums/SourceAccountKind'
 
 interface SubAccountDescribing {
   id: string;
+
+  isUsable: boolean;
+
   xPub: string;
   accountShellID: string | null;
 
@@ -71,6 +74,8 @@ interface SubAccountDescribing {
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
   // transactionIDs: string[];
   transactions: TransactionDetails[];
+  // if new txn exists
+  hasNewTxn?: boolean
 }
 
 export type HexaSubAccountDescribing = SubAccountDescribing
@@ -90,6 +95,7 @@ export type ImportedWalletSubAccountDescribing = SubAccountDescribing
 export type SubAccountDescribingConstructorProps = {
   id?: string;
   xPub?: string;
+  isUsable: boolean;
   accountShellID?: string | null;
   instanceNumber?: number | null;
   defaultTitle?: string;

@@ -15,6 +15,7 @@ import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSett
 import {  bitHyveNodeConnectionCompleted, connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration } from '../../../store/actions/nodeSettings'
 import { Keyboard } from 'react-native'
 import BitHyveNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/BitHyveNodeConnectionSuccessBottomSheet'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -24,7 +25,8 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const dispatch = useDispatch()
   const nodeSettingsState = useNodeSettingsState()
   const activePersonalNode = useActivePersonalNode()
-
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -214,9 +216,9 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
       {isKeyboardVisible == false && (
         <View style={styles.floatingNoteContainer}>
           <BottomInfoBox
-            title={'Note'}
+            title={common.note}
             infoText={
-              'Make sure that your node is accessible at all times for the app to be able to connect to it'
+              strings.nodeisaccessible
             }
           />
         </View>

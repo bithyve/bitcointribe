@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useContext } from 'react'
 import {
   View,
   Image,
@@ -15,11 +15,13 @@ import {
 } from 'react-native-responsive-screen'
 import MBKeeperButton from './MBKeeperButton'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 function ManageBackupCard( props ) {
   const value = props.value
   const selectedId = props.selectedId
-
+  const { translations } = useContext( LocalizationContext )
+  const common = translations[ 'common' ]
   const keeperButtonText = ( buttonText, number ) =>{
     if( !buttonText ) return 'Share Recovery Key ' + number
     else return buttonText
@@ -160,7 +162,7 @@ function ManageBackupCard( props ) {
                 }}
                 onPress={() => props.onPressSelectId( )}
               >
-                {value.status == 'notSetup' ? 'Setup' : 'Manage'}
+                {value.status == 'notSetup' ? common.setup : common.manage}
               </Text>
               <AntDesign
                 name={
@@ -226,7 +228,7 @@ function ManageBackupCard( props ) {
                   onPressKeeper={() => props.onPressKeeper2()}
                   keeperButtonText={
                     value.id == 1
-                      ? 'Security Question'
+                      ? value.keeper2ButtonText
                       : keeperButtonText( value.keeper2ButtonText, '2' )
                   }
                   disabled={false}

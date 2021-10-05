@@ -35,7 +35,7 @@ import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import { initNewBHRFlow } from '../store/actions/health'
+import { initNewBHRFlow } from '../store/actions/BHR'
 import { setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
@@ -73,15 +73,14 @@ export default function NewOwnQuestions( props ) {
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
-  const s3service = useSelector( ( state ) => state.health.service )
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState(
     React.createRef(),
   )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
-  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
+  const cloudPermissionGranted = useSelector( ( state ) => state.bhr.cloudPermissionGranted )
+  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -217,7 +216,7 @@ export default function NewOwnQuestions( props ) {
         setTimeout( () => {
           setMessage( 'Generating Recovery Keys' )
           setSubTextMessage(
-            'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+            'Recovery Keys help you recover your Hexa wallet in case your phone is lost',
           )
         }, 3000 )
       }, 3000 )

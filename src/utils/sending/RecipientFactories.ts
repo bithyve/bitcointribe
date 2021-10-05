@@ -72,11 +72,12 @@ export function makeContactRecipientDescription(
   const contactName = contactDetails.contactName
 
   const instreamId = contact.streamId
-  let walletName, lastSeenActive
+  let walletName, lastSeenActive, walletId
   if( instreamId ) {
     const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
     lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
     walletName = idx( instream, ( _ ) => _.primaryData.walletName )
+    walletId = idx( instream, ( _ ) => _.primaryData.walletID )
   }
 
   let displayedName = contactName
@@ -94,6 +95,8 @@ export function makeContactRecipientDescription(
     walletName,
     avatarImageSource,
     lastSeenActive,
+    walletId,
+    streamId: instreamId,
   }
 
   return contactRecipient

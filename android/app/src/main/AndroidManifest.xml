@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.hexawallet.hexa">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="io.hexawallet.hexa">
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -11,6 +13,7 @@
   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
   <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
+
   <!-- These require runtime permissions on M -->
   <uses-permission android:name="android.permission.CAMERA" />
   <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -22,6 +25,11 @@
         android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
     <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+
+    <queries>
+        <package android:name="com.google.android.gms"/>
+        <package android:name="com.android.chrome"/>
+    </queries>
     <!-- < Only if you're using GCM or localNotificationSchedule() > -->
   <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:theme="@style/AppTheme" android:networkSecurityConfig="@xml/network_security_config" android:requestLegacyExternalStorage="true">
     <activity
@@ -64,9 +72,15 @@
     <!-- Change the value to true to enable pop-up for in foreground on receiving remote notifications (for prevent duplicating while showing local notifications set this to false) -->
         <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground"
                     android:value="false"/>
-        <!-- Change the resource name to your App's accent color - or any other color you want -->
+        <meta-data  android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_notification" />
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_color"
+        android:resource="@color/notification"
+        tools:replace="android:resource"/>
+
+    <!-- Change the resource name to your App's accent color - or any other color you want -->
         <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
-                    android:resource="@color/white"/> <!-- or @android:color/{name} to use a standard color -->
+                    android:resource="@color/notification"/> <!-- or @android:color/{name} to use a standard color -->
 
         <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
         <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" />

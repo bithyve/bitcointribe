@@ -39,6 +39,7 @@ export default function SendConfirmationContent( props ) {
           ...styles.successModalHeaderView,
           marginRight: wp( '8%' ),
           marginLeft: wp( '8%' ),
+          marginTop: hp( 3 )
         }}
       >
         <Text style={styles.modalTitleText}>{props.title}</Text>
@@ -76,7 +77,7 @@ export default function SendConfirmationContent( props ) {
         style={{
           // flex: 1,
           flexDirection: 'row',
-          // marginTop: 'auto',
+          marginTop: hp( 9 ),
           alignItems: 'center',
           // backgroundColor: 'red'
         }}
@@ -87,8 +88,7 @@ export default function SendConfirmationContent( props ) {
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}
-            onPress={() => props.onPressOk()}>{props.okButtonText}</Text>
+          <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
         </AppBottomSheetTouchableWrapper>
         {props.isCancel && (
           <AppBottomSheetTouchableWrapper

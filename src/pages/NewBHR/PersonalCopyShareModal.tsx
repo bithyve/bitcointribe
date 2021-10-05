@@ -20,10 +20,9 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { useDispatch } from 'react-redux'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { sharePersonalCopy } from '../../store/actions/sss'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
-import { sharePDF } from '../../store/actions/health'
+import { sharePDF } from '../../store/actions/BHR'
 
 export default function PersonalCopyShareModal( props ) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
@@ -129,6 +128,7 @@ export default function PersonalCopyShareModal( props ) {
           paddingTop: hp( '1.5%' ),
           alignItems: 'center',
           marginLeft: 20,
+          marginTop: hp( 1 )
         }}
       >
         <Text
@@ -297,6 +297,7 @@ const styles = StyleSheet.create( {
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,
+    width: wp( 60 )
   },
   listElementIcon: {
     paddingRight: 5,

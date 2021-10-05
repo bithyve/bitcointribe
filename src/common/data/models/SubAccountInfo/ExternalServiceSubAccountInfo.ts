@@ -23,6 +23,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
   id: string;
   xPub: string;
+  isUsable: boolean;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -48,6 +49,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   constructor( {
     id = uuid(),
     xPub = null,
+    isUsable,
     accountShellID = null,
     instanceNumber = null,
     type,
@@ -66,6 +68,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   }: ConstructorProps ) {
     this.id = id
     this.xPub = xPub
+    this.isUsable = isUsable
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.type = type

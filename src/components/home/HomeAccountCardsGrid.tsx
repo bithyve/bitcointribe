@@ -4,6 +4,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import AccountCardColumn from './AccountCardColumn'
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   accountShells: AccountShell[];
@@ -35,7 +36,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
   },
   showAllAccount,
 }: Props ) => {
-  const columnData: Array<AccountShell[]> = useMemo( () => {
+  const getcolumnData = () => {
     if ( accountShells.length == 0 ) {
       return []
     }
@@ -52,14 +53,14 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     ///////////////////
 
     const evenIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
-      if ( index % 2 == 0 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ) ) {
+      if ( index % 2 == 0 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true && current.primarySubAccount.visibility !== AccountVisibility.ARCHIVED ) ) {
         accumulated.push( current )
       }
 
       return accumulated
     }, [] )
     const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
-      if ( index % 2 == 1 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ) ) {
+      if ( index % 2 == 1 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true && current.primarySubAccount.visibility !== AccountVisibility.ARCHIVED ) ) {
         accumulated.push( current )
       }
 
@@ -87,7 +88,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     const columns = []
     let currentColumn = []
     sortedShells.forEach( ( accountShell, index ) => {
-      // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
+    // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
       currentColumn.push( accountShell )
 
       // Make a new column after adding two items -- or after adding the
@@ -104,7 +105,6 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       if ( index == shellCount - 1 && currentColumn.length > 0 ) {
         columns.push( currentColumn )
       }
-    //  }
     } )
     if( columns[ columns.length - 1 ].length === 1 && columns.length !== 1 ) {
       columns[ columns.length - 1 ].push( 'add new' )
@@ -113,7 +113,89 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     }
 
     return columns
-  }, [ accountShells, showAllAccount ] )
+  }
+
+  const columnData = getcolumnData()
+
+  // const columnData: Array<AccountShell[]> = useMemo( () => {
+  //   if ( accountShells.length == 0 ) {
+  //     return []
+  //   }
+
+  //   // if ( accountShells.length == 1 ) {
+  //   //   return [ accountShells ]
+  //   // }
+
+  //   ///////////////////
+  //   // Even though we're rendering the list as horizontally scrolling set of
+  //   // 2-row columns, we want the appearance to be such that every group of four
+  //   // is ordered row-wise. The logic below is for formatting the data in such
+  //   // away that this will happen. (See: https://github.com/bithyve/hexa/issues/2250)
+  //   ///////////////////
+
+  //   const evenIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
+  //     if ( index % 2 == 0 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ) ) {
+  //       accumulated.push( current )
+  //     }
+
+  //     return accumulated
+  //   }, [] )
+  //   const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
+  //     if ( index % 2 == 1 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ) ) {
+  //       accumulated.push( current )
+  //     }
+
+  //     return accumulated
+  //   }, [] )
+  //   const sortedShells: AccountShell[] = []
+  //   let isChoosingEvenIndexedShells = true
+  //   let isFirstShell = false
+
+  //   while ( evenIndexedShells.length > 0 || oddIndexedShells.length > 0 ) {
+  //     if ( isFirstShell ) {
+  //       sortedShells.push( ...oddIndexedShells.splice( 0, 1 ) )
+  //       isFirstShell = false
+  //     } else {
+  //       if ( isChoosingEvenIndexedShells ) {
+  //         sortedShells.push( ...evenIndexedShells.splice( 0, 2 ) )
+  //       } else {
+  //         sortedShells.push( ...oddIndexedShells.splice( 0, 2 ) )
+  //       }
+  //       isChoosingEvenIndexedShells = !isChoosingEvenIndexedShells
+  //     }
+  //   }
+
+  //   const shellCount = sortedShells.length
+  //   const columns = []
+  //   let currentColumn = []
+  //   sortedShells.forEach( ( accountShell, index ) => {
+  //     // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
+  //     currentColumn.push( accountShell )
+
+  //     // Make a new column after adding two items -- or after adding the
+  //     // very first item. This is because the first column
+  //     // will only contain one item, since the "Add new" button will be placed
+  //     // in front of everything.
+  //     if ( currentColumn.length == 2 ) {
+  //       columns.push( currentColumn )
+  //       currentColumn = []
+  //     }
+
+  //     // If we're at the end and a partially filled column still exists,
+  //     // push it.
+  //     if ( index == shellCount - 1 && currentColumn.length > 0 ) {
+  //       columns.push( currentColumn )
+  //     }
+  //   //  }
+  //   } )
+  //   if( columns[ columns.length - 1 ].length === 1 && columns.length !== 1 ) {
+  //     columns[ columns.length - 1 ].push( 'add new' )
+  //   } else {
+  //     columns.push( [ 'add new' ] )
+  //   }
+
+  //   return columns
+  // }, [ accountShells, showAllAccount ] )
 
   return (
     <FlatList
@@ -124,6 +206,8 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       keyExtractor={keyExtractor}
       renderItem={( { item, index }: RenderItemProps ) => {
         return <AccountCardColumn
+          key={index}
+          index={index}
           cardData={item}
           currentLevel={currentLevel}
           // prependsAddButton={typeof item === 'string'}

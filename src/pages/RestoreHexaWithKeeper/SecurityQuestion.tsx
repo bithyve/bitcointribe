@@ -19,6 +19,12 @@ import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
 
+const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
+
+function validateAllowedCharacters( answer: string ): boolean {
+  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+}
+
 function SecurityQuestion( props ) {
 
   const [ AnswerCounter, setAnswerCounter ] = useState( 0 )
@@ -35,7 +41,7 @@ function SecurityQuestion( props ) {
   }
 
   useEffect( () => {
-    if ( ( !errorText && !answer && answer ) || answer ) setIsDisabled( false )
+    if ( !errorText && answer && validateAllowedCharacters( answer ) ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ answer, errorText ] )
 
@@ -97,7 +103,11 @@ function SecurityQuestion( props ) {
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 // onFocus={() => props.onFocus()}
-                // onBlur={() => props.onBlur()}
+                onBlur={() => {
+                  if ( validateAllowedCharacters( answer ) == false ) {
+                    setErrorText( 'Answer must contain lowercase characters(a-z) and digits (0-9)' )
+                  }
+                }}
               />
               {errorText ? (
                 <Text
@@ -153,6 +163,8 @@ function SecurityQuestion( props ) {
                 ).then( () => {
                   props.onPressConfirm( answer )
                 } )
+              } else if ( validateAllowedCharacters( answer ) == false ) {
+                setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }

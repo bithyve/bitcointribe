@@ -1,7 +1,7 @@
 import semver from 'semver'
 import DeviceInfo from 'react-native-device-info'
-import RelayServices from '../bitcoin/services/RelayService'
 import { Alert } from 'react-native'
+import Relay from '../bitcoin/utilities/Relay'
 
 type Props = {
   relayCheckMethod: string;
@@ -20,14 +20,7 @@ export default async function checkAppVersionCompatibility( {
 
   if ( version && semver.gt( version, DeviceInfo.getVersion() ) ) {
     // checking compatibility via Relay
-    const res = await RelayServices.checkCompatibility( relayCheckMethod, version )
-
-    if ( res.status !== 200 ) {
-      console.log( 'Failed to check compatibility' )
-      return true
-    }
-
-    const { compatible, alternatives } = res.data
+    const { compatible, alternatives }  = await Relay.checkCompatibility( relayCheckMethod, version )
 
     if ( !compatible ) {
       if ( !alternatives ) {

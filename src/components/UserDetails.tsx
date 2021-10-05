@@ -13,6 +13,7 @@ import Colors from '../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { nameToInitials } from '../common/CommonFunctions'
 import Fonts from '../common/Fonts'
+import { DeepLinkEncryptionType } from '../bitcoin/utilities/Interface'
 
 const styles = StyleSheet.create( {
   headerImageInitials: {
@@ -141,6 +142,11 @@ const styles = StyleSheet.create( {
 export default function CopyThisText( props ) {
 
   const setPhoneNumber = () => {
+    if( props.Contact.deepLinkConfig ){ // when trusted contact object is passed instead of RN-contact
+      const { encryptionType, encryptionKey } = props.Contact.deepLinkConfig
+      if( encryptionType === DeepLinkEncryptionType.NUMBER ) return encryptionKey
+    }
+
     const phoneNumber = props.Contact.phoneNumbers[ 0 ].number
     let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
     number = number.slice( number.length - 10 ) // last 10 digits only
