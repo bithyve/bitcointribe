@@ -26,6 +26,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { translations } from '../../common/content/LocContext'
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -57,8 +58,11 @@ const CloudBackupHistory = ( props ) => {
   const [ errorMsg, setErrorMsg ] = useState( '' )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const dispatch = useDispatch()
-
+  const [ backupInfo, setBackupInfo ] = useState( '' )
+  const [ buttonText, setButtonText ] = useState( common.backup )
+  const [ showButton, setShowButton ] = useState( false )
   const sortedHistory = ( history ) => {
     if( !history ) return
     const currentHistory = history.filter( ( element ) => {
@@ -76,6 +80,29 @@ const CloudBackupHistory = ( props ) => {
     return sortedHistory
   }
 
+  useEffect( ()=>{
+    setInfoOnBackup()
+  }, [] )
+
+  const setInfoOnBackup = () =>{
+    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
+      setButtonText( common.backup )
+      setShowButton( true )
+      setBackupInfo( strings.cloudBackupSuccessInfo )
+    } else if( currentLevel == 0 ) {
+      setButtonText( common.backup )
+      setShowButton( true )
+      setBackupInfo( strings.cloudBackupNotSetupInfo )
+    } else if( currentLevel > 0 && levelHealth[ 0 ].levelInfo[ 1 ].status == 'notAccessible' ) {
+      setButtonText( common.confirm )
+      setShowButton( true )
+      setBackupInfo( strings.cloudBackupInAccessibleInfo )
+    }
+  }
+
+  useEffect( ()=>{
+    setInfoOnBackup()
+  }, [ levelHealth ] )
 
   useEffect( () => {
     console.log( cloudBackupHistoryArray )
@@ -193,6 +220,7 @@ const CloudBackupHistory = ( props ) => {
       />
     )
   }, [] )
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -216,15 +244,14 @@ const CloudBackupHistory = ( props ) => {
       }}>
         <HistoryPageComponent
           infoBoxTitle={strings.BackupHistory}
-          infoBoxInfo={strings.historyofyourbackup}
+          infoBoxInfo={backupInfo}
           type={'security'}
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
             setConfirmationModal( true )
           }}
           data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
-          confirmButtonText={common.backup}
-          reshareButtonText={common.backup}
+          confirmButtonText={buttonText}
           disableChange={true}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
@@ -232,6 +259,7 @@ const CloudBackupHistory = ( props ) => {
           onPressChange={() => {
             props.navigation.navigate( 'NewOwnQuestions' )
           }}
+          showButton={showButton}
         />
       </View>
       <ModalContainer visible={confirmationModal} closeBottomSheet={() => {}}>

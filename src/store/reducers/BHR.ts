@@ -378,7 +378,8 @@ export default ( state = initialState, action ) => {
       case SET_CHANNEL_ASSETS:
         return {
           ...state,
-          channelAssets: action.payload.channelAssets
+          channelAssets: action.payload.channelAssets,
+          secondaryShareDownloaded: action.payload.secondaryShareDownloaded
         }
 
       case APPROVAL_STATUS:

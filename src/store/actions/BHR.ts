@@ -494,10 +494,10 @@ export const modifyLevelData = ( levelHealth?: LevelHealthInterface[], currentLe
   }
 }
 
-export const setChannelAssets = ( channelAssets ) => {
+export const setChannelAssets = ( channelAssets, secondaryShareDownloaded ) => {
   return {
     type: SET_CHANNEL_ASSETS, payload: {
-      channelAssets
+      channelAssets, secondaryShareDownloaded
     }
   }
 }

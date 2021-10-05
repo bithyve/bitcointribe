@@ -215,7 +215,7 @@ export const getIndex = ( levelHealth, type, selectedKeeper, keeperInfo ) => {
     for ( let j = 2; j < element.levelInfo.length; j++ ) {
       const element2 = element.levelInfo[ j ]
       if (
-        element2.shareType == 'contact' &&
+        ( element2.shareType == 'contact' || element2.shareType == 'existingContact' ) &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
           levelHealth[ i ]
@@ -231,7 +231,7 @@ export const getIndex = ( levelHealth, type, selectedKeeper, keeperInfo ) => {
         deviceCount++
       }
       const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
-      if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
+      if ( ( ( type == 'contact' && element2.shareType == 'contact' ) || ( type == 'existingContact' && element2.shareType == 'existingContact' ) ) && contactCount < 2 ) {
         if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
           changeIndex = 2
         } else changeIndex = 1

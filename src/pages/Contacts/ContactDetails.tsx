@@ -242,6 +242,9 @@ class ContactDetails extends PureComponent<
       showLoader: false
     } )
     const { trustedContacts } = this.props
+    this.setState( {
+      showQRClicked: true
+    } )
     this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
     this.setIsSendDisabledListener = this.props.navigation.addListener(
       'didFocus',
@@ -251,12 +254,6 @@ class ContactDetails extends PureComponent<
         this.setState( {
           isSendDisabled: false,
         } )
-        if( this.isFromApproval ) {
-          this.setState( {
-            showQRClicked: true
-          } )
-        }
-        this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
       }
     )
 
@@ -272,7 +269,6 @@ class ContactDetails extends PureComponent<
   }
 
   componentWillUnmount() {
-    this.props.setOpenToApproval( false, [], null )
     this.setIsSendDisabledListener.remove()
   }
 
@@ -1304,11 +1300,10 @@ class ContactDetails extends PureComponent<
               ...styles.bottomButton,
             }}
             onPress={() => {
-              this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
-
               this.setState( {
                 showQRClicked: true
               } )
+              this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
             }}
           >
             <Text style={[ styles.buttonText, {

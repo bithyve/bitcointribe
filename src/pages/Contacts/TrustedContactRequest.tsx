@@ -161,6 +161,7 @@ export default function TrustedContactRequest( props ) {
           {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
             return (
               <TextInput
+                key={i}
                 maxLength={1}
                 returnKeyType="done"
                 returnKeyLabel="Done"

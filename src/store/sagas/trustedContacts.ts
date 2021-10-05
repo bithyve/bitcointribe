@@ -250,24 +250,27 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+        const walletID: string = idx( instream, ( _ ) => _.primaryData.walletID )
         const nameAssociatedByContact: string = idx( instream, ( _ ) => _.primaryData.contactDetails.contactName )
 
-        if( fcmToken ){
-          let notifType, notifBody
+        if( fcmToken && walletID ){
+          let notifType, notifBody, notifTitle
           switch( temporaryContact.relationType ){
               case TrustedContactRelationTypes.KEEPER:
                 notifType = notificationType.FNF_KEEPER_REQUEST_REJECTED
+                notifTitle = 'Friends & Family notification'
                 notifBody = `F&F keeper request rejected by ${nameAssociatedByContact || wallet.walletName}`
                 break
 
               default:
                 notifType = notificationType.FNF_REQUEST_REJECTED
+                notifTitle = 'Friends & Family notification'
                 notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
           }
 
           const notification: INotification = {
             notificationType: notifType,
-            title: 'Friends & Family notification',
+            title: notifTitle,
             body: notifBody,
             data: {
             },
@@ -275,7 +278,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           }
           const notifReceivers = []
           notifReceivers.push( {
-            walletId: walletId, //instream.primaryData.walletID,
+            walletId: walletID, //instream.primaryData.walletID,
             FCMs: [ fcmToken ],
           } )
           if( notifReceivers.length )
@@ -335,7 +338,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           switch( contact.relationType ){
               case TrustedContactRelationTypes.WARD:
                 notifType = notificationType.FNF_KEEPER_REQUEST_ACCEPTED
-                notifTitle = 'Wallet Security'
+                notifTitle = 'Friends & Family notification'
                 notifBody = `Keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
                 break
 
@@ -617,9 +620,14 @@ export const initializeTrustedContactWatcher = createWatcher(
   INITIALIZE_TRUSTED_CONTACT,
 )
 
-function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: string }} ) {
-  const { walletId } = yield select( state => state.storage.wallet )
-  const { channelKey } = payload
+function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: string, isExistingContact?: boolean }} ) {
+  const { channelKey, isExistingContact } = payload
+  const { walletId, walletName }: Wallet = yield select( state => state.storage.wallet )
+  const FCM = yield select ( state => state.preferences.fcmTokenValue )
+
+  const trustedContacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
+  )
   const streamUpdates: UnecryptedStreamData = {
     streamId: TrustedContactsOperations.getStreamId( walletId ),
     metaData: {
@@ -631,8 +639,20 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
     }
   }
 
-  const contactDetails: ContactDetails = { // temp contact details
+  let contactDetails: ContactDetails = { // temp contact details
     id: ''
+  }
+  const contactToUpdate: TrustedContact = trustedContacts[ channelKey ]
+  if( contactToUpdate && isExistingContact ){
+    const primaryData: PrimaryStreamData = {
+      walletID: walletId,
+      walletName: walletName,
+      relationType: TrustedContactRelationTypes.CONTACT,
+      FCM: FCM,
+      contactDetails: contactToUpdate.contactDetails,
+    }
+    streamUpdates.primaryData = primaryData
+    contactDetails = contactToUpdate.contactDetails
   }
 
   const contactInfo: ContactInfo = {

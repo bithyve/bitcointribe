@@ -13,7 +13,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import CommonStyles from '../../common/Styles/Styles'
 import HeaderTitle from '../../components/HeaderTitle'
-import { TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { StreamData, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import trustedContacts from '../../store/reducers/trustedContacts'
 import { useSelector, useDispatch } from 'react-redux'
 import ImageStyles from '../../common/Styles/ImageStyles'
@@ -33,6 +33,7 @@ import RadioButton from '../../components/RadioButton'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import DeviceInfo from 'react-native-device-info'
 import { LocalizationContext } from '../../common/content/LocContext'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 
 const FNFToKeeper = ( props ) => {
@@ -54,26 +55,22 @@ const FNFToKeeper = ( props ) => {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const dispatch = useDispatch()
 
   useEffect( () => {
     const contacts: Trusted_Contacts = trustedContacts
-    // getContact( contacts )
     const c = []
     for ( const channelKey of Object.keys( contacts ) ) {
       const contact = contacts[ channelKey ]
       if ( ( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) && contact.contactDetails.contactName ) {
-        c.push( {
+        const instream: StreamData = useStreamFromContact( contact, wallet.walletId, true )
+        if( instream ) c.push( {
           ...contact, channelKey
         } )
       }
     }
-    // if ( c.length === 0 ) {
-    //   props.navigation.state.params.selectContact( 'AddContact', {
-    //   } )
-    //   props.navigation.goBack()
-    // }
     setContacts( c )
   }, [] )
 
@@ -480,7 +477,7 @@ const FNFToKeeper = ( props ) => {
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-        {/* {contacts.length ? <View>
+        {contacts.length ? <View>
           <Text style={{
             marginHorizontal: wp( 2 ),
             color: Colors.blue,
@@ -513,7 +510,7 @@ const FNFToKeeper = ( props ) => {
               }
             </ScrollView>
           </View>
-        </View> : null} */}
+        </View> : null}
         <Text style={{
           marginHorizontal: wp( 2 ),
           color: Colors.blue,

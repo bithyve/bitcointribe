@@ -10,9 +10,7 @@ import {
   ScrollView,
   Platform,
   ImageBackground,
-  Alert,
   RefreshControl,
-  Modal,
   Keyboard,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -32,38 +30,26 @@ import {
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
-import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
 import RestoreFromICloud from './RestoreFromICloud'
-import DeviceInfo from 'react-native-device-info'
 import RestoreSuccess from './RestoreSuccess'
 import ICloudBackupNotFound from './ICloudBackupNotFound'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import { requestTimedout } from '../../store/utils/utilities'
 import RestoreWallet from './RestoreWallet'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { isEmpty } from '../../common/CommonFunctions'
-import CloudBackup from '../../common/CommonFunctions/CloudBackup'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { decrypt, decrypt1 } from '../../common/encryption'
+import { decrypt } from '../../common/encryption'
 import LoaderModal from '../../components/LoaderModal'
-import TransparentHeaderModal from '../../components/TransparentHeaderModal'
 import Loader from '../../components/loader'
 import {
   recoverWalletUsingIcloud,
   recoverWallet,
-  updateCloudMShare,
   downloadBackupData,
   putKeeperInfo,
-  setupHealth
+  setupHealth,
+  setDownloadedBackupData
 } from '../../store/actions/BHR'
-import axios from 'axios'
-import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/BHR'
+import { initNewBHRFlow } from '../../store/actions/BHR'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import { BackupStreamData, KeeperInfoInterface, MetaShare, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { BackupStreamData, KeeperInfoInterface, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
-import { textWithoutEncoding, email } from 'react-native-communications'
 import ContactListForRestore from './ContactListForRestore'
 import SendViaLink from '../../components/SendViaLink'
 import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
@@ -74,10 +60,8 @@ import QuestionList from '../../common/QuestionList'
 import SecurityQuestion from './SecurityQuestion'
 import { completedWalletSetup, initializeRecovery } from '../../store/actions/setupAndAuth'
 import ModalContainer from '../../components/home/ModalContainer'
-
 import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -122,13 +106,11 @@ const loaderMessages = [
   // }
 ]
 interface RestoreWithICloudStateTypes {
-  selectedIds: any[];
   listData: any[];
   walletsArray: any[];
   cloudBackup: boolean;
   hideShow: boolean;
   selectedBackup: any;
-  metaShares: any[];
   showLoader: boolean;
   refreshControlLoader: boolean;
   selectedContact: any;
@@ -137,7 +119,6 @@ interface RestoreWithICloudStateTypes {
   isOtpType: boolean;
   otp: string;
   renderTimer: boolean;
-  isLinkCreated: boolean;
   loaderMessage: { heading: string; text: string; subText?: string; };
   walletName: string;
   question: string;
@@ -163,16 +144,9 @@ interface RestoreWithICloudPropsTypes {
   database: any;
   security: any;
   recoverWalletUsingIcloud: any;
-  accounts: any;
-  walletImageChecked: any;
-  SERVICES: any;
-  calculateExchangeRate: any;
-  initializeHealthSetup: any;
   recoverWallet: any;
-  updateCloudMShare: any;
   walletRecoveryFailed: boolean;
   requestShare: any;
-  downloadMetaShare: Boolean;
   errorReceiving: Boolean;
   getCloudDataRecovery: any;
   cloudData: any;
@@ -194,8 +168,9 @@ interface RestoreWithICloudPropsTypes {
   keeperInfo: KeeperInfoInterface[];
   setupHealth: any;
   wallet: Wallet;
-  cloudErrorMessage: string,
-  setCloudErrorMessage: any,
+  cloudErrorMessage: string;
+  setCloudErrorMessage: any;
+  setDownloadedBackupData: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -229,7 +204,6 @@ class RestoreWithICloud extends Component<
     this.shareOtpWithTrustedContactBottomSheet = React.createRef()
 
     this.state = {
-      selectedIds: [],
       listData: [],
       walletsArray: [],
       cloudBackup: false,
@@ -244,7 +218,6 @@ class RestoreWithICloud extends Component<
         shares: '',
         keeperData: '',
       },
-      metaShares: [],
       showLoader: false,
       refreshControlLoader: false,
       selectedContact: {
@@ -254,7 +227,6 @@ class RestoreWithICloud extends Component<
       isOtpType: false,
       otp: '',
       renderTimer: false,
-      isLinkCreated: false,
       walletName: '',
       loaderMessage: {
         heading: 'Creating your wallet', text: 'This may take a short time, while the app sets it all up for you:'
@@ -284,6 +256,7 @@ class RestoreWithICloud extends Component<
   }
 
   componentDidMount = () => {
+    this.props.setDownloadedBackupData( [] )
     this.cloudData()
   };
 
@@ -297,8 +270,6 @@ class RestoreWithICloud extends Component<
 
   componentDidUpdate = async ( prevProps, prevState ) => {
     const {
-      walletImageChecked,
-      SERVICES,
       walletRecoveryFailed,
       cloudData,
       walletCheckIn,
@@ -328,19 +299,6 @@ class RestoreWithICloud extends Component<
       } ) )
       this.showCloudRestoreError( )
       this.props.setCloudBackupStatus( CloudBackupStatus.PENDING )
-    }
-    if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
-      completedWalletSetup()
-      await AsyncStorage.setItem( 'walletRecovered', 'true' )
-      setVersion( 'Restored' )
-      initNewBHRFlow( true )
-      walletCheckIn()
-      // if ( this.loaderBottomSheet as any )
-      //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
-      this.setState( {
-        loaderModal: false
-      } )
-      this.props.navigation.navigate( 'HomeNav' )
     }
 
     if( prevProps.wallet != this.props.wallet ){
@@ -382,18 +340,6 @@ class RestoreWithICloud extends Component<
         loaderModal: false
       } )
     }
-
-    // if (
-    //   !this.state.isLinkCreated &&
-    //   this.state.contactList.length &&
-    //   this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ] &&
-    //   this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ].META_SHARE
-    // ) {
-    //   this.setState( {
-    //     isLinkCreated: true
-    //   } )
-    //   this.onCreatLink()
-    // }
 
     if ( prevProps.downloadedBackupData.length == 0 && prevProps.downloadedBackupData != this.props.downloadedBackupData && this.props.downloadedBackupData.length == 1 ) {
       if ( this.props.keeperInfo.length == 0 ) {
@@ -533,17 +479,17 @@ class RestoreWithICloud extends Component<
     } )
   }
 
-  setSecurityQuestionAndName = async () => {
-    const { answer, question, walletName, } = this.state
-    if ( answer && question && walletName ) {
-      const security = {
-        question,
-        answer,
-      }
-      this.props.initializeRecovery( walletName, security )
-    }
+  // setSecurityQuestionAndName = async () => {
+  //   const { answer, question, walletName, } = this.state
+  //   if ( answer && question && walletName ) {
+  //     const security = {
+  //       question,
+  //       answer,
+  //     }
+  //     this.props.initializeRecovery( walletName, security )
+  //   }
 
-  }
+  // }
 
   showCloudRestoreError = () => {
     if( this.props.cloudErrorMessage !== '' ) {
@@ -560,16 +506,14 @@ class RestoreWithICloud extends Component<
   }
 
   decryptCloudJson = () => {
-    const { recoverWalletUsingIcloud, accounts } = this.props
+    const { recoverWalletUsingIcloud } = this.props
     const { answer, selectedBackup }: {answer: string, selectedBackup:any} = this.state
     try {
       const key = BHROperations.strechKey( answer )
       const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
-      if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
+      // if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
       const KeeperData: KeeperInfoInterface[] = JSON.parse( selectedBackup.keeperData )
-      if ( this.props.keeperInfo.length == 0 ) {
-        this.setKeeperInfoList( selectedBackup.levelStatus, KeeperData, selectedBackup.dateTime )
-      }
+      this.setKeeperInfoList( selectedBackup.levelStatus, KeeperData, selectedBackup.dateTime )
       if (
         decryptedCloudDataJson && ( selectedBackup.levelStatus == 2 || selectedBackup.levelStatus == 3 )
       ) {
@@ -597,9 +541,6 @@ class RestoreWithICloud extends Component<
         this.props.downloadBackupData( {
           backupData: downloadedBackupDataTmp
         } )
-        // this.props.updateCloudMShare( JSON.parse( selectedBackup.shares ), 0 );
-        // if(selectedBackup.type == "device"){
-        // ( this.RestoreFromICloud as any ).current.snapTo( 0 )
         this.setState( {
           restoreModal: false
         } )
@@ -920,9 +861,7 @@ class RestoreWithICloud extends Component<
 
   render() {
     const {
-      hideShow,
       cloudBackup,
-      walletsArray,
       selectedBackup,
       showLoader,
       refreshControlLoader,
@@ -943,7 +882,7 @@ class RestoreWithICloud extends Component<
       contactListModal,
       backupModal
     } = this.state
-    const { navigation, database } = this.props
+    const { navigation } = this.props
     return (
       <View
         style={{
@@ -1345,7 +1284,7 @@ class RestoreWithICloud extends Component<
             subHeaderText={'Send a recovery request link'}
             contactText={'Requesting for recovery:'}
             contact={selectedContact.data ? selectedContact.data : null}
-            contactEmail={''}//database.WALLET_SETUP.walletName
+            contactEmail={''}
             infoText={`Click here to accept Keeper request for ${this.state.walletName
             } Hexa wallet- link will expire in ${config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
             } hours`}
@@ -1414,20 +1353,11 @@ class RestoreWithICloud extends Component<
 
 const mapStateToProps = ( state ) => {
   return {
-    accounts: state.accounts || [],
-    cloudBackupStatus:
-      idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    database: idx( state, ( _ ) => _.storage.database ) || {
-    },
+    cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     security: idx( state, ( _ ) => _.storage.wallet.security ),
-    overallHealth: idx( state, ( _ ) => _.bhr.overallHealth ),
-    walletImageChecked: idx( state, ( _ ) => _.bhr.walletImageChecked ),
-    SERVICES: idx( state, ( _ ) => _.storage.database.SERVICES ),
     walletRecoveryFailed: idx( state, ( _ ) => _.bhr.walletRecoveryFailed ),
-    errorReceiving:
-      idx( state, ( _ ) => _.bhr.errorReceiving ) || {
-      },
-    downloadMetaShare: idx( state, ( _ ) => _.bhr.loading.downloadMetaShare ),
+    errorReceiving: idx( state, ( _ ) => _.bhr.errorReceiving ) || {
+    },
     cloudData: idx( state, ( _ ) => _.cloud.cloudData ),
     downloadedBackupData: idx( state, ( _ ) => _.bhr.downloadedBackupData ),
     keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
@@ -1439,9 +1369,7 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     recoverWalletUsingIcloud,
-    initializeHealthSetup,
     recoverWallet,
-    updateCloudMShare,
     getCloudDataRecovery,
     clearCloudCache,
     initNewBHRFlow,
@@ -1453,7 +1381,8 @@ export default withNavigationFocus(
     downloadBackupData,
     putKeeperInfo,
     setupHealth,
-    setCloudErrorMessage
+    setCloudErrorMessage,
+    setDownloadedBackupData,
   } )( RestoreWithICloud )
 )
 
