@@ -45,12 +45,10 @@ export default function SendGift( props ) {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-  useEffect( () => {
-    init()
-  }, [ giftId, note ] )
+  const sendGift  = async () => {
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
+    dispatch( updateGift( updatedGift ) )
 
-  const init  = async () => {
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( dispatch, giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
     const link = shortLink !== '' ? shortLink: deepLink
     setGiftDeepLink( link )
     setGiftQR( JSON.stringify( {
@@ -65,6 +63,10 @@ export default function SendGift( props ) {
       version: DeviceInfo.getVersion(),
     } ) )
   }
+
+  useEffect( () => {
+    sendGift()
+  }, [ giftId, note ] )
 
   return (
     <ScrollView style={{
