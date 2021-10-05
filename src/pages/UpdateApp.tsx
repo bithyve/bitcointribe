@@ -143,8 +143,8 @@ export default function UpdateApp( props ) {
   const upgradeNow = () => {
     const url =
       Platform.OS == 'ios'
-        ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
-        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en'
+        ? 'https://apps.apple.com/us/app/bitcoin-wallet-hexa-2-0/id1586334138'
+        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en'
     Linking.canOpenURL( url ).then( ( supported ) => {
       if ( supported ) {
         Linking.openURL( url )
@@ -312,7 +312,7 @@ export default function UpdateApp( props ) {
                   ...styles.successModalButtonView
                 }}
               >
-                <Text style={styles.proceedButtonText}>Update Now</Text>
+                <Text style={styles.proceedButtonText}>Download Now</Text>
               </TouchableOpacity> ) : null}
 
             {!isUpdateMandotary && !isUpdateInValid ? (
