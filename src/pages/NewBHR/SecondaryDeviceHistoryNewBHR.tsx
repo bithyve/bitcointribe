@@ -188,6 +188,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
+    generate()
+  }, [ Contact, trustedContacts ] )
+
+  const generate = async () => {
     if( !Contact ) return
 
     const contacts: Trusted_Contacts = trustedContacts
@@ -212,7 +216,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
       if( !encryption_key ){
         const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
-        const { encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+        const { encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
           deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
           encryptionType: DeepLinkEncryptionType.DEFAULT,
           encryptionKey: encryption_key,
@@ -244,7 +248,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         } ) )
       }
     }
-  }, [ Contact, trustedContacts ] )
+  }
 
   const renderSecondaryDeviceContents = useCallback( () => {
     console.log( keeperQR )

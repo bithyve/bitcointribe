@@ -45,10 +45,12 @@ export default function SendGift( props ) {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-  useEffect( () => {
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress } = generateGiftLink( giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
+  const sendGift  = async () => {
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
     dispatch( updateGift( updatedGift ) )
-    setGiftDeepLink( deepLink )
+
+    const link = shortLink !== '' ? shortLink: deepLink
+    setGiftDeepLink( link )
     setGiftQR( JSON.stringify( {
       type: QRCodeTypes.GIFT,
       encryptedChannelKeys: encryptedChannelKeys,
@@ -60,6 +62,10 @@ export default function SendGift( props ) {
       note,
       version: DeviceInfo.getVersion(),
     } ) )
+  }
+
+  useEffect( () => {
+    sendGift()
   }, [ giftId, note ] )
 
   return (

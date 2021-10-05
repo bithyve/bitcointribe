@@ -161,10 +161,12 @@ export default function AddContactSendRequest( props ) {
   }, [ Contact ] )
 
   useEffect( () => {
-    console.log( 'useEffect Contact', Contact )
+    generate()
+  }, [ Contact, trustedContacts, encryptLinkWith ] )
+
+  const generate = async () => {
     // capture the contact
     if( !Contact ) return
-    console.log( 'Contact', Contact )
     const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
@@ -218,14 +220,15 @@ export default function AddContactSendRequest( props ) {
       }
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } =await generateDeepLink( {
       deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
       keysToEncrypt,
     } )
-    setTrustedLink( deepLink )
+    const link = shortLink !== '' ? shortLink: deepLink
+    setTrustedLink( link )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
       JSON.stringify( {
@@ -249,8 +252,7 @@ export default function AddContactSendRequest( props ) {
           }
         }
       } ) )
-
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
+  }
 
   const openTimer = async () => {
     setTimeout( () => {
