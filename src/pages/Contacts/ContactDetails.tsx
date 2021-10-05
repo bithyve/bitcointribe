@@ -254,12 +254,6 @@ class ContactDetails extends PureComponent<
         this.setState( {
           isSendDisabled: false,
         } )
-        if( this.isFromApproval ) {
-          this.setState( {
-            showQRClicked: true
-          } )
-        }
-        this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
       }
     )
 

@@ -30,6 +30,7 @@ import {
   setApprovalStatus,
   createOrChangeGuardian,
   downloadSMShare,
+  setChannelAssets,
 } from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -51,6 +52,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
+import { isEmpty } from '../../common/CommonFunctions'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -224,6 +226,8 @@ const PersonalCopyHistory = ( props ) => {
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
         // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
         setPersonalCopyShareModal( true )
+        dispatch( setChannelAssets ( {
+        }, null ) )
       }
     }
   }, [ pdfCreatedSuccessfully ] )
@@ -440,7 +444,8 @@ const PersonalCopyHistory = ( props ) => {
   )
 
   useEffect( ()=> {
-    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && !isEmpty( channelAssets ) && channelAssets.shareId == selectedKeeper.shareId ){
+      setIsGuardianCreationClicked( false )
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
       } ) )
@@ -469,6 +474,7 @@ const PersonalCopyHistory = ( props ) => {
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
+    setKeeperTypeModal( false )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -486,8 +492,9 @@ const PersonalCopyHistory = ( props ) => {
       } )
     }
     if ( type == 'pdf' ) {
-      // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
-      setPersonalCopyShareModal( true )
+      setTimeout( () => {
+        setPersonalCopyShareModal( true )
+      }, 1000 )
     }
   }
   const sendApprovalRequestToPK = ( ) => {

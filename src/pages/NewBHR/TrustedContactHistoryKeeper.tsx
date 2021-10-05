@@ -581,7 +581,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       if( shareType == 'existingContact' ) shareObj.updatedAt = 0
       dispatch( updateMSharesHealth( shareObj, isChange ) )
       dispatch( setChannelAssets( {
-      } ) )
+      }, null ) )
       // saveInTransitHistory()
     }
   }, [ chosenContact, trustedContacts, encryptLinkWith ] )

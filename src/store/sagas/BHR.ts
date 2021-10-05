@@ -1035,6 +1035,7 @@ function* confirmPDFSharedWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const keeperInfos: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const s3 = yield call( dbManager.getBHR )
     const metaShare: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const walletId = wallet.walletId
@@ -1043,19 +1044,21 @@ function* confirmPDFSharedWorker( { payload } ) {
     if ( shareId && metaShare.length &&  metaShare.findIndex( ( value ) => value.shareId == shareId ) > -1 ) {
       shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )
     }
+    const keeperInfo: KeeperInfoInterface = keeperInfos.find( value=>value.shareId == shareId )
 
     const scannedObj:  {
-      type: string,
-      walletName: string,
-      channelId: string,
-      streamId: string,
-      channelKey: string,
-      channelKey2: string,
-      version: string,
-      encryptedKey: string,
+      type: QRCodeTypes;
+      walletName: string;
+      channelId: string;
+      streamId: string;
+      channelKey: string;
+      secondaryChannelKey: string;
+      version: string;
+      encryptedKey: string;
+      walletId: string;
     } = JSON.parse( scannedData )
     const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedData
-    if( decryptedData == shareId ){
+    if( decryptedData == shareId && scannedObj.walletId == walletId && keeperInfo.channelKey == scannedObj.channelKey ){
       const shareObj = {
         walletId: walletId,
         shareId: shareId,
@@ -1392,7 +1395,6 @@ function* createChannelAssetsWorker( { payload } ) {
     const { shareId } = payload
     const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-    const encryptedSecondaryShares: string[] = s3.encryptedSMSecretsKeeper
     if( MetaShares && MetaShares.length ){
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
@@ -1414,9 +1416,9 @@ function* createChannelAssetsWorker( { payload } ) {
         channelAssets.secondaryMnemonicShard = secondaryShareDownloadedVar
         channelAssets.bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
       }
-      yield put( setChannelAssets( channelAssets ) )
+      yield put( setChannelAssets( channelAssets, secondaryShareDownloadedVar ) )
       yield put( setApprovalStatus( false ) )
-      yield put( secondaryShareDownloaded( null ) )
+      // yield put( secondaryShareDownloaded( null ) )
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     }
   } catch ( error ) {
@@ -1550,7 +1552,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
 
         if( updated ){
           yield put( setChannelAssets( {
-          } ) )
+          }, null ) )
           const appVersion = DeviceInfo.getVersion()
           const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
           const instream = useStreamFromContact( temporaryContact, walletId, true )

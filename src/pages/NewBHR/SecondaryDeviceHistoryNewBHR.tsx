@@ -238,7 +238,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
         dispatch( updateMSharesHealth( shareObj, isChange ) )
         dispatch( setChannelAssets( {
-        } ) )
+        }, null ) )
       }
     }
   }, [ Contact, trustedContacts ] )
