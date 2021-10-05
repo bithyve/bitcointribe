@@ -1,4 +1,3 @@
-
 apply plugin: "com.android.application"
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
@@ -60,11 +59,15 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 281
-        versionName "1.6.5"
+        versionCode 363
+        versionName "2.0.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false
     }
 
      signingConfigs {
@@ -95,7 +98,7 @@ android {
     productFlavors {
         production {
             minSdkVersion rootProject.ext.minSdkVersion
-            applicationId "io.hexawallet.hexa"
+            applicationId "io.hexawallet.hexa2"
             targetSdkVersion rootProject.ext.targetSdkVersion
             resValue "string", "build_config_package", "io.hexawallet.hexa"
         }
@@ -164,7 +167,6 @@ dependencies {
     implementation project(':react-native-config')
     implementation project(':jail-monkey')
     implementation project(':react-native-contacts')
-    implementation project(':react-native-mail')
     implementation project(':react-native-print')
     implementation project(':react-native-share')
     implementation project(':react-native-camera')
@@ -174,7 +176,6 @@ dependencies {
     implementation project(':react-native-tcp')
     implementation project(':react-native-os')
     implementation project(':react-native-svg')
-    implementation project(':react-native-cardview')
     implementation project(':react-native-video')
     implementation project(':react-native-device-info')
     implementation project(':react-native-randombytes')
@@ -200,6 +201,7 @@ dependencies {
     implementation 'com.facebook.fresco:webpsupport:1.10.0'
     implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
     implementation 'com.google.firebase:firebase-analytics:18.0.0'
+    implementation 'com.google.firebase:firebase-messaging:21.1.0'
     
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.google.http-client:google-http-client-gson:1.26.0'

@@ -11,167 +11,173 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { ScrollView } from 'react-native-gesture-handler'
+import { translations } from '../../common/content/LocContext'
 
 export default function CheckingAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
       ...styles.modalContainer, ...props.containerStyle
     }}>
-      <AppBottomSheetTouchableWrapper
-        style={{
-          justifyContent: 'center', alignItems: 'center'
-        }}
-        activeOpacity={10}
-        onPress={() => props.titleClicked && props.titleClicked()}
-      >
-        <Text style={styles.headerText}>Checking Account</Text>
-      </AppBottomSheetTouchableWrapper>
-      <View style={styles.headerSeparator} />
-      <ScrollView
-        ref={scrollViewRef}
-        style={{
-          flex: 1,
-          backgroundColor: Colors.blue,
-        }}
-        snapToInterval={hp( '85%' )}
-        decelerationRate="fast"
-      >
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '5%' ),
-            }}
-          >
-            Store some sats here, but not all. The sats here are your everyday sats - great for spending online or sending to your friends and family
-          </Text>
-          <View style={{
+      <View style={{
+        height: hp( 81 )
+      }}>
+        <AppBottomSheetTouchableWrapper
+          style={{
             justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/checking_account_info_1.png' )}
-              style={styles.helperImage}
-            />
-          </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginBottom: wp( '5%' ),
-            }}
-          >
-            For safely storing larger amounts of sats, you can use your Savings Account. This will keep your bitcoin safe and sound with better security!
-          </Text>
-          <AppBottomSheetTouchableWrapper
-            style={{
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              scrollViewRef.current &&
+          }}
+          activeOpacity={10}
+          onPress={() => props.titleClicked && props.titleClicked()}
+        >
+          <Text style={styles.headerText}>Checking Account</Text>
+        </AppBottomSheetTouchableWrapper>
+        <View style={styles.headerSeparator} />
+        <ScrollView
+          ref={scrollViewRef}
+          style={{
+          // flex: 1,
+            backgroundColor: Colors.blue,
+          }}
+          snapToInterval={hp( '85%' )}
+          decelerationRate="fast"
+        >
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                // marginTop: wp( '5%' ),
+              }}
+            >
+              {strings.checking1}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/checking_account_info_1.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '5%' ),
+              }}
+            >
+              {strings.checking2}
+            </Text>
+            <AppBottomSheetTouchableWrapper
+              style={{
+                alignItems: 'center'
+              }}
+              onPress={() => {
+                scrollViewRef.current &&
                 scrollViewRef.current.scrollTo( {
                   x: 0,
-                  y: hp( '85%' ),
+                  y: hp( '75%' ),
                   animated: true,
                 } )
-            }}
-          >
-            <FontAwesome
-              name="angle-double-down"
-              color={Colors.white}
-              size={40}
-            />
-          </AppBottomSheetTouchableWrapper>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
+              }}
+            >
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '5%' ),
-            }}
-          >
-            Your Checking Account is a single signature account. Your Savings Account is a 2 of 3 multi-signature account, secured by an authenticator
-          </Text>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/checking_account_info_1.png' )}
-              style={styles.helperImage}
-            />
-          </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginBottom: wp( '5%' ),
-            }}
-          >
-            Transactions from your Checking Account have lower fees compared to the Savings Account - keep bitcoin here for short-term holding or spending
-          </Text>
-          <AppBottomSheetTouchableWrapper
-            style={{
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              scrollViewRef.current &&
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                // marginTop: wp( '5%' ),
+              }}
+            >
+              {strings.checking3}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/checking_account_info_1.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '5%' ),
+              }}
+            >
+              {strings.checking4}
+            </Text>
+            <AppBottomSheetTouchableWrapper
+              style={{
+                alignItems: 'center'
+              }}
+              onPress={() => {
+                scrollViewRef.current &&
                 scrollViewRef.current.scrollTo( {
                   x: 0,
-                  y: hp( '170%' ),
+                  y: hp( '80%' ),
                   animated: true,
                 } )
-            }}
-          >
-            <FontAwesome
-              name="angle-double-down"
-              color={Colors.white}
-              size={40}
-            />
-          </AppBottomSheetTouchableWrapper>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
+              }}
+            >
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '5%' ),
-            }}
-          >
-            Be careful! Someone having your phone's and Hexa wallet’s passcodes, could easily spend or send sats out of your Checking Account. Don't keep sats here you don't expect to use soon
-          </Text>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/test_account_info_2.png' )}
-              style={styles.helperImage}
-            />
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '5%' ),
+              }}
+            >
+              {strings.checking5}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/test_account_info_2.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '5%' ),
+                paddingBottom: hp( '6%' ),
+              }}
+            >
+              {strings.checking6}
+            </Text>
           </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '5%' ),
-              paddingBottom: hp( '6%' ),
-            }}
-          >
-            Reminder: Due to the method we use to secure your Savings account, it is cheaper to send sats from your Checking Account compared to your Savings account
-          </Text>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   )
 }
 const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
+    // height: '80%',
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
@@ -186,7 +192,7 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 20 ),
-    marginTop: hp( '1%' ),
+    marginTop: hp( '2%' ),
     marginBottom: hp( '1%' ),
   },
   headerSeparator: {
@@ -224,7 +230,7 @@ const styles = StyleSheet.create( {
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp( '85%' ),
+    height: hp( '75%' ),
     justifyContent: 'space-between',
   },
   separatorView: {

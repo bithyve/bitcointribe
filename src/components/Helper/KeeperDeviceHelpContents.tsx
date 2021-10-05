@@ -93,7 +93,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            If your Keeper Device is not accessible, it is possible to restore it using your primary device and one of your Personal Copy Keepers 
+            If your Keeper Device is not accessible, it is possible to recover it using your primary device and one of your Personal Copy Keepers
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{
@@ -223,7 +223,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            Note that you cannot make a device that has your “Personal Copy” backed up as your Keeper Device. This is by design  
+            Note that you cannot make a device that has your “Personal Copy” backed up as your Keeper Device. This is by design
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center', marginTop: wp( '-20%' ), marginBottom: wp( '-20%' )
@@ -237,7 +237,7 @@ export default function KeeperDeviceHelpContents( props ) {
               }}
             />
           </View>
-         <Text
+          <Text
             style={{
               textAlign: 'center',
               color: Colors.white,

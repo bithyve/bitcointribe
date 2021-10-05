@@ -17,19 +17,22 @@ import CopyThisText from '../../components/CopyThisText'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RFValue } from 'react-native-responsive-fontsize'
-import QRCode from 'react-native-qrcode-svg'
-
+import QRCode from '../../components/QRCode'
+import { authenticator } from 'otplib'
 
 const TwoFASetup = props => {
   const twoFASetup = props.navigation.getParam( 'twoFASetup' )
-  const { qrData, secret } = twoFASetup
+  // const [ twoFAValidationModal, showTwoFAValidationModal ] = useState( false )
+  const { twoFAKey } = twoFASetup
 
   return (
     <SafeAreaView style={{
       flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={CommonStyles.headerContainer}>
+      <View style={[ CommonStyles.headerContainer, {
+        backgroundColor: Colors.white
+      } ]}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={
@@ -63,8 +66,8 @@ const TwoFASetup = props => {
         </View>
       </View>
       <View style={NavStyles.modalContentView}>
-        <QRCode value={qrData} size={hp( '27%' )} />
-        <CopyThisText text={secret} />
+        <QRCode title="2FA key" value={authenticator.keyuri( 'hexawallet.io', 'HEXA', twoFAKey )} size={hp( '27%' )} />
+        <CopyThisText text={twoFAKey} />
       </View>
       <View style={{
         margin: 20
@@ -76,6 +79,7 @@ const TwoFASetup = props => {
             onPress={
               () => {
                 props.navigation.navigate( 'TwoFAValidation' )
+                // showTwoFAValidationModal( true )
               }
             }
             style={{

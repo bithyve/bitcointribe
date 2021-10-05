@@ -11,88 +11,56 @@ import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
 import NewWalletName from '../pages/NewWalletName'
+import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
 import ReLogin from '../pages/ReLogin'
-import ManageBackup from '../pages/ManageBackup'
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP'
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted'
-import SecondaryDevice from '../pages/ManageBackup/SecondaryDevice'
-import TrustedContacts from '../pages/ManageBackup/TrustedContacts'
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
 import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
-import ReceivingAddress from '../pages/Accounts/ReceivingAddress'
 import QRScannerScreen from '../pages/QRScannerScreen'
-import HealthCheck from '../pages/HealthCheck'
-import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck'
-import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck'
-import NoteHealthCheck from '../pages/HealthCheck/NoteHealthCheck'
-import CloudHealthCheck from '../pages/HealthCheck/CloudHealthCheck'
-import SweepFundsFromExistingAccount from '../pages/RegenerateShare/SweepFundsFromExistingAccount'
-import NewWalletNameRegenerateShare from '../pages/RegenerateShare/NewWalletNameRegenerateShare'
-import NewWalletQuestionRegenerateShare from '../pages/RegenerateShare/NewWalletQuestionRegenerateShare'
-import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGenerationOTP'
-import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess'
-import SecureScan from '../pages/Accounts/SecureScan'
-import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP'
-import TwoFASetup from '../pages/Accounts/TwoFASetup'
-import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory'
-import SecondaryDeviceHistoryNewBHR from '../pages/NewBHR/SecondaryDeviceHistoryNewBHR'
-import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory'
-import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory'
-import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory'
-import SettingGetNewPin from '../pages/SettingGetNewPin'
-import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact'
-import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage'
-import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret'
-import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds'
 import UpdateApp from '../pages/UpdateApp'
-import SendRequest from '../pages/Contacts/SendRequest'
-import VoucherScanner from '../pages/FastBitcoin/VoucherScanner'
-import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest'
-import ContactDetails from '../pages/Contacts/ContactDetails'
-import Receive from '../pages/Accounts/Receive'
-import PairNewWallet from '../pages/FastBitcoin/PairNewWallet'
-import Intermediate from '../pages/Intermediate'
 import NewOwnQuestions from '../pages/NewOwnQuestions'
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
 import HomeStack from './stacks/home/HomeStack'
-import SendStack from './stacks/send/SendStack'
-import AccountDetailsStack from './stacks/accounts/AccountDetailsStack'
-import SwanIntegrationScreen from '../pages/SwanIntegration/SwanIntegrationScreen'
-import WyreIntegrationScreen from '../pages/WyreIntegration/WyreIntegrationScreen'
-
+import FriendsAndFamily from './stacks/F&F/F&FStack'
+import Colors from '../common/Colors'
+import Intermediate from '../pages/Intermediate'
 
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
-import RestoreWithoutICloud from '../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
-import SettingsContents from '../pages/SettingsContents'
-import SweepFunds from '../pages/SweepFunds/SweepFunds'
-import SweepFundsEnterAmount from '../pages/SweepFunds/SweepFundsEnterAmount'
-import SweepFundUseExitKey from '../pages/SweepFunds/SweepFundUseExitKey'
-import SweepConfirmation from '../pages/SweepFunds/SweepConfirmation'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
-import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup'
-import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys'
-import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity'
-// import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
-import ManageBackupNewBHR from '../pages/NewBHR/ManageBackupNewBHR'
-// import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
-import SecurityQuestionHistoryNewBHR from '../pages/NewBHR/SecurityQuestionHistory'
-// import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
-// import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistoryKeeper';
-import TrustedContactHistoryNewBHR from '../pages/NewBHR/TrustedContactHistoryKeeper'
-// import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
-// import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
-import PersonalCopyHistoryNewBHR from '../pages/NewBHR/PersonalCopyHistory'
-import CloudBackupHistory from '../pages/NewBHR/CloudBackupHistory'
+import { createBottomTabNavigator } from 'react-navigation-tabs'
+import { Text, View, Image, StyleSheet } from 'react-native'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+  widthPercentageToDP,
+} from 'react-native-responsive-screen'
+import Svg, { G, Path, Defs } from 'react-native-svg'
+import HomeSVG from '../assets/images/tabs/home.svg'
+import HomeInactiveSVG from '../assets/images/tabs/home_inactive.svg'
+import SecurityInactive from '../assets/images/tabs/security.svg'
+import Security from '../assets/images/tabs/security_active.svg'
+import SettingsInactive from '../assets/images/tabs/settings.svg'
+import Settings from '../assets/images/tabs/settings_active.svg'
+import FnFInactive from '../assets/images/tabs/f&f.svg'
+import FnF from '../assets/images/tabs/fnf_active.svg'
+import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
+import SecurityStack from './stacks/security/Security&Privacy'
+import BuyStack from './stacks/buy/BuyStack'
+import Header from './stacks/Header'
+import IconWithBadge from './stacks/security/IconWithBadge'
+
 const SetupNavigator = createStackNavigator(
   {
     Launch,
     Login,
     PasscodeConfirm,
     NewWalletName,
+    AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,
     WalletNameRecovery,
@@ -132,138 +100,265 @@ const MODAL_ROUTES = [
   'Intermediate',
 ]
 
-const HomeNavigator = createStackNavigator(
+const styles= StyleSheet.create( {
+  activeStyle:{
+    alignSelf: 'center',
+    marginTop: 2,
+    width: widthPercentageToDP( 1 ),
+    height: widthPercentageToDP( 1 ),
+    borderRadius: widthPercentageToDP( 0.5 ),
+    backgroundColor: Colors.white
+  },
+  inactiveStyle: {
+    alignSelf: 'center',
+    marginTop: 2,
+    width: widthPercentageToDP( 1 ),
+    height: widthPercentageToDP( 1 ),
+    borderRadius: widthPercentageToDP( 0.5 ),
+    // backgroundColor: Colors.white
+  }
+} )
+
+const Bottomtab = createBottomTabNavigator(
   {
     Home: {
       screen: HomeStack,
-      path: 'home',
-    },
-    ReLogin: {
-      screen: ReLogin,
       navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    Intermediate,
-    AccountDetails: {
-      screen: AccountDetailsStack,
-    },
-    ManageBackup,
-    SecondaryDevice,
-    TrustedContacts,
-    CustodianRequestOTP,
-    CustodianRequestAccepted,
-    HealthCheck,
-    SecondaryDeviceHealthCheck,
-    TrustedContactHealthCheck,
-    NoteHealthCheck,
-    CloudHealthCheck,
-    SweepFundsFromExistingAccount,
-    NewWalletNameRegenerateShare,
-    NewWalletQuestionRegenerateShare,
-    NewWalletGenerationOTP,
-    WalletCreationSuccess,
-    SecureScan,
-    GoogleAuthenticatorOTP,
-    SecondaryDeviceHistory,
-    SecondaryDeviceHistoryNewBHR,
-    TrustedContactHistory,
-    PersonalCopyHistory,
-    SecurityQuestionHistory,
-    SettingGetNewPin,
-    ContactsListForAssociateContact,
-    NewTwoFASecret,
-    TwoFASweepFunds,
-    SendRequest,
-    VoucherScanner,
-    AddContactSendRequest,
-    ContactDetails,
-    Receive,
-    PairNewWallet,
-    // ManageBackupKeeper,
-    ManageBackupNewBHR,
-    // SecurityQuestionHistoryKeeper,
-    SecurityQuestionHistoryNewBHR,
-    // KeeperFeatures,
-    // TrustedContactHistoryKeeper,
-    TrustedContactHistoryNewBHR,
-    // KeeperDeviceHistory,
-    // PersonalCopyHistoryKeeper,
-    PersonalCopyHistoryNewBHR,
-    CloudBackupHistory,
-    NewOwnQuestions,
-    RestoreWithICloud,
-    RestoreWithoutICloud,
-    SettingsContents,
-    SweepFunds,
-    SweepFundsEnterAmount,
-    SweepFundUseExitKey,
-    SweepConfirmation,
-    ScanRecoveryKey,
-    UpgradeBackup,
-    ConfirmKeys,
-    ManageBackupUpgradeSecurity,
-    TwoFAValidation,
-    TwoFASetup: {
-      screen: TwoFASetup,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    UpdateApp: {
-      screen: UpdateApp,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    PasscodeChangeSuccessPage: {
-      screen: PasscodeChangeSuccessPage,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    SwanIntegrationScreen: {
-      screen: SwanIntegrationScreen,
-      navigationOptions: {
-        title: 'Swan Home'
+        tabBarIcon: ( { focused } ) => {
+          return (
+            <View style={{
+              // marginVertical: hp( '2%' )
+            }}>
+              {focused ?
+                <HomeSVG/>
+                :
+                <HomeInactiveSVG/>
+              }
+
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+              {/* <Svg height= '30'>
+                <Image source={focused ? require( '../assets/images/tabs/fnf_active.svg' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
+                  width: 30, height: 30, alignSelf: 'center'
+                }} />
+              </Svg> */}
+            </View>
+          )
+        }
       }
     },
-    WyreIntegrationScreen: {
-      screen: WyreIntegrationScreen,
+    Freiend: {
+      screen: FriendsAndFamily,
       navigationOptions: {
-        title: 'Wyre Home'
-      }
-    }
+        tabBarIcon: ( { focused } ) => {
+          return (
+            <View style={{
+              // marginVertical: hp( '2%' )
+            }}>
+              {focused ?
+                <FnF /> : <FnFInactive />
+              }
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+            </View>
+          )
+        }
+      },
+    },
+    // Buy: {
+    //   screen: BuyStack,
+    //   navigationOptions: {
+    //     tabBarIcon: ( { focused } ) => {
+    //       return (
+    //         <View style={{
+    //           // marginVertical: hp( '2%' )
+    //         }}>
+    //           {focused ?
+    //             <Image source={require( '../assets/images/tabs/buy_active.png' )} style={{
+    //               marginBottom: 'auto',
+    //               width: 19, height: 23, alignSelf: 'center',
+    //               resizeMode: 'contain'
+    //               // backgroundColor: focused ? 'white': 'gray'
+    //             }} />
+    //             :
+    //             <Image source={require( '../assets/images/tabs/buy.png' )} style={{
+    //               marginBottom: 'auto',
+    //               width: 19, height: 23, alignSelf: 'center',
+    //               resizeMode: 'contain'
+    //               // backgroundColor: focused ? 'white': 'gray'
+    //             }} />
+    //           }
+    //           {/* {focused ?
+    //             <Svg
+    //               xmlns="http://www.w3.org/2000/svg"
+    //               width={18.824}
+    //               height={23.21}
+    //               viewBox="0 0 18.824 23.21"
+    //             >
+    //               <Defs></Defs>
+    //               <Path
+    //                 className="prefix__a"
+    //                 d="M2.56 16.811c-.333.015-.668.011-1.018.007h-.51a.463.463 0 00-.456.384l-.467 2.681a.463.463 0 00.456.543h4.063v2.195a.463.463 0 00.463.463h2.221a.463.463 0 00.463-.463v-2.08h.84v2.109a.463.463 0 00.463.463h2.25a.463.463 0 00.463-.463v-2.122l1.267-.032a5.35 5.35 0 003.369-9.73 4.821 4.821 0 00-3.567-8.068h-.951V.584a.463.463 0 00-.463-.463H9.195a.463.463 0 00-.463.463v2h-.838V.563a.463.463 0 00-.466-.459H5.182a.463.463 0 00-.463.463v2.137H.709a.463.463 0 00-.463.463v2.337a.463.463 0 00.463.463h.845c.28.007.561.014.84.038.533.048.721.254.717.789q-.037 4.763-.086 9.526c-.004.414-.06.473-.465.491zM2.477 5.084c-.3-.027-.6-.034-.9-.042h-.4V3.633h4.01a.463.463 0 00.463-.463V1.026h1.318v2.021a.463.463 0 00.463.463h1.764a.463.463 0 00.463-.463v-2h1.33v2.118a.463.463 0 00.136.328.426.426 0 00.328.135h1.414a3.895 3.895 0 012.521 6.866.463.463 0 00.075.758 4.43 4.43 0 01-2.405 8.322h-.012l-1.724.044a.463.463 0 00-.451.463v2.103H9.543v-2.109a.463.463 0 00-.463-.463H7.313a.463.463 0 00-.463.463v2.08H5.555V19.96a.463.463 0 00-.463-.463H1.115l.305-1.753h.108c.368 0 .719.007 1.068-.008a1.252 1.252 0 001.351-1.4q.05-4.764.086-9.528a1.561 1.561 0 00-1.556-1.723z"
+    //               />
+    //               <Path
+    //                 className="prefix__a"
+    //                 d="M7.435 10.654h2.953a2.683 2.683 0 100-5.366H7.435a.463.463 0 00-.463.463v4.437a.463.463 0 00.463.466zm.463-4.439h2.49a1.757 1.757 0 110 3.513h-2.49zM7.435 17.807h3.691a2.928 2.928 0 100-5.855H7.435a.463.463 0 00-.463.463v4.929a.463.463 0 00.463.463zm.463-4.929h3.227a2 2 0 110 4H7.898z"
+    //               />
+    //             </Svg>
+    //             :
+    //             <Svg
+    //               xmlns="http://www.w3.org/2000/svg"
+    //               width={18.824}
+    //               height={23.21}
+    //               viewBox="0 0 18.824 23.21"
+    //             >
+    //               <Defs></Defs>
+    //               <Path
+    //                 className="prefix__a"
+    //                 d="M2.56 16.811c-.333.015-.668.011-1.018.007h-.51a.463.463 0 00-.456.384l-.467 2.681a.463.463 0 00.456.543h4.063v2.195a.463.463 0 00.463.463h2.221a.463.463 0 00.463-.463v-2.08h.84v2.109a.463.463 0 00.463.463h2.25a.463.463 0 00.463-.463v-2.122l1.267-.032a5.35 5.35 0 003.369-9.73 4.821 4.821 0 00-3.567-8.068h-.951V.584a.463.463 0 00-.463-.463H9.195a.463.463 0 00-.463.463v2h-.838V.563a.463.463 0 00-.466-.459H5.182a.463.463 0 00-.463.463v2.137H.709a.463.463 0 00-.463.463v2.337a.463.463 0 00.463.463h.845c.28.007.561.014.84.038.533.048.721.254.717.789q-.037 4.763-.086 9.526c-.004.414-.06.473-.465.491zM2.477 5.084c-.3-.027-.6-.034-.9-.042h-.4V3.633h4.01a.463.463 0 00.463-.463V1.026h1.318v2.021a.463.463 0 00.463.463h1.764a.463.463 0 00.463-.463v-2h1.33v2.118a.463.463 0 00.136.328.426.426 0 00.328.135h1.414a3.895 3.895 0 012.521 6.866.463.463 0 00.075.758 4.43 4.43 0 01-2.405 8.322h-.012l-1.724.044a.463.463 0 00-.451.463v2.103H9.543v-2.109a.463.463 0 00-.463-.463H7.313a.463.463 0 00-.463.463v2.08H5.555V19.96a.463.463 0 00-.463-.463H1.115l.305-1.753h.108c.368 0 .719.007 1.068-.008a1.252 1.252 0 001.351-1.4q.05-4.764.086-9.528a1.561 1.561 0 00-1.556-1.723z"
+    //               />
+    //               <Path
+    //                 className="prefix__a"
+    //                 d="M7.435 10.654h2.953a2.683 2.683 0 100-5.366H7.435a.463.463 0 00-.463.463v4.437a.463.463 0 00.463.466zm.463-4.439h2.49a1.757 1.757 0 110 3.513h-2.49zM7.435 17.807h3.691a2.928 2.928 0 100-5.855H7.435a.463.463 0 00-.463.463v4.929a.463.463 0 00.463.463zm.463-4.929h3.227a2 2 0 110 4H7.898z"
+    //               />
+    //             </Svg>
+    //           } */}
+    //           {focused &&
+    //           <View style={styles.activeStyle}/>
+    //           }
+    //         </View>
+    //       )
+    //     }
+    //   },
+    // },
+    Securiy: {
+      screen: SecurityStack,
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return (
+            <IconWithBadge focused={focused} />
+          )
+        }
+      },
+    },
+
+    Setting: {
+      screen: MoreOptionsStack,
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return (
+            <View style={{
+            }}>
+              {focused ?
+                <Settings />
+                :
+                <SettingsInactive />
+              }
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+            </View>
+
+          )
+        }
+      },
+    },
   },
   {
-    headerLayoutPreset: 'center',
+    initialRouteName: 'Home',
+    // swipeEnabled: false,
+    // animationEnabled: false,
+    // lazy: false,
+    tabBarOptions: {
+      showLabel: false,
+      style: {
+        backgroundColor: Colors.blue
+      },
+      // barStyle: {
+      //   // flex: 1,
+      //   overflow:'hidden',
+      //   backgroundColor: Colors.blue,
+      //   borderRadius: 45,
+      //   margin: 15,
+      //   alignItems: 'center',
+      //   height: 70
+      // },
+      //   // flex: 1,
+      //   width: '90%',
+      //   // height: '20%',
+      //   borderRadius: 45,
+      //   overflow:'hidden',
+      //   // marginVertical: 9,
+      //   // marginHorizontal: 9,
+      //   // height: 45,
+      //   // marginBottom: hp( '1' ),
+      //   alignContent:'center',
+      //   alignSelf: 'center',
+      //   alignItems: 'center'
+      // },
+      // tabStyle:{
+      //   // margin: 15
+      //   // flex: 1,
+      //   padding: hp( 1 ),
+      //   backgroundColor: Colors.blue,
+      //   alignSelf: 'center'
+      // }
+    }
+    // transitionConfig: () => ( {
+    //   transitionSpec: {
+    //     duration: 0,
+    //   },
+    // } ),
+    // lazy: false,
+    // labeled: false,
+    // activeColor: 'red',
+    // inactiveColor: 'white',
+
+  },
+)
+const HomeNavigator = createStackNavigator(
+  {
+    Landing: {
+      screen: Bottomtab,
+      // navigationOptions: {
+      //   gesturesEnabled: false,
+      // },
+
+    },
+    // Intermediate,
+    // Login,
+  }, {
     defaultNavigationOptions: ( { navigation } ) => {
+      // if ( ( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
+      // ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
+      // ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
+      // ( navigation.state.routes[ 3 ].routes.length == 1 )
+      // ) {
       return {
-        header: null,
-        headerTitleContainerStyle: {
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
+        header: () => {
+          return <Header showContent={( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
+            ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
+            ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
+            ( navigation.state.routes[ 3 ].routes.length == 1 )
+          }
+          />
         },
       }
+      // } else {
+      //   return {
+      //     header: null
+      //   }
+      // }
     },
-    transitionConfig: ( transitionProps, prevTransitionProps ) => {
-
-      // 📝 Override the default presentation mode for screens that we
-      // want to present modally
-      const isModal = MODAL_ROUTES.some(
-        ( screenName ) =>
-          screenName === transitionProps.scene.route.routeName ||
-          ( prevTransitionProps &&
-            screenName === prevTransitionProps.scene.route.routeName ),
-      )
-
-      return StackViewTransitionConfigs.defaultTransitionConfig(
-        transitionProps,
-        prevTransitionProps,
-        isModal,
-      )
-    },
-  },
+  }
 )
 
 const Navigator = createSwitchNavigator( {

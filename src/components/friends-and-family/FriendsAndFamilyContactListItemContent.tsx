@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import React, { useContext, useMemo } from 'react'
+import { View, Text, StyleSheet, Image } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientAvatar from '../RecipientAvatar'
@@ -14,13 +14,18 @@ import ImageStyles from '../../common/Styles/ImageStyles'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
 import { agoTextForLastSeen } from '../send/LastSeenActiveUtils'
+import {  LocalizationContext } from '../../common/content/LocContext'
 
 export type Props = {
   contact: ContactRecipientDescribing,
+  index: number
 };
 
-const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: Props ) => {
-
+const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, index }: Props ) => {
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
+  const lastSeenDays = agoTextForLastSeen( contact.lastSeenActive )
   const firstNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' )[ 0 ] + ' '
   }, [ contact ] )
@@ -28,35 +33,6 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
   const secondNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' ).slice( 1 ).join( ' ' )
   }, [ contact ] )
-
-
-  const hasExpirationBadge = useMemo( () => {
-    // TODO: Establish more clarity about what this logic is supposed to mean.
-    return (
-      (
-        contact.hasTrustedChannelWithUser == false
-        || contact.trustKind != ContactTrustKind.USER_IS_KEEPING
-      ) &&
-      (
-        contact.hasXPub ||
-        contact.hasTrustedAddress
-      ) == false
-    )
-  }, [ contact ] )
-
-  const secondsUntilTrustedContactRequestExpiration = useMemo( () => {
-    if ( hasExpirationBadge == false ) { return }
-
-    return (
-      ( HexaConfig.TC_REQUEST_EXPIRY / 1000 ) -
-      ( ( Date.now() - contact.initiatedAt ) / 1000 )
-    )
-  }, [ hasExpirationBadge ] )
-
-  const isTrustedContactRequestExpired = useMemo( () => {
-    return secondsUntilTrustedContactRequestExpiration <= 0
-  }, [ secondsUntilTrustedContactRequestExpiration ] )
-
 
   return (
     <>
@@ -82,19 +58,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
       <ListItem.Content style={{
         flex: 1
       }}>
-        {Number.isFinite( contact.lastSeenActive ) && (
-          <ListItem.Subtitle
-            style={styles.lastSeenText}
-            numberOfLines={1}
-          >
-            <Text>Last seen </Text>
-            <Text style={{
-              fontFamily: Fonts.FiraSansMediumItalic
-            }}>
-              {agoTextForLastSeen( contact.lastSeenActive )}
-            </Text>
-          </ListItem.Subtitle>
-        )}
+
 
         <ListItem.Title
           style={styles.listItemTitle}
@@ -103,6 +67,26 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
           <Text>{firstNamePieceText}</Text>
           <Text style={styles.secondNamePieceText}>{secondNamePieceText}</Text>
         </ListItem.Title>
+        <ListItem.Subtitle
+          style={styles.lastSeenText}
+          numberOfLines={1}
+        >
+          <Text>{`${strings.lastSeen} `}</Text>
+          {Number.isFinite( contact.lastSeenActive ) ? (
+
+            <Text style={{
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>
+              {lastSeenDays === 'today'? common.today : lastSeenDays}
+            </Text>
+          ) : (
+            <Text style={{
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>
+              {common.unknown}
+            </Text>
+          )}
+        </ListItem.Subtitle>
 
         {/*
           📝 TODO: Show this when the F&F list is refactored to a
@@ -116,54 +100,12 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
         </ListItem.Subtitle> */}
 
       </ListItem.Content>
-
-      {hasExpirationBadge && (
-        <ListItem.Content style={{
-          flex: 0, marginRight: 6
-        }}>
-          {isTrustedContactRequestExpired && (
-            <View
-              style={styles.expirationBadgeContainer}
-            >
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Expired
-              </Text>
-            </View>
-          ) || (
-            <CountDown
-              size={12}
-              until={secondsUntilTrustedContactRequestExpiration}
-              digitStyle={{
-                backgroundColor: '#FFF',
-                borderWidth: 0,
-                borderColor: '#FFF',
-                margin: -10,
-              }}
-              digitTxtStyle={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-              separatorStyle={{
-                color: Colors.textColorGrey
-              }}
-              timeToShow={[ 'H', 'M', 'S' ]}
-              timeLabels={{
-                h: null, m: null, s: null
-              }}
-              showSeparator
-            />
-          )}
-        </ListItem.Content>
-      )}
-
-      <ListItem.Chevron />
+      {/* <Image
+        style={{
+          width: 18, height: 18
+        }}
+        source={require( '../../assets/images/icons/own-node.png' )}
+      /> */}
     </>
   )
 }
@@ -172,12 +114,14 @@ const styles = StyleSheet.create( {
   avatarContainer: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
+    borderRadius: widthPercentageToDP( 14 )/2,
     marginRight: 16,
   },
 
   avatarImage: {
-    ...ImageStyles.thumbnailImageLarge,
-    borderRadius: 9999,
+    width: widthPercentageToDP( 13 ),
+    height: widthPercentageToDP( 13 ),
+    borderRadius: widthPercentageToDP( 13 )/2,
   },
 
   listItemTitle: {

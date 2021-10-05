@@ -81,7 +81,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
     >
       {isOn ? (
         <View style={{
-          flexDirection: isVertical ? 'column' : 'row' 
+          flexDirection: isVertical ? 'column' : 'row'
         }}>
 
           <View
@@ -141,7 +141,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
         </View>
       ) : (
         <View style={{
-          flexDirection: isVertical ? 'column' : 'row' 
+          flexDirection: isVertical ? 'column' : 'row'
         }}>
           <View
             style={{
@@ -168,7 +168,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                 || (
                   <Image
                     source={
-                      activeOffImage || getCurrencyImageByRegion( fiatCurrencyCode, 'dark' )
+                      activeOffImage || getCurrencyImageByRegion( fiatCurrencyCode, 'light' )
                     }
                     style={{
                       width: wp( '3.5%' ),

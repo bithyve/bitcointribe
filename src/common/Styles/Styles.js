@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import Colors from '../Colors'
 import Fonts from '../Fonts'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 
 export default StyleSheet.create( {
@@ -10,9 +10,9 @@ export default StyleSheet.create( {
     marginTop: 10,
     alignItems: 'center',
     height: 54,
-    backgroundColor: Colors.white,
-    borderBottomColor: Colors.white,
-    borderBottomWidth: 0.5,
+    backgroundColor: Colors.backgroundColor,
+    // borderBottomColor: Colors.white,
+    // borderBottomWidth: 0.5,
   },
 
   headerLeftIconContainer: {
@@ -28,11 +28,27 @@ export default StyleSheet.create( {
 
   headerTitles: {
     color: Colors.blue,
-    fontSize: RFValue( 25 ),
+    fontSize: RFValue( 22 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },
-
+  subHeaderTitles: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    marginLeft: 20,
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop: heightPercentageToDP( 1 ),
+    letterSpacing: 0.6
+  },
+  headerInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    marginLeft: 15,
+    marginRight: 15,
+    fontWeight: 'normal',
+    marginTop: 3,
+    fontFamily: Fonts.FiraSansRegular,
+  },
   headerTitlesInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
@@ -56,10 +72,10 @@ export default StyleSheet.create( {
   },
 
   homepageAmountImage: {
-    width: widthPercentageToDP( 3 ),
-    height: widthPercentageToDP( 3 ),
+    width: widthPercentageToDP( 3.5 ),
+    height: widthPercentageToDP( 3.5 ),
     marginRight: 5,
-    marginBottom: widthPercentageToDP( 1 ),
+    // marginBottom: widthPercentageToDP( 1 ),
     resizeMode: 'contain'
   },
 

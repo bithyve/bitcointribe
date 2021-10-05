@@ -9,12 +9,16 @@ import BitcoinUnit, { displayNameForBitcoinUnit } from '../../../common/data/enu
 import { UsNumberFormat } from '../../../common/utilities'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import { shadowColorForAccountKind } from '../../../components/account-details/AccountDetailsCard'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   availableBalance: Satoshis;
   bitcoinUnit: BitcoinUnit,
   onViewMorePressed: () => void;
   isTestAccount?: boolean;
+  kind: SubAccountKind
 };
 
 const TransactionPreviewHeader: React.FC<Props> = ( {
@@ -22,7 +26,9 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
   bitcoinUnit,
   onViewMorePressed,
   isTestAccount = false,
+  kind,
 }: Props ) => {
+  const strings  = translations[ 'accounts' ]
 
   const formattedBalanceText = isTestAccount ?
     UsNumberFormat( availableBalance )
@@ -31,29 +37,31 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
   const formattedUnitText = isTestAccount ?
     displayNameForBitcoinUnit( bitcoinUnit )
     : useFormattedUnitText( {
-      bitcoinUnit 
+      bitcoinUnit
     } )
 
   return (
     <View style={styles.rootContainer}>
 
       <Text style={{
-        ...ListStyles.listItemTitle, marginBottom: 12 
+        ...ListStyles.listItemTitle, marginBottom: 12,  color: shadowColorForAccountKind( {
+          kind
+        } )
       }}>
-        Available to Spend: {formattedBalanceText} {formattedUnitText}
+        {`${strings.availableToSpend}: ${formattedBalanceText} ${formattedUnitText}`}
       </Text>
 
       <View style={styles.viewMoreLinkRow}>
-        <Text style={styles.headerDateText}>Today</Text>
+        <Text style={styles.headerDateText}>{strings.RecentTransactions}</Text>
 
         <TouchableOpacity
           style={{
-            marginLeft: 'auto', flex: 0 
+            marginLeft: 'auto', flex: 0
           }}
           onPress={onViewMorePressed}
         >
           <Text style={styles.headerTouchableText}>
-            View More
+            {strings.ViewMore}
           </Text>
         </TouchableOpacity>
       </View>

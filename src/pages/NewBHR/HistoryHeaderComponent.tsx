@@ -7,8 +7,11 @@ import {
 } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { translations } from '../../common/content/LocContext'
 
 const HistoryHeaderComponent = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+
   return (
     <View style={styles.modalHeaderTitleView}>
       <View style={{
@@ -42,7 +45,7 @@ const HistoryHeaderComponent = ( props ) => {
             flex: 1, justifyContent: 'center'
           }}>
             <Text style={styles.infoText}>
-              Last backup{' '}
+              {`${strings.Lastbackup} `}
               <Text style={{
                 fontFamily: Fonts.FiraSansMediumItalic
               }}>

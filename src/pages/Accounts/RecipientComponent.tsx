@@ -152,8 +152,9 @@ function RecipientComponent( {
 
 const styles = StyleSheet.create( {
   avatarImage: {
-    ...ImageStyles.circledAvatarContainer,
+    // ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageXLarge,
+    borderRadius: wp( 18 )/2
   },
 
   circleShapeView: {

@@ -15,7 +15,7 @@ import CloudKit
     super.init()
   }
   
-  @objc func startBackup(json: String, callback: @escaping ((ObjCBool) -> Void)){
+  @objc func startBackup(json: String, callback: @escaping ((String) -> Void)){
     let pred = NSPredicate(value: true)
     let ckQuery = CKQuery(recordType: "HexaJSONBackup", predicate: pred)
     let operation = CKQueryOperation(query: ckQuery)
@@ -33,32 +33,32 @@ import CloudKit
       }
     }
     operation.queryCompletionBlock = {(_,err) in
-      if let err = err{
+      if let err = err as? CKError{
         print(err)
-        callback(false)
+        callback("{\"status\": false, \"error\": \"\(err.localizedDescription)\", \"errorCode\": \(err.errorCode)}")
         return
       }
       print("FETCH OPERATION COMPLETED & DELETE Scheduled for all")
       let ckr = CKRecord(recordType: "HexaJSONBackup")
       ckr["json"] = json
       CKContainer.init(identifier: "iCloud.io.hexawallet.hexa").privateCloudDatabase.save(ckr) { (record, err) in
-        if let err = err{
+        if let err = err as? CKError{
           print(err)
-          callback(false)
+          callback("{\"status\": false, \"error\": \"\(err.localizedDescription)\", \"errorCode\": \(err.errorCode)}")
           return
         }
         guard let record = record else{
           print("no records....")
-          callback(false)
+          callback("{\"status\": false, \"errorCode\": -1}")
           return
         }
         guard (record["json"] as? String) != nil else{
           print("no json in record....")
-          callback(false)
+          callback("{\"status\": false, \"errorCode\": -1}")
           return
         }
         print("UPLOADED NEW JSON")
-        callback(true)
+        callback("{\"status\": true, \"errorCode\": 1111}")
       }
     }
     CKContainer.init(identifier: "iCloud.io.hexawallet.hexa").privateCloudDatabase.add(operation)
@@ -89,10 +89,9 @@ import CloudKit
       jsonFromiCloud = jsoniCloud
     }
     operation.queryCompletionBlock = {(_,err) in
-      print("queryCompleted")
-      if let err = err{
+      if let err = err as? CKError{
         print(err)
-        callback("failure")
+        callback("{\"status\": false, \"error\": \"\(err.localizedDescription)\", \"errorCode\": \(err.errorCode)}")
         return
       }
       callback(jsonFromiCloud)

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { View, StyleSheet, Image } from 'react-native'
+import { View, StyleSheet, Image, Text } from 'react-native'
 import { Card } from 'react-native-elements'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -10,6 +10,9 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { useSelector } from 'react-redux'
+import Fonts from '../../common/Fonts'
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
@@ -29,12 +32,16 @@ const SubAccountOptionCard: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
 
   const selectionIndicatorContainerStyle = useMemo( () => {
     return {
       ...styles.selectionIndicatorContainer,
       borderColor: isSelected ? Colors.blue : Colors.borderColor,
       backgroundColor: isSelected ? Colors.blue : 'transparent',
+      margin: 1
     }
   }, [ isSelected ] )
 
@@ -66,6 +73,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
       ...styles.descriptionTextContainer,
       flex: isDisabled ? 0 : 1,
       marginBottom: isDisabled ? -8 : 8,
+      // backgroundColor: 'red',
     }
   }, [ isSelected ] )
 
@@ -118,7 +126,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
 
         <Image
           style={styles.image}
-          source={getAvatarForSubAccount( subAccountInfo )}
+          source={getAvatarForSubAccount( subAccountInfo, isSelected )}
         />
 
         <View style={descriptionTextContainerStyle}>
@@ -130,16 +138,19 @@ const SubAccountOptionCard: React.FC<Props> = ( {
           </Card.Title>
         </View>
 
-        {isDisabled == false && (
-          <View style={selectionIndicatorContainerStyle}>
-            {isSelected && (
-              <Image
-                style={styles.selectionIndicatorImage}
-                source={require( '../../assets/images/icons/checkmark.png' )}
-              />
-            )}
-          </View>
-        )}
+        {!AllowSecureAccount && subAccountInfo.type == 'SAVINGS_ACCOUNT' ? <Text style={{
+          color: Colors.blue, fontSize: RFValue( 10 ), fontFamily: Fonts.FiraSansRegular
+        }}>Level up to use</Text> :
+          isDisabled == false && (
+            <View style={selectionIndicatorContainerStyle}>
+              {isSelected && (
+                <Image
+                  style={styles.selectionIndicatorImage}
+                  source={require( '../../assets/images/icons/checkmark.png' )}
+                />
+              )}
+            </View>
+          )}
       </Card>
     </View>
   )
@@ -158,10 +169,11 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: 22,
-    height: 22,
-    marginBottom: 8,
-    marginTop: 8
+    width: widthPercentageToDP( 5.4 ),
+    height: widthPercentageToDP( 5.4 ),
+    marginBottom: 10,
+    marginTop: 5,
+    resizeMode: 'contain'
   },
 
   cardContainer: {
@@ -176,6 +188,7 @@ const styles = StyleSheet.create( {
     backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     elevation: 2,
+    marginVertical: -6
   },
 
   descriptionTextContainer: {
@@ -186,7 +199,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 4,
   },
 
   subtitleText: {
@@ -194,6 +207,8 @@ const styles = StyleSheet.create( {
     fontWeight: '500',
     textAlign: 'center',
     marginBottom: 2,
+    flex: 1,
+    alignSelf: 'center'
   },
 
   selectionIndicatorContainer: {

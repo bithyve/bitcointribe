@@ -25,20 +25,24 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import { TxPriority } from '../../../bitcoin/utilities/Interface'
+import AccountShell from '../../../common/data/models/AccountShell'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 export type Props = {
-  sourceSubAccount: SubAccountDescribing;
+  accountShell: AccountShell;
   bitcoinDisplayUnit: BitcoinUnit;
-  onTransactionPriorityChanged: ( priority: TransactionPriority ) => void;
+  onTransactionPriorityChanged: ( priority: TxPriority ) => void;
 };
 
 const TransactionPriorityMenu: React.FC<Props> = ( {
-  sourceSubAccount,
+  accountShell,
   bitcoinDisplayUnit,
   onTransactionPriorityChanged,
 }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
-  const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
+  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
+  const [ customPriorityModel, showCustomPriorityModel ] = useState( false )
   const availableTransactionPriorities = useAvailableTransactionPriorities()
   const [ transactionPriorities, setTransactionPriorities ] = useState( availableTransactionPriorities )
   const transactionFeeInfo = useTransactionFeeInfoForSending()
@@ -47,12 +51,21 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
   const network = useMemo( () => {
     return config.APP_STAGE === 'dev' ||
-      sourceSubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+    accountShell.primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
       ? NetworkKind.TESTNET : NetworkKind.MAINNET
-  }, [ sourceSubAccount.sourceKind, config ] )
+  }, [ accountShell.primarySubAccount.sourceKind, config ] )
+
+  const TextValue = ( { amt, unit } ) => {
+    return (
+      <Text style={{
+        ...styles.priorityTableText,
+        flex: 1,
+      }}>{`${useFormattedAmountText( amt )} ${useFormattedUnitText( unit )}`}</Text>
+    )
+  }
 
   const showCustomPriorityBottomSheet = useCallback( () => {
-    presentBottomSheet(
+    return(
       <CustomPriorityContent
         title={'Custom Priority'}
         info={'Enter the fee rate in sats per byte.'}
@@ -62,24 +75,21 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
         isCancel={true}
         onPressOk={( amount, customEstimatedBlock ) => {
           Keyboard.dismiss()
+          showCustomPriorityModel( false )
           handleCustomFee( amount, customEstimatedBlock )
         }}
         onPressCancel={() => {
           Keyboard.dismiss()
-          dismissBottomSheet()
+          showCustomPriorityModel( false )
         }}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '44%' ],
-      },
+      />
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
 
   const handleCustomFee = ( feePerByte, customEstimatedBlocks ) => {
     dispatch( calculateCustomFee( {
-      accountShellID: sourceSubAccount.accountShellID,
+      accountShell: accountShell,
       feePerByte,
       customEstimatedBlocks,
     } ) )
@@ -90,12 +100,12 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
     const txPriorites = availableTransactionPriorities
     if( customPriorityST1.hasFailed ) {
       setTransactionPriorities( txPriorites )
-      setTransactionPriority( TransactionPriority.LOW )
-      onTransactionPriorityChanged( TransactionPriority.LOW )
+      setTransactionPriority( TxPriority.LOW )
+      onTransactionPriorityChanged( TxPriority.LOW )
     } else if ( customPriorityST1.isSuccessful ) {
-      setTransactionPriorities( [ ...txPriorites, TransactionPriority.CUSTOM ] )
-      setTransactionPriority( TransactionPriority.CUSTOM )
-      onTransactionPriorityChanged( TransactionPriority.CUSTOM )
+      setTransactionPriorities( [ ...txPriorites, TxPriority.CUSTOM ] )
+      setTransactionPriority( TxPriority.CUSTOM )
+      onTransactionPriorityChanged( TxPriority.CUSTOM )
       dismissBottomSheet()
     }
   }
@@ -151,7 +161,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                   ...styles.priorityTableText,
                   marginLeft: 12,
                 }}>
-                  {String( priority )}
+                  {String( priority.toUpperCase() )}
                 </Text>
               </View>
 
@@ -161,26 +171,28 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
               }}>
                 ~
                 {timeConvertNear30(
-                  ( transactionFeeInfo[ priority ].estimatedBlocksBeforeConfirmation + 1 )
+                  ( transactionFeeInfo[ priority.toUpperCase() ].estimatedBlocksBeforeConfirmation + 1 )
                   * 10
                 )}
               </Text>
-
-              <Text style={{
+              <TextValue amt={transactionFeeInfo[ priority.toUpperCase() ].amount} unit={{
+                bitcoinUnit: BitcoinUnit.SATS,
+              }}/>
+              {/* <Text style={{
                 ...styles.priorityTableText,
                 flex: 1,
               }}>
                 {useFormattedAmountText( transactionFeeInfo[ priority ].amount )} {useFormattedUnitText( {
                   bitcoinUnit: BitcoinUnit.SATS,
                 } )}
-              </Text>
+              </Text> */}
             </View>
           )
         } )}
 
         <TouchableOpacity
           style={styles.customPriorityGroupBox}
-          onPress={showCustomPriorityBottomSheet}
+          onPress={() => showCustomPriorityModel( true )}
         >
           <View
             style={{
@@ -210,6 +222,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
           </View>
         </TouchableOpacity>
       </View>
+      <ModalContainer visible={customPriorityModel} closeBottomSheet={() => {}} >
+        {showCustomPriorityBottomSheet()}
+      </ModalContainer>
     </View>
   )
 }

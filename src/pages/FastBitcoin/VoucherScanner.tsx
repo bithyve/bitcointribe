@@ -9,11 +9,11 @@ import {
   Platform,
   Image,
   ImageBackground,
-  AsyncStorage,
   Linking,
   TextInput,
   KeyboardAvoidingView,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import DeviceInfo from 'react-native-device-info'
 import NavStyles from '../../common/Styles/NavStyles'
@@ -617,7 +617,7 @@ const VoucherScanner = ( props ) => {
         cancelButtonText={'Back'}
         onPressIgnore={() => {}}
         isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/illustration.png' )}
+        bottomImage={require( '../../assets/images/icons/success.png' )}
       />
     )
   }, [ FBTCAccount_Data ] )
@@ -905,7 +905,9 @@ const VoucherScanner = ( props ) => {
         flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={NavStyles.modalHeaderTitleView}>
+      <View style={[ NavStyles.modalHeaderTitleView, {
+        marginHorizontal: 0
+      } ]}>
         <View style={{
           flex: 1, flexDirection: 'row', alignItems: 'center'
         }}>
@@ -988,7 +990,7 @@ const VoucherScanner = ( props ) => {
             )}
             <TextInput
               placeholder={'Enter Voucher Code'}
-              placeholderTextColor={Colors.borderColor}
+              // placeholderTextColor={Colors.borderColor}
               style={styles.qrModalTextInput}
               autoCorrect={false}
               onChangeText={( text ) => {
@@ -1389,7 +1391,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: Colors.backgroundColor,
+    borderColor: Colors.borderColor,
     height: 50,
     margin: 20,
     paddingLeft: 15,

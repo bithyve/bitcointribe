@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -14,22 +14,24 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2, resetSendStage1, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
-import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
-import TransactionPriority from '../../../common/data/enums/TransactionPriority'
+import { executeSendStage2, resetSendStage1, sendTxNotification } from '../../../store/actions/sending'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import SendConfirmationContent from '../SendConfirmationContent'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { clearTransfer, refreshAccountShell } from '../../../store/actions/accounts'
+import { clearTransfer, refreshAccountShells } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { TxPriority } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 
 export type NavigationParams = {
 };
@@ -44,87 +46,93 @@ export type Props = {
 
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
-
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
-
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
+  const [ sendSuccessModal, setSuccess ] = useState( false )
+  const [ sendFailureModal, setFailure ] = useState( false )
+  const [ errorMessage, setError ] = useState( '' )
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-  const usingExitKey = useExitKeyForSending()
   const sendingState = useSendingState()
-  const donationId = useDonationIdFromSelectedRecipients()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
-
-  const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
+  const [ note, setNote ] = useState( '' )
+  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+    return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
-  const showSendSuccessBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  useEffect( () => {
+    return () => {
+      // dismissBottomSheet()
+      setSuccess( false )
+      setFailure( false )
+    }
+  }, [ navigation ] )
+
+  const showSendSuccessBottomSheet = () => {
+    return(
       <SendConfirmationContent
-        title={'Sent Successfully'}
-        info={'Transaction(s) successfully submitted'}
-        infoText={'bitcoin successfully sent from your account'}
+        title={strings.SentSuccessfully}
+        info={strings.Transactionsubmitted}
+        infoText={strings.tsatsSent}
         recipients={sendingState.selectedRecipients}
         isFromContact={false}
-        okButtonText={'View Account'}
-        cancelButtonText={'Back'}
+        okButtonText={strings.ViewAccount}
+        cancelButtonText={common.back}
         isCancel={false}
         onPressOk={() => {
-          dismissBottomSheet()
+        // dismissBottomSheet()
+          setSuccess( false )
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          dispatch( refreshAccountShell( sourceAccountShell, {
-            autoSync: false,
-            hardRefresh: false,
-          } ) )
+          requestAnimationFrame( () => {
+            dispatch( refreshAccountShells( [ sourceAccountShell ], {
+            } ) )
+          } )
           navigation.dispatch(
             resetStackToAccountDetails( {
               accountShellID: sourceAccountShell.id,
             } )
           )
         }}
-        onPressCancel={dismissBottomSheet}
+        onPressCancel={() => setSuccess( false )}
         isSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        dismissOnOverlayPress: false,
-        dismissOnScrollDown: false,
-        snapPoints: [ '52%', '52%' ],
-      },
+      />
+    //   ,
+    //   {
+    //     ...defaultBottomSheetConfigs,
+    //     dismissOnOverlayPress: false,
+    //     dismissOnScrollDown: false,
+    //     snapPoints: [ '52%', '52%' ],
+    //   },
     )
-  },
-  [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
-  const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
-    presentBottomSheet(
+  const showSendFailureBottomSheet = useCallback( () => {
+    return(
       <SendConfirmationContent
-        title={'Send Unsuccessful'}
+        title={strings.SendUnsuccessful}
         info={String( errorMessage )}
         isFromContact={false}
         recipients={sendingState.selectedRecipients}
-        okButtonText={'Try Again'}
-        cancelButtonText={'Back'}
+        okButtonText={common.tryAgain}
+        cancelButtonText={common.back}
         isCancel={true}
-        onPressOk={dismissBottomSheet}
+        onPressOk={() => setFailure( false )}
         onPressCancel={() => {
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
-          dismissBottomSheet()
-
+          // dismissBottomSheet()
+          setFailure( false )
           navigation.dispatch(
             resetStackToAccountDetails( {
               accountShellID: sourceAccountShell.id,
@@ -133,27 +141,22 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
-      },
+      />
     )
-  },
-  [ presentBottomSheet, dismissBottomSheet ] )
+  }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
-    if( usingExitKey ){
-      dispatch( executeAlternateSendStage2( {
-        accountShellID: sourceAccountShell.id,
-        txnPriority: String( transactionPriority ),
-      } ) )
-    } else {
+    if( sourceAccountShell.primarySubAccount.isTFAEnabled )
+      navigation.navigate( 'OTPAuthentication', {
+        txnPriority: transactionPriority,
+        note
+      } )
+    else
       dispatch( executeSendStage2( {
-        accountShellID: sourceAccountShell.id,
-        txnPriority: String( transactionPriority ),
+        accountShell: sourceAccountShell,
+        txnPriority: transactionPriority,
+        note
       } ) )
-    }
   }
 
   function handleBackButtonPress() {
@@ -169,30 +172,37 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null ) => {
+
       if ( txid ) {
         dispatch( sendTxNotification() )
-
-        //dispatch donation note action during donation tx
-        const { donationNote } = sendingState.donationDetails
-        if( donationId &&  donationNote ){
-          dispatch( sendDonationNote( {
-            txid,
-            donationId: donationId,
-            donationNote: donationNote,
-          } ) )
-        }
-
-        showSendSuccessBottomSheet()
-      } else {
-        navigation.navigate( 'OTPAuthentication' )
+        // showSendSuccessBottomSheet()
+        setSuccess( true )
       }
     },
-    onFailure: showSendFailureBottomSheet,
+    onFailure: ( errorMessage: string | null ) => {
+      if ( errorMessage ) {
+        setError( errorMessage )
+        setTimeout( () => {
+          // setFailure( true )
+        }, 200 )
+      }
+    },
   } )
 
 
   return (
-    <ScrollView style={styles.rootContainer}>
+    <KeyboardAwareScrollView
+      resetScrollToCoords={{
+        x: 0, y: 0
+      }}
+      style={styles.rootContainer}
+    >
+      <ModalContainer visible={sendSuccessModal} closeBottomSheet={() => {}} >
+        {showSendSuccessBottomSheet()}
+      </ModalContainer>
+      <ModalContainer visible={sendFailureModal} closeBottomSheet={() => {}} >
+        {showSendFailureBottomSheet()}
+      </ModalContainer>
       <View style={{
         flexDirection: 'row',
         justifyContent: 'center',
@@ -204,7 +214,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         <Text style={{
           marginRight: RFValue( 4 )
         }}>
-          Sending From:
+          {`${strings.SendingFrom}:`}
         </Text>
 
         <Text style={{
@@ -225,17 +235,47 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <SendConfirmationCurrentTotalHeader />
 
       <TransactionPriorityMenu
-        sourceSubAccount={sourcePrimarySubAccount}
+        accountShell={sourceAccountShell}
         bitcoinDisplayUnit={sourceAccountShell.unit}
         onTransactionPriorityChanged={setTransactionPriority}
       />
-
+      {selectedRecipients.length === 1 &&
+      <>
+        <HeadingAndSubHeading
+          heading={common.addNote}
+          subHeading={common.subNote}
+        />
+        <View
+          style={[ styles.inputBox, styles.inputField ]}
+        >
+          <TextInput
+            style={styles.modalInputBox}
+            placeholder={`${common.note} (${common.optional})`}
+            placeholderTextColor={Colors.gray1}
+            value={note}
+            keyboardType={
+              Platform.OS == 'ios'
+                ? 'ascii-capable'
+                : 'visible-password'
+            }
+            returnKeyType="done"
+            returnKeyLabel="Done"
+            autoCompleteType="off"
+            autoCorrect={false}
+            autoCapitalize="none"
+            onChangeText={( text ) => {
+              setNote( text )
+            }}
+          />
+        </View>
+      </>
+      }
       <View style={styles.footerSection}>
         <TouchableOpacity
           onPress={handleConfirmationButtonPress}
           style={ButtonStyles.primaryActionButton}
         >
-          <Text style={ButtonStyles.actionButtonText}>Confirm & Send</Text>
+          <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -250,15 +290,63 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
             ...ButtonStyles.actionButtonText,
             color: Colors.blue,
           }}>
-            Back
+            {common.back}
           </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
+  inputField: {
+    marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    borderColor: Colors.white,
+    backgroundColor: Colors.bgColor,
+    width: widthPercentageToDP( 90 )
+  },
+  inputBox: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  inputBoxFocused: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 10,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    backgroundColor: Colors.backgroundColor1,
+  },
+  modalInputBox: {
+    flex: 1,
+    height: 50,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    paddingLeft: 15,
+    width: '90%'
+
+  },
+  modalInfoText: {
+    width: widthPercentageToDP( 90 ),
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'justify',
+    lineHeight: 18,
+    marginLeft: widthPercentageToDP( 5 ),
+    paddingVertical: heightPercentageToDP( 1 )
+  },
   rootContainer: {
     flex: 1,
   },

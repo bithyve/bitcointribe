@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -6,7 +6,7 @@ import {
   RefreshControl,
   SectionList,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader'
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard'
 import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter'
@@ -27,22 +27,27 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShells } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
-import { DerivativeAccounts, DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { Button } from 'react-native-elements'
 import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
-import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import TransactionsPreviewSection from './TransactionsPreviewSection'
-import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
 import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
-import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import idx from 'idx'
+import Colors from '../../../common/Colors'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { RootSiblingParent } from 'react-native-root-siblings'
+import ErrorModalContents from '../../../components/ErrorModalContents'
+import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
+import { markReadTx } from '../../../store/actions/accounts'
 
 export type Props = {
   navigation: any;
@@ -62,38 +67,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
+  const [ webView, showWebView ] = useState( false )
+  const swanDeepLinkContent = navigation.getParam( 'swanDeepLinkContent' )
   const accountShell = useAccountShellFromNavigation( navigation )
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const account = useAccountByAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
-  let derivativeAccountKind: any = primarySubAccount.kind
 
-  switch( primarySubAccount.kind ){
-      case SubAccountKind.REGULAR_ACCOUNT:
-      case SubAccountKind.SECURE_ACCOUNT:
-        if ( primarySubAccount.instanceNumber )
-          derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
-        else derivativeAccountKind = primarySubAccount.kind
-        break
-
-      case SubAccountKind.SERVICE:
-        derivativeAccountKind = ( primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
-        break
-
-      default:
-        derivativeAccountKind = primarySubAccount.kind
-  }
-
-  const derivativeAccountDetails: {
-    type: string;
-    number: number;
-  } = config.EJECTED_ACCOUNTS.includes( derivativeAccountKind ) ?
-    {
-      type: derivativeAccountKind,
-      number: primarySubAccount.instanceNumber,
-    }
-    : null
+  const [ showMore, setShowMore ] = useState( false )
 
   const isRefreshing = useMemo( () => {
     return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
@@ -103,10 +88,28 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     return primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT
   }, [ primarySubAccount.kind ] )
 
+  const [ secureAccountAlert, setSecureAccountAlert ] = useState( false )
+  const [ secureAccountKnowMore, setSecureAccountKnowMore ] = useState( false )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
+
+  useEffect( ()=>{
+    if( !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ){
+      setSecureAccountAlert( true )
+    }
+  }, [] )
+
+  useEffect( () => {
+    return () => {
+      const unread = accountShell.primarySubAccount.transactions.filter( tx => tx.isNew ).map( tx => tx.txid )
+      if( unread.length > 0 ) dispatch( markReadTx( unread, accountShell.id ) )
+    }
+  }, [] )
 
   function handleTransactionSelection( transaction: TransactionDescribing ) {
     navigation.navigate( 'TransactionDetails', {
@@ -127,33 +130,33 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     } )
   }
 
-  function navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType ) {
+  function navigateToDonationAccountWebViewSettings( donationAccount ) {
     navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
-      accountNumber,
-      serviceType,
     } )
   }
 
   function performRefreshOnPullDown() {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: false
+    dispatch( refreshAccountShells( [ accountShell ], {
+      hardRefresh: true
     } ) )
   }
 
-  const showKnowMoreSheet = useCallback( () => {
-    presentBottomSheet(
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
+
+  const showKnowMoreSheet = () => {
+    return(
       <KnowMoreBottomSheet
+        primarySubAccount={primarySubAccount}
         accountKind={primarySubAccount.kind}
-        onClose={dismissBottomSheet}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '95%' ],
-        handleComponent: KnowMoreBottomSheetHandle,
-      },
+        onClose={() => setShowMore( false )}
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
   const showReassignmentConfirmationBottomSheet = useCallback(
     ( destinationID ) => {
@@ -221,59 +224,50 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     },
   } )
 
-  const showDonationWebViewSheet = useCallback( () => {
-    const accountNumber = primarySubAccount.instanceNumber
-    const serviceType = primarySubAccount.sourceKind
-
-    let derivativeAccounts: DerivativeAccounts
-
-    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
-    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
-    }
-
-    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-
-    presentBottomSheet(
+  const showDonationWebViewSheet = () => {
+    return(
       <DonationWebPageBottomSheet
-        account={donationAccount}
+        account={account}
         onClickSetting={() => {
-          dismissBottomSheet()
-          navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType )
+          showWebView( false )
+          navigateToDonationAccountWebViewSettings( account )
         }}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '65%' ],
-      },
+        closeModal={() => showWebView( false )}
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
-  useEffect( ()=>{
-    // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
-    if ( primarySubAccount.isTFAEnabled ) {
-      const twoFASetupDetails = idx( accountsState, ( _ )=> _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
-      const twoFAValid = idx( accountsState, ( _ )=> _.twoFAHelpFlags.twoFAValid )
+  const renderSecureAccountAlertContent = useCallback( () => {
+    return (
+      <ErrorModalContents
+        title={strings.CompleteLevel2}
+        info={strings.Level2}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          setSecureAccountAlert( false )
+          navigation.pop()
+        }}
+        onPressIgnore={() => {
+          setSecureAccountKnowMore( true )
+          setSecureAccountAlert( false )
+        }}
+        proceedButtonText={common.ok}
+        cancelButtonText={common.learnMore}
+        isBottomImage={true}
+        bottomImage={require( '../../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }, [ secureAccountAlert ] )
 
-      if( twoFASetupDetails && !twoFAValid )
-        navigation.navigate( 'TwoFASetup', {
-          twoFASetup: twoFASetupDetails,
-        } )
-    }
-  }, [ primarySubAccount.sourceKind ] )
-
-  useEffect( () => {
-    // 📝 A slight timeout is needed here in order for the refresh control to
-    // properly lay itself out above the rest of the content and become visible
-    // when the loading starts
-    if( accountShell.syncStatus===SyncStatus.PENDING )
-      setTimeout( () => {
-        dispatch( refreshAccountShell( accountShell, {
-          autoSync: true
-        } ) )
-      }, 100 )
-  }, [] )
+  const renderSecureAccountKnowMoreContent = () => {
+    return (
+      <SavingAccountAlertBeforeLevel2
+        titleClicked={()=>{setSecureAccountAlert( true ); setSecureAccountKnowMore( false ) }}
+        containerStyle={{
+        }}
+      />
+    )
+  }
 
   useEffect( () => {
     // missing fee & exchange rates patch(restore & upgrade)
@@ -286,7 +280,13 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       dispatch( fetchFeeAndExchangeRates() )
   }, [] )
 
+  const onSendBittonPress = () => {
+    dispatch( sourceAccountSelectedForSending( accountShell ) )
 
+    navigation.navigate( 'Send', {
+      subAccountKind: primarySubAccount.kind,
+    } )
+  }
   const sections = useMemo( () => {
     return [
       {
@@ -294,11 +294,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         data: [ null ],
         renderItem: () => {
           return (
-            <View style={styles.viewSectionContainer}>
+            <View style={styles.viewAccountDetailsCard}>
               <AccountDetailsCard
                 accountShell={accountShell}
-                onKnowMorePressed={showKnowMoreSheet}
+                onKnowMorePressed={() => setShowMore( true )}
                 onSettingsPressed={navigateToAccountSettings}
+                swanDeepLinkContent={swanDeepLinkContent}
               />
             </View>
           )
@@ -317,6 +318,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                 isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
                 onViewMorePressed={navigateToTransactionsList}
                 onTransactionItemSelected={handleTransactionSelection}
+                accountShellId={accountShell.id}
+                kind={primarySubAccount.kind}
               />
             </View>
           )
@@ -331,16 +334,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
               <View style={styles.footerSection}>
                 <SendAndReceiveButtonsFooter
                   onSendPressed={() => {
-                    dispatch( sourceAccountSelectedForSending( accountShell ) )
-
-                    navigation.navigate( 'Send', {
-                      subAccountKind: primarySubAccount.kind,
-                    } )
+                    onSendBittonPress()
                   }}
                   onReceivePressed={() => {
                     navigation.navigate( 'Receive', {
-                      serviceType: primarySubAccount.sourceKind,
-                      derivativeAccountDetails,
+                      accountShell,
                     } )
                   }}
                   averageTxFees={averageTxFees}
@@ -350,6 +348,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                       ? NetworkKind.TESTNET
                       : NetworkKind.MAINNET
                   }
+                  isTestAccount={primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT}
                 />
 
                 {isShowingDonationButton && (
@@ -362,11 +361,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                       buttonStyle={ButtonStyles.floatingActionButton}
                       title="Donation Webpage"
                       titleStyle={ButtonStyles.actionButtonText}
-                      onPress={showDonationWebViewSheet}
+                      onPress={() => showWebView( true )}
                     />
                   </View>
                 )}
               </View>
+
             </View>
           )
         },
@@ -375,7 +375,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <View style={styles.rootContainer}>
+    <View style={{
+      backgroundColor: Colors.backgroundColor, flex: 1
+    }}>
+
+
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
@@ -384,12 +388,29 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           <RefreshControl
             onRefresh={performRefreshOnPullDown}
             refreshing={isRefreshing}
+            style={{
+              backgroundColor: Colors.backgroundColor,
+            }}
           />
         }
         sections={sections}
         stickySectionHeadersEnabled={false}
         keyExtractor={sectionListItemKeyExtractor}
       />
+      <ModalContainer visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
+        {showKnowMoreSheet()}
+      </ModalContainer>
+      <ModalContainer visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
+        <RootSiblingParent>
+          {showDonationWebViewSheet()}
+        </RootSiblingParent>
+      </ModalContainer>
+      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {}} >
+        {renderSecureAccountAlertContent()}
+      </ModalContainer>
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => { setSecureAccountAlert( true ); setSecureAccountKnowMore( false )  }} >
+        {renderSecureAccountKnowMoreContent()}
+      </ModalContainer>
     </View>
   )
 }
@@ -401,12 +422,17 @@ const styles = StyleSheet.create( {
 
   scrollViewContainer: {
     paddingTop: 20,
-    height: '100%',
-    paddingHorizontal: 24,
+    // height: '100%',
+    paddingHorizontal: 0,
+    backgroundColor: Colors.backgroundColor,
   },
 
   viewSectionContainer: {
     marginBottom: 10,
+  },
+
+  viewAccountDetailsCard: {
+    paddingHorizontal: 20,
   },
 
   footerSection: {

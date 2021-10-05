@@ -8,16 +8,17 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import QRCode from 'react-native-qrcode-svg'
-
+import QRCode from '../../components/QRCode'
+import { translations } from '../../common/content/LocContext'
 
 export default function SecondaryDeviceModelContents( props ) {
+  const strings  = translations[ 'bhr' ]
+
   return (
     <View
       style={{
-        height: '100%',
+        // height: '100%',
         backgroundColor: Colors.white,
         borderColor: Colors.borderColor,
         alignSelf: 'center',
@@ -27,12 +28,12 @@ export default function SecondaryDeviceModelContents( props ) {
       <View
         style={{
           ...NavStyles.modalHeaderTitleView,
-          paddingTop: hp( '0.5%' ),
+          paddingTop: hp( '3%' ),
           alignItems: 'center',
           marginLeft: 20,
         }}
       >
-        <Text style={NavStyles.modalHeaderTitleText}>Scan QR Code</Text>
+        <Text style={NavStyles.modalHeaderTitleText}>{strings.ScanQRCode}</Text>
       </View>
 
       <Text style={{
@@ -42,7 +43,7 @@ export default function SecondaryDeviceModelContents( props ) {
         marginLeft: 20,
         marginRight: 20
       }}>
-  Open the QR scanner at the bottom of the Home screen on another Personal Device running Hexa app and scan this QR
+        {strings.OpentheQRscanner}
       </Text>
       <View style={NavStyles.modalContentView}>
         {!props.secondaryQR ? (
@@ -52,12 +53,16 @@ export default function SecondaryDeviceModelContents( props ) {
             <ActivityIndicator size="large" animating color={Colors.gray1}/>
           </View>
         ) : (
-          <QRCode value={props.secondaryQR} size={hp( '27%' )} />
+          <QRCode title="Keeper request" value={props.secondaryQR} size={hp( '27%' )} />
         )}
+        {!props.secondaryQR?<Text style={{
+          fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 13 ), color: Colors.textColorGrey, marginTop: 5
+        }}>Generating your Recovery Key. Hold on.</Text>: null}
         <AppBottomSheetTouchableWrapper
+          disabled={props.secondaryQR ? false : true}
           onPress={() => props.onPressOk()}
           style={{
-            backgroundColor: Colors.blue,
+            backgroundColor: props.secondaryQR ? Colors.blue : Colors.lightBlue,
             borderRadius: 10,
             width: wp( '50%' ),
             height: wp( '13%' ),
@@ -74,7 +79,7 @@ export default function SecondaryDeviceModelContents( props ) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Yes, I have scanned
+            {strings.Ihavescanned}
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>

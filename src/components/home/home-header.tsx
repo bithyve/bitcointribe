@@ -71,6 +71,12 @@ const HomeHeader = ( {
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
+
   const showNoExchangeRateBottomSheet = useCallback( () => {
     presentBottomSheet(
       <NoExchangeRateBottomSheet
@@ -188,7 +194,7 @@ const HomeHeader = ( {
           </View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('ManageBackup');
+              navigation.navigate( 'ManageBackup' )
             }}
             style={styles.headerButton}
           >

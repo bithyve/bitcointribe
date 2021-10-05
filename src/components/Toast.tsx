@@ -1,10 +1,11 @@
-import Toast from 'react-native-root-toast';
-import Colors from "../common/Colors";
+import { heightPercentageToDP } from 'react-native-responsive-screen'
+import Toast from 'react-native-root-toast'
+import Colors from '../common/Colors'
 
-export default (message) => {
-  return Toast.show(message, {
+export default ( message ) => {
+  return Toast.show( message, {
     duration: Toast.durations.LONG,
-    position: -150,
+    position: heightPercentageToDP( -15 ),
     shadow: true,
     animation: true,
     hideOnPress: true,
@@ -12,5 +13,5 @@ export default (message) => {
     opacity: 0.9,
     backgroundColor: 'rgba(0, 108, 180, 0.5)',
     textColor: Colors.white,
-  });
-};
+  } )
+}

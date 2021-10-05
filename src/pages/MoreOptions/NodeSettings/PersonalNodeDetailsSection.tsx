@@ -14,6 +14,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import Fonts from '../../../common/Fonts'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   personalNode: PersonalNode | null;
@@ -24,6 +25,8 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
   personalNode,
   onEditButtonPressed,
 }: Props ) => {
+  const strings  = translations[ 'settings' ]
+  const common  = translations[ 'common' ]
   return (
     <View style={styles.rootContainer}>
 
@@ -36,7 +39,7 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
           <Text style={{
             ...ListStyles.infoHeaderTitleText, flex: 1
           }}>
-            Personal Node Details
+            {strings.PersonalNodeDetails}
           </Text>
 
           <Button
@@ -56,10 +59,10 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
           <Text style={{
             ...HeadingStyles.labelText, marginBottom: 4
           }}>
-            Node Address
+            {strings.NodeAddress}
           </Text>
 
-          <Text numberOfLines={1}>{personalNode?.ipAddress || 'No Address Set'}</Text>
+          <Text numberOfLines={1}>{personalNode?.ipAddress || strings.NoAddressSet}</Text>
         </View>
 
         <View style={{
@@ -69,10 +72,10 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
             ...HeadingStyles.labelText,
             marginBottom: 4
           }}>
-            Port Number
+            {strings.PortNumber}
           </Text>
 
-          <Text numberOfLines={1}>{String( personalNode?.portNumber || 'No Port Number Set' )}</Text>
+          <Text numberOfLines={1}>{String( personalNode?.portNumber || strings.NoPort )}</Text>
         </View>
 
         <TouchableOpacity
@@ -81,7 +84,7 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
           style={styles.useFallbackTouchable}
         >
           <Text style={styles.useFallbackText}>
-          Use Hexa node as fallback
+            {strings.fallback}
           </Text>
           <View style={styles.useFallbackCheckView}>
             {personalNode?.useFallback && (

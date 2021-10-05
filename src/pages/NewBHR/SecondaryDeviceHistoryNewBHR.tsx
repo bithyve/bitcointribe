@@ -3,16 +3,12 @@ import {
   View,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform,
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
-import { downloadSmShareForApproval, ErrorSending, keeperProcessStatus } from '../../store/actions/health'
-import { updatedKeeperInfo, updateMSharesHealth, secondaryShareDownloaded } from '../../store/actions/health'
+import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/BHR'
+import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
@@ -23,174 +19,121 @@ import _ from 'underscore'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import DeviceInfo from 'react-native-device-info'
 import {
+  ChannelAssets,
+  DeepLinkEncryptionType,
+  KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
+  MetaShare,
+  QRCodeTypes,
+  TrustedContact,
+  TrustedContactRelationTypes,
+  Trusted_Contacts,
+  Wallet,
 } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import {
-  REGULAR_ACCOUNT,
-  TRUSTED_CONTACTS,
-  TEST_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import ApproveSetup from './ApproveSetup'
-import AccountShell from '../../common/data/models/AccountShell'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import { addNewSecondarySubAccount } from '../../store/actions/accounts'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
+import { v4 as uuid } from 'uuid'
+import ModalContainer from '../../components/home/ModalContainer'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import { historyArray } from '../../common/CommonVars/commonVars'
+import { getIndex } from '../../common/utilities'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import dbManager from '../../storage/realm/dbManager'
+import { generateDeepLink } from '../../common/CommonFunctions'
+import { translations } from '../../common/content/LocContext'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
-  const [ ErrorBottomSheet ] = useState( React.createRef() )
-  const [ HelpBottomSheet ] = useState( React.createRef() )
+  const strings  = translations[ 'bhr' ]
+  const common  = translations[ 'common' ]
+  const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  // const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ reshareModal, setReshareModal ] = useState( false )
+  const [ ChangeBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ showQr, setShowQr ] = useState( false )
+  const [ secondaryDeviceMessageBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
+  const [ qrModal, setQRModal ] = useState( false )
+  const [ HelpModal, setHelpModal ] = useState( false )
+  const [ ErrorModal, setErrorModal ] = useState( false )
+  const [ SecondaryDeviceMessageModal, setSecondaryDeviceMessageModal ] = useState( false )
+  const [ ChangeModal, setChangeModal ] = useState( false )
+
+  const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
-  const [ QrBottomSheet ] = useState( React.createRef() )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ blockReshare, setBlockReshare ] = useState( '' )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
-  const [ keeperTypeBottomSheet, setkeeperTypeBottomSheet ] = useState( React.createRef() )
-  const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
-  const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
-  const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
-
-  const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
-  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
-
-  const SHARES_TRANSFER_DETAILS = useSelector(
-    ( state ) =>
-      state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-  )
-  const fcmTokenValue = useSelector( ( state ) => state.preferences.fcmTokenValue )
-
-  const WALLET_SETUP = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
-  )
-
-  const trustedContactsInfo = useSelector(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
-
-  const dispatch = useDispatch()
-  const [ secondaryQR, setSecondaryQR ] = useState( '' )
-  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
-
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
-  )
-  const accountShells: AccountShell[] = useSelector(
-    ( state ) => state.accounts.accountShells,
-  )
-
-  const [ ReshareBottomSheet ] = useState(
-    React.createRef(),
-  )
-  const [ ChangeBottomSheet ] = useState( React.createRef() )
-  const [ guardianExists, setGuardianExists ] = useState( false )
-
-  const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( [
-    {
-      id: 1,
-      title: 'Recovery Key created',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 2,
-      title: 'Recovery Key in-transit',
-      date: null,
-      info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 3,
-      title: 'Recovery Key accessible',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 4,
-      title: 'Recovery Key not accessible',
-      date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    // {
-    //   id: 5,
-    //   title: 'Recovery Secret In-Transit',
-    //   date: '20 May ‘19, 11:00am',
-    //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    // },
-    // {
-    //   id: 6,
-    //   title: 'Recovery Secret Not Accessible',
-    //   date: '19 May ‘19, 11:00am',
-    //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    // },
-  ] )
-  const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-
+  const [ keeperQR, setKeeperQR ] = useState( '' )
+  const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true )
-  const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
+  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
+
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
     ? props.navigation.state.params.isChangeKeeperType
     : false )
-  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
-  const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
-  const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+  const [ Contact, setContact ]: [any, any] = useState( null )
+  const [ isChangeClicked, setIsChangeClicked ] = useState( false )
+
+  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
+  const keeperProcessStatusFlag = useSelector( ( state ) => state.bhr.keeperProcessStatus )
+  const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
+  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
+  const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
+  const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
+  const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
+  const s3 = dbManager.getBHR()
+  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const dispatch = useDispatch()
+
+  const index = props.navigation.getParam( 'index' )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
+
+  const next = props.navigation.getParam( 'next' )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-    setIsReshare(
-      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
-    )
+    setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
         ? props.navigation.getParam( 'isChangeKeeperType' )
         : false
     )
-    const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
-    setSelectedShareId( shareId )
-    setIndex( props.navigation.getParam( 'index' ) )
-  }, [
-    props.navigation.getParam( 'selectedLevelId' ),
-    props.navigation.getParam( 'selectedKeeper' ),
-    props.navigation.state.params,
-  ] )
+    setChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+    setOldChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  }, [ props.navigation.state.params ] )
 
-  const [ secondaryDeviceBottomSheet ] = useState(
-    React.createRef(),
-  )
-  const [
-    secondaryDeviceMessageBottomSheet,
-  ] = useState( React.createRef() )
-  const uploadMetaShare = useSelector(
-    ( state ) => state.health.loading.uploadMetaShare,
-  )
-  const updateEphemeralChannelLoader = useSelector(
-    ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
-  )
+  useEffect( ()=>{
+    const firstName = 'Personal'
+    let lastName = 'Device'
+    if( index === 0 ) lastName = 'Device 1'
+    else if( index === 3 ) lastName = 'Device 2'
+    else lastName = 'Device 3'
 
-  const next = props.navigation.getParam( 'next' )
+    const Contact = {
+      id: uuid(),
+      name: `${firstName} ${lastName ? lastName : ''}`
+    }
+    setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+  }, [ ] )
 
   const saveInTransitHistory = async () => {
     const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
@@ -208,280 +151,139 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
-  const updateTrustedContactsInfo = useCallback(
-    async ( contact ) => {
-      const tcInfo = trustedContactsInfo
-
-      if ( tcInfo.length ) {
-        tcInfo[ 0 ] = contact
-      } else {
-        tcInfo[ 0 ] = contact
-        tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-        tcInfo[ 2 ] = undefined
-      }
-      console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
-      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-    },
-    [ trustedContactsInfo ],
-  )
-
   const createGuardian = useCallback(
-    async ( changeKeeper?: boolean ) => {
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      if( ( keeperQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      const firstName = 'Secondary'
-      let lastName = 'Device'
-      if( index === 0 ) lastName = 'Device1'
-      else if( index === 3 ) lastName = 'Device2'
-      else lastName = 'Device3'
+      const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKeyTemp )
 
-      const contactName = `${firstName} ${lastName ? lastName : ''}`
-        .toLowerCase()
-        .trim()
-
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-      let info = null
-      if ( trustedContact && trustedContact.secondaryKey ) info = trustedContact.secondaryKey
-
-      const shareExpired =  !SHARES_TRANSFER_DETAILS[ index ] ||
-      Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
-      config.TC_REQUEST_EXPIRY
-      // Keeper setup started
-      dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-      dispatch( updatedKeeperInfo( {
-        shareId: selectedShareId,
-        name: contactName,
-        uuid: '',
-        publicKey: '',
-        ephemeralAddress: '',
-        type: 'device',
+      const obj: KeeperInfoInterface = {
+        shareId: selectedKeeper.shareId,
+        name: Contact && Contact.name ? Contact.name : '',
+        type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        currentLevel: currentLevel,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
         data: {
-          name: contactName, index
-        }
-      } ) )
-
-      if ( changeKeeper || shareExpired || isChange ) {
-        setSecondaryQR( '' )
-        updateTrustedContactsInfo( {
-          firstName, lastName
-        } )
-        // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
-      } else {
-        const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-        const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY? true: false
-
-        if (
-          !hasTrustedChannel &&
-          isEphemeralChannelExpired
-        ) setSecondaryQR( '' )
+          ...Contact, index
+        },
+        channelKey: channelKeyTemp
       }
 
-      const contactInfo = {
-        contactName,
-        info: info? info.trim(): null,
-        isGuardian: true,
-        shareIndex: index,
-        shareId: selectedShareId,
-        changeContact: changeKeeper || isChange,
-      }
-
-      let parentShell: AccountShell
-      accountShells.forEach( ( shell: AccountShell ) => {
-        if( !shell.primarySubAccount.instanceNumber ){
-          if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
-        }
-      } )
-      const newSecondarySubAccount: SubAccountDescribing = new TrustedContactsSubAccountInfo( {
-        accountShellID: parentShell.id,
-        isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
-      } )
-
-      dispatch(
-        addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
-      )
+      dispatch( updatedKeeperInfo( obj ) )
+      dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
-    [ SHARES_TRANSFER_DETAILS, trustedContacts ],
+    [ trustedContacts, Contact ],
   )
 
-  useEffect( () => {
-    if ( uploadMetaShare || updateEphemeralChannelLoader ) {
-      if ( secondaryQR ) setSecondaryQR( '' )
-      return
+  useEffect( ()=> {
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( createOrChangeGuardian( {
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, isPrimaryKeeper
+      } ) )
     }
-
-    const firstName = 'Secondary'
-    let lastName = 'Device'
-    if( index === 0 ) lastName = 'Device1'
-    else if( index === 3 ) lastName = 'Device2'
-    else lastName = 'Device3'
-    const contactName = `${firstName} ${lastName ? lastName : ''}`
-      .toLowerCase()
-      .trim()
-
-    if (
-      trustedContacts.tc.trustedContacts[ contactName ] &&
-      trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-    ) {
-      const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
-        contactName
-      ]
-      if( publicKey ) {
-        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
-      }
-      if( isGuardianCreationClicked ){
-        setIsGuardianCreationClicked( false )
-        updateShare()
-        setSecondaryQR(
-          JSON.stringify( {
-            isGuardian: true,
-            requester: WALLET_SETUP.walletName,
-            publicKey,
-            info: secondaryKey,
-            uploadedAt:
-            trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-              .initiatedAt,
-            type: 'secondaryDeviceGuardian',
-            ver: DeviceInfo.getVersion(),
-            isFromKeeper: true,
-          } ),
-        )
-      }
-    }
-  }, [
-    SHARES_TRANSFER_DETAILS,
-    trustedContacts,
-    uploadMetaShare,
-    updateEphemeralChannelLoader,
-    isGuardianCreationClicked
-  ] )
+  }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
-    const firstName = 'Secondary'
-    let lastName = 'Device'
-    if( index === 0 ) lastName = 'Device1'
-    else if( index === 3 ) lastName = 'Device2'
-    else lastName = 'Device3'
-    const contactName = `${firstName} ${lastName ? lastName : ''}`
-      .toLowerCase()
-      .trim()
-    const tcInstance = trustedContacts.tc.trustedContacts[ contactName ]
-    console.log( {
-      tcInstance
-    } )
-    if ( tcInstance ) {
-      if ( tcInstance.symmetricKey ) {
-        setGuardianExists( true )
-      }
-    }
-  }, [ trustedContacts ] )
+    if( !Contact ) return
 
-  useEffect( () => {
-    ( async () => {
-      // if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
-      //   ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-      //   createGuardian()
-      // }
-      // blocking keeper reshare till 100% health
-      const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
-      if ( blockPCShare ) {
-        setBlockReshare( blockPCShare )
-      }
-      const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
-      const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
-      const trustedData = trustedContactsInfo[ contactName ]
-
-      console.log( 'trustedData.trustedChannel', trustedData.trustedChannel.data[ 1 ] )
-      if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
-        if( trustedData.trustedChannel.data[ 1 ] && semver.lt( trustedData.trustedChannel.data[ 1 ].data.version, '1.6.0' ) ) {
-          setTimeout( () => {
-            setErrorMessageHeader( 'Error sending Recovery Key' )
-            setErrorMessage(
-              'your keeper need to update app / come online',
-            )
-            setIsVersionMismatch( true )
-          }, 2 );
-          ( ErrorBottomSheet as any ).current.snapTo( 1 )
+    const contacts: Trusted_Contacts = trustedContacts
+    let currentContact: TrustedContact
+    let channelKey: string
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === Contact.id ){
+          currentContact = contacts[ ck ]
+          channelKey = ck
+          break
         }
       }
 
-      console.log( 'trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel', trustedContacts.tc.trustedContacts, props.navigation.getParam( 'selectedKeeper' ) )
-      // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
-      //   AsyncStorage.setItem('blockPCShare', 'true');
-      //   setBlockReshare(blockPCShare);
-      // }
-    } )()
-  }, [] )
+    if ( currentContact ) {
+      const appVersion = DeviceInfo.getVersion()
+      let encryption_key: string
+      if( currentContact.deepLinkConfig ){
+        const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
+        if( DeepLinkEncryptionType.DEFAULT === encryptionType ) encryption_key = encryptionKey
+      }
 
+      if( !encryption_key ){
+        const { encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( DeepLinkEncryptionType.DEFAULT, encryption_key, currentContact, wallet.walletName )
+        const QRData = JSON.stringify( {
+          type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
+          encryptedChannelKeys: encryptedChannelKeys,
+          encryptionType,
+          encryptionHint,
+          walletName: wallet.walletName,
+          version: appVersion,
+        } )
+        setKeeperQR( QRData )
+      }
+      if( isGuardianCreationClicked ) {
+        const shareObj = {
+          walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+          shareId: selectedKeeper.shareId,
+          reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+          shareType: isPrimaryKeeper ? 'primaryKeeper' : 'device',
+          status: 'notAccessible',
+          name: Contact && Contact.name ? Contact.name : ''
+        }
+
+        dispatch( updateMSharesHealth( shareObj, isChange ) )
+        dispatch( setChannelAssets( {
+        } ) )
+      }
+    }
+  }, [ Contact, trustedContacts ] )
 
   const renderSecondaryDeviceContents = useCallback( () => {
-    console.log( secondaryQR )
+    console.log( keeperQR )
     return (
       <SecondaryDevice
-        secondaryQR={secondaryQR}
+        secondaryQR={keeperQR}
         onPressOk={async () => {
-          saveInTransitHistory();
+          saveInTransitHistory()
           // dispatch(checkMSharesHealth());
-          ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
-          if ( next ) {
-            props.navigation.goBack()
+          // ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+          setShowQr( false )
+          if( props.navigation.getParam( 'isChangeKeeperType' ) ){
+            props.navigation.pop( 2 )
+          } else {
+            props.navigation.pop( 1 )
           }
           setTimeout( () => {
             setIsReshare( true )
           }, 2 )
         }}
         onPressBack={() => {
-          ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+          // ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+          setShowQr( false )
         }}
       />
     )
-  }, [ secondaryQR ] )
-
-  const renderSecondaryDeviceHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
+  }, [ keeperQR ] )
 
   const renderSecondaryDeviceMessageContents = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={secondaryDeviceMessageBottomSheet}
-        title={'Keeper Device'}
+        title={'Personal Device'}
         note={
-          'For confirming your Recovery Key on the Keeper Device, simply open the app on that device and log in'
+          strings.confirmingyourRecovery
         }
-        proceedButtonText={'Ok, got it'}
-        onPressProceed={() => {
-          if ( secondaryDeviceMessageBottomSheet.current )
-            ( secondaryDeviceMessageBottomSheet as any ).current.snapTo( 0 )
-        }}
-        onPressIgnore={() => {
-          if ( secondaryDeviceMessageBottomSheet.current )
-            ( secondaryDeviceMessageBottomSheet as any ).current.snapTo( 0 )
-        }}
+        proceedButtonText={strings.ok}
+        onPressProceed={() => setSecondaryDeviceMessageModal( false )}
+        onPressIgnore={() => setSecondaryDeviceMessageModal( false )}
         isBottomImage={false}
       />
     )
   }, [] )
 
-  const renderSecondaryDeviceMessageHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
-
   useEffect( () => {
-    if ( next ) ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+    if ( next ) setShowQr( true )
   }, [ next ] )
 
   const sortedHistory = ( history ) => {
@@ -530,123 +332,54 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
-        modalRef={ErrorBottomSheet}
+        modalRef={ErrorModal}
         title={errorMessageHeader}
         info={errorMessage}
-        proceedButtonText={'Try again'}
-        onPressProceed={() => {
-          ( ErrorBottomSheet as any ).current.snapTo( 0 )
-        }}
+        proceedButtonText={common.tryAgain}
+        onPressProceed={() => setErrorModal( false )}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/errorImage.png' )}
       />
     )
   }, [ errorMessage, errorMessageHeader ] )
 
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( ErrorBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
-
   useEffect( () => {
     if ( isErrorSendingFailed ) {
       setTimeout( () => {
-        setErrorMessageHeader( 'Error sending Recovery Key' )
+        setErrorMessageHeader( strings.ErrorsendingRecovery )
         setErrorMessage(
-          'There was an error while sending your Recovery Key, please try again in a little while',
+          strings.errorwhilesendingyourRecovery,
         )
-      }, 2 );
-      ( ErrorBottomSheet as any ).current.snapTo( 1 )
+      }, 2 )
+      setErrorModal( true )
       dispatch( ErrorSending( null ) )
     }
   }, [ isErrorSendingFailed ] )
-
-  const renderHelpHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          if ( HelpBottomSheet.current )
-            ( HelpBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }
-
-  const renderReshareContent = useCallback( () => {
-    return (
-      <ErrorModalContents
-        modalRef={ReshareBottomSheet}
-        title={'Reshare with the same device?'}
-        info={
-          'Proceed if you want to reshare the link/ QR with the same device'
-        }
-        note={
-          'For a different device, please go back and choose ‘Change device'
-        }
-        proceedButtonText={'Reshare'}
-        cancelButtonText={'Back'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          ( ReshareBottomSheet as any ).current.snapTo( 0 )
-
-          if ( blockReshare ) {
-            ( QrBottomSheet.current as any ).snapTo( 1 )
-          } else {
-            createGuardian();
-            ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-          }
-        }}
-        onPressIgnore={() => {
-          ( ReshareBottomSheet as any ).current.snapTo( 0 )
-        }}
-        isBottomImage={false}
-      />
-    )
-  }, [] )
-
-  const renderReshareHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (ReshareBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
 
   const renderChangeContent = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
         title={'Change your\nKeeper'}
-        info={'Having problems with your Keeper'}
+        info={strings.problemswithyourKeeper}
         note={
-          'You can change the Keeper you selected to send your Recovery Key'
+          strings.changetheKeeper
         }
-        proceedButtonText={'Change'}
-        cancelButtonText={'Back'}
+        proceedButtonText={common.change}
+        cancelButtonText={common.back}
         isIgnoreButton={true}
         onPressProceed={() => {
-          ( ChangeBottomSheet as any ).current.snapTo( 0 )
-
-          if ( blockReshare ) {
-            ( QrBottomSheet.current as any ).snapTo( 1 )
-          } else {
-            const changeKeeper = true
-            createGuardian( changeKeeper );
-            ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-          }
+          setIsChange( true )
+          setKeeperQR( '' )
+          setIsReshare( false )
+          // ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 );
+          setShowQr( true )
+          setChangeModal( false )
+          createGuardian( {
+            isChangeTemp: true
+          } )
         }}
-        onPressIgnore={() => {
-          ( ChangeBottomSheet as any ).current.snapTo( 0 )
-        }}
+        onPressIgnore={() => setChangeModal( false )}
         isBottomImage={false}
       />
     )
@@ -665,127 +398,59 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const renderHelpContent = () => {
     return (
       <KeeperDeviceHelpContents
-        titleClicked={() => {
-          if ( HelpBottomSheet.current )
-            ( HelpBottomSheet as any ).current.snapTo( 0 )
-        }}
+        titleClicked={() => setHelpModal( false )}
       />
     )
   }
 
   if ( isErrorSendingFailed ) {
     setTimeout( () => {
-      setErrorMessageHeader( 'Error sending Recovery Key' )
+      setErrorMessageHeader( strings.ErrorsendingRecovery )
       setErrorMessage(
-        'There was an error while sending your Recovery Key, please try again in a little while',
+        strings.errorwhilesendingyourRecovery,
       )
-    }, 2 );
-    ( ErrorBottomSheet as any ).current.snapTo( 1 )
+    }, 2 )
+    setErrorModal( true )
     dispatch( ErrorSending( null ) )
   }
 
   const sendApprovalRequestToPK = ( ) => {
-    setQrBottomSheetsFlag( true );
-    ( QrBottomSheet as any ).current.snapTo( 1 );
-    ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+    setQrBottomSheetsFlag( true )
+    setQRModal( true )
+    setKeeperTypeModal( false )
   }
 
   const renderQrContent = () => {
     return (
       <QRModal
         isFromKeeperDeviceHistory={false}
-        QRModalHeader={'QR scanner'}
-        title={'Note'}
+        QRModalHeader={strings.QRscanner}
+        title={common.note}
         infoText={
-          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+          strings.approvethisrequest
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          setIsApprovalStarted( true )
-          dispatch( downloadSmShareForApproval( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
-          if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
+          setQRModal( false )
         }}
         onPressContinue={async() => {
-          // setIsApprovalStarted( true )
-          // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          // try {
-          //   if ( qrScannedData ) {
-          //     dispatch( downloadSmShareForApproval( qrScannedData ) )
-          //     setQrBottomSheetsFlag( false )
-          //   }
-          // } catch ( err ) {
-          //   console.log( {
-          //     err
-          //   } )
-          // }
-        }}
-      />
-    )
-  }
-
-  const renderQrHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"erds","channelId":"28cc7e44b3ca629fe98450412f750d29fcf93d2de5057e841a665e8e73e98cfb","streamId":"b83dea121","secondaryChannelKey":"FLPy5dqRHTFCGqhZibhW9SLH","version":"1.8.0","walletId":"23887039bd673cfaa6fdc5ab9786aa130e010e9bbbc6731890361240ed83a55a"}'
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
         }}
       />
     )
   }
 
   const onPressChangeKeeperType = ( type, name ) => {
-    let levelhealth: LevelHealthInterface[] = []
-    if ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( currentLevel == 3 && levelHealth[ 2 ] )
-      levelhealth = [ levelHealth[ 2 ] ]
-    let changeIndex = 1
-    let contactCount = 0
-    let deviceCount = 0
-    for ( let i = 0; i < levelhealth.length; i++ ) {
-      const element = levelhealth[ i ]
-      for ( let j = 2; j < element.levelInfo.length; j++ ) {
-        const element2 = element.levelInfo[ j ]
-        if (
-          element2.shareType == 'contact' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          contactCount++
-        }
-        if (
-          element2.shareType == 'device' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          deviceCount++
-        }
-        const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
-        if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-          if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
-            changeIndex = 2
-          } else changeIndex = 1
-        }
-        if( type == 'device' ){
-          if ( element2.shareType == 'device' && deviceCount == 1 ) {
-            changeIndex = 3
-          } else if( element2.shareType == 'device' && deviceCount == 2 ){
-            changeIndex = 4
-          }
-        }
-      }
-    }
-    console.log( 'changeIndex', changeIndex )
+    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    setIsChangeClicked( false )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -795,7 +460,12 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       } )
     }
     if ( type == 'device' ) {
-      ( ChangeBottomSheet as any ).current.snapTo( 1 )
+      setTimeout( () => {
+        setIsChange( true )
+        setKeeperQR( '' )
+        setIsReshare( false )
+      }, 2 )
+      setChangeModal( true )
     }
     if ( type == 'pdf' ) {
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
@@ -807,42 +477,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( !downloadSmShare ) setIsApprovalStarted( false )
-    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
-      ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-      ( QrBottomSheet as any ).current.snapTo( 0 )
+    if( approvalStatus && isChangeClicked ){
+      console.log( 'APPROVe SD' )
+      setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
     }
-  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+  }, [ approvalStatus ] )
 
-  const updateShare = () =>{
-    let contactName = 'Secondary Device'
-    if( index === 0 ) contactName = 'Secondary Device1'
-    else if( index === 3 ) contactName = 'Secondary Device2'
-    else contactName = 'Secondary Device3'
-    const shareArray = [
-      {
-        walletId: s3Service.getWalletId().data.walletId,
-        shareId: selectedShareId,
-        reshareVersion: 0,
-        updatedAt: moment( new Date() ).valueOf(),
-        name: contactName,
-        shareType: 'device',
-      },
-    ]
-    console.log( 'shareArray', shareArray )
-    dispatch( updateMSharesHealth( shareArray ) )
-  }
-
-  const deviceText = ( text ) =>{
-    switch ( text ) {
-        case 'Secondary Device1': return 'Personal Device1'
-        case 'Secondary Device2': return 'Personal Device2'
-        case 'Secondary Device3': return 'Personal Device3'
-
-        default:
-          return text
+  useEffect( ()=> {
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
     }
-  }
+  }, [ channelAssets ] )
 
   return (
     <View style={{
@@ -854,10 +500,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
-        selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
-        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
+        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'never'}
+        moreInfo={props.navigation.state.params.selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />
       <View style={{
@@ -867,35 +514,34 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
-          confirmButtonText={'Share Now'}
+          confirmButtonText={props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressConfirm={() => {
-            createGuardian();
-            ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+            if( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
+              setShowQr( true )
+              createGuardian()
+            } else {
+              setSecondaryDeviceMessageModal( true )
+            }
           }}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
-            ( ReshareBottomSheet as any ).current.snapTo( 1 )
+            setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChangeKeeperAllow}
+          isChangeKeeperAllow={isChangeKeeperAllow && !isPrimaryKeeper && selectedKeeper.updatedAt}
           isVersionMismatch={isVersionMismatch}
-          onPressChange={() => {
-            if( isPrimaryKeeper ){
-              setSelectedKeeperType( 'device' )
-              setSelectedKeeperName( 'Secondary Device1' )
-              sendApprovalRequestToPK( )
-            } else{
-              ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
-            }
-            // (ChangeBottomSheet as any).current.snapTo(1);
-          }}
+          onPressChange={() => { setKeeperTypeModal( true ) }}
         />
       </View>
-      <BottomSheet
+      <ModalContainer visible={showQr} closeBottomSheet={() => {}} >
+        {renderSecondaryDeviceContents()}
+      </ModalContainer>
+      {/* <BottomSheet
         onCloseEnd={() => {
           if( keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ){
-            saveInTransitHistory();
-            ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+            saveInTransitHistory()
+            // ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+            setShowQr( false )
             if ( next ) {
               props.navigation.goBack()
             }
@@ -905,147 +551,75 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           }
         }}
         onCloseStart={() => {
-          ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+          // ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+          setShowQr( false )
         }}
         enabledInnerScrolling={true}
         ref={secondaryDeviceBottomSheet as any}
         snapPoints={[ -30, hp( '85%' ) ]}
         renderContent={renderSecondaryDeviceContents}
         renderHeader={renderSecondaryDeviceHeader}
-      />
-      <BottomSheet
-        onCloseStart={() => {
-          ( secondaryDeviceMessageBottomSheet.current as any ).current.snapTo( 0 )
-        }}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={secondaryDeviceMessageBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
-        ]}
-        renderContent={renderSecondaryDeviceMessageContents}
-        renderHeader={renderSecondaryDeviceMessageHeader}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          setQrBottomSheetsFlag( true )
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
-        }}
-        onCloseStart={() => { }}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={QrBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '92%' ) : hp( '91%' ),
-        ]}
-        renderContent={renderQrContent}
-        renderHeader={renderQrHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={HelpBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '87%' ) : hp( '89%' ),
-        ]}
-        renderContent={renderHelpContent}
-        renderHeader={renderHelpHeader}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ReshareBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '37%' ) : hp( '45%' ),
-        ]}
-        renderContent={renderReshareContent}
-        renderHeader={renderReshareHeader}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ChangeBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '37%' ) : hp( '45%' ),
-        ]}
-        renderContent={renderChangeContent}
-        renderHeader={renderChangeHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={keeperTypeBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp( '75%' )
-            : hp( '75%' ),
-        ]}
-        renderContent={() => (
-          <KeeperTypeModalContents
-            headerText={'Change backup method'}
-            subHeader={'Share your Recovery Key with a new contact or a different device'}
-            onPressSetup={async ( type, name ) => {
-              setSelectedKeeperType( type )
-              setSelectedKeeperName( name )
-              sendApprovalRequestToPK( )
-            }}
-            onPressBack={() =>
-              ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+      /> */}
+      <ModalContainer visible={SecondaryDeviceMessageModal} closeBottomSheet={()=>setSecondaryDeviceMessageModal( false )} >
+        {renderSecondaryDeviceMessageContents()}
+      </ModalContainer>
+      <ModalContainer visible={ErrorModal} closeBottomSheet={()=>setErrorModal( false )} >
+        {renderErrorModalContent()}
+      </ModalContainer>
+      <ModalContainer visible={qrModal} closeBottomSheet={()=>{setQRModal( false )}} >
+        {renderQrContent()}
+      </ModalContainer>
+      <ModalContainer visible={HelpModal} closeBottomSheet={()=>{setHelpModal( false )}} >
+        {renderHelpContent()}
+      </ModalContainer>
+      <ModalContainer visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
+        <ErrorModalContents
+          // modalRef={ReshareBottomSheet}
+          title={strings.Resharewithsamedevice}
+          info={
+            strings.ifyouwanttoreshare
+          }
+          note={
+            strings.differentdevice
+          }
+          proceedButtonText={strings.reshare}
+          cancelButtonText={common.back}
+          isIgnoreButton={true}
+          onPressProceed={() => {
+            // ( ReshareBottomSheet as any ).current.snapTo( 0 )
+            setReshareModal( false )
+            if ( blockReshare ) {
+              setQRModal( true )
+            } else {
+              // ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+              setShowQr( true )
+              createGuardian()
             }
-            selectedLevelId={selectedLevelId}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() =>
-              ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
-            }
-          />
-        )}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ApprovePrimaryKeeperBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '70' ),
-        ]}
-        renderContent={() => (
-          <ApproveSetup
-            isContinueDisabled={false}
-            onPressContinue={() => {
-              onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() => {
-              ( keeperTypeBottomSheet as any ).current.snapTo( 1 );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-      />
+          }}
+          onPressIgnore={() => {
+            // ( ReshareBottomSheet as any ).current.snapTo( 0 )
+            setReshareModal( false )
+          }}
+          isBottomImage={false}
+        />
+      </ModalContainer>
+      <ModalContainer visible={ChangeModal} closeBottomSheet={()=>{setChangeModal( false )}} >
+        {renderChangeContent()}
+      </ModalContainer>
+      <ModalContainer visible={keeperTypeModal} closeBottomSheet={()=>{setKeeperTypeModal( false )}} >
+        <KeeperTypeModalContents
+          headerText={strings.Changebackupmethod}
+          subHeader={strings.withanewcontact}
+          onPressSetup={async ( type, name ) => {
+            setSelectedKeeperType( type )
+            setSelectedKeeperName( name )
+            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            else onPressChangeKeeperType( type, name )
+          }}
+          onPressBack={() => setKeeperTypeModal( false )}
+          selectedLevelId={selectedLevelId}
+        />
+      </ModalContainer>
     </View>
   )
 }

@@ -32,13 +32,14 @@ export default function SendConfirmationContent( props ) {
 
   return (
     <View style={{
-      height: '100%', backgroundColor: Colors.white
+      backgroundColor: Colors.white
     }}>
       <View
         style={{
           ...styles.successModalHeaderView,
           marginRight: wp( '8%' ),
           marginLeft: wp( '8%' ),
+          marginTop: hp( 3 )
         }}
       >
         <Text style={styles.modalTitleText}>{props.title}</Text>
@@ -50,7 +51,7 @@ export default function SendConfirmationContent( props ) {
       </View>
 
       <ScrollView style={{
-        marginTop: hp( '1.5%' ), marginBottom: hp( '2%' )
+        marginTop: hp( '1.5%' ), marginBottom: hp( '1%' )
       }}>
         {props.recipients.map( ( item ) => renderRecipientItem( item ) )}
       </ScrollView>
@@ -58,6 +59,7 @@ export default function SendConfirmationContent( props ) {
       {props.infoText && (
         <View
           style={{
+            flex:1,
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
             marginRight: wp( '8%' ),
@@ -73,13 +75,11 @@ export default function SendConfirmationContent( props ) {
       )}
       <View
         style={{
+          // flex: 1,
           flexDirection: 'row',
-          marginTop: 'auto',
+          marginTop: hp( 9 ),
           alignItems: 'center',
-          marginBottom:
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? wp( '2%' )
-              : wp( '2%' ),
+          // backgroundColor: 'red'
         }}
       >
         <AppBottomSheetTouchableWrapper
@@ -88,8 +88,7 @@ export default function SendConfirmationContent( props ) {
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}
-            onPress={() => props.onPressOk()}>{props.okButtonText}</Text>
+          <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
         </AppBottomSheetTouchableWrapper>
         {props.isCancel && (
           <AppBottomSheetTouchableWrapper
@@ -112,9 +111,11 @@ export default function SendConfirmationContent( props ) {
           <Image
             style={{
               width: wp( '25%' ),
-              height: hp( '18%' ),
-              marginLeft: 'auto',
+              height: hp( '10%' ),
               resizeMode: 'cover',
+              marginLeft: 'auto',
+              // backgroundColor: 'green'
+              // marginBottom: props.recipients.length === 0 ? 'auto' : 0,
             }}
             source={
               props.isSuccess

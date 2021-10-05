@@ -16,15 +16,6 @@ export default function useSwanIntegrationResultFromAction( actionKind: SwanActi
             return `Succeed. Token Details: ${swanIntegrationState.swanTokenDetails}`
           }
 
-        case SwanActionKind.CREATE_SWAN_ACCOUNT_SHELL:
-          if ( swanIntegrationState.isAddingSwanMetadata ) {
-            return 'In Progress'
-          } else if ( swanIntegrationState.addSwanMetadataFailed ) {
-            return `Failed. Message: ${swanIntegrationState.addSwanMetadataFailedMessage}`
-          } else {
-            return `Succeed. Metadata Details: ${swanIntegrationState.swanMetadataDetails}`
-          }
-
         case SwanActionKind.LINK_HEXA_AND_SWAN_SUB_ACCOUNTS:
           if ( swanIntegrationState.isLinkingSwanWallet ) {
             return 'In Progress'

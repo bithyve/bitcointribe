@@ -1,109 +1,214 @@
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 
 import {
+  updateSwanStatus,
   FETCH_SWAN_AUTHENTICATION_URL,
+  fetchSwanAuthenticationUrlInitiated,
   fetchSwanAuthenticationUrlSucceeded,
+  REDEEM_SWAN_CODE_FOR_TOKEN,
+  redeemSwanCodeForTokenInitiated,
+  redeemSwanCodeForTokenSucceeded,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN,
+  createWithdrawalWalletOnSwanInitiated,
+  createWithdrawalWalletOnSwanSucceeded,
+
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
   linkSwanWalletFailed,
+  tempSwanAccountInfoSaved,
+  CREATE_TEMP_SWAN_ACCOUNT_INFO
 } from '../actions/SwanIntegration'
 
 import {
-  getSwanAuthToken,
-  linkSwanWallet,
-  syncSwanWallet,
-  redeemAuthCode
+  redeemAuthCodeForToken,
+  createWithdrawalWalletOnSwan,
+  setupAutomaticWithdrawals
 } from '../../services/swan'
 
 import { createWatcher } from '../utils/utilities'
 
-import { generatePKCEParameters } from '../lib/swan'
+import { generatePKCEParameters } from '../../utils/random/pkce'
 import Config from '../../bitcoin/HexaConfig'
+import { AccountsState } from '../reducers/accounts'
+import { Account, Accounts, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import { addNewAccount, generateShellFromAccount } from './accounts'
+import { updateAccountShells } from '../actions/accounts'
+import { updateWalletImageHealth } from '../actions/BHR'
 
-const client_id = Config.SWAN_CLIENT_ID || 'demo-web-client'
-const swan_auth_url = 'https://login-demo.curity.io/oauth/v2/oauth-authorize'// Config.SWAN_BASE_URL
-const redirect_uri = 'hexa://dev/swan/success/code/'//'https://oauth.tools/callback/code' //
+import dbManager from '../../storage/realm/dbManager'
 
+const swan_auth_url = `${Config.SWAN_BASE_URL}/oidc/auth`
+const redirect_uri = Config.SWAN_REDIRECT_URL
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
   FETCH_SWAN_AUTHENTICATION_URL
 )
 
 export function* fetchSwanAuthenticationUrlWorker( { payload } ) {
-  const { code_challenge, code_verifier, nonce, state } = generatePKCEParameters()
+  yield put( fetchSwanAuthenticationUrlInitiated() )
+  const { code_challenge, code_verifier, nonce, state } = yield call( generatePKCEParameters )
   const swanAuthenticationUrl = `\
 ${swan_auth_url}?\
-&client_id=${client_id}\
-&state=${state}\
-&scope=openid%20profile%20read\
+client_id=${Config.SWAN_CLIENT_ID}\
+&redirect_uri=${redirect_uri}\
 &response_type=code\
+&scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal\
+&state=${state}\
 &code_challenge=${code_challenge}\
 &code_challenge_method=S256\
-&prompt=login\
-&ui_locales=en\
-&nonce=${nonce}\
-&redirect_uri=${redirect_uri}\
+&response_mode=query\
 `
-  console.log( {
-    code_challenge, code_verifier, nonce, state, swanAuthenticationUrl
-  } )
+
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
   } ) )
 }
 
-export function* fetchSwanTokenWorker( { payload } ) {
-  // Authentication code is available which needs to be redeemed
-  console.log( 'About to Redeem Authorization Code ', payload.data )
+
+export const redeemSwanCodeForTokenWatcher = createWatcher(
+  redeemSwanCodeForTokenWorker,
+  REDEEM_SWAN_CODE_FOR_TOKEN
+)
+export function* redeemSwanCodeForTokenWorker( { payload } ) {
+  yield put( redeemSwanCodeForTokenInitiated() )
+
+  // Extract swan auth code from deep link redirect url
+  const splits = payload.data.split( '/' )
+  const code = splits[ splits.length - 1 ].split( '&' )[ 0 ].split( '=' )[ 1 ]
+
+  const { code_verifier, state } = yield select(
+    ( state ) => state.swanIntegration
+  )
+
   try {
-    const result = yield call( redeemAuthCode, payload.data )
+    const swanResponse = yield call( redeemAuthCodeForToken, {
+      code,
+      state,
+      code_verifier
+    } )
 
-    console.log( '***-> result', result )
-    if ( !result || result.status !== 200 ) {
-      const data = {
-        fetchSwanTokenFail: true,
-        fetchSwanTokenFailMessage: 'Swan authentication failed',
-      }
-      //yield put( fetchSwanTokenFailed( data ) )
-    } else {
-      /*
-      If we are here that means authentication was succesful with Swan
-      there are 2 options to consider
-
-      Option 1:
-      User is now athenticated with Swan so they really do have a Swan account
-      we can now create a Swan Account and save:
-      swan xpub,
-      The returned auth token
-      initial linkingStatus as 'NOT_LINKED'
-      isConfirmed  as false
-
-      Option 2:
-      Create the swan account shell as a separate action and reducer
-      and update it when we get the auth token.
-      */
-
-      //yield put( fetchSwanTokenSucceeded( result.data ) )
-      if ( result.error ) {
-        const data = {
-          fetchSwanTokenFail: true,
-          fetchSwanTokenFailMessage: result.message || 'Swan authentication failed',
+    const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
+    yield put( redeemSwanCodeForTokenSucceeded( {
+      swanAuthenticatedToken: access_token
+    } ) )
+    yield call( createWithdrawalWalletOnSwanWorker, {
+      payload: {
+        data: {
+          minBtcThreshold: 0.01
         }
-        //yield put( fetchSwanTokenFailed( data ) )
       }
-    }
-  } catch ( err ) {
-    console.log( 'err', err )
+    } )
+  } catch ( error ) {
     const data = {
-      fetchSwanTokenFail: true,
-      fetchSwanTokenFailMessage: 'Swan authentication failed',
+      linkSwanWalletFailed: true,
+      linkSwanWalletFailedMessage: 'Swan Account link failed',
     }
-    //yield put( fetchSwanTokenFailed( data ) )
+    yield put( linkSwanWalletFailed( data ) )
+  }
+
+}
+
+
+export const createWithdrawalWalletOnSwanWatcher = createWatcher(
+  createWithdrawalWalletOnSwanWorker,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN
+)
+export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
+
+  yield put( createWithdrawalWalletOnSwanInitiated( payload.data.minBtcThreshold ) )
+
+  const { swanAuthenticatedToken, minBtcThreshold } = yield select(
+    ( state ) => state.swanIntegration
+  )
+
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accounts: Accounts = accountState.accounts
+
+  let swanAccountDetails = null
+
+  for ( const key in accounts ) {
+
+    if( accounts[ key ].type ==='SWAN_ACCOUNT' )
+
+      swanAccountDetails = accounts[ key ]
+  }
+
+  const swanXpub = swanAccountDetails.xpub
+
+  let swanCreateResponse
+
+  try {
+    swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
+      access_token: swanAuthenticatedToken,
+      extendedPublicKey: swanXpub,
+      displayName: swanAccountDetails.accountName || 'Sats purchased from Swan'
+    } )
+  }
+  catch( e )  {
+    console.log( {
+      e
+    } )
+  }
+  yield put( updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) )
+
+  const swanWithdrawalResponse = yield call( setupAutomaticWithdrawals, {
+    walletId: swanCreateResponse.data.item.id,
+    access_token: swanAuthenticatedToken,
+    minBtcThreshold
+  } )
+
+  yield put( createWithdrawalWalletOnSwanSucceeded( {
+    swanWalletId: swanWithdrawalResponse.data.item.id
+  } ) )
+
+  // enable hexa-swan account
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  const swanAccounts = wallet.accounts[ AccountType.SWAN_ACCOUNT ]
+  if( swanAccounts.length ){
+    // upgrade default savings account
+    const defaultSwanAccount = accounts[ swanAccounts[ 0 ] ]
+    if( !defaultSwanAccount.isUsable ){
+      defaultSwanAccount.isUsable = true
+      defaultSwanAccount.accountDescription = 'Auto-withdraw wallet'
+      yield put( updateAccountShells( {
+        accounts: {
+          [ defaultSwanAccount.id ]: defaultSwanAccount
+        }
+      } ) )
+      yield call( dbManager.updateAccount, defaultSwanAccount.id, defaultSwanAccount )
+      yield put( updateWalletImageHealth( {
+        updateAccounts: true,
+        accountIds: [ defaultSwanAccount.id ]
+      } ) )
+    }
   }
 }
 
+function* createTempSwanAccountInfo( { payload }: {
+  payload: {
+    accountDetails: {
+      name: string,
+      description: string,
+    }
+  }
+} ) {
+  const { accountDetails } = payload
+  const account: Account = yield call(
+    addNewAccount,
+    AccountType.SWAN_ACCOUNT,
+    accountDetails,
+  )
+  const accountShell = yield call( generateShellFromAccount, account )
+
+  yield put( tempSwanAccountInfoSaved( accountShell ) )
+}
+
+export const addTempSwanAccountInfoWatcher = createWatcher( createTempSwanAccountInfo, CREATE_TEMP_SWAN_ACCOUNT_INFO )
+
 function* linkSwanWalletWorker( { payload } ) {
-  console.log( 'linkSwanWallet payload.data', payload.data )
   /*
   Continue with this worker only if:
   condition 1: Swan Account is not present

@@ -10,6 +10,7 @@ import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import Toast from '../../../components/Toast'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 
 export interface Props {
   choices: SubAccountDescribing[];
@@ -27,6 +28,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 
   const { currentWyreSubAccount } = useAccountsState()
   const { currentRampSubAccount } = useAccountsState()
+  const { currentSwanSubAccount } = useAccountsState()
   /**
    * Helper to determine whether or not adding a new sub-account kind
    * from the "Add New" screen is currently supported.
@@ -51,6 +53,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
           return false
         case SubAccountKind.FULLY_IMPORTED_WALLET:
           return false
+        case SubAccountKind.FNF_ACCOUNT:
+          return true
         default:
           return false
     }
@@ -68,8 +72,10 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
     switch ( serviceAccountKind ) {
         case ServiceAccountKind.FAST_BITCOINS:
           return false
-        case ServiceAccountKind.SWAN:
+        case ServiceAccountKind.FNF_ACCOUNT:
           return false
+        case ServiceAccountKind.SWAN:
+          return currentSwanSubAccount == null
         case ServiceAccountKind.WYRE:
           return currentWyreSubAccount == null
         case ServiceAccountKind.RAMP:
@@ -97,6 +103,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
           return 'COMING SOON'
         case SubAccountKind.DONATION_ACCOUNT:
           return 'NEW'
+        case SubAccountKind.FNF_ACCOUNT:
+          return 'COMING SOON'
         case SubAccountKind.SERVICE:
           return specialTagForServiceChoice( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
         case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
@@ -112,8 +120,10 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
     switch ( serviceAccountKind ) {
         case ServiceAccountKind.FAST_BITCOINS:
           return 'COMING SOON'
-        case ServiceAccountKind.SWAN:
+        case ServiceAccountKind.FNF_ACCOUNT:
           return 'COMING SOON'
+        case ServiceAccountKind.SWAN:
+          return 'NEW'
         case ServiceAccountKind.WYRE:
           return 'NEW'
         case ServiceAccountKind.RAMP:
@@ -133,7 +143,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         data={choices}
         extraData={[ selectedChoice ]}
         renderItem={( { item: subAccountInfo }: { item: SubAccountDescribing } ) => {
-          const isDisabled = isSubAccountCreationSupported( subAccountInfo ) == false
+          const isDisabled = isSubAccountCreationSupported( subAccountInfo ) == false || subAccountInfo.visibility === AccountVisibility.HIDDEN
 
           return (
             <View style={styles.cardShadowContainer}>
@@ -164,7 +174,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    backgroundColor: Colors.secondaryBackgroundColor,
+    backgroundColor: Colors.shadowColor,
     borderRadius: 12,
   },
 

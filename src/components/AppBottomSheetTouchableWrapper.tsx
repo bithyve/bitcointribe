@@ -1,6 +1,6 @@
-import { TouchableOpacity, TouchableOpacityProps, Platform} from "react-native";
-import { TouchableOpacity as TouchableOpacityGestureHandler } from "react-native-gesture-handler";
-import React, { ReactNode } from "react";
+import { TouchableOpacity, TouchableOpacityProps, Platform } from 'react-native'
+// import { TouchableOpacity as TouchableOpacityGestureHandler } from 'react-native-gesture-handler'
+import React, { ReactNode } from 'react'
 
 /**
  * This component uses TouchableOpacity from `react-native-gesture-handler` while on Android
@@ -11,11 +11,11 @@ import React, { ReactNode } from "react";
  * `@gorhom/bottom-sheet` across the app.
  */
 export const AppBottomSheetTouchableWrapper = (
-    props: { children: ReactNode } & Pick<TouchableOpacityProps,'onPress' | 'style' | 'activeOpacity' | 'disabled' | 'hitSlop'>,
-  ) =>
-    Platform.select({
-      android: <TouchableOpacityGestureHandler {...props} />,
-      ios: (
-        <TouchableOpacity {...props}/>
-      ),
-    });
+  props: { children: ReactNode } & Pick<TouchableOpacityProps, 'onPress' | 'style' | 'activeOpacity' | 'disabled' | 'hitSlop' | 'delayPressIn'>,
+) =>
+  Platform.select( {
+    android: <TouchableOpacity {...props} />,
+    ios: (
+      <TouchableOpacity {...props}/>
+    ),
+  } )

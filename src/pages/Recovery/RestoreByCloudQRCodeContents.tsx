@@ -9,10 +9,6 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  restoreShareFromQR,
-  UnableRecoverShareFromQR,
-} from '../../store/actions/sss'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -33,7 +29,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
   const [ processButtonText, setProcessButtonText ] = useState( 'Okay' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const unableRecoverShareFromQR = useSelector(
-    ( state ) => state.sss.unableRecoverShareFromQR,
+    ( state ) => state.bhr.unableRecoverShareFromQR,
   )
   console.log( 'unableRecoverShareFromQR', unableRecoverShareFromQR )
 
@@ -109,7 +105,8 @@ export default function RestoreByCloudQRCodeContents( props ) {
       setStartNumberCounter( startNumberCounter )
     }
     if ( qrDataArray.length === 8 ) {
-      dispatch( restoreShareFromQR( qrDataArray ) )
+      // Removed sss file
+      // dispatch( restoreShareFromQR( qrDataArray ) )
       setQrDataArray( [] )
       setCounter( 1 )
       setQrData( '' )
@@ -151,7 +148,8 @@ export default function RestoreByCloudQRCodeContents( props ) {
       setProcessButtonText( 'Try again' )
     }, 2 )
     errorBottomSheetRef.current.snapTo( 1 )
-    dispatch( UnableRecoverShareFromQR( null ) )
+    // Removed sss file
+    // dispatch( UnableRecoverShareFromQR( null ) )
   }
 
   return (
@@ -159,7 +157,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
       <ScrollView>
         <View style={NavStyles.modalHeaderTitleView}>
           <View style={{
-            flexDirection: 'row', flex: 1 
+            flexDirection: 'row', flex: 1
           }}>
             <View>
               <Text style={NavStyles.modalHeaderTitleText}>
@@ -171,7 +169,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
               </Text>
             </View>
             <View style={{
-              flexDirection: 'row', marginLeft: 'auto' 
+              flexDirection: 'row', marginLeft: 'auto'
             }}>
               <KnowMoreButton
                 onpress={() => {
@@ -195,7 +193,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
         </View>
 
         <View style={{
-          marginLeft: 30 
+          marginLeft: 30
         }}>
           <Text
             style={{
@@ -230,7 +228,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
 
         <View style={styles.qrScannerSection}>
           <Text style={{
-            ...NavStyles.modalHeaderSubtitleText, fontSize: RFValue( 15 ) 
+            ...NavStyles.modalHeaderSubtitleText, fontSize: RFValue( 15 )
           }}>
             Scan a Bitcoin address or any Hexa QR
           </Text>

@@ -4,15 +4,14 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
-  Image,
   ScrollView,
   RefreshControl,
   ImageBackground,
   Platform,
-  AsyncStorage,
+  InteractionManager
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -20,64 +19,36 @@ import {
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import { fetchEphemeralChannel } from '../../store/actions/trustedContacts'
+import { PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import moment from 'moment'
-import {
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import {
-  getLevelInfo,
-} from '../../common/CommonFunctions'
-import { trustedChannelsSetupSync } from '../../store/actions/trustedContacts'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import { syncPermanentChannels } from '../../store/actions/trustedContacts'
 import {
   generateMetaShare,
-  checkMSharesHealth,
   initLevelTwo,
-  sendApprovalRequest,
-  onApprovalStatusChange,
-  reShareWithSameKeeper,
-  autoShareContact,
-  generateSMMetaShares,
   deletePrivateData,
-  updateKeeperInfoToTrustedChannel,
-  secondaryShareDownloaded,
   autoShareToLevel2Keepers,
-  downloadSmShareForApproval,
   updateLevelData,
   keeperProcessStatus,
-  setLevelToNotSetupStatus
-} from '../../store/actions/health'
-import { modifyLevelStatus } from './ManageBackupFunction'
+  setLevelToNotSetupStatus,
+  setHealthStatus,
+  modifyLevelData,
+  setApprovalStatus,
+  downloadSMShare,
+  updateKeeperInfoToChannel,
+} from '../../store/actions/BHR'
 import {
+  LevelData,
   LevelHealthInterface,
   MetaShare,
-  notificationType,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
-import {
-  fetchKeeperTrustedChannel,
-  trustedContactInitialized,
-  updateNewFcm,
-} from '../../store/actions/keeper'
-import { nameToInitials } from '../../common/CommonFunctions'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import ModalHeader from '../../components/ModalHeader'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import AccountShell from '../../common/data/models/AccountShell'
-import PersonalNode from '../../common/data/models/PersonalNode'
-import { setCloudData, updateHealthForCloud } from '../../store/actions/cloud'
+import { setCloudData, updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
 import ApproveSetup from './ApproveSetup'
 import QRModal from '../Accounts/QRModal'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
@@ -85,11 +56,25 @@ import LoaderModal from '../../components/LoaderModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import Loader from '../../components/loader'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
+import debounce from 'lodash.debounce'
+import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/BHR'
+import LevelStatus from '../../common/data/enums/LevelStatus'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import ManageBackupCard from './ManageBackupCard'
+import { TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import ModalContainer from '../../components/home/ModalContainer'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import dbManager from '../../storage/realm/dbManager'
+import realm from '../../storage/realm/realm'
+import schema from '../../storage/realm/schema/Schema'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import { LocalizationContext, translations } from '../../common/content/LocContext'
+
 interface ManageBackupNewBHRStateTypes {
-  levelData: any[];
   selectedId: any;
-  encryptedCloudDataJson: any;
-  isError: boolean;
   selectedKeeper: {
     shareType: string;
     updatedAt: number;
@@ -98,64 +83,51 @@ interface ManageBackupNewBHRStateTypes {
     reshareVersion: number;
     name: string;
     data: any;
+    channelKey?: string;
   };
   selectedLevelId: number;
   selectedKeeperType: string;
   selectedKeeperName: string;
+  isEnabled: boolean;
   errorTitle: string;
   errorInfo: string;
   refreshControlLoader: boolean;
-  QrBottomSheetsFlag: boolean;
-  secondaryShare: MetaShare;
   showLoader: boolean;
   knowMoreType: string;
+  keeping: any[];
+  keeperTypeModal: boolean;
+  errorModal: boolean;
+  showQRModal: boolean;
+  isLevel3Started: boolean;
+  loaderModal: boolean;
+  knwowMoreModal: boolean;
+  metaSharesKeeper: MetaShare[];
+  onKeeperButtonClick: boolean;
+  strings: object;
+  common: object;
+  iCloudErrors: object;
+  driveErrors: object;
+  cloudErrorModal: boolean;
+  errorMsg: string;
 }
 
 interface ManageBackupNewBHRPropsTypes {
   navigation: any;
-  updateHealthForCloud: any;
+  containerStyle: {};
   cloudBackupStatus: CloudBackupStatus;
-  walletName: string;
-  regularAccount: RegularAccount;
-  database: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: any;
-  healthLoading: any;
   generateMetaShare: any;
-  checkMSharesHealth: any;
-  isLevelTwoMetaShareCreated: Boolean;
-  isLevel2Initialized: Boolean;
   isLevel3Initialized: Boolean;
   initLevelTwo: any;
-  s3Service: S3Service;
   keeperInfo: any[];
-  sendApprovalRequest: any;
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
-  onApprovalStatusChange: any;
-  secureAccount: SecureAccount;
-  fetchKeeperTrustedChannel: any;
-  keeperApproveStatus: any;
-  metaSharesKeeper: MetaShare[];
-  reShareWithSameKeeper: any;
-  autoShareContact: any;
-  trustedChannelsSetupSync: any;
-  trustedChannelsSetupSyncing: any;
-  accountShells: AccountShell[];
-  activePersonalNode: PersonalNode;
-  versionHistory: any;
-  updateNewFcm: any;
+  syncPermanentChannels: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
-  isSmMetaSharesCreatedFlag: boolean;
-  generateSMMetaShares: any;
   deletePrivateData: any;
-  updateKeeperInfoToTrustedChannel: any;
-  secondaryShareDownloaded: any
   autoShareToLevel2Keepers: any;
-  downloadSmShareForApproval: any;
-  downloadSmShare: boolean;
-  secondaryShareDownloadedStatus: any;
   cloudPermissionGranted: boolean;
   updateLevelData: any;
   keeperProcessStatusFlag: string;
@@ -163,37 +135,55 @@ interface ManageBackupNewBHRPropsTypes {
   setLevelToNotSetupStatus: any;
   isLevelToNotSetupStatus: boolean;
   initLoading: boolean;
+  setHealthStatus: any;
+  onPressKeeper: any;
+  navigationObj: any;
+  status: any;
+  errorTitle: any;
+  errorInfo: any;
+  isTypeBottomSheetOpen: any;
+  setLevelCompletionError: any;
+  setIsKeeperTypeBottomSheetOpen: any;
+  updateCloudData: any;
+  levelData: LevelData[]
+  shieldHealth: boolean;
+  modifyLevelData: any;
+  modifyLevelDataStatus: boolean;
+  trustedContacts: Trusted_Contacts;
+  createChannelAssets: any;
+  setApprovalStatus: any;
+  approvalStatus: boolean;
+  downloadSMShare: any;
+  updateKeeperInfoToChannel: any;
+  isKeeperInfoUpdated2: boolean;
+  isKeeperInfoUpdated3: boolean;
+  generateMetaShareStatus: boolean;
+  cloudErrorMessage: string;
+  setCloudErrorMessage: any;
 }
 
+// const HeaderComponent = React.lazy( () => import( '../../navigation/stacks/Header' ) )
 class ManageBackupNewBHR extends Component<
   ManageBackupNewBHRPropsTypes,
   ManageBackupNewBHRStateTypes
 > {
   focusListener: any;
-  appStateListener: any;
-  firebaseNotificationListener: any;
-  notificationOpenedListener: any;
-  NoInternetBottomSheet: any;
-  unsubscribe: any;
   ErrorBottomSheet: any;
   keeperTypeBottomSheet: any;
   QrBottomSheet: any;
-  ApprovePrimaryKeeperBottomSheet: any
   loaderBottomSheet: any
   knowMoreBottomSheet: any
 
-  constructor( props ) {
+  static contextType = LocalizationContext
+
+  constructor( props, context ) {
+    super( props, context )
     super( props )
     this.focusListener = null
-    this.appStateListener = null
-    this.NoInternetBottomSheet = React.createRef()
-    this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
-    this.QrBottomSheet
-    this.ApprovePrimaryKeeperBottomSheet
-    this.loaderBottomSheet
-    this.knowMoreBottomSheet = React.createRef( )
+    const s3 = dbManager.getBHR()
+    console.log( 's3', this.context )
 
     const obj = {
       shareType: '',
@@ -205,233 +195,219 @@ class ManageBackupNewBHR extends Component<
       data: {
       },
       uuid: '',
+      channelKey: ''
     }
+
     this.state = {
       selectedKeeper: obj,
       selectedId: 0,
-      isError: false,
-      levelData: [
-        {
-          levelName: 'Level 1',
-          status: 'notSetup',
-          keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on GoogleDrive',
-          keeper2ButtonText: 'Security Question',
-          keeper1: obj,
-          keeper2: obj,
-          note:'',
-          info:'Automated Cloud Backup',
-          id: 1,
-        },
-        {
-          levelName: 'Level 2',
-          status: 'notSetup',
-          keeper1ButtonText: 'Share Recovery Key 1',
-          keeper2ButtonText: 'Share Recovery Key 2',
-          keeper1: obj,
-          keeper2: obj,
-          note:'',
-          info:'Double Backup',
-          id: 2,
-        },
-        {
-          levelName: 'Level 3',
-          status: 'notSetup',
-          keeper1ButtonText: 'Share Recovery Key 1',
-          keeper2ButtonText: 'Share Recovery Key 2',
-          keeper1: obj,
-          keeper2: obj,
-          note:'',
-          info:'Multi Key Backup',
-          id: 3,
-        },
-      ],
-      encryptedCloudDataJson: [],
       selectedLevelId: 0,
       selectedKeeperType: '',
       selectedKeeperName: '',
+      isEnabled: false,
       errorTitle: '',
       errorInfo: '',
       refreshControlLoader: false,
-      QrBottomSheetsFlag: false,
-      secondaryShare: null,
       showLoader: false,
-      knowMoreType: 'manageBackup'
+      knowMoreType: 'manageBackup',
+      keeping: [],
+      keeperTypeModal: false,
+      errorModal: false,
+      showQRModal: false,
+      isLevel3Started: false,
+      loaderModal: false,
+      knwowMoreModal: false,
+      metaSharesKeeper: [ ...s3.metaSharesKeeper  ],
+      onKeeperButtonClick: false,
+      strings: translations [ 'bhr' ],
+      common: translations [ 'common' ],
+      iCloudErrors: translations [ 'iCloudErrors' ],
+      driveErrors: translations [ 'driveErrors' ],
+      cloudErrorModal: false,
+      errorMsg: ''
     }
   }
 
   componentDidMount = async () => {
-    await AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
-      if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
-        this.props.setLevelToNotSetupStatus()
-      }
-      // updates the new FCM token to channels post recovery
-      if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
-        this.props.updateNewFcm()
-      }
+    InteractionManager.runAfterInteractions( async() => {
+      realm.objects( schema.BHR ).addListener( obj => {
+        if( obj.length > 0 ) {
+          this.setState( {
+            metaSharesKeeper: obj[ 0 ].metaSharesKeeper
+          } )
+        }
+      } )
+      this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
+      await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
+        if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
+          this.props.setLevelToNotSetupStatus()
+          this.props.modifyLevelData()
+        } else {
+          await this.onRefresh()
+          this.props.modifyLevelData()
+        }
+        // updates the new FCM token to channels post recovery
+        // if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
+        //   this.props.updateNewFcm()
+        // }
+      } )
+      this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+        this.updateAddressBook( )
+      } )
     } )
-
-    await this.onRefresh()
-    this.modifyLevelData()
   };
 
-  modifyLevelData = () => {
-    const { levelHealth, currentLevel, keeperInfo } = this.props
-    const levelHealthObject = [ ...levelHealth ]
-    const levelData = modifyLevelStatus(
-      this.state.levelData,
-      levelHealthObject,
-      currentLevel,
-      keeperInfo,
-      this.updateLevelDataToReducer
+  updateAddressBook = async ( ) => {
+    const { trustedContacts } = this.props
+
+    const keeping = []
+    for( const channelKey of Object.keys( trustedContacts ) ){
+      const contact = trustedContacts[ channelKey ]
+      const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
+
+      if( contact.isActive ){
+        if( isWard ){
+          if( isWard ) keeping.push( makeContactRecipientDescription(
+            channelKey,
+            contact,
+            ContactTrustKind.USER_IS_KEEPING,
+          ) )
+        }
+      } else {
+        // TODO: inject in expired contacts list
+      }
+    }
+
+    this.setState( {
+      keeping,
+    }
     )
-    console.log( 'LEVELDATA', levelData )
-    this.setState( {
-      levelData: levelData.levelData,
-      isError: levelData.isError,
-    } )
-    //this.setSelectedCards()
   };
 
-  setSelectedCards = () => {
-    const { levelData } = this.state
-    for ( let a = 0; a < levelData.length; a++ ) {
-      if ( levelData[ a ].status == 'notSetup' ) {
-        this.setState( {
-          selectedId: levelData[ a ].id
-        } )
-        break
-      }
-    }
-    let level = 1
-    if (
-      levelData.findIndex(
-        ( value ) => value.status == 'bad' || value.status == 'notSetup'
-      )
-    ) {
-      const index = levelData.findIndex(
-        ( value ) => value.status == 'bad' || value.status == 'notSetup'
-      )
-      level = levelData[ index > -1 ? index - 1 : 2 ].id
-    }
-    let value = 1
-    if ( this.state.levelData[ 0 ].status == 'notSetup' || this.state.levelData[ 0 ].status == 'bad' ) value = 1
-    else if ( level === 3 ) value = 0
-    else if ( level ) value = level + 1
-    this.setState( {
-      selectedId: value
+  handleContactSelection(
+    contactDescription: ContactRecipientDescribing,
+    index: number,
+    contactType: string,
+  ) {
+    this.props.navigation.navigate( 'ContactDetails', {
+      contact: contactDescription,
+      index,
+      contactsType: contactType,
     } )
-  };
-
-  selectId = ( value ) => {
-    if ( value != this.state.selectedId ) this.setState( {
-      selectedId: value
-    } )
-    else this.setState( {
-      selectedId: 0
-    } )
-  };
-
-  getTime = ( item ) => {
-    return ( item.toString() && item.toString() == '0' ) ||
-      item.toString() == 'never'
-      ? 'never'
-      : timeFormatter( moment( new Date() ), item )
-  };
-
-  updateLevelDataToReducer = ( levelData ) =>{
-    this.props.updateLevelData( levelData )
   }
+
+  renderContactItem = ( {
+    contactDescription,
+    index,
+    contactsType,
+  }: {
+    contactDescription: ContactRecipientDescribing;
+    index: number;
+    contactsType: string;
+  } ) => {
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          this.handleContactSelection( contactDescription, index, contactsType )
+        }
+        style={{
+          marginTop: hp( 1 ),
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+        key={index}
+      >
+        <View style={styles.imageContainer}>
+          <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+        </View>
+        <Text style={{
+          textAlign: 'center',
+          marginTop: hp ( 0.5 ),
+          alignSelf: 'center',
+          fontSize: RFValue( 10 ),
+          fontFamily: Fonts.FiraSansRegular
+        }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
+      </TouchableOpacity>
+    )
+  };
+
+  toggleSwitch = () => this.setState( {
+    isEnabled: !this.state.isEnabled
+  } );
 
   componentDidUpdate = ( prevProps, prevState ) => {
     const {
-      healthLoading,
       cloudBackupStatus,
       levelHealth
     } = this.props
+
     if (
-      prevProps.healthLoading !== this.props.healthLoading ||
+      prevProps.trustedContacts != this.props.trustedContacts
+    ) {
+      requestAnimationFrame( () => {
+        this.updateAddressBook()
+      } )
+    }
+    if (
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
-      console.log( 'healthLoading', healthLoading )
-      console.log( 'cloudBackupStatus', cloudBackupStatus )
-
-      if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
+      if ( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
           refreshControlLoader: true,
           showLoader: true
         } )
-      } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
+      } else if ( ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
         this.setState( {
           refreshControlLoader: false,
           showLoader: false
         } )
+        if( ( this.props.currentLevel == 2 && !this.props.isKeeperInfoUpdated2 ) || this.props.currentLevel == 3 && !this.props.isKeeperInfoUpdated3 )
+          this.props.updateKeeperInfoToChannel()
       }
+    }
+
+    if( ( prevProps.trustedContacts != this.props.trustedContacts ) || ( prevProps.levelData != this.props.levelData ) ){
+      this.setState( {
+        refreshControlLoader: false
+      } )
+    }
+
+    if( prevProps.isLevelToNotSetupStatus != this.props.isLevelToNotSetupStatus && this.props.isLevelToNotSetupStatus ){
+      this.setState( {
+        showLoader: false
+      } )
     }
 
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
-      if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
-        levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
-      ) {
-        this.loaderBottomSheet.snapTo( 1 )
-      }
-      this.modifyLevelData( )
+      this.autoCloudUpload()
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0 && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true
+        prevProps.levelHealth.length == 0 &&
+        cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+        this.props.cloudPermissionGranted === true &&
+        this.props.levelHealth.length &&
+        this.props.levelHealth[ 0 ].levelInfo.length &&
+        this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup'
       ) {
         this.props.setCloudData( )
-      } else if(
-        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' )
-      ) {
-        this.props.deletePrivateData()
       }
-      else if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 2 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 2 ].levelInfo[ 3 ].status == 'accessible' &&
-      levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
-      levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
-      ) {
-        this.updateCloudData()
-      }
-    }
-
-    if( prevProps.levelHealth != this.props.levelHealth ){
-      this.autoUploadShare()
-      if (
-        this.props.levelHealth.findIndex(
-          ( value ) =>
-            value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' || item.shareType == 'device' ) >
-            -1
-        ) > -1
-      ) {
-        this.props.trustedChannelsSetupSync()
-      }
-    }
-
-    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-      this.updateCloudData()
-    }
-
-    if( this.props.currentLevel == 3 ) {
-      this.loaderBottomSheet.snapTo( 0 )
     }
 
     if (
-      JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 0 && this.props.metaSharesKeeper.length == 3
+      prevState.metaSharesKeeper != this.state.metaSharesKeeper && this.state.metaSharesKeeper.length == 3 && this.state.onKeeperButtonClick
     ) {
       const obj = {
         id: 2,
         selectedKeeper: {
-          shareType: 'device',
-          name: 'Secondary Device1',
+          shareType: 'primaryKeeper',
+          name: 'Personal Device 1',
           reshareVersion: 0,
-          status: 'notAccessible',
+          status: 'notSetup',
           updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
+          shareId: this.state.metaSharesKeeper[ 1 ]
             .shareId,
           data: {
           },
@@ -440,11 +416,18 @@ class ManageBackupNewBHR extends Component<
       }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
+        showLoader: false,
+        selectedLevelId: 2
+      }, () => {
+        this.goToHistory( obj )
       } )
+      this.props.setIsKeeperTypeBottomSheetOpen( false )
+      // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      // this.goToHistory( obj )
+      // this.loaderBottomSheet.snapTo( 0 )
     }
     if (
-      JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 3 && this.props.metaSharesKeeper.length == 5
+      prevState.metaSharesKeeper != this.state.metaSharesKeeper && this.state.metaSharesKeeper.length == 5 && this.state.onKeeperButtonClick
     ) {
       const obj = {
         id: 2,
@@ -452,14 +435,30 @@ class ManageBackupNewBHR extends Component<
           shareType: this.state.selectedKeeperType,
           name: this.state.selectedKeeperName,
           reshareVersion: 0,
-          status: 'notAccessible',
+          status: 'notSetup',
           updatedAt: 0,
-          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 3 ]
-            .shareId,
+          shareId: this.state.metaSharesKeeper[ 3 ].shareId,
           data: {
           },
         },
         isSetup: true,
+      }
+      if( this.state.selectedKeeperType == 'pdf' ){
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+        }, () => {
+          this.sendApprovalRequestToPK( )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
+      } else {
+        this.setState( {
+          selectedKeeper: obj.selectedKeeper,
+          showLoader: false,
+          selectedLevelId: 2
+        }, () => {
+          this.goToHistory( obj )
+          this.props.setIsKeeperTypeBottomSheetOpen( false )
+        } )
       }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
@@ -467,331 +466,245 @@ class ManageBackupNewBHR extends Component<
       this.sendApprovalRequestToPK( )
     }
 
-    if( prevProps.initLoading !== this.props.initLoading && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
-      this.goToHistory( {
-        id: 2,
-        selectedKeeper: this.state.selectedKeeper,
-        isSetup: true
-      } )
-      this.loaderBottomSheet.snapTo( 0 )
-    }
-
     if( prevProps.keeperProcessStatusFlag != this.props.keeperProcessStatusFlag && this.props.keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
-      this.props.updateKeeperInfoToTrustedChannel()
       this.props.keeperProcessStatus( '' )
     }
 
-    if (
-      ( prevProps.secondaryShareDownloadedStatus !== this.props.secondaryShareDownloadedStatus ||
-      prevProps.downloadSmShare !==
-      this.props.downloadSmShare ) && !this.props.downloadSmShare && this.props.secondaryShareDownloadedStatus
-    ) {
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 1 );
-      ( this.QrBottomSheet as any ).snapTo( 0 )
+    if( prevProps.status !== this.props.status && this.props.status === LevelStatus.FAILED ){
+      this.setState( {
+        errorTitle: this.props.errorTitle,
+        errorInfo: this.props.errorInfo,
+        showLoader: false
+      } )
+      this.props.setLevelCompletionError( null, null, LevelStatus.PENDING )
+      // ( this.ErrorBottomSheet as any ).snapTo( 1 )
+      this.setState( {
+        errorModal: true
+      } )
     }
-  };
 
-  updateCloudData = () => {
-    if( this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
-    // if( this.props.cloudPermissionGranted === false ) return
-    const { currentLevel, keeperInfo, levelHealth, s3Service } = this.props
-    let secretShare = {
-    }
-    if ( levelHealth.length > 0 ) {
-      const levelInfo = getLevelInfo( levelHealth, currentLevel )
-
-      if ( levelInfo ) {
-        if (
-          levelInfo[ 2 ] &&
-          levelInfo[ 3 ] &&
-          levelInfo[ 2 ].status == 'accessible' &&
-          levelInfo[ 3 ].status == 'accessible'
-        ) {
-          for (
-            let i = 0;
-            i < s3Service.levelhealth.metaSharesKeeper.length;
-            i++
-          ) {
-            const element = s3Service.levelhealth.metaSharesKeeper[ i ]
-
-            if ( levelInfo[ 0 ].shareId == element.shareId ) {
-              secretShare = element
-              break
-            }
-          }
-        }
+    if( prevProps.navigationObj !== this.props.navigationObj ){
+      this.setState( {
+        selectedKeeper: this.props.navigationObj.selectedKeeper, selectedLevelId: this.props.navigationObj.id
+      } )
+      if( this.props.navigationObj.selectedKeeper.shareType && this.props.navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
+        this.goToHistory( this.props.navigationObj )
+      } else {
+        this.setState( {
+          keeperTypeModal: true
+        } )
+        this.goToHistory( this.props.navigationObj )
       }
     }
-    this.props.setCloudData(
-      keeperInfo,
-      currentLevel == 3 ? 3 : currentLevel + 1,
-      secretShare
-    )
-  };
 
-  autoUploadShare = () => {
-    const {
-      levelHealth,
-      currentLevel,
-      autoShareToLevel2Keepers
-    } = this.props
-    if (
-      levelHealth[ 2 ] &&
-      currentLevel == 2 &&
-      levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
-      levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible'
-    ) {
-      console.log( 'autoUploadShare levelHealth', levelHealth )
-      autoShareToLevel2Keepers( [ ...levelHealth ] )
+    if( prevProps.isTypeBottomSheetOpen !== this.props.isTypeBottomSheetOpen && this.props.isTypeBottomSheetOpen === true ){
+      this.setState( {
+        showLoader: false
+      }, () => {
+        this.setState( {
+          keeperTypeModal: true
+        } )
+      } )
+      this.props.setIsKeeperTypeBottomSheetOpen( false )
+    }
+
+    if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus && this.state.isLevel3Started ) {
+      this.setState( {
+        showLoader: false
+      } )
+      console.log( 'APPROVe MB' )
+      this.setState( {
+        showQRModal: false
+      },
+      () => {
+        const {
+          selectedKeeper,
+          selectedLevelId,
+          selectedKeeperType,
+          selectedKeeperName,
+        } = this.state
+        const obj = {
+          id: selectedLevelId,
+          selectedKeeper: {
+            ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+            shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.state.metaSharesKeeper[ 1 ] ? this.state.metaSharesKeeper[ 1 ].shareId: '' : this.state.metaSharesKeeper[ 4 ] ? this.state.metaSharesKeeper[ 4 ].shareId : ''
+          },
+          isSetup: true,
+        }
+        this.goToHistory( obj )
+      } )
+    }
+
+    if( prevProps.levelHealth != this.props.levelHealth ){
+      if (
+        this.props.currentLevel == 2 &&
+        levelHealth[ 1 ] &&
+        levelHealth[ 1 ].levelInfo[ 4 ] &&
+        levelHealth[ 1 ].levelInfo[ 5 ] &&
+        levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
+        ( levelHealth[ 1 ].levelInfo[ 2 ].updatedAt == 0 ||
+        levelHealth[ 1 ].levelInfo[ 3 ].updatedAt == 0 )
+      ) {
+        this.props.autoShareToLevel2Keepers()
+      }
+    }
+
+    if( prevProps.cloudErrorMessage != this.props.cloudErrorMessage && this.props.cloudErrorMessage != '' ){
+      const message = Platform.select( {
+        ios: this.state.iCloudErrors[ this.props.cloudErrorMessage ],
+        android: this.state.driveErrors[ this.props.cloudErrorMessage ],
+      } )
+      this.setState( {
+        cloudErrorModal: true, errorMsg: message
+      } )
+      this.props.setCloudErrorMessage( '' )
     }
   };
+
+  componentWillUnmount() {
+    this.focusListener.remove()
+  }
 
   goToHistory = ( value ) => {
-    const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
-    console.log( 'VALUE', value )
+    const { id, selectedKeeper, isSetup, isChangeKeeperAllow } = value
+    this.setState( {
+      showLoader: false
+    } )
     const navigationParams = {
-      selectedTime: selectedKeeper.updatedAt
-        ? this.getTime( selectedKeeper.updatedAt )
-        : 'never',
-      selectedStatus: selectedKeeper.status,
-      selectedTitle: selectedKeeper.name,
+      selectedTitle: selectedKeeper.name ? selectedKeeper.name : this.state.selectedKeeperName,
       selectedLevelId: id,
-      selectedContact: selectedKeeper.data,
       selectedKeeper,
     }
-    if ( selectedKeeper.shareType == 'device' ) {
-      let index = 0
-      let count = 0
-      for ( let i = 0; i < this.state.levelData.length; i++ ) {
-        const element = this.state.levelData[ i ]
-        if ( element.keeper1.shareType == 'device' ) count++
-        if ( element.keeper2.shareType == 'device' ) count++
+    let index = 1
+    let count = 0
+    if ( selectedKeeper.shareType == 'primaryKeeper' || selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
+      for ( let i = 0; i < this.props.levelData.length; i++ ) {
+        const element = this.props.levelData[ i ]
+        if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
+          if ( element.keeper1.shareType == 'contact' || element.keeper1.shareType == 'existingContact' ) count++
+          if ( element.keeper2.shareType == 'contact' || element.keeper2.shareType == 'existingContact' ) count++
+        }
+        if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
+          if ( element.keeper1.shareType == 'device' || element.keeper1.shareType == 'primaryKeeper' ) count++
+          if ( element.keeper2.shareType == 'device' ) count++
+        }
       }
-      if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ){
-        index = selectedKeeper.data.index
+      if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
+        if ( count == 1 && isSetup ) index = 2
+        else if ( count == 0 && isSetup ) index = 1
+        else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
       }
-      else if ( count == 0 && isSetup ) index = 0
-      else if ( count == 1 && isSetup ) index = 3
-      else if ( count == 2 && isSetup ) index = 4
-      else {
-        index = 0
+      if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
+        if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ) index = selectedKeeper.data.index
+        else if ( count == 0 && isSetup ) index = 0
+        else if ( count == 1 && isSetup ) index = 3
+        else if ( count == 2 && isSetup ) index = 4
+        else index = 0
       }
-      console.log( 'device index', index );
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
-      ( this.QrBottomSheet as any ).snapTo( 0 );
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
+      if( selectedKeeper.shareType == 'primaryKeeper' ) index = 0
+    }
+    // ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+    this.setState( {
+      keeperTypeModal: false,
+      showQRModal: false,
+    } )
+    if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
-        isPrimaryKeeper,
+        isPrimaryKeeper: selectedKeeper.shareType == 'primaryKeeper' ? true : false,
         isChangeKeeperAllow,
-        index,
+        index: index > -1 ? index : 0,
       } )
-    } else if ( selectedKeeper.shareType == 'contact' ) {
-      console.log( 'inside selectedKeeper.shareType', selectedKeeper.shareType )
-      let index = 1
-      let count = 0
-      for ( let i = 0; i < this.state.levelData.length; i++ ) {
-        const element = this.state.levelData[ i ]
-        if ( element.keeper1.shareType == 'contact' ) count++
-        if ( element.keeper2.shareType == 'contact' ) count++
-      }
-      if ( count == 1 && isSetup ) index = 2
-      else if ( count == 0 && isSetup ) index = 1
-      else {
-        index = selectedKeeper.data.index
-      }
-      console.log( 'contact index', index );
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
-      ( this.QrBottomSheet as any ).snapTo( 0 );
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
+    } else if ( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
       this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         index,
         isChangeKeeperAllow
       } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
-      ( this.QrBottomSheet as any ).snapTo( 0 );
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate(
-        'PersonalCopyHistoryNewBHR',
-        navigationParams,
-        isChangeKeeperAllow
+        'PersonalCopyHistoryNewBHR', {
+          ...navigationParams,
+          isChangeKeeperAllow
+        }
       )
     }
   };
 
-  onPressKeeper = ( value, number ) => {
-    const {
-      currentLevel,
-      isLevelThreeMetaShareCreated,
-      isLevel3Initialized,
-      isLevelTwoMetaShareCreated,
-      isLevel2Initialized,
-      secureAccount,
-    } = this.props
-    if (
-      currentLevel == 1 &&
-      value.id == 3 &&
-      !isLevelThreeMetaShareCreated &&
-      !isLevel3Initialized
-    ) {
-      this.setState( {
-        errorTitle: 'Please complete Level 2',
-        errorInfo:
-        'It seems you have not completed Level 2. Please complete Level 2 to proceed'
-      } );
-      ( this.ErrorBottomSheet as any ).snapTo( 1 )
-      return
-    } else if (
-      currentLevel == 1 &&
-      number == 2 &&
-      value.id == 2 &&
-      !isLevelTwoMetaShareCreated &&
-      !isLevel2Initialized
-    ) {
-      this.setState( {
-        errorTitle: 'Please complete Personal Device Setup',
-        errorInfo:
-          'It seems you have not completed Personal Device setup, please complete Personal Device setup to proceed',
-      } );
-      ( this.ErrorBottomSheet as any ).snapTo( 1 )
-      return
-    } else if (
-      currentLevel == 1 &&
-      number == 2 &&
-      value.id == 2 &&
-      !secureAccount.secureHDWallet.xpubs.secondary &&
-      !secureAccount.secureHDWallet.xpubs.bh
-    ) {
-      this.setState( {
-        errorTitle: 'Please make sure Primary Keeper setup completed.',
-        errorInfo:
-          'Please check if you have completed Primary Keeper Setup and check notifications for xPubs.',
-      } );
-      ( this.ErrorBottomSheet as any ).snapTo( 1 )
-      return
-    } else {
-      this.setState( {
-        errorTitle: '', errorInfo: ''
-      } )
-    }
-    const keeper = number == 1 ? value.keeper1 : value.keeper2
+  onPressKeeperButton = ( value, number ) => {
     this.setState( {
-      selectedKeeper: keeper,
       selectedLevelId: value.id,
+      onKeeperButtonClick: true
     } )
-    console.log( 'this.props.metaSharesKeeper.length', this.props.metaSharesKeeper.length )
-    const obj = {
-      id: value.id,
-      selectedKeeper: {
-        ...keeper,
-        name: value.id === 2 && number == 1 ? 'Secondary Device1' : keeper.name,
-        shareType: value.id === 2 && number == 1 ? 'device' : keeper.shareType,
-        shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-      },
-      isSetup: keeper.updatedAt ? false : true,
-      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false,
-      isChangeKeeperAllow: currentLevel == 1 && value.id == 2 ? false : currentLevel == 2 && this.props.metaSharesKeeper.length === 5 ? false : true
-    }
-    if ( keeper.updatedAt > 0 ) {
-      this.goToHistory( obj )
-      return
-    } else {
-      if ( value.id === 2 && number == 1 ) {
-        if ( this.props.currentLevel == 1 ) {
-          if (
-            !this.props.isLevel2Initialized &&
-            !this.props.isLevelTwoMetaShareCreated &&
-            value.id == 2 && this.props.metaSharesKeeper.length != 3
-          ) {
-            this.loaderBottomSheet.snapTo( 1 )
-            this.props.generateMetaShare( value.id )
-          } else {
-            this.goToHistory( obj )
-          }
-          if( !this.props.isSmMetaSharesCreatedFlag ){
-            this.props.generateSMMetaShares()
-          }
-        } else {
-          this.setState( {
-            errorTitle: 'Please complete Level 1',
-            errorInfo:
-              'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed',
-          } );
-          ( this.ErrorBottomSheet as any ).snapTo( 1 )
-        }
-      } else ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
-    }
+    this.props.onPressKeeper( value, number )
   };
 
   onRefresh = async () => {
-    this.props.checkMSharesHealth()
+    this.setState( {
+      refreshControlLoader: true
+    } )
+    const contacts: Trusted_Contacts = this.props.trustedContacts
+    const channelUpdates = []
+    // Contact or Device type
+    if( contacts ){
+      for( const ck of Object.keys( contacts ) ){
+        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ){
+          // initiate permanent channel
+          const channelUpdate =  {
+            contactInfo: {
+              channelKey: ck,
+            }
+          }
+          channelUpdates.push( channelUpdate )
+        }
+      }
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+        channelUpdates: channelUpdates,
+        metaSync: true
+      } )
+    }
+    this.props.modifyLevelData( )
+    this.props.setHealthStatus()
+    this.autoCloudUpload()
   };
 
-  getImageIcon = ( chosenContact ) => {
-    if ( chosenContact && chosenContact.name ) {
-      if ( chosenContact.imageAvailable ) {
-        return (
-          <View style={styles.imageBackground}>
-            <Image
-              source={{
-                uri: chosenContact.image.uri
-              }}
-              style={styles.contactImage}
-            />
-          </View>
-        )
-      } else {
-        return (
-          <View style={styles.imageBackground}>
-            <Text
-              style={{
-                textAlign: 'center',
-                fontSize: RFValue( 9 ),
-              }}
-            >
-              {chosenContact &&
-              chosenContact.firstName === 'F&F request' &&
-              chosenContact.contactsWalletName !== undefined &&
-              chosenContact.contactsWalletName !== ''
-                ? nameToInitials( `${chosenContact.contactsWalletName}'s wallet` )
-                : chosenContact && chosenContact.name
-                  ? nameToInitials(
-                    chosenContact &&
-                      chosenContact.firstName &&
-                      chosenContact.lastName
-                      ? chosenContact.firstName + ' ' + chosenContact.lastName
-                      : chosenContact.firstName && !chosenContact.lastName
-                        ? chosenContact.firstName
-                        : !chosenContact.firstName && chosenContact.lastName
-                          ? chosenContact.lastName
-                          : ''
-                  )
-                  : ''}
-            </Text>
-          </View>
-        )
+  autoCloudUpload = () =>{
+    const { levelHealth, cloudBackupStatus } = this.props
+    if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
+      if( levelHealth[ 1 ].levelInfo.length == 4 &&
+        levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
+        levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
+        cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
+        this.props.deletePrivateData()
+        this.props.updateCloudData()
+      } else if( levelHealth[ 1 ].levelInfo.length == 6 &&
+        levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
+        levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
+        cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
+        this.props.updateCloudData()
+        this.setState( {
+          loaderModal: true
+        } )
       }
     }
-    return (
-      <Image
-        style={styles.contactImageAvatar}
-        source={require( '../../assets/images/icons/icon_user.png' )}
-      />
-    )
-  };
-
-  closeErrorModal = () => {
-    ( this.ErrorBottomSheet as any ).snapTo( 0 )
-  };
+  }
 
   sendApprovalRequestToPK = ( ) => {
     this.setState( {
-      QrBottomSheetsFlag: true
-    } );
-    ( this.QrBottomSheet as any ).snapTo( 1 );
-    ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+      showQRModal: true,
+      isLevel3Started: true
+    } )
+
+    // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+    this.setState( {
+      keeperTypeModal: false
+    } )
   };
 
   renderQrContent = () => {
@@ -799,38 +712,38 @@ class ManageBackupNewBHR extends Component<
       <QRModal
         isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
-        title={'Note'}
+        title={this.state.common[ 'note' ]}
         infoText={
-          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+          this.state.strings[
+            'Pleaseapprovethis'
+          ]
         }
-        modalRef={this.QrBottomSheet}
-        isOpenedFlag={this.state.QrBottomSheetsFlag}
+        isOpenedFlag={this.state.showQRModal}
         onQrScan={async( qrScannedData ) => {
-          this.props.downloadSmShareForApproval( qrScannedData )
           this.setState( {
-            QrBottomSheetsFlag: false
+            showLoader: true
+          } )
+          this.props.setApprovalStatus( false )
+          this.props.downloadSMShare( qrScannedData )
+          this.setState( {
+            showQRModal: false
           } )
         }}
         onBackPress={() => {
           this.setState( {
-            QrBottomSheetsFlag: false
+            showQRModal: false
           } )
-          if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          // try {
-          //   if ( qrScannedData ) {
-          //     this.props.downloadSmShareForApproval( qrScannedData )
-          //     this.setState( {
-          //       QrBottomSheetsFlag: false
-          //     } )
-          //   }
-          // } catch ( err ) {
-          //   console.log( {
-          //     err
-          //   } )
-          // }
+          this.setState( {
+            showLoader: true
+          } )
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sdfsd","channelId":"b819ad391b9b81c5a6debd67f82c2ea772d282ab75af67cfb4a599328c80f99f","streamId":"5adb81478","secondaryChannelKey":"YUlXUgC4q6mzJx2DalfRw5cV","version":"1.9.5","walletId":"4ec72a6d467844c32bd136250496238cafc5baabed1f474a7a1e2122b86444d3"}'
+          this.props.setApprovalStatus( false )
+          this.props.downloadSMShare( qrScannedData )
+          this.setState( {
+            showQRModal: false
+          } )
         }}
       />
     )
@@ -841,9 +754,8 @@ class ManageBackupNewBHR extends Component<
       <ModalHeader
         onPressHeader={() => {
           this.setState( {
-            QrBottomSheetsFlag: false
-          } );
-          ( this.QrBottomSheet as any ).snapTo( 0 )
+            showQRModal: false,
+          } )
         }}
       />
     )
@@ -852,8 +764,10 @@ class ManageBackupNewBHR extends Component<
   renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Generating your Recovery Keys'}
-        messageText={'It may take a little while as the wallet creates Recovery Keys. Do not close the app or go back'}
+        headerText={`${this.state.strings[
+          'Generatingyour'
+        ]} Recovery Keys`}
+        messageText={this.state.strings[ 'Itmaytake' ]}
         messageText2={''}
         showGif={false}
       />
@@ -879,11 +793,48 @@ class ManageBackupNewBHR extends Component<
   renderKnowMoreModalContent = () => {
     return ( <MBNewBhrKnowMoreSheetContents
       type={this.state.knowMoreType}
-      titleClicked={()=>{this.knowMoreBottomSheet.snapTo( 0 )}}
+      titleClicked={()=>{
+        this.setState( {
+          knwowMoreModal: false
+        } )
+      }}
       containerStyle={{
         shadowOpacity: 0,
       }}
     /> )
+  }
+
+  renderCloudErrorContent = () => {
+    return (
+      <ErrorModalContents
+        title={this.state.strings[ 'CloudBackupError' ]}
+        //info={cloudErrorMessage}
+        note={this.state.errorMsg}
+        onPressProceed={()=>{
+          this.setState( {
+            cloudErrorModal: false
+          } )
+          this.autoCloudUpload()
+        }}
+        onPressIgnore={()=> {
+          this.setState( {
+            cloudErrorModal: false
+          } )
+        }}
+        proceedButtonText={this.state.common[ 'tryAgain' ]}
+        cancelButtonText={this.state.common[ 'ok' ]}
+        isIgnoreButton={true}
+        isBottomImage={true}
+        isBottomImageStyle={{
+          width: wp( '27%' ),
+          height: wp( '27%' ),
+          marginLeft: 'auto',
+          resizeMode: 'stretch',
+          marginBottom: hp( '-3%' ),
+        }}
+        bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+      />
+    )
   }
 
   renderKnowMoreModalHeader = () => {
@@ -891,83 +842,137 @@ class ManageBackupNewBHR extends Component<
       <ModalHeader
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          this.knowMoreBottomSheet.snapTo( 0 )
+          this.setState( {
+            knwowMoreModal: false
+          } )
         }}
       />
     )
   }
 
-  keeperButtonText = ( buttonText, number ) =>{
-    console.log( 'buttonText', buttonText, number )
-    if( !buttonText ) return 'Share Recovery Key ' + number
-    switch ( buttonText ) {
-        case 'Secondary Device1': return 'Personal Device1'
-        case 'Secondary Device2': return 'Personal Device2'
-        case 'Secondary Device3': return 'Personal Device3'
-        case 'Keeper PDF': return 'PDF Backup'
-        default:
-          return buttonText
+  onKeeperButtonPress = ( value, keeperNumber ) =>{
+    requestAnimationFrame( () => {
+      if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+        this.props.setLevelCompletionError( this.state.strings[ 'PleaseSetPasswordTitle' ], this.state.strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED )
+        return
+      }
+      if( value.id == 1 && keeperNumber == 2 ){
+        if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+          this.props.navigation.navigate(
+            'CloudBackupHistory',
+            {
+              selectedTime: value.keeper2.updatedAt
+                ? getTime( value.keeper2.updatedAt )
+                : 'never',
+            }
+          )
+        }
+      } else if( value.id == 1 && keeperNumber == 1 ) {
+        this.props.navigation.navigate(
+          'SecurityQuestionHistoryNewBHR',
+          {
+            selectedTime: value.keeper1.updatedAt
+              ? getTime( value.keeper1.updatedAt )
+              : 'never',
+          }
+        )
+      } else {
+        this.setState( {
+          showLoader: true,
+          selectedKeeper: keeperNumber == 1 ? value.keeper1 : value.keeper2
+        } )
+
+        this.onPressKeeperButton( value, keeperNumber )
+      }
+    } )
+  }
+
+  getHeaderMessage = () => {
+    const { levelData, currentLevel } = this.props
+    const { strings } = this.state
+
+    if( levelData ){
+      for ( let i = 0; i < levelData.length; i++ ) {
+        const element = levelData[ i ]
+        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
+          return element.keeper1.name+ ` ${strings[ 'needsyourattention' ]}.`
+        }
+        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
+          return  element.keeper2.name+ ` ${strings[ 'needsyourattention' ]}.`
+        }
+      }
+    }
+    if( currentLevel == 0 ){
+      return strings[ 'incompletelevel1' ]
+    } else if( currentLevel === 1 ){
+      return strings[ 'incompletelevel2' ]
+    } else if( currentLevel === 2 ){
+      return strings[ 'incompletelevel3' ]
+    } else if( currentLevel == 3 ){
+      return strings[ 'complete' ]
     }
   }
 
   render() {
     const {
-      levelData,
-      selectedId,
-      isError,
       selectedLevelId,
       refreshControlLoader,
       selectedKeeper,
+      isEnabled,
+      keeping,
+      selectedKeeperName,
+      selectedKeeperType,
+      keeperTypeModal,
+      errorModal,
+      showQRModal,
+      loaderModal,
+      strings,
+      knwowMoreModal,
+      cloudErrorModal
     } = this.state
-    const { navigation, currentLevel } = this.props
+    const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
       <View style={{
-        flex: 1, backgroundColor: 'white'
+        backgroundColor: Colors.blue,
+        flex: 1
       }}>
-        <SafeAreaView style={{
-          flex: 0
-        }} />
-        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{
-            flex: 1, flexDirection: 'row', alignItems: 'center'
+        <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <View style={styles.accountCardsSectionContainer}>
+          <Text style={{
+            color: Colors.blue,
+            fontSize: RFValue( 18 ),
+            letterSpacing: 0.54,
+            fontFamily: Fonts.FiraSansMedium,
+            marginTop: hp( 4 ),
+            marginHorizontal: wp( 4 ),
+            paddingBottom: hp( 1 )
           }}>
-            <TouchableOpacity
-              onPress={() => navigation.replace( 'Home' )}
-              style={styles.headerBackArrowView}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
+            {strings[ 'SecurityPrivacy' ]}
+          </Text>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshControlLoader}
+                onRefresh={() => this.onRefresh()}
               />
-            </TouchableOpacity>
-          </View>
-          {/* <TouchableOpacity
-            onPress={() => navigation.replace( 'Home' )}
-            style={styles.headerSettingImageView}
+            }
+            style={{
+              flex: 1
+            }}
           >
-            <Image
-              source={require( '../../assets/images/icons/setting.png' )}
-              style={styles.headerSettingImage}
-            />
-          </TouchableOpacity> */}
-        </View>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshControlLoader}
-              onRefresh={() => this.onRefresh()}
-            />
-          }
-          style={{
-            flex: 1
-          }}
-        >
-          <View style={ styles.topHealthView }>
             <View style={{
-              justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
+              flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp( 4 ), alignItems: 'center', paddingTop: wp( 3 ),
             }}>
+              <View style={{
+                flex:2
+              }}>
+                <Text style={{
+                  color: Colors.blue,
+                  fontSize: RFValue( 12 ),
+                  fontFamily: Fonts.FiraSansRegular
+                }}>{strings[ 'WalletBackup' ]}</Text>
+                <Text style={styles.headerMessageText}>{this.getHeaderMessage()}</Text>
+              </View>
               <ImageBackground
                 source={require( '../../assets/images/icons/keeper_sheild.png' )}
                 style={{
@@ -975,689 +980,172 @@ class ManageBackupNewBHR extends Component<
                 }}
                 resizeMode={'contain'}
               >
-                {isError && (
-                  <View
-                    style={{
-                      backgroundColor: Colors.red,
-                      height: wp( '3%' ),
-                      width: wp( '3%' ),
-                      borderRadius: wp( '3%' ) / 2,
-                      position: 'absolute',
-                      top: wp( '5%' ),
-                      right: 0,
-                      borderWidth: 2,
-                      borderColor: Colors.white,
-                    }}
-                  />
+                {shieldHealth && (
+                  <View style={styles.shieldErrorDot} />
                 )}
               </ImageBackground>
             </View>
-            <View style={styles.headerSeparator} />
-            {currentLevel ?
-              <View style={{
-                width: wp( '35%' )
-              }}>
-                <Text style={styles.backupText}>Wallet Security</Text>
-                <Text style={styles.backupInfoText}>You are</Text>
-                <Text style={styles.backupInfoText}>at Level {currentLevel ? currentLevel : ''}
-                </Text>
-              </View>:
-              <View style={{
-                width: wp( '35%' ),
-              }}>
-                <Text style={styles.backupText}>Wallet Security</Text>
-                <Text style={styles.backupInfoText}>Complete Level 1</Text>
-              </View>
-            }
-          </View>
-          <View style={{
-            justifyContent:'center',
-            alignItems:'center',
-            width: wp( '85%' ),
-            marginLeft: 30,
-            marginRight: 30
-          }}>
-            <Text style={{
-              color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, textAlign: 'center'
-            }}>{currentLevel === 1 ? 'Cloud Backup complete, \nyou can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              position: 'relative',
-              paddingBottom: wp( '7%' ),
-            }}
-          >
-            {levelData.map( ( value, index ) => {
-              return (
-                <TouchableOpacity key={index} onPress={() => this.selectId( value.id )}>
-                  <View
-                    style={{
-                      borderRadius: 10,
-                      marginTop: wp( '7%' ),
-                      backgroundColor:
-                        value.status == 'good'
-                          ? Colors.blue
-                          : Colors.backgroundColor,
-                      shadowRadius:
-                        selectedId && selectedId == value.id ? 10 : 0,
-                      shadowColor: Colors.borderColor,
-                      shadowOpacity:
-                        selectedId && selectedId == value.id ? 10 : 0,
-                      shadowOffset: {
-                        width: 5, height: 5
-                      },
-                      elevation:
-                        selectedId == value.id || selectedId == 0 ? 10 : 0,
-                      opacity:
-                        selectedId == value.id || selectedId == 0 ? 1 : 0.3,
+            <View style={styles.body}>
+              {levelData.map( ( value, index ) => {
+                return (
+                  <ManageBackupCard
+                    key={index}
+                    value={value}
+                    selectedId={this.state.selectedId}
+                    selectedKeeper={this.state.selectedKeeper}
+                    onPressSelectId={( )=>{ this.setState( {
+                      selectedId: value.id != this.state.selectedId ? value.id : 0
+                    } )
                     }}
-                  >
-                    <View style={styles.cardView}>
-                      <View style={{
-                        flexDirection: 'row'
-                      }}>
-                        {value.status == 'good' ? (
-                          <View
-                            style={{
-                              ...styles.cardHealthImageView,
-                              elevation:
-                                selectedId == value.id || selectedId == 0
-                                  ? 10
-                                  : 0,
-                              backgroundColor:
-                                value.status == 'good'
-                                  ? Colors.green
-                                  : Colors.red,
-                            }}
-                          >
-                            {value.status == 'good' ? (
-                              <Image
-                                source={require( '../../assets/images/icons/check_white.png' )}
-                                style={{
-                                  ...styles.cardHealthImage,
-                                  width: wp( '4%' ),
-                                }}
-                              />
-                            ) : (
-                              <Image
-                                source={require( '../../assets/images/icons/icon_error_white.png' )}
-                                style={styles.cardHealthImage}
-                              />
-                            )}
-                          </View>
-                        ) : (
-                          <Image
-                            source={require( '../../assets/images/icons/icon_setup.png' )}
-                            style={{
-                              borderRadius: wp( '7%' ) / 2,
-                              width: wp( '7%' ),
-                              height: wp( '7%' ),
-                            }}
-                          />
-                        )}
-                        <TouchableOpacity
-                          onPress={()=>{
-                            this.setState( {
-                              knowMoreType: value.id == 1 ? 'level1' : value.id == 2 ? 'level2' : 'level3'
-                            } )
-                            this.knowMoreBottomSheet.snapTo( 1 )
-                          }}
-                          style={{
-                            ...styles.cardButtonView,
-                            backgroundColor:
-                              value.status == 'notSetup' || value.status == 'bad'
-                                ? Colors.white
-                                : Colors.deepBlue,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              ...styles.cardButtonText,
-                              color:
-                                value.status == 'notSetup'|| value.status == 'bad'
-                                  ? Colors.textColorGrey
-                                  : Colors.white,
-                              width:'auto'
-                            }}
-                          >
-                            Know More
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
+                    onPressKnowMore={() => {
+                      this.setState( {
+                        knowMoreType: value.levelName,
+                        knwowMoreModal: true
+                      } )
+                    }}
+                    onPressKeeper1={()=> this.onKeeperButtonPress( value, 1 )}
+                    onPressKeeper2={()=> this.onKeeperButtonPress( value, 2 )}
+                  />
+                )
+              } )}
+            </View>
+            <View style={{
+              marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor, height: '100%',
+              paddingLeft: wp ( '6%' ),
+              paddingBottom: hp( 3 )
+            }}>
+              <Text style={styles.pageTitle}>I am the Keeper of</Text>
+              <Text style={styles.pageInfoText}>
+                {strings[ 'Contactswhose' ]}
+              </Text>
+              <View style={{
+                marginBottom: 15
+              }}>
+                {keeping.length > 0 ?
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{
+                      height: 'auto', alignItems: 'flex-start', flexDirection: 'row'
+                    }}>
+                    {keeping.length && keeping.map( ( item, index ) => {
+                      return this.renderContactItem( {
+                        contactDescription: item,
+                        index,
+                        contactsType: 'I am the Keeper of',
+                      } )
+                    } ) }
+                  </ScrollView>
+                  :
+                  <BottomInfoBox
+                    containerStyle={{
+                      marginLeft: wp( 0 ),
+                      marginTop: hp( 2.5 ),
+                      backgroundColor: Colors.white
+                    }}
+                    title={this.state.common[ 'note' ]}
+                    infoText={strings[ 'Whenyouhave' ]}
+                  />
+                }
+              </View>
+            </View>
+          </ScrollView>
 
-                      <View style={{
-                        flexDirection: 'row', marginTop: 'auto'
-                      }}>
-                        <View style={{
-                          justifyContent: 'center'
-                        }}>
-                          <Text
-                            style={{
-                              ...styles.levelText,
-                              color:
-                                value.status == 'notSetup'|| value.status == 'bad'
-                                  ? Colors.textColorGrey
-                                  : Colors.white,
-                            }}
-                          >
-                            {value.levelName}
-                          </Text>
-                          <Text
-                            style={{
-                              ...styles.levelInfoText,
-                              color:
-                                value.status == 'notSetup'|| value.status == 'bad'
-                                  ? Colors.textColorGrey
-                                  : Colors.white,
-                              width: wp( '55%' )
-                            }}
-                          >
-                            {value.info}
-                          </Text>
-                        </View>
-                        <TouchableOpacity
-                          activeOpacity={10}
-                          onPress={() => this.selectId( value.id )}
-                          style={styles.manageButton}
-                        >
-                          <Text
-                            style={{
-                              ...styles.manageButtonText,
-                              color:
-                                value.status == 'notSetup'|| value.status == 'bad'
-                                  ? Colors.black
-                                  : Colors.white,
-                            }}
-                            onPress={() => this.selectId( value.id )}
-                          >
-                            {value.status == 'notSetup' ? 'Setup' : 'Manage'}
-                          </Text>
-                          <AntDesign
-                            name={
-                              selectedId && selectedId == value.id
-                                ? 'arrowup'
-                                : 'arrowright'
-                            }
-                            color={
-                              value.status == 'notSetup'|| value.status == 'bad'
-                                ? Colors.black
-                                : Colors.white
-                            }
-                            size={12}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    {selectedId == value.id ? (
-                      <View>
-                        <View
-                          style={{
-                            backgroundColor: Colors.white, height: 0.5
-                          }}
-                        />
-                        <View style={styles.cardView}>
-                          <View style={{
-                            width: wp( '70%' )
-                          }}>
-                            <Text
-                              numberOfLines={2}
-                              style={{
-                                color:
-                                  value.status == 'notSetup'|| value.status == 'bad'
-                                    ? Colors.textColorGrey
-                                    : Colors.white,
-                                fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue( 10 ),
-                              }}
-                            >
-                              {value.note}
-                            </Text>
-                          </View>
-                          {value.id == 1 ? (
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                marginTop: 'auto',
-                              }}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  borderColor:
-                                    value.keeper1.status == 'accessible'
-                                      ? Colors.deepBlue
-                                      : Colors.red,
-                                  borderWidth:
-                                    value.keeper1.status == 'accessible'
-                                      ? 0
-                                      : 1,
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  overflow:'hidden'
-                                }}
-                                disabled={this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS}
-                                onPress={() => {
-                                  if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-                                    navigation.navigate(
-                                      'CloudBackupHistory',
-                                      {
-                                        selectedTime: this.getTime( new Date() ),
-                                        selectedStatus: 'Ugly',
-                                      }
-                                    )
-                                    // this.updateCloudData()
-                                  }
-                                }}
-                              >
-                                <Image
-                                  source={require( '../../assets/images/icons/ico_cloud_backup.png' )}
-                                  style={styles.resetImage}
-                                />
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    fontSize: RFValue( 8 ),
-                                    marginLeft: wp( '2%' ),
-                                  }}
-                                  numberOfLines={1}
-                                >
-                                  {value.keeper1ButtonText}
-                                </Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  borderColor:
-                                  value.keeper2.status == 'accessible'
-                                    ? value.status == 'notSetup'|| value.status == 'bad'
-                                      ? Colors.white
-                                      : Colors.deepBlue
-                                    : Colors.red,
-                                  borderWidth:
-                                    value.keeper2.status == 'accessible'
-                                      ? 0
-                                      : 0.5,
-                                  marginLeft: 'auto',
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  overflow: 'hidden'
-                                }}
-                                onPress={() =>
-                                  navigation.navigate(
-                                    'SecurityQuestionHistoryNewBHR',
-                                    {
-                                      selectedTime: this.getTime( new Date() ),
-                                      selectedStatus: 'Ugly',
-                                    }
-                                  )
-                                }
-                              >
-                                <ImageBackground
-                                  source={require( '../../assets/images/icons/questionMark.png' )}
-                                  style={{
-                                    ...styles.resetImage,
-                                    position: 'relative',
-                                  }}
-                                >
-                                  {value.keeper2.status == 'notAccessible' ? (
-                                    <View
-                                      style={{
-                                        backgroundColor: Colors.red,
-                                        width: wp( '1%' ),
-                                        height: wp( '1%' ),
-                                        position: 'absolute',
-                                        top: 0,
-                                        right: 0,
-                                        borderRadius: wp( '1%' ) / 2,
-                                      }}
-                                    />
-                                  ) : null}
-                                </ImageBackground>
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    fontSize: RFValue( 8 ),
-                                    marginLeft: wp( '2%' ),
-                                  }}
-                                  numberOfLines={1}
-                                >
-                                  Security Question
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          ) : (
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                marginTop: 'auto',
-                                justifyContent: 'space-between'
-                              }}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  backgroundColor:
-                                    value.status == 'notSetup'|| value.status == 'bad'
-                                      ? Colors.white
-                                      : Colors.deepBlue,
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  borderColor:
-                                    value.keeper1.status == 'accessible'
-                                      ? value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.white
-                                        : Colors.deepBlue
-                                      : Colors.red,
-                                  borderWidth:
-                                    value.keeper1.status == 'accessible'
-                                      ? 0
-                                      : 1,
-                                  overflow:'hidden'
-                                }}
-                                onPress={() => this.onPressKeeper( value, 1 )}
-                              >
-                                {value.keeper1.status == 'accessible' &&
-                                ( value.keeper1.shareType == 'device' ) ? (
-                                    <Image
-                                      source={
-                                        value.keeper1.shareType == 'device'
-                                          ? require( '../../assets/images/icons/icon_ipad_blue.png' )
-                                          : require( '../../assets/images/icons/pexels-photo.png' )
-                                      }
-                                      style={{
-                                        width: wp( '6%' ),
-                                        height: wp( '6%' ),
-                                        resizeMode: 'contain',
-                                        borderRadius: wp( '6%' ) / 2,
-                                      }}
-                                    />
-                                  ) : value.keeper1.shareType == 'contact' &&
-                                  value.keeper1.updatedAt != 0 ? (
-                                      this.getImageIcon( value.keeper1.data )
-                                    ) : value.keeper1.shareType == 'pdf' &&
-                                  value.keeper1.status == 'accessible' ? (
-                                        <Image
-                                          source={require( '../../assets/images/icons/doc.png' )}
-                                          style={{
-                                            width: wp( '5%' ),
-                                            height: wp( '6%' ),
-                                            resizeMode: 'contain',
-                                          }}
-                                        />
-                                      ) : (
-                                        <View
-                                          style={{
-                                            backgroundColor: Colors.red,
-                                            width: wp( '2%' ),
-                                            height: wp( '2%' ),
-                                            borderRadius: wp( '2%' ) / 2,
-                                          }}
-                                        />
-                                      )}
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    color:
-                                      value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.textColorGrey
-                                        : Colors.white,
-                                    fontSize: RFValue( 8 ),
-                                    marginLeft: wp( '2%' ),
-                                  } }
-                                  numberOfLines={1}
-                                >
-                                  {this.keeperButtonText( value.keeper1ButtonText, '1' )}
-                                </Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  backgroundColor:
-                                    value.status == 'notSetup'|| value.status == 'bad'
-                                      ? Colors.white
-                                      : Colors.deepBlue,
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  borderColor:
-                                    value.keeper2.status == 'accessible'
-                                      ? value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.white
-                                        : Colors.deepBlue
-                                      : Colors.red,
-                                  borderWidth:
-                                    value.keeper2.status == 'accessible'
-                                      ? 0
-                                      : 0.5,
-                                  marginLeft: wp( '4%' ),
-                                  overflow:'hidden'
-                                }}
-                                onPress={() => this.onPressKeeper( value, 2 )}
-                              >
-                                {value.keeper2.status == 'accessible' &&
-                                ( value.keeper2.shareType == 'device' ) ? (
-                                    <Image
-                                      source={
-                                        value.keeper2.shareType == 'device'
-                                          ? require( '../../assets/images/icons/icon_ipad_blue.png' )
-                                          : require( '../../assets/images/icons/pexels-photo.png' )
-                                      }
-                                      style={{
-                                        width: wp( '6%' ),
-                                        height: wp( '6%' ),
-                                        resizeMode: 'contain',
-                                        borderRadius: wp( '6%' ) / 2,
-                                      }}
-                                    />
-                                  ) : value.keeper2.shareType == 'contact' &&
-                                  value.keeper2.updatedAt != 0 ? (
-                                      this.getImageIcon( value.keeper2.data )
-                                    ) : value.keeper2.shareType == 'pdf' &&
-                                  value.keeper2.status == 'accessible' ? (
-                                        <Image
-                                          source={require( '../../assets/images/icons/doc.png' )}
-                                          style={{
-                                            width: wp( '5%' ),
-                                            height: wp( '6%' ),
-                                            resizeMode: 'contain',
-                                          }}
-                                        />
-                                      ) : (
-                                        <View
-                                          style={{
-                                            backgroundColor: Colors.red,
-                                            width: wp( '2%' ),
-                                            height: wp( '2%' ),
-                                            borderRadius: wp( '2%' ) / 2,
-                                          }}
-                                        />
-                                      )}
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    fontSize: RFValue( 8 ),
-                                    color:
-                                      value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.textColorGrey
-                                        : Colors.white,
-                                    marginLeft: wp( '2%' ),
-                                  }}
-                                  numberOfLines={1}
-                                >
-                                  {this.keeperButtonText( value.keeper2ButtonText, '2' )}
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          )}
-                        </View>
-                      </View>
-                    ) : null}
-                  </View>
-                </TouchableOpacity>
-              )
-            } )}
-          </View>
-        </ScrollView>
-        {this.state.showLoader ? <Loader /> : null}
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={( c )=>this.keeperTypeBottomSheet = c}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '75%' )
-              : hp( '75%' ),
-          ]}
-          renderContent={() => (
+          <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
-              subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
+              subHeader={strings[ 'saveyourRecovery' ]}
               onPressSetup={async ( type, name ) => {
-                this.setState( {
-                  selectedKeeperType: type,
-                  selectedKeeperName: name,
-                } )
-                if (
-                  selectedLevelId == 3 &&
+                try{
+                  this.setState( {
+                    selectedKeeperType: type,
+                    selectedKeeperName: name,
+                  } )
+                  if (
+                    selectedLevelId == 3 &&
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2 &&
-                  this.props.metaSharesKeeper.length != 5
-                ) {
-                  this.props.generateMetaShare( selectedLevelId )
-                } else if( selectedLevelId == 3 ) {
-                  this.sendApprovalRequestToPK( )
-                } else {
-                  const obj = {
-                    id: selectedLevelId,
-                    selectedKeeper: {
-                      ...selectedKeeper,
-                      name: selectedKeeper.name ? selectedKeeper.name : name,
-                      shareType: selectedKeeper.shareType
-                        ? selectedKeeper.shareType
-                        : type,
-                      shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-                    },
-                    isSetup: true,
+                  this.state.metaSharesKeeper.length != 5
+                  ) {
+                    this.props.generateMetaShare( selectedLevelId )
+                  } else if( type == 'pdf' ){
+                    this.sendApprovalRequestToPK( )
+                  } else {
+                    const obj = {
+                      id: selectedLevelId,
+                      selectedKeeper: {
+                        shareType: type,
+                        name: name,
+                        reshareVersion: 0,
+                        status: 'notSetup',
+                        updatedAt: 0,
+                        shareId: this.state.selectedKeeper.shareId,
+                        data: {
+                        },
+                      },
+                      isSetup: true,
+                    }
+                    this.setState( {
+                      selectedKeeper: obj.selectedKeeper,
+                      showLoader: false,
+                      selectedLevelId: 2
+                    }, () => {
+                      this.goToHistory( obj )
+                    } )
                   }
-                  console.log( 'obj', obj )
-                  this.goToHistory( obj );
-                  /** other than ThirdLevel first position */
-                  ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+                } catch( err ){
+                  console.log( 'err', err )
                 }
               }}
-              onPressBack={() =>
-                ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+              onPressBack={() =>{
+                this.props.setIsKeeperTypeBottomSheetOpen( false )
+                this.setState( {
+                  keeperTypeModal: false
+                } )
+              }
               }
               selectedLevelId={selectedLevelId}
             />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              onPressHeader={() =>
-                ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
-              }
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={( c ) => { this.ErrorBottomSheet = c }}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '30%' )
-              : hp( '35%' ),
-          ]}
-          renderContent={()=><ErrorModalContents
-            modalRef={this.ErrorBottomSheet as any}
-            title={this.state.errorTitle}
-            info={this.state.errorInfo}
-            proceedButtonText={'Got it'}
-            isIgnoreButton={false}
-            onPressProceed={() => this.closeErrorModal()}
-            isBottomImage={true}
-            bottomImage={require( '../../assets/images/icons/errorImage.png' )}
-          />}
-          renderHeader={()=><ModalHeader onPressHeader={() => this.closeErrorModal()} />}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={( c )=>this.ApprovePrimaryKeeperBottomSheet=c}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '70' ),
-          ]}
-          renderContent={() => (
-            <ApproveSetup
-              isContinueDisabled={false}
-              onPressContinue={() => {
-                ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
-                const {
-                  selectedKeeper,
-                  selectedLevelId,
-                  selectedKeeperType,
-                  selectedKeeperName,
-                } = this.state
-                const obj = {
-                  id: selectedLevelId,
-                  selectedKeeper: {
-                    ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-                  },
-                  isSetup: true,
-                }
-                this.goToHistory( obj )
+          </ModalContainer >
+          <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+            <ErrorModalContents
+              modalRef={this.ErrorBottomSheet as any}
+              title={this.state.errorTitle}
+              info={this.state.errorInfo}
+              proceedButtonText={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? 'Proceed To Password' : 'Got it'}
+              cancelButtonText={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? 'Got it' : ''}
+              isIgnoreButton={( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ? true : false}
+              onPressProceed={() => {
+                this.setState( {
+                  errorModal: false
+                } )
+                if( ( this.props.currentLevel == 0 && this.props.levelHealth.length == 0 ) || ( this.props.currentLevel == 0 && this.props.levelHealth.length && this.props.levelHealth[ 0 ].levelInfo.length && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) this.props.navigation.navigate( 'SetNewPassword', {
+                  isFromManageBackup: true,
+                } )
               }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              onPressHeader={() => {
-                ( this.keeperTypeBottomSheet as any ).snapTo( 1 );
-                ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
+              onPressIgnore={() => {
+                this.setState( {
+                  errorModal: false
+                } )
               }}
+              isBottomImage={true}
+              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
-          )}
-        />
-        <BottomSheet
-          onOpenEnd={() => {
-            this.setState( {
-              QrBottomSheetsFlag: true
-            } )
-          }}
-          onCloseEnd={() => {
-            this.setState( {
-              QrBottomSheetsFlag: false
-            } )
-          }}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={( c )=>this.QrBottomSheet=c}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '90%' ) : hp( '89%' ),
-          ]}
-          renderContent={this.renderQrContent}
-          renderHeader={this.renderQrHeader}
-        />
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={( c )=>this.loaderBottomSheet = c}
-          snapPoints={[ -50, hp( '100%' ) ]}
-          renderContent={this.renderLoaderModalContent}
-          renderHeader={this.renderLoaderModalHeader}
-        />
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={( c )=>this.knowMoreBottomSheet = c}
-          snapPoints={[ -50, hp( '95%' ) ]}
-          renderContent={this.renderKnowMoreModalContent}
-          renderHeader={this.renderKnowMoreModalHeader}
-        />
+          </ModalContainer>
+          <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
+            {this.renderQrContent()}
+          </ModalContainer>
+          <ModalContainer visible={knwowMoreModal} closeBottomSheet={() => {}} >
+            {this.renderKnowMoreModalContent()}
+          </ModalContainer>
+          <ModalContainer visible={cloudErrorModal} closeBottomSheet={() => {this.setState( {
+            cloudErrorModal: false
+          } )}}>
+            {this.renderCloudErrorContent()}
+          </ModalContainer>
+        </View>
+        {this.state.showLoader ? <Loader /> : null}
       </View>
     )
   }
@@ -1665,91 +1153,152 @@ class ManageBackupNewBHR extends Component<
 
 const mapStateToProps = ( state ) => {
   return {
-    accounts: state.accounts || [],
-    walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
-    metaSharesKeeper: idx(
-      state,
-      ( _ ) => _.health.service.levelhealth.metaSharesKeeper
-    ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     cloudBackupStatus:
       idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
-    database: idx( state, ( _ ) => _.storage.database ) || {
-    },
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
-    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
-    isLevelTwoMetaShareCreated: idx(
-      state,
-      ( _ ) => _.health.isLevelTwoMetaShareCreated
-    ),
-    isLevel2Initialized: idx( state, ( _ ) => _.health.isLevel2Initialized ),
-    isLevel3Initialized: idx( state, ( _ ) => _.health.isLevel3Initialized ),
+    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
+    isLevel3Initialized: idx( state, ( _ ) => _.bhr.isLevel3Initialized ),
     isLevelThreeMetaShareCreated: idx(
       state,
-      ( _ ) => _.health.isLevelThreeMetaShareCreated
+      ( _ ) => _.bhr.isLevelThreeMetaShareCreated
     ),
-    healthLoading: idx( state, ( _ ) => _.health.loading.checkMSharesHealth ),
-    keeperSetupStatus: idx( state, ( _ ) => _.health.loading.keeperSetupStatus ),
-    initLoading: idx( state, ( _ ) => _.health.loading.initLoader ),
-
-    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
+    initLoading: idx( state, ( _ ) => _.bhr.loading.initLoader ),
+    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
-    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
-    keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
-    trustedChannelsSetupSyncing: idx(
-      state,
-      ( _ ) => _.trustedContacts.loading.trustedChannelsSetupSync
-    ),
-    accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
-    activePersonalNode: idx( state, ( _ ) => _.nodeSettings.activePersonalNode ),
-    versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
     isNewFCMUpdated: idx( state, ( _ ) => _.keeper.isNewFCMUpdated ),
-    isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.health.isSmMetaSharesCreatedFlag ),
-    downloadSmShare: idx( state, ( _ ) => _.health.loading.downloadSmShare ),
-    secondaryShareDownloadedStatus: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
-    cloudPermissionGranted: state.health.cloudPermissionGranted,
-    keeperProcessStatusFlag:  idx( state, ( _ ) => _.health.keeperProcessStatus ),
-    isLevelToNotSetupStatus: idx( state, ( _ ) => _.health.isLevelToNotSetupStatus ),
+    cloudPermissionGranted: idx( state, ( _ ) => _.bhr.cloudPermissionGranted ),
+    keeperProcessStatusFlag:  idx( state, ( _ ) => _.bhr.keeperProcessStatus ),
+    isLevelToNotSetupStatus: idx( state, ( _ ) => _.bhr.isLevelToNotSetupStatus ),
+    status: idx( state, ( _ ) => _.bhr.status ),
+    errorTitle: idx( state, ( _ ) => _.bhr.errorTitle ),
+    navigationObj: idx( state, ( _ ) => _.bhr.navigationObj ),
+    errorInfo: idx( state, ( _ ) => _.bhr.errorInfo ),
+    isTypeBottomSheetOpen: idx( state, ( _ ) => _.bhr.isTypeBottomSheetOpen ),
+    levelData: idx( state, ( _ ) => _.bhr.levelData ),
+    shieldHealth: idx( state, ( _ ) => _.bhr.shieldHealth ),
+    modifyLevelDataStatus: idx( state, ( _ ) => _.bhr.loading.modifyLevelDataStatus ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
+    approvalStatus: idx( state, ( _ ) => _.bhr.approvalStatus ),
+    isKeeperInfoUpdated2: idx( state, ( _ ) => _.bhr.isKeeperInfoUpdated2 ),
+    generateMetaShareStatus: idx( state, ( _ ) => _.bhr.loading.generateMetaShareStatus ),
+    cloudErrorMessage: idx( state, ( _ ) => _.cloud.cloudErrorMessage ),
   }
 }
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
-    updateHealthForCloud,
     generateMetaShare,
-    checkMSharesHealth,
     initLevelTwo,
-    sendApprovalRequest,
-    onApprovalStatusChange,
-    fetchKeeperTrustedChannel,
-    reShareWithSameKeeper,
-    autoShareContact,
-    trustedChannelsSetupSync,
-    updateNewFcm,
+    syncPermanentChannels,
     setCloudData,
-    generateSMMetaShares,
     deletePrivateData,
-    updateKeeperInfoToTrustedChannel,
-    secondaryShareDownloaded,
     autoShareToLevel2Keepers,
-    downloadSmShareForApproval,
     updateLevelData,
     keeperProcessStatus,
     setLevelToNotSetupStatus,
+    setHealthStatus,
+    onPressKeeper,
+    setLevelCompletionError,
+    setIsKeeperTypeBottomSheetOpen,
+    updateCloudData,
+    modifyLevelData,
+    setApprovalStatus,
+    downloadSMShare,
+    updateKeeperInfoToChannel,
+    setCloudErrorMessage
   } )( ManageBackupNewBHR )
 )
 
 const styles = StyleSheet.create( {
+  imageContainer: {
+    width: wp( 15 ),
+    height: wp( 15 ),
+    borderRadius: wp( 15 )/2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 0.6,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    elevation: 10
+  },
+  avatarImage: {
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
+    marginHorizontal: wp ( 1 ),
+  },
+  moreImage: {
+    width: wp( '10%' ),
+    height: wp( '10%' ),
+  },
+  pageTitle: {
+    color: Colors.blue,
+    fontSize: RFValue( 16 ),
+    // fontFamily: Fonts.FiraSansRegular,
+    paddingTop: wp ( '2%' ),
+    fontFamily: Fonts.FiraSansMedium,
+    // paddingLeft: wp ( '4%' )
+  },
+  cardTitle: {
+    color: Colors.blue,
+    fontSize: RFValue( 12 ),
+    // fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansMedium,
+    marginVertical: wp( 2 ),
+    // marginHorizontal: wp( 4 )
+  },
+  pageInfoText: {
+    // paddingLeft: wp ( '4%' ),
+    color: Colors.textColorGrey,
+    letterSpacing: 0.5,
+    fontSize: RFValue( 11 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop: 3,
+  },
+  addModalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular
+  },
+
+  addModalInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 11 ),
+    marginTop: 5,
+    fontFamily: Fonts.FiraSansRegular
+  },
+
+  modalElementInfoView: {
+    flex: 1,
+    // margin: 10,
+    height: hp( '5%' ),
+    flexDirection: 'row',
+    // justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: wp ( '6%' )
+  },
+  accountCardsSectionContainer: {
+    height: hp( '71.46%' ),
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor,
+    borderTopLeftRadius: 25,
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: {
+      width: 2,
+      height: -1,
+    },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   modalHeaderTitleView: {
     alignItems: 'center',
     flexDirection: 'row',
     paddingRight: 5,
     paddingBottom: 5,
-    paddingTop: 10,
+    paddingTop: 7,
     marginLeft: 20,
     marginRight: 20,
   },
@@ -1758,24 +1307,14 @@ const styles = StyleSheet.create( {
     width: 30,
     justifyContent: 'center',
   },
-  headerSettingImageView: {
-    height: wp( '10%' ),
-    width: wp( '10&' ),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerSettingImage: {
-    height: wp( '6%' ),
-    width: wp( '6%' ),
-  },
   topHealthView: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
   healthShieldImage: {
-    width: wp( '17%' ),
-    height: wp( '25%' ),
+    width: wp( '10%' ),
+    height: wp( '18%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1798,21 +1337,23 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 18 ),
   },
   cardView: {
-    height: wp( '35%' ),
+    height: wp( '11%' ),
     width: wp( '85%' ),
     padding: 15,
+    borderBottomWidth: 0.5,
+    borderColor: Colors.textColorGrey,
   },
   cardHealthImageView: {
     backgroundColor: Colors.red,
-    shadowColor: Colors.deepBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 0, height: 3
-    },
-    shadowRadius: 10,
+    // shadowColor: Colors.deepBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 0, height: 3
+    // },
+    // shadowRadius: 10,
     borderRadius: wp( '7%' ) / 2,
-    width: wp( '7%' ),
-    height: wp( '7%' ),
+    width: wp( '6%' ),
+    height: wp( '6%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1836,70 +1377,41 @@ const styles = StyleSheet.create( {
     width: wp( '24%' ),
   },
   levelText: {
-    fontSize: RFValue( 18 ),
+    fontSize: RFValue( 16 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
   levelInfoText: {
-    fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.white,
-  },
-  manageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    marginTop: 'auto',
-  },
-  manageButtonText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.white,
-    marginRight: 5,
   },
-  appBackupButton: {
-    flexDirection: 'row',
-    backgroundColor: Colors.deepBlue,
-    alignItems: 'center',
-    borderRadius: 8,
-    width: wp( '37%' ),
-    height: wp( '11%' ),
-  },
-  resetImage: {
-    width: wp( '4%' ),
-    height: wp( '4%' ),
-    resizeMode: 'contain',
-  },
-  contactImageAvatar: {
-    width: wp( '6%' ),
-    height: wp( '6%' ),
-    alignSelf: 'center',
-    shadowColor: Colors.textColorGrey,
-    shadowOpacity: 0.5,
-    shadowOffset: {
-      width: 0, height: 3
-    },
-    shadowRadius: 5,
-  },
-  contactImage: {
-    height: wp( '6%' ),
-    width: wp( '6%' ),
-    borderRadius: wp( '6%' ) / 2,
-  },
-  imageBackground: {
-    backgroundColor: Colors.shadowBlue,
-    height: wp( '6%' ),
-    width: wp( '6%' ),
-    borderRadius: wp( '6%' ) / 2,
+  shieldErrorDot: {
+    backgroundColor: Colors.red,
+    height: wp( '3%' ),
+    width: wp( '3%' ),
+    borderRadius: wp( '3%' ) / 2,
+    position: 'absolute',
+    top: wp( '5%' ),
+    right: 0,
+    borderWidth: 2,
     borderColor: Colors.white,
-    borderWidth: 1,
-    shadowColor: Colors.textColorGrey,
-    shadowOpacity: 0.5,
-    shadowOffset: {
-      width: 0, height: 3
-    },
-    shadowRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
+  headerMessageView: {
+    justifyContent:'center',
+    alignItems:'center',
+    width: wp( '85%' ),
+    marginLeft: 30,
+    marginRight: 30
+  },
+  headerMessageText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    // textAlign: 'center'
+  },
+  body: {
+    flex: 1,
+    alignItems: 'center',
+    position: 'relative',
+    paddingBottom: wp( '7%' ),
+  }
 } )

@@ -11,175 +11,181 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { ScrollView } from 'react-native-gesture-handler'
+import { translations } from '../../common/content/LocContext'
 
 export default function TestAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
       ...styles.modalContainer, ...props.containerStyle
     }}>
-      <AppBottomSheetTouchableWrapper
-        style={{
-          justifyContent: 'center', alignItems: 'center'
-        }}
-        activeOpacity={10}
-        onPress={() => props.titleClicked && props.titleClicked()}
-      >
-        <Text style={styles.headerText}>Test Account</Text>
-      </AppBottomSheetTouchableWrapper>
-      <View style={styles.headerSeparator} />
-      <ScrollView
-        ref={scrollViewRef}
-        style={{
-          flex: 1,
-          backgroundColor: Colors.blue,
-        }}
-        snapToInterval={hp( '85%' )}
-        decelerationRate="fast"
-      >
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '5%' ),
-              marginBottom: wp( '3%' ),
-            }}
-          >
-            We realise that the world of Bitcoin could seem daunting at first. We’ve designed the Test Account to help demystify Bitcoin without risking your own funds
-          </Text>
-          <View style={{
+      <View style={{
+        height: hp( 81 )
+      }}>
+        <AppBottomSheetTouchableWrapper
+          style={{
             justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/test_account_info_1.png' )}
-              style={styles.helperImage}
-            />
-          </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              // marginBottom: wp('15%'),
-            }}
-          >
-            Learn to use Hexa and bitcoin with the Test Account. Think of this account as the wallet’s training wheels!
-          </Text>
-          <AppBottomSheetTouchableWrapper
-            style={{
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              scrollViewRef.current &&
-                scrollViewRef.current.scrollTo( {
-                  x: 0,
-                  y: hp( '85%' ),
-                  animated: true,
-                } )
-            }}
-          >
-            <FontAwesome
-              name="angle-double-down"
-              color={Colors.white}
-              size={40}
-            />
-          </AppBottomSheetTouchableWrapper>
-          {/* <View style={styles.separatorView} /> */}
-        </View>
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '5%' ),
-              marginBottom: wp( '3%' ),
-            }}
-          >
-            his account is loaded with test sats that you can send to your friend's Test Accounts. This helps you learn to transact using real sats, without sending real money
-          </Text>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/test_account_info_1.png' )}
-              style={styles.helperImage}
-            />
-          </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              // marginBottom: wp('15%'),
-            }}
-          >
-            Remember that test sats can only be sent to other wallets that also support test sats - don't try to send them to real bitcoin addresses
-          </Text>
-          <AppBottomSheetTouchableWrapper
-            style={{
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              scrollViewRef.current &&
-                scrollViewRef.current.scrollTo( {
-                  x: 0,
-                  y: hp( '170%' ),
-                  animated: true,
-                } )
-            }}
-          >
-            <FontAwesome
-              name="angle-double-down"
-              color={Colors.white}
-              size={40}
-            />
-          </AppBottomSheetTouchableWrapper>
-          {/* <View style={styles.separatorView} /> */}
-        </View>
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '7%' ),
-            }}
-          >
-            With the Test Account, you can rest assured that, whatever you do, you aren't risking losing your real-world sats or bitcoin. The test sats have no monetary value, so they're risk-free
-          </Text>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/test_account_info_1.png' )}
-              style={styles.helperImage}
-            />
-          </View>
-          <View style={styles.bottomLinkView}>
-            <Text style={{
-              ...styles.infoText, marginLeft: 0, marginRight: 0
-            }}>
-              Let your imagination run wild, try sending test sats to, and receiving sats, from multiple friends in different permutations and combinations!
+          }}
+          activeOpacity={10}
+          onPress={() => props.titleClicked && props.titleClicked()}
+        >
+          <Text style={styles.headerText}>Test Account</Text>
+        </AppBottomSheetTouchableWrapper>
+        <View style={styles.headerSeparator} />
+        <ScrollView
+          ref={scrollViewRef}
+          style={{
+            flex: 1,
+            backgroundColor: Colors.blue,
+          }}
+          snapToInterval={hp( '70%' )}
+          decelerationRate="fast"
+        >
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '5%' ),
+                marginBottom: wp( '1%' ),
+              }}
+            >
+              {strings.test1}
             </Text>
             <View style={{
-              ...styles.linkView, marginTop: wp( '7%' )
+              justifyContent: 'center', alignItems: 'center'
             }}>
-              <Text style={styles.toKnowMoreText}>To know more,</Text>
-              <AppBottomSheetTouchableWrapper
-                style={{
-                  marginLeft: 5
-                }}
-                onPress={() => openLink( 'https://en.bitcoin.it/wiki/Testnet' )}
-              >
-                <Text style={styles.clickHereText}>click here</Text>
-              </AppBottomSheetTouchableWrapper>
+              <Image
+                source={require( '../../assets/images/icons/test_account_info_1.png' )}
+                style={styles.helperImage}
+              />
             </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '15%' ),
+              }}
+            >
+              {strings.test2}
+            </Text>
+            <AppBottomSheetTouchableWrapper
+              style={{
+                alignItems: 'center'
+              }}
+              onPress={() => {
+                scrollViewRef.current &&
+                scrollViewRef.current.scrollTo( {
+                  x: 0,
+                  y: hp( '75%' ),
+                  animated: true,
+                } )
+              }}
+            >
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper>
+            {/* <View style={styles.separatorView} /> */}
           </View>
-          {/* <View style={{
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '10%' ),
+                marginBottom: wp( '3%' ),
+              }}
+            >
+              {strings.test3}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/test_account_info_1.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '9%' ),
+              }}
+            >
+              {strings.test4}
+            </Text>
+            <AppBottomSheetTouchableWrapper
+              style={{
+                alignItems: 'center'
+              }}
+              onPress={() => {
+                scrollViewRef.current &&
+                scrollViewRef.current.scrollTo( {
+                  x: 0,
+                  y: hp( '150%' ),
+                  animated: true,
+                } )
+              }}
+            >
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper>
+            {/* <View style={styles.separatorView} /> */}
+          </View>
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '18%' ),
+              }}
+            >
+              {strings.test5}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/test_account_info_1.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <View style={styles.bottomLinkView}>
+              <Text style={{
+                ...styles.infoText, marginLeft: 0, marginRight: 0
+              }}>
+                {strings.test6}
+              </Text>
+              <View style={{
+                ...styles.linkView, marginTop: wp( '7%' )
+              }}>
+                <Text style={styles.toKnowMoreText}>{strings.toknowmore}</Text>
+                <AppBottomSheetTouchableWrapper
+                  style={{
+                    marginLeft: 5
+                  }}
+                  onPress={() => openLink( 'https://en.bitcoin.it/wiki/Testnet' )}
+                >
+                  <Text style={styles.clickHereText}>{strings.clickhere}</Text>
+                </AppBottomSheetTouchableWrapper>
+              </View>
+            </View>
+            {/* <View style={{
             ...styles.separatorView, marginBottom: wp( '7%' )
           }} /> */}
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
+      </View>
     </View>
   )
 }
 const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
@@ -226,7 +232,7 @@ const styles = StyleSheet.create( {
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp( '85%' ),
+    height: hp( '70%' ),
     justifyContent: 'space-between',
   },
   separatorView: {
@@ -241,7 +247,7 @@ const styles = StyleSheet.create( {
   },
   helperImage: {
     width: wp( '80%' ),
-    height: wp( '65%' ),
+    height: wp( '60%' ),
     resizeMode: 'contain',
   },
   bottomLinkView: {

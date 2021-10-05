@@ -1,52 +1,53 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, Image } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import ListStyles from '../../../common/Styles/ListStyles';
-import ImageStyles from '../../../common/Styles/ImageStyles';
-import AccountVisibility from '../../../common/data/enums/AccountVisibility';
+import React, { useMemo } from 'react'
+import { StyleSheet, Image } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import ListStyles from '../../../common/Styles/ListStyles'
+import ImageStyles from '../../../common/Styles/ImageStyles'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   visibilityOption: AccountVisibility;
 };
 
-const VisibilityOptionsListItemContent: React.FC<Props> = ({
-  visibilityOption,
-}: Props) => {
+const VisibilityOptionsListItemContent: React.FC<Props> = ( { visibilityOption, }: Props ) => {
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
 
-  const avatarImageSource = useMemo(() => {
-    switch (visibilityOption) {
-      case AccountVisibility.DEFAULT:
-        return require('../../../assets/images/icons/account-visibility/icon_visible.png');
-      case AccountVisibility.HIDDEN:
-        return require('../../../assets/images/icons/account-visibility/icon_hidden.png');
-      case AccountVisibility.DURESS:
-        return require('../../../assets/images/icons/account-visibility/icon_duress.png');
+  const avatarImageSource = useMemo( () => {
+    switch ( visibilityOption ) {
+        case AccountVisibility.DEFAULT:
+          return require( '../../../assets/images/icons/account-visibility/icon_visible.png' )
+        case AccountVisibility.HIDDEN:
+          return require( '../../../assets/images/icons/account-visibility/icon_hidden.png' )
+        case AccountVisibility.DURESS:
+          return require( '../../../assets/images/icons/account-visibility/icon_duress.png' )
     }
-  }, [visibilityOption]);
+  }, [ visibilityOption ] )
 
-  const titleText = useMemo(() => {
-    switch (visibilityOption) {
-      case AccountVisibility.DEFAULT:
-        return "Visible";
-      case AccountVisibility.HIDDEN:
-        return "Hidden";
-      case AccountVisibility.DURESS:
-        return "Duress";
+  const titleText = useMemo( () => {
+    switch ( visibilityOption ) {
+        case AccountVisibility.DEFAULT:
+          return common.visible
+        case AccountVisibility.HIDDEN:
+          return common.hidden
+        case AccountVisibility.DURESS:
+          return common.duress
     }
-  }, [visibilityOption]);
+  }, [ visibilityOption ] )
 
-  const subtitleText = useMemo(() => {
-    switch (visibilityOption) {
-      case AccountVisibility.DEFAULT:
-        return "Always show this account.";
-      case AccountVisibility.HIDDEN:
-        return "Only show when manually revealing all accounts.";
-      case AccountVisibility.DURESS:
-        return "Only show in Duress mode -- or when manually revealing all accounts.";
-      default:
-        return "";
+  const subtitleText = useMemo( () => {
+    switch ( visibilityOption ) {
+        case AccountVisibility.DEFAULT:
+          return strings.Alwaysshow
+        case AccountVisibility.HIDDEN:
+          return strings.Onlyshow
+        case AccountVisibility.DURESS:
+          return strings.Duressmode
+        default:
+          return ''
     }
-  }, [visibilityOption]);
+  }, [ visibilityOption ] )
 
   return (
     <>
@@ -72,10 +73,10 @@ const VisibilityOptionsListItemContent: React.FC<Props> = ({
         </ListItem.Subtitle>
       </ListItem.Content>
     </>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.thumbnailImageSmall,
     marginRight: 14,
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   titleSection: {
     flex: 1,
   },
-});
+} )
 
 
-export default VisibilityOptionsListItemContent;
+export default VisibilityOptionsListItemContent

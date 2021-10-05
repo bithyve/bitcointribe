@@ -6,7 +6,6 @@ import {
   Image,
   FlatList,
   Platform,
-  AsyncStorage,
   TouchableOpacity,
 } from 'react-native'
 import {
@@ -21,7 +20,6 @@ import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper
 import { useDispatch } from 'react-redux'
 import BottomInfoBox from './BottomInfoBox'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { sharePersonalCopy } from '../store/actions/sss'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from './ModalHeader'
 
@@ -60,7 +58,6 @@ export default function PersonalCopyShareModal( props ) {
   const dispatch = useDispatch()
 
   const onShare = async ( shareOption, isEmailOtherOptions ) => {
-    dispatch( sharePersonalCopy( shareOption.type, props.selectedPersonalCopy, isEmailOtherOptions ) )
     props.onPressShare()
   }
 

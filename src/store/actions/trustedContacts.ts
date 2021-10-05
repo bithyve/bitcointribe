@@ -1,295 +1,176 @@
 // types and action creators: dispatched by components and sagas
-import { Action } from 'redux'
+import { ImageSourcePropType } from 'react-native'
 import {
-  TrustedDataElements,
-  EphemeralDataElements,
-  trustedChannelActions,
-  ShareUploadables,
-  Contacts,
+  UnecryptedStreamData,
+  ContactInfo,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
-import { createAction } from 'redux-actions'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
-export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
+export const SYNC_PERMANENT_CHANNELS = 'SYNC_PERMANENT_CHANNELS'
+export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
+export const REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
+export const EDIT_TRUSTED_CONTACT = 'EDIT_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
-export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
-export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
-export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
-export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
-export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
-export const UPDATE_TRUSTED_CONTACTS_INFO = 'UPDATE_TRUSTED_CONTACTS_INFO'
-export const UPDATE_ADDRESS_BOOK_LOCALLY = 'UPDATE_ADDRESS_BOOK_LOCALLY'
+export const RESTORE_TRUSTED_CONTACTS = 'RESTORE_TRUSTED_CONTACTS'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
-export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
-export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
-export const CLEAR_TRUSTED_CONTACTS_CACHE = 'CLEAR_TRUSTED_CONTACTS_CACHE'
-export const SEND_VERSION_UPDATE_NOTIFICATION = 'SEND_VERSION_UPDATE_NOTIFICATION'
-export const MULTI_UPDATE_TRUSTED_CHANNELS = 'MULTI_UPDATE_TRUSTED_CHANNELS'
+export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
+export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
 
-export const clearTrustedContactsCache = () => {
-  return {
-    type: CLEAR_TRUSTED_CONTACTS_CACHE
-  }
+export enum PermanentChannelsSyncKind {
+  SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
+  EXISTING_CONTACTS = 'EXISTING_CONTACTS',
+  NON_FINALIZED_CONTACTS = 'NON_FINALIZED_CONTACTS'
 }
 
-export const approveTrustedContact = (
-  contactInfo: { contactName: string; info: string },
-  contactsPublicKey: string,
-  updateEphemeralChannel?: Boolean,
-  contactsWalletName?: string,
-  isGuardian?: boolean,
-  isFromKeeper?: boolean,
+export const syncPermanentChannels = (
+  {
+    permanentChannelsSyncKind, // kind of channel sync
+    channelUpdates, // out-stream updates for the channels
+    metaSync,   // sync only meta-data for the channels
+    hardSync, // sync channel irrespective of the new-data flag status
+  }:
+  {
+    permanentChannelsSyncKind: PermanentChannelsSyncKind,
+    channelUpdates?: {
+    contactInfo: ContactInfo,
+    streamUpdates?: UnecryptedStreamData,
+  }[],
+  metaSync?: boolean,
+  hardSync?: boolean,
+}
 ) => {
   return {
-    type: APPROVE_TRUSTED_CONTACT,
+    type: SYNC_PERMANENT_CHANNELS,
     payload: {
-      contactInfo,
-      contactsPublicKey,
-      updateEphemeralChannel,
-      contactsWalletName,
-      isGuardian,
-      isFromKeeper,
+      permanentChannelsSyncKind,
+      channelUpdates,
+      metaSync,
+      hardSync,
     },
   }
 }
 
-export const removeTrustedContact = ( contactName, shareIndex? ) => {
+export enum InitTrustedContactFlowKind {
+  SETUP_TRUSTED_CONTACT = 'SETUP_TRUSTED_CONTACT',
+  APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT',
+  REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT',
+  EDIT_TRUSTED_CONTACT = 'EDIT_TRUSTED_CONTACT'
+}
+
+export const initializeTrustedContact = (
+  {
+    contact,
+    flowKind,
+    isKeeper,
+    isPrimaryKeeper,
+    channelKey,
+    contactsSecondaryChannelKey,
+    shareId,
+  }:{
+      contact: any,
+      flowKind: InitTrustedContactFlowKind,
+      isKeeper?: boolean,
+      isPrimaryKeeper?: boolean,
+      channelKey?: string,
+      contactsSecondaryChannelKey?: string,
+      shareId?: string
+    },
+) => {
+  return {
+    type: INITIALIZE_TRUSTED_CONTACT,
+    payload: {
+      contact,
+      flowKind,
+      isKeeper,
+      isPrimaryKeeper,
+      channelKey,
+      contactsSecondaryChannelKey,
+      shareId,
+    },
+  }
+}
+
+export const rejectTrustedContact = ( { channelKey } : {channelKey: string} ) => {
+  return {
+    type: REJECT_TRUSTED_CONTACT,
+    payload: {
+      channelKey
+    },
+  }
+}
+
+export const editTrustedContact = ( { channelKey, contactName, image } : {channelKey: string, contactName?: string, image?: ImageSourcePropType} ) => {
+  return {
+    type: EDIT_TRUSTED_CONTACT,
+    payload: {
+      channelKey,
+      contactName,
+      image,
+    },
+  }
+}
+
+export const removeTrustedContact = ( { channelKey } : {channelKey: string} ) => {
   return {
     type: REMOVE_TRUSTED_CONTACT,
     payload: {
-      contactName,
-      shareIndex,
+      channelKey
     },
   }
 }
 
-export const updateEphemeralChannel = (
-  contactInfo: { contactName: string; info: string, walletName?: string; },
-  data: EphemeralDataElements,
-  fetch?: Boolean,
-  trustedContacts?: TrustedContactsService,
-  uploadXpub?: Boolean,
-  shareUploadables?: ShareUploadables,
-  updatedDB?: any,
-  isFromKeeper?: boolean
-) => {
+export const restoreTrustedContacts = ( { walletId, channelKeys } : {walletId: string, channelKeys: string[]} ) => {
   return {
-    type: UPDATE_EPHEMERAL_CHANNEL,
+    type: RESTORE_TRUSTED_CONTACTS,
     payload: {
-      contactInfo,
-      data,
-      fetch,
-      trustedContacts,
-      uploadXpub,
-      shareUploadables,
-      updatedDB,
-      isFromKeeper,
+      walletId,
+      channelKeys
     },
   }
 }
 
-export const fetchEphemeralChannel = (
-  contactInfo: { contactName: string; info: string },
-  approveTC?: Boolean,
-  publicKey?: string,
-) => {
-  return {
-    type: FETCH_EPHEMERAL_CHANNEL,
-    payload: {
-      contactInfo, approveTC, publicKey
-    },
-  }
-}
-
-export const updateTrustedChannel = (
-  contactInfo: { contactName: string; info: string },
-  data: TrustedDataElements,
-  fetch?: Boolean,
-  shareUploadables?: ShareUploadables,
-  updatedDB?: any,
-) => {
-  return {
-    type: UPDATE_TRUSTED_CHANNEL,
-    payload: {
-      contactInfo, data, fetch, shareUploadables, updatedDB
-    },
-  }
-}
-
-export const fetchTrustedChannel = (
-  contactInfo: {
-    contactName: string;
-    info: string;
-  },
-  action: trustedChannelActions,
-  contactsWalletName?: string,
-) => {
-  return {
-    type: FETCH_TRUSTED_CHANNEL,
-    payload: {
-      contactInfo, action, contactsWalletName
-    },
-  }
-}
-
-export const trustedChannelsSetupSync = () => {
-  return {
-    type: TRUSTED_CHANNELS_SETUP_SYNC,
-  }
-}
-
-export const walletCheckIn = ( synchingContacts?: Boolean ) => {
+export const walletCheckIn = ( currencyCode?: string ) => {
   return {
     type: WALLET_CHECK_IN,
     payload: {
-      synchingContacts
+      currencyCode
     },
   }
 }
-
-export const syncTrustedChannels = ( contacts? ) => {
-  return {
-    type: SYNC_TRUSTED_CHANNELS,
-    payload: {
-      contacts
-    },
-  }
-}
-
-export const postRecoveryChannelSync = () => {
-  return {
-    type: POST_RECOVERY_CHANNEL_SYNC,
-  }
-}
-
-export const updateTrustedContactsInfoLocally = ( trustedContactsInfo ) => {
-  return {
-    type: UPDATE_TRUSTED_CONTACTS_INFO,
-    payload: {
-      trustedContactsInfo
-    },
-  }
-}
-
-export const sendVersionUpdateNotification = ( version: string ) => {
-  return {
-    type: SEND_VERSION_UPDATE_NOTIFICATION,
-    payload: {
-      version
-    }
-  }
-}
-
-export const multiUpdateTrustedChannels = ( data: TrustedDataElements, contacts?: Contacts ) => {
-  return {
-    type: MULTI_UPDATE_TRUSTED_CHANNELS,
-    payload: {
-      data, contacts
-    }
-  }
-}
-
 
 // types and action creators: dispatched by sagas
-export const TRUSTED_CONTACT_APPROVED = 'TRUSTED_CONTACT_APPROVED'
-export const EPHEMERAL_CHANNEL_UPDATED = 'EPHEMERAL_CHANNEL_UPDATED'
-export const EPHEMERAL_CHANNEL_FETCHED = 'EPHEMERAL_CHANNEL_FETCHED'
-export const TRUSTED_CHANNEL_UPDATED = 'TRUSTED_CHANNEL_UPDATED'
-export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED'
-export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED'
-export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS'
-export const SWITCH_TC_LOADING = 'SWITCH_TC_LOADING'
-export const UPGRADE_REDUCER = 'UPGRADE_REDUCER'
+export const EXISTING_PERMANENT_CHANNELS_SYNCHED = 'EXISTING_PERMANENT_CHANNELS_SYNCHED'
+export const UPDATE_TRUSTED_CONTACTS = 'UPDATE_TRUSTED_CONTACTS'
+export const RESTORE_CONTACTS = 'RESTORE_CONTACTS'
 
-export const trustedContactApproved = (
-  contactName: string,
-  approved: Boolean,
-) => {
+export const existingPermanentChannelsSynched = ( { successful }: {successful: boolean} ) => {
   return {
-    type: TRUSTED_CONTACT_APPROVED,
+    type: EXISTING_PERMANENT_CHANNELS_SYNCHED,
     payload: {
-      contactName, approved
-    },
+      successful
+    }
   }
 }
 
-export const ephemeralChannelUpdated = (
-  contactName: string,
-  updated: Boolean,
-  data?: any,
-) => {
+export const updateTrustedContacts = ( contacts: Trusted_Contacts ) => {
   return {
-    type: EPHEMERAL_CHANNEL_UPDATED,
+    type: UPDATE_TRUSTED_CONTACTS,
     payload: {
-      contactName, updated, data
-    },
+      contacts
+    }
   }
 }
 
-export const ephemeralChannelFetched = ( contactName: string, data: any ) => {
+export const updateWalletNameToChannel = () => {
   return {
-    type: EPHEMERAL_CHANNEL_FETCHED,
-    payload: {
-      contactName, data
-    },
+    type: UPDATE_WALLET_NAME_TO_CHANNEL,
   }
 }
 
-export const trustedChannelUpdated = (
-  contactName: string,
-  updated: Boolean,
-  data?: any,
-) => {
+export const updateWalletName = ( walletName: string ) => {
   return {
-    type: TRUSTED_CHANNEL_UPDATED,
-    payload: {
-      contactName, updated, data
-    },
-  }
-}
-
-export const trustedChannelFetched = ( contactName: string, data: any ) => {
-  return {
-    type: TRUSTED_CHANNEL_FETCHED,
-    payload: {
-      contactName, data
-    },
-  }
-}
-
-export const paymentDetailsFetched = ( paymentDetails ) => {
-  return {
-    type: PAYMENT_DETAILS_FETCHED,
-    payload: {
-      paymentDetails
-    },
-  }
-}
-
-export const clearPaymentDetails = () => {
-  return {
-    type: CLEAR_PAYMENT_DETAILS,
-  }
-}
-
-export const switchTCLoading = ( beingLoaded ) => {
-  return {
-    type: SWITCH_TC_LOADING,
-    payload: {
-      beingLoaded
-    },
-  }
-}
-
-const updateAddressBookLocallyRequest = createAction(
-  UPDATE_ADDRESS_BOOK_LOCALLY,
-)
-
-export const updateAddressBookLocally = ( payload ) => ( dispatch ) =>
-  dispatch( updateAddressBookLocallyRequest( payload ) )
-
-export const upgradeReducer = (  ) => {
-  return {
-    type: UPGRADE_REDUCER,
+    type: UPDATE_WALLET_NAME, payload: {
+      walletName
+    }
   }
 }

@@ -9,10 +9,10 @@ import {
   Text,
   Image,
   Platform,
-  AsyncStorage,
   Alert,
   RefreshControl,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../../common/Fonts'
@@ -34,11 +34,8 @@ import RecoverySuccessModalContents from '../../components/RecoverySuccessModalC
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  downloadMShare,
-  recoverWallet,
-  walletRecoveryFailed,
   ErrorReceiving,
-} from '../../store/actions/sss'
+} from '../../store/actions/BHR'
 import ModalHeader from '../../components/ModalHeader'
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents'
 
@@ -46,6 +43,7 @@ import LoaderModal from '../../components/LoaderModal'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
 import { walletCheckIn } from '../../store/actions/trustedContacts'
 import { setVersion } from '../../store/actions/versionHistory'
+import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 
 export default function RestoreSelectedContactsList( props ) {
   const [ SecondaryDeviceRS, setSecondaryDeviceRS ] = useState( null )
@@ -66,13 +64,11 @@ export default function RestoreSelectedContactsList( props ) {
 
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const { downloadMetaShare } = useSelector( ( state ) => state.sss.loading )
-
-  const isWalletRecoveryFailed = useSelector(
-    ( state ) => state.sss.walletRecoveryFailed,
-  )
+  const { downloadMetaShare } = useSelector( ( state ) => state.bhr.loading )
+  // Removed sss file
+  const isWalletRecoveryFailed = false
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.sss.errorReceiving,
+    ( state ) => state.bhr.errorReceiving,
   )
 
   const [ exchangeRates, setExchangeRates ] = useState()
@@ -265,8 +261,8 @@ export default function RestoreSelectedContactsList( props ) {
       }, 2 );
       ( ErrorBottomSheet as any ).current.snapTo( 1 );
       ( loaderBottomSheet as any ).current.snapTo( 0 )
-
-      dispatch( walletRecoveryFailed( null ) )
+      // Removed sss file
+      // dispatch( walletRecoveryFailed( null ) )
     }
   }, [ isWalletRecoveryFailed ] )
 
@@ -305,13 +301,13 @@ export default function RestoreSelectedContactsList( props ) {
   }, [ SD_META_SHARE ] )
 
   const walletImageChecked: Boolean = useSelector(
-    ( state ) => state.sss.walletImageChecked,
+    ( state ) => state.bhr.walletImageChecked,
   )
 
   useEffect( () => {
     ( async () => {
       if ( SERVICES && walletImageChecked ) {
-        AsyncStorage.setItem( 'walletExists', 'true' )
+        dispatch( completedWalletSetup() )
         AsyncStorage.setItem( 'walletRecovered', 'true' )
 
         dispatch( walletCheckIn() )
@@ -339,7 +335,8 @@ export default function RestoreSelectedContactsList( props ) {
           console.log( {
             KEY
           } )
-          dispatch( downloadMShare( KEY, null, 'recovery' ) )
+          // Removed sss file
+          // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
           Alert.alert(
             'Key Exists',
@@ -348,7 +345,8 @@ export default function RestoreSelectedContactsList( props ) {
         }
       } else if ( key ) {
         // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
-        dispatch( downloadMShare( key, null, 'recovery' ) )
+        // Removed sss file
+        // dispatch( downloadMShare( key, null, 'recovery' ) )
       }
     },
     [ RECOVERY_SHARES ],
@@ -484,7 +482,7 @@ export default function RestoreSelectedContactsList( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack()
+            props.navigation.navigate( 'WalletInitialization' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -503,12 +501,12 @@ export default function RestoreSelectedContactsList( props ) {
         }
       >
         <HeaderTitle
-          firstLineTitle={'Restore wallet using'}
+          firstLineTitle={'Recover wallet using'}
           secondLineTitle={'Recovery Keys'}
           infoTextNormal={
             'These are the Recovery Keys that you have stored in five places. '
           }
-          infoTextBold={'You need three of them restore your wallet'}
+          infoTextBold={'You need three of them recover your wallet'}
         />
         <TouchableOpacity
           style={{
@@ -973,7 +971,8 @@ export default function RestoreSelectedContactsList( props ) {
                 setTimeout( () => {
                   setElevation( 0 )
                 }, 2 )
-                dispatch( recoverWallet() )
+                // Removed sss file
+                // dispatch( recoverWallet() )
                 dispatch( setVersion( 'Restored' ) )
               }}
             >

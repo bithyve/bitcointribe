@@ -25,11 +25,10 @@ import { SafeAreaView } from 'react-navigation'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
+import { DonationAccount } from '../../../bitcoin/utilities/Interface'
 
 export type NavigationParams = {
   account: Record<string, unknown>;
-  serviceType: string;
-  accountNumber: number;
 };
 
 export type NavigationProp = {
@@ -42,36 +41,25 @@ export type Props = {
 
 const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
-  const {
-    donationAccount,
-    serviceType,
-    accountNumber,
-  } = useMemo( () => {
-    return {
-      donationAccount: navigation.getParam( 'account' ),
-      serviceType: navigation.getParam( 'serviceType' ),
-      accountNumber: navigation.getParam( 'accountNumber' ),
-    }
+  const donationAccount: DonationAccount = useMemo( () => {
+    return navigation.getParam( 'account' )
   }, [ navigation.params ] )
 
 
   const [ isDonationTotalEnable, setIsDonationTotalEnable ] = useState(
     donationAccount.configuration.displayBalance
   )
-
-  const [
-    isDonationTransactionEnable,
-    setIsDonationTransactionEnable,
-  ] = useState( donationAccount.configuration.displayTransactions )
-
-  const [ hideTxDetails, setHideTxDetails ] = useState(
-    !donationAccount.configuration.displayTxDetails,
+  const [ isIncomingTxnEnabled, setIsIncomingTxnEnabled ] = useState(
+    donationAccount.configuration.displayIncomingTxs
+  )
+  const [ isOutgoingTxnEnabled, setIsOutgoingTxnEnabled ] = useState(
+    donationAccount.configuration.displayOutgoingTxs
   )
 
   const [ disableSave, setDisableSave ] = useState( true )
   const [ doneeName, setDoneeName ] = useState( donationAccount.donee )
-  const [ description, setDescription ] = useState( donationAccount.description )
-  const [ cause, setCause ] = useState( donationAccount.subject )
+  const [ description, setDescription ] = useState( donationAccount.accountDescription )
+  const [ cause, setCause ] = useState( donationAccount.accountName )
 
   const [ isDonationPause, setIsDonationPause ] = useState(
     donationAccount.disableAccount ? donationAccount.disableAccount : false,
@@ -94,14 +82,13 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
     if (
       isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        donationAccount.configuration.displayTransactions ||
-      !hideTxDetails !== donationAccount.configuration.displayTxDetails
+      isIncomingTxnEnabled !== donationAccount.configuration.displayIncomingTxs ||
+      isOutgoingTxnEnabled !== donationAccount.configuration.displayOutgoingTxs
     ) {
       const configuration = {
         displayBalance: isDonationTotalEnable,
-        displayTransactions: isDonationTransactionEnable,
-        displayTxDetails: !hideTxDetails,
+        displayIncomingTxs: isIncomingTxnEnabled,
+        displayOutgoingTxs: isOutgoingTxnEnabled,
       }
 
       preferences = preferences
@@ -115,13 +102,13 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.description ) ||
-      ( cause && cause !== donationAccount.subject )
+      ( description && description !== donationAccount.accountDescription ) ||
+      ( cause && cause !== donationAccount.accountName )
     ) {
       const accountDetails = {
         donee: doneeName ? doneeName : donationAccount.donee,
-        subject: cause ? cause : donationAccount.subject,
-        description: description ? description : donationAccount.description,
+        subject: cause ? cause : donationAccount.accountName,
+        description: description ? description : donationAccount.accountDescription,
       }
       preferences = preferences
         ? {
@@ -135,7 +122,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     if ( preferences ) {
       Toast( 'Your preferences would be updated shortly' )
       dispatch(
-        updateDonationPreferences( serviceType, accountNumber, preferences ),
+        updateDonationPreferences( donationAccount, preferences ),
       )
       setDisableSave( true )
     }
@@ -144,12 +131,11 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
   useEffect( () => {
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.description ) ||
-      ( cause && cause !== donationAccount.subject ) ||
+      ( description && description !== donationAccount.accountDescription ) ||
+      ( cause && cause !== donationAccount.accountName ) ||
       isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        donationAccount.configuration.displayTransactions ||
-      !hideTxDetails !== donationAccount.configuration.displayTxDetails ||
+      isIncomingTxnEnabled !== donationAccount.configuration.displayIncomingTxs ||
+      isOutgoingTxnEnabled !== donationAccount.configuration.displayOutgoingTxs ||
       isDonationPause !== donationAccount.disableAccount
     ) {
       setDisableSave( false )
@@ -161,9 +147,9 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     description,
     cause,
     isDonationPause,
-    hideTxDetails,
     isDonationTotalEnable,
-    isDonationTransactionEnable,
+    isIncomingTxnEnabled,
+    isOutgoingTxnEnabled,
   ] )
 
   return (
@@ -178,7 +164,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
         <ScrollView>
 
           <View style={{
-            ...NavStyles.modalHeaderTitleView, paddingHorizontal: 0
+            ...NavStyles.modalHeaderTitleView, paddingHorizontal: 0, justifyContent: 'space-between'
           }}>
             <View style={{
               flexDirection: 'row', alignItems: 'center'
@@ -329,13 +315,16 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 isOn={isDonationTotalEnable}
               />
             </View>
-            <View style={styles.rowContainer}>
+
+            <View style={{
+              ...styles.rowContainer, marginTop: 10
+            }}>
               <Image
                 style={styles.imageStyle}
-                source={require( '../../../assets/images/icons/icon_donation_transactions.png' )}
+                source={require( '../../../assets/images/icons/icon_donation_total.png' )}
               />
               <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Show Transactions</Text>
+                <Text style={styles.titleTextStyle}>Incoming Transactions</Text>
                 <Text
                   style={{
                     ...styles.modalInfoText,
@@ -343,7 +332,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                     color: Colors.lightTextColor,
                   }}
                 >
-                  Show / hide transactions on web view
+                  Show incoming donation transactions
                 </Text>
               </View>
               <CurrencyKindToggleSwitch
@@ -352,38 +341,26 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 isNotImage={true}
                 trackColor={Colors.lightBlue}
                 thumbColor={
-                  isDonationTransactionEnable ? Colors.blue : Colors.white
+                  isIncomingTxnEnabled ? Colors.blue : Colors.white
                 }
-                onpress={() =>
-                  setIsDonationTransactionEnable( ( prevState ) => !prevState )
+                onpress={() =>{
+                  if( isIncomingTxnEnabled ) setIsOutgoingTxnEnabled( false )
+                  setIsIncomingTxnEnabled( ( prevState ) => !prevState )
                 }
-                isOn={isDonationTransactionEnable}
+                }
+                isOn={isIncomingTxnEnabled}
               />
             </View>
 
-            <View style={styles.rowContainer}>
-              <View
-                style={{
-                  ...styles.circleShapeView,
-                  backgroundColor: Colors.lightBlue,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue( 20 ),
-                    color: Colors.white,
-                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
-                  }}
-                >
-                  @
-                </Text>
-              </View>
-
+            <View style={{
+              ...styles.rowContainer, marginTop: 10
+            }}>
+              <Image
+                style={styles.imageStyle}
+                source={require( '../../../assets/images/icons/icon_donation_total.png' )}
+              />
               <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Hide Transaction ID</Text>
+                <Text style={styles.titleTextStyle}>Outgoing Transactions</Text>
                 <Text
                   style={{
                     ...styles.modalInfoText,
@@ -391,7 +368,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                     color: Colors.lightTextColor,
                   }}
                 >
-                  Show / hide transaction ID on the web view
+                  Show outgoing donation transactions
                 </Text>
               </View>
               <CurrencyKindToggleSwitch
@@ -399,9 +376,14 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 thumbSize={wp( '6%' )}
                 isNotImage={true}
                 trackColor={Colors.lightBlue}
-                thumbColor={hideTxDetails ? Colors.blue : Colors.white}
-                onpress={() => setHideTxDetails( ( prevState ) => !prevState )}
-                isOn={hideTxDetails}
+                thumbColor={
+                  isOutgoingTxnEnabled ? Colors.blue : Colors.white
+                }
+                onpress={() => {
+                  if( isIncomingTxnEnabled || isOutgoingTxnEnabled ) setIsOutgoingTxnEnabled( ( prevState ) => !prevState )
+                }
+                }
+                isOn={isOutgoingTxnEnabled}
               />
             </View>
 

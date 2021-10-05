@@ -9,194 +9,201 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import openLink from '../../utils/OpenLink'
+import { translations } from '../../common/content/LocContext'
 
-export default function ReceiveHelpContents(props) {
+export default function ReceiveHelpContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={styles.modalContainer}>
-      <AppBottomSheetTouchableWrapper
-        style={{
-          justifyContent: 'center', alignItems: 'center'
-        }}
-        activeOpacity={10}
-        onPress={() => props.titleClicked && props.titleClicked()}
-      >
-        <Text style={styles.headerText}>Receive Bitcoins</Text>
-      </AppBottomSheetTouchableWrapper>
-      <View style={styles.headerSeparator} />
-      <ScrollView
-        ref={scrollViewRef}
-        style={{
-          flex: 1,
-          backgroundColor: Colors.blue,
-        }}
-        snapToInterval={hp('80%')}
-        decelerationRate="fast"
-      >
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp('5%'),
-            }}
-          >
-            To receive sats or bitcoin, you share the QR code with the person trying to send you money. Scanning the QR code with their phone camera gives them your bitcoin address.
-          </Text>
-          <View style={{
+      <View style={{
+        height: hp( 81 )
+      }}>
+        <AppBottomSheetTouchableWrapper
+          style={{
             justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/bitcoin_receive_info_1.png')}
-              style={styles.helperImage}
-            />
-          </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginBottom: wp('15%'),
-            }}
-          >
-            For your privacy, a new address is generated each time you want to receive sats or bitcoin. The app does this on its own - you don't have to do a thing!
-          </Text>
-          <AppBottomSheetTouchableWrapper
-            style={{
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              scrollViewRef.current?.scrollTo({
-                x: 0,
-                y: hp('80%'),
-                animated: true,
-              })
-            }}
-          >
-            <FontAwesome
-              name="angle-double-down"
-              color={Colors.white}
-              size={40}
-            />
-          </AppBottomSheetTouchableWrapper>
-          <View style={styles.separatorView} />
-        </View>
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp('10%'),
-            }}
-          >
-            Depending on the sender's wallet, you may receive a few less sats than you requested - this may be due to the mining fee.
-          </Text>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
-              style={styles.helperImage}
-            />
-          </View>
-          <Text style={{
-            ...styles.infoText, marginBottom: wp('15%'),
-          }}>
-           If your sender sends the transaction with higher mining fees, it gets to you faster. Make sure they know!
-            </Text>
-          <AppBottomSheetTouchableWrapper
-            style={{
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              scrollViewRef.current?.scrollTo({
-                x: 0,
-                y: hp('160%'),
-                animated: true,
-              })
-            }}
-          >
-            <FontAwesome
-              name="angle-double-down"
-              color={Colors.white}
-              size={40}
-            />
-          </AppBottomSheetTouchableWrapper>
-          <View style={styles.separatorView} />
-        </View>
-
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp('10%'),
-            }}
-          >
-            When you send sats, our app calculates the fees to get your money to your recipient within a certain window of time - or you can use a custom fee, if you know what you're doing. 
-          </Text>
-          <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Image
-              source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
-              style={styles.helperImage}
-            />
-          </View>
-          <View style={styles.bottomLinkView}>
-            <Text style={{
-              ...styles.infoText, marginLeft: 0, marginRight: 0
-            }}>
-             Fees provide additional incentives for the miner to process your transaction, resulting in you (or your recipient) receiving your sats faster.
-            </Text>
-            <View
-            style={{
-              flexDirection: 'row',
-              marginLeft: wp( '10%' ),
-              marginRight: wp( '10%' ),
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginTop: wp('7%')
-            }}
-          >
+          }}
+          activeOpacity={10}
+          onPress={() => props.titleClicked && props.titleClicked()}
+        >
+          <Text style={styles.headerText}>{strings.ReceiveBitcoins}</Text>
+        </AppBottomSheetTouchableWrapper>
+        <View style={styles.headerSeparator} />
+        <ScrollView
+          ref={scrollViewRef}
+          style={{
+            flex: 1,
+            backgroundColor: Colors.blue,
+          }}
+          snapToInterval={hp( '72%' )}
+          decelerationRate="fast"
+        >
+          <View style={styles.ElementView}>
             <Text
               style={{
-                color: Colors.white,
-                // textAlign: 'center',
-                fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansRegular,
+                ...styles.infoText,
+                marginTop: wp( '5%' ),
               }}
             >
-              To know more,
+              {strings.Toreceive}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/bitcoin_receive_info_1.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '15%' ),
+              }}
+            >
+              {strings.Foryourprivacy}
             </Text>
             <AppBottomSheetTouchableWrapper
               style={{
-                marginLeft: 5
+                alignItems: 'center'
               }}
-              onPress={() =>
-                openLink(
-                  'https://github.com/6102bitcoin/bitcoin-intro#step-12-buying-privately',
-                )
-              }
+              onPress={() => {
+                scrollViewRef.current?.scrollTo( {
+                  x: 0,
+                  y: hp( '80%' ),
+                  animated: true,
+                } )
+              }}
             >
-              <Text
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper>
+            <View style={styles.separatorView} />
+          </View>
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '10%' ),
+              }}
+            >
+              {strings.Dependingon}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/bitcoin_send_info_2.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text style={{
+              ...styles.infoText, marginBottom: wp( '15%' ),
+            }}>
+              {strings.Ifyoursender}
+            </Text>
+            <AppBottomSheetTouchableWrapper
+              style={{
+                alignItems: 'center'
+              }}
+              onPress={() => {
+                scrollViewRef.current?.scrollTo( {
+                  x: 0,
+                  y: hp( '180%' ),
+                  animated: true,
+                } )
+              }}
+            >
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper>
+            <View style={styles.separatorView} />
+          </View>
+
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '10%' ),
+              }}
+            >
+              {strings.Whenyousendsats}
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/bitcoin_send_info_2.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <View style={styles.bottomLinkView}>
+              <Text style={{
+                ...styles.infoText, marginLeft: 0, marginRight: 0
+              }}>
+                {strings.Feesprovide}
+              </Text>
+              <View
                 style={{
-                  color: Colors.white,
-                  fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textDecorationLine: 'underline',
-                  textAlign: 'center',
+                  flexDirection: 'row',
+                  marginLeft: wp( '10%' ),
+                  marginRight: wp( '10%' ),
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                  marginTop: wp( '7%' )
                 }}
               >
-                click here
-              </Text>
-            </AppBottomSheetTouchableWrapper>
+                <Text
+                  style={{
+                    color: Colors.white,
+                    // textAlign: 'center',
+                    fontSize: RFValue( 13 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {strings.toknowmore}
+                </Text>
+                <AppBottomSheetTouchableWrapper
+                  style={{
+                    marginLeft: 5
+                  }}
+                  onPress={() =>
+                    openLink(
+                      'https://github.com/6102bitcoin/bitcoin-intro#step-12-buying-privately',
+                    )
+                  }
+                >
+                  <Text
+                    style={{
+                      color: Colors.white,
+                      fontSize: RFValue( 13 ),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textDecorationLine: 'underline',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {strings.clickhere}
+                  </Text>
+                </AppBottomSheetTouchableWrapper>
+              </View>
+            </View>
           </View>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
@@ -210,69 +217,69 @@ const styles = StyleSheet.create({
   headerText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(20),
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
+    fontSize: RFValue( 20 ),
+    marginTop: hp( '1%' ),
+    marginBottom: hp( '1%' ),
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,
     height: 1,
-    marginLeft: wp('5%'),
-    marginRight: wp('5%'),
-    marginBottom: hp('1%'),
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
+    marginBottom: hp( '1%' ),
   },
   infoText: {
     textAlign: 'center',
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: wp('10%'),
-    marginRight: wp('10%'),
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
   },
   clickHereText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
   toKnowMoreText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   linkView: {
     flexDirection: 'row',
-    marginLeft: wp('10%'),
-    marginRight: wp('10%'),
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
     justifyContent: 'center',
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('80%'),
+    height: hp( '72%' ),
     justifyContent: 'space-between',
   },
   separatorView: {
-    width: wp('70%'),
+    width: wp( '70%' ),
     height: 0,
     alignSelf: 'center',
-    marginBottom: wp('1%'),
+    marginBottom: wp( '1%' ),
     borderStyle: 'dotted',
     borderWidth: 1,
     borderRadius: 1,
     borderColor: Colors.white,
   },
   helperImage: {
-    width: wp('80%'),
-    height: wp('65%'),
+    width: wp( '80%' ),
+    height: wp( '65%' ),
     resizeMode: 'contain',
   },
   bottomLinkView: {
-    marginLeft: wp('10%'),
-    marginRight: wp('10%'),
-    marginBottom: wp('15%'),
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
+    marginBottom: wp( '15%' ),
   },
-})
+} )
 
 //     <View style={styles.modalContainer}>
 //       <AppBottomSheetTouchableWrapper

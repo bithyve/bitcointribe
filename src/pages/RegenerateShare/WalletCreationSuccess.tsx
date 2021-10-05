@@ -23,22 +23,22 @@ const WalletCreationSuccess = props => {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalHeaderTitleView}>
         <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center' 
+          flex: 1, flexDirection: 'row', alignItems: 'center'
         }}>
           <TouchableOpacity
             onPress={() => {
               props.navigation.navigate( 'Home' )
             }}
             style={{
-              height: 30, width: 30, justifyContent: 'center' 
+              height: 30, width: 30, justifyContent: 'center'
             }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -47,16 +47,16 @@ const WalletCreationSuccess = props => {
         </View>
       </View>
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={{
-          ...styles.modalContentContainer, height: '100%' 
+          ...styles.modalContentContainer, height: '100%'
         }}>
           <View style={{
-            height: '100%' 
+            height: '100%'
           }}>
             <View style={{
-              marginTop: hp( '3.5%' ), marginBottom: hp( '2%' ) 
+              marginTop: hp( '3.5%' ), marginBottom: hp( '2%' )
             }}>
               <Text style={styles.commModeModalHeaderText}>
                 {'Recovery Key Sent\nSuccessfully'}
@@ -64,7 +64,7 @@ const WalletCreationSuccess = props => {
               <Text style={styles.commModeModalInfoText}>
                 Congratulations! You can now use your{' '}
                 <Text style={{
-                  fontFamily: Fonts.FiraSansMediumItalic 
+                  fontFamily: Fonts.FiraSansMediumItalic
                 }}>
                   Wallet
                 </Text>
@@ -73,14 +73,14 @@ const WalletCreationSuccess = props => {
             <View style={styles.contactProfileView}>
               <View style={styles.box}>
                 <View style={{
-                  justifyContent: 'center', paddingLeft: 20 
+                  justifyContent: 'center', paddingLeft: 20
                 }}>
                   <Text style={styles.successModalWalletNameText}>
                     {'Arpan Jain'}
                   </Text>
                   <View
                     style={{
-                      flexDirection: 'row', alignItems: 'flex-end' 
+                      flexDirection: 'row', alignItems: 'flex-end'
                     }}
                   >
                     <Image
@@ -119,7 +119,7 @@ const WalletCreationSuccess = props => {
         </View>
       </View>
       <View style={{
-        flexDirection: 'row', justifyContent: 'center' 
+        flexDirection: 'row', justifyContent: 'center'
       }}>
         <TouchableOpacity
           onPress={() => {
@@ -138,7 +138,7 @@ const WalletCreationSuccess = props => {
             shadowColor: Colors.shadowBlue,
             shadowOpacity: 1,
             shadowOffset: {
-              width: 15, height: 15 
+              width: 15, height: 15
             },
           }}
         >
@@ -153,9 +153,9 @@ const WalletCreationSuccess = props => {
           </Text>
         </TouchableOpacity>
         <Image
-          source={require( '../../assets/images/icons/illustration.png' )}
+          source={require( '../../assets/images/icons/success.png' )}
           style={{
-            height: wp( '40%' ), width: wp( '35%' ), marginLeft: 'auto' 
+            height: wp( '40%' ), width: wp( '35%' ), marginLeft: 'auto'
           }}
         />
       </View>

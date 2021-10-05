@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ImageBackground,
   Image,
   ImageSourcePropType,
+  AppState,
 } from 'react-native'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import Fonts from '../../common/Fonts'
@@ -22,11 +23,23 @@ import { subAccountSettingsUpdateCompleted } from '../../store/actions/accounts'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import { useSelector } from 'react-redux'
+import ModalContainer from '../home/ModalContainer'
+import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import { useDispatch } from 'react-redux'
+import { clearSwanCache, isSwanVisited, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { withNavigation } from 'react-navigation'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { translations } from '../../common/content/LocContext'
 
 export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
+  swanDeepLinkContent: string | null;
+  navigation: any
 };
 
 function backgroundImageForAccountKind(
@@ -47,6 +60,8 @@ function backgroundImageForAccountKind(
               return require( '../../assets/images/carouselImages/wyre_account_background.png' )
             case( ServiceAccountKind.RAMP ):
               return require( '../../assets/images/carouselImages/ramp_account_background.png' )
+            case( ServiceAccountKind.SWAN ):
+              return require( '../../assets/images/carouselImages/swan_account_background.png' )
         }
       default:
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
@@ -62,16 +77,18 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
       case SubAccountKind.SECURE_ACCOUNT:
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
-        return Colors.borderColor
+        return Colors.kashmirBlue
       case SubAccountKind.SERVICE:
         switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
             case ( ServiceAccountKind.WYRE ):
               return Colors.danube
             case ( ServiceAccountKind.RAMP ):
               return Colors.riptide
+            case ( ServiceAccountKind.SWAN ):
+              return Colors.kashmirBlue
         }
       default:
-        return Colors.borderColor
+        return Colors.kashmirBlue
   }
 }
 
@@ -79,8 +96,53 @@ const AccountDetailsCard: React.FC<Props> = ( {
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
+  swanDeepLinkContent,
+  navigation
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const [ swanModal, showSwanModal ] = useState( false )
+  const dispatch = useDispatch()
+  const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
+  const isTestAccount = useMemo( () => {
+    return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
+  }, [ accountShell.primarySubAccount.kind ] )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
+
+  useEffect( () => {
+    AppState.addEventListener(
+      'change',
+      onAppStateChange
+    )
+    return () => AppState.removeEventListener( 'change', onAppStateChange )
+  } )
+
+  const  onAppStateChange = ( state ) => {
+    if( state === 'background' && swanModal && !primarySubAccount.isUsable &&
+    primarySubAccount.kind === SubAccountKind.SERVICE &&
+  ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
+      showSwanModal( false )
+      navigation.pop()
+    }
+  }
+  useEffect( () => {
+    if (
+      !primarySubAccount.isUsable &&
+        primarySubAccount.kind === SubAccountKind.SERVICE &&
+      ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
+      dispatch( clearSwanCache() )
+      dispatch( updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED ) )
+      // else {
+      //   dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
+      // }
+      setTimeout( () => {
+        showSwanModal( true )
+      }, 600 )
+
+    }
+  }, [] )
 
   const rootContainerStyle = useMemo( () => {
     return {
@@ -99,7 +161,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           marginBottom: 8,
         }}>
           <Image
-            source={getAvatarForSubAccount( primarySubAccount )}
+            source={getAvatarForSubAccount( primarySubAccount, false, false, true )}
             style={styles.accountKindBadgeImage}
           />
 
@@ -148,9 +210,11 @@ const AccountDetailsCard: React.FC<Props> = ( {
           currencyImageStyle={styles.balanceCurrencyIcon}
           bitcoinIconColor="light"
           textColor={Colors.white}
+          isTestAccount={isTestAccount}
         />
-
+        { accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
         <KnowMoreButton />
+        }
       </View>
     )
   }
@@ -158,7 +222,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const KnowMoreButton: React.FC = () => {
     return (
       <Button
-        title="Know More"
+        title={common.knowMore}
         type="outline"
         buttonStyle={{
           borderRadius: 5,
@@ -191,6 +255,21 @@ const AccountDetailsCard: React.FC<Props> = ( {
 
   return (
     <View style={rootContainerStyle}>
+      <ModalContainer visible={swanModal} closeBottomSheet={() => {}} >
+        <BottomSheetSwanInfo
+          swanDeepLinkContent={swanDeepLinkContent}
+          onClickSetting={() => {
+            showSwanModal( false )
+          }}
+          onPress={() => {
+            if ( !isVisited ) {
+              dispatch( isSwanVisited() )
+            }
+            showSwanModal( false )
+            navigation.pop()
+          }}
+        />
+      </ModalContainer>
       <ImageBackground
         source={backgroundImageForAccountKind( primarySubAccount )}
         style={{
@@ -248,8 +327,8 @@ const styles = StyleSheet.create( {
   },
 
   accountKindBadgeImage: {
-    width: 58,
-    height: 58,
+    width: widthPercentageToDP( 16 ),
+    height: widthPercentageToDP( 16 ),
     resizeMode: 'contain',
   },
 
@@ -257,6 +336,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
+    letterSpacing: 0.01
   },
 
   title2Text: {
@@ -302,4 +382,8 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default AccountDetailsCard
+export default withNavigation( AccountDetailsCard )
+
+export {
+  shadowColorForAccountKind
+}

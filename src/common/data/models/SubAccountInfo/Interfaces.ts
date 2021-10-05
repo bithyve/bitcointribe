@@ -3,6 +3,7 @@ import ServiceAccountKind from '../../enums/ServiceAccountKind'
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup'
 import AccountVisibility from '../../enums/AccountVisibility'
 import {
+  AccountType,
   Balances,
   TransactionDetails,
 } from '../../../../bitcoin/utilities/Interface'
@@ -10,6 +11,9 @@ import SourceAccountKind from '../../enums/SourceAccountKind'
 
 interface SubAccountDescribing {
   id: string;
+
+  isUsable: boolean;
+
   xPub: string;
   accountShellID: string | null;
 
@@ -24,6 +28,11 @@ interface SubAccountDescribing {
    * Parent account(backend) of this sub-account
    */
   sourceKind: SourceAccountKind;
+
+   /**
+   * Backend account's type
+   */
+  type: AccountType;
 
   /**
    * Balances in Satoshis.
@@ -65,6 +74,8 @@ interface SubAccountDescribing {
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
   // transactionIDs: string[];
   transactions: TransactionDetails[];
+  // if new txn exists
+  hasNewTxn?: boolean
 }
 
 export type HexaSubAccountDescribing = SubAccountDescribing
@@ -84,10 +95,12 @@ export type ImportedWalletSubAccountDescribing = SubAccountDescribing
 export type SubAccountDescribingConstructorProps = {
   id?: string;
   xPub?: string;
+  isUsable: boolean;
   accountShellID?: string | null;
   instanceNumber?: number | null;
   defaultTitle?: string;
   defaultSubTitle?: string;
+  type?: AccountType;
   defaultDescription?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;

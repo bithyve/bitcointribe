@@ -5,12 +5,13 @@ import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import FormStyles from '../../../common/Styles/FormStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import ButtonBlue from '../../../components/ButtonBlue'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -21,6 +22,8 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   const [ accountName, setAccountName ] = useState(
     primarySubAccount?.customDisplayName ||
@@ -52,10 +55,14 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   } )
 
   function handleSaveButtonPress() {
-    primarySubAccount.customDisplayName = accountName
-    primarySubAccount.customDescription = accountDescription
-
-    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    const settings = {
+      accountName,
+      accountDescription,
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
+    navigation.navigate( 'Home' )
   }
 
   return (
@@ -64,10 +71,10 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <View style={{
           flexDirection: 'row'
         }}>
-          <Text style={styles.headerText}>Please edit the </Text>
-          <Text style={{
+          <Text style={styles.headerText}>{strings.Youcanset}</Text>
+          {/* <Text style={{
             ...styles.headerText, fontStyle: 'italic'
-          }}>Name and Description</Text>
+          }}>Name and Description</Text> */}
         </View>
       </View>
 
@@ -75,9 +82,9 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <Input
           inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter an account name'}
+          placeholder={strings.Enteraccountname}
           placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
+          // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountName}
           maxLength={24}
           numberOfLines={1}
@@ -89,9 +96,9 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <Input
           inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter A Description'}
+          placeholder={strings.Enterdescription}
           placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
+          // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountDescription}
           numberOfLines={2}
           onChangeText={setAccountDescription}
@@ -101,7 +108,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
 
       <View style={styles.listFooterSection}>
         <ButtonBlue
-          buttonText="Confirm & Proceed"
+          buttonText={common.confirmProceed}
           handleButtonPress={handleSaveButtonPress}
           buttonDisable={canSaveChanges === false}
         />

@@ -25,6 +25,7 @@ import ModalHeader from '../../components/ModalHeader'
 import SendConfirmationContent from './SendConfirmationContent'
 import DeviceInfo from 'react-native-device-info'
 import { validateTwoFA } from '../../store/actions/accounts'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export default function TwoFAValidation( props ) {
   const [ Elevation, setElevation ] = useState( 10 )
@@ -33,6 +34,7 @@ export default function TwoFAValidation( props ) {
   const [ SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
+  const [ unsuccessModal, setUnsuccessModal ] = useState( false )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
   const twoFAHelpFlags = useSelector( ( state ) => state.accounts.twoFAHelpFlags )
@@ -43,7 +45,8 @@ export default function TwoFAValidation( props ) {
       if( validationSucccessful ){
         props.navigation.navigate( 'AccountDetails' )
       } else if( validationSucccessful === false ) {
-        SendUnSuccessBottomSheet.current.snapTo( 1 )
+        // SendUnSuccessBottomSheet.current.snapTo( 1 )
+        setUnsuccessModal( true )
       }
     }
   }, [ twoFAHelpFlags ] )
@@ -80,14 +83,16 @@ export default function TwoFAValidation( props ) {
         cancelButtonText={'Back'}
         isCancel={true}
         onPressOk={() => {
-          if ( SendUnSuccessBottomSheet.current )
-            SendUnSuccessBottomSheet.current.snapTo( 0 )
+          // if ( SendUnSuccessBottomSheet.current )
+          // SendUnSuccessBottomSheet.current.snapTo( 0 )
+          setUnsuccessModal( false )
 
           setIsConfirmDisabled( false )
         }}
         onPressCancel={() => {
-          if ( SendUnSuccessBottomSheet.current )
-            SendUnSuccessBottomSheet.current.snapTo( 0 )
+          // if ( SendUnSuccessBottomSheet.current )
+          // SendUnSuccessBottomSheet.current.snapTo( 0 )
+          setUnsuccessModal( false )
           props.navigation.navigate( 'Home' )
         }}
         isUnSuccess={true}
@@ -100,8 +105,9 @@ export default function TwoFAValidation( props ) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          if ( SendUnSuccessBottomSheet.current )
-            SendUnSuccessBottomSheet.current.snapTo( 0 )
+          // if ( SendUnSuccessBottomSheet.current )
+          //   SendUnSuccessBottomSheet.current.snapTo( 0 )
+          setUnsuccessModal( false )
         }}
       />
     )
@@ -112,7 +118,9 @@ export default function TwoFAValidation( props ) {
       flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={commonStyle.headerContainer}>
+      <View style={[ commonStyle.headerContainer, {
+        backgroundColor: Colors.white
+      } ]}>
         <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
           onPress={() => {
@@ -347,12 +355,19 @@ export default function TwoFAValidation( props ) {
             </TouchableOpacity>
           </View>
         </View>
-
-        <BottomSheet
+        <ModalContainer visible={unsuccessModal} closeBottomSheet={() => {}} >
+          {renderSendUnSuccessContents()}
+        </ModalContainer>
+        {/* <BottomSheet
           onCloseStart={() => {
             SendUnSuccessBottomSheet.current.snapTo( 0 )
           }}
-          onCloseEnd={() => setElevation( 10 )}
+          onCloseEnd={() => {
+            setElevation( 10 )
+          }}
+          onOpenEnd={() => {
+            setElevation( 0 )
+          }}
           enabledInnerScrolling={true}
           ref={SendUnSuccessBottomSheet}
           snapPoints={[
@@ -363,7 +378,7 @@ export default function TwoFAValidation( props ) {
           ]}
           renderContent={renderSendUnSuccessContents}
           renderHeader={renderSendUnSuccessHeader}
-        />
+        /> */}
       </View>
     </SafeAreaView>
   )

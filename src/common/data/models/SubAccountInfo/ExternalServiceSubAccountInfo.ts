@@ -8,22 +8,27 @@ import {
   SubAccountDescribingConstructorProps,
 } from './Interfaces'
 import {
+  AccountType,
   Balances,
   TransactionDetails,
 } from '../../../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../enums/SourceAccountKind'
+import { ImageSourcePropType } from 'react-native'
 
 type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultDescription?: string;
   serviceAccountKind: ServiceAccountKind;
+  type: AccountType
 };
 export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
   id: string;
   xPub: string;
+  isUsable: boolean;
   accountShellID: string | null;
   instanceNumber: number;
 
   kind: SubAccountKind = SubAccountKind.SERVICE;
+  type: AccountType;
   sourceKind: SourceAccountKind;
 
   serviceAccountKind: ServiceAccountKind;
@@ -44,8 +49,10 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   constructor( {
     id = uuid(),
     xPub = null,
+    isUsable,
     accountShellID = null,
     instanceNumber = null,
+    type,
     defaultTitle,
     defaultDescription,
     serviceAccountKind,
@@ -61,8 +68,10 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   }: ConstructorProps ) {
     this.id = id
     this.xPub = xPub
+    this.isUsable = isUsable
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
+    this.type = type
     this.defaultTitle = defaultTitle
     this.defaultDescription = defaultDescription
     this.serviceAccountKind = serviceAccountKind

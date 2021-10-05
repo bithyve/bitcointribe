@@ -1,45 +1,72 @@
+import config from '../../src/bitcoin/HexaConfig'
+const { HEXA_ID, SWAN_BASE_URL, SWAN_URL_PREFIX } = config
+import { BH_AXIOS, SWAN_AXIOS } from './api'
 import axios from 'axios'
-import Config from 'react-native-config'
+import qs from 'querystring'
+export const redeemAuthCodeForToken = ( { code, state, code_verifier } ) => {
+  try {
+    const body = {
+      code_verifier, code, state
+    }
 
-const swanOAuthURL = Config.SWAN_URL || 'https://login-demo.curity.io/oauth/v2/oauth-token'//'https://dev-api.swanbitcoin.com/'
-
-export const redeemAuthCode = ( data ) =>
-  axios( {
-    method: 'post',
-    url: 'https://login-demo.curity.io/oauth/v2/oauth-token',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    data: new URLSearchParams( {
-      grant_type: 'authorization_code',
-      code:'ESJaHCabOUKwf46LEqdSerokFDNb5DLa',
-      client_id:'demo-web-client',
-      client_secret:'6koyn9KpRuofYt2U',
-      redirect_uri: 'https://oauth.tools/callback/code'
+    return BH_AXIOS.post( 'swanAuth', {
+      HEXA_ID,
+      ...body
     } )
-  } )
 
-export const getSwanAuthToken = ( data ) =>
-  axios( {
-    method: 'get',
-    url: swanOAuthURL,
-  } )
-
-export const linkSwanWallet = ( data ) =>
-  axios( {
-    method: 'post',
-    url: swanOAuthURL.concat( 'wallets?mode=swan' ),
-    data,
-    headers: {
-      Authorization: `Bearer ${data.swanAuthToken}`
+  } catch ( error ) {
+    return {
+      error
     }
-  } )
+  }
+}
 
-export const syncSwanWallet = ( data ) =>
-  axios( {
-    method: 'get',
-    url: `${swanOAuthURL}wallets/${data.swanWalletId}?mode=swan`,
-    headers: {
-      Authorization: `Bearer ${data.swanAuthToken}`
+export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey, displayName } ) => {
+  try {
+
+    const data = {
+      extendedPublicKey, displayName
     }
-  } )
+
+    const headers= {
+      'Authorization': `Bearer ${access_token}`,
+      'Content-Type': 'application/json'
+    }
+
+    return axios( {
+      method: 'POST',
+      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}wallets`,
+      headers,
+      data
+    } )
+
+  } catch ( error ) {
+    return {
+      error
+    }
+  }
+}
+
+
+export const setupAutomaticWithdrawals = ( { access_token, walletId, minBtcThreshold } ) => {
+  try {
+    const data = {
+      walletId, minBtcThreshold
+    }
+    const headers= {
+      'Authorization': `Bearer ${access_token}`,
+      'Content-Type': 'application/json'
+    }
+
+    return axios( {
+      method: 'POST',
+      url: `${SWAN_BASE_URL}${SWAN_URL_PREFIX}automatic-withdrawal`,
+      headers,
+      data
+    } )
+  } catch ( error ) {
+    return {
+      error
+    }
+  }
+}

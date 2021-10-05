@@ -4,23 +4,17 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform,
   PermissionsAndroid,
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
 import HistoryPageComponent from './HistoryPageComponent'
 import PersonalCopyShareModal from './PersonalCopyShareModal'
 import moment from 'moment'
 import _ from 'underscore'
-import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
@@ -29,70 +23,65 @@ import {
   getPDFData,
   confirmPDFShared,
   emptyShareTransferDetailsForContactChange,
-  downloadSmShareForApproval,
   keeperProcessStatus,
-} from '../../store/actions/health'
+  updatedKeeperInfo,
+  updateMSharesHealth,
+  createChannelAssets,
+  setApprovalStatus,
+  createOrChangeGuardian,
+  downloadSMShare,
+} from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
-  LevelHealthInterface,
+  ChannelAssets,
+  KeeperInfoInterface,
+  MetaShare,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
 import ApproveSetup from './ApproveSetup'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
+import { v4 as uuid } from 'uuid'
+import config from '../../bitcoin/HexaConfig'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import { historyArray } from '../../common/CommonVars/commonVars'
+import ModalContainer from '../../components/home/ModalContainer'
+import { getIndex } from '../../common/utilities'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import dbManager from '../../storage/realm/dbManager'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
-  const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
-  const [ HelpBottomSheet, setHelpBottomSheet ] = useState( React.createRef() )
-  const [ keeperTypeBottomSheet, setkeeperTypeBottomSheet ] = useState(
-    React.createRef()
-  )
+  // const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
+  const [ errorModal, setErrorModal ] = useState( false )
+  const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const storagePermissionBottomSheet = useRef<BottomSheet>()
   const [ hasStoragePermission, setHasStoragePermission ] = useState( false )
-
+  const [ storagePermissionModal, setStoragePermissionModal ] = useState( false )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ QrBottomSheet, setQrBottomSheet ] = useState( React.useRef() )
+  const [ HelpModal, setHelpModal ] = useState( false )
+
+  const [ qrModal, setQRModal ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const [ blockReshare, setBlockReshare ] = useState( '' )
-  const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
-  const [ personalCopyHistory, setPersonalCopyHistory ] = useState( [
-    {
-      id: 1,
-      title: 'Recovery Key created',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 2,
-      title: 'Recovery Key in-transit',
-      date: null,
-      info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 3,
-      title: 'Recovery Key accessible',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 4,
-      title: 'Recovery Key not accessible',
-      date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-  ] )
-  const [
-    PersonalCopyShareBottomSheet,
-    setPersonalCopyShareBottomSheet,
-  ] = useState( React.createRef() )
+  const [ isChangeClicked, setIsChangeClicked ] = useState( false )
+  const [ personalCopyHistory, setPersonalCopyHistory ] = useState( historyArray )
+  // const [
+  //   PersonalCopyShareBottomSheet,
+  //   setPersonalCopyShareBottomSheet,
+  // ] = useState( React.createRef() )
+
+  const [ personalCopyShareModal, setPersonalCopyShareModal ] = useState( false )
   const selectedPersonalCopy = props.navigation.getParam(
     'selectedPersonalCopy'
   )
+  const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
   const [ selectedLevelId, setSelectedLevelId ] = useState(
     props.navigation.state.params.selectedLevelId
@@ -100,50 +89,69 @@ const PersonalCopyHistory = ( props ) => {
   const [ selectedKeeper, setSelectedKeeper ] = useState(
     props.navigation.state.params.selectedKeeper
   )
-  const [ isReshare, setIsReshare ] = useState(
-    props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false :
+    props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-  const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
-  const pdfInfo = useSelector( ( state ) => state.health.pdfInfo )
+  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
+  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
+  const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
+  const pdfInfo = useSelector( ( state ) => state.bhr.pdfInfo )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
-  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
-  const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
-  const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
-  const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
-  const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
+  const pdfDataConfirm = useSelector( ( state ) => state.bhr.loading.pdfDataConfirm )
+  const pdfCreatedSuccessfully = useSelector( ( state ) => state.bhr.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
-
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
+  const s3 = dbManager.getBHR()
+  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const trustedContacts: Trusted_Contacts = useSelector(
+    ( state ) => state.trustedContacts.contacts,
+  )
+  const [ Contact, setContact ]:[any, any] = useState( {
+  } )
+  const index = 5
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
+  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
+  const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
+  const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
+  const [ isConfirm, setIsConfirm ] = useState( false )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare(
-      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+      props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
     )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
         ? props.navigation.getParam( 'isChangeKeeperType' )
         : false
     )
+    if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ) ){
+      dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
+    }
   }, [
-    props.navigation.getParam( 'selectedLevelId' ),
-    props.navigation.getParam( 'selectedKeeper' ),
     props.navigation.state.params
   ] )
 
+  useEffect( ()=>{
+    const Contact = {
+      id: uuid(),
+      name: 'Personal Copy'
+    }
+    setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+  }, [ ] )
+
   useEffect( ()=>  {
     if( Platform.OS === 'ios' ) {
-      ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+      // ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+      setStoragePermissionModal( false )
       setHasStoragePermission( true )
     } else {
       hasStoragePermission
-        ? ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
-        : ( storagePermissionBottomSheet as any ).current.snapTo( 1 )
+        ? setStoragePermissionModal( false )
+        : setStoragePermissionModal( true )
     }
     if( hasStoragePermission ){
       generatePDF()
@@ -170,9 +178,7 @@ const PersonalCopyHistory = ( props ) => {
   // };
 
   const generatePDF = async() => {
-    console.log( 'isChange', isChange )
-    console.log( 'useEffect pdfInfo', pdfInfo )
-    dispatch( getPDFData( selectedKeeper.shareId, isChange ) )
+    createGuardian( )
     const shareHistory = JSON.parse(
       await AsyncStorage.getItem( 'shareHistory' )
     )
@@ -214,11 +220,19 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
-      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
-        ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+
+      if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
+        // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+        setPersonalCopyShareModal( true )
       }
     }
   }, [ pdfCreatedSuccessfully ] )
+
+  useEffect( () => {
+    if( pdfInfo.filePath ){
+      setConfirmDisable( false )
+    }
+  }, [ pdfInfo ] )
 
   useEffect( () => {
     if( !pdfDataConfirm ){
@@ -229,28 +243,19 @@ const PersonalCopyHistory = ( props ) => {
   const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
-        modalRef={ErrorBottomSheet}
+        // modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
         proceedButtonText={'Try again'}
         onPressProceed={() => {
-          ( ErrorBottomSheet as any ).current.snapTo( 0 )
+          // ( ErrorBottomSheet as any ).current.snapTo( 0 )
+          setErrorModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/errorImage.png' )}
       />
     )
   }, [ errorMessage, errorMessageHeader ] )
-
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (ErrorBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
 
   const renderPersonalCopyShareModalContent = useCallback( () => {
     return (
@@ -259,13 +264,25 @@ const PersonalCopyHistory = ( props ) => {
         selectedPersonalCopy={selectedPersonalCopy}
         personalCopyDetails={personalCopyDetails}
         onPressBack={() => {
-          ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          setPersonalCopyShareModal( false )
         }}
-        onPressShare={() => {}}
+        onPressShare={() => {
+          const shareObj = {
+            walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+            shareId: selectedKeeper.shareId,
+            reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+            shareType: 'pdf',
+            status: 'notAccessible',
+            name: 'Personal Copy'
+          }
+          dispatch( updateMSharesHealth( shareObj, false ) )
+        }}
         onPressConfirm={() => {
           try {
-            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) );
-            ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
+            // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+            setPersonalCopyShareModal( false )
             if (
               props.navigation.getParam( 'prevKeeperType' ) &&
               props.navigation.getParam( 'isChange' ) &&
@@ -280,6 +297,11 @@ const PersonalCopyHistory = ( props ) => {
               )
             }
             setIsReshare( true )
+            if( props.navigation.getParam( 'isChangeKeeperType' ) ){
+              props.navigation.pop( 2 )
+            } else {
+              props.navigation.pop( 1 )
+            }
           } catch ( err ) {
             dispatch( keeperProcessStatus( '' ) )
             console.log( 'error', err )
@@ -289,36 +311,12 @@ const PersonalCopyHistory = ( props ) => {
     )
   }, [ selectedPersonalCopy, personalCopyDetails ] )
 
-  const renderPersonalCopyShareModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
 
-  const renderHelpHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          if ( HelpBottomSheet.current )
-            ( HelpBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }
 
   const renderHelpContent = () => {
     return (
       <PersonalCopyHelpContents
-        titleClicked={() => {
-          if ( HelpBottomSheet.current )
-            ( HelpBottomSheet as any ).current.snapTo( 0 )
-        }}
+        titleClicked={() => setHelpModal( false )}
       />
     )
   }
@@ -331,13 +329,16 @@ const PersonalCopyHistory = ( props ) => {
         setErrorMessage(
           'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
         )
-        setHasStoragePermission( false );
-        ( storagePermissionBottomSheet as any ).current.snapTo( 0 );
-        ( ErrorBottomSheet as any ).current.snapTo( 1 )
+        setHasStoragePermission( false )
+        // ( storagePermissionBottomSheet as any ).current.snapTo( 0 );
+        setStoragePermissionModal( false )
+        // ( ErrorBottomSheet as any ).current.snapTo( 1 )
+        setErrorModal( true )
         return
       }
       else {
-        ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+        // ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+        setStoragePermissionModal( false )
         setHasStoragePermission( true )
       }
     }
@@ -350,6 +351,7 @@ const PersonalCopyHistory = ( props ) => {
 
   const requestStoragePermission = async () => {
     try {
+      dispatch( setIsPermissionGiven( true ) )
       const result = await PermissionsAndroid.requestMultiple( [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -371,6 +373,7 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   const checkStoragePermission = async () =>  {
+    dispatch( setIsPermissionGiven( true ) )
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
         await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),
@@ -409,63 +412,63 @@ const PersonalCopyHistory = ( props ) => {
     )
   }, [] )
 
+  const createGuardian = useCallback(
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      if( ( selectedKeeper.channelKey || isReshare ) && !isChangeKeeper ) return
+      setIsGuardianCreationClicked( true )
+      const channelKey: string = isChange ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKey )
 
-  const renderStoragePermissionModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
+      const obj: KeeperInfoInterface = {
+        shareId: selectedKeeper.shareId,
+        name: 'Personal Copy',
+        type: 'pdf',
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        currentLevel: currentLevel,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        data: {
+          ...Contact, index
+        },
+        channelKey: channelKey
+      }
+      dispatch( updatedKeeperInfo( obj ) )
+      dispatch( createChannelAssets( selectedKeeper.shareId ) )
+    },
+    [ trustedContacts, Contact ],
+  )
 
-  const onPressChangeKeeperType = ( type, name ) => {
-    let levelhealth: LevelHealthInterface[] = []
-    if ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( currentLevel == 3 && levelHealth[ 2 ] )
-      levelhealth = [ levelHealth[ 2 ] ]
-    let changeIndex = 1
-    let contactCount = 0
-    let deviceCount = 0
-    for ( let i = 0; i < levelhealth.length; i++ ) {
-      const element = levelhealth[ i ]
-      for ( let j = 2; j < element.levelInfo.length; j++ ) {
-        const element2 = element.levelInfo[ j ]
-        if (
-          element2.shareType == 'contact' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          contactCount++
-        }
-        if (
-          element2.shareType == 'device' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          deviceCount++
-        }
-        const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
-        if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-          if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
-            changeIndex = 2
-          } else changeIndex = 1
-        }
-        if( type == 'device' ){
-          if ( element2.shareType == 'device' && deviceCount == 1 ) {
-            changeIndex = 3
-          } else if( element2.shareType == 'device' && deviceCount == 2 ){
-            changeIndex = 4
-          }
+  useEffect( ()=> {
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( createOrChangeGuardian( {
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
+      } ) )
+    }
+  }, [ createChannelAssetsStatus, channelAssets ] )
+
+  useEffect( () => {
+    if( !Contact ) return
+
+    const contacts: Trusted_Contacts = trustedContacts
+    let channelKey: string
+
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === Contact.id ){
+          channelKey = ck
+          break
         }
       }
+
+    if ( channelKey ) {
+      dispatch( getPDFData( selectedKeeper.shareId, Contact, channelKey, isChange ) )
     }
+  }, [ Contact, trustedContacts ] )
+
+  const onPressChangeKeeperType = ( type, name ) => {
+    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    setIsChangeClicked( false )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -483,13 +486,17 @@ const PersonalCopyHistory = ( props ) => {
       } )
     }
     if ( type == 'pdf' ) {
-      ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+      // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+      setPersonalCopyShareModal( true )
     }
   }
   const sendApprovalRequestToPK = ( ) => {
-    setQrBottomSheetsFlag( true );
-    ( QrBottomSheet as any ).current.snapTo( 1 );
-    ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+    setQrBottomSheetsFlag( true )
+    setIsConfirm( false )
+    // ( QrBottomSheet as any ).current.snapTo( 1 )
+    setQRModal( true )
+    // ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+    setKeeperTypeModal( false )
   }
 
   const renderQrContent = () => {
@@ -498,53 +505,65 @@ const PersonalCopyHistory = ( props ) => {
         isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
-        infoText={
-          'Open your PDF copy and scan the first QR for approval.'
-        }
+        infoText={'Open your PDF copy and scan the first QR for approval.'}
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
-          const popAction = StackActions.pop( {
-            n: isChange ? 2 : 1
-          } )
-          props.navigation.dispatch( popAction )
+          if( isConfirm ){
+            dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
+            setQrBottomSheetsFlag( false )
+            // ( QrBottomSheet as any ).current.snapTo( 0 )
+            setQRModal( false )
+            const popAction = StackActions.pop( {
+              n: isChange ? 2 : 1
+            } )
+            props.navigation.dispatch( popAction )
+          } else {
+            dispatch( setApprovalStatus( false ) )
+            dispatch( downloadSMShare( qrScannedData ) )
+          }
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
-          if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
+          // if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
+          setQRModal( false )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"pdf","encryptedData":"35c329e9d0ffa374bf2a9589173578c0bdc8727c4e7a3cb5c6862854717a1c88657751643790a4c48308060e8d4adf47ec647b475cbdc2ced65b2b91c8a2beb1","encryptedKey":"814a3670890461aa790a66385bf3068bdf04f13d296b8a06d6716adf9622b0ac9cbe9b7593e7894efb77afd1a9280588f24a50d300d44e3d37c840a41947232c3b0272fe57465c96e1d09892591a7259"}'
-          dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-          setQrBottomSheetsFlag( false )
+          if( isConfirm ) {
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Assa","channelId":"71a5d2b39c9396f8023c19070d70d0f78594d31d9eb137c524ab20ccc653b8f6","streamId":"def0d8970","channelKey":"lSiTUPAsqBCdgH6P6PzXzJ50","secondaryChannelKey":"lRm8RJ3vdm6dFvM6iNtrveoe","version":"1.9.5","walletId":"8a428172e0983cc1425aaaa122c74333022e9fad12bd30f28969659b03f2b3ed","encryptedKey":"6e8282c13d1f33cabad34fc8e5c91ad941944fa11e2207e907e6ef8b57c0966c092fd3e5bf5c99e7ed8a2dd3ac87eed377c31779f3c261927c415775dfed42c72ceb9d927c5fce69020b43c6ff71a635"}'
+            dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
+            setQrBottomSheetsFlag( false )
+            const popAction = StackActions.pop( {
+              n: isChange ? 2 : 1
+            } )
+            props.navigation.dispatch( popAction )
+          } else {
+            setQRModal( false )
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
+            dispatch( setApprovalStatus( false ) )
+            dispatch( downloadSMShare( qrScannedData ) )
+          }
         }}
       />
     )
   }
 
-  const renderQrHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }
 
   useEffect( ()=>{
-    if( !downloadSmShare ) setIsApprovalStarted( false )
-    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
-      ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-      ( QrBottomSheet as any ).current.snapTo( 0 )
+    if( approvalStatus && isChangeClicked ){
+      console.log( 'APPROVe' )
+      setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
     }
-  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+  }, [ approvalStatus ] )
 
-  const deviceText = ( text ) =>{
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
+
+  const deviceText = ( text ) => {
     switch ( text ) {
         case 'Keeper PDF': return 'PDF Backup'
 
@@ -566,8 +585,9 @@ const PersonalCopyHistory = ( props ) => {
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
-        selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'never'}
         moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />
@@ -579,140 +599,61 @@ const PersonalCopyHistory = ( props ) => {
           IsReshare={isReshare}
           data={sortedHistory( personalCopyHistory )}
           confirmDisable={confirmDisable}
-          onConfirm={ isReshare && selectedKeeper.status == 'notAccessible' ? ()=>{
-            ( QrBottomSheet as any ).current.snapTo( 1 )
+          onConfirm={ isReshare && ( selectedKeeper.status == 'notSetup' || selectedKeeper.status == 'notAccessible' ) ? ()=>{
+            setIsConfirm( true )
+            setQrBottomSheetsFlag( true )
+            // ( QrBottomSheet as any ).current.snapTo( 1 )
+            setQRModal( true )
           } : null}
           confirmButtonText={'Share Now'}
           onPressConfirm={() => {
-            ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            setPersonalCopyShareModal( true )
           }}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
-            console.log(
-              'onPressReshare PersonalCopyShareBottomSheet',
-              PersonalCopyShareBottomSheet
-            );
-            ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            setPersonalCopyShareModal( true )
           }}
           isChangeKeeperAllow={isChangeKeeperAllow}
           changeButtonText={'Change'}
           onPressChange={() => {
-            ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            // ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            setKeeperTypeModal( true )
           }}
         />
       </View>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={PersonalCopyShareBottomSheet as any}
-        snapPoints={[ -50, hp( '85%' ) ]}
-        renderContent={renderPersonalCopyShareModalContent}
-        renderHeader={renderPersonalCopyShareModalHeader}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
+      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => {}} >
+        {renderPersonalCopyShareModalContent()}
+      </ModalContainer>
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {}} >
+        {renderErrorModalContent()}
+      </ModalContainer>
 
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={HelpBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '87%' ) : hp( '89%' ),
-        ]}
-        renderContent={renderHelpContent}
-        renderHeader={renderHelpHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={keeperTypeBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '75%' ) : hp( '75%' ),
-        ]}
-        renderContent={() => (
-          <KeeperTypeModalContents
-            headerText={'Change backup method'}
-            subHeader={'Share your Recovery Key with a new contact or a different device'}
-            onPressSetup={async ( type, name ) => {
-              setSelectedKeeperType( type )
-              setSelectedKeeperName( name )
-              sendApprovalRequestToPK( )
-            }}
-            onPressBack={() => ( keeperTypeBottomSheet as any ).current.snapTo( 0 )}
-            selectedLevelId={selectedLevelId}
-            keeper={selectedKeeper}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() =>
-              ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
-            }
-          />
-        )}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          setQrBottomSheetsFlag( true )
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
-        }}
-        onCloseStart={() => { }}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={QrBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '92%' ) : hp( '91%' ),
-        ]}
-        renderContent={renderQrContent}
-        renderHeader={renderQrHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ApprovePrimaryKeeperBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '70' ),
-        ]}
-        renderContent={() => (
-          <ApproveSetup
-            isContinueDisabled={false}
-            onPressContinue={() => {
-              onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() => {
-              ( keeperTypeBottomSheet as any ).current.snapTo( 1 );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={storagePermissionBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '55%' ) : hp( '60%' ),
-        ]}
-        renderContent={renderStoragePermissionModalContent}
-        renderHeader={renderStoragePermissionModalHeader}
-      />
+      <ModalContainer visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
+        {renderHelpContent()}
+      </ModalContainer>
+      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}} >
+        <KeeperTypeModalContents
+          headerText={'Change backup method'}
+          subHeader={'Share your Recovery Key with a new contact or a different device'}
+          onPressSetup={async ( type, name ) => {
+            setSelectedKeeperType( type )
+            setSelectedKeeperName( name )
+            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            else onPressChangeKeeperType( type, name )
+          }}
+          onPressBack={() => setKeeperTypeModal( false )}
+          selectedLevelId={selectedLevelId}
+          keeper={selectedKeeper}
+        />
+      </ModalContainer>
+      <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
+        {renderQrContent()}
+      </ModalContainer>
+      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
+        {renderStoragePermissionModalContent()}
+      </ModalContainer>
     </View>
   )
 }

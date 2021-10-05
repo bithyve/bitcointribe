@@ -22,6 +22,7 @@ export default function ContactListForRestore( props ) {
         console.log( 'data', data )
         return (
           <AppBottomSheetTouchableWrapper
+            key={index}
             activeOpacity={10}
             onPress={() => props.onPressCard( contact, index )}
             style={{

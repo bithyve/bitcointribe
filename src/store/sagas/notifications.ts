@@ -1,5 +1,4 @@
 import { call, put, select } from 'redux-saga/effects'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -7,35 +6,35 @@ import {
   SEND_NOTIFICATION,
   FETCH_NOTIFICATIONS,
   notificationsFetched,
+  fetchNotificationStarted,
+  GET_MESSAGES,
+  storeMessagesTimeStamp,
+  messageFetched,
+  UPDATE_MESSAGES_STATUS_INAPP,
+  UPDATE_MESSAGES_STATUS
 } from '../actions/notifications'
-import { INotification, Contacts } from '../../bitcoin/utilities/Interface'
-import { AsyncStorage, Alert } from 'react-native'
-import RelayServices from '../../bitcoin/services/RelayService'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
+import Relay from '../../bitcoin/utilities/Relay'
+
 
 function* updateFCMTokensWorker( { payload } ) {
-  const { FCMs } = payload
-  if ( FCMs.length === 0 ) {
-    throw new Error( 'No FCM token found' )
-  }
-
-  const service: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-  const { data } = yield call( service.getWalletId )
-
-  const res = yield call(
-    RelayServices.updateFCMTokens,
-    data.walletId,
-    payload.FCMs,
-  )
-  if ( res.status === 200 ) {
-    const { updated } = res.data
-    console.log( {
-      updated
-    } )
-  } else {
-    console.log( 'Failed to update FCMs on the server' )
+  try{
+    const { FCMs } = payload
+    if ( FCMs.length === 0 ) {
+      throw new Error( 'No FCM token found' )
+    }
+    const { walletId } = yield select(
+      ( state ) => state.storage.wallet,
+    )
+    const { updated } = yield call(
+      Relay.updateFCMTokens,
+      walletId,
+      payload.FCMs,
+    )
+    if ( !updated ) console.log( 'Failed to update FCMs on the server' )
+  } catch( err ){
+    console.log( 'err', err )
   }
 }
 
@@ -44,69 +43,91 @@ export const updateFCMTokensWatcher = createWatcher(
   UPDATE_FCM_TOKENS,
 )
 
-// function* sendNotificationWorker({ payload }) {
-//   const { contactName, notificationType, title, body, data, tag } = payload;
-
-//   const notification: INotification = {
-//     notificationType,
-//     title,
-//     body,
-//     data: {
-//       ...data,
-//     },
-//     tag,
-//   };
-
-//   const trustedContacts: TrustedContactsService = yield select(
-//     (state) => state.trustedContacts.service,
-//   );
-//   const contacts: Contacts = trustedContacts.tc.trustedContacts;
-//   if (
-//     !contacts[contactName] ||
-//     !contactName[contactName].walletId ||
-//     !contactName[contactName].FCMs
-//   )
-//     throw new Error('Failed to send notification; contact assets missing');
-
-//   const receiverWalletID = contactName[contactName].walletId;
-//   const receiverFCMs = contactName[contactName].FCMs;
-
-//   const res = yield call(
-//     RelayServices.sendNotification,
-//     receiverWalletID,
-//     receiverFCMs,
-//     notification,
-//   );
-//   if (res.status === 200) {
-//     const { delivered } = res.data;
-//     console.log({ delivered });
-//   } else {
-//     console.log('Failed to deliver notification');
-//   }
-// }
-
-// export const sendNotificationWatcher = createWatcher(
-//   sendNotificationWorker,
-//   SEND_NOTIFICATION,
-// );
-
 export function* fetchNotificationsWorker() {
-  const service: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  yield put( fetchNotificationStarted( true ) )
+  const { walletId } = yield select(
+    ( state ) => state.storage.wallet,
   )
-  const { data } = yield call( service.getWalletId )
-
-  const res = yield call( RelayServices.fetchNotifications, data.walletId )
-  if ( res.status === 200 ) {
-    const { notifications, DHInfos } = res.data
-    yield call( AsyncStorage.setItem, 'DHInfos', JSON.stringify( DHInfos ) )
-    yield put( notificationsFetched( notifications ) )
-  } else {
-    console.log( 'Failed to fetch notification' )
-  }
+  const { notifications } = yield call( Relay.fetchNotifications, walletId )
+  yield call( notificationsFetched, notifications )
+  //yield call( setupNotificationListWorker )
+  yield put( fetchNotificationStarted( false ) )
 }
 
 export const fetchNotificationsWatcher = createWatcher(
   fetchNotificationsWorker,
   FETCH_NOTIFICATIONS,
+)
+
+
+export function* getMessageWorker() {
+  yield put( fetchNotificationStarted( true ) )
+  const storedMessages = yield select(
+    ( state ) => state.notifications.messages,
+  )
+  const walletId = yield select( ( state ) => state.preferences.walletId, )
+  const timeStamp = yield select(
+    ( state ) => state.notifications.timeStamp,
+  )
+  console.log( 'messages timeStamp', timeStamp )
+
+  const { messages } = yield call( Relay.getMessages, walletId, timeStamp )
+  if( !storedMessages ) return
+  const newMessageArray = storedMessages.concat( messages.filter( ( { notificationId } ) => !storedMessages.find( f => f.notificationId == notificationId ) ) )
+  console.log( 'newMessageArray', newMessageArray )
+
+  yield put( messageFetched( newMessageArray ) )
+  yield put( storeMessagesTimeStamp() )
+
+  yield put( fetchNotificationStarted( false ) )
+}
+
+export const getMessageWatcher = createWatcher(
+  getMessageWorker,
+  GET_MESSAGES,
+)
+
+
+export function* updateMessageStatusInAppWorker( { payload } ) {
+  const { messageNotificationId } = payload
+  const messages = yield select(
+    ( state ) => state.notifications.messages,
+  )
+  const messageArray = messages.map( message => (
+    message.notificationId === messageNotificationId? {
+      ...message, 'status': 'read',
+    }: message
+  ) )
+  console.log( 'messageArray', messageArray )
+  yield put( messageFetched( messageArray ) )
+}
+
+export const updateMessageStatusInAppWatcher = createWatcher(
+  updateMessageStatusInAppWorker,
+  UPDATE_MESSAGES_STATUS_INAPP,
+)
+
+
+export function* updateMessageStatusWorker( { payload } ) {
+  try{
+    const { data } = payload
+    if ( data.length === 0 ) {
+      throw new Error( 'No data found' )
+    }
+    const walletId = yield select( ( state ) => state.preferences.walletId, )
+    const { updated } = yield call(
+      Relay.updateMessageStatus,
+      walletId,
+      data,
+    )
+    if ( !updated ) console.log( 'Failed to update messageStatus on the server' )
+
+  } catch( err ){
+    console.log( 'err', err )
+  }
+}
+
+export const updateMessageStatusWatcher = createWatcher(
+  updateMessageStatusWorker,
+  UPDATE_MESSAGES_STATUS,
 )

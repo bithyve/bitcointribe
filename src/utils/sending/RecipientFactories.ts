@@ -6,22 +6,20 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
+import { TrustedContact } from '../../bitcoin/utilities/Interface'
+import idx from 'idx'
 
 type AddressRecipientFactoryProps = {
   address: string;
-  donationID?: string | null;
 };
 
-export function makeAddressRecipientDescription( {
-  address,
-  donationID = null,
-}: AddressRecipientFactoryProps ): AddressRecipientDescribing {
+export function makeAddressRecipientDescription( { address, }: AddressRecipientFactoryProps ): AddressRecipientDescribing {
   return {
     id: address,
     kind: RecipientKind.ADDRESS,
     displayedName: '@',
     avatarImageSource: null,
-    donationID,
   }
 }
 
@@ -66,47 +64,40 @@ export function makeAccountRecipientDescription(
 
 
 export function makeContactRecipientDescription(
-  data: unknown,
+  channelKey: string,
+  contact: TrustedContact,
   trustKind: ContactTrustKind = ContactTrustKind.OTHER,
 ): ContactRecipientDescribing {
-  let recipientKind = RecipientKind.CONTACT
+  const { contactDetails } = contact
+  const contactName = contactDetails.contactName
 
-  // 📝 Attempt at being more robust for the issue noted here: https://github.com/bithyve/hexa/issues/2004#issuecomment-728635654
-  let displayedName = data.contactName || data.displayedName
-
-  if (
-    displayedName &&
-    [
-      'f&f request',
-      'f&f request awaiting',
-      'f & f request',
-      'f & f request awaiting',
-    ].some( ( placeholder ) => displayedName.startsWith( placeholder ) )
-  ) {
-    displayedName = null
+  const instreamId = contact.streamId
+  let walletName, lastSeenActive, walletId
+  if( instreamId ) {
+    const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+    lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
+    walletName = idx( instream, ( _ ) => _.primaryData.walletName )
+    walletId = idx( instream, ( _ ) => _.primaryData.walletID )
   }
 
-  displayedName = displayedName || data.contactsWalletName || data.walletName
+  let displayedName = contactName
+  if ( !displayedName && walletName ) displayedName = walletName
+  if ( !displayedName ) displayedName = SKIPPED_CONTACT_NAME
 
-  // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
-  if ( !displayedName ) {
-    recipientKind = RecipientKind.ADDRESS
-    displayedName = data.id
-  }
-
-  return {
-    id: data.id,
-    kind: recipientKind,
-    displayedName: displayedName,
-    walletName: data.contactsWalletName || data.walletName,
-    avatarImageSource: data.avatarImageSource || data.image,
-    availableBalance: data.bitcoinAmount || data.amount || 0,
-    initiatedAt: data.initiatedAt,
-    lastSeenActive: data.lastSeen || data.lastSeenActive,
+  const avatarImageSource = contactDetails.image
+  const contactRecipient: ContactRecipientDescribing = {
+    id: contactDetails.id,
+    channelKey,
+    isActive: contact.isActive,
+    kind: RecipientKind.CONTACT,
     trustKind,
-    hasXPub: data.hasXpub,
-    hasTrustedAddress: data.hasTrustedAddress,
-    hasTrustedChannelWithUser:
-      data.hasTrustedChannel || data.hasTrustedChannelWithUser,
+    displayedName,
+    walletName,
+    avatarImageSource,
+    lastSeenActive,
+    walletId,
+    streamId: instreamId,
   }
+
+  return contactRecipient
 }

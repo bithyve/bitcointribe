@@ -85,7 +85,7 @@ export default function VoucherRedeemSuccess( props ) {
             source={
               props.bottomImage
                 ? props.bottomImage
-                : require( '../../assets/images/icons/illustration.png' )
+                : require( '../../assets/images/icons/success.png' )
             }
             style={styles.successModalImage}
           />

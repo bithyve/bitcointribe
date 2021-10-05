@@ -91,17 +91,21 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestEmail()
-                        .requestIdToken("1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com") //Client ID for Web application
-                        .requestScopes(new Scope(DriveScopes.DRIVE_APPDATA))
-                        .build();
+                try{
+                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestEmail()
+                            .requestIdToken("1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com") //Client ID for Web application
+                            .build();
 
-                googleApiClient = new GoogleApiClient.Builder(activity.getBaseContext())
-                        .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                        .build();
-                googleApiClient.connect();
-                promise.resolve(true);
+                    googleApiClient = new GoogleApiClient.Builder(activity.getBaseContext())
+                            .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                            .build();
+                    googleApiClient.connect();
+                    promise.resolve(true);
+                }catch (Exception e) {
+                    promise.resolve(false);
+                    Log.d(TAG, e.toString());
+                }
             }
         });
     }
@@ -112,14 +116,14 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     public void login(final Promise promise) {
         tokenPromise = promise;
         if (googleApiClient == null) {
-            onError(-1, "googleApiClient is null");
+            onError(30, "googleApiClient is null");
             return;
         }
 
         final Activity activity = getCurrentActivity();
 
         if (activity == null) {
-            onError(-1, "No activity");
+            onError(30, "No activity");
             return;
         }
         GoogleSignInAccount accougetDriveClientnt = GoogleSignIn.getLastSignedInAccount(getReactApplicationContext());
@@ -127,8 +131,12 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-                    activity.startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
+                    try{
+                        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+                        activity.startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
+                    }catch (Exception e) {
+                        onError(30, "GoogleSignIn failed");
+                    }
                 }
             });
         } else{
@@ -187,6 +195,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         WritableMap map = Arguments.createMap();
         map.putString(EVENT_KEY, ERROR);
         map.putString("error", error);
+        map.putString("code", String.valueOf((code)));
         tokenPromise.resolve(map);
     }
 
@@ -256,6 +265,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                             } else {
                                 WritableMap map = Arguments.createMap();
                                 map.putString(EVENT_KEY, ON_FAILURE);
+                                map.putString("code", "31");
                                 uploadFilePromise.resolve(map);
                             }
 
@@ -320,6 +330,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                             }   else{
                                 WritableMap map = Arguments.createMap();
                                 map.putString(EVENT_KEY, ON_FAILURE);
+                                map.putString("code", "32");
                                 listOfFilesAvailable.resolve(map);
                             }
                         }
@@ -358,12 +369,14 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                         Log.d(TAG, "onFailure updateFile: " + e.getMessage());
                         WritableMap map = Arguments.createMap();
                         map.putString(EVENT_KEY, ON_FAILURE);
+                        map.putString("code", "33");
                         updateFilePromise.resolve(map);
                     }
                 });
         } catch (Exception e) {
             WritableMap map = Arguments.createMap();
             map.putString(EVENT_KEY, ON_FAILURE);
+            map.putString("code", "33");
             updateFilePromise.resolve(map);
             Log.d(TAG, " updateFilePromise Exception: " + e.getMessage());
         }
@@ -391,13 +404,17 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        WritableMap map = Arguments.createMap();
+                        map.putString(EVENT_KEY, ON_FAILURE);
+                        map.putString("code", "34");
                         Log.d(TAG, "onFailure readFilePromise: " + e.getMessage());
-                        readFilePromise.resolve(e.getMessage());
+                        readFilePromise.resolve(map);
                     }
                 });
         } catch (Exception e) {
             WritableMap map = Arguments.createMap();
             map.putString(EVENT_KEY, ON_FAILURE);
+            map.putString("code", "34");
             readFilePromise.resolve(map);
             Log.d(TAG, " readFile Exception: " + e.getMessage());
         }

@@ -6,7 +6,6 @@ import {
   Image,
   FlatList,
   Platform,
-  AsyncStorage,
   TouchableOpacity,
 } from 'react-native'
 import {
@@ -21,10 +20,9 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { useDispatch } from 'react-redux'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { sharePersonalCopy } from '../../store/actions/sss'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
-import { sharePDF } from '../../store/actions/health'
+import { sharePDF } from '../../store/actions/BHR'
 
 export default function PersonalCopyShareModal( props ) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
@@ -127,9 +125,10 @@ export default function PersonalCopyShareModal( props ) {
           paddingBottom: hp( '1.5%' ),
           marginRight: 10,
           marginBottom: hp( '1.5%' ),
-          paddingTop: hp( '0.5%' ),
+          paddingTop: hp( '1.5%' ),
           alignItems: 'center',
           marginLeft: 20,
+          marginTop: hp( 1 )
         }}
       >
         <Text
@@ -143,7 +142,7 @@ export default function PersonalCopyShareModal( props ) {
         </Text>
       </View>
       <View style={{
-        flex: 1
+        // flex: 1
       }}>
         <FlatList
           data={personalCopyShareOptions}
@@ -169,7 +168,7 @@ export default function PersonalCopyShareModal( props ) {
                   source={item.imageIcon}
                 />
                 <View style={{
-                  justifyContent: 'space-between', flex: 1
+                  justifyContent: 'space-between',
                 }}>
                   <Text style={styles.listElementsTitle}>{item.title}</Text>
                   <Text style={styles.listElementsInfo}>{item.info}</Text>
@@ -237,7 +236,7 @@ export default function PersonalCopyShareModal( props ) {
 
 const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
     width: '100%',
   },
@@ -298,6 +297,7 @@ const styles = StyleSheet.create( {
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,
+    width: wp( 60 )
   },
   listElementIcon: {
     paddingRight: 5,

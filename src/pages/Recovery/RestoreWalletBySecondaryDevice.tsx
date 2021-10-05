@@ -24,17 +24,17 @@ import HeaderTitle from '../../components/HeaderTitle'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  requestShare,
-  downloadMShare,
   ErrorReceiving,
-} from '../../store/actions/sss'
+} from '../../store/actions/BHR'
 import Toast from '../../components/Toast'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import config from '../../bitcoin/HexaConfig'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import CopyThisText from '../../components/CopyThisText'
 
 export default function RestoreWalletBySecondaryDevice( props ) {
   const [ secondaryQR, setSecondaryQR ] = useState( '' )
@@ -42,10 +42,13 @@ export default function RestoreWalletBySecondaryDevice( props ) {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorReceivingFailed = useSelector(
-    ( state ) => state.sss.errorReceiving,
+    ( state ) => state.bhr.errorReceiving,
   )
-  const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
+  const { DECENTRALIZED_BACKUP } = useSelector(
     ( state ) => state.storage.database,
+  )
+  const wallet: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
@@ -59,7 +62,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
     ? setSecondaryQR(
       JSON.stringify( {
         ...REQUEST_DETAILS,
-        requester: WALLET_SETUP.walletName,
+        requester: wallet.walletName,
         type: 'recoveryQR',
         ver: DeviceInfo.getVersion(),
       } ),
@@ -69,7 +72,8 @@ export default function RestoreWalletBySecondaryDevice( props ) {
 
   const dispatch = useDispatch()
   useEffect( () => {
-    if ( !REQUEST_DETAILS ) dispatch( requestShare( 0 ) )
+    // Removed sss file
+    // if ( !REQUEST_DETAILS ) dispatch( requestShare( 0 ) )
   }, [] )
 
   if ( META_SHARE ) {
@@ -111,10 +115,10 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             }
 
             // downloadSecret(index, recoveryRequest.publicKey);
-
-            dispatch(
-              downloadMShare( recoveryRequest.publicKey, null, 'recovery', 0 ),
-            )
+            // Removed sss file
+            // dispatch(
+            //   downloadMShare( recoveryRequest.publicKey, null, 'recovery', 0 ),
+            // )
 
             setTimeout( () => {
               props.navigation.navigate( 'RestoreSelectedContactsList' )
@@ -195,7 +199,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             marginBottom: 22
           }}>
             <HeaderTitle
-              firstLineTitle={'Restore wallet using'}
+              firstLineTitle={'Recover wallet using'}
               secondLineTitle={'Keeper Device'}
               infoTextNormal={
                 'Use the Recovery Key stored in your Keeper device. '
@@ -212,9 +216,15 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={secondaryQR} size={hp( '27%' )} />
+              <QRCode title="Recovery key" value={secondaryQR} size={hp( '27%' )} />
             )}
           </View>
+          {secondaryQR?<CopyThisText
+            backgroundColor={Colors.backgroundColor}
+            text={secondaryQR}
+            width={'20%'}
+            height={'15%'}
+          /> : null}
 
           {REQUEST_DETAILS ? (
             <View
@@ -227,9 +237,10 @@ export default function RestoreWalletBySecondaryDevice( props ) {
             >
               <TouchableOpacity
                 onPress={() => {
-                  dispatch(
-                    downloadMShare( REQUEST_DETAILS.KEY, null, 'recovery' ),
-                  )
+                  // Removed this method
+                  // dispatch(
+                  //   downloadMShare( REQUEST_DETAILS.KEY, null, 'recovery' ),
+                  // )
                   props.navigation.goBack()
                 }}
                 disabled={!!META_SHARE}

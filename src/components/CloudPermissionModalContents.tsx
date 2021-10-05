@@ -9,11 +9,13 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import DeviceInfo from 'react-native-device-info'
+import { translations } from '../common/content/LocContext'
 
 export default function CloudPermissionModalContents( props ) {
   const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
   const [ timeLeft, setTimeLeft ] = useState( null )
   const [ intervalRef, setIntervalRef ] = useState( null )
+  const strings  = translations[ 'common' ]
 
   const getElusiveTimer = () =>{
     return timerArray.map( ( value, key )=>{
@@ -53,143 +55,142 @@ export default function CloudPermissionModalContents( props ) {
 
   return (
     <View style={{
-      ...styles.modalContentContainer, height: '100%'
+      ...styles.modalContentContainer,
     }}>
+      {/* <View style={{
+        // height: '100%'
+      }}> */}
       <View style={{
-        height: '100%'
+        ...styles.successModalHeaderView, flexDirection:'row', alignItems:'center'
       }}>
-        <View style={{
-          ...styles.successModalHeaderView, flexDirection:'row', alignItems:'center'
-        }}>
-          <Text
-            style={{
-              color: props.headerTextColor
-                ? props.headerTextColor
-                : Colors.blue,
-              fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansMedium,
-            }}
-          >
-            {props.title}
-            {props.titleNextLine ? '\n' + props.titleNextLine : null}
-          </Text>
-          {props.isRendered && <View style={{
-            flexDirection:'row', justifyContent:'space-between', alignItems: 'center', width: wp( '10%' ), alignSelf: 'auto', marginLeft: 'auto', elevation: 5, shadowColor: Colors.babyGray, shadowOffset: {
-              width: 0, height: 3
-            }, shadowOpacity: 1, shadowRadius: 4
-          }}>
-            {getElusiveTimer()}
-          </View>}
-        </View>
-        <View style={styles.successModalAmountView}>
-          {props.info ? (
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginTop: wp( '1.5%' ),
-                marginBottom: hp( '3%' ),
-                color: Colors.lightTextColor,
-              }}
-            >
-              {props.info}
-            </Text>
-          ) : null}
-          {props.note ? (
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginBottom: hp( '1%' ),
-                marginTop: 'auto',
-              }}
-            >
-              {props.note}
-              {props.noteNextLine ? '\n' + props.noteNextLine : null}
-            </Text>
-          ) : null}
-        </View>
-        {props.otherText ? (
-          <View style={styles.successModalAmountView}>
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginBottom: hp( '1%' ),
-                marginTop: 'auto',
-              }}
-            >
-              {props.otherText}
-            </Text>
-          </View>
-        ) : null}
-        <View
+        <Text
           style={{
-            height: hp( '14%' ),
-            flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'center',
+            color: props.headerTextColor
+              ? props.headerTextColor
+              : Colors.blue,
+            fontSize: RFValue( 18 ),
+            fontFamily: Fonts.FiraSansMedium,
           }}
         >
-          <AppBottomSheetTouchableWrapper
-            onPress={() => { clearInterval( intervalRef ); props.onPressProceed( true ) }}
+          {props.title}
+          {props.titleNextLine ? '\n' + props.titleNextLine : null}
+        </Text>
+        {props.isRendered && <View style={{
+          flexDirection:'row', justifyContent:'space-between', alignItems: 'center', width: wp( '10%' ), alignSelf: 'auto', marginLeft: 'auto', elevation: 5, shadowColor: Colors.babyGray, shadowOffset: {
+            width: 0, height: 3
+          }, shadowOpacity: 1, shadowRadius: 4
+        }}>
+          {getElusiveTimer()}
+        </View>}
+      </View>
+      <View style={styles.successModalAmountView}>
+        {props.info ? (
+          <Text
             style={{
-              ...styles.successModalButtonView,
-              shadowColor: props.buttonShadowColor
-                ? props.buttonShadowColor
-                : Colors.shadowBlue,
-              backgroundColor: props.buttonColor
-                ? props.buttonColor
+              ...styles.modalInfoText,
+              marginTop: wp( '1.5%' ),
+              marginBottom: hp( '3%' ),
+            }}
+          >
+            {props.info}
+          </Text>
+        ) : null}
+        {props.note ? (
+          <Text
+            style={{
+              ...styles.modalInfoText,
+              marginBottom: hp( '1%' ),
+              marginTop: 'auto',
+            }}
+          >
+            {props.note}
+            {props.noteNextLine ? '\n' + props.noteNextLine : null}
+          </Text>
+        ) : null}
+      </View>
+      {props.otherText ? (
+        <View style={styles.successModalAmountView}>
+          <Text
+            style={{
+              ...styles.modalInfoText,
+              marginBottom: hp( '1%' ),
+              marginTop: 'auto',
+            }}
+          >
+            {props.otherText}
+          </Text>
+        </View>
+      ) : null}
+      <View
+        style={{
+          height: hp( '14%' ),
+          flexDirection: 'row',
+          marginTop: 'auto',
+          alignItems: 'center',
+        }}
+      >
+        <AppBottomSheetTouchableWrapper
+          onPress={() => { clearInterval( intervalRef ); props.onPressProceed( true ) }}
+          style={{
+            ...styles.successModalButtonView,
+            shadowColor: props.buttonShadowColor
+              ? props.buttonShadowColor
+              : Colors.shadowBlue,
+            backgroundColor: props.buttonColor
+              ? props.buttonColor
+              : Colors.blue,
+          }}
+        >
+          <Text
+            style={{
+              ...styles.proceedButtonText,
+              color: props.buttonTextColor
+                ? props.buttonTextColor
+                : Colors.white,
+            }}
+          >
+            {strings.backup}
+          </Text>
+        </AppBottomSheetTouchableWrapper>
+
+        <AppBottomSheetTouchableWrapper
+          onPress={() => { clearInterval( intervalRef ); props.onPressIgnore( false )}}
+          style={{
+            height: wp( '13%' ),
+            width: wp( '25%' ),
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            paddingLeft: wp( '8%' ),
+          }}
+        >
+          <Text
+            style={{
+              ...styles.proceedButtonText,
+              color: props.buttonTextColor
+                ? props.buttonTextColor
                 : Colors.blue,
             }}
           >
-            <Text
-              style={{
-                ...styles.proceedButtonText,
-                color: props.buttonTextColor
-                  ? props.buttonTextColor
-                  : Colors.white,
-              }}
-            >
-              {'Backup'}
-            </Text>
-          </AppBottomSheetTouchableWrapper>
-
-          <AppBottomSheetTouchableWrapper
-            onPress={() => { clearInterval( intervalRef ); props.onPressIgnore( false )}}
-            style={{
-              height: wp( '13%' ),
-              width: wp( '25%' ),
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              paddingLeft: wp( '8%' ),
-            }}
-          >
-            <Text
-              style={{
-                ...styles.proceedButtonText,
-                color: props.buttonTextColor
-                  ? props.buttonTextColor
-                  : Colors.blue,
-              }}
-            >
-              {'Skip'}
-            </Text>
-          </AppBottomSheetTouchableWrapper>
-          <Image
-            source={
-              props.bottomImage
-                ? props.bottomImage
-                : require( '../assets/images/icons/noInternet.png' )
-            }
-            style={styles.successModalImage}
-          />
-        </View>
+            {strings.skip}
+          </Text>
+        </AppBottomSheetTouchableWrapper>
+        <Image
+          source={
+            props.bottomImage
+              ? props.bottomImage
+              : require( '../assets/images/icons/noInternet.png' )
+          }
+          style={styles.successModalImage}
+        />
       </View>
+      {/* </View> */}
     </View>
   )
 }
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
@@ -199,8 +200,11 @@ const styles = StyleSheet.create( {
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    opacity: 1,
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    marginRight: wp( 10 )
   },
   successModalAmountView: {
     justifyContent: 'center',

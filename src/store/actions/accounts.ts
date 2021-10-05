@@ -1,9 +1,13 @@
 import { Action } from 'redux'
+import { Account, Accounts, ContactInfo, DonationAccount } from '../../bitcoin/utilities/Interface'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { newAccountsInfo } from '../sagas/accounts'
 
 // types and action creators: dispatched by components and sagas
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
+export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS'
 export const GET_TESTCOINS = 'GET_TESTCOINS'
 export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS'
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
@@ -23,11 +27,12 @@ export const VALIDATE_TWO_FA = 'VALIDATE_TWO_FA'
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE'
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT'
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES'
-export const ADD_NEW_ACCOUNT_SHELL = 'ADD_NEW_ACCOUNT_SHELL'
+export const ADD_NEW_ACCOUNT_SHELLS = 'ADD_NEW_ACCOUNT_SHELLS'
+export const RESTORE_ACCOUNT_SHELLS = 'RESTORE_ACCOUNT_SHELLS'
 export const ADD_NEW_SECONDARY_SUBACCOUNT = 'ADD_NEW_SECONDARY_SUBACCOUNT'
 export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
   'ADD_NEW_ACCOUNT_SHELL_COMPLETED'
-export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS'
+export const UPDATE_ACCOUNT_SETTINGS = 'UPDATE_ACCOUNT_SETTINGS'
 export const SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED =
   'SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED'
 export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS'
@@ -37,19 +42,28 @@ export const MERGE_ACCOUNT_SHELLS = 'MERGE_ACCOUNT_SHELLS'
 export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED'
 export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED'
 export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT'
-export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL'
+export const RECOMPUTE_NET_BALANCE = 'RECOMPUTE_NET_BALANCE'
+export const REFRESH_ACCOUNT_SHELLS = 'REFRESH_ACCOUNT_SHELLS'
 export const BLIND_REFRESH = 'BLIND_REFRESH'
-export const ACCOUNT_SHELL_REFRESH_COMPLETED =
-  'ACCOUNT_SHELL_REFRESH_COMPLETED'
-export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
+export const ACCOUNT_SHELLS_REFRESH_STARTED = 'ACCOUNT_SHELLS_REFRESH_STARTED'
+export const ACCOUNT_SHELLS_REFRESH_COMPLETED =
+  'ACCOUNT_SHELLS_REFRESH_COMPLETED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
 export const FETCH_RECEIVE_ADDRESS = 'FETCH_RECEIVE_ADDRESS'
 export const FETCH_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_RECEIVE_ADDRESS_SUCCEEDED'
 export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
+export const MARK_READ_TRANSACTION = 'MARK_READ_TRANSACTION'
+export const READ_TRANSACTION = 'READ_TRANSACTION'
+
+export const MARK_ACCOUNT_CHECKED = 'MARK_ACCOUNT_CHECKED'
+export const ACCOUNT_CHECKED = 'ACCOUNT_CHECKED'
 
 export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
 export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
 export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
+export const SET_SHOW_ALL_ACCOUNT = 'SET_SHOW_ALL_ACCOUNT'
+export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
+export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
 
 export const getAllAccountsData = () => {
   return {
@@ -66,13 +80,48 @@ export const setAllAccountsData = ( accounts ) => {
   }
 }
 
+export const accountChecked = ( accountShells: AccountShell [], accounts: Accounts ) => {
+  return {
+    type: ACCOUNT_CHECKED,
+    payload: {
+      accountShells,
+      accounts,
+    },
+  }
+}
+
+export const readTxn = ( accountShells: AccountShell [], accounts: Accounts ) => {
+  return {
+    type: READ_TRANSACTION,
+    payload: {
+      accountShells,
+      accounts,
+    },
+  }
+}
+
+export const markAccountChecked = ( shellId: string ) => {
+  return {
+    type: MARK_ACCOUNT_CHECKED,
+    payload: {
+      shellId
+    },
+  }
+}
+
+export const markReadTx = ( txIds: string[], shellId: string ) => {
+  return {
+    type: MARK_READ_TRANSACTION,
+    payload: {
+      txIds,
+      shellId
+    },
+  }
+}
 
 export const fetchBalanceTx = (
   serviceType: string,
   options: {
-    service?;
-    loader?: boolean;
-    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
     blindRefresh?: boolean;
     shouldNotInsert?: boolean;
@@ -87,9 +136,26 @@ export const fetchBalanceTx = (
   }
 }
 
-export const getTestcoins = ( ) => {
+
+export const syncAccounts = (
+  accounts: Accounts,
+  options: {
+    hardRefresh?: boolean;
+    blindRefresh?: boolean;
+  } = {
+  }
+) => {
+  return {
+    type: SYNC_ACCOUNTS, payload: {
+      accounts, options
+    }
+  }
+}
+
+export const getTestcoins = ( testAccount: Account ) => {
   return {
     type: GET_TESTCOINS,
+    payload: testAccount
   }
 }
 
@@ -134,9 +200,12 @@ export const clearAccountSyncCache = () => {
 
 // This is called once per login to automatically sync balances and
 // transactions of all shells
-export const autoSyncShells = () => {
+export const autoSyncShells = ( syncAll?: boolean, hardRefresh?: boolean, ) => {
   return {
-    type: AUTO_SYNC_SHELLS
+    type: AUTO_SYNC_SHELLS,
+    payload: {
+      syncAll, hardRefresh,
+    },
   }
 }
 
@@ -168,11 +237,12 @@ export const fetchFeeAndExchangeRates = () => {
   }
 }
 
-export const generateSecondaryXpriv = ( serviceType, secondaryMnemonic ) => {
+export const generateSecondaryXpriv = ( accountShell, secondaryMnemonic ) => {
   return {
     type: GENERATE_SECONDARY_XPRIV,
     payload: {
-      serviceType, secondaryMnemonic
+      accountShell,
+      secondaryMnemonic
     },
   }
 }
@@ -223,8 +293,6 @@ export const setupDonationAccount = (
   description: string,
   configuration: {
     displayBalance: boolean;
-    displayTransactions: boolean;
-    displayTxDetails: boolean;
   },
   disableAccount?: boolean
 ) => {
@@ -242,14 +310,13 @@ export const setupDonationAccount = (
 }
 
 export const updateDonationPreferences = (
-  serviceType: string,
-  accountNumber: number,
+  donationAccount: DonationAccount,
   preferences: {
     disableAccount?: boolean;
     configuration?: {
       displayBalance: boolean;
-      displayTransactions: boolean;
-      displayTxDetails: boolean;
+      displayIncomingTxs: boolean;
+      displayOutgoingTxs: boolean;
     };
     accountDetails?: {
       donee: string;
@@ -261,7 +328,7 @@ export const updateDonationPreferences = (
   return {
     type: UPDATE_DONATION_PREFERENCES,
     payload: {
-      serviceType, accountNumber, preferences
+      donationAccount, preferences
     },
   }
 }
@@ -274,13 +341,19 @@ export const remapAccountShells = ( services ) => {
   }
 }
 
-export const refreshAccountShell = (
-  shell: AccountShell,
-  options: { autoSync?: boolean, hardRefresh?: boolean }
+export const recomputeNetBalance = () => {
+  return {
+    type: RECOMPUTE_NET_BALANCE
+  }
+}
+
+export const refreshAccountShells = (
+  shells: AccountShell[],
+  options: { hardRefresh?: boolean, syncDonationAccount?: boolean }
 ) => {
   return {
-    type: REFRESH_ACCOUNT_SHELL, payload: {
-      shell, options
+    type: REFRESH_ACCOUNT_SHELLS, payload: {
+      shells, options
     }
   }
 }
@@ -291,36 +364,48 @@ export const blindRefresh = () => {
   }
 }
 
-
-export const accountShellRefreshCompleted = ( payload: AccountShell ) => {
+export const accountShellRefreshStarted = ( payload: AccountShell[] ) => {
   return {
-    type: ACCOUNT_SHELL_REFRESH_COMPLETED,
+    type: ACCOUNT_SHELLS_REFRESH_STARTED,
     payload,
   }
 }
 
-export const accountShellRefreshStarted = ( payload: AccountShell ) => {
+export const accountShellRefreshCompleted = ( payload: AccountShell[] ) => {
   return {
-    type: ACCOUNT_SHELL_REFRESH_STARTED,
+    type: ACCOUNT_SHELLS_REFRESH_COMPLETED,
     payload,
   }
 }
 
-export interface AddNewAccountShellAction extends Action {
-  type: typeof ADD_NEW_ACCOUNT_SHELL;
-  payload: SubAccountDescribing;
+export interface AddNewAccountShellsAction extends Action {
+  type: typeof ADD_NEW_ACCOUNT_SHELLS;
+  payload: newAccountsInfo[];
 }
 
-export const addNewAccountShell = (
-  payload: SubAccountDescribing
-): AddNewAccountShellAction => {
+export const addNewAccountShells = (
+  payload: newAccountsInfo[]
+): AddNewAccountShellsAction => {
   return {
-    type: ADD_NEW_ACCOUNT_SHELL,
-    payload,
+    type: ADD_NEW_ACCOUNT_SHELLS,
+    payload
   }
 }
 
-export interface ContactInfo  { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, paymentDetails?: {amount: string, address: string}, legacy?: boolean}
+export interface RestoreAccountShellsAction extends Action {
+  type: typeof RESTORE_ACCOUNT_SHELLS;
+  payload: Account[];
+}
+
+export const restoreAccountShells = (
+  payload: Account[]
+): RestoreAccountShellsAction => {
+  return {
+    type: RESTORE_ACCOUNT_SHELLS,
+    payload
+  }
+}
+
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,
@@ -344,16 +429,30 @@ export const newAccountShellCreationCompleted = (): AddNewAccountShellCompletion
   }
 }
 
-export interface UpdateSubAccountSettingsAction extends Action {
-  type: typeof UPDATE_SUB_ACCOUNT_SETTINGS;
-  payload: SubAccountDescribing;
+export interface UpdateAccountSettingsAction extends Action {
+  type: typeof UPDATE_ACCOUNT_SETTINGS;
+  payload: {
+    accountShell: AccountShell,
+    settings: {
+      accountName?: string,
+      accountDescription?: string,
+      visibility?: AccountVisibility,
+    },
+  };
 }
 
-export const updateSubAccountSettings = (
-  payload: SubAccountDescribing
-): UpdateSubAccountSettingsAction => {
+export const updateAccountSettings = (
+  payload: {
+    accountShell: AccountShell,
+    settings: {
+      accountName?: string,
+      accountDescription?: string,
+      visibility?: AccountVisibility,
+    },
+  }
+): UpdateAccountSettingsAction => {
   return {
-    type: UPDATE_SUB_ACCOUNT_SETTINGS, payload
+    type: UPDATE_ACCOUNT_SETTINGS, payload
   }
 }
 
@@ -461,9 +560,10 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
-export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED'
+export const UPDATE_ACCOUNTS = 'UPDATE_ACCOUNTS'
+export const UPDATE_ACCOUNT_SHELLS = 'UPDATE_ACCOUNT_SHELLS'
+export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
-export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS'
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED'
 export const ACCOUNT_SETTINGS_UPDATE_FAILED = 'ACCOUNT_SETTINGS_UPDATE_FAILED'
 export const TRANSACTION_REASSIGNMENT_SUCCEEDED =
@@ -511,6 +611,7 @@ export const secondaryXprivGenerated = ( generated ) => {
     }
   }
 }
+
 export const twoFAValid = ( isValid: boolean ) => {
   return {
     type: TWO_FA_VALID,
@@ -519,6 +620,7 @@ export const twoFAValid = ( isValid: boolean ) => {
     }
   }
 }
+
 export const twoFAResetted = ( resetted ) => {
   return {
     type: TWO_FA_RESETTED, payload: {
@@ -541,44 +643,60 @@ export const newAccountShellAddFailed = ( {
   }
 }
 
-export const newAccountShellAdded = ( { accountShell, }: {
-  accountShell: AccountShell;
-} ) => {
-  return {
-    type: NEW_ACCOUNT_SHELL_ADDED,
-    payload: accountShell
-  }
-}
-
-export const restoredAccountShells = ( { accountShells, }: {
+export const newAccountShellsAdded = ( { accountShells, accounts }: {
   accountShells: AccountShell[];
+  accounts: Accounts
 } ) => {
   return {
-    type: RESTORED_ACCOUNT_SHELLS, payload: {
-      accountShells
+    type: NEW_ACCOUNT_SHELLS_ADDED,
+    payload: {
+      accountShells,
+      accounts
     }
   }
 }
 
-export const accountSettingsUpdateFailed = ( {
-  account,
-  error,
-}: {
-  account: SubAccountDescribing;
+export const updateAccounts = ( { accounts }: { accounts: Accounts } ) => {
+  return {
+    type: UPDATE_ACCOUNTS,
+    payload: {
+      accounts
+    }
+  }
+}
+
+export const updateAccountShells = ( { accounts }: { accounts: Accounts } ) => {
+  return {
+    type: UPDATE_ACCOUNT_SHELLS,
+    payload: {
+      accounts
+    }
+  }
+}
+
+// export const restoredAccountShells = ( { accountShells, }: {
+//   accountShells: AccountShell[];
+// } ) => {
+//   return {
+//     type: RESTORE_ACCOUNT_SHELLS, payload: {
+//       accountShells
+//     }
+//   }
+// }
+
+export const accountSettingsUpdateFailed = ( {  error, }: {
   error: Error;
 } ) => {
   return {
     type: ACCOUNT_SETTINGS_UPDATE_FAILED, payload: {
-      account, error
+      error
     }
   }
 }
 
-export const accountSettingsUpdated = ( { account, }: {
-  account: SubAccountDescribing;
-} ) => {
+export const accountSettingsUpdated = ( ) => {
   return {
-    type: ACCOUNT_SETTINGS_UPDATED, payload: account
+    type: ACCOUNT_SETTINGS_UPDATED,
   }
 }
 
@@ -651,13 +769,35 @@ export const clearReceiveAddress = ( ) => {
   }
 }
 
-export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, serviceType ) => {
+export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, accountShell ) => {
   return {
     type: CREATE_SM_N_RESETTFA_OR_XPRIV,
     payload: {
       qrdata,
       QRModalHeader,
-      serviceType
+      accountShell
     },
+  }
+}
+
+export const setShowAllAccount = ( showAllAccount ) => {
+  return {
+    type: SET_SHOW_ALL_ACCOUNT, payload: {
+      showAllAccount
+    }
+  }
+}
+
+export const resetAccountUpdateFlag = () => {
+  return {
+    type: RESET_ACCOUNT_UPDATE_FLAG,
+  }
+}
+
+export const setResetTwoFALoader = ( flag ) => {
+  return {
+    type: RESET_TWO_FA_LOADER, payload:{
+      flag
+    }
   }
 }

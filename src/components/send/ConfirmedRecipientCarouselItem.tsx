@@ -11,6 +11,9 @@ import { TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
+import {
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 
 
 export type Props = {
@@ -36,10 +39,9 @@ const ConfirmedRecipientCarouselItem: React.FC<Props> = ( {
     <View style={{
       ...styles.rootContainer, ...containerStyle
     }}>
-
       <RecipientAvatar
         recipient={recipient}
-        containerStyle={styles.circledAvatarContainer}
+        contentContainerStyle={styles.avatarImage}
       />
 
       <View style={styles.textContentContainer}>
@@ -72,6 +74,13 @@ const styles = StyleSheet.create( {
   circledAvatarContainer: {
     ...ImageStyles.thumbnailImageMedium,
     ...ImageStyles.circledAvatarContainer,
+    borderRadius: wp( 12 )/2,
+  },
+
+  avatarImage: {
+    // ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp ( 14 )/2,
   },
 
   textContentContainer: {

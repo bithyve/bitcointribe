@@ -23,7 +23,6 @@ import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
-  clearPaymentDetails,
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -150,7 +149,8 @@ class ConfirmKeys extends Component<
         }}>
           {listData.map( ( item, index ) => {
             return (
-              <TouchableOpacity
+              <View
+                key={index}
                 style={{
                   ...styles.cardsView,
                   borderBottomWidth: index == 2 ? 0 : 4,
@@ -258,7 +258,7 @@ class ConfirmKeys extends Component<
                     <Text style={styles.statusText}>Waiting for Key</Text>
                   </View>
                 )}
-              </TouchableOpacity>
+              </View>
             )
           } )}
         </ScrollView>
@@ -482,9 +482,7 @@ class ConfirmKeys extends Component<
 const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
-    walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
-    s3Service: idx( state, ( _ ) => _.sss.service ),
+    walletName: idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
   }

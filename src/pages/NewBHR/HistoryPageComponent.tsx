@@ -14,8 +14,11 @@ import {
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import { translations } from '../../common/content/LocContext'
 
 const HistoryPageComponent = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const SelectOption = ( Id ) => {
     if ( Id == SelectedOption ) {
@@ -89,7 +92,7 @@ const HistoryPageComponent = ( props ) => {
               infoText={
                 props.infoBoxInfo
                   ? props.infoBoxInfo
-                  : 'The history of your Recovery Key will appear here'
+                  : strings.historyofyourRecovery
               }
             />
           )}
@@ -98,7 +101,7 @@ const HistoryPageComponent = ( props ) => {
         <View style={{
           flex: 1
         }}>
-          <ScrollView>
+          {/* <ScrollView>
             {[ 1, 2, 3, 4 ].map( ( index ) => {
               return (
                 <View style={styles.waterMarkCard} key={index}>
@@ -109,17 +112,17 @@ const HistoryPageComponent = ( props ) => {
                 </View>
               )
             } )}
-          </ScrollView>
+          </ScrollView> */}
           <View style={{
-            backgroundColor: Colors.backgroundColor
+            backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
           }}>
             <BottomInfoBox
               backgroundColor={Colors.white}
-              title={props.infoBoxTitle ? props.infoBoxTitle : 'No history'}
+              title={props.infoBoxTitle ? props.infoBoxTitle : strings.Nohistory}
               infoText={
                 props.infoBoxInfo
                   ? props.infoBoxInfo
-                  : 'The history of your Recovery Key will appear here'
+                  : strings.historyofyourRecovery
               }
             />
           </View>
@@ -135,6 +138,7 @@ const HistoryPageComponent = ( props ) => {
               width: 'auto',
               justifyContent:'center'
             }}
+            delayPressIn={0}
             onPress={() => props.onConfirm()}
           >
             <Text
@@ -172,6 +176,7 @@ const HistoryPageComponent = ( props ) => {
                     ? Colors.lightBlue
                     : Colors.blue,
                 }}
+                delayPressIn={0}
                 disabled={props.confirmDisable ? props.confirmDisable : false}
               >
                 <Text
@@ -186,8 +191,7 @@ const HistoryPageComponent = ( props ) => {
                 </Text>
               </TouchableOpacity>
             ) : null}
-          {!props.isVersionMismatch &&
-          props.IsReshare &&
+          {/* {!props.isVersionMismatch &&
           props.isChangeKeeperAllow ? (
               <TouchableOpacity
                 disabled={props.disableChange ? props.disableChange : false}
@@ -199,6 +203,7 @@ const HistoryPageComponent = ( props ) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
+                delayPressIn={0}
               >
                 <Text
                   style={{
@@ -209,7 +214,7 @@ const HistoryPageComponent = ( props ) => {
                   {props.changeButtonText}
                 </Text>
               </TouchableOpacity>
-            ) : null}
+            ) : null} */}
         </View>
       </View>
     </View>

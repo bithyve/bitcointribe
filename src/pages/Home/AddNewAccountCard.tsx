@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
-import CardView from 'react-native-cardview'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export type Props = {
   onPress: () => void;
@@ -15,9 +15,11 @@ const AddNewAccountCard: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
+  const { translations } = useContext( LocalizationContext )
+  const add_new = translations[ 'home' ].add_new
   return (
     <TouchableOpacity onPress={onPress} style={containerStyle}>
-      <CardView cornerRadius={10} style={styles.cardContainer}>
+      <View style={styles.cardContainer}>
         <View
           style={{
             flex: 1,
@@ -35,13 +37,13 @@ const AddNewAccountCard: React.FC<Props> = ( {
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
-              fontWeight: '600',
+              fontWeight: '500',
             }}
           >
-            Add New
+            {add_new}
           </Text>
         </View>
-      </CardView>
+      </View>
     </TouchableOpacity>
   )
 }
@@ -50,10 +52,16 @@ const AddNewAccountCard: React.FC<Props> = ( {
 const styles = StyleSheet.create( {
   cardContainer: {
     backgroundColor: Colors.white,
-    width: widthPercentageToDP( 42.6 ),
-    height: heightPercentageToDP( 20.1 ),
-    borderColor: Colors.borderColor,
-    borderWidth: 1,
+    width: widthPercentageToDP( 43 ),
+    height: heightPercentageToDP( 20 ),
+    // borderColor: Colors.borderColor,
+    borderRadius: 10,
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    elevation: 6
   },
 } )
 

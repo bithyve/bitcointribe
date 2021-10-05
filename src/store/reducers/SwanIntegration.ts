@@ -1,24 +1,61 @@
-import { $CombinedState } from 'redux'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import AccountShell from '../../common/data/models/AccountShell'
 import {
+  UPDATE_SWAN_STATUS,
+  CLEAR_SWAN_CACHE,
+  FETCH_SWAN_AUTHENTICATION_URL_STARTED,
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
+  REDEEM_SWAN_CODE_FOR_TOKEN_STARTED,
+  REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED,
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
-
   LINK_SWAN_WALLET,
+  TEMP_SWAN_ACCOUNT_INFO_SAVED,
+  IS_VISITED
 } from '../actions/SwanIntegration'
 
 
 export type SwanIntegrationState = {
+  swanErrorCode: string | null,
+  swanAccountCreationStatus: SwanAccountCreationStatus | null,
   isSwanAuthenticationInProgress: boolean | null,
   swanAuthenticationUrl: string | null,
   code_verifier: string | null,
   code_challenge: string | null,
   state: string | null,
   nonce: number | null,
+
+  hasFetchSwanAuthenticationUrlInitiated: boolean | null,
   hasFetchSwanAuthenticationUrlSucceeded: boolean | null,
-  hasFetchSwanAuthenticationCodeSucceeded: boolean | null,
-  swanAuthenticatedCode: string | null,
+  hasFetchSwanAuthenticationUrlCompleted: boolean | null,
+
+  hasRedeemSwanCodeForTokenSucceeded: boolean | null,
+  hasRedeemSwanCodeForTokenCompleted: boolean | null,
+  hasRedeemSwanCodeForTokenInitiated: boolean | null,
+
+  minBtcThreshold: number | 0.01,
+
+  hasCreateWithdrawalWalletOnSwanSucceeded: boolean | null,
+  hasCreateWithdrawalWalletOnSwanCompleted: boolean | null,
+  hasCreateWithdrawalWalletOnSwanInitiated: boolean | null,
+
+  hasSwanAccountCreationInitiated: boolean | null,
+  hasSwanAccountCreationCompleted: boolean | null,
+  hasSwanAccountCreationSucceeded: boolean | null,
+  swanAccountDetails: AccountShell, // temperory swan account shell object
+
+  // indicator for swan registration
+  startRegistration: boolean | true
+
+  // is account open
+  isVisited: boolean | false
+
+  // The below values are currently not being used
+  swanAuthenticatedToken: string | null,
   isSwanRedeemCodeInProgress: boolean | null,
   swanToken: string | null
 
@@ -45,18 +82,38 @@ export type SwanIntegrationState = {
 }
 
 const INITIAL_STATE: SwanIntegrationState = {
+  swanErrorCode: '',
+  swanAccountCreationStatus: null,
   isSwanAuthenticationInProgress: false,
   swanAuthenticationUrl: null,
   code_challenge: null,
   code_verifier: null,
   state: null,
   nonce: null,
+  hasFetchSwanAuthenticationUrlInitiated: false,
   hasFetchSwanAuthenticationUrlSucceeded: false,
-  hasFetchSwanAuthenticationCodeSucceeded: false,
-  swanAuthenticatedCode: null,
+  hasFetchSwanAuthenticationUrlCompleted: false,
+
+  hasRedeemSwanCodeForTokenSucceeded: false,
+  hasRedeemSwanCodeForTokenCompleted: false,
+  hasRedeemSwanCodeForTokenInitiated: false,
+
+  minBtcThreshold: 0.01,
+  hasSwanAccountCreationSucceeded: false,
+  hasSwanAccountCreationCompleted: false,
+  hasSwanAccountCreationInitiated: false,
+
+  swanAccountDetails: null,
+
+  startRegistration: true,
+
+  isVisited: false,
+  hasCreateWithdrawalWalletOnSwanSucceeded: false,
+  hasCreateWithdrawalWalletOnSwanCompleted: false,
+  hasCreateWithdrawalWalletOnSwanInitiated: false,
+  swanAuthenticatedToken: null,
   isSwanRedeemCodeInProgress: false,
   swanToken: null,
-
 
   swanTokenDetails: null,
   swanWalletDetails: null,
@@ -81,17 +138,87 @@ const INITIAL_STATE: SwanIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
+      case UPDATE_SWAN_STATUS:
+        return {
+          ...state,
+          swanAccountCreationStatus: action.payload.data
+        }
+      case IS_VISITED:
+        return {
+          ...state,
+          isVisited: true
+        }
+
+      case CLEAR_SWAN_CACHE:
+        return {
+          ...INITIAL_STATE
+        }
+
+      case FETCH_SWAN_AUTHENTICATION_URL_STARTED:
+        return {
+          ...state,
+          hasFetchSwanAuthenticationUrlInitiated: true
+        }
+
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
           ...state,
+          // swanAccountCreationStatus: SwanAccountCreationStatus.INITIAL_USER_AUTHENTICATION_IN_PROGRESS,
           isSwanAuthenticationInProgress: true,
+          hasFetchSwanAuthenticationUrlInitiated: true,
           hasFetchSwanAuthenticationUrlSucceeded: true,
+          hasFetchSwanAuthenticationUrlCompleted: true,
           swanAuthenticationUrl: action.payload.data.swanAuthenticationUrl,
           code_challenge: action.payload.data.code_challenge,
           code_verifier: action.payload.data.code_verifier,
           nonce: action.payload.data.nonce,
-          state: action.payload.data.state
+          state: action.payload.data.state,
+          swanAuthenticatedToken: null,
+          hasRedeemSwanCodeForTokenSucceeded: false,
+          hasRedeemSwanCodeForTokenCompleted: false,
+          hasRedeemSwanCodeForTokenInitiated: false,
         }
+
+      case REDEEM_SWAN_CODE_FOR_TOKEN_STARTED:
+        return {
+          ...state,
+          hasRedeemSwanCodeForTokenInitiated: true,
+        }
+
+      case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
+        return {
+          ...state,
+          hasRedeemSwanCodeForTokenSucceeded: true,
+          hasRedeemSwanCodeForTokenCompleted: true,
+          swanAuthenticatedToken: action.payload.data.swanAuthenticatedToken,
+          hasCreateWithdrawalWalletOnSwanSucceeded: false,
+          hasCreateWithdrawalWalletOnSwanCompleted: false,
+          hasCreateWithdrawalWalletOnSwanInitiated: false,
+        }
+
+      case CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED:
+        return {
+          ...state,
+          minBtcThreshold: action.payload.data || 0.01,
+          hasCreateWithdrawalWalletOnSwanInitiated: true,
+        }
+
+      case CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED:
+        return {
+          ...state,
+          swanAccountCreationStatus: SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY,
+          hasCreateWithdrawalWalletOnSwanSucceeded: true,
+          hasCreateWithdrawalWalletOnSwanCompleted: true,
+          swanWalletId: action.payload.data.swanWalletId,
+          startRegistration: false
+        }
+
+      case TEMP_SWAN_ACCOUNT_INFO_SAVED:
+        return {
+          ...state,
+          swanAccountDetails: action.payload.data
+        }
+
       case LINK_SWAN_WALLET:
         return {
           ...state,
@@ -99,23 +226,15 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case LINK_SWAN_WALLET_FAILED:
-        console.log(
-          'action.payload.linkSwanWalletFailedMessage',
-          action.payload.linkSwanWalletFailed,
-          action.payload.linkSwanWalletFailedMessage,
-        )
         return {
           ...state,
           isLinkingSwanWallet: false,
           linkSwanWalletFailed: true,
           linkSwanWalletFailedMessage: action.payload.linkSwanWalletFailedMessage,
+          swanAccountCreationStatus: SwanAccountCreationStatus.ERROR,
         }
 
       case LINK_SWAN_WALLET_SUCCEEDED:
-        console.log(
-          'payload.swanWalletDetails',
-          action.payload.swanWalletDetails,
-        )
         return {
           ...state,
           isLinkingSwanWallet: false,

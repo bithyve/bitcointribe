@@ -14,7 +14,6 @@ import {
   BackHandler,
   Alert,
   ActivityIndicator,
-  AsyncStorage,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'

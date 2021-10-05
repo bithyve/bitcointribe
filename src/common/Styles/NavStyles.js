@@ -56,7 +56,7 @@ const NavStyles = StyleSheet.create( {
   },
 
   modalContentView: {
-    flex: 1,
+    // flex: 1,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

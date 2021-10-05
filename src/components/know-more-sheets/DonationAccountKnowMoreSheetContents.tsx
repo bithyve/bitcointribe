@@ -10,115 +10,119 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { translations } from '../../common/content/LocContext'
 
 export default function DonationAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
 
   return (
     <View style={{
       ...styles.modalContainer, ...props.containerStyle
     }}>
-      <AppBottomSheetTouchableWrapper
-        style={styles.viewStyle}
-        activeOpacity={10}
-        onPress={() => props.titleClicked && props.titleClicked()}
-      >
-        <Text style={styles.headerText}>Donation Account</Text>
-      </AppBottomSheetTouchableWrapper>
+      <View style={{
+        height: hp( 81 )
+      }}>
+        <AppBottomSheetTouchableWrapper
+          style={styles.viewStyle}
+          activeOpacity={10}
+          onPress={() => props.titleClicked && props.titleClicked()}
+        >
+          <Text style={styles.headerText}>Donation Account</Text>
+        </AppBottomSheetTouchableWrapper>
 
-      <View style={styles.headerSeparator} />
+        <View style={styles.headerSeparator} />
 
-      <ScrollView
-        ref={scrollViewRef}
-        style={{
-          flex: 1,
-          backgroundColor: Colors.blue,
-        }}
-        snapToInterval={hp( '85%' )}
-        decelerationRate="fast"
-      >
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '4%' ),
-            }}
-          >
-            Collect donations for the causes of your choice - from all over the world.
-          </Text>
-          <View style={styles.viewStyle}>
-            <Image
-              source={require( '../../assets/images/icons/donationHelper.png' )}
-              style={styles.helperImage}
-            />
+        <ScrollView
+          ref={scrollViewRef}
+          style={{
+          // flex: 1,
+            backgroundColor: Colors.blue,
+          }}
+          snapToInterval={hp( '77%' )}
+          decelerationRate="fast"
+        >
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp( '4%' ),
+              }}
+            >
+              {strings.donation1}
+            </Text>
+            <View style={styles.viewStyle}>
+              <Image
+                source={require( '../../assets/images/icons/donationHelper.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '4%' ),
+              }}
+            >
+              {strings.donation2}
+            </Text>
+
+            <AppBottomSheetTouchableWrapper
+              style={{
+                alignItems: 'center'
+              }}
+              onPress={() => {
+                scrollViewRef.current?.scrollTo( {
+                  x: 0,
+                  y: hp( '79%' ),
+                  animated: true,
+                } )
+              }}
+            >
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper>
+
+            <View style={styles.viewStyle}>
+              {/* <View style={styles.separatorView}/> */}
+            </View>
           </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginBottom: wp( '4%' ),
-            }}
-          >
-            Self-manage your Donation Account without worrying about the tech involved.
-          </Text>
 
-          <AppBottomSheetTouchableWrapper
-            style={{
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              scrollViewRef.current?.scrollTo( {
-                x: 0,
-                y: hp( '85%' ),
-                animated: true,
-              } )
-            }}
-          >
-            <FontAwesome
-              name="angle-double-down"
-              color={Colors.white}
-              size={40}
-            />
-          </AppBottomSheetTouchableWrapper>
-
-          <View style={styles.viewStyle}>
-            {/* <View style={styles.separatorView}/> */}
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+              }}
+            >
+              {strings.donation3}
+            </Text>
+            <View style={styles.viewStyle}>
+              <Image
+                source={require( '../../assets/images/icons/donationHelper2.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '4%' ),
+              }}
+            >
+              {strings.donation4}
+            </Text>
+            <View style={styles.viewStyle}>
+              {/* <View style={styles.separatorView}/> */}
+            </View>
           </View>
-        </View>
-
-        <View style={styles.ElementView}>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginTop: wp( '4%' ),
-            }}
-          >
-            A web page and embed code for the account generates a new address every few minutes, helping with privacy of your transactions without needing any input from you.
-          </Text>
-          <View style={styles.viewStyle}>
-            <Image
-              source={require( '../../assets/images/icons/donationHelper2.png' )}
-              style={styles.helperImage}
-            />
-          </View>
-          <Text
-            style={{
-              ...styles.infoText,
-              marginBottom: wp( '4%' ),
-            }}
-          >
-           Your supporters can donate by paying to the addresses these pages generate.
-          </Text>
-          <View style={styles.viewStyle}>
-            {/* <View style={styles.separatorView}/> */}
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   )
 }
 const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
@@ -171,7 +175,7 @@ const styles = StyleSheet.create( {
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp( '89%' ),
+    height: hp( '81%' ),
     justifyContent: 'space-between',
   },
   separatorView: {
@@ -186,7 +190,7 @@ const styles = StyleSheet.create( {
   },
   helperImage: {
     width: wp( '80%' ),
-    height: wp( '60%' ),
+    height: wp( '50%' ),
     resizeMode: 'contain',
   },
   bottomLinkView: {

@@ -12,10 +12,9 @@ import {
   Platform,
   TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar,
-  AsyncStorage,
-  Alert,
+  StatusBar
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RFValue } from 'react-native-responsive-fontsize'
 import NavStyles from '../../common/Styles/NavStyles'
 import {
@@ -31,17 +30,12 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import BottomSheet from 'reanimated-bottom-sheet'
 
 import {
-  SECURE_ACCOUNT,
-  TEST_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-
-import {
   setReceiveHelper,
   setSavingWarning,
 } from '../../store/actions/preferences'
-import { getAccountIcon, getAccountTitle } from './Send/utils'
+import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
 import KnowMoreButton from '../../components/KnowMoreButton'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import CopyThisText from '../../components/CopyThisText'
 import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
@@ -52,43 +46,42 @@ import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
 import idx from 'idx'
 import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 import DeviceInfo from 'react-native-device-info'
+import AccountShell from '../../common/data/models/AccountShell'
+import { Account, AccountType } from '../../bitcoin/utilities/Interface'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import ModalContainer from '../../components/home/ModalContainer'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { getNextFreeAddress } from '../../store/sagas/accounts'
+import { translations } from '../../common/content/LocContext'
 
 export default function Receive( props ) {
-
-  const [ ReceiveHelperBottomSheet ] = useState( React.createRef() )
+  const dispatch = useDispatch()
+  const [ receiveHelper, showReceiveHelper ] = useState( false )
+  const [ receiveModal, setReceiveModal ] = useState( false )
   const [ isReceiveHelperDone, setIsReceiveHelperDone ] = useState( true )
   const isReceiveHelperDoneValue = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.isReceiveHelperDoneValue ),
   )
-
   const savingWarning = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.savingWarning ),
   )
-
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
-
   const [ amount, setAmount ] = useState( '' )
-  const [ serviceType ] = useState(
-    props.navigation.getParam( 'serviceType' )
-      ? props.navigation.getParam( 'serviceType' )
-      : '',
-  )
-  const derivativeAccountDetails =
-    props.navigation.state.params.derivativeAccountDetails
-  const dispatch = useDispatch()
-
+  const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
+  const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
+  const [ paymentURI, setPaymentURI ] = useState( null )
 
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
-  const { service } = useSelector( ( state ) => state.accounts[ serviceType ] )
-
 
   const onPressTouchableWrapper = () => {
-    if ( ReceiveHelperBottomSheet.current )
-      ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
+    showReceiveHelper( false )
   }
 
   const onPressBack = () => {
@@ -97,21 +90,7 @@ export default function Receive( props ) {
 
   const onPressKnowMore = () => {
     dispatch( setReceiveHelper( true ) )
-    if ( ReceiveHelperBottomSheet.current )
-      ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
-  }
-
-  const onPressReceiveHelperHeader = () => {
-    if ( isReceiveHelperDone ) {
-      if ( ReceiveHelperBottomSheet.current )
-        ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
-      setTimeout( () => {
-        setIsReceiveHelperDone( false )
-      }, 10 )
-    } else {
-      if ( ReceiveHelperBottomSheet.current )
-        ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
-    }
+    showReceiveHelper( true )
   }
 
   const checkNShowHelperModal = async () => {
@@ -119,15 +98,14 @@ export default function Receive( props ) {
     if ( !isReceiveHelperDone1 ) {
       await AsyncStorage.getItem( 'isReceiveHelperDone' )
     }
-    if ( !isReceiveHelperDone1 && serviceType == TEST_ACCOUNT ) {
+    if ( !isReceiveHelperDone1 && accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ) {
       dispatch( setReceiveHelper( true ) )
       //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout( () => {
         setIsReceiveHelperDone( true )
       }, 10 )
       setTimeout( () => {
-        if ( ReceiveHelperBottomSheet.current )
-          ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
+        showReceiveHelper( true )
       }, 1000 )
     } else {
       setTimeout( () => {
@@ -139,7 +117,7 @@ export default function Receive( props ) {
   useEffect( () => {
     checkNShowHelperModal()
     //(async () => {
-    if ( serviceType === SECURE_ACCOUNT ) {
+    if ( accountShell.primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ) {
       if ( !savingWarning ) {
         //await AsyncStorage.getItem('savingsWarning')
         // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
@@ -157,43 +135,45 @@ export default function Receive( props ) {
       ( SecureReceiveWarningBottomSheet as any ).current.snapTo( 0 )
   }
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ props.navigation ] )
+
   const showReceiveAmountBottomSheet = useCallback( () => {
-    presentBottomSheet(
+    return(
+
       <ReceiveAmountContent
-        title={'Receive sats'}
-        message={'Receive sats into the selected account'}
+        title={strings.Receivesats}
+        message={strings.Receivesatsinto}
         onPressConfirm={( amount ) => {
           setAmount( amount )
-          dismissBottomSheet()
+          setReceiveModal( false )
         }}
         selectedAmount={amount}
         onPressBack={() => {
-          dismissBottomSheet()
+          setReceiveModal( false )
         }
         }
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '50%' ],
-        overlayOpacity: 0.9,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet, amount ] )
+  }, [ amount ] )
+
 
   useEffect( () => {
-    const receivingAddress = service.getReceivingAddress(
-      derivativeAccountDetails ? derivativeAccountDetails.type : null,
-      derivativeAccountDetails ? derivativeAccountDetails.number : null,
-    )
-    let receiveAt = receivingAddress ? receivingAddress : ''
+    const receivingAddress = getNextFreeAddress( dispatch, account )
+    setReceivingAddress( receivingAddress )
+  }, [] )
+
+  useEffect( () => {
     if ( amount ) {
-      receiveAt = service.getPaymentURI( receiveAt, {
+      const newPaymentURI = AccountUtilities.generatePaymentURI( receivingAddress, {
         amount: parseInt( amount ) / SATOSHIS_IN_BTC,
       } ).paymentURI
-    }
-    setReceivingAddress( receiveAt )
-
-  }, [ service, amount, ] )
+      setPaymentURI( newPaymentURI )
+    } else if( paymentURI ) setPaymentURI( null )
+  }, [ amount ] )
 
   return (
     <View style={{
@@ -232,7 +212,7 @@ export default function Receive( props ) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    getAccountIcon( serviceType, derivativeAccountDetails )
+                    getAccountIconByShell( accountShell )
                   }
                   style={{
                     width: wp( '10%' ), height: wp( '10%' )
@@ -241,7 +221,7 @@ export default function Receive( props ) {
                 <View style={{
                   marginLeft: wp( '2.5%' )
                 }}>
-                  <Text style={NavStyles.modalHeaderTitleText}>Receive</Text>
+                  <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
                   <Text
                     style={{
                       color: Colors.textColorGrey,
@@ -250,12 +230,12 @@ export default function Receive( props ) {
                     }}
                   >
                     {
-                      getAccountTitle( serviceType, derivativeAccountDetails )
+                      getAccountTitleByShell( accountShell )
                     }
                   </Text>
                 </View>
               </View>
-              {serviceType == TEST_ACCOUNT ? (
+              {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
                 <KnowMoreButton
                   onpress={() => onPressKnowMore()}
                   containerStyle={{
@@ -268,22 +248,22 @@ export default function Receive( props ) {
             </View>
             <ScrollView>
               <View style={styles.QRView}>
-                <QRCode value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
+                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI? paymentURI: receivingAddress? receivingAddress: 'null'} size={hp( '27%' )} />
               </View>
 
               <CopyThisText
                 backgroundColor={Colors.white}
-                text={receivingAddress}
+                text={paymentURI? paymentURI: receivingAddress}
               />
 
               <AppBottomSheetTouchableWrapper
-                onPress={() => { showReceiveAmountBottomSheet() }}
+                onPress={() => { setReceiveModal( true ) }}
                 style={styles.selectedView}
               >
                 <View
                   style={styles.text}
                 >
-                  <Text style={styles.titleText}>{'Enter amount to receive'}</Text>
+                  <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>
                 </View>
 
                 <View style={{
@@ -303,35 +283,24 @@ export default function Receive( props ) {
               marginBottom: hp( '2.5%' )
             }}>
               <BottomInfoBox
-                title="Note"
-                infoText="It would take some time for the sats to reflect in your account based on the network condition"
+                title={common.note}
+                infoText={strings.Itwouldtake}
               />
             </View>
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
 
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ReceiveHelperBottomSheet as any}
-        snapPoints={[ -50, hp( '89%' ) ]}
-        renderContent={() => (
-          <ReceiveHelpContents
-            titleClicked={() => {
-              if ( ReceiveHelperBottomSheet.current )
-                ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            borderColor={Colors.blue}
-            backgroundColor={Colors.blue}
-            onPressHeader={() => onPressReceiveHelperHeader()}
-          />
-        )}
-      />
-
+      <ModalContainer visible={receiveHelper} closeBottomSheet={() => {showReceiveHelper( false )}} >
+        <ReceiveHelpContents
+          titleClicked={() => {
+            showReceiveHelper( false )
+          }}
+        />
+      </ModalContainer>
+      <ModalContainer visible={receiveModal} closeBottomSheet={() => {setReceiveModal( false )} } >
+        {showReceiveAmountBottomSheet()}
+      </ModalContainer>
       <BottomSheet
         enabledInnerScrolling={true}
         enabledGestureInteraction={false}

@@ -2,6 +2,10 @@ import { StyleSheet } from 'react-native'
 import Colors from '../Colors'
 import Fonts from '../Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 
 const ListStyles = StyleSheet.create( {
@@ -11,18 +15,18 @@ const ListStyles = StyleSheet.create( {
   },
 
   thumbnailImageMedium: {
-    width: 44,
-    height: 44,
+    width: wp( 9 ),
+    height: wp( 9 ),
   },
 
   thumbnailImageLarge: {
-    width: 54,
-    height: 54,
+    width: wp( 14 ),
+    height: wp( 14 ),
   },
 
   thumbnailImageXLarge: {
-    width: 64,
-    height: 64,
+    width: wp( 18 ),
+    height: wp( 18 ),
   },
 
   reorderItemIconImage: {
@@ -31,7 +35,7 @@ const ListStyles = StyleSheet.create( {
   },
 
   circledAvatarContainer: {
-    borderRadius: 9999,
+    borderRadius: wp( 15 )/2,
     borderColor: Colors.white,
     borderWidth: 2,
     alignItems: 'center',

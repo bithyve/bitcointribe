@@ -1,21 +1,20 @@
-import React, { memo, useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Colors from '../../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Fonts from './../../common/Fonts';
+import React, { memo, useMemo } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native'
+import Colors from '../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from './../../common/Fonts'
 import {
   widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
-import CardView from 'react-native-cardview';
-import Entypo from 'react-native-vector-icons/Entypo';
+} from 'react-native-responsive-screen'
+import Entypo from 'react-native-vector-icons/Entypo'
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../../common/constants/wallet-service-types';
-import config from '../../bitcoin/HexaConfig';
-import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay';
+} from '../../common/constants/wallet-service-types'
+import config from '../../bitcoin/HexaConfig'
+import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 
-const AccountsListSend = ({
+const AccountsListSend = ( {
   balances,
   accounts,
   onSelectContact,
@@ -25,40 +24,38 @@ const AccountsListSend = ({
   // (And a screen called "AddNewAccount" probably shouldn't be trying to use something
   // called "AccountsListSend" 😃).
   fromAddNewAccount,
-}) => {
+} ) => {
 
-  const balance = useMemo(() => {
-    if (accounts.id === REGULAR_ACCOUNT) {
-      return balances.regularBalance;
-    } else if (accounts.id === SECURE_ACCOUNT) {
-      return balances.secureBalance;
+  const balance = useMemo( () => {
+    if ( accounts.id === REGULAR_ACCOUNT ) {
+      return balances.regularBalance
+    } else if ( accounts.id === SECURE_ACCOUNT ) {
+      return balances.secureBalance
     } else if (
-      config.EJECTED_ACCOUNTS.includes(accounts.id) &&
+      config.EJECTED_ACCOUNTS.includes( accounts.id ) &&
       balances.additionalBalances
     ) {
       return balances.additionalBalances[
         accounts.type + accounts.id + accounts.account_number
-      ];
+      ]
     } else {
-      return 0;
+      return 0
     }
-  }, [accounts]);
+  }, [ accounts ] )
 
-  const balanceTextStyle = useMemo(() => {
+  const balanceTextStyle = useMemo( () => {
     return {
       ...styles.accountBalance,
       color: checkedItem ? Colors.white : Colors.borderColor,
-    };
-  }, [accounts]);
+    }
+  }, [ accounts ] )
 
   return (
     <TouchableOpacity
       style={styles.accountView}
-      onPress={() => onSelectContact(accounts)}
+      onPress={() => onSelectContact( accounts )}
     >
-      <CardView
-        cornerRadius={10}
-        opacity={1}
+      <View
         style={{
           ...styles.card,
           backgroundColor: checkedItem ? Colors.lightBlue : Colors.white,
@@ -87,9 +84,11 @@ const AccountsListSend = ({
             />
           )}
 
-          <View style={{ marginTop: wp('5%'), marginBottom: 7 }}>
+          <View style={{
+            marginTop: wp( '5%' ), marginBottom: 7
+          }}>
             <TouchableOpacity
-              onPress={() => onSelectContact(accounts)}
+              onPress={() => onSelectContact( accounts )}
               style={{
                 ...styles.checkedItem,
                 borderColor: checkedItem ? Colors.blue : Colors.borderColor,
@@ -99,22 +98,22 @@ const AccountsListSend = ({
               {checkedItem && (
                 <Entypo
                   name={'check'}
-                  size={RFValue(12)}
+                  size={RFValue( 12 )}
                   color={Colors.white}
                 />
               )}
             </TouchableOpacity>
           </View>
         </View>
-      </CardView>
+      </View>
     </TouchableOpacity>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   card: {
-    width: wp('30%'),
-    height: wp('35%'),
+    width: wp( '30%' ),
+    height: wp( '35%' ),
     marginLeft: 15,
     flexDirection: 'row',
     borderRadius: 15,
@@ -122,7 +121,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   accountView: {
-    height: wp('40%'),
+    height: wp( '40%' ),
     justifyContent: 'center',
     shadowOffset: {
       width: 4,
@@ -140,32 +139,32 @@ const styles = StyleSheet.create({
     marginRight: 2,
   },
   image: {
-    width: wp('10%'),
-    height: wp('10%'),
+    width: wp( '10%' ),
+    height: wp( '10%' ),
     alignSelf: 'center',
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
   accountName: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontWeight: '500',
     textAlign: 'center',
     alignSelf: 'center',
   },
   accountBalance: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
     marginTop: 5,
     alignSelf: 'center',
   },
   checkedItem: {
-    height: wp('5%'),
-    width: wp('5%'),
-    borderRadius: wp('5%') / 2,
+    height: wp( '5%' ),
+    width: wp( '5%' ),
+    borderRadius: wp( '5%' ) / 2,
     borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+} )
 
-export default memo(AccountsListSend);
+export default memo( AccountsListSend )

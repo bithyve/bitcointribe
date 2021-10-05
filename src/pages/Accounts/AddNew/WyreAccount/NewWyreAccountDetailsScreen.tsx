@@ -5,7 +5,6 @@ import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import { Input, Button } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import ExternalServiceSubAccountInfo from '../../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useWyreIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
@@ -28,7 +27,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const { wyreHostedUrl } = useWyreIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from Wyre' )
+  const [ accountDescription, setAccountDescription ] = useState( 'Sats purchased from Wyre' )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const canProceed = useMemo( () => {
     return (
@@ -43,7 +42,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     currentSubAccount.customDisplayName = accountName
     currentSubAccount.customDescription = accountDescription
 
-    if( !hasButtonBeenPressed ){dispatch( addNewAccountShell( currentSubAccount ) )}
+    // if( !hasButtonBeenPressed ){dispatch( addNewAccountShell( currentSubAccount ) )}
     setHasButtonBeenPressed( true )
   }
 
@@ -93,7 +92,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
               <Input
                 inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
                 inputStyle={FormStyles.inputText}
-                placeholder={'Enter A Description'}
+                placeholder={'Enter a description'}
                 placeholderTextColor={FormStyles.placeholderText.color}
                 underlineColorAndroid={FormStyles.placeholderText.color}
                 value={accountDescription}

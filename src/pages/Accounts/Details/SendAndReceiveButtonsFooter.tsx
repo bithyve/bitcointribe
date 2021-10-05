@@ -15,6 +15,7 @@ import NetworkKind from '../../../common/data/enums/NetworkKind'
 import Fonts from '../../../common/Fonts'
 import useCurrencyCode from '../../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
+import { translations } from '../../../common/content/LocContext'
 
 type FooterButtonProps = {
   style?: Record<string, unknown>;
@@ -29,6 +30,7 @@ export type Props = {
   onReceivePressed: () => void;
   averageTxFees: any;
   network: NetworkKind;
+  isTestAccount: boolean;
 };
 
 const FooterButton: React.FC<FooterButtonProps> = ( {
@@ -46,6 +48,7 @@ const FooterButton: React.FC<FooterButtonProps> = ( {
         ...styles.buttonContainer,
         ...style
       }}
+      delayPressIn={0}
     >
       <View style={styles.buttonImageContainer}>
         <Image source={imageSource} style={styles.buttonImage} />
@@ -64,10 +67,11 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
   onReceivePressed,
   averageTxFees,
   network,
+  isTestAccount
 } ) => {
   const currencyKind = useCurrencyKind()
   const currencyCode = useCurrencyCode()
-
+  const common  = translations[ 'common' ]
   const transactionFeeUnitPrefix = useMemo( () => {
     if ( currencyKind == CurrencyKind.FIAT ) {
       return currencyCode.toLowerCase()
@@ -97,15 +101,15 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
           marginRight: 8
         }}
         onPress={onSendPressed}
-        title="Send"
+        title={common.send}
         subtitle={`Tran Fee: ~${
           averageTxFees ? averageTxFees[ network ].low.averageTxFee : 0
-        } (${transactionFeeUnitText})`}
-        imageSource={require( '../../../assets/images/icons/icon_send.png' )}
+        } (${isTestAccount ? 't-sats' : transactionFeeUnitText})`}
+        imageSource={require( '../../../assets/images/icons/icon_send_blue.png' )}
       />
       <FooterButton
         onPress={onReceivePressed}
-        title="Receive"
+        title={common.receive}
         subtitle={''}
         imageSource={require( '../../../assets/images/icons/icon_receive_translucent.png' )}
       />

@@ -13,6 +13,7 @@ const Colors = {
   white: '#ffffff',
   offWhite: '#F5F5F5',
   red: '#FF7761',
+  tomatoRed: '#FF7861',
   homepageButtonColor: '#2C85C1',
   yellow: '#F7C910',
   shadowYellow: '#fff2cc',
@@ -28,7 +29,11 @@ const Colors = {
   coral: '#D35400',
   danube: '#5D8ED1',
   riptide: '#77E3B5',
-
+  kashmirBlue: '#546D92',
+  gold: '#E9BB35',
+  bgColor: '#F8F8F8',
+  shadowColor: '#8686860D',
+  darkGray: '#00000065',
   // Grayscale
   gray1: '#d0d0d0',
   gray2: '#A3A3A3',
@@ -36,6 +41,8 @@ const Colors = {
   gray4: '#6C6C6C',
   gray5: '#3A3A3C',
   gray6: '#2F2F2F',
+  gray7: '#FCFCFC',
+  gray8: '#A0A0A0',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',

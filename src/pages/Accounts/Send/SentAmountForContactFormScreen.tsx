@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Keyboard } from 'react-native'
+import { View, Text, StyleSheet, Keyboard, TouchableOpacity } from 'react-native'
 import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -7,9 +7,8 @@ import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import AccountShell from '../../../common/data/models/AccountShell'
-import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
+import { ContactRecipientDescribing, RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
@@ -20,8 +19,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { TouchableOpacity, useBottomSheetModal } from '@gorhom/bottom-sheet'
-import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending, updateDonationNote } from '../../../store/actions/sending'
+import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
@@ -32,7 +30,10 @@ import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-uti
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import idx from 'idx'
-import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
+import RecipientKind from '../../../common/data/enums/RecipientKind'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { translations } from '../../../common/content/LocContext'
 
 export type NavigationParams = {
 };
@@ -48,10 +49,10 @@ export type Props = {
 const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
 
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
+  const [ sendFailureModal, setFailure ] = useState( false )
+  const [ errorMessage, setError ] = useState( '' )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   const selectedRecipients = useSelectedRecipientsForSending()
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
@@ -60,9 +61,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const spendableBalance = useSpendableBalanceForAccountShell( sourceAccountShell )
   const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
-  const [ noteText, setNoteText ] = useState( '' )
   const sendingState = useSendingState()
-  const donationId = useDonationIdFromSelectedRecipients()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
@@ -75,7 +74,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+    return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
 
@@ -83,54 +82,72 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     return Array.from( selectedRecipients || [] ).reverse()
   }, [ selectedRecipients ] )
 
+  useEffect( () => {
+    return () => {
+      setFailure( false )
+    }
+  }, [ navigation ] )
+
+  useEffect( ()=> {
+    // refresh selected recipient's permanent channel
+    if( currentRecipient && currentRecipient.kind === RecipientKind.CONTACT ){
+      const channelUpdate = {
+        contactInfo: {
+          channelKey: ( currentRecipient as ContactRecipientDescribing ).channelKey,
+        }
+      }
+      dispatch( syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+        channelUpdates: [ channelUpdate ]
+      } ) )
+    }
+  }, [ ( currentRecipient as ContactRecipientDescribing )?.channelKey ] )
 
   function handleRecipientRemoval( recipient: RecipientDescribing ) {
     dispatch( recipientRemovedFromSending( recipient ) )
     navigation.goBack()
   }
 
-  function handleConfirmationButtonPress() {
+  function updateAmountForRecipient() {
     dispatch( amountForRecipientUpdated( {
       recipient: currentRecipient,
       amount: selectedAmount
     } ) )
+  }
 
+  function handleConfirmationButtonPress() {
+    updateAmountForRecipient()
     dispatch( executeSendStage1( {
-      accountShellID: sourceAccountShell.id
+      accountShell: sourceAccountShell
     } ) )
-
-    // update donation note
-    if( donationId && noteText )
-      dispatch( updateDonationNote( {
-        donationNote: noteText
-      } ) )
   }
 
   function handleAddRecipientButtonPress() {
+    updateAmountForRecipient()
     navigation.goBack()
   }
 
   function handleSendMaxPress( ) {
     dispatch( calculateSendMaxFee( {
       numberOfRecipients: selectedRecipients.length,
-      accountShellID: sourceAccountShell.id,
+      accountShell: sourceAccountShell,
     } ) )
   }
 
-  const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
-    presentBottomSheet(
+  const showSendFailureBottomSheet = useCallback( () => {
+    return(
       <SendConfirmationContent
-        title={'Send Unsuccessful'}
+        title={strings.SendUnsuccessful}
         info={String( errorMessage )}
         isFromContact={false}
         recipients={sendingState.selectedRecipients}
-        okButtonText={'Try Again'}
-        cancelButtonText={'Back'}
+        okButtonText={common.tryAgain}
+        cancelButtonText={common.back}
         isCancel={true}
-        onPressOk={dismissBottomSheet}
+        onPressOk={() => setFailure( false )}
         onPressCancel={() => {
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
-          dismissBottomSheet()
+          setFailure( false )
 
           navigation.dispatch(
             resetStackToAccountDetails( {
@@ -140,21 +157,21 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
-      },
+      />
     )
-  },
-  [ presentBottomSheet, dismissBottomSheet ] )
+  }, [ errorMessage ] )
 
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
       navigation.navigate( 'SendConfirmation' )
     },
-    onFailure: showSendFailureBottomSheet,
+    onFailure: ( error ) => {
+      setError( error )
+      setTimeout( () => {
+        setFailure( true )
+      }, 200 )
+    },
   } )
 
   useEffect( ()=> {
@@ -166,7 +183,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   return (
     <View style={styles.rootContainer}>
-
+      <ModalContainer visible={sendFailureModal} closeBottomSheet={() => {}} >
+        {showSendFailureBottomSheet()}
+      </ModalContainer>
       <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
           recipients={orderedRecipients}
@@ -185,7 +204,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         <Text style={{
           marginRight: RFValue( 4 )
         }}>
-          Sending From:
+          {`${strings.SendingFrom}:`}
         </Text>
 
         <Text style={{
@@ -205,37 +224,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
           spendableBalance={spendableBalance}
           onAmountChanged={( amount: Satoshis ) => {
             setSelectedAmount( amount )
-
-            dispatch( amountForRecipientUpdated( {
-              recipient: currentRecipient,
-              amount,
-            } ) )
           }}
           onSendMaxPressed={handleSendMaxPress}
         />
-
-        { donationId ? (
-          <View style={styles.textInputFieldWrapper}>
-            <Input
-              containerStyle={styles.textInputContainer}
-              inputContainerStyle={{
-                height: '100%',
-                padding: 0,
-                borderBottomColor: 'transparent',
-              }}
-              inputStyle={styles.textInputContent}
-              placeholder={'Send a short note to the donee'}
-              placeholderTextColor={FormStyles.placeholderText.color}
-              value={noteText}
-              returnKeyLabel="Done"
-              returnKeyType="done"
-              onSubmitEditing={Keyboard.dismiss}
-              onChangeText={setNoteText}
-              autoCorrect={false}
-              autoCompleteType="off"
-            />
-          </View>
-        ): null}
       </View>
 
       <View style={styles.footerSection}>
@@ -246,7 +237,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
           }}
         >
-          <Text style={ButtonStyles.actionButtonText}>Confirm & Proceed</Text>
+          <Text style={ButtonStyles.actionButtonText}>{common.confirmProceed}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -262,7 +253,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             ...ButtonStyles.actionButtonText,
             color: sendingState.sendMaxFee || !selectedAmount ? Colors.lightBlue: Colors.blue,
           }}>
-              Add Recipient
+            {strings.AddRecipient}
           </Text>
         </TouchableOpacity>
       </View>

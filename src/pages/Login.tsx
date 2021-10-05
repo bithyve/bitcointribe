@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   StatusBar,
-  AsyncStorage,
   Platform,
-  BackHandler
+  BackHandler,
+  Linking
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -25,55 +25,39 @@ import LoaderModal from '../components/LoaderModal'
 import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
-import ModalHeader from '../components/ModalHeader'
-import RelayServices from '../bitcoin/services/RelayService'
-import { initMigration } from '../store/actions/preferences'
-import openLink from '../utils/OpenLink'
-import content from '../common/content'
-
-const LOADER_MESSAGE_TIME = 2
-const loaderMessages = [
-  {
-    heading: 'Non-custodial buys',
-    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
-    subText: '(*select locations)',
-  },
-  {
-    heading: 'Friends & Family',
-    text:
-      'Add contacts to Hexa and send sats w/o asking for address every time',
-    subText: '',
-  },
-  {
-    heading: 'Hexa Savings Account',
-    text: 'Don’t forget to set up your 2FA code on an authenticator app',
-    subText: '',
-  },
-  {
-    heading: 'Donation Accounts',
-    text:
-      'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
-    subText: '',
-  },
-  {
-    heading: 'Satoshis or Sats',
-    text: '1 bitcoin = 100 million satoshis or sats',
-    subText: 'Hexa uses sats to make using bitcoin easier',
-  },
-  {
-    heading: 'Hexa Test Account',
-    text: 'Test Account comes preloaded with test-sats',
-    subText: 'Best place to start if you are new to Bitcoin',
-  },
-]
-
-const getRandomMessage = () => {
-  const randomIndex = Math.floor( Math.random() * 6 )
-  return loaderMessages[ randomIndex ]
-}
+import { processDeepLink } from '../common/CommonFunctions'
+import ModalContainer from '../components/home/ModalContainer'
+import firebase from '@react-native-firebase/app'
+import {
+  setIsPermissionGiven,
+  setFCMToken
+} from '../store/actions/preferences'
+import messaging from '@react-native-firebase/messaging'
+import {
+  updateFCMTokens,
+} from '../store/actions/notifications'
+import { autoSyncShells } from '../store/actions/accounts'
+import Relay from '../bitcoin/utilities/Relay'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export default function Login( props ) {
-
+  // const subPoints = [
+  //   'Setting up multi-accounts',
+  //   'Fetching test sats & balances',
+  //   'Generating shares for back-up',
+  //   'Getting the latest details'
+  // ]
+  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
+  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  // )
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
+  const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
+  const getRandomMessage = () => {
+    const randomIndex = Math.floor( Math.random() * 5 )
+    return strings.loaderMessages[ randomIndex ]
+  }
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
   const [ subTextMessage1 ] = useState( initialMessage.text )
@@ -84,17 +68,24 @@ export default function Login( props ) {
   const [ JailBrokenInfo, setJailBrokenInfo ] = useState( '' )
   const [ passcodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
-  const [ loaderBottomSheet ] = useState(
-    React.createRef<BottomSheet>(),
-  )
+  // const [ loaderBottomSheet ] = useState(
+  //   React.createRef<BottomSheet>(),
+  // )
+  const [ loaderModal, setloaderModal ] = useState( false )
+  const [ errorModal, setErrorModal ] = useState( false )
+
   const [ ErrorBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
   const releaseCasesValue = useSelector(
     ( state ) => state.preferences.releaseCasesValue,
   )
-
+  const existingFCMToken = useSelector(
+    ( state ) => state.preferences.fcmTokenValue,
+  )
+  const [ requestName, setRequestName ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
+  const [ creationFlag, setCreationFlag ] = useState( false )
 
   const onPressNumber = useCallback(
     ( text ) => {
@@ -118,11 +109,29 @@ export default function Login( props ) {
   }, [] )
 
   useEffect( () => {
+    Linking.addEventListener( 'url', handleDeepLinkEvent )
+    //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
       BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      Linking.removeEventListener( 'url', handleDeepLinkEvent )
     }
+
   }, [] )
+
+  const handleDeepLinkEvent = async ( { url } ) => {
+    handleDeepLinking( url )
+  }
+
+  const handleDeepLinking = async ( url: string | null ) => {
+    // console.log( 'Login::handleDeepLinkEvent::URL: ', url )
+    if ( url == null ) {
+      return
+    }
+    setCreationFlag( true )
+    const requestName = await processDeepLink( url )
+    setRequestName( requestName )
+  }
 
   useEffect( () => {
     if ( passcode.length == 4 ) {
@@ -135,10 +144,12 @@ export default function Login( props ) {
   const { isAuthenticated, authenticationFailed } = useSelector(
     ( state ) => state.setupAndAuth,
   )
+  const { walletExists } = useSelector( ( state ) => state.storage )
 
   useEffect( () => {
     if ( JailMonkey.isJailBroken() ) {
-      ErrorBottomSheet.current.snapTo( 1 )
+      // ErrorBottomSheet.current.snapTo( 1 )
+      setErrorModal( true )
       setTimeout( () => {
         setJailBrokenTitle(
           Platform.OS == 'ios'
@@ -155,7 +166,8 @@ export default function Login( props ) {
     }
     DeviceInfo.isPinOrFingerprintSet().then( ( isPinOrFingerprintSet ) => {
       if ( !isPinOrFingerprintSet ) {
-        ErrorBottomSheet.current.snapTo( 1 )
+        // ErrorBottomSheet.current.snapTo( 1 )
+        setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
             'Your phone does not have any secure entry like Pin or Biometric',
@@ -168,25 +180,24 @@ export default function Login( props ) {
       }
     } )
 
-    RelayServices.fetchReleases( DeviceInfo.getBuildNumber() )
+    Relay.fetchReleases( DeviceInfo.getBuildNumber() )
       .then( async ( res ) => {
         // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
-        // JSON.parse(
-        //   await AsyncStorage.getItem('releaseCases'),
-        // );
+
         if (
-          res.data.releases.length &&
-          res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
+          res.releases.length &&
+          res.releases[ 0 ].build > DeviceInfo.getBuildNumber()
         ) {
           if (
             releaseCases &&
-            releaseCases.build == res.data.releases[ 0 ].build &&
-            releaseCases.ignoreClick
+            releaseCases.build == res.releases[ 0 ].build &&
+            releaseCases.ignoreClick &&
+            releaseCases.reminderLimit < 0
           )
             return
           props.navigation.navigate( 'UpdateApp', {
-            releaseData: res.data.releases,
+            releaseData: res.releases,
           } )
         }
         return
@@ -197,39 +208,77 @@ export default function Login( props ) {
   }, [] )
 
 
-  const custodyRequest = props.navigation.getParam( 'custodyRequest' )
-  const recoveryRequest = props.navigation.getParam( 'recoveryRequest' )
-  const trustedContactRequest = props.navigation.getParam(
-    'trustedContactRequest',
-  )
-  const userKey = props.navigation.getParam( 'userKey' )
-  const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
-
   useEffect( () => {
     if ( isAuthenticated ) {
-      // migrate async keys
-      if ( !isMigrated ) {
-        dispatch( initMigration() )
-      }
-      AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
-        if ( exists ) {
-          setTimeout( () => {
-            if ( loaderBottomSheet.current ) {
-              loaderBottomSheet.current.snapTo( 0 )
+      if( !walletExists ) {
+        props.navigation.replace( 'WalletInitialization' )
+      } else {
+        setloaderModal( false )
+        if( !creationFlag ) {
+          props.navigation.navigate( 'Home', {
+            screen: 'Home'
+          } )
+        } else if( requestName ){
+          props.navigation.navigate( 'Home', {
+            screen: 'Home',
+            params: {
+              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+              userKey: requestName && requestName.userKey ? requestName.userKey : null,
+              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
             }
-            props.navigation.navigate( 'Home', {
-              custodyRequest,
-              recoveryRequest,
-              trustedContactRequest,
-              userKey,
-            } )
-          }, LOADER_MESSAGE_TIME )
-        } else {
-          props.navigation.replace( 'WalletInitialization' )
+          } )
         }
-      } )
+
+        bootStrapNotifications()
+        dispatch( autoSyncShells() )
+      }
     }
-  }, [ isAuthenticated ] )
+  }, [ isAuthenticated, walletExists, requestName ] )
+
+  const bootStrapNotifications = async () => {
+    dispatch( setIsPermissionGiven( true ) )
+    const t0 = performance.now()
+    if ( Platform.OS === 'ios' ) {
+      firebase
+        .messaging()
+        .hasPermission()
+        .then( ( enabled ) => {
+          if ( enabled ) {
+            storeFCMToken()
+            //this.createNotificationListeners()
+          } else {
+            firebase
+              .messaging()
+              .requestPermission( {
+                provisional: true,
+              } )
+              .then( () => {
+                storeFCMToken()
+                // this.createNotificationListeners()
+              } )
+              .catch( () => {
+                console.log( 'Permission rejected.' )
+              } )
+          }
+        } )
+        .catch()
+    } else {
+      storeFCMToken()
+      //this.createNotificationListeners()
+    }
+    const t1 = performance.now()
+    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
+  }
+
+  const storeFCMToken = async () => {
+    const fcmToken = await messaging().getToken()
+    if ( !existingFCMToken || existingFCMToken != fcmToken ) {
+      dispatch( setFCMToken( fcmToken ) )
+      dispatch( updateFCMTokens( [ fcmToken ] ) )
+    }
+  }
 
   const handleLoaderMessages = ( passcode ) => {
     setTimeout( () => {
@@ -244,6 +293,8 @@ export default function Login( props ) {
         messageText={subTextMessage1}
         messageText2={subTextMessage2}
         showGif={false}
+        // subPoints={subPoints}
+        // bottomText={bottomTextMessage}
       />
     )
   }, [ message, subTextMessage1, subTextMessage2 ] )
@@ -267,21 +318,22 @@ export default function Login( props ) {
   const checkPasscode = () => {
     if ( checkAuth ) {
       setTimeout( () => {
-        loaderBottomSheet.current.snapTo( 0 )
+        // loaderBottomSheet.current.snapTo( 0 )
+        setloaderModal( false )
       }, 2 )
 
       return (
         <View style={{
           marginLeft: 'auto'
         }}>
-          <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
+          <Text style={styles.errorText}>{strings.Incorrect}</Text>
         </View>
       )
     }
   }
 
   useEffect( () => {
-    if ( authenticationFailed ) {
+    if ( authenticationFailed && passcode ) {
       setCheckAuth( true )
       checkPasscode()
       setPasscode( '' )
@@ -298,23 +350,25 @@ export default function Login( props ) {
         info={JailBrokenInfo}
         proceedButtonText={'Ok'}
         onPressProceed={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
+          // ErrorBottomSheet.current.snapTo( 0 )
+          setErrorModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../assets/images/icons/errorImage.png' )}
+        type={'small'}
       />
     )
   }, [ JailBrokenTitle ] )
 
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
+  // const renderErrorModalHeader = useCallback( () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         ErrorBottomSheet.current.snapTo( 0 )
+  //       }}
+  //     />
+  //   )
+  // }, [] )
 
   return (
     <View style={{
@@ -326,11 +380,11 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>{content.login.welcome}</Text>
+          <Text style={styles.headerTitleText}>{strings.welcome}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              {content.login.enter_your}{' '}
-              <Text style={styles.boldItalicText}>{content.login.passcode}</Text>
+              {strings.enter_your}{' '}
+              <Text style={styles.boldItalicText}>{strings.passcode}</Text>
             </Text>
             <View style={{
               alignSelf: 'baseline'
@@ -480,7 +534,7 @@ export default function Login( props ) {
                     setIsDisabledProceed( true )
                     setElevation( 0 )
                   }, 2 )
-                  setTimeout( () => loaderBottomSheet.current?.snapTo( 1 ), 2 )
+                  setTimeout( () => setloaderModal( true ), 2 )
                   handleLoaderMessages( passcode )
                 }}
                 style={{
@@ -491,7 +545,7 @@ export default function Login( props ) {
                     : Colors.blue,
                 }}
               >
-                <Text style={styles.proceedButtonText}>Proceed</Text>
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
               </TouchableOpacity>
             </View>
           ) : null}
@@ -635,17 +689,14 @@ export default function Login( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <BottomSheet
-          onCloseEnd={() => { }}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[ -50, hp( '100%' ) ]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
-        />
+        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'}>
+          {renderLoaderModalContent()}
+        </ModalContainer>
       </View>
-      <BottomSheet
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+        {renderErrorModalContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         onCloseEnd={() => {
           setElevation( 10 )
         }}
@@ -660,7 +711,7 @@ export default function Login( props ) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
-      />
+      /> */}
     </View>
   )
 }
@@ -723,7 +774,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp( '6%' ),
+    marginTop: hp( '15%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
@@ -747,9 +798,10 @@ const styles = StyleSheet.create( {
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.red,
-    fontSize: RFValue( 11 ),
+    color: Colors.tomatoRed,
+    fontSize: RFValue( 10 ),
     fontStyle: 'italic',
+    letterSpacing: 0.5
   },
   headerTitleText: {
     color: Colors.blue,

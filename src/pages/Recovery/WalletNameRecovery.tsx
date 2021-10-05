@@ -115,14 +115,12 @@ export default function WalletNameRecovery( props ) {
             <View style={styles.bottomButtonView}>
               <TouchableOpacity
                 onPress={() =>
-                  // props.navigation.navigate("ScanRecoveryKey", {
-                  //   walletName: walletName,
-                  //   scannedData: (scannedData) =>
-                  //     this.handleScannedData(scannedData),
-                  // })
                   props.navigation.navigate( 'RecoveryQuestion', {
                     walletName
                   } )
+                  // props.navigation.navigate( 'RestoreWithICloud', {
+                  //   walletName
+                  // } )
                 }
                 style={styles.buttonView}
               >

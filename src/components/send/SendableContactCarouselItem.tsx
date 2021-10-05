@@ -7,6 +7,9 @@ import Colors from '../../common/Colors'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import Entypo from 'react-native-vector-icons/Entypo'
 import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
+import {
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 
 export type Props = {
   contact: ContactRecipientDescribing;
@@ -25,7 +28,10 @@ const SendableContactCarouselItem: React.FC<Props> = ( {
       ...styles.rootContainer, ...containerStyle
     }}>
       <View style={styles.circledAvatarContainer}>
-        <RecipientAvatar recipient={contact} />
+      <RecipientAvatar
+        recipient={contact}
+        contentContainerStyle={styles.avatarImage}
+      />
 
         {isSelected && (
           <View style={{
@@ -64,6 +70,12 @@ const styles = StyleSheet.create( {
   circledAvatarContainer: {
     ...ImageStyles.thumbnailImageMedium,
     ...ImageStyles.circledAvatarContainer,
+    borderRadius: wp( 12 )/2,
+  },
+  avatarImage: {
+    // ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp ( 12 )/2,
   },
 
   circledView: {

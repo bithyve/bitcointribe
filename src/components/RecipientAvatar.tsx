@@ -14,18 +14,19 @@ export type Props = {
 
 const RecipientAvatar: React.FC<Props> = ( {
   recipient,
-  containerStyle = {
-  },
-  contentContainerStyle = {
-    ...ImageStyles.circledAvatarContainer,
-    ...ImageStyles.thumbnailImageMedium,
-  },
+  contentContainerStyle
 }: Props ) => {
-  if ( recipient.avatarImageSource ) {
+  if ( recipient.avatarImageSource || recipient.image ) {
     return (
-      <View style={containerStyle}>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          ...contentContainerStyle,
+        }}
+      >
         <Image
-          source={recipient.avatarImageSource}
+          source={recipient.avatarImageSource ? recipient.avatarImageSource : recipient.image}
           style={contentContainerStyle}
           resizeMode="contain"
         />
@@ -48,7 +49,7 @@ const RecipientAvatar: React.FC<Props> = ( {
           }}
         >
           {nameToInitials(
-            recipient.kind == RecipientKind.ADDRESS ? '@' : ( recipient.displayedName || '' )
+            recipient.kind == RecipientKind.ADDRESS ? '@' : ( recipient.displayedName ? recipient.displayedName : recipient.contactName || '' )
           )}
         </Text>
       </View>

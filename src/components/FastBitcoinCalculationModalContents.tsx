@@ -82,7 +82,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
                 ...styles.textBox, paddingLeft: 10
               }}
               placeholder={'Enter Voucher Code'}
-              placeholderTextColor={Colors.borderColor}
+              placeholderTextColor={Colors.textColorGrey}
               onFocus={() => {
                 props.modalRef.current.snapTo( 2 )
               }}

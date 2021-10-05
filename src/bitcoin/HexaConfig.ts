@@ -1,29 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import {
   DerivativeAccount,
   DerivativeAccounts,
   TrustedContactDerivativeAccount,
   DonationDerivativeAccount,
+  SwanDerivativeAccount,
+  RampDerivativeAccount,
+  WyreDerivativeAccount,
+  AccountType,
 } from './utilities/Interface'
 import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
   WYRE,
-  RAMP
+  RAMP,
+  SWAN
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
+import { APP_STAGE } from '../common/interfaces/Interfaces'
+
 class HexaConfig {
   //RAMP details
   public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://buy.ramp.network/'
   public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE ? Config.RAMP_REFERRAL_CODE.trim() : 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
-  public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID ? Config.SWAN_CLIENT_ID.trim() : 'hexa-dev'
-  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL ? Config.SWAN_AUTH_URL.trim() : 'https://dev-api.swanbitcoin.com'
-  public WALLET_SLUG: string = Config.WALLET_SLUG ? Config.WALLET_SLUG.trim() : 'WALLET_SLUG'
+  public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa'
+  public SWAN_BASE_URL:string = Config.SWAN_BASE_URL || 'https://api.swanbitcoin.com'
+  public SWAN_URL_PREFIX:string = Config.SWAN_URL_PREFIX || '/apps/v20210824/'
+  public SWAN_REDIRECT_URL: string = Config.SWAN_REDIRECT_URL || 'https%3A%2F%2Fhexa.bithyve.com%2FdeepLink%2Fdev%2Fswan%2F'
+  public WALLET_SLUG: string = Config.WALLET_SLUG ? Config.WALLET_SLUG.trim() : 'hexa'
   public FBTC_REGISTRATION_URL: string = Config.FBTC_REGISTRATION_URL ? Config.FBTC_REGISTRATION_URL.trim() : 'https://fastbitcoins.com/create-account/hexa'
   public FBTC_URL: string = Config.FBTC_URL ? Config.FBTC_URL.trim() : 'https://wallet-api.fastbitcoins.com/v2/'
   public TESTNET_BASE_URL: string = Config.BIT_TESTNET_BASE_URL ? Config.BIT_TESTNET_BASE_URL.trim() : 'https://test-wrapper.bithyve.com'
@@ -31,13 +39,14 @@ class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
-  public BITCOIN_NODE: Client;
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
-  public TOKEN = 'notUsed';
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
   public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
   public GAP_LIMIT: number = Config.BIT_GAP_LIMIT ? parseInt( Config.BIT_GAP_LIMIT.trim(), 10 ) : 5;
+  public DONATION_GAP_LIMIT = Config.BIT_DONATION_GAP_LIMIT? parseInt( Config.BIT_DONATION_GAP_LIMIT.trim(), 10 ) : 50;
+  public DONATION_GAP_LIMIT_INTERNAL = Config.DONATION_GAP_LIMIT_INTERNAL? parseInt( Config.DONATION_GAP_LIMIT_INTERNAL.trim(), 10 ) : 20;
+
   public DERIVATIVE_GAP_LIMIT = 5;
   public CIPHER_SPEC: {
     algorithm: string;
@@ -69,10 +78,10 @@ class HexaConfig {
   };
   public SSS_TOTAL: number = Config.BIT_SSS_TOTAL ? parseInt( Config.BIT_SSS_TOTAL.trim(), 10 ) : 5;
   public SSS_THRESHOLD: number = Config.BIT_SSS_THRESHOLD ? parseInt( Config.BIT_SSS_THRESHOLD.trim(), 10 ) : 3;
-  public SSS_LEVEL1_TOTAL: number = Config.BIT_SSS_LEVEL1_TOTAL ? parseInt(Config.BIT_SSS_LEVEL1_TOTAL.trim(), 10) : 3;
-  public SSS_LEVEL1_THRESHOLD: number = Config.BIT_SSS_LEVEL1_THRESHOLD ? parseInt(Config.BIT_SSS_LEVEL1_THRESHOLD.trim(), 10) : 2;
-  public SSS_LEVEL2_TOTAL: number = Config.BIT_SSS_LEVEL2_TOTAL ? parseInt(Config.BIT_SSS_LEVEL2_TOTAL.trim(), 10) : 5;
-  public SSS_LEVEL2_THRESHOLD: number = Config.BIT_SSS_LEVEL2_THRESHOLD ? parseInt(Config.BIT_SSS_LEVEL2_THRESHOLD.trim(), 10) : 3;
+  public SSS_LEVEL1_TOTAL: number = Config.BIT_SSS_LEVEL1_TOTAL ? parseInt( Config.BIT_SSS_LEVEL1_TOTAL.trim(), 10 ) : 3;
+  public SSS_LEVEL1_THRESHOLD: number = Config.BIT_SSS_LEVEL1_THRESHOLD ? parseInt( Config.BIT_SSS_LEVEL1_THRESHOLD.trim(), 10 ) : 2;
+  public SSS_LEVEL2_TOTAL: number = Config.BIT_SSS_LEVEL2_TOTAL ? parseInt( Config.BIT_SSS_LEVEL2_TOTAL.trim(), 10 ) : 5;
+  public SSS_LEVEL2_THRESHOLD: number = Config.BIT_SSS_LEVEL2_THRESHOLD ? parseInt( Config.BIT_SSS_LEVEL2_THRESHOLD.trim(), 10 ) : 3;
   public MSG_ID_LENGTH: number = Config.BIT_MSG_ID_LENGTH ? parseInt( Config.BIT_MSG_ID_LENGTH.trim(), 10 ) : 12;
   public CHUNK_SIZE: number = Config.BIT_CHUNK_SIZE ? parseInt( Config.BIT_CHUNK_SIZE.trim(), 10 ) : 3;
   public CHECKSUM_ITR: number = Config.BIT_CHECKSUM_ITR ? parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 ) : 2;
@@ -116,7 +125,34 @@ class HexaConfig {
   public NOTIFICATION_HOUR = Config.NOTIFICATION_HOUR ? parseInt( Config.NOTIFICATION_HOUR.trim(), 10 ) : 336
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
-  public KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY ? parseInt(Config.KP_REQUEST_EXPIRY.trim(), 10) : 86400000;
+  public KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY ? parseInt( Config.KP_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
+
+  public ACCOUNT_INSTANCES = {
+    [ AccountType.TEST_ACCOUNT ]: {
+      series: 0,
+      upperBound: 1,
+    },
+    [ AccountType.CHECKING_ACCOUNT ]: {
+      series: 0,
+      upperBound: 10,
+    },
+    [ AccountType.SAVINGS_ACCOUNT ]: {
+      series: 10,
+      upperBound: 10,
+    },
+    [ AccountType.DONATION_ACCOUNT ]: {
+      series: 20,
+      upperBound: 10,
+    },
+    [ AccountType.SWAN_ACCOUNT ]: {
+      series: 30,
+      upperBound: 10,
+    },
+    [ AccountType.DEPOSIT_ACCOUNT ]: {
+      series: 40,
+      upperBound: 10,
+    },
+  }
 
   public BITHYVE_ESPLORA_API_ENDPOINTS = {
     TESTNET: {
@@ -147,17 +183,6 @@ class HexaConfig {
   public SIGNING_SERVER: string;
   public APP_STAGE: string;
 
-  public API_URLS = {
-    TESTNET: {
-      BASE: 'notUsed',
-      UNSPENT_OUTPUTS: 'notUsed'
-    },
-    MAINNET: {
-      BASE: 'notUsed',
-      UNSPENT_OUTPUTS: 'notUsed'
-    }
-  };
-
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
     series: Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ) : 1,
     instance: {
@@ -174,7 +199,7 @@ class HexaConfig {
     },
   };
 
-  public WYRE: DerivativeAccount = {
+  public WYRE: WyreDerivativeAccount = {
     series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
     instance: {
       max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 5,
@@ -182,10 +207,18 @@ class HexaConfig {
     },
   };
 
-  public RAMP: DerivativeAccount = {
+  public RAMP: RampDerivativeAccount = {
     series: Config.BIT_RAMP_SERIES ? parseInt( Config.BIT_RAMP_SERIES.trim(), 10 ) : 31,
     instance: {
       max: Config.BIT_RAMP_INSTANCE_COUNT ? parseInt( Config.BIT_RAMP_INSTANCE_COUNT.trim(), 10 ) : 5,
+      using: 0,
+    },
+  };
+
+  public SWAN: SwanDerivativeAccount = {
+    series: Config.BIT_SWAN_SERIES ? parseInt( Config.BIT_SWAN_SERIES.trim(), 10 ) : 41,
+    instance: {
+      max: Config.BIT_SWAN_INSTANCE_COUNT ? parseInt( Config.BIT_SWAN_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -213,11 +246,12 @@ class HexaConfig {
     FAST_BITCOINS: this.FAST_BITCOINS,
     WYRE: this.WYRE,
     RAMP: this.RAMP,
+    SWAN: this.SWAN,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP ];
+  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP, SWAN ];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys( this.DERIVATIVE_ACC ).filter(
     ( account ) => !this.EJECTED_ACCOUNTS.includes( account ),
@@ -232,22 +266,13 @@ class HexaConfig {
 
     this.setNetwork()
 
-    // TODO:: Refactor Bitcoin folder to remove Client
-    this.BITCOIN_NODE = new Client( {
-      network:
-        this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
-      timeout: 10000,
-      username: 'notUsed',
-      password: 'noUsed',
-      host: 'notUsed',
-    } )
     const BIT_SERVER_MODE = Config.BIT_SERVER_MODE ? Config.BIT_SERVER_MODE.trim() : 'PROD'
     if ( BIT_SERVER_MODE === 'LOCAL' || BIT_SERVER_MODE === 'DEV' ) {
-      this.APP_STAGE = 'dev'
+      this.APP_STAGE = APP_STAGE.DEVELOPMENT
     } else if ( BIT_SERVER_MODE === 'STA' ) {
-      this.APP_STAGE = 'sta'
+      this.APP_STAGE = APP_STAGE.STAGING
     } else {
-      this.APP_STAGE = 'app'
+      this.APP_STAGE = APP_STAGE.PRODUCTION
     }
   }
 

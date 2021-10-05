@@ -5,8 +5,7 @@ import {
   SECONDARY_XPRIV_GENERATED,
   TWO_FA_RESETTED,
   AVERAGE_TX_FEE,
-  ADD_NEW_ACCOUNT_SHELL,
-  NEW_ACCOUNT_SHELL_ADDED,
+  ADD_NEW_ACCOUNT_SHELLS,
   NEW_ACCOUNT_ADD_FAILED,
   ADD_NEW_ACCOUNT_SHELL_COMPLETED,
   ACCOUNT_SETTINGS_UPDATED,
@@ -22,10 +21,9 @@ import {
   ACCOUNT_SHELL_MERGE_FAILED,
   ACCOUNT_SHELLS_ORDER_UPDATED,
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
-  ACCOUNT_SHELL_REFRESH_COMPLETED,
-  ACCOUNT_SHELL_REFRESH_STARTED,
+  ACCOUNT_SHELLS_REFRESH_STARTED,
+  ACCOUNT_SHELLS_REFRESH_COMPLETED,
   CLEAR_ACCOUNT_SYNC_CACHE,
-  RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
   BLIND_REFRESH_STARTED,
@@ -34,47 +32,29 @@ import {
   CLEAR_RECEIVE_ADDRESS,
   GENERATE_SECONDARY_XPRIV,
   RESET_TWO_FA,
-  VALIDATE_TWO_FA
+  VALIDATE_TWO_FA,
+  SET_SHOW_ALL_ACCOUNT,
+  RESET_ACCOUNT_UPDATE_FLAG,
+  RESET_TWO_FA_LOADER,
+  NEW_ACCOUNT_SHELLS_ADDED,
+  UPDATE_ACCOUNT_SHELLS,
+  UPDATE_ACCOUNTS,
+  READ_TRANSACTION,
+  ACCOUNT_CHECKED,
+  RECOMPUTE_NET_BALANCE,
 } from '../actions/accounts'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import { SERVICES_ENRICHED } from '../actions/storage'
-import {
-  REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
-import { updateAccountShells } from '../utils/accountShellMapping'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-
-export type AccountVars = {
-  service: RegularAccount | TestAccount | SecureAccount;
-}
-
-// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
-const ACCOUNT_VARS: AccountVars  = {
-  service: null,
-}
+import { Account, Accounts } from '../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 export type AccountsState = {
-  servicesEnriched: boolean;
   accountsSynched: boolean;
-  testCoinsReceived: boolean,
+  accounts: Accounts,
   accountShells: AccountShell[];
-
-  // TODO: Consider removing these in favor of just looking
-  // up account data from `activeAccounts` using a UUID.
-  REGULAR_ACCOUNT: AccountVars;
-  TEST_ACCOUNT: AccountVars;
-  SECURE_ACCOUNT: AccountVars;
-
+  netBalance: number;
   exchangeRates?: any;
   averageTxFees: any;
-
   twoFAHelpFlags: {
       xprivGenerated: boolean | null;
       twoFAValid: boolean | null;
@@ -100,29 +80,24 @@ export type AccountsState = {
   accountShellMergeSource: AccountShell | null;
   accountShellMergeDestination: AccountShell | null;
 
-  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-
   refreshed: boolean;
-  accounts: any,
+  testCoinsReceived: boolean,
 
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
+  showAllAccount: boolean | null;
+  resetTwoFALoader: boolean;
 };
 
 const initialState: AccountsState = {
-  servicesEnriched: false,
   accountsSynched: false,
   exchangeRates: null,
-  testCoinsReceived: false,
-
-  REGULAR_ACCOUNT: ACCOUNT_VARS,
-  TEST_ACCOUNT: ACCOUNT_VARS,
-  SECURE_ACCOUNT: ACCOUNT_VARS,
 
   averageTxFees: null,
+  accounts: {
+  },
   accountShells: [],
-
+  netBalance: 0,
   twoFAHelpFlags: {
     xprivGenerated: null,
     twoFAValid: null,
@@ -148,14 +123,17 @@ const initialState: AccountsState = {
   accountShellMergeSource: null,
   accountShellMergeDestination: null,
 
-  currentWyreSubAccount: null,
-  currentRampSubAccount: null,
+  // currentWyreSubAccount: null,
+  // currentRampSubAccount: null,
+  // currentSwanSubAccount: null,
 
   refreshed: false,
-  accounts: null,
+  testCoinsReceived: false,
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,
+  showAllAccount: false,
+  resetTwoFALoader: false,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -166,27 +144,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
           testCoinsReceived: true
         }
-
-      case SERVICES_ENRICHED:
-        const { services } = action.payload
-        if ( action.payload.services )
-          return {
-            ...state,
-            [ REGULAR_ACCOUNT ]: {
-              ...state[ REGULAR_ACCOUNT ],
-              service: action.payload.services[ REGULAR_ACCOUNT ],
-            },
-            [ TEST_ACCOUNT ]: {
-              ...state[ TEST_ACCOUNT ],
-              service: action.payload.services[ TEST_ACCOUNT ],
-            },
-            [ SECURE_ACCOUNT ]: {
-              ...state[ SECURE_ACCOUNT ],
-              service: action.payload.services[ SECURE_ACCOUNT ],
-            },
-            servicesEnriched: true,
-            accountShells: updateAccountShells( services, state.accountShells ),
-          }
 
       case ACCOUNTS_SYNCHED:
         return {
@@ -252,6 +209,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           twoFAHelpFlags: {
             ...state.twoFAHelpFlags,
             twoFAResetted: action.payload.resetted,
+            twoFAValid: false,
           },
         }
 
@@ -262,7 +220,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           averageTxFees: action.payload.averageTxFees,
         }
 
-      case ADD_NEW_ACCOUNT_SHELL:
+      case ADD_NEW_ACCOUNT_SHELLS:
         return {
           ...state,
           isGeneratingNewAccountShell: true,
@@ -270,36 +228,15 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           hasNewAccountShellGenerationFailed: false,
         }
 
-      case NEW_ACCOUNT_SHELL_ADDED:
-        // using temperory variable to assign wyre account
-        // need to add the default wyre account to account state
-        // for now there is only one wyre account created so the first one is added as default
-        // this will need to be modified later elsewhere to add default wyre account to state
-        let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
-        let currentRampSubAccount: ExternalServiceSubAccountInfo | null
-        if (
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.WYRE
-        ) {
-          currentWyreSubAccount = action.payload.primarySubAccount
-        }
-        if (
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.RAMP
-        ) {
-          currentRampSubAccount = action.payload.primarySubAccount
-        }
-
+      case NEW_ACCOUNT_SHELLS_ADDED:
         return {
           ...state,
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: true,
-          accountShells: state.accountShells.concat( action.payload ),
-          ...currentWyreSubAccount && {
-            currentWyreSubAccount
-          },
-          ...currentRampSubAccount && {
-            currentRampSubAccount
+          accountShells: state.accountShells.concat( ...action.payload.accountShells ),
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts
           }
         }
 
@@ -319,10 +256,78 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           hasNewAccountShellGenerationFailed: false,
         }
 
-      case RESTORED_ACCOUNT_SHELLS:
+      case UPDATE_ACCOUNTS:
         return {
           ...state,
-          accountShells: action.payload.accountShells,
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts,
+          },
+        }
+
+      case READ_TRANSACTION: {
+        const { accountShells, accounts } = action.payload
+        return {
+          ...state,
+          accountShells: accountShells,
+          accounts: accounts,
+        }
+      }
+
+      case ACCOUNT_CHECKED: {
+        const { accountShells, accounts } = action.payload
+        return {
+          ...state,
+          accountShells: accountShells,
+          accounts: accounts,
+        }
+      }
+
+      case UPDATE_ACCOUNT_SHELLS:
+        const accounts = action.payload.accounts
+        const shells = state.accountShells
+        shells.forEach( ( shell )=>{
+          const account: Account = accounts[ shell.primarySubAccount.id ]
+          if( !account ) return shell
+
+          const accountDetails = {
+            accountName: account.accountName,
+            accountDescription: account.accountDescription,
+            accountXpub: account.xpub,
+            accountVisibility: account.accountVisibility,
+            hasNewTxn: account.hasNewTxn
+          }
+          AccountShell.updatePrimarySubAccountDetails(
+            shell,
+            account.isUsable,
+            account.balances,
+            account.transactions,
+            accountDetails
+          )
+          return shell
+        } )
+
+        return {
+          ...state,
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts,
+          },
+          accountShells: shells,
+        }
+
+      case RECOMPUTE_NET_BALANCE:
+        let netBalance = 0
+        state.accountShells.forEach( ( accountShell: AccountShell ) => {
+          if (
+            accountShell.primarySubAccount.sourceKind !==
+          SourceAccountKind.TEST_ACCOUNT
+          )
+            netBalance += AccountShell.getTotalBalance( accountShell )
+        } )
+        return {
+          ...state,
+          netBalance
         }
 
       case ACCOUNT_SETTINGS_UPDATED:
@@ -443,34 +448,43 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case REMAP_ACCOUNT_SHELLS:
         return {
           ...state,
-          accountShells: updateAccountShells( action.payload.services, [] ),
         }
 
-      case ACCOUNT_SHELL_REFRESH_STARTED:
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).syncStatus = SyncStatus.IN_PROGRESS
+      case ACCOUNT_SHELLS_REFRESH_STARTED:
+        const shellsRefreshing: AccountShell[] = action.payload
+        shellsRefreshing.forEach( refreshingShell => {
+          state.accountShells.forEach(
+            ( shell ) => {
+              if( shell.id == refreshingShell.id ) shell.syncStatus = SyncStatus.IN_PROGRESS
+              else shell.syncStatus = SyncStatus.COMPLETED
+            }
+          )
+        } )
         return {
           ...state,
         }
-      case ACCOUNT_SHELL_REFRESH_COMPLETED:
+
+      case ACCOUNT_SHELLS_REFRESH_COMPLETED:
         // Updating Account Sync State to shell data model
         // This will be used to display sync icon on Home Screen
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).syncStatus = SyncStatus.COMPLETED
+        const shellsRefreshed: AccountShell[] = action.payload
+        shellsRefreshed.forEach( refreshedShell => {
+          state.accountShells.find(
+            ( shell ) => shell.id == refreshedShell.id
+          ).syncStatus = SyncStatus.COMPLETED
+        } )
         return {
           ...state,
         }
 
-      case CLEAR_ACCOUNT_SYNC_CACHE:
-        // This will clear the sync state at the start of each login session
-        // This is required in order to ensure sync icon is shown again for each session
-        state.accountShells.map(
-          ( shell ) => shell.syncStatus = SyncStatus.PENDING )
-        return {
-          ...state,
-        }
+        // case CLEAR_ACCOUNT_SYNC_CACHE:
+        //   // This will clear the sync state at the start of each login session
+        //   // This is required in order to ensure sync icon is shown again for each session
+        //   state.accountShells.map(
+        //     ( shell ) => shell.syncStatus = SyncStatus.PENDING )
+        //   return {
+        //     ...state,
+        //   }
 
       case BLIND_REFRESH_STARTED:
         return {
@@ -498,6 +512,25 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           hasReceiveAddressSucceeded: null
         }
 
+      case SET_SHOW_ALL_ACCOUNT:
+        return {
+          ...state,
+          showAllAccount: action.payload.showAllAccount,
+        }
+
+      case RESET_ACCOUNT_UPDATE_FLAG:
+        return {
+          ...state,
+          isUpdatingAccountSettings: false,
+          hasAccountSettingsUpdateSucceeded: false,
+          hasAccountSettingsUpdateFailed: false,
+        }
+
+      case RESET_TWO_FA_LOADER:
+        return {
+          ...state,
+          resetTwoFALoader: action.payload.flag,
+        }
       default:
         return state
   }
