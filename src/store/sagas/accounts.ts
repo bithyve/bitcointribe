@@ -132,7 +132,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
+export async function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
@@ -152,7 +152,7 @@ export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: st
     let deepLinkEncryptionOTP
     if( shouldEncrypt ) deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
       deepLinkKind: DeepLinkKind.GIFT,
       encryptionType: shouldEncrypt? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT,
       encryptionKey: deepLinkEncryptionOTP,
@@ -165,7 +165,7 @@ export function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: st
       }
     } )
     return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress
+      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )

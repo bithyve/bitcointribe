@@ -1001,3 +1001,13 @@ export interface cloudDataInterface {
   secondaryShare?: string;
   seed?: string;
 }
+
+export enum ShortLinkKind {
+  CONTACT = 'request',
+  KEEPER = 'keeper',
+  PRIMARY_KEEPER = 'keeper',
+  RECIPROCAL_KEEPER = 'keeper',
+  EXISTING_CONTACT = 'request',
+  GIFT = 'gift',
+  DONATION = 'donation'
+}

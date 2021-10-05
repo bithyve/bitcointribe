@@ -128,6 +128,10 @@ export default function QrAndLink( props ) {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
+    generate()
+  }, [ Contact, trustedContacts, encryptLinkWith ] )
+
+  const generate = async () => {
     console.log( 'useEffect Contact', Contact )
     // capture the contact
     if( !Contact ) return
@@ -228,7 +232,7 @@ export default function QrAndLink( props ) {
       } ) )
       // saveInTransitHistory()
     }
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
+  }
 
   const openTimer = async () => {
     setTimeout( () => {
