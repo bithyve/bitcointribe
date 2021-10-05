@@ -32,7 +32,7 @@ const WalletSettingsStack = createStackNavigator(
     ChangeCurrency: {
       screen: ChangeCurrencyScreen,
       navigationOptions: {
-        title: 'Change Currency',
+        title: '',
       },
     },
     ReLogin: {

@@ -14,14 +14,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { currencyKindSet } from '../../store/actions/preferences'
 import { ScrollView } from 'react-native-gesture-handler'
 import { LocalizationContext } from '../../common/content/LocContext'
-import Languages from '../../common/content/availableLanguages'
-
-import ModalContainer from '../../components/home/ModalContainer'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation: any;
@@ -41,14 +33,9 @@ interface MenuOption {
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
 const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  const {
-    translations,
-    appLanguage,
-    setAppLanguage,
-  } = useContext( LocalizationContext )
+  const { translations, } = useContext( LocalizationContext )
   // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
   const [ isEnabled, setIsEnabled ] = useState( false )
-  const [ showLangModal, setShowLangModal ] = useState( false )
   const toggleSwitch = () => setIsEnabled( previousState => !previousState )
   const currencyCode = useSelector(
     ( state ) => state.preferences.currencyCode,
@@ -153,48 +140,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
       <View style={styles.accountCardsSectionContainer}>
-        <ModalContainer visible={showLangModal} closeBottomSheet={() => {setShowLangModal( false )}} >
-          <View style={styles.modalContentContainer}>
-            <Text
-              style={{
-                color:Colors.blue,
-                fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular,
-                marginVertical: wp( 2 ),
-              }}
-              numberOfLines={1}
-            >
-              {strings.changeLanguage}
-            </Text>
-            <FlatList
-              data={Languages}
-              contentContainerStyle={styles.list}
-              renderItem={( { item, } ) => (
-                <TouchableOpacity
-                  key={item.iso}
-                  activeOpacity={0.6}
-                  style={appLanguage === item.iso ? styles.containerItemSelected : styles.containerItem}
-                  onPress={() => setAppLanguage( item.iso )}>
-                  <Text style={styles.flag}>{item.flag}</Text>
-                  <Text style={styles.textLanName}>{item.displayTitle}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            <TouchableOpacity
-              activeOpacity={0.6}
-              onPress={() => setShowLangModal( false )}
-              style={{
-                height: 45, borderRadius: wp( 7/2 ),
-                backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-                margin: wp( 3 ),
-              }}
-            >
-              <Text style={{
-                color: 'white'
-              }}>{common.done}</Text>
-            </TouchableOpacity>
-          </View>
-        </ModalContainer>
+
         <Text style={{
           color: Colors.blue,
           fontSize: RFValue( 18 ),
@@ -303,44 +249,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               </AppBottomSheetTouchableWrapper>
             }}
           />
-          <TouchableOpacity
-            onPress={() => setShowLangModal( true )}
-            style={[ styles.otherCards, styles.extraHeight ]}
-          >
-            <Image
-              source={require( '../../assets/images/icons/translate.png' )}
-              style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
-              }}
-            />
-            <View style={{
-              marginLeft: 10
-            }}>
-              <View style={{
-                flexDirection: 'row'
-              }}>
-                <Text style={styles.addModalTitleText}>
-                  {strings.Language}
-                </Text>
-                {/* <View style={styles.containerBeta}>
-                  <Text style={styles.textBeta}>Beta</Text>
-                </View> */}
-              </View>
-              <Text style={styles.addModalInfoText}>
-                {strings.changeLanguage }
-              </Text>
-            </View>
-            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
-              style={{
-                width: widthPercentageToDP( '2.5%' ),
-                height: widthPercentageToDP( '2.5%' ),
-                alignSelf: 'center',
-                marginLeft: 'auto',
-                resizeMode: 'contain'
-              }}
-            />
-          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               Linking.openURL( 'https://hexawallet.io/faq/' )
