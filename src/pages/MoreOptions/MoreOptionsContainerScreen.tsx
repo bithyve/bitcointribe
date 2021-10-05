@@ -323,9 +323,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 <Text style={styles.addModalTitleText}>
                   {strings.Language}
                 </Text>
-                <View style={styles.containerBeta}>
+                {/* <View style={styles.containerBeta}>
                   <Text style={styles.textBeta}>Beta</Text>
-                </View>
+                </View> */}
               </View>
               <Text style={styles.addModalInfoText}>
                 {strings.changeLanguage }
