@@ -6,7 +6,8 @@ import {
   StatusBar,
   TouchableOpacity,
   ScrollView,
-  Text
+  Text,
+  Alert
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -36,7 +37,8 @@ export default function SendGift( props ) {
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
   const giftToSend = accountsState.gifts[ giftId ]
   const [ note, setNote ] = useState( '' )
-  const [ encryptWithOTP, setEncryptWithOTP ] = useState( false )
+  const [ encryptWithOTP, setEncryptWithOTP ] = useState( true )
+  const [ encryptionOTP, setEncryptionOTP ] = useState( '' )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
   const dispatch = useDispatch()
@@ -62,6 +64,10 @@ export default function SendGift( props ) {
       note,
       version: DeviceInfo.getVersion(),
     } ) )
+    setEncryptionOTP( deepLinkEncryptionOTP )
+
+    // TODO: remove alert and show OTP on the UI
+    Alert.alert( 'OTP: ', deepLinkEncryptionOTP )
   }
 
   useEffect( () => {
