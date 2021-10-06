@@ -46,7 +46,6 @@ export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const [ isOTPType, setIsOTPType ] = useState( false )
   const [ shareOtpWithTrustedContactModel, setShareOtpWithTrustedContactModel ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
   const [ secure2FAModal, setSecure2FAModal ] = useState( false )
@@ -63,15 +62,16 @@ export default function AddContactSendRequest( props ) {
   const [ timerModal, setTimerModal ] = useState( false )
   const [ renderTimer, setRenderTimer ] = useState( false )
 
+  const giftId = props.navigation.getParam( 'giftId' )
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
-  const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
+  const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT )
+  const [ isOTPType, setIsOTPType ] = useState( false )
 
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
-  const giftId = props.navigation.getParam( 'giftId' )
 
   const headerText = props.navigation.getParam( 'headerText' )
     ? props.navigation.getParam( 'headerText' )
@@ -149,6 +149,10 @@ export default function AddContactSendRequest( props ) {
 
   useEffect( () => {
     getContact()
+    // if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
+    //   setIsOTPType( true )
+    //   setShareOtpWithTrustedContactModel( true )
+    // }
   }, [] )
 
   useEffect( ()=> {
