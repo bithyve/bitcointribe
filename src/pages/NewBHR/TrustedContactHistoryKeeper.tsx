@@ -393,7 +393,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const onPressReshare = useCallback( async () => {
     setReshareModal( false )
     if( selectedKeeper.shareType == 'existingContact' ){
-      sendNotificationForExistingContact()
+      createGuardian( {
+        chosenContactTmp: chosenContact, shareType: 'existingContact'
+      } )
     } else {
       props.navigation.navigate( 'QrAndLink', {
         contact: chosenContact,
@@ -546,7 +548,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   useEffect( ()=> {
-    if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
       } ) )
@@ -582,9 +584,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
       dispatch( updateMSharesHealth( shareObj, isChange ) )
       dispatch( setChannelAssets( {
       }, null ) )
+      setIsGuardianCreationClicked( false )
       // saveInTransitHistory()
     }
-  }, [ chosenContact, trustedContacts, encryptLinkWith ] )
+  }, [ chosenContact, trustedContacts ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )

@@ -1486,19 +1486,22 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     if( existingContact ) {
       const existingContactDetails = contacts[ channelKey ].contactDetails
-      const channelUpdate =  {
-        contactInfo: {
-          contactDetails: existingContactDetails,
-          channelKey,
+      const instream = useStreamFromContact( contacts[ channelKey ], wallet.walletId, true )
+      if( !instream.primaryData ){
+        const channelUpdate =  {
+          contactInfo: {
+            contactDetails: existingContactDetails,
+            channelKey,
+          }
         }
+        const payloadForSync = {
+          permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+          channelUpdates: [ channelUpdate ],
+        }
+        yield call( syncPermanentChannelsWorker, {
+          payload: payloadForSync
+        } )
       }
-      const payloadForSync = {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-        channelUpdates: [ channelUpdate ],
-      }
-      yield call( syncPermanentChannelsWorker, {
-        payload: payloadForSync
-      } )
     }
     const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
@@ -1536,7 +1539,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           streamId: TrustedContactsOperations.getStreamId( walletId ),
           contact: contacts[ channelKey ],
           contactDetails: contacts[ channelKey ].contactDetails,
-          secondaryChannelKey: BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
+          secondaryChannelKey: contacts[ channelKey ].secondaryChannelKey ? contacts[ channelKey ].secondaryChannelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
           metaSync: true,
           unEncryptedOutstreamUpdates: streamUpdates
         }
@@ -2021,7 +2024,7 @@ function* acceptExistingContactRequestWorker( { payload } ) {
         data: {
           walletName: walletName,
           channelKey: channelKey,
-          contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
+          contactsSecondaryChannelKey: temporaryContact.contactsSecondaryChannelKey,
           version: appVersion
         },
         tag: notificationTag.IMP,
