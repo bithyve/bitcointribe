@@ -7,7 +7,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
-import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/BHR'
+import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, modifyLevelData, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/BHR'
 import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -22,7 +22,7 @@ import {
   ChannelAssets,
   DeepLinkEncryptionType,
   KeeperInfoInterface,
-  Keepers,
+  LevelData,
   LevelHealthInterface,
   MetaShare,
   QRCodeTypes,
@@ -49,11 +49,14 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
 import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import { translations } from '../../common/content/LocContext'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
+
   // const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ reshareModal, setReshareModal ] = useState( false )
   const [ ChangeBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -88,6 +91,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
   const [ isChangeClicked, setIsChangeClicked ] = useState( false )
+  const [ isShareClicked, setIsShareClicked ] = useState( false )
 
   const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
   const keeperProcessStatusFlag = useSelector( ( state ) => state.bhr.keeperProcessStatus )
@@ -245,7 +249,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
         dispatch( updateMSharesHealth( shareObj, isChange ) )
         dispatch( setChannelAssets( {
-        } ) )
+        }, null ) )
       }
     }
   }
@@ -256,26 +260,53 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <SecondaryDevice
         secondaryQR={keeperQR}
         onPressOk={async () => {
-          saveInTransitHistory()
-          // dispatch(checkMSharesHealth());
-          // ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
-          setShowQr( false )
-          if( props.navigation.getParam( 'isChangeKeeperType' ) ){
-            props.navigation.pop( 2 )
-          } else {
-            props.navigation.pop( 1 )
+          setIsShareClicked( true )
+          if( trustedContacts ) {
+            let channelUpdate
+            if ( channelKey && trustedContacts[ channelKey ] && trustedContacts[ channelKey ].contactDetails.id === Contact.id ) {
+              channelUpdate =  {
+                contactInfo: {
+                  channelKey: channelKey,
+                }
+              }
+            }
+            if( channelUpdate )
+              dispatch( syncPermanentChannels( {
+                permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+                channelUpdates: [ channelUpdate ],
+                metaSync: true
+              } ) )
           }
+          setShowQr( false )
           setTimeout( () => {
             setIsReshare( true )
           }, 2 )
         }}
         onPressBack={() => {
-          // ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
           setShowQr( false )
         }}
       />
     )
   }, [ keeperQR ] )
+
+  useEffect( ()=>{
+    if( isShareClicked ) dispatch( modifyLevelData() )
+  }, [ trustedContacts, isShareClicked ] )
+
+  useEffect( ()=>{
+    if( isShareClicked ){
+      if( levelData.find( value=>( value.keeper1.shareId == selectedKeeper.shareId && value.keeper1.status !== 'notSetup' ) || ( value.keeper2.shareId == selectedKeeper.shareId && value.keeper2.status !== 'notSetup' ) ) ) {
+        setTimeout( () => {
+          if( props.navigation.getParam( 'isChangeKeeperType' ) ) {
+            props.navigation.pop( 2 )
+          } else {
+            props.navigation.pop( 1 )
+          }
+          setShowQr( false )
+        }, 500 )
+      }
+    }
+  }, [ levelData, isShareClicked ] )
 
   const renderSecondaryDeviceMessageContents = useCallback( () => {
     return (
@@ -522,6 +553,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
+          showButton={true}
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}

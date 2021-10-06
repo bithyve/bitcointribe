@@ -215,21 +215,16 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 function* updateHealthForCloudWorker( { payload } ) {
   try {
     const { share } = payload
-    const levelHealth = yield select( ( state ) => state.bhr.levelHealth )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    let levelHealthVar = levelHealth[ 0 ].levelInfo[ 1 ]
+    let levelHealthVar: LevelInfo = levelHealth[ 0 ].levelInfo[ 1 ]
     if (
       share &&
       !( Object.keys( share ).length === 0 && share.constructor === Object ) &&
       levelHealth.length > 0
     ) {
-      levelHealthVar = levelHealth[ levelHealth.length - 1 ].levelInfo[ 1 ]
+      levelHealthVar = levelHealth[ levelHealth.findIndex( value=>value.levelInfo.find( temp=>temp.shareId == share.shareId ) ) ].levelInfo[ 1 ]
     }
-    // health update for 1st upload to cloud
-    // if (
-    //   levelHealth.length &&
-    //   levelHealthVar.status != 'accessible'
-    // ) {
     if ( levelHealthVar.shareType == 'cloud' ) {
       levelHealthVar.updatedAt = moment( new Date() ).valueOf()
       levelHealthVar.status = 'accessible'
@@ -246,7 +241,6 @@ function* updateHealthForCloudWorker( { payload } ) {
       name: levelHealthVar.name
     }
     yield put( updateMSharesHealth( shareObj ) )
-    // }
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )

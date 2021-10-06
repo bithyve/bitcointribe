@@ -20,6 +20,7 @@ export const ASSOCIATE_GIFT = 'ASSOCIATE_GIFT'
 export const FETCH_GIFT_FROM_CHANNEL = 'FETCH_GIFT_FROM_CHANNEL'
 export const SYNC_GIFTS_STATUS = 'SYNC_GIFTS_STATUS'
 export const REJECT_GIFT = 'REJECT_GIFT'
+export const RECLAIM_GIFT = 'RECLAIM_GIFT'
 
 export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
@@ -71,6 +72,7 @@ export const initializeTrustedContact = (
     channelKey,
     contactsSecondaryChannelKey,
     shareId,
+    giftId,
   }:{
       contact: any,
       flowKind: InitTrustedContactFlowKind,
@@ -79,6 +81,7 @@ export const initializeTrustedContact = (
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
       shareId?: string,
+      giftId?: string,
     },
 ) => {
   return {
@@ -91,15 +94,16 @@ export const initializeTrustedContact = (
       channelKey,
       contactsSecondaryChannelKey,
       shareId,
+      giftId
     },
   }
 }
 
-export const rejectTrustedContact = ( { channelKey } : {channelKey: string} ) => {
+export const rejectTrustedContact = ( { channelKey, isExistingContact } : {channelKey: string; isExistingContact?: string;} ) => {
   return {
     type: REJECT_TRUSTED_CONTACT,
     payload: {
-      channelKey
+      channelKey, isExistingContact
     },
   }
 }
@@ -168,6 +172,15 @@ export const rejectGift = ( channelAddress: string ) => {
     type: REJECT_GIFT,
     payload: {
       channelAddress
+    }
+  }
+}
+
+export const reclaimGift = ( giftId: string ) => {
+  return {
+    type: RECLAIM_GIFT,
+    payload: {
+      giftId
     }
   }
 }

@@ -95,8 +95,7 @@ const ManageGifts = ( { navigation } ) => {
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
           navigation.navigate( 'GiftDetails', {
-            title, walletName, createdAt: selectedGift.timestamps.created, amount: selectedGift.amount,
-            type: GiftStatus.CREATED
+            title, walletName, gift: selectedGift
           } )
           // navigation.navigate( 'AddContact', {
           //   fromScreen: 'ManageGift',
@@ -269,7 +268,7 @@ const ManageGifts = ( { navigation } ) => {
                         key={index}
                         onPress={() => {
                           navigation.navigate( 'GiftDetails', {
-                            title, walletName, createdAt: item.createdAt, amount: item.amount, avatar: true,
+                            title, walletName, gift: item
                           } )
                         }
                         }

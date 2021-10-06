@@ -115,7 +115,7 @@ function MBKeeperButton( props ) {
                 borderRadius: wp( '6%' ) / 2,
               }}
             />
-          ) : keeper.shareType == 'contact' && keeper.updatedAt != 0 ? (
+          ) : ( keeper.shareType == 'contact' || keeper.shareType == 'existingContact' ) && keeper.updatedAt != 0 ? (
             getImageIcon( keeper.data )
           ) : keeper.shareType == 'pdf' && keeper.status == 'accessible' ? (
             <Image

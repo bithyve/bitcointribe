@@ -6,8 +6,7 @@ import {
   SafeAreaView,
   Text,
   StatusBar,
-  ScrollView,
-  Platform
+  ScrollView
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -21,16 +20,16 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
+import { AccountType, Gift, GiftStatus } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
+import { reclaimGift } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { title, walletName, createdAt, amount, avatar, type } = navigation.state.params
-  console.log( 'navigation', navigation.state.params,  amount, type )
+  const { title, walletName, gift }: {title: string, walletName: string, gift: Gift} = navigation.state.params
 
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
@@ -80,107 +79,89 @@ const GiftDetails = ( { navigation } ) => {
         </View>
         <TouchableOpacity
           onPress={() => {}}
-          style={type === GiftStatus.CREATED ? styles.dashedContainer : [ styles.dashedContainer, {
+          style={gift.status === GiftStatus.CREATED ? styles.dashedContainer : [ styles.dashedContainer, {
             borderColor: Colors.white
           } ]}>
-          <View style={type === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle }>
-
-            <View style={{
-              marginHorizontal: wp( 1 ),  flexDirection: 'row', justifyContent: 'space-between',
-            }}>
-              <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-                fontWeight: '600'
-              }}>
-                {title}
-              </Text>
-              <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-              }}>
-              at {moment( createdAt ).format( 'lll' )}
-              </Text>
-            </View>
-            <View style={{
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: hp( 1 )
-            }}>
-              <View style={{
-                flexDirection: 'row',
-              }}>
-                {avatar ?
-                  <View style={styles.avatarContainer}>
-                    {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-                  </View>
-                  :
-                  <GiftCard />
-                }
-                <View style={{
-                  marginLeft: wp( 1 )
-                }}>
-                  <Text style={{
-                    color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}>
-                    {walletName ? walletName : 'from Checking Account'}
-                  </Text>
-                  <Text style={{
-                    color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}>
-                    {walletName ?? 'Lorem ipsum dolor'}
-                  </Text>
-                </View>
-
-              </View>
-
-              <Text style={{
-                color: Colors.black,
-                fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular
-              }}>
-                {numberWithCommas( amount )}
-                <Text style={{
-                  color: Colors.lightTextColor,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular
-                }}> sats
-                </Text>
-              </Text>
-            </View>
+          {/* <View style={gift.status === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle }> */}
+          <View style={styles.avatarContainer}>
+            {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
           </View>
+          <View style={{
+            marginHorizontal: wp( 3 )
+          }}>
+            <Text style={{
+              color: Colors.lightTextColor,
+              fontSize: RFValue( 10 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}>
+              {title}
+            </Text>
+            <Text style={{
+              color: Colors.lightTextColor,
+              fontSize: RFValue( 10 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}>
+              {walletName}
+            </Text>
+            <Text style={{
+              color: Colors.lightTextColor,
+              fontSize: RFValue( 10 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}>
+              at {moment( gift.timestamps.created ).format( 'lll' )}
+            </Text>
+          </View>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 'auto'
+          }}>
+            <Text style={{
+              color: Colors.black,
+              fontSize: RFValue( 24 ),
+              fontFamily: Fonts.FiraSansRegular
+            }}>
+              {numberWithCommas( gift.amount )}
+              <Text style={{
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular
+              }}> sats
+              </Text>
+            </Text>
+          </View>
+
         </TouchableOpacity>
 
       </SafeAreaView>
-      <View style={{
-        ...styles.keeperViewStyle
-      }}><TouchableOpacity
-          style={{
-            ...styles.bottomButton,
-          }}
-          onPress={() => {
-          }}
-        >
-          <Text style={[ styles.buttonText, {
-          } ]}>Send Gift Card</Text>
-          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            ...styles.bottomButton,
-          }}
-          onPress={() => {
-          }}
-        >
-          <Text style={[ styles.buttonText, {
-          } ]}>Expire Gift Card</Text>
-          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit</Text>
-        </TouchableOpacity>
-      </View>
+
+      {gift.status === GiftStatus.SENT?
+        (
+          <View style={{
+            ...styles.keeperViewStyle
+          }}><TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+                dispatch( reclaimGift( gift.id ) )
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Reclaim Gift Card</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Send Reminder</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+            </TouchableOpacity>
+          </View>
+        ): null }
     </ScrollView>
   )
 }
@@ -387,4 +368,3 @@ const styles = StyleSheet.create( {
 } )
 
 export default GiftDetails
-

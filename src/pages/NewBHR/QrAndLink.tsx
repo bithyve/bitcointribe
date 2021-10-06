@@ -229,7 +229,7 @@ export default function QrAndLink( props ) {
       if( shareType == 'existingContact' ) shareObj.updatedAt = 0
       dispatch( updateMSharesHealth( shareObj, isChange ) )
       dispatch( setChannelAssets( {
-      } ) )
+      }, null ) )
       // saveInTransitHistory()
     }
   }

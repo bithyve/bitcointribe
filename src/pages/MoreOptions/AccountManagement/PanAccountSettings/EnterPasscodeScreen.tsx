@@ -11,6 +11,7 @@ import Fonts from '../../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { setShowAllAccount } from '../../../../store/actions/accounts'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, credsAuthenticated, switchReLogin } from '../../../../store/actions/setupAndAuth'
@@ -42,12 +43,22 @@ export default function EnterPasscodeScreen( props ) {
     state => state.setupAndAuth,
   )
 
+  const { security } = useSelector(
+    state => state.storage.wallet,
+  )
+
   useEffect( () => {
     if ( reLogin ) {
       setCheckAuth( false )
       dispatch( credsAuthenticated( false ) )
-      props.navigation.navigate( 'SecurityQuestion' )
-      dispatch( switchReLogin( false, true ) )
+      if( security && security.question ) {
+        props.navigation.navigate( 'SecurityQuestion' )
+        dispatch( switchReLogin( false, true ) )
+      } else {
+        dispatch( setShowAllAccount( true ) )
+        props.navigation.navigate( 'AccountManagementRoot' )
+        dispatch( switchReLogin( false, true ) )
+      }
     }
   }, [ reLogin ] )
 

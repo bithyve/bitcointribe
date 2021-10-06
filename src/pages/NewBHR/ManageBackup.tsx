@@ -453,29 +453,6 @@ export default function ManageBackup( props ) {
     }
   }
 
-  const getHeaderMessage = () => {
-    if( levelData ){
-      for ( let i = 0; i < levelData.length; i++ ) {
-        const element = levelData[ i ]
-        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
-          return element.keeper1.name+ ` ${strings[ 'needsyourattention' ]}.`
-        }
-        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
-          return  element.keeper2.name+ ` ${strings[ 'needsyourattention' ]}.`
-        }
-      }
-    }
-    if( currentLevel == 0 ){
-      return strings[ 'incompletelevel1' ]
-    } else if( currentLevel === 1 ){
-      return strings[ 'incompletelevel2' ]
-    } else if( currentLevel === 2 ){
-      return strings[ 'incompletelevel3' ]
-    } else if( currentLevel == 3 ){
-      return strings[ 'complete' ]
-    }
-  }
-
   const onKeeperButtonPress = ( value, keeperNumber ) =>{
     // requestAnimationFrame( () => {
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
@@ -625,7 +602,7 @@ export default function ManageBackup( props ) {
                 fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular
               }}>{strings[ 'WalletBackup' ]}</Text>
-              <Text style={styles.headerMessageText}>{getHeaderMessage()}</Text>
+              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo' ]}</Text>
             </View>
             <ImageBackground
               source={require( '../../assets/images/icons/keeper_sheild.png' )}

@@ -132,7 +132,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export async function generateGiftLink( dispatch:any, giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
+export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
@@ -145,9 +145,7 @@ export async function generateGiftLink( dispatch:any, giftToSend: Gift, walletNa
       }
     }
 
-    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ).then( ( ) => {
-      dispatch( updateGift( giftToSend ) )
-    } ) // non-awaited upload
+    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
 
     let deepLinkEncryptionOTP
     if( shouldEncrypt ) deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
@@ -165,7 +163,7 @@ export async function generateGiftLink( dispatch:any, giftToSend: Gift, walletNa
       }
     } )
     return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink
+      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )

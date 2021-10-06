@@ -19,6 +19,8 @@ import {
   SYNC_GIFTS_STATUS,
   REJECT_GIFT,
   ASSOCIATE_GIFT,
+  fetchGiftFromTemporaryChannel,
+  RECLAIM_GIFT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -62,7 +64,7 @@ import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth, getApprovalFromKeepers } from '../actions/BHR'
-import { getNextFreeAddressWorker, setup2FADetails } from './accounts'
+import { generateGiftLink, getNextFreeAddressWorker, setup2FADetails } from './accounts'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { updateWalletNameToChannel } from '../actions/trustedContacts'
 import { updateWallet } from '../actions/storage'
@@ -72,6 +74,7 @@ import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import { processDeepLink } from '../../common/CommonFunctions'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -155,19 +158,37 @@ export const associateGiftWatcher = createWatcher(
 
 function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const { channelAddress } = payload
+
+  for( const giftId in storedGifts ){
+    if( channelAddress === storedGifts[ giftId ].channelAddress ) {
+      Toast( 'Gift already exist' )
+      return
+    }
+  }
 
   let gift: Gift, giftMetaData :GiftMetaData
   try{
-    const res = yield call( Relay.fetchGiftChannel, payload.channelAddress, payload.decryptionKey )
+    const res = yield call( Relay.fetchGiftChannel, channelAddress, payload.decryptionKey )
     gift = res.gift
     giftMetaData = res.metaData
+
     if( !gift ){
       if( !giftMetaData ) throw new Error( 'Gift data unavailable' )
       else {
-        if( giftMetaData.status === GiftStatus.ACCEPTED )
-          Toast( 'Gift already claimed' )
-        else if( giftMetaData.status === GiftStatus.REJECTED )
-          Toast( 'Gift already rejected' )
+        switch( giftMetaData.status ){
+            case GiftStatus.ACCEPTED:
+              Toast( 'Gift already claimed' )
+              break
+
+            case GiftStatus.REJECTED:
+              Toast( 'Gift already rejected' )
+              break
+
+            case GiftStatus.RECLAIMED:
+              Toast( 'Gift already reclaimed' )
+              break
+        }
         return
       }
     }
@@ -268,6 +289,42 @@ function* rejectGiftWorker( { payload }: {payload: { channelAddress: string}} ) 
 export const rejectGiftWatcher = createWatcher(
   rejectGiftWorker,
   REJECT_GIFT
+)
+
+function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const gift: Gift = storedGifts[ payload.giftId ]
+
+  const giftChannelsToSync = {
+    [ gift.channelAddress ]: {
+      creator: true,
+      metaDataUpdates: {
+        status: GiftStatus.RECLAIMED
+      },
+    }
+  }
+
+  const { synchedGiftChannels }: { synchedGiftChannels: {
+    [channelAddress: string]: {
+        metaData: GiftMetaData;
+    };
+  };
+  } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
+  const { metaData: giftMetaData } = synchedGiftChannels[ gift.channelAddress ]
+  console.log( {
+    giftMetaData
+  } )
+  if( giftMetaData.status === GiftStatus.RECLAIMED ){
+    gift.status = giftMetaData.status
+    gift.timestamps.reclaimed = Date.now()
+    yield put( updateGift( gift ) )
+    Toast( 'Gift reclaimed' )
+  } else throw new Error( 'Unable to reclaim gift' )
+}
+
+export const reclaimGiftWatcher = createWatcher(
+  reclaimGiftWorker,
+  RECLAIM_GIFT
 )
 
 function* syncGiftsStatusWorker() {
@@ -479,24 +536,27 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+        const walletID: string = idx( instream, ( _ ) => _.primaryData.walletID )
         const nameAssociatedByContact: string = idx( instream, ( _ ) => _.primaryData.contactDetails.contactName )
 
-        if( fcmToken ){
-          let notifType, notifBody
+        if( fcmToken && walletID ){
+          let notifType, notifBody, notifTitle
           switch( temporaryContact.relationType ){
               case TrustedContactRelationTypes.KEEPER:
                 notifType = notificationType.FNF_KEEPER_REQUEST_REJECTED
+                notifTitle = 'Friends & Family notification'
                 notifBody = `F&F keeper request rejected by ${nameAssociatedByContact || wallet.walletName}`
                 break
 
               default:
                 notifType = notificationType.FNF_REQUEST_REJECTED
+                notifTitle = 'Friends & Family notification'
                 notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
           }
 
           const notification: INotification = {
             notificationType: notifType,
-            title: 'Friends & Family notification',
+            title: notifTitle,
             body: notifBody,
             data: {
             },
@@ -504,7 +564,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           }
           const notifReceivers = []
           notifReceivers.push( {
-            walletId: walletId, //instream.primaryData.walletID,
+            walletId: walletID, //instream.primaryData.walletID,
             FCMs: [ fcmToken ],
           } )
           if( notifReceivers.length )
@@ -564,7 +624,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           switch( contact.relationType ){
               case TrustedContactRelationTypes.WARD:
                 notifType = notificationType.FNF_KEEPER_REQUEST_ACCEPTED
-                notifTitle = 'Wallet Security'
+                notifTitle = 'Friends & Family notification'
                 notifBody = `Keeper request accepted by ${nameAssociatedByContact || wallet.walletName}`
                 break
 
@@ -670,8 +730,8 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string }} ) {
-  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string }} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -738,6 +798,17 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
   }
 
+  // prepare gift data
+  let giftDeepLink
+  if( giftId && flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
+    const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+    const giftToSend = gifts[ giftId ]
+
+    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, wallet.walletName, FCM, '' )
+    yield put( updateGift( updatedGift ) )
+    giftDeepLink = deepLink
+  }
+
   // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
@@ -745,6 +816,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     relationType,
     FCM,
     paymentAddresses,
+    giftDeepLink,
     contactDetails: contactInfo.contactDetails
   }
 
@@ -813,32 +885,55 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     }
   } )
 
-  if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && isPrimaryKeeper && contactsSecondaryChannelKey ){
-    // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
+  if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
     yield delay( 1000 ) // delaying to make sure the primary ward's instream is updated in the reducer
     const contacts: Trusted_Contacts = yield select(
       ( state ) => state.trustedContacts.contacts,
     )
-    const primaryWard = contacts[ channelKey ]
-    const instreamId = primaryWard.streamId
-    const instream: UnecryptedStreamData = idx( primaryWard, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
-    const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )
+    const approvedContact = contacts[ channelKey ]
+    const instreamId = approvedContact.streamId
+    const instream: UnecryptedStreamData = idx( approvedContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
 
-    const instreamSecondaryData: SecondaryStreamData = {
-      secondaryMnemonicShard: wardsSecondaryShards[ 1 ],
-      bhXpub
-    }
-    const instreamUpdates = {
-      streamId: instreamId,
-      secondaryEncryptedData: TrustedContactsOperations.encryptData(
-        primaryWard.contactsSecondaryChannelKey,
-        instreamSecondaryData
-      ).encryptedData
+    if( instream.primaryData?.giftDeepLink ){
+      // process incoming gift
+      console.log( 'link', instream.primaryData.giftDeepLink )
+      const { giftRequest } = yield call( processDeepLink, instream.primaryData.giftDeepLink )
+      let decryptionKey
+      try{
+        switch( giftRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              decryptionKey = giftRequest.encryptedChannelKeys
+              break
+        }
+      } catch( err ){
+        Toast( 'Unable to process gift' )
+        return
+      }
+
+      yield put( fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey ) )
     }
 
-    yield call( TrustedContactsOperations.updateStream, {
-      channelKey, streamUpdates: instreamUpdates
-    } )
+    if( isPrimaryKeeper && contactsSecondaryChannelKey ){
+      // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
+      const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )
+
+      const instreamSecondaryData: SecondaryStreamData = {
+        secondaryMnemonicShard: wardsSecondaryShards[ 1 ],
+        bhXpub
+      }
+      const instreamUpdates = {
+        streamId: instreamId,
+        secondaryEncryptedData: TrustedContactsOperations.encryptData(
+          approvedContact.contactsSecondaryChannelKey,
+          instreamSecondaryData
+        ).encryptedData
+      }
+
+      yield call( TrustedContactsOperations.updateStream, {
+        channelKey, streamUpdates: instreamUpdates
+      } )
+    }
+
   }
 }
 
@@ -847,9 +942,14 @@ export const initializeTrustedContactWatcher = createWatcher(
   INITIALIZE_TRUSTED_CONTACT,
 )
 
-function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: string }} ) {
-  const { walletId } = yield select( state => state.storage.wallet )
-  const { channelKey } = payload
+function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: string, isExistingContact?: boolean }} ) {
+  const { channelKey, isExistingContact } = payload
+  const { walletId, walletName }: Wallet = yield select( state => state.storage.wallet )
+  const FCM = yield select ( state => state.preferences.fcmTokenValue )
+
+  const trustedContacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
+  )
   const streamUpdates: UnecryptedStreamData = {
     streamId: TrustedContactsOperations.getStreamId( walletId ),
     metaData: {
@@ -861,8 +961,20 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
     }
   }
 
-  const contactDetails: ContactDetails = { // temp contact details
+  let contactDetails: ContactDetails = { // temp contact details
     id: ''
+  }
+  const contactToUpdate: TrustedContact = trustedContacts[ channelKey ]
+  if( contactToUpdate && isExistingContact ){
+    const primaryData: PrimaryStreamData = {
+      walletID: walletId,
+      walletName: walletName,
+      relationType: TrustedContactRelationTypes.CONTACT,
+      FCM: FCM,
+      contactDetails: contactToUpdate.contactDetails,
+    }
+    streamUpdates.primaryData = primaryData
+    contactDetails = contactToUpdate.contactDetails
   }
 
   const contactInfo: ContactInfo = {

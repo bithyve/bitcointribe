@@ -87,6 +87,7 @@ import {
   syncGiftsStatusWatcher,
   rejectGiftWatcher,
   associateGiftWatcher,
+  reclaimGiftWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -230,6 +231,7 @@ const rootSaga = function* () {
     fetchGiftFromChannelWatcher,
     syncGiftsStatusWatcher,
     rejectGiftWatcher,
+    reclaimGiftWatcher,
 
     // bhr
     initHealthWatcher,
