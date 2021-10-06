@@ -6,7 +6,8 @@ import {
   StatusBar,
   TouchableOpacity,
   ScrollView,
-  Text
+  Text,
+  Alert
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -64,6 +65,9 @@ export default function SendGift( props ) {
       version: DeviceInfo.getVersion(),
     } ) )
     setEncryptionOTP( deepLinkEncryptionOTP )
+
+    // TODO: remove alert and show OTP on the UI
+    Alert.alert( 'OTP: ', deepLinkEncryptionOTP )
   }
 
   useEffect( () => {

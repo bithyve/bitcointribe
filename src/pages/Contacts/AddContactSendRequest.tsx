@@ -7,7 +7,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -149,11 +150,13 @@ export default function AddContactSendRequest( props ) {
 
   useEffect( () => {
     getContact()
-    // if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
-    //   setIsOTPType( true )
-    //   setShareOtpWithTrustedContactModel( true )
-    // }
-  }, [] )
+    if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
+      // TODO: remove alert and show OTP on the UI
+      // setIsOTPType( true )
+      // setShareOtpWithTrustedContactModel( true )
+      if( encryptionKey ) Alert.alert( 'OTP: ', encryptionKey )
+    }
+  }, [ encryptionKey ] )
 
   useEffect( ()=> {
     if ( !Contact ) return

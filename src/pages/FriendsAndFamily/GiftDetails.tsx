@@ -20,15 +20,15 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { AccountType, Gift } from '../../bitcoin/utilities/Interface'
+import { AccountType, Gift, GiftStatus } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
+import { reclaimGift } from '../../store/actions/trustedContacts'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { title, walletName, createdAt, amount } = navigation.state.params
-  console.log( 'navigation', navigation.state.params,  amount )
+  const { title, walletName, gift }: {title: string, walletName: string, gift: Gift} = navigation.state.params
 
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
@@ -120,7 +120,7 @@ const GiftDetails = ( { navigation } ) => {
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
             }}>
-              at {moment( createdAt ).format( 'lll' )}
+              at {moment( gift.timestamps.created ).format( 'lll' )}
             </Text>
           </View>
           <View style={{
@@ -131,7 +131,7 @@ const GiftDetails = ( { navigation } ) => {
               fontSize: RFValue( 24 ),
               fontFamily: Fonts.FiraSansRegular
             }}>
-              {numberWithCommas( amount )}
+              {numberWithCommas( gift.amount )}
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
@@ -144,31 +144,36 @@ const GiftDetails = ( { navigation } ) => {
         </View>
 
       </SafeAreaView>
-      <View style={{
-        ...styles.keeperViewStyle
-      }}><TouchableOpacity
-          style={{
-            ...styles.bottomButton,
-          }}
-          onPress={() => {
-          }}
-        >
-          <Text style={[ styles.buttonText, {
-          } ]}>Reclaim Gift Card</Text>
-          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            ...styles.bottomButton,
-          }}
-          onPress={() => {
-          }}
-        >
-          <Text style={[ styles.buttonText, {
-          } ]}>Send Reminder</Text>
-          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
-        </TouchableOpacity>
-      </View>
+
+      {gift.status === GiftStatus.SENT?
+        (
+          <View style={{
+            ...styles.keeperViewStyle
+          }}><TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+                dispatch( reclaimGift( gift.id ) )
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Reclaim Gift Card</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Send Reminder</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+            </TouchableOpacity>
+          </View>
+        ): null }
     </ScrollView>
   )
 }
