@@ -20,6 +20,7 @@ import {
   REJECT_GIFT,
   ASSOCIATE_GIFT,
   fetchGiftFromTemporaryChannel,
+  RECLAIM_GIFT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -157,19 +158,37 @@ export const associateGiftWatcher = createWatcher(
 
 function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const { channelAddress } = payload
+
+  for( const giftId in storedGifts ){
+    if( channelAddress === storedGifts[ giftId ].channelAddress ) {
+      Toast( 'Gift already exist' )
+      return
+    }
+  }
 
   let gift: Gift, giftMetaData :GiftMetaData
   try{
-    const res = yield call( Relay.fetchGiftChannel, payload.channelAddress, payload.decryptionKey )
+    const res = yield call( Relay.fetchGiftChannel, channelAddress, payload.decryptionKey )
     gift = res.gift
     giftMetaData = res.metaData
+
     if( !gift ){
       if( !giftMetaData ) throw new Error( 'Gift data unavailable' )
       else {
-        if( giftMetaData.status === GiftStatus.ACCEPTED )
-          Toast( 'Gift already claimed' )
-        else if( giftMetaData.status === GiftStatus.REJECTED )
-          Toast( 'Gift already rejected' )
+        switch( giftMetaData.status ){
+            case GiftStatus.ACCEPTED:
+              Toast( 'Gift already claimed' )
+              break
+
+            case GiftStatus.REJECTED:
+              Toast( 'Gift already rejected' )
+              break
+
+            case GiftStatus.RECLAIMED:
+              Toast( 'Gift already reclaimed' )
+              break
+        }
         return
       }
     }
@@ -270,6 +289,42 @@ function* rejectGiftWorker( { payload }: {payload: { channelAddress: string}} ) 
 export const rejectGiftWatcher = createWatcher(
   rejectGiftWorker,
   REJECT_GIFT
+)
+
+function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const gift: Gift = storedGifts[ payload.giftId ]
+
+  const giftChannelsToSync = {
+    [ gift.channelAddress ]: {
+      creator: true,
+      metaDataUpdates: {
+        status: GiftStatus.RECLAIMED
+      },
+    }
+  }
+
+  const { synchedGiftChannels }: { synchedGiftChannels: {
+    [channelAddress: string]: {
+        metaData: GiftMetaData;
+    };
+  };
+  } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
+  const { metaData: giftMetaData } = synchedGiftChannels[ gift.channelAddress ]
+  console.log( {
+    giftMetaData
+  } )
+  if( giftMetaData.status === GiftStatus.RECLAIMED ){
+    gift.status = giftMetaData.status
+    gift.timestamps.reclaimed = Date.now()
+    yield put( updateGift( gift ) )
+    Toast( 'Gift reclaimed' )
+  } else throw new Error( 'Unable to reclaim gift' )
+}
+
+export const reclaimGiftWatcher = createWatcher(
+  reclaimGiftWorker,
+  RECLAIM_GIFT
 )
 
 function* syncGiftsStatusWorker() {
