@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
+/* eslint-disable react/jsx-key */
+import React, { useEffect, useState, useContext } from 'react'
 import {
   View,
   Text,
   TouchableOpacity,
   SafeAreaView,
+  Linking,
+  StyleSheet
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -17,7 +20,80 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useDispatch, useSelector } from 'react-redux'
 import { setCurrencyCode } from '../store/actions/preferences'
-import { translations } from '../common/content/LocContext'
+import { translations, LocalizationContext } from '../common/content/LocContext'
+import ChangeCurrency from '../assets/images/icon_currency.svg'
+import IconLanguage from '../assets/images/icon_language.svg'
+import Languages from '../common/content/availableLanguages'
+
+const styles = StyleSheet.create( {
+  container: {
+    flexGrow: 1,
+    paddingHorizontal:  wp( '5%' ),
+    backgroundColor: Colors.background,
+  },
+  textHeading: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 24 ),
+    color: Colors.blue,
+    marginBottom: wp( '5%' ),
+    marginTop: wp( '10%' ),
+  },
+  textTitle: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 15 ),
+    color: Colors.blue,
+  },
+  textSubtitle: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    color: Colors.textColorGrey,
+  },
+  row: {
+    flexDirection: 'row',
+    marginBottom: wp( '2%' ),
+    marginTop: wp( '8%' ),
+  },
+  containerItem: {
+    marginHorizontal: wp( '5%' ),
+  },
+  btn:{
+    flexDirection: 'row',
+    height: wp( '13%' ),
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+  },
+  textCurrency: {
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue( 18 ),
+    color: Colors.textColorGrey,
+  },
+  icArrow: {
+    marginLeft: wp( '3%' ),
+    marginRight: wp( '3%' ),
+    alignSelf: 'center',
+  },
+  textValue: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUs: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 16 ),
+    color: Colors.blue,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUsSub: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    marginLeft: wp( '3%' ),
+    marginTop: wp( '1%' ),
+  }
+} )
+
 
 export default function ChangeCurrencyScreen( props ) {
   const [ currencyList ] = useState( FiatCurrencies )
@@ -25,7 +101,14 @@ export default function ChangeCurrencyScreen( props ) {
   const dispatch = useDispatch()
   const strings  = translations[ 'settings' ]
   const common  = translations[ 'common' ]
+  const {
+    appLanguage,
+    setAppLanguage,
+  } = useContext( LocalizationContext )
   const [ isVisible, setIsVisible ] = useState( false )
+  //const [ showCurrencies, setShowCurrencies ] = useState( false )
+  const [ showLanguages, setShowLanguages ] = useState( false )
+  const [ selectedLanguage, setSelectedLanguage ] = useState( Languages.find( lang => lang.iso === appLanguage ) )
   const [ currency, setCurrency ] = useState( {
     code: 'USD',
     symbol: '$',
@@ -43,42 +126,32 @@ export default function ChangeCurrencyScreen( props ) {
     } )()
   }, [] )
 
-  const setNewCurrency = async () => {
+  const setNewCurrency = () => {
     dispatch( setCurrencyCode( currency.code ) )
     props.navigation.goBack()
   }
 
-  return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <Text
-        style={{
-          fontFamily: Fonts.FiraSansRegular,
-          fontSize: RFValue( 11 ),
-          color: Colors.textColorGrey,
-          marginLeft: wp( '10%' ),
-          marginRight: wp( '10%' ),
-          marginTop: wp( '5%' ),
-          marginBottom: wp( '7%' ),
-        }}
-      >
-        {strings.Selectyourlocalcurrency}
-      </Text>
+  const MenuHeading = ( { title, subtitle, Icon } ) => {
+    return (
+      <View style={styles.row}>
+        <Icon />
+        <View style={styles.containerItem}>
+          <Text style={styles.textTitle}>{title}</Text>
+          <Text
+            style={styles.textSubtitle}
+          >
+            {subtitle}
+          </Text>
+        </View>
+      </View>
+    )
+  }
+
+  const Menu = ( { label, value, onPress, arrow } ) => {
+    return (
       <TouchableOpacity
-        onPress={() => {
-          setIsVisible( !isVisible )
-          setIsDisabled( false )
-        }}
-        style={{
-          flexDirection: 'row',
-          height: wp( '13%' ),
-          borderRadius: 10,
-          borderWidth: 1,
-          borderColor: Colors.borderColor,
-          marginLeft: wp( '10%' ),
-          marginRight: wp( '10%' ),
-        }}
+        onPress={onPress}
+        style={styles.btn}
       >
         <View
           style={{
@@ -92,13 +165,9 @@ export default function ChangeCurrencyScreen( props ) {
           }}
         >
           <Text
-            style={{
-              fontFamily: Fonts.FiraSansMedium,
-              fontSize: RFValue( 13 ),
-              color: Colors.textColorGrey,
-            }}
+            style={styles.textCurrency}
           >
-            {currency ? currency.symbol : '$'}
+            {label}
           </Text>
         </View>
         <View
@@ -107,14 +176,9 @@ export default function ChangeCurrencyScreen( props ) {
           }}
         >
           <Text
-            style={{
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue( 13 ),
-              color: Colors.textColorGrey,
-              marginLeft: wp( '3%' ),
-            }}
+            style={styles.textValue}
           >
-            {currency ? currency.code : CurrencyCode}
+            {value}
           </Text>
         </View>
         <View
@@ -125,21 +189,129 @@ export default function ChangeCurrencyScreen( props ) {
           }}
         >
           <Ionicons
-            name={isVisible ? 'ios-arrow-up' : 'ios-arrow-down'}
+            name={arrow ? 'chevron-up' : 'chevron-down'}
             color={Colors.textColorGrey}
-            size={15}
-            style={{
-              marginLeft: wp( '3%' ),
-              marginRight: wp( '3%' ),
-              alignSelf: 'center',
-            }}
+            size={18}
+            style={styles.icArrow}
           />
         </View>
       </TouchableOpacity>
-      <View style={{
-        position: 'relative', flex: 1
-      }}>
-        {isVisible && (
+    )
+  }
+
+  return (
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <ScrollView contentContainerStyle={styles.container} overScrollMode="never" showsVerticalScrollIndicator={false}>
+        <Text style={styles.textHeading}>{strings.ChangeCurrency}</Text>
+        <MenuHeading
+          title={strings.AlternateCurrency}
+          subtitle={strings.Selectyourlocalcurrency}
+          Icon={()=> <ChangeCurrency width={40 } height={40}/>}
+        />
+        <Menu
+          onPress={()=> {
+            setIsVisible( !isVisible )
+            setIsDisabled( false )
+            setShowLanguages( false )
+          }}
+          arrow={isVisible}
+          label={currency ? currency.symbol : '$'}
+          value={currency ? currency.code : CurrencyCode}
+        />
+        <View style={{
+          position: 'relative',
+        }}>
+          {isVisible && (
+            <View
+              style={{
+                marginTop: wp( '3%' ),
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: Colors.borderColor,
+                overflow: 'hidden',
+              }}
+            >
+              <ScrollView>
+                {currencyList.map( ( item ) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCurrency( item )
+                        setIsVisible( false )
+                        dispatch( setCurrencyCode( item.code ) )
+                      }}
+                      style={{
+                        flexDirection: 'row', height: wp( '13%' )
+                      }}
+                    >
+                      <View
+                        style={{
+                          height: wp( '13%' ),
+                          width: wp( '15%' ),
+                          backgroundColor: Colors.white,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderBottomWidth: 1,
+                          borderBottomColor: Colors.borderColor,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: Fonts.FiraSansMedium,
+                            fontSize: RFValue( 13 ),
+                            color: Colors.textColorGrey,
+                          }}
+                        >
+                          {item.symbol}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          height: wp( '13%' ),
+                          borderBottomWidth: 1,
+                          borderBottomColor: Colors.borderColor,
+                          backgroundColor: Colors.white,
+
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue( 13 ),
+                            color: Colors.textColorGrey,
+                            marginLeft: wp( '3%' ),
+                          }}
+                        >
+                          {item.code}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  )
+                } )}
+              </ScrollView>
+            </View>
+          )}
+        </View>
+
+        <MenuHeading
+          title={strings.LanguageSettings}
+          subtitle={strings.Chooseyourlanguage}
+          Icon={()=> <IconLanguage width={40 } height={40}/>}
+        />
+        <Menu
+          onPress={()=> {
+            setShowLanguages( !showLanguages )
+            setIsDisabled( false )
+          }}
+          arrow={showLanguages}
+          label={selectedLanguage.flag}
+          value={`${selectedLanguage.country_code.toUpperCase()}- ${selectedLanguage.displayTitle}`}
+        />
+        {showLanguages && (
           <View
             style={{
               marginTop: wp( '3%' ),
@@ -147,17 +319,17 @@ export default function ChangeCurrencyScreen( props ) {
               borderWidth: 1,
               borderColor: Colors.borderColor,
               overflow: 'hidden',
-              marginLeft: wp( '10%' ),
-              marginRight: wp( '10%' ),
             }}
           >
             <ScrollView>
-              {currencyList.map( ( item ) => {
+              {Languages.map( ( item ) => {
                 return (
                   <TouchableOpacity
                     onPress={() => {
-                      setCurrency( item )
+                      setAppLanguage( item.iso )
+                      setShowLanguages( false )
                       setIsVisible( false )
+                      setSelectedLanguage( Languages.find( lang => lang.iso === item.iso ) )
                     }}
                     style={{
                       flexDirection: 'row', height: wp( '13%' )
@@ -167,21 +339,20 @@ export default function ChangeCurrencyScreen( props ) {
                       style={{
                         height: wp( '13%' ),
                         width: wp( '15%' ),
-                        backgroundColor: Colors.borderColor,
+                        backgroundColor: Colors.white,
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderBottomWidth: 1,
-                        borderBottomColor: Colors.white,
+                        borderBottomColor: Colors.borderColor,
                       }}
                     >
                       <Text
                         style={{
-                          fontFamily: Fonts.FiraSansMedium,
-                          fontSize: RFValue( 13 ),
-                          color: Colors.textColorGrey,
+                          fontSize: RFValue( 22 ),
+                          color: 'black',
                         }}
                       >
-                        {item.symbol}
+                        {item.flag}
                       </Text>
                     </View>
                     <View
@@ -201,7 +372,12 @@ export default function ChangeCurrencyScreen( props ) {
                           marginLeft: wp( '3%' ),
                         }}
                       >
-                        {item.code}
+                        <Text style={{
+                          textTransform: 'uppercase'
+                        }}>
+                          {item.country_code}
+                        </Text>
+                        <Text>{`- ${item.displayTitle}`}</Text>
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -210,9 +386,46 @@ export default function ChangeCurrencyScreen( props ) {
             </ScrollView>
           </View>
         )}
-      </View>
 
-      <View>
+        <TouchableOpacity
+          onPress={()=> Linking.openURL( 'https://crowdin.com/project/hexa-wallet' )
+          }
+          activeOpacity={0.6}
+          style={[ {
+            marginTop: 20,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: Colors.borderColor,
+            paddingVertical: 5,
+            flexDirection: 'row'
+          } ]}
+        >
+          <View style={{
+            flex: 1
+          }}>
+            <Text
+              style={styles.textHelpUs}
+            >
+              {strings.HelpUstranslate}
+            </Text>
+            <Text
+              style={styles.textHelpUsSub}
+            >
+              {strings.HelpUstranslateSub}
+            </Text>
+          </View>
+          <Ionicons
+            name={'chevron-forward'}
+            color={Colors.textColorGrey}
+            size={22}
+            style={styles.icArrow}
+          />
+        </TouchableOpacity>
+
+      </ScrollView>
+
+
+      {/* <View>
         <TouchableOpacity
           disabled={isDisabled}
           onPress={() => setNewCurrency()}
@@ -239,6 +452,7 @@ export default function ChangeCurrencyScreen( props ) {
           </Text>
         </TouchableOpacity>
       </View>
+     */}
     </SafeAreaView>
   )
 }
