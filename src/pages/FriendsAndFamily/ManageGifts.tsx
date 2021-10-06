@@ -32,6 +32,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import { syncGiftsStatus } from '../../store/actions/trustedContacts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
+import ManageGiftsList from './ManageGiftsList'
 
 
 const listItemKeyExtractor = ( item ) => item.id
@@ -94,7 +95,8 @@ const ManageGifts = ( { navigation } ) => {
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
           navigation.navigate( 'GiftDetails', {
-            title, walletName, createdAt: selectedGift.timestamps.created, amount: selectedGift.amount
+            title, walletName, createdAt: selectedGift.timestamps.created, amount: selectedGift.amount,
+            type: GiftStatus.CREATED
           } )
           // navigation.navigate( 'AddContact', {
           //   fromScreen: 'ManageGift',
@@ -244,17 +246,17 @@ const ManageGifts = ( { navigation } ) => {
             data={giftsArr?.[ `${active}` ]}
             keyExtractor={listItemKeyExtractor}
             renderItem={( { item, index } ) => {
-              console.log( 'item', item.type === GiftType.RECEIVED )
+              console.log( 'item.createdAt', item )
               const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
               const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
               return(
                 <>
                   {active === GiftStatus.CREATED ?
-                    <DashedContainer
+                    <ManageGiftsList
                       titleText={'Available Gift'}
                       subText={'Lorem ipsum dolor sit amet'}
                       amt={numberWithCommas( item.amount )}
-                      date={item.createdAt}
+                      date={item.timestamps?.created}
                       image={<GiftCard />}
                       onPress={ () => processGift( item, title, walletName )}
                     />
@@ -267,7 +269,7 @@ const ManageGifts = ( { navigation } ) => {
                         key={index}
                         onPress={() => {
                           navigation.navigate( 'GiftDetails', {
-                            title, walletName, createdAt: item.createdAt, amount: item.amount
+                            title, walletName, createdAt: item.createdAt, amount: item.amount, avatar: true,
                           } )
                         }
                         }
@@ -347,13 +349,17 @@ const ManageGifts = ( { navigation } ) => {
         </View>
         {Object.values( gifts?? {
         } ).length === 0 &&
-      <BottomInfoBox
-        backgroundColor={Colors.white}
-        title={'Note'}
-        infoText={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-        }
-      />
+        <View style={{
+          marginTop: hp( '45%' )
+        }}>
+          <BottomInfoBox
+            backgroundColor={Colors.white}
+            title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+            }
+          />
+        </View>
         }
       </View>
     </View>

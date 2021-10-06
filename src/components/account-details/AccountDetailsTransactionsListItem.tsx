@@ -15,7 +15,7 @@ const AccountDetailsTransactionsListItem: React.FC<Props> = ( { transaction, acc
       backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )
     }} pad={2}>
       <TransactionsFlatListItemContent accountShellId={accountShellId} transaction={transaction} />
-      <ListItem.Chevron size={28}/>
+      <ListItem.Chevron size={22}/>
     </ListItem>
   )
 }

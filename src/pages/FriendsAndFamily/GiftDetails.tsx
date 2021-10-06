@@ -6,7 +6,8 @@ import {
   SafeAreaView,
   Text,
   StatusBar,
-  ScrollView
+  ScrollView,
+  Platform
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -20,15 +21,16 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { AccountType, Gift } from '../../bitcoin/utilities/Interface'
+import { Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
+import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { title, walletName, createdAt, amount } = navigation.state.params
-  console.log( 'navigation', navigation.state.params,  amount )
+  const { title, walletName, createdAt, amount, avatar, type } = navigation.state.params
+  console.log( 'navigation', navigation.state.params,  amount, type )
 
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
@@ -76,72 +78,82 @@ const GiftDetails = ( { navigation } ) => {
             step={''}
           />
         </View>
-        <View
-          style={{
-            width: '90%',
-            backgroundColor: Colors.gray7,
-            shadowOpacity: 0.06,
-            shadowOffset: {
-              width: 10, height: 10
-            },
-            shadowRadius: 10,
-            elevation: 2,
-            alignSelf: 'center',
-            borderRadius: wp( 2 ),
-            marginTop: hp( 1 ),
-            marginBottom: hp( 1 ),
-            paddingVertical: hp( 3 ),
-            paddingHorizontal: wp( 3 ),
-            flexDirection: 'row',
-            alignItems: 'center'
-          }}>
-          <View style={styles.avatarContainer}>
-            {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-          </View>
-          <View style={{
-            marginHorizontal: wp( 3 )
-          }}>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+        <TouchableOpacity
+          onPress={() => {}}
+          style={type === GiftStatus.CREATED ? styles.dashedContainer : [ styles.dashedContainer, {
+            borderColor: Colors.white
+          } ]}>
+          <View style={type === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle }>
+
+            <View style={{
+              marginHorizontal: wp( 1 ),  flexDirection: 'row', justifyContent: 'space-between',
             }}>
-              {title}
-            </Text>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>
-              {walletName}
-            </Text>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>
-              at {moment( createdAt ).format( 'lll' )}
-            </Text>
-          </View>
-          <View style={{
-            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 'auto'
-          }}>
-            <Text style={{
-              color: Colors.black,
-              fontSize: RFValue( 24 ),
-              fontFamily: Fonts.FiraSansRegular
-            }}>
-              {numberWithCommas( amount )}
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular
-              }}> sats
+                fontFamily: Fonts.FiraSansRegular,
+                fontWeight: '600'
+              }}>
+                {title}
               </Text>
-            </Text>
-          </View>
+              <Text style={{
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular,
+              }}>
+              at {moment( createdAt ).format( 'lll' )}
+              </Text>
+            </View>
+            <View style={{
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: hp( 1 )
+            }}>
+              <View style={{
+                flexDirection: 'row',
+              }}>
+                {avatar ?
+                  <View style={styles.avatarContainer}>
+                    {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
+                  </View>
+                  :
+                  <GiftCard />
+                }
+                <View style={{
+                  marginLeft: wp( 1 )
+                }}>
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}>
+                    {walletName ? walletName : 'from Checking Account'}
+                  </Text>
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}>
+                    {walletName ?? 'Lorem ipsum dolor'}
+                  </Text>
+                </View>
 
-        </View>
+              </View>
+
+              <Text style={{
+                color: Colors.black,
+                fontSize: RFValue( 18 ),
+                fontFamily: Fonts.FiraSansRegular
+              }}>
+                {numberWithCommas( amount )}
+                <Text style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular
+                }}> sats
+                </Text>
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
 
       </SafeAreaView>
       <View style={{
@@ -154,8 +166,8 @@ const GiftDetails = ( { navigation } ) => {
           }}
         >
           <Text style={[ styles.buttonText, {
-          } ]}>Reclaim Gift Card</Text>
-          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+          } ]}>Send Gift Card</Text>
+          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
@@ -165,8 +177,8 @@ const GiftDetails = ( { navigation } ) => {
           }}
         >
           <Text style={[ styles.buttonText, {
-          } ]}>Send Reminder</Text>
-          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+          } ]}>Expire Gift Card</Text>
+          <Text style={styles.buttonSubText}>Lorem ipsum dolor sit</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -174,6 +186,38 @@ const GiftDetails = ( { navigation } ) => {
 }
 
 const styles = StyleSheet.create( {
+  dashedStyle: {
+    backgroundColor: Colors.gray7,
+    borderRadius: wp( 2 ),
+    paddingTop: hp( 1 ),
+    paddingHorizontal: wp( 4 ),
+    borderColor: Colors.lightBlue,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  normalStyle: {
+    backgroundColor: Colors.gray7,
+    paddingTop: hp( 1 ),
+    paddingHorizontal: wp( 2 ),
+  },
+  dashedContainer: {
+    width: '90%',
+    backgroundColor: Colors.gray7,
+    // shadowOpacity: 0.06,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // shadowRadius: 10,
+    // elevation: 2,
+    alignSelf: 'center',
+    borderRadius: wp( 2 ),
+    marginTop: hp( 1 ),
+    marginBottom: hp( 1 ),
+    paddingVertical: wp( 1 ),
+    paddingHorizontal: wp( 1 ),
+    borderColor: Colors.lightBlue,
+    borderWidth: 1,
+  },
   avatarContainer: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageMedium,

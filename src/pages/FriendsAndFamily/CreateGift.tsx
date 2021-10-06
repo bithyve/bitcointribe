@@ -444,12 +444,14 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.54
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginRight: wp( 10 )
+    marginRight: wp( 10 ),
+    letterSpacing: 0.6
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor,

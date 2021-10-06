@@ -15,6 +15,7 @@ import { AccountType } from '../../bitcoin/utilities/Interface'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   transaction: TransactionDescribing;
@@ -80,7 +81,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
   }, [ transaction.transactionType ] )
 
   const formattedDateText = useMemo( () => {
-    return moment( transaction.date ).format( 'DD/MM/YYYY • hh:MMa' )
+    return moment( transaction.date ).format( 'DD/MM/YY • hh:MMa' )
   }, [ transaction.transactionType ] )
 
   const getReceiversCount = useMemo( () => {
@@ -175,7 +176,7 @@ const styles = StyleSheet.create( {
   },
 
   titleSection: {
-    flex: 1,
+    flex: 1, width: widthPercentageToDP( '35%' )
   },
 
   containerImg: {
@@ -234,13 +235,16 @@ const styles = StyleSheet.create( {
 
   titleText: {
     color: Colors.greyTextColor,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     marginBottom: 2,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
+    fontFamily: Fonts.FiraSansRegular,
   },
 
   subtitleText: {
     fontSize: RFValue( 10 ),
+    letterSpacing: 0.3,
+    color: Colors.gray2
   },
 
   bitcoinImage: {
