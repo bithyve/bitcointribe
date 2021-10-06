@@ -144,7 +144,7 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
       access_token: swanAuthenticatedToken,
       extendedPublicKey: swanXpub,
-      displayName: swanAccountDetails.accountName || 'Sats purchased from Swan'
+      displayName: 'Hexa Wallet'
     } )
   }
   catch( e )  {
@@ -208,6 +208,7 @@ function* createTempSwanAccountInfo( { payload }: {
 
 export const addTempSwanAccountInfoWatcher = createWatcher( createTempSwanAccountInfo, CREATE_TEMP_SWAN_ACCOUNT_INFO )
 
+// Link is not currently used. all redux code related to link can be removed
 function* linkSwanWalletWorker( { payload } ) {
   /*
   Continue with this worker only if:
@@ -245,8 +246,6 @@ function* linkSwanWalletWorker( { payload } ) {
     payload.data.xpub = swanAccount.xpub
     payload.data.swanAuthToken = swanAccount.swanAuthToken
 
-    // {"btcAddresses":["3PTECsh6bMhNVmDPYqkYkr3cro2Mo8q6fL"],"displayName":"wallet-test"}
-
     let result = yield call( linkSwanWallet, payload.data )
 
     if ( !result || result.status !== 200 ) {
@@ -256,19 +255,7 @@ function* linkSwanWalletWorker( { payload } ) {
       }
       yield put( linkSwanWalletFailed( data ) )
     } else {
-      /*
-      If its a success the response will be as follows:
 
-      {
-          "entity": "walletAddress",
-          "item": {
-              "id": "096cd43f-f1c5-47cb-9acb-6a29134c5262",
-              "btcAddress": "2N6aLeRSg3p63BguHpjMf5CVcfYQtr7xoan",
-              "isConfirmed": false,
-              "displayName": "wallet-test"
-          }
-      }
-      */
       result = {
         entity: 'walletAddress',
         item: {
