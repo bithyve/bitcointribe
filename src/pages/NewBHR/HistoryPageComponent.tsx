@@ -83,7 +83,7 @@ const HistoryPageComponent = ( props ) => {
               )
             } )}
           </ScrollView>
-          {props.data.length <= 1 && (
+          {props.data.length <= 1 || props.infoBoxTitle == strings.BackupHistory && (
             <BottomInfoBox
               backgroundColor={Colors.white}
               title={
@@ -128,7 +128,7 @@ const HistoryPageComponent = ( props ) => {
           </View>
         </View>
       )}
-      <View>
+      {props.showButton ? <View>
         {props.onConfirm ?
           <TouchableOpacity
             style={{
@@ -216,7 +216,8 @@ const HistoryPageComponent = ( props ) => {
               </TouchableOpacity>
             ) : null} */}
         </View>
-      </View>
+      </View> : null
+      }
     </View>
   )
 }

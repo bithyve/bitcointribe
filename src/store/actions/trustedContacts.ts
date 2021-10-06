@@ -98,11 +98,11 @@ export const initializeTrustedContact = (
   }
 }
 
-export const rejectTrustedContact = ( { channelKey } : {channelKey: string} ) => {
+export const rejectTrustedContact = ( { channelKey, isExistingContact } : {channelKey: string; isExistingContact?: string;} ) => {
   return {
     type: REJECT_TRUSTED_CONTACT,
     payload: {
-      channelKey
+      channelKey, isExistingContact
     },
   }
 }
