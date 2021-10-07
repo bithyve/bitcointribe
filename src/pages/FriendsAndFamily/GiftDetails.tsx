@@ -29,7 +29,7 @@ import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { title, walletName, gift }: {title: string, walletName: string, gift: Gift} = navigation.state.params
+  const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
@@ -82,53 +82,76 @@ const GiftDetails = ( { navigation } ) => {
           style={gift.status === GiftStatus.CREATED ? styles.dashedContainer : [ styles.dashedContainer, {
             borderColor: Colors.white
           } ]}>
-          {/* <View style={gift.status === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle }> */}
-          <View style={styles.avatarContainer}>
-            {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-          </View>
-          <View style={{
-            marginHorizontal: wp( 3 )
-          }}>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+          <View style={gift.status === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle }>
+
+            <View style={{
+              marginHorizontal: wp( 1 ),  flexDirection: 'row', justifyContent: 'space-between',
             }}>
-              {title}
-            </Text>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>
-              {walletName}
-            </Text>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>
-              at {moment( gift.timestamps.created ).format( 'lll' )}
-            </Text>
-          </View>
-          <View style={{
-            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 'auto'
-          }}>
-            <Text style={{
-              color: Colors.black,
-              fontSize: RFValue( 24 ),
-              fontFamily: Fonts.FiraSansRegular
-            }}>
-              {numberWithCommas( gift.amount )}
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular
-              }}> sats
+                fontFamily: Fonts.FiraSansRegular,
+                fontWeight: '600'
+              }}>
+                {title}
               </Text>
-            </Text>
-          </View>
+              <Text style={{
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular,
+              }}>
+              at {moment( gift.timestamps.created ).format( 'lll' )}
+              </Text>
+            </View>
+            <View style={{
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: hp( 1 )
+            }}>
+              <View style={{
+                flexDirection: 'row',
+              }}>
+                {avatar ?
+                  <View style={styles.avatarContainer}>
+                    {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
+                  </View>
+                  :
+                  <GiftCard />
+                }
+                <View style={{
+                  marginLeft: wp( 1 )
+                }}>
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}>
+                    {walletName ? walletName : 'from Checking Account'}
+                  </Text>
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}>
+                    {walletName ?? 'Lorem ipsum dolor'}
+                  </Text>
+                </View>
 
+              </View>
+
+              <Text style={{
+                color: Colors.black,
+                fontSize: RFValue( 18 ),
+                fontFamily: Fonts.FiraSansRegular
+              }}>
+                {numberWithCommas( gift.amount )}
+                <Text style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular
+                }}> sats
+                </Text>
+              </Text>
+            </View>
+          </View>
         </TouchableOpacity>
 
       </SafeAreaView>

@@ -65,7 +65,7 @@ const ManageGifts = ( { navigation } ) => {
         receivedArr.push( gift )
       } else {
         if ( gift.status === GiftStatus.CREATED ) availableGifts.push( gift )
-        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
+        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
       }
     } )
@@ -95,7 +95,7 @@ const ManageGifts = ( { navigation } ) => {
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
           navigation.navigate( 'GiftDetails', {
-            title, walletName, gift: selectedGift
+            title, walletName, gift: selectedGift, avatar: true
           } )
           // navigation.navigate( 'AddContact', {
           //   fromScreen: 'ManageGift',
@@ -268,7 +268,7 @@ const ManageGifts = ( { navigation } ) => {
                         key={index}
                         onPress={() => {
                           navigation.navigate( 'GiftDetails', {
-                            title, walletName, gift: item
+                            title, walletName, gift: item, avatar: true
                           } )
                         }
                         }
