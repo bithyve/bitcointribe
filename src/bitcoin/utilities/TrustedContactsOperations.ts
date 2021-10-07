@@ -282,7 +282,7 @@ export default class TrustedContactsOperations {
     if( incomingRelationshipType ){
       if (
         [
-          // TrustedContactRelationTypes.WARD,
+          TrustedContactRelationTypes.WARD,
           TrustedContactRelationTypes.KEEPER_WARD,
         ].includes( contact.relationType ) &&
         [ TrustedContactRelationTypes.CONTACT ].includes( incomingRelationshipType )

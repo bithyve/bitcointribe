@@ -35,6 +35,7 @@ import {
   setApprovalStatus,
   createOrChangeGuardian,
   downloadSMShare,
+  switchS3LoaderKeeper,
 } from '../../store/actions/BHR'
 import { useDispatch } from 'react-redux'
 import {
@@ -145,6 +146,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const index = props.navigation.getParam( 'index' )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const dispatch = useDispatch()
+
+  useEffect( ()=>{
+    if( createChannelAssetsStatus ) dispatch( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
+  }, [] )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -393,9 +398,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const onPressReshare = useCallback( async () => {
     setReshareModal( false )
     if( selectedKeeper.shareType == 'existingContact' ){
-      createGuardian( {
-        chosenContactTmp: chosenContact, shareType: 'existingContact'
-      } )
+      sendNotificationForExistingContact()
     } else {
       props.navigation.navigate( 'QrAndLink', {
         contact: chosenContact,
