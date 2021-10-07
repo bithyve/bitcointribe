@@ -33,6 +33,7 @@ interface MenuOption {
   name ?: string,
   onOptionPressed?: () => void;
   // isSwitch: boolean;
+  imageSource: ImageSourcePropType;
 }
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
@@ -48,53 +49,52 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const strings = translations[ 'settings' ]
   const common = translations[ 'common' ]
   const menuOptions: MenuOption[] = [
-  // {
-  //   title: 'Use FaceId',
-  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
-  //   subtitle: 'Unlock your wallet using FaceId',
-  //   // screenName: 'FriendsAndFamily',
-  //   isSwitch: true
-  // },
-  // {
-  //   title: 'Dark Mode',
-  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
-  //   subtitle: 'Use dark Mode on your wallet',
-  //   // screenName: 'FriendsAndFamily',
-  //   isSwitch: true
-  // },
+    // {
+    //   title: 'Use FaceId',
+    //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+    //   subtitle: 'Unlock your wallet using FaceId',
+    //   // screenName: 'FriendsAndFamily',
+    //   isSwitch: true
+    // },
+    // {
+    //   title: 'Dark Mode',
+    //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+    //   subtitle: 'Use dark Mode on your wallet',
+    //   // screenName: 'FriendsAndFamily',
+    //   isSwitch: true
+    // },
     {
-      title: 'Account Management',
-      // imageSource: AccManagement,
-      subtitle: 'View and manage your accounts',
+      title: strings.accountManagement,
+      imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
+      subtitle: strings.accountManagementSub,
       screenName: 'AccountManagement',
     },
     /*
-  Commenting this out as per https://github.com/bithyve/hexa/issues/2560
-  leaving the option here so that it can be enabled in a future release.
-
-  {
-    title: 'Friends & Family',
-    imageSource: require( '../../assets/images/icons/addressbook.png' ),
-    subtitle: 'View and manage your contacts',
-    screenName: 'FriendsAndFamily',
-  },
-  */
+    Commenting this out as per https://github.com/bithyve/hexa/issues/2560
+    leaving the option here so that it can be enabled in a future release.
     {
-      title: 'Node Settings',
-      subtitle: 'Connect Hexa wallet to your own node',
+      title: 'Friends & Family',
+      imageSource: require( '../../assets/images/icons/addressbook.png' ),
+      subtitle: 'View and manage your contacts',
+      screenName: 'FriendsAndFamily',
+    },
+    */
+    {
+      title: strings.node,
+      imageSource: require( '../../assets/images/icons/own-node.png' ),
+      subtitle: strings.nodeSub,
       screenName: 'NodeSettings',
     },
     /*
-  Commenting this out as per https://github.com/bithyve/hexa/issues/2560
-  leaving the option here so that it can be enabled in a future release.
-
-  {
-    title: 'Funding Sources',
-    imageSource: require( '../../assets/images/icons/existing_saving_method.png' ),
-    subtitle: 'Buying methods integrated in your wallet',
-    screenName: 'FundingSources',
-  },
-  */
+    Commenting this out as per https://github.com/bithyve/hexa/issues/2560
+    leaving the option here so that it can be enabled in a future release.
+    {
+      title: 'Funding Sources',
+      imageSource: require( '../../assets/images/icons/existing_saving_method.png' ),
+      subtitle: 'Buying methods integrated in your wallet',
+      screenName: 'FundingSources',
+    },
+    */
     // {
     //   title: 'Hexa Community (Telegram)',
     //   imageSource: require( '../../assets/images/icons/telegram.png' ),
@@ -108,13 +108,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   },
     // },
     {
-      title: 'Wallet Settings',
-      subtitle: 'Your wallet settings & preferences',
+      imageSource: require( '../../assets/images/icons/settings.png' ),
+      subtitle: strings.walletSettingsSub,
+      title: strings.walletSettings,
       screenName: 'WalletSettings',
     },
     {
-      title: 'App Info',
-      subtitle: 'Hexa app version number and details',
+      title: strings.AppInfo,
+      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      subtitle: strings.AppInfoSub,
       screenName: 'AppInfo',
     },
   ]
