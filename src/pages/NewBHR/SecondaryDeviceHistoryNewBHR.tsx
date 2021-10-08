@@ -3,11 +3,10 @@ import {
   View,
   SafeAreaView,
   StatusBar,
-  Platform,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
-import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, modifyLevelData, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/BHR'
+import { createChannelAssets, createOrChangeGuardian, ErrorSending, modifyLevelData, setChannelAssets, updatedKeeperInfo } from '../../store/actions/BHR'
 import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -32,14 +31,9 @@ import {
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
-import QRModal from '../Accounts/QRModal'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
-import ApproveSetup from './ApproveSetup'
-import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import semver from 'semver'
 import { v4 as uuid } from 'uuid'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
@@ -54,7 +48,6 @@ import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/ac
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
-  const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
 
   // const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -63,7 +56,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ showQr, setShowQr ] = useState( false )
   const [ secondaryDeviceMessageBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
-  const [ qrModal, setQRModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
   const [ ErrorModal, setErrorModal ] = useState( false )
   const [ SecondaryDeviceMessageModal, setSecondaryDeviceMessageModal ] = useState( false )
@@ -73,8 +65,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const [ blockReshare, setBlockReshare ] = useState( '' )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
@@ -96,7 +86,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
   const keeperProcessStatusFlag = useSelector( ( state ) => state.bhr.keeperProcessStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
-  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
@@ -445,40 +434,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     dispatch( ErrorSending( null ) )
   }
 
-  const sendApprovalRequestToPK = ( ) => {
-    setQrBottomSheetsFlag( true )
-    setQRModal( true )
-    setKeeperTypeModal( false )
-  }
-
-  const renderQrContent = () => {
-    return (
-      <QRModal
-        isFromKeeperDeviceHistory={false}
-        QRModalHeader={strings.QRscanner}
-        title={common.note}
-        infoText={
-          strings.approvethisrequest
-        }
-        modalRef={QrBottomSheet}
-        isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={async( qrScannedData ) => {
-          dispatch( setApprovalStatus( false ) )
-          dispatch( downloadSMShare( qrScannedData ) )
-        }}
-        onBackPress={() => {
-          setQrBottomSheetsFlag( false )
-          setQRModal( false )
-        }}
-        onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"erds","channelId":"28cc7e44b3ca629fe98450412f750d29fcf93d2de5057e841a665e8e73e98cfb","streamId":"b83dea121","secondaryChannelKey":"FLPy5dqRHTFCGqhZibhW9SLH","version":"1.8.0","walletId":"23887039bd673cfaa6fdc5ab9786aa130e010e9bbbc6731890361240ed83a55a"}'
-          dispatch( setApprovalStatus( false ) )
-          dispatch( downloadSMShare( qrScannedData ) )
-        }}
-      />
-    )
-  }
-
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
@@ -506,20 +461,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       } )
     }
   }
-
-  useEffect( ()=>{
-    if( approvalStatus && isChangeClicked ){
-      console.log( 'APPROVe SD' )
-      setQRModal( false )
-      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-    }
-  }, [ approvalStatus ] )
-
-  useEffect( ()=> {
-    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
-      dispatch( setApprovalStatus( true ) )
-    }
-  }, [ channelAssets ] )
 
   return (
     <View style={{
@@ -598,15 +539,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <ModalContainer visible={ErrorModal} closeBottomSheet={()=>setErrorModal( false )} >
         {renderErrorModalContent()}
       </ModalContainer>
-      <ModalContainer visible={qrModal} closeBottomSheet={()=>{setQRModal( false )}} >
-        {renderQrContent()}
-      </ModalContainer>
       <ModalContainer visible={HelpModal} closeBottomSheet={()=>{setHelpModal( false )}} >
         {renderHelpContent()}
       </ModalContainer>
       <ModalContainer visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
         <ErrorModalContents
-          // modalRef={ReshareBottomSheet}
           title={strings.Resharewithsamedevice}
           info={
             strings.ifyouwanttoreshare
@@ -618,18 +555,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           cancelButtonText={common.back}
           isIgnoreButton={true}
           onPressProceed={() => {
-            // ( ReshareBottomSheet as any ).current.snapTo( 0 )
             setReshareModal( false )
-            if ( blockReshare ) {
-              setQRModal( true )
-            } else {
-              // ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-              setShowQr( true )
-              createGuardian()
-            }
+            setShowQr( true )
+            createGuardian()
           }}
           onPressIgnore={() => {
-            // ( ReshareBottomSheet as any ).current.snapTo( 0 )
             setReshareModal( false )
           }}
           isBottomImage={false}
@@ -645,8 +575,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           selectedLevelId={selectedLevelId}

@@ -545,7 +545,7 @@
       "3": "Erreur réseau, veuillez vérifier votre connexion Internet.",
       "7": "Il se peut que vous ayez appuyé trop de fois. Veuillez réessayer après quelque temps.",
       "9": "Vous n'êtes pas connecté à votre compte iCloud. Veuillez vous connecter à partir des paramètres de votre téléphone.",
-      "default": "Nous avons rencontré une erreur non standard. Veuillez réessayer après un certain temps ou contactez"
+      "default": "Oups!! Il semble y avoir un problème avec le réseau. Veuillez essayer après un certain temps."
   },
   "driveErrors": {
       "17": "Échec de la connexion à votre Google Drive. Veuillez essayer après un certain temps.",

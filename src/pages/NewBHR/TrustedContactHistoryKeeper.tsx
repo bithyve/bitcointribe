@@ -18,23 +18,19 @@ import { useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
-import ModalHeader from '../../components/ModalHeader'
 import HistoryPageComponent from './HistoryPageComponent'
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact'
 import moment from 'moment'
 import _ from 'underscore'
-import { generateDeepLink, nameToInitials } from '../../common/CommonFunctions'
+import { nameToInitials } from '../../common/CommonFunctions'
 import {
   ErrorSending,
   updateMSharesHealth,
   updatedKeeperInfo,
   setChannelAssets,
   createChannelAssets,
-  setApprovalStatus,
   createOrChangeGuardian,
-  downloadSMShare,
   switchS3LoaderKeeper,
 } from '../../store/actions/BHR'
 import { useDispatch } from 'react-redux'
@@ -43,13 +39,11 @@ import {
   Keepers,
   LevelHealthInterface,
   MetaShare,
-  QRCodeTypes,
   TrustedContact,
   Trusted_Contacts,
   ChannelAssets,
   TrustedContactRelationTypes,
   Wallet,
-  DeepLinkEncryptionType,
   INotification,
   notificationType,
   notificationTag,
@@ -59,8 +53,6 @@ import config from '../../bitcoin/HexaConfig'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
-import QRModal from '../Accounts/QRModal'
-import ApproveSetup from './ApproveSetup'
 import semver from 'semver'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
@@ -73,16 +65,12 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
 import idx from 'idx'
 import Toast from '../../components/Toast'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Loader from '../../components/loader'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import Relay from '../../bitcoin/utilities/Relay'
 
 const TrustedContactHistoryKeeper = ( props ) => {
-  const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
-  const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
-  const [ qrModal, setQRModal ] = useState( false )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
   const [ ErrorModal, setErrorModal ] = useState( false )
@@ -93,7 +81,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ changeContact, setChangeContact ] = useState( false )
-  const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ reshareModal, setReshareModal ] = useState( false )
@@ -107,8 +94,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ showLoader, setShowLoader ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
   const [ renderTimer, setRenderTimer ] = useState( false )
-  const [ isOTPType, setIsOTPType ] = useState( false )
-  const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedContactHistory, setTrustedContactHistory ] = useState( historyArray )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
@@ -134,7 +119,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
-  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
@@ -615,54 +599,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }
 
-  const sendApprovalRequestToPK = ( ) => {
-    setQrBottomSheetsFlag( true )
-    setQRModal( true )
-    setKeeperTypeModal( false )
-  }
-
-  const renderQrContent = () => {
-    return (
-      <QRModal
-        isFromKeeperDeviceHistory={false}
-        QRModalHeader={'QR scanner'}
-        title={'Note'}
-        infoText={
-          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
-        }
-        modalRef={QrBottomSheet}
-        isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={async( qrScannedData ) => {
-          dispatch( setApprovalStatus( false ) )
-          dispatch( downloadSMShare( qrScannedData ) )
-        }}
-        onBackPress={() => {
-          setQrBottomSheetsFlag( false )
-          setQRModal( false )
-        }}
-        onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
-          dispatch( setApprovalStatus( false ) )
-          dispatch( downloadSMShare( qrScannedData ) )
-        }}
-      />
-    )
-  }
-
-  useEffect( ()=>{
-    if( approvalStatus && isChangeClicked ){
-      setQRModal( false )
-      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-    }
-  }, [ approvalStatus ] )
-
-  useEffect( ()=>{
-    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
-      dispatch( setApprovalStatus( true ) )
-    }
-  }, [ channelAssets ] )
-
-
   const onPressContinue = ( selectedContacts ) => {
     Keyboard.dismiss()
     let shareType = 'contact'
@@ -889,16 +825,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           selectedLevelId={selectedLevelId}
           keeper={selectedKeeper}
         />
-      </ModalContainer>
-      <ModalContainer visible={qrModal} closeBottomSheet={() => {setQRModal( false )}} >
-        {renderQrContent()}
       </ModalContainer>
       {showLoader ? <Loader /> : null}
     </View>
