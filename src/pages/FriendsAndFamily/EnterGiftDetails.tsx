@@ -4,40 +4,70 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  TextInput,
   Text,
   StatusBar,
-  ScrollView
+  ScrollView,
+  Platform
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import moment from 'moment'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { AccountType, Gift, GiftStatus } from '../../bitcoin/utilities/Interface'
+import { Gift, Wallet } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import { reclaimGift } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import More from '../../assets/images/svgs/icon_more_gray.svg'
+import { translations } from '../../common/content/LocContext'
 
 const GiftDetails = ( { navigation } ) => {
-  const dispatch = useDispatch()
+  const { giftId } = navigation.state.params
+  const wallet: Wallet = useSelector( state => state.storage.wallet )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
+  const [ note, setNote ] = useState( '' )
+  const [ name, setName ] = useState( '' )
+
+  useEffect( () => {
+    setName( wallet.walletName )
+  }, [] )
+
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
-  const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
-  //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
 
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  const renderButton = ( text ) => {
+
+    const isDisabled = false
+    return(
+      <TouchableOpacity
+        disabled={isDisabled}
+        onPress={()=>{
+          navigation.navigate( 'SendGift', {
+            fromScreen: 'Gift',
+            giftId: giftId,
+            note: note
+          } )
+        }}
+        style={isDisabled ? {
+          ...styles.disabledButtonView
+        } : {
+          ...styles.buttonView
+        }
+        }
+      >
+        <Text style={styles.buttonText}>Next</Text>
+      </TouchableOpacity>
+    )
   }
-
 
   return (
     <ScrollView contentContainerStyle={{
@@ -77,12 +107,125 @@ const GiftDetails = ( { navigation } ) => {
             step={''}
           />
         </View>
+        <View
+          style={[ styles.inputBox, styles.inputField ]}
+        >
+          <TextInput
+            style={styles.modalInputBox}
+            placeholder={'Enter name'}
+            placeholderTextColor={Colors.gray1}
+            value={name}
+            keyboardType={
+              Platform.OS == 'ios'
+                ? 'ascii-capable'
+                : 'visible-password'
+            }
+            returnKeyType="done"
+            returnKeyLabel="Done"
+            autoCompleteType="off"
+            autoCorrect={false}
+            autoCapitalize="none"
+            onChangeText={( text ) => {
+              setNote( text )
+            }}
+          />
+        </View>
+        <TouchableOpacity
+          onPress={() => {}}
+          style={styles.dashedContainer}>
+          <View style={styles.dashedStyle}>
+            <View style={{
+              flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+            }}>
+              <View style={{
+                flexDirection: 'row', alignItems: 'center'
+              }}>
+                <GiftCard />
+                <View>
+                  <Text style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue( 13 ),
+                    fontFamily: Fonts.FiraSansRegular,
+
+                  }}>
+                    Greeting Bitcoin
+                  </Text>
+                  <Text style={styles.subText}>
+                    {walletName ?? 'Lorem ipsum dolor'}
+                  </Text>
+                </View>
+              </View>
+              <More/>
+            </View>
+          </View>
+        </TouchableOpacity>
+        <View
+          style={[ styles.inputBox, styles.inputField ]}
+        >
+          <TextInput
+            style={styles.modalInputBox}
+            placeholder={`${common.addNote} (${common.optional})`}
+            placeholderTextColor={Colors.gray1}
+            value={note}
+            keyboardType={
+              Platform.OS == 'ios'
+                ? 'ascii-capable'
+                : 'visible-password'
+            }
+            returnKeyType="done"
+            returnKeyLabel="Done"
+            autoCompleteType="off"
+            autoCorrect={false}
+            autoCapitalize="none"
+            onChangeText={( text ) => {
+              setNote( text )
+            }}
+          />
+        </View>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', marginTop: hp( 2 )
+        }}>
+          {renderButton( 'Next' )}
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+          </View>
+        </View>
+
       </SafeAreaView>
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '6%' ),
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 5,
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  inputField: {
+    marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    borderColor: Colors.white,
+    backgroundColor: Colors.white,
+    width: wp( 90 )
+  },
   line:{
     height: '100%',
     width: wp( 0.18 ),
@@ -91,7 +234,7 @@ const styles = StyleSheet.create( {
   },
   subText: {
     color: Colors.lightTextColor,
-    fontSize: RFValue( 10 ),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   dot: {
@@ -111,7 +254,7 @@ const styles = StyleSheet.create( {
   dashedStyle: {
     backgroundColor: Colors.gray7,
     borderRadius: wp( 2 ),
-    paddingTop: hp( 1 ),
+    paddingVertical: hp( 1 ),
     paddingHorizontal: wp( 4 ),
     borderColor: Colors.lightBlue,
     borderWidth: 1,
@@ -205,7 +348,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     height: wp( '12%' ),
-    // width: wp( '27%' ),
+    width: wp( '30%' ),
     paddingHorizontal: wp( 2 ),
     justifyContent: 'center',
     alignItems: 'center',
@@ -216,11 +359,12 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
-    marginLeft: wp( 2 )
+    marginLeft: wp( 5 )
   },
   disabledButtonView: {
+    marginTop: hp( 2 ),
     height: wp( '12%' ),
-    width: wp( '27%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -230,7 +374,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.lightBlue,
-    marginLeft: wp( 2 )
+    marginLeft: wp( 5 )
   },
   imageView: {
     width: 18,
@@ -251,7 +395,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    backgroundColor: Colors.white,
+    paddingLeft: 15,
+    width: '90%'
   },
   inputBox: {
     borderWidth: 0.5,

@@ -234,7 +234,7 @@ const GiftDetails = ( { navigation } ) => {
               }}
               onPress={() => {
                 // dispatch( reclaimGift( gift.id ) )
-                navigation.navigate( 'SendGift', {
+                navigation.navigate( 'EnterGiftDetails', {
                   giftId: ( gift as Gift ).id,
                 } )
               }}

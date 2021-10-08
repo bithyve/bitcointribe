@@ -53,6 +53,7 @@ import { UsNumberFormat } from '../../common/utilities'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
 import FormStyles from '../../common/Styles/FormStyles'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -143,7 +144,7 @@ const CreateGift = ( { navigation } ) => {
 
               case 'Add F&F and Send':
                 setGiftModal( false )
-                navigation.navigate( 'AddContact', {
+                navigation.navigate( 'EnterGiftDetails', {
                   fromScreen: 'Gift',
                   giftId: ( createdGift as Gift ).id
                 } )
@@ -151,7 +152,7 @@ const CreateGift = ( { navigation } ) => {
 
               case 'Send Gift':
                 setGiftModal( false )
-                navigation.navigate( 'SendGift', {
+                navigation.navigate( 'EnterGiftDetails', {
                   giftId: ( createdGift as Gift ).id,
                 } )
                 break
@@ -167,6 +168,19 @@ const CreateGift = ( { navigation } ) => {
         <Text style={styles.buttonText}>Send Gift</Text>
       </TouchableOpacity>
     )
+  }
+
+  function onPressNumber( text ) {
+    let tmpPasscode = amount
+    if ( amount.length < 4 ) {
+      if ( text != 'x' ) {
+        tmpPasscode += text
+        setAmount( tmpPasscode )
+      }
+    }
+    if ( amount && text == 'x' ) {
+      setAmount( amount.slice( 0, -1 ) )
+    }
   }
 
   const renderCreateGiftModal =()=>{
@@ -256,6 +270,7 @@ const CreateGift = ( { navigation } ) => {
         }}>
           {renderButton( addfNf ? 'Add F&F and Send' : 'Send Gift' )}
           {/* {renderButton( 'Add F&F and Send' )}   */}
+
         </View>
       </View>
     )
@@ -263,12 +278,12 @@ const CreateGift = ( { navigation } ) => {
 
   const BalanceCurrencyIcon = () => {
     const style = {
-      height: RFValue( 14 ), width: RFValue( 14 ), resizeMode: 'contain'
+
     }
 
     if ( prefersBitcoin ) {
       return <Image style={{
-        ...style
+        height: RFValue( 14 ), width: RFValue( 14 ), resizeMode: 'contain'
       }} source={require( '../../assets/images/currencySymbols/icon_bitcoin_gray.png' )} />
     }
 
@@ -388,7 +403,7 @@ const CreateGift = ( { navigation } ) => {
                     ).toFixed( 2 )
                     : 0}
               </Text>
-              <Text style={styles.homeHeaderAmountUnitText}>
+              <Text>
                 {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
               </Text>
             </Text>
@@ -402,7 +417,8 @@ const CreateGift = ( { navigation } ) => {
             borderColor: Colors.white,
             marginTop: 10,
             backgroundColor: Colors.white,
-            paddingHorizontal: wp( 3 )
+            paddingHorizontal: wp( 3 ),
+            height: 50,
           }}
         >
           <BalanceCurrencyIcon />
@@ -410,14 +426,7 @@ const CreateGift = ( { navigation } ) => {
           <View style={{
             width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
           }} />
-          <TextInput
-            style={styles.modalInputBox}
-            placeholder={'Enter amount in sats'}
-            placeholderTextColor={Colors.borderColor}
-            value={amount}
-            keyboardType={'numeric'}
-            onChangeText={( text ) => {setAmount( text )}}
-          />
+          <Text style={styles.modalInputBox}>{amount?? 'Enter amount in sats'}</Text>
           {isAmountInvalid && (
             <View style={{
               marginLeft: 'auto'
@@ -463,12 +472,177 @@ const CreateGift = ( { navigation } ) => {
 
           {renderButton( 'Create Gift' )}
         </View>
+        <View style={{
+        }}>
+
+          <View style={styles.keyPadRow}>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '1' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '1' )}
+              >
+              1
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '2' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '2' )}
+              >
+              2
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '3' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '3' )}
+              >
+              3
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.keyPadRow}>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '4' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '4' )}
+              >
+              4
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '5' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '5' )}
+              >
+              5
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '6' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '6' )}
+              >
+              6
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.keyPadRow}>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '7' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '7' )}
+              >
+              7
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '8' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '8' )}
+              >
+              8
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '9' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '9' )}
+              >
+              9
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.keyPadRow}>
+            <View style={styles.keyPadElementTouchable}>
+              <Text style={{
+                flex: 1, padding: 15
+              }}></Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => onPressNumber( '0' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( '0' )}
+              >
+              0
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onPressNumber( 'x' )}
+              style={styles.keyPadElementTouchable}
+            >
+              <Text
+                style={styles.keyPadElementText}
+                onPress={() => onPressNumber( 'x' )}
+              >
+                <Ionicons
+                  name="ios-backspace"
+                  size={30}
+                  color={Colors.blue}
+                />
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </SafeAreaView>
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
+  keyPadRow: {
+    flexDirection: 'row',
+    height: hp( '8%' ),
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue( 11, 812 ),
+    fontStyle: 'italic',
+  },
+  keyPadElementTouchable: {
+    flex: 1,
+    height: hp( '8%' ),
+    fontSize: RFValue( 18 ),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  keyPadElementText: {
+    color: Colors.blue,
+    fontSize: RFValue( 25 ),
+    fontFamily: Fonts.FiraSansRegular,
+    fontStyle: 'normal',
+  },
   cardBitCoinImage: {
     width: wp( '3.5%' ),
     height: wp( '3.5%' ),
@@ -546,11 +720,11 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     backgroundColor: Colors.white,
+    alignSelf: 'center'
   },
   inputBox: {
     borderWidth: 0.5,

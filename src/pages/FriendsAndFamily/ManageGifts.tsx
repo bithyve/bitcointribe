@@ -142,13 +142,10 @@ const ManageGifts = ( { navigation } ) => {
       flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
-
-
       <View style={{
         height: 'auto',
         backgroundColor: Colors.backgroundColor,
       }}>
-
         <SafeAreaView
           style={{
             backgroundColor: Colors.backgroundColor
@@ -248,7 +245,6 @@ const ManageGifts = ( { navigation } ) => {
             data={giftsArr?.[ `${active}` ]}
             keyExtractor={listItemKeyExtractor}
             renderItem={( { item, index } ) => {
-              console.log( 'item.createdAt', item )
               const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
               const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
               return(
@@ -485,7 +481,8 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 6 )
   },
   buttonText: {
-    color: Colors.gray2
+    color: Colors.gray2,
+    fontFamily: Fonts.FiraSansMedium
   },
   buttonNavigator:{
     width: wp( '20%' ),
