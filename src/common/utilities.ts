@@ -166,9 +166,12 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
           }
         } : selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length ? selectedKeeperInfo.data : {
         }
-        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
+        if ( element.status != 'notSetup' && keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
+        else element.data = {
+        }
         // Channel Key
-        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = channelKey
+        if ( element.status != 'notSetup' && keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = channelKey
+        else element.channelKey = ''
       }
     }
   }
@@ -192,8 +195,8 @@ export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
 
     const displayName1 = element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.displayedName ? element.keeper1.data.displayedName : ''
     const displayName2 = element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.displayedName ? element.keeper2.data.displayedName : ''
-    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name ? element.keeper1.name : i == 0 && !element.keeper1.name ? 'Set Password' : ''
-    levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : element.keeper2.name ? element.keeper2.name : i == 0 && !element.keeper2.name ? Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive' : ''
+    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : i == 0 && !element.keeper1.name ? 'Set Password' : ''
+    levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : i == 0 && !element.keeper2.name ? Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive' : ''
   }
   return levelData
 }
