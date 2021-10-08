@@ -137,6 +137,8 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
   try{
     giftToSend.status = GiftStatus.SENT
     giftToSend.timestamps.sent = Date.now()
+    giftToSend.note = note
+
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
       notificationInfo: {
