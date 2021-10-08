@@ -126,11 +126,7 @@ const GiftDetails = ( { navigation } ) => {
                   }}>
                     {walletName ? walletName : 'from Checking Account'}
                   </Text>
-                  <Text style={{
-                    color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}>
+                  <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
                   </Text>
                 </View>
@@ -153,7 +149,50 @@ const GiftDetails = ( { navigation } ) => {
             </View>
           </View>
         </TouchableOpacity>
+        <View style={{
+          marginVertical: hp( 2 )
+        }}>
+          {Object.entries( gift.timestamps?? {
+          } ).reverse().map( ( item, index ) => {
 
+            return(
+              <View key={index} style={styles.timeInfo}>
+                <View style={{
+                  flexDirection: 'row',
+                }}>
+                  <View style={styles.dot} />
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontWeight: '600'
+                  }}>
+
+                    {moment( item[ 1 ] ).format( 'lll' )}
+                  </Text>
+                </View>
+                <View style={{
+                  flexDirection: 'row', alignItems: 'center'
+                }}>
+                  <View style={styles.line} />
+                  <View style={[ styles.normalStyle, {
+                    width: wp( '80%' ), borderRadius: wp( 2 ), paddingVertical: hp( 1 )
+                  } ]}>
+                    <Text style={[ styles.modalInfoText, {
+                      marginBottom: hp( 1 )
+                    } ]}>
+              Gift Card {item[ 0 ]}
+                    </Text>
+                    <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text>
+                  </View>
+                </View>
+
+
+              </View>
+            )
+          } )}
+
+        </View>
       </SafeAreaView>
 
       {gift.status === GiftStatus.SENT?
@@ -185,11 +224,68 @@ const GiftDetails = ( { navigation } ) => {
             </TouchableOpacity>
           </View>
         ): null }
+      {gift.status === GiftStatus.CREATED?
+        (
+          <View style={{
+            ...styles.keeperViewStyle
+          }}><TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+                // dispatch( reclaimGift( gift.id ) )
+                navigation.navigate( 'SendGift', {
+                  giftId: ( gift as Gift ).id,
+                } )
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Send Gift Card</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Expire Gift Card</Text>
+              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+            </TouchableOpacity>
+          </View>
+        ): null }
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
+  line:{
+    height: '100%',
+    width: wp( 0.18 ),
+    backgroundColor: Colors.lightTextColor,
+    marginHorizontal: wp( 3 ),
+  },
+  subText: {
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  dot: {
+    height: 8,
+    width: 8,
+    borderRadius: 8/2,
+    backgroundColor: Colors.lightTextColor,
+    marginHorizontal: wp( 2 ),
+    alignSelf: 'center'
+  },
+  timeInfo:{
+    width: '87%',
+    alignSelf: 'center',
+    alignItems: 'flex-start',
+    marginVertical: hp( 1 )
+  },
   dashedStyle: {
     backgroundColor: Colors.gray7,
     borderRadius: wp( 2 ),

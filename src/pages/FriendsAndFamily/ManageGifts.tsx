@@ -33,7 +33,7 @@ import { syncGiftsStatus } from '../../store/actions/trustedContacts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ManageGiftsList from './ManageGiftsList'
-
+import IconAdd from '../../assets/images/svgs/icon_add.svg'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -95,7 +95,7 @@ const ManageGifts = ( { navigation } ) => {
     switch( selectedGift.status ){
         case GiftStatus.CREATED:
           navigation.navigate( 'GiftDetails', {
-            title, walletName, gift: selectedGift, avatar: true
+            title, walletName, gift: selectedGift, avatar: false
           } )
           // navigation.navigate( 'AddContact', {
           //   fromScreen: 'ManageGift',
@@ -189,6 +189,8 @@ const ManageGifts = ( { navigation } ) => {
             infoTextNormal1={''}
             step={''}
           />
+          {Object.values( gifts?? {
+          } ).length !== 0 &&
           <TouchableOpacity
             onPress={() => navigation.navigate( 'CreateGift' )}
             style={{
@@ -205,6 +207,7 @@ const ManageGifts = ( { navigation } ) => {
             <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
 
           </TouchableOpacity>
+          }
         </View>
         <ScrollView
           style={{
@@ -272,6 +275,11 @@ const ManageGifts = ( { navigation } ) => {
                           } )
                         }
                         }
+                        style={{
+                          backgroundColor: Colors.backgroundColor1,
+                          borderRadius: wp( 2 ),
+                          padding: wp( 3 ),
+                        }}
                       >
                         <View style={{
                           flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
@@ -349,15 +357,87 @@ const ManageGifts = ( { navigation } ) => {
         {Object.values( gifts?? {
         } ).length === 0 &&
         <View style={{
-          marginTop: hp( '45%' )
+          // marginTop: hp( '45%' )
         }}>
           <BottomInfoBox
-            backgroundColor={Colors.white}
-            title={'Note'}
+            // backgroundColor={Colors.white}
+            // title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
             }
           />
+          <View style={styles.centeredView}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate( 'CreateGift' )}
+              style={{
+                flexDirection: 'row', alignItems: 'center'
+              }}>
+              <IconAdd />
+              <Text style={styles.createGiftText}>
+              Create New Gift
+              </Text>
+            </TouchableOpacity>
+            {/* <ScrollView style={{
+              flex: 1
+            }}> */}
+            {[ 1, 2, 3 ].map( ( value, index ) => {
+              return (
+                <View key={index} style={styles.scrollViewContainer}>
+
+                  <View>
+                    <View style={styles.roundedView} />
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp( '4%' ),
+                        width: wp( '22%' ),
+                        borderRadius: 10,
+                      }}
+                    />
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp( '4%' ),
+                        width: wp( '34%' ),
+                        borderRadius: 10,
+                        marginTop: hp( 1 ),
+                      }}
+                    />
+
+                  </View>
+                  <View>
+
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp( '4%' ),
+                        width: wp( '35%' ),
+                        borderRadius: 10,
+                        marginTop: hp( 0.5 ),
+                        alignSelf: 'flex-end'
+                      }}
+                    />
+                    <View style={{
+                      flexDirection: 'row', marginTop: hp( 5 ), flex: 1, alignItems: 'flex-end'
+                    }}>
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp( '8%' ),
+                          width: wp( '32%' ),
+                          borderRadius: 20,
+
+                        }}
+                      />
+                      <View style={styles.roundedViewSmall} />
+                    </View>
+                  </View>
+                </View>
+              )
+            } )}
+            {/* </ScrollView> */}
+          </View>
+
         </View>
         }
       </View>
@@ -366,6 +446,44 @@ const ManageGifts = ( { navigation } ) => {
 }
 
 const styles = StyleSheet.create( {
+  roundedView: {
+    width: wp( 12 ),
+    height: wp( 12 ),
+    borderRadius: wp( 12/2 ),
+    backgroundColor: Colors.backgroundColor,
+    marginBottom: hp( 2 )
+  },
+  roundedViewSmall: {
+    width: wp( 9 ),
+    height: wp( 9 ),
+    borderRadius: wp( 9/2 ),
+    backgroundColor: Colors.backgroundColor,
+    marginHorizontal: wp( 1 )
+  },
+  scrollViewContainer: {
+    margin: wp( '3%' ),
+    backgroundColor: Colors.white,
+    paddingVertical: hp( 2 ),
+    borderRadius: 10,
+    // height: wp( '20%' ),
+    width: wp( '90%' ),
+    paddingLeft: wp( '3%' ),
+    paddingRight: wp( '3%' ),
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  createGiftText:{
+    color: Colors.darkBlue,
+    fontSize: RFValue( 12 ),
+    letterSpacing: 0.3,
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  centeredView: {
+    // alignSelf: 'center',
+    marginHorizontal: wp( 6 )
+  },
   buttonText: {
     color: Colors.gray2
   },
@@ -399,10 +517,10 @@ const styles = StyleSheet.create( {
   },
   listItem: {
     marginVertical: hp( 0.5 ),
-    borderRadius: wp( 2 ),
-    padding: wp( 3 ),
+    // borderRadius: wp( 2 ),
+    // padding: wp( 3 ),
     alignItems:'center',
-    backgroundColor: Colors.backgroundColor1,
+    // backgroundColor: Colors.backgroundColor1,
     flexDirection: 'row'
   },
   proceedButtonText: {
