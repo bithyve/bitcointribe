@@ -242,7 +242,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 //                qrCodeString.getString(7),
 //                smallBold));
 //        document.add(preface);
-        document.newPage();
+        //document.newPage();
         // Secondary Xpub and 2FA Secret
         /*preface = new Paragraph();
         preface.add(new Paragraph(
@@ -266,7 +266,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         document.add(preface);*/
 
 
-        // Exit Key and BitHyve Xpub
+        /*  // Exit Key and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Exit/Regenerate 2FA Key:",
@@ -286,7 +286,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 //        document.add(preface);
 
 
-        /*preface = new Paragraph();
+        preface = new Paragraph();
         preface.add(new Paragraph(
                 "BitHyve Xpub:",
                 catFont));
@@ -348,7 +348,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
 
-        // Exit Key and BitHyve Xpub
+        /*// Exit Key and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Exit/Regenerate 2FA Key:",
@@ -361,6 +361,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
+        */
     }
 
 
