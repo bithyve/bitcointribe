@@ -46,6 +46,7 @@ function* setupWalletWorker( { payload } ) {
   const wallet: Wallet = {
     walletId,
     walletName,
+    userName: walletName,
     security,
     primaryMnemonic,
     primarySeed: primarySeed.toString( 'hex' ),

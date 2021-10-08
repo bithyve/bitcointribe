@@ -830,6 +830,7 @@ export enum NetworkType {
 export interface Wallet {
   walletId: string,
   walletName: string,
+  userName: string,
   security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
   primarySeed: string,

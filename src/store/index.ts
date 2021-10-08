@@ -171,6 +171,7 @@ import {
 } from './sagas/upgradeToNewBhr'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
+import { updateUserNameWatcher } from './sagas/storage'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -313,6 +314,8 @@ const rootSaga = function* () {
     autoShareContactKeeperWatcher,
     updateAvailableKeeperDataWatcher,
 
+    // storage
+    updateUserNameWatcher,
   ]
 
   yield all(

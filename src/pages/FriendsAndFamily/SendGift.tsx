@@ -48,7 +48,8 @@ export default function SendGift( props ) {
   }
 
   const sendGift  = async () => {
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
+    const senderName = wallet.userName? wallet.userName: wallet.walletName
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, note, encryptWithOTP )
     dispatch( updateGift( updatedGift ) )
 
     const link = shortLink !== '' ? shortLink: deepLink
