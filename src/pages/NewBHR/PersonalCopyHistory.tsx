@@ -16,7 +16,6 @@ import PersonalCopyShareModal from './PersonalCopyShareModal'
 import moment from 'moment'
 import _ from 'underscore'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import {
@@ -27,9 +26,7 @@ import {
   updatedKeeperInfo,
   updateMSharesHealth,
   createChannelAssets,
-  setApprovalStatus,
   createOrChangeGuardian,
-  downloadSMShare,
   setChannelAssets,
 } from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
@@ -41,7 +38,6 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
-import ApproveSetup from './ApproveSetup'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
 import { v4 as uuid } from 'uuid'
@@ -497,14 +493,6 @@ const PersonalCopyHistory = ( props ) => {
       }, 1000 )
     }
   }
-  const sendApprovalRequestToPK = ( ) => {
-    setQrBottomSheetsFlag( true )
-    setIsConfirm( false )
-    // ( QrBottomSheet as any ).current.snapTo( 1 )
-    setQRModal( true )
-    // ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
-    setKeeperTypeModal( false )
-  }
 
   const renderQrContent = () => {
     return (
@@ -525,9 +513,6 @@ const PersonalCopyHistory = ( props ) => {
               n: isChange ? 2 : 1
             } )
             props.navigation.dispatch( popAction )
-          } else {
-            dispatch( setApprovalStatus( false ) )
-            dispatch( downloadSMShare( qrScannedData ) )
           }
         }}
         onBackPress={() => {
@@ -537,38 +522,18 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Assa","channelId":"71a5d2b39c9396f8023c19070d70d0f78594d31d9eb137c524ab20ccc653b8f6","streamId":"def0d8970","channelKey":"lSiTUPAsqBCdgH6P6PzXzJ50","secondaryChannelKey":"lRm8RJ3vdm6dFvM6iNtrveoe","version":"1.9.5","walletId":"8a428172e0983cc1425aaaa122c74333022e9fad12bd30f28969659b03f2b3ed","encryptedKey":"6e8282c13d1f33cabad34fc8e5c91ad941944fa11e2207e907e6ef8b57c0966c092fd3e5bf5c99e7ed8a2dd3ac87eed377c31779f3c261927c415775dfed42c72ceb9d927c5fce69020b43c6ff71a635"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Ssd","channelId":"aa6aaa4873edf201f47e60bb9a50b2ee2e43578b477d6b96a5c2ba988fdf079b","streamId":"36d5d4a05","channelKey":"HYk3ECVHVcMyDn1Xc3fHhRH4","secondaryChannelKey":"mWZrWjJwlPdL83nvgiOIImi9","version":"2.0.0","walletId":"533afe13140f2f9a36861a6aa6de12a95f519277602dac7f4c4cc93b04b209ad","encryptedKey":"8d37585357435dd9e4a157975087f1368ccd4fb4ef4f76bc61bd5dc605d61b0f4bf80ed3f37f88283aeaa4ca8d09dfde3b7d7a81637dc409f9c3939dd131c911d310aa6f4361c380d5fcace80fed38cb"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
               n: isChange ? 2 : 1
             } )
             props.navigation.dispatch( popAction )
-          } else {
-            setQRModal( false )
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
-            dispatch( setApprovalStatus( false ) )
-            dispatch( downloadSMShare( qrScannedData ) )
           }
         }}
       />
     )
   }
-
-
-  useEffect( ()=>{
-    if( approvalStatus && isChangeClicked ){
-      console.log( 'APPROVe' )
-      setQRModal( false )
-      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-    }
-  }, [ approvalStatus ] )
-
-  useEffect( ()=>{
-    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
-      dispatch( setApprovalStatus( true ) )
-    }
-  }, [ channelAssets ] )
 
   const deviceText = ( text ) => {
     switch ( text ) {
@@ -648,8 +613,7 @@ const PersonalCopyHistory = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           selectedLevelId={selectedLevelId}

@@ -850,19 +850,9 @@ function* getPDFDataWorker( { payload } ) {
           wallet.security.answer
         ).encryptedData,
       }
-      const secondaryData = {
-        type: QRCodeTypes.RECOVERY_REQUEST,
-        walletName: wallet.walletName,
-        channelId: currentContact.permanentChannelAddress,
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
-        secondaryChannelKey: currentContact.secondaryChannelKey,
-        version: appVersion,
-        walletId
-      }
 
       const qrData = [
         JSON.stringify( recoveryData ),
-        JSON.stringify( secondaryData ),
       ]
       console.log( 'PDF recoveryData', JSON.stringify( recoveryData ) )
       const pdfData = {

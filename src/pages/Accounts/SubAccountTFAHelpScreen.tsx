@@ -155,7 +155,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         isFromKeeperDeviceHistory={false}
         QRModalHeader={QRModalHeader}
         title={'Scan the Approval/Exit Key'}
-        infoText={`This can be found on the last page of your PDF personal copy ${availableKeepersName ? 'or from'+availableKeepersName : '' }`}
+        infoText={`This can be found on ${availableKeepersName ? availableKeepersName : '' }`}
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={( qrData ) => {
