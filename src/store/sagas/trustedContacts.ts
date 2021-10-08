@@ -803,8 +803,8 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   if( giftId && flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
     const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
     const giftToSend = gifts[ giftId ]
-
-    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, wallet.walletName, FCM, '' )
+    const senderName = wallet.userName? wallet.userName: wallet.walletName
+    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, '' )
     yield put( updateGift( updatedGift ) )
     giftDeepLink = deepLink
   }
