@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, ActivityIndicator } from 'react-native'
+import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native'
 import NavStyles from '../../common/Styles/NavStyles'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -11,6 +11,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import QRCode from '../../components/QRCode'
 import { translations } from '../../common/content/LocContext'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export default function SecondaryDeviceModelContents( props ) {
   const strings  = translations[ 'bhr' ]
@@ -25,23 +26,45 @@ export default function SecondaryDeviceModelContents( props ) {
         width: '100%',
       }}
     >
-      <View
-        style={{
-          ...NavStyles.modalHeaderTitleView,
-          paddingTop: hp( '3%' ),
-          alignItems: 'center',
-          marginLeft: 20,
-        }}
-      >
-        <Text style={NavStyles.modalHeaderTitleText}>{strings.ScanQRCode}</Text>
+      <View style={{
+        flexDirection: 'row', justifyContent: 'space-between'
+      }}>
+        <View
+          style={{
+            ...NavStyles.modalHeaderTitleView,
+            paddingTop: hp( '3%' ),
+            alignItems: 'center',
+            marginLeft: 20,
+            flex: 1
+          }}
+        >
+          <Text style={NavStyles.modalHeaderTitleText}>{strings.ScanQRCode}</Text>
+        </View>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            props.onPressBack()
+          }}
+          style={{
+            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+            marginTop: wp( 3 ), marginRight: wp( 3 )
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} style={{
+          // marginTop: hp( 0.5 )
+          }} />
+        </TouchableOpacity>
       </View>
+
 
       <Text style={{
         color: Colors.textColorGrey,
         fontSize: RFValue( 12 ),
+        letterSpacing: 0.1,
         fontFamily: Fonts.FiraSansRegular,
         marginLeft: 20,
-        marginRight: 20
+        marginRight: wp( 8 )
       }}>
         {strings.OpentheQRscanner}
       </Text>

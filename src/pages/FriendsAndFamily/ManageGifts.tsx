@@ -221,7 +221,7 @@ const ManageGifts = ( { navigation } ) => {
                 <TouchableOpacity
                   key={item}
                   style={[ styles.buttonNavigator, {
-                    backgroundColor: active === item ? Colors.blue : Colors.borderColor
+                    backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor
                   } ]}
                   onPress={() =>buttonPress( item )}
                 >
@@ -536,7 +536,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.lightBlue,
     borderRadius: wp ( 2 ),
     height: hp( 4 ),
     paddingHorizontal: wp( 2 )

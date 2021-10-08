@@ -69,6 +69,7 @@ const CreateGift = ( { navigation } ) => {
   const [ amount, setAmount ] = useState( '' )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
+  const [ addfNf, setAddfNf ] = useState( false )
   const [ giftModal, setGiftModal ] =useState( false )
   const [ createdGift, setCreatedGift ] = useState( null )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
@@ -156,7 +157,7 @@ const CreateGift = ( { navigation } ) => {
         }
         }
       >
-        <Text style={styles.buttonText}>{text}</Text>
+        <Text style={styles.buttonText}>Send Gift</Text>
       </TouchableOpacity>
     )
   }
@@ -214,10 +215,40 @@ const CreateGift = ( { navigation } ) => {
 
         </View>
         <View style={{
+          marginVertical: hp( 5 ),
+          marginHorizontal: wp( 7 ),
+          flexDirection: 'row'
+        }}>
+          <TouchableOpacity
+            onPress={() => setAddfNf( !addfNf )}
+            style={{
+              flexDirection: 'row'
+            }}
+          >
+
+            <View style={styles.imageView}>
+              {addfNf &&
+              <CheckMark style={{
+                marginLeft: 6,
+                marginTop: 6
+              }}/>
+              }
+            </View>
+            <Text style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue( 12 ),
+              fontFamily: Fonts.FiraSansRegular,
+              marginHorizontal: wp( 3 )
+            }}>
+          Add to Friends & Family
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{
           marginLeft: wp( 4 ), flexDirection: 'row'
         }}>
-          {renderButton( 'Send Gift' )}
-          {renderButton( 'Add F&F and Send' )}
+          {renderButton( addfNf ? 'Add F&F and Send' : 'Send Gift' )}
+          {/* {renderButton( 'Add F&F and Send' )}   */}
         </View>
       </View>
     )
@@ -376,7 +407,7 @@ const CreateGift = ( { navigation } ) => {
           }} />
           <TextInput
             style={styles.modalInputBox}
-            placeholder={'Enter amount'}
+            placeholder={'Enter amount in sats'}
             placeholderTextColor={Colors.borderColor}
             value={amount}
             keyboardType={'numeric'}

@@ -1431,7 +1431,7 @@ class UpgradeBackup extends Component<
           ref={this.secondaryDeviceBottomSheet}
           snapPoints={[ -30, hp( '85%' ) ]}
           renderContent={this.renderSecondaryDeviceContents}
-          renderHeader={this.renderSecondaryDeviceHeader}
+          // renderHeader={this.renderSecondaryDeviceHeader}
         />
         <BottomSheet
           enabledInnerScrolling={true}
