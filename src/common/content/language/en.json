@@ -547,8 +547,8 @@
       "4": "iCloud is currently inaccessible. Please try again in sometime.",
       "3": "Network error, please check your internet connection.",
       "7": "You may have pressed requested too many times. Please try after sometime.",
-      "9": "You are not logged-in into your iCloud account. Please log in from your Phone Settings.",
-      "default": "We encountered a non-standard error. Please try again after sometime or contact"
+      "9": "You are not logged-in into your iCloud account. Please log in from your phone Settings.",
+      "default": "We encountered a non-standard error. Please try again after sometime or contact us"
     },
     "driveErrors": {
       "17": "Failed to connect to your Google Drive. Please try after sometime.",
@@ -560,13 +560,13 @@
       "7": "A network error occurred. Please check your connection and try again.",
       "unabletoreconnect": "Unable to re-connect with Google Drive right now. Please try again after sometime.",
       "19": "Unable to connect with Google Drive right now. Please try again after sometime.",
-      "3": "Google Play services is disabled on your phone. Please enable them from Phone Settings",
+      "3": "Google Play services is disabled on your phone. Please enable them from phone Settings",
       "2": "The installed version of Google Play services is out of date. Please update it from Play store.",
       "4": "You are not logged-in into your Google Drive account. Please log in from your Phone Settings.",
       "15": "Request timed out. Please try again.",
       "30": "Please check authentication with your google account in settings and try again.",
       "errorinuploadingdata": "Error in uploading data. Please re-try again.",
       "12501": "We recommend signing in as it easily allows you to backup your wallet on your personal cloud.",
-      "default": "We encountered a non-standard error. Please try again after sometime or contact"
+      "default": "We encountered a non-standard error. Please try again after sometime or contact us"
     }
 }

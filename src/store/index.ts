@@ -142,7 +142,8 @@ import {
   retrieveMetaSharesWatcher,
   onPressKeeperChannelWatcher,
   updateSecondaryShardWatcher,
-  getApprovalFromKeeperWatcher
+  getApprovalFromKeeperWatcher,
+  rejectedExistingContactRequestWatcher,
 } from './sagas/BHR'
 
 import {
@@ -268,6 +269,7 @@ const rootSaga = function* () {
     confirmPDFSharedFromUpgradeWatcher,
     updateSecondaryShardWatcher,
     getApprovalFromKeeperWatcher,
+    rejectedExistingContactRequestWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

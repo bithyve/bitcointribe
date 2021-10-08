@@ -32,7 +32,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import { generateGifts } from '../../store/actions/accounts'
 import { AccountsState } from '../../store/reducers/accounts'
-import { AccountType, Gift } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, Gift, TxPriority } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
@@ -72,19 +72,23 @@ const CreateGift = ( { navigation } ) => {
   const [ addfNf, setAddfNf ] = useState( false )
   const [ giftModal, setGiftModal ] =useState( false )
   const [ createdGift, setCreatedGift ] = useState( null )
-  const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
+  const accountState: AccountsState = useSelector( ( state ) => idx( state, ( _ ) => _.accounts ) )
+  const accountShells: AccountShell[] = accountState.accountShells
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
-
+  const account: Account = accountState.accounts[ sourcePrimarySubAccount.id ]
+  const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
   }, [ amount ] )
 
   const isAmountInvalid = useMemo( () => {
+    if( includeFees ) if( currentSatsAmountFormValue <= averageLowTxFee ) return true
+
     return currentSatsAmountFormValue > spendableBalance
-  }, [ currentSatsAmountFormValue, spendableBalance ] )
+  }, [ currentSatsAmountFormValue, spendableBalance, includeFees, averageLowTxFee ] )
 
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
@@ -109,6 +113,10 @@ const CreateGift = ( { navigation } ) => {
     }
   }, [ accountsState.selectedGiftId, initGiftCreation ] )
 
+  useEffect( () => {
+    if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
+  }, [ account, accountState.averageTxFees ] )
+
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
@@ -117,7 +125,6 @@ const CreateGift = ( { navigation } ) => {
     const actualAmount = ( ( spendableBalance / SATOSHIS_IN_BTC ) *
     accountsState.exchangeRates[ currencyCode ].last
     ).toFixed( 2 )
-    console.log( 'actualAmount', spendableBalance, actualAmount )
 
 
     const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
@@ -285,8 +292,6 @@ const CreateGift = ( { navigation } ) => {
     }
   }
 
-  console.log( 'prefersBitcoin', currencyCode, accountsState.netBalance, accountsState.exchangeRates[ currencyCode ] )
-
   return (
     <ScrollView contentContainerStyle={{
       flexGrow: 1
@@ -375,10 +380,10 @@ const CreateGift = ( { navigation } ) => {
               {'Available to spend '}
               <Text style={styles.balanceText}>
                 {prefersBitcoin
-                  ? UsNumberFormat( accountsState.netBalance )
+                  ? UsNumberFormat( spendableBalance )
                   : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
                     ? (
-                      ( accountsState.netBalance / SATOSHIS_IN_BTC ) *
+                      ( spendableBalance / SATOSHIS_IN_BTC ) *
                       accountsState.exchangeRates[ currencyCode ].last
                     ).toFixed( 2 )
                     : 0}

@@ -12,7 +12,7 @@ import TransactionDescribing from '../../common/data/models/Transactions/Interfa
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 import { AccountType } from '../../bitcoin/utilities/Interface'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForTransaction'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
@@ -62,7 +62,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
   const getTitle = useMemo( () => {
     if( transaction.transactionType === TransactionKind.RECEIVE ) {
-      return transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType )
+      return transaction.sender || 'External address'
     } else {
       let name = ''
       if( transaction.receivers ) {
@@ -70,7 +70,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
           name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length - 1} other`
         } else {
           name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name :
-            transaction.recipientAddresses ? transaction.recipientAddresses[ 0 ] : transaction.accountType || transaction.accountName : '' ||  transaction.accountType || transaction.accountName
+            transaction.recipientAddresses ? 'External address' : transaction.accountType || transaction.accountName : '' ||  transaction.accountType || transaction.accountName
         }
       } else {
         name =  transaction.accountName? transaction.accountName: transaction.accountType
@@ -119,7 +119,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
       <View style={styles.containerImg}>
         {/* <View style={styles.avatarImage} > */}
-        {getAvatarForSubAccount( primarySubAccount, false, true )}
+        {getAvatarForSubAccount( primarySubAccount, false, true, false, transaction )}
         {/* </View> */}
 
 

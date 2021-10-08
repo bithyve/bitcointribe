@@ -68,7 +68,8 @@ import {
   initializeHealthSetup,
   updateCloudPermission,
   acceptExistingContactRequest,
-  updateSecondaryShard
+  updateSecondaryShard,
+  rejectedExistingContactRequest
 } from '../../store/actions/BHR'
 import {
   updateFCMTokens,
@@ -256,7 +257,8 @@ interface HomePropsTypes {
   updateSecondaryShard: any;
   openApproval: boolean;
   availableKeepers: KeeperInfoInterface[]
-  approvalContactData: ContactRecipientDescribing
+  approvalContactData: ContactRecipientDescribing;
+  rejectedExistingContactRequest: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -766,6 +768,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const unread = messages.filter( msg => msg.status === 'unread' )
     if ( Platform.OS === 'ios' ) {
       PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
+    }
+    const notificationRejection = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
+    if( notificationRejection ) {
+      this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
     const notification = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST && value.status == 'unread' )
     if( notification && notification.status == 'unread' ){
@@ -1675,7 +1681,8 @@ export default withNavigationFocus(
     getMessages,
     syncPermanentChannels,
     updateLastSeen,
-    updateSecondaryShard
+    updateSecondaryShard,
+    rejectedExistingContactRequest
   } )( Home )
 )
 

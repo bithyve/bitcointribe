@@ -137,6 +137,8 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
   try{
     giftToSend.status = GiftStatus.SENT
     giftToSend.timestamps.sent = Date.now()
+    giftToSend.note = note
+
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
       notificationInfo: {
@@ -148,7 +150,15 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
 
     let deepLinkEncryptionOTP
-    if( shouldEncrypt ) deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+    if( shouldEncrypt ) {
+      deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+      giftToSend.deepLinkConfig = {
+        encryptionType: DeepLinkEncryptionType.OTP,
+        encryptionKey: deepLinkEncryptionOTP,
+      }
+    } else {
+      giftToSend.deepLinkConfig = null // removes previous link config(if any)
+    }
 
     const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
       deepLinkKind: DeepLinkKind.GIFT,

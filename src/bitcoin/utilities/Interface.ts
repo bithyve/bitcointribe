@@ -980,6 +980,11 @@ export interface Gift {
     walletName?: string,
     contactId?: string
   },
+  note?: string,
+  deepLinkConfig?: {
+    encryptionType: string,
+    encryptionKey: string,
+  }
 }
 
 export interface GiftMetaData {
