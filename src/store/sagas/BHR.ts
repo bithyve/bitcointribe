@@ -1498,19 +1498,22 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     if( existingContact ) {
       const existingContactDetails = contacts[ channelKey ].contactDetails
-      const channelUpdate =  {
-        contactInfo: {
-          contactDetails: existingContactDetails,
-          channelKey,
+      const instream = useStreamFromContact( contacts[ channelKey ], wallet.walletId, true )
+      if( !instream.primaryData ){
+        const channelUpdate =  {
+          contactInfo: {
+            contactDetails: existingContactDetails,
+            channelKey,
+          }
         }
+        const payloadForSync = {
+          permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+          channelUpdates: [ channelUpdate ],
+        }
+        yield call( syncPermanentChannelsWorker, {
+          payload: payloadForSync
+        } )
       }
-      const payloadForSync = {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-        channelUpdates: [ channelUpdate ],
-      }
-      yield call( syncPermanentChannelsWorker, {
-        payload: payloadForSync
-      } )
     }
     const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
@@ -1548,7 +1551,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           streamId: TrustedContactsOperations.getStreamId( walletId ),
           contact: contacts[ channelKey ],
           contactDetails: contacts[ channelKey ].contactDetails,
-          secondaryChannelKey: BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
+          secondaryChannelKey: contacts[ channelKey ].secondaryChannelKey ? contacts[ channelKey ].secondaryChannelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
           metaSync: true,
           unEncryptedOutstreamUpdates: streamUpdates
         }
@@ -1972,7 +1975,23 @@ export const updateKeeperInfoToChannelWatcher = createWatcher(
 function* acceptExistingContactRequestWorker( { payload } ) {
   try {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
+    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+    const { walletName, walletId } = yield select( ( state ) => state.storage.wallet )
     const { channelKey, contactsSecondaryChannelKey } = payload
+    const existingContactDetails = contacts[ channelKey ].contactDetails
+    const channelUpdate =  {
+      contactInfo: {
+        contactDetails: existingContactDetails,
+        channelKey,
+      }
+    }
+    const payloadForSync = {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      channelUpdates: [ channelUpdate ],
+    }
+    yield call( syncPermanentChannelsWorker, {
+      payload: payloadForSync
+    } )
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     if ( keeperInfo.length > 0 ) {
@@ -1983,8 +2002,7 @@ function* acceptExistingContactRequestWorker( { payload } ) {
       }
     }
     yield put( putKeeperInfo( keeperInfo ) )
-    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    const { walletName, walletId } = yield select( ( state ) => state.storage.wallet )
+
     const primaryData: PrimaryStreamData = {
       contactDetails: contacts[ channelKey ].contactDetails,
       walletID: walletId,
@@ -2027,13 +2045,13 @@ function* acceptExistingContactRequestWorker( { payload } ) {
       const instream = useStreamFromContact( temporaryContact, walletId, true )
       const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
       const notification: INotification = {
-        notificationType: notificationType.FNF_KEEPER_REQUEST,
+        notificationType: notificationType.FNF_KEEPER_REQUEST_ACCEPTED,
         title: 'Friends & Family request',
         body: `Your Keeper request to ${temporaryContact.contactDetails.contactName} has been accepted`,
         data: {
           walletName: walletName,
           channelKey: channelKey,
-          contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
+          contactsSecondaryChannelKey: temporaryContact.contactsSecondaryChannelKey,
           version: appVersion
         },
         tag: notificationTag.IMP,
@@ -2480,5 +2498,75 @@ function* getApprovalFromKeeperWorker( { payload } ) {
 
 export const getApprovalFromKeeperWatcher = createWatcher(
   getApprovalFromKeeperWorker,
+  GET_APPROVAL_FROM_KEEPER,
+)
+
+function* rejectedExistingContactRequestWorker( { payload } ) {
+  const { channelKey } = payload
+  const { walletId, walletName }: Wallet = yield select( ( state ) => state.storage.wallet )
+  const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
+  const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+  const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+  const s3 = yield call( dbManager.getBHR )
+  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const KeeperInfoElement: KeeperInfoInterface = {
+    ...keeperInfo.find( value=>value.channelKey == channelKey )
+  }
+  if( contacts[ channelKey ] && contacts[ channelKey ].isActive && contacts[ channelKey ].unencryptedPermanentChannel && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ] && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ].primaryData.relationType == TrustedContactRelationTypes.KEEPER ) return
+  if( KeeperInfoElement ){
+
+    const primaryData: PrimaryStreamData = {
+      contactDetails: contacts[ channelKey ].contactDetails,
+      walletID: walletId,
+      walletName,
+      relationType: TrustedContactRelationTypes.CONTACT,
+    }
+
+    const streamUpdates: UnecryptedStreamData = {
+      streamId: TrustedContactsOperations.getStreamId( walletId ),
+      primaryData,
+      backupData: null,
+      metaData: {
+        flags:{
+          active: true,
+          newData: true,
+          lastSeen: Date.now(),
+        },
+        version: DeviceInfo.getVersion()
+      }
+    }
+
+    const { updated }: {
+      updated: boolean;
+      updatedContacts: Trusted_Contacts
+    } = yield call(
+      TrustedContactsOperations.syncPermanentChannels,
+      [ {
+        channelKey: channelKey,
+        streamId: streamUpdates.streamId,
+        contactDetails: contacts[ channelKey ].contactDetails,
+        unEncryptedOutstreamUpdates: streamUpdates,
+      } ]
+    )
+    if( updated && levelHealth.find( value=>value.levelInfo.find( temp=>temp.shareId == KeeperInfoElement.shareId ) ) ){
+      const shareObj = {
+        walletId: walletId,
+        shareId: KeeperInfoElement.shareId,
+        reshareVersion: MetaShares.find( value=>value.shareId == KeeperInfoElement.shareId ).meta.reshareVersion,
+        updatedAt: 0,
+        status: 'notSetup',
+        name: '',
+        shareType: ''
+      }
+      yield put( updateMSharesHealth( shareObj, false ) )
+      const KeeperInfoTemp = [ ...keeperInfo ]
+      KeeperInfoTemp.splice( keeperInfo.findIndex( value=>value.channelKey == KeeperInfoElement.channelKey ), 1 )
+      yield put( putKeeperInfo( KeeperInfoTemp ) )
+    }
+  }
+}
+
+export const rejectedExistingContactRequestWatcher = createWatcher(
+  rejectedExistingContactRequestWorker,
   GET_APPROVAL_FROM_KEEPER,
 )

@@ -35,6 +35,7 @@ import {
   setApprovalStatus,
   createOrChangeGuardian,
   downloadSMShare,
+  switchS3LoaderKeeper,
 } from '../../store/actions/BHR'
 import { useDispatch } from 'react-redux'
 import {
@@ -145,6 +146,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const index = props.navigation.getParam( 'index' )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const dispatch = useDispatch()
+
+  useEffect( ()=>{
+    if( createChannelAssetsStatus ) dispatch( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
+  }, [] )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -546,7 +551,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   useEffect( ()=> {
-    if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
       } ) )
@@ -582,9 +587,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
       dispatch( updateMSharesHealth( shareObj, isChange ) )
       dispatch( setChannelAssets( {
       }, null ) )
+      setIsGuardianCreationClicked( false )
       // saveInTransitHistory()
     }
-  }, [ chosenContact, trustedContacts, encryptLinkWith ] )
+  }, [ chosenContact, trustedContacts ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )

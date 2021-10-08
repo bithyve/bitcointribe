@@ -354,7 +354,6 @@ export default class TrustedContactsOperations {
 
         if ( !contact.isActive ) continue // skip non-active contacts
         if( contactsSecondaryChannelKey ) contact.contactsSecondaryChannelKey = contactsSecondaryChannelKey // execution case: when a contact is upgraded to a keeper
-
         // auto-update last seen(if flags aren't already present)
         if ( !unEncryptedOutstreamUpdates || !idx( unEncryptedOutstreamUpdates, _ => _.metaData.flags ) ){
           if( !unEncryptedOutstreamUpdates ) unEncryptedOutstreamUpdates = {
