@@ -39,6 +39,7 @@ const TransactionsNote = 'TransactionsNote'
 const ContactImage = 'ContactImage'
 const Gifts = 'Gifts'
 const GiftSenderReceiver = 'GiftSenderReceiver'
+const GiftDeepLinkConfig = 'GiftDeepLinkConfig'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -427,6 +428,9 @@ export const WalletSchema: ObjectSchema = {
     walletName: {
       type: 'string', optional: true,
     },
+    userName: {
+      type: 'string', optional: true,
+    },
     primaryMnemonic: {
       type: 'string', optional: true,
     },
@@ -803,6 +807,18 @@ export const GiftSenderReceiverSchema: ObjectSchema = {
   },
 }
 
+export const GiftDeepLinkConfigSchema : ObjectSchema = {
+  name: GiftDeepLinkConfig,
+  properties: {
+    encryptionType: {
+      type: 'string', optional: true
+    },
+    encryptionKey: {
+      type: 'string', optional: true
+    },
+  },
+}
+
 export const GiftsSchema: ObjectSchema = {
   name: Gifts,
   primaryKey: 'id',
@@ -833,6 +849,12 @@ export const GiftsSchema: ObjectSchema = {
     },
     receiver: {
       type: GiftSenderReceiver, optional: true
+    },
+    note: {
+      type: 'string', optional: true
+    },
+    deepLinkConfig: {
+      type: GiftDeepLinkConfig, optional: true
     }
   },
 }

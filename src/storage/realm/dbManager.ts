@@ -317,6 +317,21 @@ const createGift = async ( gift ) => {
   }
 }
 
+const updateGift = ( id, gift  ) => {
+  try {
+    let giftRef = db.objects( schema.Gifts ).filtered( `id = "${id}"` )
+    if( giftRef.length > 0 ) {
+      db.write( ()=> {
+        giftRef = gift
+      } )
+    }
+    //db.create( schema.Gifts, gift, true )
+    return true
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
 const getGifts = ( ids ) => {
   if( ids ) {
     const idsQuery = ids.map( id => `id = "${id}"` ).join( ' OR ' )
@@ -387,5 +402,6 @@ export default {
   updateTransactions,
   getGifts,
   createGifts,
-  createGift
+  createGift,
+  updateGift
 }

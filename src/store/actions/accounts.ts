@@ -585,6 +585,7 @@ export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 export const BLIND_REFRESH_STARTED = 'BLIND_REFRESH_STARTED'
 export const UPDATE_GIFT = 'UPDATE_GIFT'
+export const SET_GIFTS = 'SET_GIFTS'
 
 export const testcoinsReceived = ( ) => {
   return {
@@ -819,6 +820,17 @@ export const updateGift = ( gift: Gift ) => {
     type: UPDATE_GIFT,
     payload: {
       gift
+    }
+  }
+}
+
+export const setGifts = ( gifts:{
+    [id: string]: Gift
+  } ) => {
+  return {
+    type: SET_GIFTS,
+    payload: {
+      gifts
     }
   }
 }
