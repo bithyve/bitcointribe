@@ -1077,11 +1077,15 @@ export default class AccountOperations {
     if( includeFee ){
       priorityBasedTxPrerequisites.outputs.forEach( output => {
         if( !output.address ){
+          // adding back fee to the change address
           output.value += priorityBasedTxPrerequisites.fee
         } else {
-          output.value -= priorityBasedTxPrerequisites.fee
-          if( output.value <= 0 ) throw new Error( 'Failed to generate gifts, inclusion fee is greater than gift amount' )
-          feeDeductedFromAddress = output.address
+          // deducting fee from the gift(or one of the gifts)
+          if( !feeDeductedFromAddress ){
+            output.value -= priorityBasedTxPrerequisites.fee
+            if( output.value <= 0 ) throw new Error( 'Failed to generate gifts, inclusion fee is greater than gift amount' )
+            feeDeductedFromAddress = output.address
+          }
         }
       } )
     }
