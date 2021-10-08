@@ -24,8 +24,10 @@ import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
 import DeviceInfo from 'react-native-device-info'
 import { updateGift } from '../../store/actions/accounts'
+import { updateWalletImageHealth } from '../../store/actions/BHR'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
+import dbManager from '../../storage/realm/dbManager'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -48,9 +50,14 @@ export default function SendGift( props ) {
   }
 
   const sendGift  = async () => {
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, wallet.walletName, fcmToken, note, encryptWithOTP )
+    const senderName = wallet.userName? wallet.userName: wallet.walletName
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, note, encryptWithOTP )
     dispatch( updateGift( updatedGift ) )
-
+    dbManager.createGift( updatedGift  )
+    dispatch( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: [ updatedGift.id ]
+    } ) )
     const link = shortLink !== '' ? shortLink: deepLink
     setGiftDeepLink( link )
     setGiftQR( JSON.stringify( {

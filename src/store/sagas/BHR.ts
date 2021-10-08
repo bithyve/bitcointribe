@@ -110,7 +110,7 @@ import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
-import { restoreAccountShells, updateAccountShells } from '../actions/accounts'
+import { restoreAccountShells, updateAccountShells, setGifts } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
@@ -502,6 +502,7 @@ function* recoverWalletWorker( { payload } ) {
     }
 
     const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+    console.log( 'getWI', getWI )
     if( getWI.status == 200 ) {
       image = getWI.data.walletImage
     }
@@ -534,6 +535,7 @@ function* recoverWalletWorker( { payload } ) {
         questionId: selectedBackup.questionId,
         answer: answer
       },
+      userName: image.userName ? image.userName: '',
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: DeviceInfo.getVersion(),
@@ -559,7 +561,6 @@ function* recoverWalletWorker( { payload } ) {
     // Version histroy Restore
     if( image.versionHistory ) yield put( setVersionHistory( JSON.parse( BHROperations.decryptWithAnswer( image.versionHistory, decryptionKey ).decryptedData ) ) )
     // restore Accounts
-    yield put( restoreAccountShells( acc ) )
     // restore health
     yield call( setupLevelHealthWorker, {
       payload: {
@@ -570,6 +571,21 @@ function* recoverWalletWorker( { payload } ) {
     // restore Metashres
     if( level > 1 ) yield put( retrieveMetaShares( shares ) )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    // restore gifts
+    if( image.gifts ) {
+      const gifts = {
+      }
+      Object.keys( image.gifts ).forEach( ( giftId ) => {
+        const decryptedData = BHROperations.decryptWithAnswer( image.gifts[ giftId ], decryptionKey ).decryptedData
+        gifts[ giftId ] = JSON.parse( decryptedData )
+      } )
+      yield put( setGifts( gifts ) )
+      const data = Object.keys( gifts ).map( ( key ) => gifts[ key ] )
+      yield call( dbManager.createGifts, data )
+    }
+
+    yield put( restoreAccountShells( acc ) )
+
   } catch ( err ) {
     console.log( err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
@@ -698,6 +714,7 @@ function* updateWalletImageWorker( { payload } ) {
   const walletImage : NewWalletImage = {
     name: wallet.walletName,
     walletId : wallet.walletId,
+    userName: wallet.userName ? wallet.userName : ''
   }
   const encryptionKey = bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' )
   if( updateSmShare ) {

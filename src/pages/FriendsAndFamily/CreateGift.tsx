@@ -54,6 +54,7 @@ import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
 import FormStyles from '../../common/Styles/FormStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { updateUserName } from '../../store/actions/storage'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -112,6 +113,8 @@ const CreateGift = ( { navigation } ) => {
         setInitGiftCreation( false )
       }
     }
+
+    dispatch( updateUserName( 'Sam' ) )
   }, [ accountsState.selectedGiftId, initGiftCreation ] )
 
   useEffect( () => {

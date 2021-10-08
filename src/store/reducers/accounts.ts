@@ -44,6 +44,7 @@ import {
   RECOMPUTE_NET_BALANCE,
   UPDATE_GIFT,
   GENERATE_GIFTS,
+  SET_GIFTS
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -557,7 +558,11 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           },
           selectedGiftId: gift.id
         }
-
+      case SET_GIFTS:
+        return {
+          ...state,
+          gifts: action.payload.gifts,
+        }
       default:
         return state
   }

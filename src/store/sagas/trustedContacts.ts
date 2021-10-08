@@ -139,6 +139,7 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
   } )
   gift.receiver.accountId = associationAccount.id
   yield put( updateGift( gift ) )
+  yield call( dbManager.createGift, gift )
   yield put( updateAccountShells( {
     accounts: {
       [ associationAccount.id ]: associationAccount
@@ -147,7 +148,9 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
   yield call( dbManager.updateAccount, associationAccount.id, associationAccount )
   yield put( updateWalletImageHealth( {
     updateAccounts: true,
-    accountIds: [ associationAccount.id ]
+    accountIds: [ associationAccount.id ],
+    updateGifts: true,
+    giftIds: [ gift.id ]
   } ) )
 }
 
@@ -208,7 +211,11 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
         giftId: gift.id
       }
     } )
-
+    yield call( dbManager.createGift, gift )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: [ gift.id ]
+    } ) )
     if( giftMetaData ){
       giftMetaData.status = GiftStatus.ACCEPTED
 
@@ -318,6 +325,11 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
     gift.status = giftMetaData.status
     gift.timestamps.reclaimed = Date.now()
     yield put( updateGift( gift ) )
+    yield call( dbManager.createGift, gift )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: [ gift.id ]
+    } ) )
     Toast( 'Gift reclaimed' )
   } else throw new Error( 'Unable to reclaim gift' )
 }
@@ -370,6 +382,11 @@ function* syncGiftsStatusWorker() {
       if( giftToUpdate.status !== giftMetaData.status ){
         giftToUpdate.status = giftMetaData.status
         yield put( updateGift( giftToUpdate ) )
+        yield call( dbManager.createGift, giftToUpdate )
+        yield put( updateWalletImageHealth( {
+          updateGifts: true,
+          giftIds: [ giftToUpdate.id ]
+        } ) )
       }
     }
   }
@@ -803,9 +820,14 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   if( giftId && flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
     const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
     const giftToSend = gifts[ giftId ]
-
-    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, wallet.walletName, FCM, '' )
+    const senderName = wallet.userName? wallet.userName: wallet.walletName
+    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, '' )
     yield put( updateGift( updatedGift ) )
+    yield call( dbManager.createGift, updatedGift )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: [ updatedGift.id ]
+    } ) )
     giftDeepLink = deepLink
   }
 

@@ -626,6 +626,7 @@ export interface Trusted_Contacts {
 export interface NewWalletImage {
   walletId: string;
   name: string;
+  userName?: string,
   accounts?: {
     [accountId: string]: {
       encryptedData: string
@@ -830,6 +831,7 @@ export enum NetworkType {
 export interface Wallet {
   walletId: string,
   walletName: string,
+  userName?: string,
   security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
   primarySeed: string,
