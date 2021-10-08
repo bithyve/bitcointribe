@@ -545,7 +545,7 @@
       "3": "Error de red, verifique su conexión a Internet.",
       "7": "Es posible que haya presionado solicitado demasiadas veces. Inténtelo después de algún tiempo.",
       "9": "No ha iniciado sesión en su cuenta de iCloud. Inicie sesión desde la configuración de su teléfono.",
-      "default": "Encontramos un error no estándar. Inténtelo de nuevo después de algún tiempo o póngase en contacto con"
+      "default": "¡¡UPS!! Parece haber un problema con la red. Inténtelo después de algún tiempo."
   },
   "driveErrors": {
       "17": "No se pudo conectar a su Google Drive. Inténtelo después de algún tiempo.",

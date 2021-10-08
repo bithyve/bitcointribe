@@ -538,13 +538,13 @@
       "3": "Network error, please check your internet connection.",
       "7": "You may have pressed requested too many times. Please try after sometime.",
       "9": "You are not logged-in into your iCloud account. Please log in from your Phone Settings.",
-      "default": "We encountered a non-standard error. Please try again after sometime or contact"
+      "default": "Oops!! There seems to be a problem with the network. Please try after sometime."
     },
     "driveErrors": {
       "17": "Failed to connect to your Google Drive. Please try after sometime.",
       "Errorconnecting": "Error connecting with server. Please try again after sometime.",
       "10": "Technical error occurred. This cannot be rectified at your end. Please contact our support.",
-      "13": "We encountered a non-standard error. Please try again after sometime",
+      "13": "We encountered a error. Please try again after sometime",
       "8": "Google Drive is temporarily unavailable. Please try again",
       "5": "Incorrect account name. Please use the account name you used originally while setting up the wallet.",
       "7": "A network error occurred. Please check your connection and try again.",
@@ -557,6 +557,6 @@
       "30": "Please check authentication with your google account in settings and try again.",
       "errorinuploadingdata": "Error in uploading data. Please re-try again.",
       "12501": "We recommend signing in as it easily allows you to backup your wallet on your personal cloud.",
-      "default": "We encountered a non-standard error. Please try again after sometime or contact"
+      "default": "We encountered a error. Please try again after sometime or contact"
     }
 }

@@ -39,6 +39,8 @@ import {
 import { autoSyncShells } from '../store/actions/accounts'
 import Relay from '../bitcoin/utilities/Relay'
 import { LocalizationContext } from '../common/content/LocContext'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import { setCloudBackupStatus } from '../store/actions/cloud'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -109,6 +111,7 @@ export default function Login( props ) {
   }, [] )
 
   useEffect( () => {
+    dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )

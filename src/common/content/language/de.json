@@ -545,7 +545,7 @@
       "3": "Netzwerkfehler, bitte überprüfe deine Internetverbindung.",
       "7": "Möglicherweise hast Du zu oft auf \"angefordert\" gedrückt. Bitte versuchen Sie es nach einiger Zeit noch einmal.",
       "9": "Du bist nicht in deinem iCloud-Konto angemeldet. Bitte melde dich über deine Telefoneinstellungen an.",
-      "default": "Wir sind auf einen nicht standardmäßigen Fehler gestoßen. Bitte versuche es nach einiger Zeit erneut oder kontaktiere"
+      "default": "Hoppla!! Es scheint ein Problem mit dem Netzwerk zu geben. Bitte versuchen Sie es nach einiger Zeit."
   },
   "driveErrors": {
       "17": "Es konnte keine Verbindung zu deinem Google Drive hergestellt werden. Bitte versuche es nach einiger Zeit noch einmal.",
