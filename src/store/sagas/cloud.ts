@@ -117,7 +117,7 @@ function* cloudWorker( { payload } ) {
             data, share
           }
         } ),
-        timeout: delay( 5000 )
+        timeout: delay( 30000 )
       } )
       console.log( 'response', response )
       console.log( 'timeout', timeout )
