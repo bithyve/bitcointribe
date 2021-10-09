@@ -131,10 +131,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const dispatch = useDispatch()
 
-  useEffect( ()=>{
-    if( createChannelAssetsStatus ) dispatch( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-  }, [] )
-
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )

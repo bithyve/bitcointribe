@@ -1,4 +1,4 @@
-import { call, put, select } from 'redux-saga/effects'
+import { call, delay, put, race, select } from 'redux-saga/effects'
 import {
   createWatcher,
 } from '../utils/utilities'
@@ -66,7 +66,8 @@ import {
   GET_APPROVAL_FROM_KEEPER,
   setOpenToApproval,
   getApprovalFromKeepers,
-  REJECTED_EC_REQUEST
+  REJECTED_EC_REQUEST,
+  setSecondaryDataInfoStatus
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -116,7 +117,7 @@ import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../actions/trustedContacts'
 import { syncPermanentChannelsWorker, restoreTrustedContactsWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -2455,25 +2456,40 @@ export const updateSecondaryShardWatcher = createWatcher(
 )
 
 function* getApprovalFromKeeperWorker( { payload } ) {
-  yield put( switchS3LoaderKeeper( 'getSecondaryDataInfoStatus' ) )
-  const { flag, contact } : { flag: boolean, contact: TrustedContact} = payload
-  const res = yield call( TrustedContactsOperations.retrieveFromStream, {
-    walletId: contact.walletID, channelKey: contact.channelKey, options: {
-      retrieveBackupData: true,
-      retrieveSecondaryData: true
-    }, secondaryChannelKey: contact.contactsSecondaryChannelKey
-  } )
-  if( res.backupData && res.backupData.keeperInfo && !res.secondaryData ){
-    if( res.backupData.keeperInfo ) {
-      const contactData = makeContactRecipientDescription(
-        contact.channelKey,
-        contact,
-        ContactTrustKind.KEEPER_OF_USER,
-      )
-      yield put( setOpenToApproval( true, res.backupData.keeperInfo, contactData ) )
+  try {
+    yield put( setSecondaryDataInfoStatus( true ) )
+    const { flag, contact } : { flag: boolean, contact: TrustedContact} = payload
+    const { response, timeout } = yield race( {
+      response: call( TrustedContactsOperations.retrieveFromStream, {
+        walletId: contact.walletID, channelKey: contact.channelKey, options: {
+          retrieveBackupData: true,
+          retrieveSecondaryData: true
+        }, secondaryChannelKey: contact.contactsSecondaryChannelKey
+      } ),
+      timeout: delay( 10000 )
+    } )
+    if( !timeout ){
+      if( response.backupData && response.backupData.keeperInfo && !response.secondaryData ){
+        if( response.backupData.keeperInfo ) {
+          const contactData = makeContactRecipientDescription(
+            contact.channelKey,
+            contact,
+            ContactTrustKind.KEEPER_OF_USER,
+          )
+          yield put( setOpenToApproval( true, response.backupData.keeperInfo, contactData ) )
+        }
+      } else { yield put( setOpenToApproval( false, [], null ) ) }
+      yield put( setSecondaryDataInfoStatus( false ) )
+    } else {
+      Toast( 'Network Error' )
+      yield put( setOpenToApproval( null, [], null ) )
+      yield put( setSecondaryDataInfoStatus( false ) )
     }
-  } else { yield put( setOpenToApproval( false, [], null ) ) }
-  yield put( switchS3LoaderKeeper( 'getSecondaryDataInfoStatus' ) )
+  } catch ( error ) {
+    Toast( 'Network Error' )
+    yield put( setOpenToApproval( null, [], null ) )
+    yield put( setSecondaryDataInfoStatus( false ) )
+  }
 }
 
 export const getApprovalFromKeeperWatcher = createWatcher(
@@ -2514,7 +2530,7 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
       }
     }
 
-    const { updated }: {
+    const { updated, updatedContacts }: {
       updated: boolean;
       updatedContacts: Trusted_Contacts
     } = yield call(
@@ -2526,6 +2542,12 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
         unEncryptedOutstreamUpdates: streamUpdates,
       } ]
     )
+
+    yield put( updateTrustedContacts( updatedContacts ) )
+    for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
+      yield call( dbManager.updateContact, value )
+    }
+
     if( updated && levelHealth.find( value=>value.levelInfo.find( temp=>temp.shareId == KeeperInfoElement.shareId ) ) ){
       const shareObj = {
         walletId: walletId,
