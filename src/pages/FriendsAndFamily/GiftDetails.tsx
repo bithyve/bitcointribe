@@ -26,11 +26,13 @@ import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import { reclaimGift } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
+import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
-
+  const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
+  const [ isOpen, setIsOpen ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
 
@@ -78,14 +80,17 @@ const GiftDetails = ( { navigation } ) => {
           />
         </View>
         <TouchableOpacity
-          onPress={() => {}}
-          style={gift.status === GiftStatus.CREATED ? styles.dashedContainer : [ styles.dashedContainer, {
-            borderColor: Colors.white
+          onPress={() => setIsOpen( !isOpen )}
+          style={gift.status === GiftStatus.CREATED ? [ styles.dashedContainer, {
+            // position: isOpen ? 'absolute': 'relative'
+          } ] : [ styles.dashedContainer, {
+            borderColor: Colors.white,
+            // position: isOpen ? 'absolute': 'relative'
           } ]}>
-          <View style={gift.status === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle }>
+          <View style={gift.status === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle}>
 
             <View style={{
-              marginHorizontal: wp( 1 ),  flexDirection: 'row', justifyContent: 'space-between',
+              marginHorizontal: wp( 1 ), flexDirection: 'row', justifyContent: 'space-between',
             }}>
               <Text style={{
                 color: Colors.lightTextColor,
@@ -100,7 +105,7 @@ const GiftDetails = ( { navigation } ) => {
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansRegular,
               }}>
-              at {moment( gift.timestamps.created ).format( 'lll' )}
+                at {moment( gift.timestamps.created ).format( 'lll' )}
               </Text>
             </View>
             <View style={{
@@ -146,13 +151,73 @@ const GiftDetails = ( { navigation } ) => {
                 }}> sats
                 </Text>
               </Text>
+              {isOpen ? <ArrowDown /> : <ArrowUp />}
             </View>
           </View>
+          {isOpen && gift.status !== GiftStatus.CREATED && gift?.deepLinkConfig?.encryptionType === 'OTP' &&
+            <View style={{
+              marginHorizontal: wp( 1 )
+            }}>
+              <Text style={{
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular,
+                fontWeight: '600',
+              }}>
+                Share OTP with contact
+              </Text>
+              <View style={{
+                flexDirection: 'row', marginLeft: wp( 3 ), marginVertical: hp( 2 )
+              }}>
+                {gift?.deepLinkConfig?.encryptionKey.split( '' ).map( ( num, index ) => {
+                  return (
+                    <View
+                      key={index}
+                      style={{
+
+                        alignItems: 'center', backgroundColor: Colors.backgroundColor, marginHorizontal: wp( 1 ), borderRadius: wp( 2 )
+                      }}>
+                      <Text style={{
+                        marginHorizontal: wp( 4 ), marginVertical: wp( 3 )
+                      }}>{num}</Text>
+                    </View>
+                  )
+                } )}
+              </View>
+            </View>
+          }
+          {isOpen && gift.status !== GiftStatus.CREATED && gift.note !== '' &&
+            <View style={{
+              marginHorizontal: wp( 1 ),
+            }}>
+              <Text style={{
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular,
+                fontWeight: '600'
+              }}>
+                Message to recipient
+              </Text>
+              <View
+                style={{
+                  marginLeft: wp( 3 ), marginVertical: hp( 2 ),
+                  alignItems: 'center', backgroundColor: Colors.backgroundColor, marginHorizontal: wp( 2 ), borderRadius: wp( 2 ), marginRight: wp( 9 )
+                }}>
+                <Text style={{
+                  marginHorizontal: wp( 3 ), marginVertical: wp( 2 ), color: Colors.textColorGrey,
+                  fontSize: RFValue( 10 ),
+                  letterSpacing: 0.5,
+                  fontFamily: Fonts.FiraSansRegular,
+                }}>{gift.note}</Text>
+              </View>
+
+            </View>
+          }
         </TouchableOpacity>
         <View style={{
           marginVertical: hp( 2 )
         }}>
-          {Object.entries( gift.timestamps?? {
+          {Object.entries( gift.timestamps ?? {
           } ).reverse().map( ( item, index ) => {
 
             return(
@@ -172,16 +237,16 @@ const GiftDetails = ( { navigation } ) => {
                   </Text>
                 </View>
                 <View style={{
-                  flexDirection: 'row', alignItems: 'center'
+                  flexDirection: 'row', alignItems: 'flex-start'
                 }}>
                   <View style={styles.line} />
                   <View style={[ styles.normalStyle, {
-                    width: wp( '80%' ), borderRadius: wp( 2 ), paddingVertical: hp( 1 )
+                    width: wp( '80%' ), borderRadius: wp( 2 ), paddingVertical: hp( 1 ), marginTop: hp( 1 )
                   } ]}>
                     <Text style={[ styles.modalInfoText, {
                       marginBottom: hp( 1 )
                     } ]}>
-              Gift Card {item[ 0 ]}
+                      Gift Card {item[ 0 ]}
                     </Text>
                     <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text>
                   </View>
@@ -195,7 +260,7 @@ const GiftDetails = ( { navigation } ) => {
         </View>
       </SafeAreaView>
 
-      {gift.status === GiftStatus.SENT?
+      {gift.status === GiftStatus.SENT ?
         (
           <View style={{
             ...styles.keeperViewStyle
@@ -223,8 +288,8 @@ const GiftDetails = ( { navigation } ) => {
               <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
             </TouchableOpacity>
           </View>
-        ): null }
-      {gift.status === GiftStatus.CREATED?
+        ) : null}
+      {gift.status === GiftStatus.CREATED ?
         (
           <View style={{
             ...styles.keeperViewStyle
@@ -233,7 +298,7 @@ const GiftDetails = ( { navigation } ) => {
                 ...styles.bottomButton,
               }}
               onPress={() => {
-                // dispatch( reclaimGift( gift.id ) )
+              // dispatch( reclaimGift( gift.id ) )
                 navigation.navigate( 'EnterGiftDetails', {
                   giftId: ( gift as Gift ).id,
                 } )
@@ -255,15 +320,15 @@ const GiftDetails = ( { navigation } ) => {
               <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
             </TouchableOpacity>
           </View>
-        ): null }
+        ) : null}
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
-  line:{
-    height: '100%',
-    width: wp( 0.18 ),
+  line: {
+    height: hp( 9 ),
+    width: wp( 0.09 ),
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 3 ),
   },
@@ -275,16 +340,15 @@ const styles = StyleSheet.create( {
   dot: {
     height: 8,
     width: 8,
-    borderRadius: 8/2,
+    borderRadius: 8 / 2,
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 2 ),
     alignSelf: 'center'
   },
-  timeInfo:{
+  timeInfo: {
     width: '87%',
     alignSelf: 'center',
     alignItems: 'flex-start',
-    marginVertical: hp( 1 )
   },
   dashedStyle: {
     backgroundColor: Colors.gray7,
@@ -321,7 +385,7 @@ const styles = StyleSheet.create( {
   avatarContainer: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 9 )/2,
+    borderRadius: wp( 9 ) / 2,
   },
   bottomButton: {
     backgroundColor: Colors.lightBlue,
@@ -451,7 +515,7 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.white,
   },
-  accImage:{
+  accImage: {
     marginRight: wp( 4 )
   },
   availableToSpendText: {
@@ -475,7 +539,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: Colors.blue,
-    borderRadius: wp ( 2 ),
+    borderRadius: wp( 2 ),
     height: hp( 4 ),
     paddingHorizontal: wp( 2 )
   },

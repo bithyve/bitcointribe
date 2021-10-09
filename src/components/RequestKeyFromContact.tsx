@@ -195,10 +195,12 @@ export default function RequestKeyFromContact( props ) {
         width={'20%'}
         height={'18%'}
       />
+      {props.isGift &&
       <View style={styles.statusIndicatorView}>
         <View style={styles.statusIndicatorInactiveView} />
         <View style={styles.statusIndicatorActiveView} />
       </View>
+      }
     </View>
   )
 }
