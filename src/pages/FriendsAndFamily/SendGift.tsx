@@ -18,7 +18,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { GiftStatus, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import { QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
@@ -34,11 +34,11 @@ export default function SendGift( props ) {
   const strings = translations[ 'f&f' ]
 
   const giftId = props.navigation.getParam( 'giftId' )
+  const note = props.navigation.getParam( 'note' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
   const giftToSend = accountsState.gifts[ giftId ]
-  const [ note, setNote ] = useState( '' )
   const [ encryptWithOTP, setEncryptWithOTP ] = useState( true )
   const [ encryptionOTP, setEncryptionOTP ] = useState( '' )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
@@ -79,7 +79,7 @@ export default function SendGift( props ) {
 
   useEffect( () => {
     sendGift()
-  }, [ giftId, note ] )
+  }, [ giftId ] )
 
   return (
     <ScrollView style={{
@@ -115,8 +115,8 @@ export default function SendGift( props ) {
           style={{
             justifyContent: 'center',
             alignItems: 'flex-end',
-            backgroundColor: Colors.blue,
-            paddingHorizontal: wp( 2 ),
+            backgroundColor: Colors.lightBlue,
+            paddingHorizontal: wp( 4 ),
             paddingVertical: wp( 1 ),
             marginRight: wp( 5 ),
             borderRadius: wp( 2 )
@@ -125,8 +125,8 @@ export default function SendGift( props ) {
           <Text
             style={{
               ...{
-                color: Colors.white,
-                fontSize: RFValue( 13 ),
+                color: Colors.backgroundColor1,
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular,
               }
             }}
@@ -155,7 +155,6 @@ export default function SendGift( props ) {
         amt={numberWithCommas( giftToSend.amount )}
         onPressShare={() => {
         }}
-        onSetNote={setNote}
       />
     </ScrollView>
   )

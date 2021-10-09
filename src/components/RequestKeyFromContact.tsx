@@ -150,32 +150,6 @@ export default function RequestKeyFromContact( props ) {
           </View>
 
         </View>
-        <View
-          style={[ styles.inputBox, styles.inputField ]}
-        >
-          <TextInput
-            style={styles.modalInputBox}
-            placeholder={`${common.addNote} (${common.optional})`}
-            placeholderTextColor={Colors.gray1}
-            value={note}
-            keyboardType={
-              Platform.OS == 'ios'
-                ? 'ascii-capable'
-                : 'visible-password'
-            }
-            returnKeyType="done"
-            returnKeyLabel="Done"
-            autoCompleteType="off"
-            autoCorrect={false}
-            autoCapitalize="none"
-            onChangeText={( text ) => {
-              setNote( text )
-            }}
-            onEndEditing={()=> {
-              if( props.onSetNote ) props.onSetNote( note )
-            }}
-          />
-        </View>
       </>
       }
       <View
@@ -221,10 +195,35 @@ export default function RequestKeyFromContact( props ) {
         width={'20%'}
         height={'18%'}
       />
+      {props.isGift &&
+      <View style={styles.statusIndicatorView}>
+        <View style={styles.statusIndicatorInactiveView} />
+        <View style={styles.statusIndicatorActiveView} />
+      </View>
+      }
     </View>
   )
 }
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '6%' ),
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 5,
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
   inputField: {
     marginBottom: 15,
     flexDirection: 'row',

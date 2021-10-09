@@ -606,7 +606,7 @@ export default function AddContactAddressBook( props ) {
               info={strings.info}
               otherText={strings.otherText}
               proceedButtonText={common.continue}
-              isIgnoreButton={false}
+              isIgnoreButton={true}
               onPressProceed={() => {
                 getContactPermission()
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )

@@ -56,7 +56,7 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
 
         <ListItem.Subtitle
           style={[ ListStyles.listItemSubtitle, {
-            fontSize: RFValue( 10 )
+            fontSize: RFValue( 10 ),
           } ]}
           numberOfLines={2}
         >
@@ -64,10 +64,10 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
         </ListItem.Subtitle>
       </ListItem.Content>
 
-      {/* <Image
+      <Image
         source={require( '../../../assets/images/icons/icon_rearrange.png' )}
         style={ImageStyles.reorderItemIconImage}
-      /> */}
+      />
     </ListItem>
   )
 }

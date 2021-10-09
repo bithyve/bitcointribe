@@ -379,7 +379,7 @@ const FNFToKeeper = ( props ) => {
         info={strings.Ifyouwantto}
         otherText={strings.Weneither}
         proceedButtonText={common.continue}
-        isIgnoreButton={false}
+        isIgnoreButton={true}
         onPressProceed={() => {
           getContactPermission()
           // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )

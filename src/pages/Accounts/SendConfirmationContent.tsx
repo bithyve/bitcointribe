@@ -59,7 +59,6 @@ export default function SendConfirmationContent( props ) {
       {props.infoText && (
         <View
           style={{
-            flex:1,
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
             marginRight: wp( '8%' ),

@@ -31,7 +31,7 @@ import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
 import SendGift from '../../../pages/FriendsAndFamily/SendGift'
 import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
-
+import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -53,6 +53,7 @@ const FriendsAndFamily = createStackNavigator(
       },
     },
     ManageGifts,
+    EnterGiftDetails,
     GiftDetails,
     CreateGift,
     SendGift,
