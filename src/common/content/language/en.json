@@ -554,7 +554,7 @@
       "17": "Failed to connect to your Google Drive. Please try after sometime.",
       "Errorconnecting": "Error connecting with server. Please try again after sometime.",
       "10": "Technical error occurred. This cannot be rectified at your end. Please contact our support.",
-      "13": "We encountered a non-standard error. Please try again after sometime",
+      "13": "We encountered a error. Please try again after sometime",
       "8": "Google Drive is temporarily unavailable. Please try again",
       "5": "Incorrect account name. Please use the account name you used originally while setting up the wallet.",
       "7": "A network error occurred. Please check your connection and try again.",
