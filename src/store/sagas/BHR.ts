@@ -65,7 +65,8 @@ import {
   UPDATE_SECONDARY_SHARD,
   GET_APPROVAL_FROM_KEEPER,
   setOpenToApproval,
-  getApprovalFromKeepers
+  getApprovalFromKeepers,
+  REJECTED_EC_REQUEST
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -291,9 +292,9 @@ function* updateSharesHealthWorker( { payload } ) {
         const element = levelInfo[ j ]
         if( element.shareId === payload.shares.shareId ){
           levelHealth[ i ].levelInfo[ j ].updatedAt = payload.shares.updatedAt ? moment( new Date() ).valueOf() : levelHealth[ i ].levelInfo[ j ].updatedAt
-          levelHealth[ i ].levelInfo[ j ].name = payload.shares.name ? payload.shares.name : levelHealth[ i ].levelInfo[ j ].name ? levelHealth[ i ].levelInfo[ j ].name : ''
-          levelHealth[ i ].levelInfo[ j ].reshareVersion = payload.shares.reshareVersion ? payload.shares.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
-          levelHealth[ i ].levelInfo[ j ].shareType = payload.shares.shareType ? payload.shares.shareType : levelHealth[ i ].levelInfo[ j ].shareType ? levelHealth[ i ].levelInfo[ j ].shareType : ''
+          if( typeof payload.shares.name !== 'undefined' ) levelHealth[ i ].levelInfo[ j ].name = payload.shares.name
+          levelHealth[ i ].levelInfo[ j ].reshareVersion = payload.shares.reshareVersion !== undefined ? payload.shares.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
+          levelHealth[ i ].levelInfo[ j ].shareType = payload.shares.shareType !== undefined ? payload.shares.shareType : levelHealth[ i ].levelInfo[ j ].shareType ? levelHealth[ i ].levelInfo[ j ].shareType : ''
           if( payload.shares.status ){
             levelHealth[ i ].levelInfo[ j ].status = payload.shares.status
           }
@@ -878,19 +879,9 @@ function* getPDFDataWorker( { payload } ) {
           wallet.security.answer
         ).encryptedData,
       }
-      const secondaryData = {
-        type: QRCodeTypes.RECOVERY_REQUEST,
-        walletName: wallet.walletName,
-        channelId: currentContact.permanentChannelAddress,
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
-        secondaryChannelKey: currentContact.secondaryChannelKey,
-        version: appVersion,
-        walletId
-      }
 
       const qrData = [
         JSON.stringify( recoveryData ),
-        JSON.stringify( secondaryData ),
       ]
       console.log( 'PDF recoveryData', JSON.stringify( recoveryData ) )
       const pdfData = {
@@ -1698,18 +1689,19 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
               }
             } )
             if( !levelInfo[ j ].name ) levelInfo[ j ].name = currentContact.contactDetails && currentContact.contactDetails.contactName ? currentContact.contactDetails.contactName : currentContact.unencryptedPermanentChannel[ instream.streamId ] && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName ? currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName : ''
+            else levelInfo[ j ].name = ''
             if( res.status ) {
               levelInfo[ j ].status = 'accessible'
               levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
             }
           } else {
-            // console.log( 'instream', instream )
             if( instream ) {
               if( !levelInfo[ j ].name ) levelInfo[ j ].name = currentContact.contactDetails && currentContact.contactDetails.contactName ? currentContact.contactDetails.contactName : currentContact.unencryptedPermanentChannel[ instream.streamId ] && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData && currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName ? currentContact.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName : ''
               levelInfo[ j ].status = Math.round( Math.abs( Date.now() - instream.metaData.flags.lastSeen ) / ( 60 * 1000 ) ) > config.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 ? 'notAccessible' : 'accessible'
               levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
             }
           }
+          if( levelInfo[ j ].name && levelInfo[ j ].status == 'notSetup' ) levelInfo[ j ].name = ''
         }
       }
     }
@@ -2524,12 +2516,10 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
   const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
   const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-  const s3 = yield call( dbManager.getBHR )
-  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const KeeperInfoElement: KeeperInfoInterface = {
     ...keeperInfo.find( value=>value.channelKey == channelKey )
   }
-  if( contacts[ channelKey ] && contacts[ channelKey ].isActive && contacts[ channelKey ].unencryptedPermanentChannel && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ] && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ].primaryData.relationType == TrustedContactRelationTypes.KEEPER ) return
+  if( contacts[ channelKey ] && contacts[ channelKey ].isActive && contacts[ channelKey ].unencryptedPermanentChannel && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ] && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ].primaryData.relationType == TrustedContactRelationTypes.CONTACT ) return
   if( KeeperInfoElement ){
 
     const primaryData: PrimaryStreamData = {
@@ -2569,13 +2559,17 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
       const shareObj = {
         walletId: walletId,
         shareId: KeeperInfoElement.shareId,
-        reshareVersion: MetaShares.find( value=>value.shareId == KeeperInfoElement.shareId ).meta.reshareVersion,
+        reshareVersion: 0,
         updatedAt: 0,
         status: 'notSetup',
         name: '',
         shareType: ''
       }
-      yield put( updateMSharesHealth( shareObj, false ) )
+      yield call( updateSharesHealthWorker, {
+        payload:{
+          shares: shareObj, isNeedToUpdateCurrentLevel:false
+        }
+      } )
       const KeeperInfoTemp = [ ...keeperInfo ]
       KeeperInfoTemp.splice( keeperInfo.findIndex( value=>value.channelKey == KeeperInfoElement.channelKey ), 1 )
       yield put( putKeeperInfo( KeeperInfoTemp ) )
@@ -2585,5 +2579,5 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
 
 export const rejectedExistingContactRequestWatcher = createWatcher(
   rejectedExistingContactRequestWorker,
-  GET_APPROVAL_FROM_KEEPER,
+  REJECTED_EC_REQUEST,
 )

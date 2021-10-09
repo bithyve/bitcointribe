@@ -551,7 +551,7 @@
       "3": "Erro de rede, verifique sua conexão com a Internet.",
       "7": "Você pode ter pressionado solicitado muitas vezes. Por favor, tente depois de algum tempo.",
       "9": "Você não está conectado à sua conta do iCloud. Faça login nas configurações do seu telefone.",
-      "default": "Encontramos um erro fora do padrão. Por favor, tente novamente depois de algum tempo ou entre em contato"
+      "default": "Opa !! Parece haver um problema com a rede. Por favor, tente depois de algum tempo."
   },
   "driveErrors": {
       "17": "Falha ao conectar ao seu Google Drive. Por favor, tente depois de algum tempo.",

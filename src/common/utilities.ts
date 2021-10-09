@@ -166,9 +166,12 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
           }
         } : selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length ? selectedKeeperInfo.data : {
         }
-        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
+        if ( element.status != 'notSetup' && keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
+        else element.data = {
+        }
         // Channel Key
-        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = channelKey
+        if ( element.status != 'notSetup' && keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = channelKey
+        else element.channelKey = ''
       }
     }
   }

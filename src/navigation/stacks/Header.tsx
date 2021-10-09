@@ -358,6 +358,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, 500 )
     this.notificationCheck()
     this.openBottomSheetOnLaunch( BottomSheetKind.NOTIFICATIONS_LIST )
+    const notificationRejection = this.props.messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
+    console.log( 'notificationRejection', notificationRejection )
+    if( notificationRejection ) {
+      this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
+    }
   };
 
   notificationCheck = () =>{
@@ -383,6 +388,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.handleNotificationBottomSheetSelection( message )
         }
       }
+    }
+    const notificationRejection = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
+    console.log( 'notificationRejection', notificationRejection )
+    if( notificationRejection ) {
+      this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
   }
 
@@ -768,10 +778,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const unread = messages.filter( msg => msg.status === 'unread' )
     if ( Platform.OS === 'ios' ) {
       PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
-    }
-    const notificationRejection = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
-    if( notificationRejection ) {
-      this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
     const notification = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST && value.status == 'unread' )
     if( notification && notification.status == 'unread' ){
