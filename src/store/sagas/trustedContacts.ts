@@ -75,6 +75,7 @@ import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import { processDeepLink } from '../../common/CommonFunctions'
+import { generateTrustedContact } from '../../bitcoin/utilities/TrustedContactFactory'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( 256 )
@@ -537,6 +538,34 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
   if( !channelSyncUpdates.length ) {
     console.log( 'Exiting sync: no channels to update' )
     return
+  }
+
+  // initialize new contact(if required)
+  for( const channelSyncUpdate of channelSyncUpdates ){
+    const {
+      channelKey,
+      contact,
+      contactDetails,
+      secondaryChannelKey,
+      unEncryptedOutstreamUpdates,
+      contactsSecondaryChannelKey,
+    } = channelSyncUpdate
+    if ( !contact ) {
+      if ( !contactDetails ) throw new Error( 'Init failed: contact details missing' )
+      channelSyncUpdate.contact = generateTrustedContact( {
+        contactDetails,
+        channelKey,
+        secondaryChannelKey,
+        contactsSecondaryChannelKey,
+        unEncryptedOutstreamUpdates,
+      } )
+
+      if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT || flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
+        yield put( updateTrustedContacts( {
+          [ channelSyncUpdate.contact.channelKey ]: channelSyncUpdate.contact
+        } ) )
+      }
+    }
   }
 
   try {
