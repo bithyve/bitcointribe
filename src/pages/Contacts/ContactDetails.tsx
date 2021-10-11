@@ -109,7 +109,7 @@ interface ContactDetailsPropTypes {
   newBHRFlowStarted: any;
   keeperInfo: KeeperInfoInterface[];
   availableKeepers: KeeperInfoInterface[];
-  openApproval: boolean;
+  openApproval: any;
   approvalContactData: ContactRecipientDescribing;
   updateSecondaryShard: any;
   getApprovalFromKeepers: any;
@@ -1222,7 +1222,7 @@ class ContactDetails extends PureComponent<
             )}
           </View>
         )}
-        { this.contactsType == 'I am the Keeper of' && !this.props.openApproval && this.props.availableKeepers.length == 0 && (
+        {this.contactsType == 'I am the Keeper of' && this.props.openApproval != null && this.props.availableKeepers.length == 0 && (
           <View style={styles.keeperViewStyle}>
             {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
               disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING )}
@@ -1293,7 +1293,7 @@ class ContactDetails extends PureComponent<
             ) : null}
           </View>
         )}
-        {this.props.openApproval && this.props.availableKeepers.length && <View style={{
+        {this.props.openApproval && this.props.openApproval != null && this.props.availableKeepers.length && <View style={{
           ...styles.keeperViewStyle, justifyContent: 'flex-start', paddingLeft: wp( 5 )
         }}><TouchableOpacity
             style={{
@@ -1421,7 +1421,7 @@ class ContactDetails extends PureComponent<
               } )
             }}
             onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Saaaaaaaa","channelId":"1033c8a86e92232fd979cfa3ca0108c6c9e172dfc27380e31d04c6ed9280a8d6","streamId":"ae1d2a9b5","secondaryChannelKey":"zFtHWgh0NbCYRDxGJiTkKdOW","version":"2.0.0","walletId":"5c4da7520f27cea7689956531ca7bae5ea5c8fe819c68336ad04a1b63fad2276"}'
+              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Test","channelId":"b6fda5fccdcd52d4bf7791f629d5de30d9f559ad6733ff9a0e7d2429745f4ccc","streamId":"765087d33","secondaryChannelKey":"TGfS9qqRHcaQOzOQ6WR1Plhc","version":"2.0.0","walletId":"5999171c4129eca5a12a0221712a708c66a8507ff81c139a33812f3383982766"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />
