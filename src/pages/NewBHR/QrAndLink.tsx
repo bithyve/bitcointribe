@@ -128,8 +128,12 @@ export default function QrAndLink( props ) {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
-    generate()
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
+    if( trustedLink ) generate()  // prevents multiple generation as trusted-contact updates twice during init
+  }, [ Contact, trustedContacts ] )
+
+  useEffect( ()=> {
+    generate() // re-generate deeplink if encryption key changes
+  }, [ encryptLinkWith ] )
 
   const generate = async () => {
     console.log( 'useEffect Contact', Contact )
@@ -186,7 +190,7 @@ export default function QrAndLink( props ) {
       }
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
       deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,

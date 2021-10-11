@@ -181,7 +181,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
-    generate()
+    if( !keeperQR ) generate()  // prevents multiple generation as trusted-contact updates twice during init
   }, [ Contact, trustedContacts ] )
 
   const generate = async () => {

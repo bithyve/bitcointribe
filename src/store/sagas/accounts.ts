@@ -132,7 +132,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean  ) {
+export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
@@ -167,6 +167,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       encryptionKey: deepLinkEncryptionOTP,
       walletName: walletName,
       keysToEncrypt: encryptionKey,
+      generateShortLink,
       extraData: {
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
