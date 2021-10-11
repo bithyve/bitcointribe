@@ -128,28 +128,22 @@ export default function AddContactSendRequest( props ) {
 
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
-
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
-    // if ( fromEdit ) {
-    //   dispatch( editTrustedContact( {
-    //     channelKey: Contact.channelKey,
-    //     contactName: Contact.name,
-    //     image: Contact.image
-    //   } ) )
-    // } else {
+
     dispatch( initializeTrustedContact( {
       contact: Contact,
       flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
       giftId
     } ) )
-    // }
-
   }, [ Contact, giftId ] )
 
-  useEffect( () => {
+  useEffect( ()=> {
     getContact()
+  }, [] )
+
+  useEffect( () => {
     if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
       // TODO: remove alert and show OTP on the UI
       // setIsOTPType( true )
@@ -237,6 +231,7 @@ export default function AddContactSendRequest( props ) {
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
       keysToEncrypt,
+      generateShortLink: true,
     } )
     const link = shortLink !== '' ? shortLink: deepLink
     setTrustedLink( link )

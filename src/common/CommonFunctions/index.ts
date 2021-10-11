@@ -350,7 +350,7 @@ export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: Tr
   return deepLinkKind
 }
 
-export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, extraData?: any } ) => {
+export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any } ) => {
 
   let encryptedChannelKeys: string
   let encryptionHint: string
@@ -383,52 +383,34 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
     deepLink =
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
   }
-  let shortLinkKind = ''
 
-  switch( deepLinkKind ){
-      case DeepLinkKind.CONTACT:
-        shortLinkKind = ShortLinkKind.CONTACT
-        break
-      case DeepLinkKind.KEEPER:
-        shortLinkKind = ShortLinkKind.KEEPER
-        break
-      case DeepLinkKind.PRIMARY_KEEPER:
-        shortLinkKind = ShortLinkKind.KEEPER
-      case DeepLinkKind.RECIPROCAL_KEEPER:
-        shortLinkKind = ShortLinkKind.KEEPER
-      case DeepLinkKind.EXISTING_CONTACT:
-        shortLinkKind = ShortLinkKind.KEEPER
-        break
-      default:
-        shortLinkKind = ''
-        break
+  let shortLink = ''
+  if( generateShortLink ) {
+    try {
+      const url = deepLink.replace( /\s+/g, '' )
+      const domain = 'https://hexawallet.page.link'
+      shortLink = await dynamicLinks().buildShortLink( {
+        link: url,
+        domainUriPrefix: domain,
+        android: {
+          packageName: DeviceInfo.getBundleId(),
+          fallbackUrl: url,
+        },
+        ios: {
+          fallbackUrl: url,
+          bundleId: DeviceInfo.getBundleId()
+        },
+        navigation: {
+          forcedRedirectEnabled: false
+        }
+      }, dynamicLinks.ShortLinkType.SHORT )
+    } catch ( error ) {
+      shortLink = ''
+    }
   }
-  const url = deepLink.replace( /\s+/g, '' )
-  try {
-    const domain = 'https://hexawallet.page.link'
-    const shortLink = await dynamicLinks().buildShortLink( {
-      link: url,
-      domainUriPrefix: domain,
-      android: {
-        packageName: DeviceInfo.getBundleId(),
-        fallbackUrl: url,
-      },
-      ios: {
-        fallbackUrl: url,
-        bundleId: DeviceInfo.getBundleId()
-      },
-      navigation: {
-        forcedRedirectEnabled: false
-      }
-    }, dynamicLinks.ShortLinkType.SHORT )
-    return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink: shortLink .replace( /\s+/g, '' )
-    }
-  } catch ( error ) {
-    console.log( error )
-    return {
-      deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink: ''
-    }
+
+  return {
+    deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink: shortLink? shortLink.replace( /\s+/g, '' ): ''
   }
 }
 

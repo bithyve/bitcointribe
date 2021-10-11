@@ -51,7 +51,8 @@ export default function SendGift( props ) {
 
   const sendGift  = async () => {
     const senderName = wallet.userName? wallet.userName: wallet.walletName
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, note, encryptWithOTP )
+    const generateShortLink = true
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, note, encryptWithOTP, generateShortLink )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
     dispatch( updateWalletImageHealth( {
