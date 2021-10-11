@@ -542,7 +542,7 @@ export default function ContactList( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       )}
-      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => {setPermissionsModal( false )}} >
         {renderContactListErrorModalContent()}
       </ModalContainer>
       {/* <BottomSheet

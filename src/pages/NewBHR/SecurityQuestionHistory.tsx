@@ -254,10 +254,10 @@ const SecurityQuestionHistory = ( props ) => {
           }}
         />
       </View>
-      <ModalContainer visible={questionModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
         {renderSecurityQuestionContent()}
       </ModalContainer>
-      <ModalContainer visible={successModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={successModal} closeBottomSheet={() => {showSuccessModal( false )}} >
         {renderHealthCheckSuccessModalContent()}
       </ModalContainer>
     </View>
