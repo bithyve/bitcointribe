@@ -323,34 +323,11 @@ export default class TrustedContactsOperations {
         channelKey,
         streamId,
         contact,
-        contactDetails,
         secondaryChannelKey,
         unEncryptedOutstreamUpdates,
         contactsSecondaryChannelKey,
         metaSync,
       } of channelSyncDetails ) {
-
-        if ( !contact ) { // initialize contact
-          if ( !contactDetails )
-            throw new Error( 'Init failed: contact details missing' )
-          const newContact: TrustedContact = {
-            contactDetails,
-            channelKey,
-            permanentChannelAddress: crypto
-              .createHash( 'sha256' )
-              .update( channelKey )
-              .digest( 'hex' ),
-            relationType: idx(
-              unEncryptedOutstreamUpdates,
-              ( _ ) => _.primaryData.relationType
-            ),
-            secondaryChannelKey,
-            contactsSecondaryChannelKey,
-            isActive: true,
-            hasNewData: true,
-          }
-          contact = newContact
-        }
 
         if ( !contact.isActive ) continue // skip non-active contacts
         if( contactsSecondaryChannelKey ) contact.contactsSecondaryChannelKey = contactsSecondaryChannelKey // execution case: when a contact is upgraded to a keeper
