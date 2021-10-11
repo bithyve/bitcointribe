@@ -75,6 +75,9 @@ const ModalContainer = ( {
       >
         <TouchableOpacity
           activeOpacity={1}
+          onPressOut={() => {
+            closeBottomSheet()
+          }}
           style={{
             flex:1,
             justifyContent: 'flex-end'
