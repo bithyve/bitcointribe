@@ -72,7 +72,7 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           <HeaderTitle
             firstLineTitle={'Gift Card Details'}
-            secondLineTitle={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do'}
+            secondLineTitle={'Logs of Gift status appear here'}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
@@ -131,9 +131,9 @@ const GiftDetails = ( { navigation } ) => {
                   }}>
                     {walletName ? walletName : 'from Checking Account'}
                   </Text>
-                  <Text style={styles.subText}>
+                  {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
-                  </Text>
+                  </Text> */}
                 </View>
 
               </View>
@@ -253,7 +253,7 @@ const GiftDetails = ( { navigation } ) => {
                     } ]}>
                       Gift Card {item[ 0 ]}
                     </Text>
-                    <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text>
+                    {/* <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text> */}
                   </View>
                 </View>
 
@@ -279,7 +279,7 @@ const GiftDetails = ( { navigation } ) => {
             >
               <Text style={[ styles.buttonText, {
               } ]}>Reclaim Gift Card</Text>
-              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -290,7 +290,7 @@ const GiftDetails = ( { navigation } ) => {
             >
               <Text style={[ styles.buttonText, {
               } ]}>Send Reminder</Text>
-              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
             </TouchableOpacity>
           </View>
         ) : null}
@@ -311,7 +311,7 @@ const GiftDetails = ( { navigation } ) => {
             >
               <Text style={[ styles.buttonText, {
               } ]}>Send Gift Card</Text>
-              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -322,7 +322,7 @@ const GiftDetails = ( { navigation } ) => {
             >
               <Text style={[ styles.buttonText, {
               } ]}>Expire Gift Card</Text>
-              <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text>
+              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
             </TouchableOpacity>
           </View>
         ) : null}

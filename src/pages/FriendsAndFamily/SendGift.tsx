@@ -35,6 +35,7 @@ export default function SendGift( props ) {
 
   const giftId = props.navigation.getParam( 'giftId' )
   const note = props.navigation.getParam( 'note' )
+  const isContact = props.navigation.getParam( 'isContact' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
@@ -112,7 +113,7 @@ export default function SendGift( props ) {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => props.navigation.pop( 3 )}
+          onPress={() => props.navigation.pop( isContact ? 4 : 3 )}
           style={{
             justifyContent: 'center',
             alignItems: 'flex-end',
@@ -139,7 +140,7 @@ export default function SendGift( props ) {
       <RequestKeyFromContact
         isModal={false}
         headerText={'Send gift'}
-        subHeaderText={'You can choose to send it to anyone using the QR or the link'}
+        subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
         contact={{

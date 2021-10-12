@@ -30,7 +30,7 @@ import More from '../../assets/images/svgs/icon_more_gray.svg'
 import { translations } from '../../common/content/LocContext'
 
 const GiftDetails = ( { navigation } ) => {
-  const { giftId } = navigation.state.params
+  const { giftId, contact } = navigation.state.params
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
@@ -54,7 +54,8 @@ const GiftDetails = ( { navigation } ) => {
           navigation.navigate( 'SendGift', {
             fromScreen: 'Gift',
             giftId: giftId,
-            note: note
+            note: note,
+            isContact: contact ? true : false
           } )
         }}
         style={isDisabled ? {
@@ -100,7 +101,7 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           <HeaderTitle
             firstLineTitle={'Enter gift details'}
-            secondLineTitle={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do'}
+            secondLineTitle={'Who are we delighting today?'}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
@@ -150,9 +151,9 @@ const GiftDetails = ( { navigation } ) => {
                   }}>
                     Greeting Bitcoin
                   </Text>
-                  <Text style={styles.subText}>
+                  {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
-                  </Text>
+                  </Text> */}
                 </View>
               </View>
               <More/>
@@ -164,7 +165,7 @@ const GiftDetails = ( { navigation } ) => {
         >
           <TextInput
             style={styles.modalInputBox}
-            placeholder={`${common.addNote} (${common.optional})`}
+            placeholder={`Add a personal note (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
             keyboardType={

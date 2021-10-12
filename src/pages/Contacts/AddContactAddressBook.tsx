@@ -296,6 +296,13 @@ export default function AddContactAddressBook( props ) {
         props.navigation.navigate( 'ContactDetails', {
           contact: selectedContacts[ 0 ],
         } )
+      } else if ( props.navigation.state.params?.fromScreen === 'Gift' )  {
+        props.navigation.navigate( 'EnterGiftDetails', {
+          fromScreen: 'Gift',
+          giftId: props.navigation.state.params?.giftId,
+          contact: selectedContacts[ 0 ],
+        } )
+
       } else {
         props.navigation.navigate( 'AddContactSendRequest', {
           SelectedContact: selectedContacts,
