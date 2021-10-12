@@ -53,6 +53,7 @@ import PassActive from '../assets/images/svgs/icon_password_active.svg'
 import PassInActive from '../assets/images/svgs/icon_password.svg'
 import QueActive from '../assets/images/svgs/icon_question.svg'
 import QueInActive from '../assets/images/svgs/question_inactive.svg'
+import ButtonStyles from '../common/Styles/ButtonStyles'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -1304,14 +1305,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '4%' ),
         flexDirection: 'row', marginTop: hp( 2 )
       }}>
-        <ButtonBlue
-          buttonText={common.confirmProceed}
-          handleButtonPress={confirmAction}
-          buttonDisable={false}
-        />
+        <TouchableOpacity
+          onPress={() => {confirmAction()}}
+          style={ButtonStyles.primaryActionButton}
+        >
+          <Text style={{
+            fontSize: RFValue( 13 ),
+            color: Colors.white,
+            fontFamily: Fonts.FiraSansMedium,
+            alignSelf: 'center',
+          }}>{`${common.confirmProceed}`}</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            console.log( 'asfds' )
             setIsSkipClicked( true )
             dispatch( updateCloudPermission( false ) )
             onPressProceed( true )
