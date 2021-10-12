@@ -70,6 +70,7 @@ export default function QrAndLink( props ) {
   const isReshare = props.navigation.getParam( 'isReshare' )
   const oldChannelKey = props.navigation.getParam( 'oldChannelKey' )
   const index = props.navigation.getParam( 'index' )
+  const recreateChannel = props.navigation.getParam( 'recreateChannel' )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
   const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
@@ -88,18 +89,16 @@ export default function QrAndLink( props ) {
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
-      if ( contact.contactDetails.id === Contact.id && shareType != 'existingContact' ) return
+      if ( contact.channelKey === channelKey && shareType != 'existingContact' ) {alert( 'retrun' ); return}
     }
-    createGuardian( {
-      isChangeTemp: isChange, chosenContactTmp: Contact
-    } )
+    createGuardian( )
   }, [ Contact ] )
 
-  const createGuardian = ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+  const createGuardian = ( ) => {
     const isChangeKeeper = isChange ? isChange : false
-    if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
+    if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper && !recreateChannel ) return
     setIsGuardianCreationClicked( true )
-    const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    const channelKeyTemp: string = recreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     setChannelKey( channelKeyTemp )
 
     const obj: KeeperInfoInterface = {
@@ -138,16 +137,9 @@ export default function QrAndLink( props ) {
     if( !Contact ) return
     console.log( 'Contact', Contact )
     const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
+    const currentContact: TrustedContact = contacts[ channelKey ]
 
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === Contact.id ){
-          currentContact = contacts[ ck ]
-          break
-        }
-      }
-    if ( !currentContact || ( shareType == 'existingContact' && ( currentContact.relationType != TrustedContactRelationTypes.EXISTING_CONTACT && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) ) return
+    if ( !currentContact || ( shareType == 'existingContact' && ( currentContact.relationType != TrustedContactRelationTypes.EXISTING_CONTACT && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) || ( currentContact && !currentContact.isActive ) ) {console.log( 'RETURN FROM CONTACT' );return}
 
     // generate deep link & QR for the contact
     let encryption_key: string
