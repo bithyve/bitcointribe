@@ -1030,11 +1030,14 @@ function* confirmPDFSharedWorker( { payload } ) {
     const keeperInfos: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const s3 = yield call( dbManager.getBHR )
     const metaShare: MetaShare[] = [ ...s3.metaSharesKeeper ]
+    const oldMetaShare: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
     const walletId = wallet.walletId
     const answer = yield select( ( state ) => state.storage.wallet.security.answer )
     let shareIndex = 3
-    if ( shareId && metaShare.length &&  metaShare.findIndex( ( value ) => value.shareId == shareId ) > -1 ) {
+    if ( shareId && metaShare.length && metaShare.find( ( value ) => value.shareId == shareId ) ) {
       shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )
+    } else if( shareId && oldMetaShare && oldMetaShare.find( ( value ) => value.shareId == shareId ) ){
+      shareIndex = oldMetaShare.findIndex( ( value ) => value.shareId == shareId )
     }
     const keeperInfo: KeeperInfoInterface = keeperInfos.find( value=>value.shareId == shareId )
 
@@ -1050,11 +1053,15 @@ function* confirmPDFSharedWorker( { payload } ) {
       walletId: string;
     } = JSON.parse( scannedData )
     const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedData
-    if( decryptedData == shareId && scannedObj.walletId == walletId && keeperInfo.channelKey == scannedObj.channelKey ){
+    if( decryptedData == shareId && scannedObj.walletId == walletId ){
       const shareObj = {
         walletId: walletId,
         shareId: shareId,
-        reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
+        reshareVersion: metaShare.find( ( value ) => value.shareId == shareId ) ?
+          metaShare.find( ( value ) => value.shareId == shareId ).meta.reshareVersion :
+          oldMetaShare.find( ( value ) => value.shareId == shareId ) ?
+            oldMetaShare.find( ( value ) => value.shareId == shareId ).meta.reshareVersion :
+            3,
         updatedAt: moment( new Date() ).valueOf(),
         name: 'Personal Copy',
         shareType: 'pdf',
@@ -1387,6 +1394,7 @@ function* createChannelAssetsWorker( { payload } ) {
     const { shareId } = payload
     const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+    const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
     if( MetaShares && MetaShares.length ){
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
@@ -1395,9 +1403,10 @@ function* createChannelAssetsWorker( { payload } ) {
         ( state ) => state.storage.wallet
       )
       const primaryMnemonicShardTemp = {
-        shareId: MetaShares.find( value=>value.shareId==shareId ).shareId,
-        meta: MetaShares.find( value=>value.shareId==shareId ).meta,
-        encryptedShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare
+        shareId: MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ).shareId : OldMetaShares.length ? OldMetaShares.find( value=>value.shareId==shareId ).shareId : '',
+        meta: MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ).meta : OldMetaShares.length ? OldMetaShares.find( value=>value.shareId==shareId ).meta : {
+        },
+        encryptedShare: MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ).encryptedShare : OldMetaShares.length ? OldMetaShares.find( value=>value.shareId==shareId ).encryptedShare : ''
       }
       const channelAssets: ChannelAssets = {
         primaryMnemonicShard: primaryMnemonicShardTemp,

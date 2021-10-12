@@ -35,6 +35,7 @@ import {
   KeeperInfoInterface,
   MetaShare,
   Trusted_Contacts,
+  Wallet,
 } from '../../bitcoin/utilities/Interface'
 import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
@@ -90,19 +91,22 @@ const PersonalCopyHistory = ( props ) => {
   const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false :
     props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
-  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
+  const levelData = useSelector( ( state ) => state.bhr.levelData )
+
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const pdfInfo = useSelector( ( state ) => state.bhr.pdfInfo )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const pdfDataConfirm = useSelector( ( state ) => state.bhr.loading.pdfDataConfirm )
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.bhr.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useSelector(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -269,9 +273,12 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressShare={() => {
           const shareObj = {
-            walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+            walletId: wallet.walletId,
             shareId: selectedKeeper.shareId,
-            reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+            reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+              MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion:
+              OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId )?
+                OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion: 0,
             shareType: 'pdf',
             status: 'notAccessible',
             name: 'Personal Copy'
@@ -424,10 +431,14 @@ const PersonalCopyHistory = ( props ) => {
         shareId: selectedKeeper.shareId,
         name: 'Personal Copy',
         type: 'pdf',
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+            2,
         data: {
           ...Contact, index
         },
@@ -468,7 +479,7 @@ const PersonalCopyHistory = ( props ) => {
   }, [ Contact, trustedContacts ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
-    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
     setKeeperTypeModal( false )
     if ( type == 'contact' ) {
@@ -522,7 +533,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Ssd","channelId":"aa6aaa4873edf201f47e60bb9a50b2ee2e43578b477d6b96a5c2ba988fdf079b","streamId":"36d5d4a05","channelKey":"HYk3ECVHVcMyDn1Xc3fHhRH4","secondaryChannelKey":"mWZrWjJwlPdL83nvgiOIImi9","version":"2.0.0","walletId":"533afe13140f2f9a36861a6aa6de12a95f519277602dac7f4c4cc93b04b209ad","encryptedKey":"8d37585357435dd9e4a157975087f1368ccd4fb4ef4f76bc61bd5dc605d61b0f4bf80ed3f37f88283aeaa4ca8d09dfde3b7d7a81637dc409f9c3939dd131c911d310aa6f4361c380d5fcace80fed38cb"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asaqw","channelId":"49609cdcfec0edd70a89c561ffa4d874731d0e9e0e4acc45522918e045a04c99","streamId":"9dd969edd","channelKey":"JFupDEybfz1a5FsliKU9MAUb","secondaryChannelKey":"LCc6dVLgVk8zPrR8wCY5RFFr","version":"2.0.0","walletId":"af5fc360fff2b6400a11d5909ecef0e44c0330908418fd334bea003205269051","encryptedKey":"94a645ed2156f237fe2f9c4f8b13568e6016d72bd5243a5ceb322f61c93e92e037137aba7a8522e70ea655e98b1f13f6214b15b970857df201c4e08325a2f631a2b446d763c7d56a51442d799bcaf875"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
@@ -588,7 +599,7 @@ const PersonalCopyHistory = ( props ) => {
             // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
             setPersonalCopyShareModal( true )
           }}
-          isChangeKeeperAllow={isChangeKeeperAllow}
+          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? true : false}
           changeButtonText={'Change'}
           onPressChange={() => {
             // ( keeperTypeBottomSheet as any ).current.snapTo( 1 )

@@ -47,7 +47,8 @@ import {
   INotification,
   notificationType,
   notificationTag,
-  LevelInfo
+  LevelInfo,
+  LevelData
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
@@ -121,8 +122,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const [ contacts, setContacts ] = useState( [] )
@@ -155,6 +157,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ isChange ] )
 
+  //didMount
   useEffect( () => {
     ( async () => {
       const contacts: Trusted_Contacts = trustedContacts
@@ -506,10 +509,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
         type: shareType,
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+            2,
         data: {
           ...Contact, index
         },
@@ -552,17 +559,22 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }
 
-    if ( !currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) return
+    if ( !currentContact || ( currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) return
 
     if( isGuardianCreationClicked ) {
       const shareObj: LevelInfo = {
-        walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+        walletId: wallet.walletId,
         shareId: selectedKeeper.shareId,
-        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion :
+          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
         shareType: shareType,
         status: 'notAccessible',
-        name: chosenContact && chosenContact.name ? chosenContact.name : ''
+        name: chosenContact && chosenContact.name ? chosenContact.name : '',
+        updatedAt: 0
       }
+
       if( shareType == 'existingContact' ) shareObj.updatedAt = 0
       dispatch( updateMSharesHealth( shareObj, isChange ) )
       dispatch( setChannelAssets( {
@@ -573,8 +585,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ chosenContact, trustedContacts ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
-    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
+    setKeeperTypeModal( false )
+
     if ( type == 'contact' ) {
       setChangeModal( true )
     }
@@ -675,7 +689,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setReshareModal( true )
           }}
           isVersionMismatch={isVersionMismatch}
-          isChangeKeeperAllow={isChangeKeeperAllow && selectedKeeper.updatedAt}
+          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? true : false}
           reshareButtonText={'Reshare'}
           changeButtonText={'Change'}
         />

@@ -335,11 +335,12 @@ const FNFToKeeper = ( props ) => {
 
   async function onContactSelect( index ) {
     let contactTemp = []
-    const contacts = filterContactData
+    const contacts = [ ...filterContactData ]
     if ( contact.length && contacts[ index ].id == contact[ 0 ].id && !contact[ 0 ].isExisting ) {
       contactTemp = []
       contacts[ index ].checked = false
     } else {
+      if( filterContactData.findIndex( value=>value.checked == true ) > -1 )contacts[ filterContactData.findIndex( value=>value.checked == true ) ].checked = false
       contactTemp[ 0 ] = contacts[ index ]
       contacts[ index ].checked = true
     }
@@ -577,7 +578,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            height: DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
+            height: DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '50%' ),
           }}>
             {filterContactData ? (
               <FlatList
