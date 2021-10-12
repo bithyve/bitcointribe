@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  TouchableOpacity,
 } from 'react-native'
 import { Button } from 'react-native-elements'
 import {
@@ -128,9 +129,7 @@ const HomeBuyCard = ( {
           <Text>{incramount}</Text>
         </View>
       </View>
-      <Button
-        raised
-        title={strings.buy}
+      <TouchableOpacity
         // icon={
         //   <Image
         //     source={require( '../../assets/images/icons/recurring_buy.png' )}
@@ -141,9 +140,9 @@ const HomeBuyCard = ( {
         //     }}
         //   />
         // }
-        buttonStyle={{
+        style={{
           borderRadius: wp( 2 ),
-          paddingVertical: wp( 2.5 ),
+          paddingVertical: wp( 2.7 ),
           paddingHorizontal: wp( 4 ),
           backgroundColor: Colors.blue,
           shadowColor: Colors.shadowBlue,
@@ -153,14 +152,16 @@ const HomeBuyCard = ( {
           },
           elevation: 15
         }}
-        titleStyle={{
-          ...ButtonStyles.floatingActionButtonText,
-          marginLeft: wp( 1 ),
-        }}
         onPress={() =>
           openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
         }
-      />
+      >
+        <Text style={{
+          ...ButtonStyles.floatingActionButtonText,
+        }}>
+          {strings.buy}
+        </Text>
+      </TouchableOpacity>
     </View>
   )
 }
