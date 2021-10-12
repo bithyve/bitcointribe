@@ -275,6 +275,7 @@ const GiftDetails = ( { navigation } ) => {
               }}
               onPress={() => {
                 dispatch( reclaimGift( gift.id ) )
+                navigation.goBack()
               }}
             >
               <Text style={[ styles.buttonText, {
