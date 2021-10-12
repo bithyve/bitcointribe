@@ -64,6 +64,7 @@ import {
   Gift,
   GiftMetaData,
   GiftStatus,
+  GiftThemeId,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -132,13 +133,14 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
+export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
     giftToSend.timestamps.sent = Date.now()
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
+    giftToSend.themeId = themeId
 
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
@@ -172,6 +174,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
         note,
+        themeId: giftToSend.themeId
       }
     } )
     return {

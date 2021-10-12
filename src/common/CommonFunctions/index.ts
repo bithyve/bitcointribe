@@ -378,7 +378,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 
   if( deepLinkKind === DeepLinkKind.GIFT ){
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/v${appVersion}`
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
@@ -476,6 +476,7 @@ export const processDeepLink = ( deepLink: string ) => {
             channelAddress: splits[ 8 ],
             amount: splits[ 9 ],
             note: splits[ 10 ],
+            themeId: splits[ 11 ],
             version,
           }
           return {
@@ -546,6 +547,7 @@ export const processRequestQR = ( qrData: string ) => {
             channelAddress: parsedData.channelAddress,
             amount: parsedData.amount,
             note: parsedData.note,
+            themeId: parsedData.themeId,
             version: parsedData.version,
             type: parsedData.type,
             isQR: true,
