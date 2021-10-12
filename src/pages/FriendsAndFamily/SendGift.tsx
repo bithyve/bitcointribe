@@ -18,7 +18,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import { GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
@@ -44,6 +44,7 @@ export default function SendGift( props ) {
   const [ encryptionOTP, setEncryptionOTP ] = useState( '' )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
+  const [ giftThemeId, setGiftThemeId ] = useState( GiftThemeId.ONE )
   const dispatch = useDispatch()
 
   const numberWithCommas = ( x ) => {
@@ -53,7 +54,7 @@ export default function SendGift( props ) {
   const sendGift  = async () => {
     const senderName = wallet.userName? wallet.userName: wallet.walletName
     const generateShortLink = true
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, note, encryptWithOTP, generateShortLink )
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
     dispatch( updateWalletImageHealth( {
@@ -71,6 +72,7 @@ export default function SendGift( props ) {
       channelAddress,
       amount: giftToSend.amount,
       note,
+      themeId: giftToSend.themeId,
       version: DeviceInfo.getVersion(),
     } ) )
     setEncryptionOTP( deepLinkEncryptionOTP )

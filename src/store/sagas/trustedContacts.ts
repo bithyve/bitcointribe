@@ -50,6 +50,7 @@ import {
   DeepLinkKind,
   DeepLinkEncryptionType,
   GiftMetaData,
+  GiftThemeId,
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -850,7 +851,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
     const giftToSend = gifts[ giftId ]
     const senderName = wallet.userName? wallet.userName: wallet.walletName
-    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, '' )
+    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, GiftThemeId.ONE, '' )
     yield put( updateGift( updatedGift ) )
     yield call( dbManager.createGift, updatedGift )
     yield put( updateWalletImageHealth( {

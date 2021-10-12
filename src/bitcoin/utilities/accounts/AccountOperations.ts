@@ -20,6 +20,7 @@ import {
   Gift,
   GiftType,
   GiftStatus,
+  GiftThemeId,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
@@ -1055,6 +1056,7 @@ export default class AccountOperations {
         amount,
         type: GiftType.SENT,
         status: GiftStatus.CREATED,
+        themeId: GiftThemeId.ONE,
         timestamps: {
           created: Date.now(),
         },

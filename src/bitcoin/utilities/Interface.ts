@@ -944,6 +944,11 @@ export enum DeepLinkEncryptionType {
   OTP = 'OTP'
 }
 
+export enum GiftThemeId {
+  ONE = 'ONE',
+  TWO = 'TWO'
+}
+
 export enum GiftType {
   SENT = 'SENT',
   RECEIVED = 'RECEIVED'
@@ -965,6 +970,7 @@ export interface Gift {
   amount: number,
   type: GiftType,
   status: GiftStatus,
+  themeId: GiftThemeId,
   timestamps: {
     created: number,
     sent?: number,
