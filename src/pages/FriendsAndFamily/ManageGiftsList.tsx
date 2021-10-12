@@ -81,14 +81,14 @@ const ManageGiftsList = ( props ) => {
             }}>
               {props.titleText}
             </Text>
-            <Text style={{
+            {/* <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
 
             }}>
               {props.subText}
-            </Text>
+            </Text> */}
           </View>
           <View style={{
             flexDirection: 'row', alignItems: 'flex-end',

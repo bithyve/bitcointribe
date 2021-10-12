@@ -69,6 +69,7 @@ const CreateGift = ( { navigation } ) => {
   const currencyCode =  useSelector( state => state.preferences.currencyCode )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
+  const [ showKeyboard, setKeyboard ] = useState( false )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -125,7 +126,7 @@ const CreateGift = ( { navigation } ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-  const renderButton = ( text ) => {
+  const renderButton = ( text, condn ) => {
     const actualAmount = ( ( spendableBalance / SATOSHIS_IN_BTC ) *
     accountsState.exchangeRates[ currencyCode ].last
     ).toFixed( 2 )
@@ -136,7 +137,7 @@ const CreateGift = ( { navigation } ) => {
       <TouchableOpacity
         disabled={isDisabled}
         onPress={()=>{
-          switch( text ){
+          switch( condn ){
               case 'Create Gift':
                 dispatch( generateGifts( {
                   amounts: [ Number( amount ) ],
@@ -147,7 +148,7 @@ const CreateGift = ( { navigation } ) => {
 
               case 'Add F&F and Send':
                 setGiftModal( false )
-                navigation.navigate( 'EnterGiftDetails', {
+                navigation.navigate( 'AddContact', {
                   fromScreen: 'Gift',
                   giftId: ( createdGift as Gift ).id
                 } )
@@ -168,7 +169,7 @@ const CreateGift = ( { navigation } ) => {
         }
         }
       >
-        <Text style={styles.buttonText}>Send Gift</Text>
+        <Text style={styles.buttonText}>{text}</Text>
       </TouchableOpacity>
     )
   }
@@ -218,11 +219,11 @@ const CreateGift = ( { navigation } ) => {
             <Text style={styles.modalTitleText}>Gift Created</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+            }}>{'You\'re ready to elate!'}</Text>
           </View>
           <DashedContainer
             titleText={'Available Gift'}
-            subText={'Lorem ipsum dolor sit amet'}
+            subText={'Someone\'s about to feel extra special'}
             amt={numberWithCommas( createdGift.amount )}
             date={new Date()}
             image={<GiftCard />}
@@ -234,7 +235,7 @@ const CreateGift = ( { navigation } ) => {
               paddingRight: wp( 15 ),
               backgroundColor: 'transparent'
             }}
-            infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit'}
+            infoText={'The Gift is ready to be sent to anyone you choose. If unclaimed, the sats would revert to your wallet.'}
           />
 
         </View>
@@ -271,7 +272,7 @@ const CreateGift = ( { navigation } ) => {
         <View style={{
           marginLeft: wp( 4 ), flexDirection: 'row'
         }}>
-          {renderButton( addfNf ? 'Add F&F and Send' : 'Send Gift' )}
+          {renderButton( 'Send Gift', addfNf ? 'Add F&F and Send' : 'Send Gift' )}
           {/* {renderButton( 'Add F&F and Send' )}   */}
 
         </View>
@@ -429,7 +430,20 @@ const CreateGift = ( { navigation } ) => {
           <View style={{
             width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
           }} />
-          <Text style={styles.modalInputBox}>{amount?? 'Enter amount in sats'}</Text>
+          <Text style={[ styles.modalInputBox, {
+            color: amount !== '' ? Colors.textColorGrey : Colors.gray1
+          } ]} onPress={() => setKeyboard( true )}>{amount}
+            {!showKeyboard &&
+          <Text style={{
+            fontSize: RFValue( 12 ),
+          }}>
+            {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
+          </Text>
+            }
+            {( showKeyboard ) && <Text style={{
+              color: Colors.lightBlue, fontSize: RFValue( 18 ),
+            }}>|</Text>}
+          </Text>
           {isAmountInvalid && (
             <View style={{
               marginLeft: 'auto'
@@ -473,8 +487,9 @@ const CreateGift = ( { navigation } ) => {
         }}>
 
 
-          {renderButton( 'Create Gift' )}
+          {renderButton( 'Create Gift',  'Create Gift' )}
         </View>
+        {showKeyboard &&
         <View style={{
         }}>
 
@@ -617,6 +632,7 @@ const CreateGift = ( { navigation } ) => {
             </TouchableOpacity>
           </View>
         </View>
+        }
       </SafeAreaView>
     </ScrollView>
   )
@@ -723,7 +739,7 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 15 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     backgroundColor: Colors.white,

@@ -23,8 +23,6 @@ import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
-import DashedContainer from './DashedContainer'
-import RecipientAvatar from '../../components/RecipientAvatar'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import idx from 'idx'
 import { Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
@@ -43,6 +41,7 @@ const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
+  const [ timer, setTimer ] = useState( true )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
@@ -53,6 +52,14 @@ const ManageGifts = ( { navigation } ) => {
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
 
   const dispatch = useDispatch()
+
+  useEffect( ()=> {
+    if ( timer ) {
+      setTimeout( () => {
+        setTimer( false )
+      }, 2000 )
+    }
+  }, [] )
 
   useEffect( ()=> {
     const availableGifts = []
@@ -89,9 +96,6 @@ const ManageGifts = ( { navigation } ) => {
   useEffect( () => {
     dispatch( syncGiftsStatus() )
     getIsVisited()
-
-
-
   }, [] )
 
   const getIsVisited = async() => {
@@ -151,6 +155,21 @@ const ManageGifts = ( { navigation } ) => {
     setActive( type )
   }
 
+  const getText = () => {
+    if ( active === GiftStatus.CREATED ) {
+      return 'Gifts that you have created and are ready to be sent are visible below'
+    }
+    if ( active === GiftStatus.SENT ) {
+      return 'Gifts you\'ve sent are visible below'
+    }
+    if ( active === GiftStatus.EXPIRED ) {
+      return 'Gifts that were unclaimed and thus expired are visible below'
+    }
+    if ( active === GiftType.RECEIVED ) {
+      return 'Gifts you\'ve received are visible below'
+    }
+  }
+
   return (
     <View style={{
       // height: '50%',
@@ -198,9 +217,6 @@ const ManageGifts = ( { navigation } ) => {
               ...styles.selectedContactsView,
             }}
           >
-            <Text style={[ styles.contactText, {
-              fontSize: RFValue( 24 ),
-            } ]}>+</Text>
             {/* <Image
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/icon_add_grey.png' )}
@@ -270,7 +286,7 @@ const ManageGifts = ( { navigation } ) => {
                   {active === GiftStatus.CREATED ?
                     <ManageGiftsList
                       titleText={'Available Gift'}
-                      subText={'Lorem ipsum dolor sit amet'}
+                      // subText={'Lorem ipsum dolor sit amet'}
                       amt={numberWithCommas( item.amount )}
                       date={item.timestamps?.created}
                       image={<GiftCard />}
@@ -373,9 +389,7 @@ const ManageGifts = ( { navigation } ) => {
           <BottomInfoBox
             // backgroundColor={Colors.white}
             // title={'Note'}
-            infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-            }
+            infoText={getText()}
           />
         }
         {Object.values( gifts?? {
@@ -386,9 +400,7 @@ const ManageGifts = ( { navigation } ) => {
           <BottomInfoBox
             // backgroundColor={Colors.white}
             // title={'Note'}
-            infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-            }
+            infoText={getText()}
           />
           <View style={styles.centeredView}>
             <TouchableOpacity
@@ -404,7 +416,7 @@ const ManageGifts = ( { navigation } ) => {
             {/* <ScrollView style={{
               flex: 1
             }}> */}
-            {[ 1, 2, 3 ].map( ( value, index ) => {
+            {timer && [ 1, 2, 3 ].map( ( value, index ) => {
               return (
                 <View key={index} style={styles.scrollViewContainer}>
 

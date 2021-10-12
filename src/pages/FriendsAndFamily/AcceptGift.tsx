@@ -342,11 +342,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           <Text style={styles.modalTitleText}>Gift Sats Accepted</Text>
           <Text style={{
             ...styles.modalInfoText,
-          }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+          }}>The sats have been added to the account</Text>
         </View>
         <DashedContainer
           titleText={'Gift Accepted'}
-          subText={'Lorem ipsum dolor sit amet'}
+          // subText={'Lorem ipsum dolor sit amet'}
           amt={numberWithCommas( giftAmount )}
           image={<GiftCard width={63} height={63} />}
         />
@@ -355,7 +355,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             paddingRight: wp( 15 ),
             backgroundColor: 'transparent'
           }}
-          infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit'}
+          infoText={''}
         />
         <View style={{
           marginLeft: wp( 6 ),
