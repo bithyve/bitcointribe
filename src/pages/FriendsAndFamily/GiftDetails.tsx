@@ -137,21 +137,26 @@ const GiftDetails = ( { navigation } ) => {
                 </View>
 
               </View>
-
-              <Text style={{
-                color: Colors.black,
-                fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular
+              <View style={{
+                flexDirection: 'row', alignItems: 'center'
               }}>
-                {numberWithCommas( gift.amount )}
+
+
                 <Text style={{
-                  color: Colors.lightTextColor,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular
-                }}> sats
+                  color: Colors.black,
+                  fontSize: RFValue( 18 ),
+                  fontFamily: Fonts.FiraSansRegular, marginHorizontal: wp( 2 )
+                }}>
+                  {numberWithCommas( gift.amount )}
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular
+                  }}> sats
+                  </Text>
                 </Text>
-              </Text>
-              {isOpen ? <ArrowDown /> : <ArrowUp />}
+                {isOpen ? <ArrowDown /> : <ArrowUp />}
+              </View>
             </View>
           </View>
           {isOpen && gift.status !== GiftStatus.CREATED && gift?.deepLinkConfig?.encryptionType === 'OTP' &&

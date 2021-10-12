@@ -34,17 +34,21 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ManageGiftsList from './ManageGiftsList'
 import IconAdd from '../../assets/images/svgs/icon_add.svg'
+import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const listItemKeyExtractor = ( item ) => item.id
 
 const ManageGifts = ( { navigation } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
+  const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
 
@@ -84,8 +88,19 @@ const ManageGifts = ( { navigation } ) => {
 
   useEffect( () => {
     dispatch( syncGiftsStatus() )
+    getIsVisited()
+
+
+
   }, [] )
 
+  const getIsVisited = async() => {
+    const isVisited = await AsyncStorage.getItem( 'GiftVisited' )
+    if ( !isVisited ) {
+      setKnowMore( true )
+      AsyncStorage.setItem( 'GiftVisited', 'true' )
+    }
+  }
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
@@ -142,6 +157,9 @@ const ManageGifts = ( { navigation } ) => {
       flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
+      <ModalContainer visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
+        <GiftKnowMore closeModal={() => setKnowMore( false )} />
+      </ModalContainer>
       <View style={{
         height: 'auto',
         backgroundColor: Colors.backgroundColor,
@@ -158,7 +176,7 @@ const ManageGifts = ( { navigation } ) => {
       </ModalContainer>
         } */}
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between'
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -174,22 +192,8 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-        </View>
-        <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
-        }}>
-          <HeaderTitle
-            firstLineTitle={'Manage Gifts'}
-            secondLineTitle={'View and manage created Gifts'}
-            infoTextNormal={''}
-            infoTextBold={''}
-            infoTextNormal1={''}
-            step={''}
-          />
-          {Object.values( gifts?? {
-          } ).length !== 0 &&
           <TouchableOpacity
-            onPress={() => navigation.navigate( 'CreateGift' )}
+            onPress={() => setKnowMore( true )}
             style={{
               ...styles.selectedContactsView,
             }}
@@ -201,10 +205,24 @@ const ManageGifts = ( { navigation } ) => {
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/icon_add_grey.png' )}
                   /> */}
-            <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
+            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
 
           </TouchableOpacity>
-          }
+        </View>
+
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
+        }}>
+          <HeaderTitle
+            firstLineTitle={'Manage Gifts'}
+            secondLineTitle={'View and manage created Gifts'}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
+
+
         </View>
         <ScrollView
           style={{
@@ -350,6 +368,16 @@ const ManageGifts = ( { navigation } ) => {
             }}
           />
         </View>
+        { Object.values( gifts?? {
+        } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
+          <BottomInfoBox
+            // backgroundColor={Colors.white}
+            // title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+            }
+          />
+        }
         {Object.values( gifts?? {
         } ).length === 0 &&
         <View style={{
@@ -437,6 +465,25 @@ const ManageGifts = ( { navigation } ) => {
         </View>
         }
       </View>
+      {Object.values( gifts?? {
+      } ).length !== 0 &&
+          <TouchableOpacity
+            onPress={() => navigation.navigate( 'CreateGift' )}
+            style={{
+              ...styles.createView,
+            }}
+          >
+            <Text style={[ styles.contactText, {
+              fontSize: RFValue( 24 ),
+            } ]}>+</Text>
+            {/* <Image
+                    style={styles.addGrayImage}
+                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
+                  /> */}
+            <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
+
+          </TouchableOpacity>
+      }
     </View>
   )
 }
@@ -457,9 +504,10 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 1 )
   },
   scrollViewContainer: {
-    margin: wp( '3%' ),
+    marginHorizontal: wp( '3%' ),
+    marginVertical: wp( '1.8%' ),
     backgroundColor: Colors.white,
-    paddingVertical: hp( 2 ),
+    paddingVertical: hp( 1 ),
     borderRadius: 10,
     // height: wp( '20%' ),
     width: wp( '90%' ),
@@ -536,7 +584,21 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightBlue,
     borderRadius: wp ( 2 ),
     height: hp( 4 ),
-    paddingHorizontal: wp( 2 )
+    paddingHorizontal: wp( 2 ),
+    marginRight: wp( 4 )
+  },
+  createView: {
+    position: 'absolute',
+    bottom: hp( 5 ),
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: Colors.lightBlue,
+    borderRadius: wp ( 2 ),
+    height: hp( 5 ),
+    paddingHorizontal: wp( 2 ),
+    marginRight: wp( 4 )
   },
   contactText: {
     fontSize: RFValue( 13 ),
