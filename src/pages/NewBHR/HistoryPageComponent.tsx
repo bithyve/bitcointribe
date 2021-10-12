@@ -191,7 +191,7 @@ const HistoryPageComponent = ( props ) => {
                 </Text>
               </TouchableOpacity>
             ) : null}
-          {/* {!props.isVersionMismatch &&
+          {!props.isVersionMismatch &&
           props.isChangeKeeperAllow ? (
               <TouchableOpacity
                 disabled={props.disableChange ? props.disableChange : false}
@@ -214,7 +214,7 @@ const HistoryPageComponent = ( props ) => {
                   {props.changeButtonText}
                 </Text>
               </TouchableOpacity>
-            ) : null} */}
+            ) : null}
         </View>
       </View> : null
       }

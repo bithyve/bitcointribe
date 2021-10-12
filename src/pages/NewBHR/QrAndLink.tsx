@@ -72,6 +72,7 @@ export default function QrAndLink( props ) {
   const index = props.navigation.getParam( 'index' )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 
@@ -105,10 +106,14 @@ export default function QrAndLink( props ) {
       shareId: selectedKeeper.shareId,
       name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
       type: shareType,
-      scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+      scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
       currentLevel: currentLevel,
       createdAt: moment( new Date() ).valueOf(),
-      sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+      sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+        MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+        OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+          2,
       data: {
         ...Contact, index
       },
@@ -223,9 +228,12 @@ export default function QrAndLink( props ) {
       } ) )
     if( isGuardianCreationClicked ) {
       const shareObj: LevelInfo = {
-        walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+        walletId: wallet.walletId,
         shareId: selectedKeeper.shareId,
-        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion :
+          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
         shareType: shareType,
         status: 'notAccessible',
         name: Contact && Contact.name ? Contact.name : ''

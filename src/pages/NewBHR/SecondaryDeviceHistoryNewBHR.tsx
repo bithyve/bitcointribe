@@ -94,6 +94,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
   const dispatch = useDispatch()
 
   const index = props.navigation.getParam( 'index' )
@@ -151,15 +152,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       setIsGuardianCreationClicked( true )
       const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKeyTemp )
-
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.name ? Contact.name : '',
         type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+            2,
         data: {
           ...Contact, index
         },
@@ -228,9 +232,12 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       }
       if( isGuardianCreationClicked ) {
         const shareObj = {
-          walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+          walletId: wallet.walletId,
           shareId: selectedKeeper.shareId,
-          reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+          reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion :
+            OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+              OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
           shareType: isPrimaryKeeper ? 'primaryKeeper' : 'device',
           status: 'notAccessible',
           name: Contact && Contact.name ? Contact.name : ''
@@ -446,8 +453,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const onPressChangeKeeperType = ( type, name ) => {
-    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
+    setKeeperTypeModal( false )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -498,9 +506,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
-          confirmButtonText={props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
+          confirmButtonText={isChange ? 'Share Now' : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressConfirm={() => {
-            if( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
+            if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
               setShowQr( true )
               createGuardian()
             } else {
@@ -512,7 +520,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChangeKeeperAllow && !isPrimaryKeeper && selectedKeeper.updatedAt}
+          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? true : false}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => { setKeeperTypeModal( true ) }}
         />
