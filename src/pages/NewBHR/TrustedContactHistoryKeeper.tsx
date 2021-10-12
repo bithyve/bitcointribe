@@ -116,7 +116,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ shareType, setShareType ] = useState( props.navigation.getParam( 'selectedKeeper' ).shareType )
   const [ showQrCode, setShowQrCode ] = useState( false )
   const [ showFNFList, setShowFNFList ] = useState( false )
-
+  const [ recreateChannel, setRecreateChannel ] = useState( false )
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
@@ -379,21 +379,32 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const onPressReshare = useCallback( async () => {
-    setReshareModal( false )
-    if( selectedKeeper.shareType == 'existingContact' ){
-      sendNotificationForExistingContact()
+    const currentContact: TrustedContact = trustedContacts[ channelKey ]
+    console.log( 'currentContact && currentContact.isActive', currentContact.isActive )
+    if ( currentContact && currentContact.isActive ){
+      setReshareModal( false )
+      if( selectedKeeper.shareType == 'existingContact' ){
+        sendNotificationForExistingContact()
+      } else {
+        props.navigation.navigate( 'QrAndLink', {
+          contact: chosenContact,
+          selectedKeeper: selectedKeeper,
+          isChange: isChange,
+          shareType,
+          isReshare,
+          oldChannelKey,
+          channelKey: channelKey
+        } )
+      }
     } else {
-      props.navigation.navigate( 'QrAndLink', {
-        contact: chosenContact,
-        selectedKeeper: selectedKeeper,
-        isChange: isChange,
-        shareType,
-        isReshare,
-        oldChannelKey,
-        channelKey: channelKey
+      setRecreateChannel( true )
+      setReshareModal( false )
+      props.navigation.navigate( 'FNFToKeeper', {
+        ...props.navigation.state.params,
+        onPressContinue,
+        recreateChannel: true
       } )
     }
-
   }, [ selectedTitle, chosenContact, getContacts ] )
 
   const renderChangeContent = useCallback( () => {
@@ -493,14 +504,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
     )
   }
 
-  const createGuardian = async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, shareType?: string} ) => {
+  const createGuardian = async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, shareType?: string, isRecreateChannel?: any} ) => {
     const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
     const Contact = payload.chosenContactTmp
+    const isRecreateChannel = payload && payload.isRecreateChannel ? payload.isRecreateChannel : false
 
-    if( payload.shareType != 'existingContact' && isReshare && !isChangeKeeper ){
+    if( payload.shareType != 'existingContact' && isReshare && !isChangeKeeper && !isRecreateChannel ){
       console.log( 'RETURN' ); return}
     setIsGuardianCreationClicked( true )
-    const channelKeyTemp: string = payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    const channelKeyTemp: string = isRecreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     setChannelKey( channelKeyTemp )
 
     if( payload.shareType == 'existingContact' ){
@@ -533,7 +545,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
       shareType: payload.shareType,
       isReshare,
       oldChannelKey,
-      channelKey: channelKeyTemp
+      channelKey: channelKeyTemp,
+      recreateChannel: isRecreateChannel
     } )
   }
 
@@ -609,14 +622,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }
 
-  const onPressContinue = ( selectedContacts ) => {
+  const onPressContinue = ( selectedContacts, isRecreateChannel? ) => {
     Keyboard.dismiss()
     let shareType = 'contact'
     if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); shareType = 'existingContact' }
     setShareType( shareType )
     setTimeout( () => {
       createGuardian( {
-        chosenContactTmp: getContacts( selectedContacts ), shareType
+        chosenContactTmp: getContacts( selectedContacts ), shareType, isRecreateChannel: isRecreateChannel
       } )
       setShowQrCode( true )
     }, 10 )
@@ -680,7 +693,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
                 ...props.navigation.state.params,
                 onPressContinue
               } )
-              setShowQrCode( true )
             } else {
               setSecondaryDeviceMessageModal( true )
             }
