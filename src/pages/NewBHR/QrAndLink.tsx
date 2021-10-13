@@ -89,7 +89,7 @@ export default function QrAndLink( props ) {
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
-      if ( contact.channelKey === channelKey && shareType != 'existingContact' ) {alert( 'retrun' ); return}
+      if ( contact.channelKey === channelKey && shareType != 'existingContact' ) return
     }
     createGuardian( )
   }, [ Contact ] )
@@ -137,7 +137,7 @@ export default function QrAndLink( props ) {
 
   useEffect( ()=> {
     generate() // re-generate deeplink if encryption key changes
-  }, [ encryptLinkWith ] )
+  }, [ encryptLinkWith, trustedContacts ] )
 
   const generate = async () => {
     console.log( 'useEffect Contact', Contact )

@@ -562,15 +562,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     // capture the contact
     if( !chosenContact ) return
     const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
-
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === chosenContact.id ){
-          currentContact = contacts[ ck ]
-          break
-        }
-      }
+    const currentContact: TrustedContact = contacts[ channelKey ]
 
     if ( !currentContact || ( currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) return
 

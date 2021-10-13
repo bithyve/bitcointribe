@@ -195,16 +195,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if( !Contact ) return
 
     const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
-    let channelKey: string
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === Contact.id ){
-          currentContact = contacts[ ck ]
-          channelKey = ck
-          break
-        }
-      }
+    const currentContact: TrustedContact = contacts[ channelKey ]
 
     if ( currentContact ) {
       const appVersion = DeviceInfo.getVersion()
