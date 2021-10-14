@@ -80,7 +80,7 @@ export default function SecondaryDeviceModelContents( props ) {
         )}
         {!props.secondaryQR?<Text style={{
           fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 13 ), color: Colors.textColorGrey, marginTop: 5
-        }}>Generating your Recovery Key. Hold on.</Text>: null}
+        }}>{'Generating your Recovery Key. Hold on.\nDo not try to go back or close the app.'}</Text>: null}
         <AppBottomSheetTouchableWrapper
           disabled={props.secondaryQR ? false : true}
           onPress={() => props.onPressOk()}
