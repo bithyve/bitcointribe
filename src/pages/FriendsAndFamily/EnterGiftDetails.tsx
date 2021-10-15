@@ -22,7 +22,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { Gift, Wallet } from '../../bitcoin/utilities/Interface'
+import { Gift, GiftThemeId, Wallet } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
@@ -96,7 +96,7 @@ const GiftDetails = ( { navigation } ) => {
               subHeaderText:strings.send,
               contactText:strings.adding,
               showDone:true,
-              themeId: dropdownBoxValue?.id
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
             } )
           } else {
             navigation.navigate( 'SendGift', {
@@ -105,7 +105,7 @@ const GiftDetails = ( { navigation } ) => {
               note,
               contact,
               senderName: name,
-              themeId: dropdownBoxValue?.id
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
             } )
           }
 

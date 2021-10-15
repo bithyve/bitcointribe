@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator, Platform, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, Platform, TouchableOpacity, Image } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,6 +28,7 @@ import DashedLargeContainer from '../pages/FriendsAndFamily/DahsedLargeContainer
 import ButtonGroupWithIcon from '../pages/FriendsAndFamily/ButtonGroupWithIcon'
 import ThemeList from '../pages/FriendsAndFamily/Theme'
 import { withNavigation } from 'react-navigation'
+import { nameToInitials } from '../common/CommonFunctions'
 
 function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
@@ -86,8 +87,8 @@ function RequestKeyFromContact( props ) {
 
   const getTheme = () => {
     // props.themeId
-    return ThemeList[ `${props.themeId}` ].avatar
-
+    const filteredArr = ThemeList.filter( ( item => item.id === props.themeId ) )
+    return filteredArr[ 0 ]
   }
 
   const numberWithCommas = ( x ) => {
@@ -99,6 +100,13 @@ function RequestKeyFromContact( props ) {
       type, qrCode: props.QR, link: shareLink, ...props
     } )
   }
+  const setPhoneNumber = () =>{
+    const phoneNumber = Contact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    return number
+  }
+
   return (
     <View style={styles.modalContainer}>
       <HeaderTitle
@@ -125,34 +133,94 @@ function RequestKeyFromContact( props ) {
             borderRadius: wp( 2 ),
             marginTop: hp( 1 ),
             marginBottom: hp( 1 ),
-            paddingVertical: hp( 3 ),
+            paddingVertical: hp( 2 ),
             paddingHorizontal: wp( 3 ),
             flexDirection: 'row',
             alignItems: 'center'
           }}>
-          <GiftCard />
+          {contact ? contact.imageAvailable ?
+            <Image
+              source={contact.image}
+              style={{
+                ...styles.contactProfileImage
+              }}
+            />
+            : (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: Colors.backgroundColor,
+                  width: 70,
+                  height: 70,
+                  borderRadius: 70 / 2,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: {
+                    width: 2, height: 2
+                  },
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: RFValue( 20 ),
+                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                  }}
+                >
+                  {nameToInitials(
+                    Contact && Contact.firstName && Contact.lastName
+                      ? Contact.firstName + ' ' + Contact.lastName
+                      : Contact && Contact.firstName && !Contact.lastName
+                        ? Contact.firstName
+                        : Contact && !Contact.firstName && Contact.lastName
+                          ? Contact.lastName
+                          : '',
+                  )}
+                </Text>
+              </View>
+            )
+            : <GiftCard />
+          }
+
           <View style={{
             marginHorizontal: wp( 3 )
           }}>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>
-                from <Text style={{
+            {contact && contact.name ?
+              <Text style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue( 11 ),
                 fontFamily: Fonts.FiraSansMediumItalic,
               }}>
-                Checking Account
+                {contact.name}
               </Text>
-            </Text>
+              :
+              <Text style={{
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular,
+              }}>
+                from <Text style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue( 11 ),
+                  fontFamily: Fonts.FiraSansMediumItalic,
+                }}>
+                Checking Account
+                </Text>
+              </Text>
+            }
             <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
+              marginTop: hp( 0.5 )
             }}>
-              {moment(  ).format( 'lll' )}
+              {Contact &&
+                Contact.phoneNumbers &&
+                Contact.phoneNumbers.length ? (
+                  setPhoneNumber()
+                ) : Contact && Contact.emails && Contact.emails.length ? ( Contact && Contact.emails[ 0 ].email
+                ) : moment(  ).format( 'lll' )}
             </Text>
           </View>
 
@@ -180,7 +248,7 @@ function RequestKeyFromContact( props ) {
       }
       {props.isGift &&
       <BottomInfoBox
-        infoText={'Your friend will be prompted to enter their {encryptionOTP} while accepting the gift card'}
+        infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
       />
       }
       {!props.isGift &&
@@ -244,7 +312,7 @@ function RequestKeyFromContact( props ) {
         extraText={'This is to get you started!\nWelcome to Bitcoin'}
         amt={numberWithCommas( props.amt )}
         image={<GiftCard />}
-        themeImage={getTheme()}
+        theme={getTheme()}
       />
       }
       {props.isGift &&
@@ -270,6 +338,12 @@ function RequestKeyFromContact( props ) {
   )
 }
 const styles = StyleSheet.create( {
+  contactProfileImage: {
+    width: 70,
+    height: 70,
+    resizeMode: 'cover',
+    borderRadius: 70 / 2,
+  },
   dashedStyle: {
     backgroundColor: Colors.gray7,
     borderRadius: wp( 2 ),
