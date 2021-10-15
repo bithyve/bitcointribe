@@ -482,19 +482,30 @@ const PersonalCopyHistory = ( props ) => {
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
     setKeeperTypeModal( false )
+    const navigationParams = {
+      selectedTitle: name,
+      selectedLevelId: selectedLevelId,
+      selectedKeeper: {
+        shareType: type,
+        name: name,
+        reshareVersion: 0,
+        status: 'notSetup',
+        updatedAt: 0,
+        shareId: selectedKeeper.shareId,
+        data: {
+        },
+      },
+      index: changeIndex,
+    }
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
     if ( type == 'device' ) {
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
@@ -533,7 +544,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asaqw","channelId":"49609cdcfec0edd70a89c561ffa4d874731d0e9e0e4acc45522918e045a04c99","streamId":"9dd969edd","channelKey":"JFupDEybfz1a5FsliKU9MAUb","secondaryChannelKey":"LCc6dVLgVk8zPrR8wCY5RFFr","version":"2.0.0","walletId":"af5fc360fff2b6400a11d5909ecef0e44c0330908418fd334bea003205269051","encryptedKey":"94a645ed2156f237fe2f9c4f8b13568e6016d72bd5243a5ceb322f61c93e92e037137aba7a8522e70ea655e98b1f13f6214b15b970857df201c4e08325a2f631a2b446d763c7d56a51442d799bcaf875"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asda","channelId":"dc9986c392da183bcbe1811aa6232a8d8f2fe7f1f4a21ee4852505a591d5cd5e","streamId":"07a7d807c","channelKey":"N7KUMNsPZSmvZGPczYmO1c6L","secondaryChannelKey":"VBK1kByohkx5C5386NQ2UO1G","version":"2.0.1","walletId":"1c2e8a04d13056c6eb5cdb6d7b16b16c90a2e8c3158ad50fc7fdeba5f903d719","encryptedKey":"92817fe2b172943568b5f304ac954434e66c98a01b5e76d93782757fa89e285f18797ec689369b6bc2d570d85d73bf826eea44620277640995e936da076e5e42b70b060a118ace9e8ab36fb14ad6e41b"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {

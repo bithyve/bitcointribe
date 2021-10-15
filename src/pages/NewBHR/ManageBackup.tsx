@@ -347,8 +347,10 @@ export default function ManageBackup( props ) {
       setCloudErrorModal( true )
       //setErrorMsg( cloudErrorMessage )
       dispatch( setCloudErrorMessage( '' ) )
+    } else if( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.IN_PROGRESS ){
+      setCloudErrorModal( false )
     }
-  }, [ cloudErrorMessage ] )
+  }, [ cloudErrorMessage, cloudBackupStatus ] )
 
   const handleContactSelection = (
     contactDescription: ContactRecipientDescribing,
@@ -447,13 +449,13 @@ export default function ManageBackup( props ) {
     }
   }
 
-  const onKeeperButtonPress = ( value, keeperNumber ) =>{
+  const onKeeperButtonPress = ( value, keeperNumber ) => {
     // requestAnimationFrame( () => {
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return
     }
-    if( value.id == 1 && keeperNumber == 2 ){
+    if( value.id == 1 && keeperNumber == 2 ) {
       if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
         props.navigation.navigate(
           'CloudBackupHistory',
@@ -745,9 +747,12 @@ export default function ManageBackup( props ) {
             note={errorMsg}
             onPressProceed={()=>{
               setCloudErrorModal( false )
-              autoCloudUpload()
+              setTimeout( () => {
+                setLoaderModal( true )
+              }, 500 )
+              dispatch( updateCloudData() )
             }}
-            onPressIgnore={()=> setCloudErrorModal( false )}
+            onPressIgnore={()=> setTimeout( ()=>{setCloudErrorModal( false )}, 500 )}
             proceedButtonText={common.tryAgain}
             cancelButtonText={common.ok}
             isIgnoreButton={true}
