@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { View, Image, Text, StyleSheet } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -11,25 +11,29 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import RadioButton from '../../components/RadioButton'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { useSelector } from 'react-redux'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function KeeperTypeModalContents( props ) {
+  const { translations } = useContext( LocalizationContext )
+  const common = translations[ 'common' ]
+  const strings = translations[ 'bhr' ]
   const [ keeperTypesData, setKeeperTypesData ] = useState( [
     {
       type: 'contact',
-      name: 'Backup with contact',
-      info: 'Backup the Recovery Key with a friend or family member',
+      name: strings.Backupwithcontact,
+      info: strings.BackupwithcontactSub,
       image: require( '../../assets/images/icons/icon_contact.png' ),
     },
     {
       type: 'device',
-      name: 'Backup on a device',
-      info: 'Use another device running Hexa to secure the Recovery Key',
+      name: strings.Backuponadevice,
+      info: strings.BackuponadeviceSub,
       image: require( '../../assets/images/icons/icon_secondarydevice.png' ),
     },
     {
       type: 'pdf',
-      name: 'Backup using a PDF',
-      info: 'The Recovery Key gets stored in a PDF. Keep it safe digitally or physically as a print out',
+      name: strings.BackupusingPDF,
+      info: strings.BackupusingPDFSub,
       image: require( '../../assets/images/icons/files-and-folders-2.png' ),
     },
   ] )
@@ -245,7 +249,7 @@ export default function KeeperTypeModalContents( props ) {
               color: Colors.white,
             }}
           >
-               Share Recovery Key
+            {strings.ShareRecoveryKey}
           </Text>
         </AppBottomSheetTouchableWrapper>
         <AppBottomSheetTouchableWrapper
@@ -258,7 +262,7 @@ export default function KeeperTypeModalContents( props ) {
               color: Colors.blue,
             }}
           >
-              Back
+            {common.back}
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>
