@@ -599,7 +599,7 @@ const PersonalCopyHistory = ( props ) => {
             // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
             setPersonalCopyShareModal( true )
           }}
-          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? true : false}
+          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           changeButtonText={'Change'}
           onPressChange={() => {
             // ( keeperTypeBottomSheet as any ).current.snapTo( 1 )

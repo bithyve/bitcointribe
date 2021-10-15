@@ -146,15 +146,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const createGuardian = useCallback(
-    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-      if( ( keeperQR || isReshare ) && !isChangeKeeper ) return
+      const isReshareTemp = payload && payload.isReshare ? payload.isReshare : undefined
+      if( ( keeperQR || isReshare ) && !isChangeKeeper && !isReshareTemp ) return
       setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKeyTemp: string = isReshareTemp ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKeyTemp )
+      const contactDetails = payload && payload.chosenContactTmp ? payload.chosenContactTmp : Contact
+      setContact( contactDetails )
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
-        name: Contact && Contact.name ? Contact.name : '',
+        name: contactDetails && contactDetails.name ? contactDetails.name : contactDetails.displayedName ? contactDetails.displayedName : '',
         type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
         currentLevel: currentLevel,
@@ -165,7 +168,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
             2,
         data: {
-          ...Contact, index
+          ...contactDetails, index
         },
         channelKey: channelKeyTemp
       }
@@ -192,16 +195,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if( !Contact ) return
 
     const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
-    let channelKey: string
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === Contact.id ){
-          currentContact = contacts[ ck ]
-          channelKey = ck
-          break
-        }
-      }
+    const currentContact: TrustedContact = contacts[ channelKey ]
 
     if ( currentContact ) {
       const appVersion = DeviceInfo.getVersion()
@@ -481,6 +475,39 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
+  const onPressReshare = () => {
+    let currentContact: TrustedContact
+    if( trustedContacts )
+      for( const ck of Object.keys( trustedContacts ) ){
+        if ( trustedContacts[ ck ].contactDetails.id === Contact.id ){
+          currentContact = trustedContacts[ ck ]
+          break
+        }
+      }
+
+    if ( currentContact && currentContact.isActive ){
+      setReshareModal( false )
+      setShowQr( true )
+      createGuardian()
+    }
+    else {
+      setReshareModal( false )
+      let name = 'Personal Device 1'
+      if( index === 3 ) name = 'Personal Device 2'
+      else if( index === 4 ) name = 'Personal Device 3'
+
+      const contact = {
+        id: uuid(),
+        name: name
+      }
+      setContact( contact )
+      createGuardian( {
+        isReshare: true, chosenContactTmp: contact
+      } )
+      setShowQr( true )
+    }
+  }
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -520,7 +547,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? true : false}
+          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => { setKeeperTypeModal( true ) }}
         />
@@ -573,11 +600,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           proceedButtonText={strings.reshare}
           cancelButtonText={common.back}
           isIgnoreButton={true}
-          onPressProceed={() => {
-            setReshareModal( false )
-            setShowQr( true )
-            createGuardian()
-          }}
+          onPressProceed={() => onPressReshare() }
           onPressIgnore={() => {
             setReshareModal( false )
           }}
