@@ -269,121 +269,128 @@ const ManageGifts = ( { navigation } ) => {
             } )
           }
         </ScrollView>
-        <View style={{
+        {/* <View style={{
           height: 'auto'
-        }}>
+        }}> */}
 
 
-          <FlatList
-            // extraData={selectedDestinationID}
-            data={giftsArr?.[ `${active}` ]}
-            keyExtractor={listItemKeyExtractor}
-            renderItem={( { item, index } ) => {
-              const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
-              const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
-              return(
-                <>
-                  {active === GiftStatus.CREATED ?
-                    <ManageGiftsList
-                      titleText={'Available Gift'}
-                      // subText={'Lorem ipsum dolor sit amet'}
-                      amt={numberWithCommas( item.amount )}
-                      date={item.timestamps?.created}
-                      image={<GiftCard />}
-                      onPress={ () => processGift( item, title, walletName )}
-                    />
-                    :
-                    <View
+        <FlatList
+          // extraData={selectedDestinationID}
+          style={{
+            height: hp( giftsArr?.[ `${active}` ].length === 0 ? 0 : 69 ),
+          }}
+          contentInset={{
+            right: 0, top: 0, left: 0, bottom: hp( 9 )
+          }}
+          showsVerticalScrollIndicator={false}
+          data={giftsArr?.[ `${active}` ]}
+          keyExtractor={listItemKeyExtractor}
+          renderItem={( { item, index } ) => {
+            const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
+            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
+            return(
+              <>
+                {active === GiftStatus.CREATED ?
+                  <ManageGiftsList
+                    titleText={'Available Gift'}
+                    // subText={'Lorem ipsum dolor sit amet'}
+                    amt={numberWithCommas( item.amount )}
+                    date={item.timestamps?.created}
+                    image={<GiftCard />}
+                    onPress={ () => processGift( item, title, walletName )}
+                  />
+                  :
+                  <View
+                    style={{
+                      marginHorizontal: wp( 6 ), marginTop: hp( 1 )
+                    }}>
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => {
+                        navigation.navigate( 'GiftDetails', {
+                          title, walletName, gift: item, avatar: true
+                        } )
+                      }
+                      }
                       style={{
-                        marginHorizontal: wp( 6 ), marginTop: hp( 1 )
+                        backgroundColor: Colors.backgroundColor1,
+                        borderRadius: wp( 2 ),
+                        padding: wp( 3 ),
+                      }}
+                    >
+                      <View style={{
+                        flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
                       }}>
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() => {
-                          navigation.navigate( 'GiftDetails', {
-                            title, walletName, gift: item, avatar: true
-                          } )
-                        }
-                        }
-                        style={{
-                          backgroundColor: Colors.backgroundColor1,
-                          borderRadius: wp( 2 ),
-                          padding: wp( 3 ),
-                        }}
+                        <Text style={{
+                          color: Colors.lightTextColor,
+                          fontSize: RFValue( 10 ),
+                          letterSpacing: 0.7,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontWeight: '700'
+                        }}>
+                          {title}
+                        </Text>
+                        <Text style={{
+                          color: Colors.lightTextColor,
+                          fontSize: RFValue( 10 ),
+                          letterSpacing: 0.1,
+                          fontFamily: Fonts.FiraSansRegular,
+                          alignSelf: 'flex-end'
+                        }}>
+                          {moment( item.createdAt ).format( 'lll' )}
+                        </Text>
+                      </View>
+
+                      <View style={{
+                        ...styles.listItem
+                      }}
                       >
+                        <View style={styles.avatarContainer}>
+                          {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
+                        </View>
                         <View style={{
-                          flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
+                          alignItems: 'flex-start', marginHorizontal: wp( 2 )
                         }}>
                           <Text style={{
-                            color: Colors.lightTextColor,
-                            fontSize: RFValue( 10 ),
-                            letterSpacing: 0.7,
-                            fontFamily: Fonts.FiraSansRegular,
-                            fontWeight: '700'
+                            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
                           }}>
-                            {title}
+                            {walletName}
                           </Text>
                           <Text style={{
-                            color: Colors.lightTextColor,
-                            fontSize: RFValue( 10 ),
-                            letterSpacing: 0.1,
+                            ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
+                          }}>Lorem ipsum dolor sit amet</Text>
+                        </View>
+                        <View style={{
+                          marginLeft: 'auto',
+                          marginRight: wp( 2 ),
+                        }}>
+                          <Text style={{
+                            color: Colors.black,
+                            fontSize: RFValue( 18 ),
                             fontFamily: Fonts.FiraSansRegular,
-                            alignSelf: 'flex-end'
                           }}>
-                            {moment( item.createdAt ).format( 'lll' )}
+                            {numberWithCommas( item.amount )}
+                            <Text style={{
+                              color: Colors.lightTextColor,
+                              fontSize: RFValue( 10 ),
+                              fontFamily: Fonts.FiraSansRegular
+                            }}> sats
+                            </Text>
                           </Text>
                         </View>
+                        <RightArrow />
+                      </View>
 
-                        <View style={{
-                          ...styles.listItem
-                        }}
-                        >
-                          <View style={styles.avatarContainer}>
-                            {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-                          </View>
-                          <View style={{
-                            alignItems: 'flex-start', marginHorizontal: wp( 2 )
-                          }}>
-                            <Text style={{
-                              textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
-                            }}>
-                              {walletName}
-                            </Text>
-                            <Text style={{
-                              ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
-                            }}>Lorem ipsum dolor sit amet</Text>
-                          </View>
-                          <View style={{
-                            marginLeft: 'auto',
-                            marginRight: wp( 2 ),
-                          }}>
-                            <Text style={{
-                              color: Colors.black,
-                              fontSize: RFValue( 18 ),
-                              fontFamily: Fonts.FiraSansRegular,
-                            }}>
-                              {numberWithCommas( item.amount )}
-                              <Text style={{
-                                color: Colors.lightTextColor,
-                                fontSize: RFValue( 10 ),
-                                fontFamily: Fonts.FiraSansRegular
-                              }}> sats
-                              </Text>
-                            </Text>
-                          </View>
-                          <RightArrow />
-                        </View>
+                    </TouchableOpacity>
+                  </View>
+                }
+              </>
 
-                      </TouchableOpacity>
-                    </View>
-                  }
-                </>
+            )
 
-              )
-
-            }}
-          />
-        </View>
+          }}
+        />
+        {/* </View> */}
         { Object.values( gifts?? {
         } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
           <BottomInfoBox

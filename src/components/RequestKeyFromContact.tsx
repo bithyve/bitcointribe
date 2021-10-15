@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator, Platform, TextInput } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, Platform, TouchableOpacity } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -19,8 +19,16 @@ import CopyThisText from '../components/CopyThisText'
 import HeaderTitle from './HeaderTitle'
 import { translations } from '../common/content/LocContext'
 import GiftCard from '../assets/images/svgs/icon_gift.svg'
+import Link from '../assets/images/svgs/link.svg'
+import More from '../assets/images/svgs/icon_more_gray.svg'
 
-export default function RequestKeyFromContact( props ) {
+import BottomInfoBox from './BottomInfoBox'
+import DashedContainer from '../pages/FriendsAndFamily/DashedContainer'
+import DashedLargeContainer from '../pages/FriendsAndFamily/DahsedLargeContainer'
+import ButtonGroupWithIcon from '../pages/FriendsAndFamily/ButtonGroupWithIcon'
+import { withNavigation } from 'react-navigation'
+
+function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
@@ -73,6 +81,16 @@ export default function RequestKeyFromContact( props ) {
       // console.log(error);
 
     }
+  }
+
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
+
+  const shareViaLinkOrQR = ( type ) => {
+    props.navigation.navigate( 'SendViaLinkAndQR', {
+      type, qrCode: props.QR, link: shareLink, ...props
+    } )
   }
   return (
     <View style={styles.modalContainer}>
@@ -130,10 +148,11 @@ export default function RequestKeyFromContact( props ) {
               {moment(  ).format( 'lll' )}
             </Text>
           </View>
+
           <View style={{
             flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 'auto'
           }}>
-            <Text style={{
+            {/* <Text style={{
               color: Colors.black,
               fontSize: RFValue( 24 ),
               fontFamily: Fonts.FiraSansRegular
@@ -145,13 +164,19 @@ export default function RequestKeyFromContact( props ) {
                 fontFamily: Fonts.FiraSansRegular
               }}> sats
               </Text>
-            </Text>
-            {props.image}
+            </Text> */}
+            <More/>
           </View>
 
         </View>
       </>
       }
+      {props.isGift &&
+      <BottomInfoBox
+        infoText={'Your friend will be prompted to enter their {encryptionOTP} while accepting the gift card'}
+      />
+      }
+      {!props.isGift &&
       <View
         style={[ styles.mainContainer,
           {
@@ -171,13 +196,14 @@ export default function RequestKeyFromContact( props ) {
               size={hp( '27%' )} />
           )}
         </View>
-        {props.OR?<CopyThisText
+        {props.OR ?<CopyThisText
           backgroundColor={Colors.backgroundColor}
           text={props.OR}
           width={'20%'}
           height={'15%'}
         /> : null}
       </View>
+      }
       {!props.isGift &&
       <HeaderTitle
         firstLineTitle={strings.orShare}
@@ -188,6 +214,7 @@ export default function RequestKeyFromContact( props ) {
         step={''}
       />
       }
+      {!props.isGift &&
       <CopyThisText
         openLink={shareLink ? shareOption : () => { }}
         backgroundColor={Colors.white}
@@ -195,20 +222,79 @@ export default function RequestKeyFromContact( props ) {
         width={'20%'}
         height={'18%'}
       />
+      }
+      {/* <TouchableOpacity
+        onPress={() => {}}
+        style={styles.dashedContainer}>
+        <View style={styles.dashedStyle}>
+        </View>
+      </TouchableOpacity> */}
+      <DashedLargeContainer
+        titleText={'Gift Card'}
+        titleTextColor={Colors.black}
+        subText={props.senderName}
+        extraText={'This is to get you started!\nWelcome to Bitcoin'}
+        amt={numberWithCommas( props.amt )}
+        image={<GiftCard />}
+      />
       {props.isGift &&
-      <View style={styles.statusIndicatorView}>
-        <View style={styles.statusIndicatorInactiveView} />
-        <View style={styles.statusIndicatorActiveView} />
+      <View style={{
+        flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
+      }}>
+        <ButtonGroupWithIcon
+          buttonOneIcon={<Link />}
+          buttonOneText={'Share Link'}
+          onButtonPress={( type ) => shareViaLinkOrQR( type )}
+          buttonTwoIcon={<Link />}
+          buttonTwoText={'Share Image'}
+        />
+
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
+        </View>
       </View>
       }
     </View>
   )
 }
 const styles = StyleSheet.create( {
+  dashedStyle: {
+    backgroundColor: Colors.gray7,
+    borderRadius: wp( 2 ),
+    paddingVertical: hp( 1 ),
+    paddingHorizontal: wp( 4 ),
+    borderColor: Colors.lightBlue,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  // normalStyle: {
+  //   backgroundColor: Colors.gray7,
+  //   paddingTop: hp( 1 ),
+  //   paddingHorizontal: wp( 2 ),
+  // },
+  dashedContainer: {
+    width: '90%',
+    backgroundColor: Colors.gray7,
+    // shadowOpacity: 0.06,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // shadowRadius: 10,
+    // elevation: 2,
+    alignSelf: 'center',
+    borderRadius: wp( 2 ),
+    marginTop: hp( 1 ),
+    marginBottom: hp( 1 ),
+    paddingVertical: wp( 1 ),
+    paddingHorizontal: wp( 1 ),
+    borderColor: Colors.lightBlue,
+    borderWidth: 1,
+  },
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
-    marginHorizontal: wp( '6%' ),
   },
   statusIndicatorActiveView: {
     height: 5,
@@ -349,3 +435,5 @@ const styles = StyleSheet.create( {
     alignItems: 'flex-start'
   }
 } )
+
+export default withNavigation( RequestKeyFromContact )
