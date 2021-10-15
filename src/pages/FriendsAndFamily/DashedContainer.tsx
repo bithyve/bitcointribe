@@ -20,7 +20,7 @@ const DashedContainer = ( props ) => {
 
   return(
     <TouchableOpacity
-      onPress={() => props.onPress() ? props.onPress() : () => {}}
+      onPress={() => props.onPress ? props.onPress() : () => {}}
       key={props.key}
       style={{
         width: '90%',
@@ -59,7 +59,8 @@ const DashedContainer = ( props ) => {
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
               fontWeight: '700',
-              letterSpacing: 0.8
+              letterSpacing: 0.8,
+
             }}>
               {props.titleText}
             </Text>
@@ -67,7 +68,7 @@ const DashedContainer = ( props ) => {
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
-
+              width: wp( '45%' )
             }}>
               {props.subText}
             </Text>

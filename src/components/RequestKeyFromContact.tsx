@@ -26,6 +26,7 @@ import BottomInfoBox from './BottomInfoBox'
 import DashedContainer from '../pages/FriendsAndFamily/DashedContainer'
 import DashedLargeContainer from '../pages/FriendsAndFamily/DahsedLargeContainer'
 import ButtonGroupWithIcon from '../pages/FriendsAndFamily/ButtonGroupWithIcon'
+import ThemeList from '../pages/FriendsAndFamily/Theme'
 import { withNavigation } from 'react-navigation'
 
 function RequestKeyFromContact( props ) {
@@ -81,6 +82,12 @@ function RequestKeyFromContact( props ) {
       // console.log(error);
 
     }
+  }
+
+  const getTheme = () => {
+    // props.themeId
+    return ThemeList[ `${props.themeId}` ].avatar
+
   }
 
   const numberWithCommas = ( x ) => {
@@ -229,6 +236,7 @@ function RequestKeyFromContact( props ) {
         <View style={styles.dashedStyle}>
         </View>
       </TouchableOpacity> */}
+      {props.isGift &&
       <DashedLargeContainer
         titleText={'Gift Card'}
         titleTextColor={Colors.black}
@@ -236,7 +244,9 @@ function RequestKeyFromContact( props ) {
         extraText={'This is to get you started!\nWelcome to Bitcoin'}
         amt={numberWithCommas( props.amt )}
         image={<GiftCard />}
+        themeImage={getTheme()}
       />
+      }
       {props.isGift &&
       <View style={{
         flexDirection: 'row', alignItems: 'center', margin: wp( 6 )

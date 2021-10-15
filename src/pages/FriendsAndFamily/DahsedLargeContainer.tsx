@@ -20,7 +20,7 @@ const DashedLargeContainer = ( props ) => {
 
   return(
     <TouchableOpacity
-      onPress={() => props.onPress() ? props.onPress() : () => {}}
+      onPress={() => props.onPress ? props.onPress() : () => {}}
       key={props.key}
       style={{
         width: '90%',
@@ -137,7 +137,7 @@ const DashedLargeContainer = ( props ) => {
           <View style={{
             alignSelf: 'flex-end'
           }}>
-            {props.image}
+            {props.themeImage ?? props.image}
           </View>
 
         </View>

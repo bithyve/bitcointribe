@@ -8,7 +8,8 @@ import {
   Text,
   StatusBar,
   ScrollView,
-  Platform
+  Platform,
+  ImagePropTypes
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -31,6 +32,7 @@ import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import Halloween from '../../assets/images/svgs/halloween.svg'
 import Birthday from '../../assets/images/svgs/birthday.svg'
+import ThemeList from './Theme'
 
 import { translations } from '../../common/content/LocContext'
 
@@ -43,34 +45,36 @@ const GiftDetails = ( { navigation } ) => {
   const [ note, setNote ] = useState( '' )
   const [ name, setName ] = useState( '' )
   // const QuestionList = login.questionList
-  const ThemeList= [
-    {
-      'id': '1', 'title': 'Bitcoin', 'subText': 'Lorem ipsum dolor', 'avatar': <Halloween />
-    },
-    {
-      'id': '2', 'title': 'Halloween', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />
-    },
-    {
-      'id': '3', 'title': 'Birthday', 'subText': 'Lorem ipsum dolor', 'avatar': <Halloween />
-    },
-    {
-      'id': '4', 'title': 'Wedding', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />
-    },
-    // {
-    //   "id": "5","title": "Congratulations", "subText": "Lorem ipsum dolor", "avatar": <Birthday />
-    // }
-  ]
+  // const ThemeList= [
+  //   {
+  //     'id': '1', 'title': 'Bitcoin', 'subText': 'Lorem ipsum dolor', 'avatar': <GiftCard />, color: Colors.lightBlue
+  //   },
+  //   {
+  //     'id': '2', 'title': 'Halloween', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />, color: Colors.greenShade
+  //   },
+  //   {
+  //     'id': '3', 'title': 'Birthday', 'subText': 'Lorem ipsum dolor', 'avatar': <Halloween />, color: Colors.pink
+  //   },
+  //   {
+  //     'id': '4', 'title': 'Wedding', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />, color: Colors.lightBlue
+  //   },
+  //   // {
+  //   //   "id": "5","title": "Congratulations", "subText": "Lorem ipsum dolor", "avatar": <Birthday />
+  //   // }
+  // ]
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
-  const [ dropdownBoxList ] = useState( ThemeList )
+  const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: '',
     title: '',
     subText: '',
-    avatar: ''
+    avatar: ImagePropTypes,
+    color: ''
   } )
 
   useEffect( () => {
+    setDropdownBoxList( ThemeList )
     setName( wallet.walletName )
   }, [] )
 
@@ -92,6 +96,7 @@ const GiftDetails = ( { navigation } ) => {
               subHeaderText:strings.send,
               contactText:strings.adding,
               showDone:true,
+              themeId: dropdownBoxValue?.id
             } )
           } else {
             navigation.navigate( 'SendGift', {
@@ -99,7 +104,8 @@ const GiftDetails = ( { navigation } ) => {
               giftId,
               note,
               contact,
-              senderName: name
+              senderName: name,
+              themeId: dropdownBoxValue?.id
             } )
           }
 
@@ -209,22 +215,26 @@ const GiftDetails = ( { navigation } ) => {
               <View style={{
                 flexDirection: 'row', alignItems: 'center'
               }}>
-                <GiftCard />
-                <View>
-                  <Text style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                <View style={{
+                  margin: wp( 1 )
+                }}>
+                  {dropdownBoxValue?.avatar
+                    ? dropdownBoxValue?.avatar
+                    : <GiftCard />}
+                </View>
 
-                  }}>
-                    {dropdownBoxValue.title
-                      ? dropdownBoxValue.title
+                <View>
+                  <Text style={styles.titleText}>
+                    {dropdownBoxValue?.title
+                      ? dropdownBoxValue?.title
                       : 'Greeting Bitcoin'}
 
                   </Text>
-                  {/* <Text style={styles.subText}>
-                    {walletName ?? 'Lorem ipsum dolor'}
-                  </Text> */}
+                  <Text style={styles.subText}>
+                    {dropdownBoxValue?.subText
+                      ? dropdownBoxValue?.subText
+                      : 'Greeting Bitcoin'}
+                  </Text>
                 </View>
               </View>
               {
@@ -257,8 +267,9 @@ const GiftDetails = ( { navigation } ) => {
           <View style={styles.dropdownBoxModal}>
             <ScrollView
               nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={false}
               style={{
-                height: hp( '40%' )
+                height: hp( '36%' )
               }}
             >
               {dropdownBoxList.map( ( value, index ) => (
@@ -271,11 +282,14 @@ const GiftDetails = ( { navigation } ) => {
                     }, 70 )
                   }}
                   style={[ styles.dashedStyle, {
+                    margin: wp( 1.5 ),
+                    borderColor: `${value.color?? Colors.lightBlue}`,
                     backgroundColor: dropdownBoxValue
-                      ? dropdownBoxValue.id == value.id
+                      ? dropdownBoxValue?.id == value.id
                         ? Colors.skyBlue
                         : Colors.white
                       : Colors.white,
+
                   } ]}
                 >
                   <View style={{
@@ -284,19 +298,19 @@ const GiftDetails = ( { navigation } ) => {
                     <View style={{
                       flexDirection: 'row', alignItems: 'center'
                     }}>
-                      {value.avatar}
-                      <View>
-                        <Text style={{
-                          color: Colors.textColorGrey,
-                          fontSize: RFValue( 13 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                      <View style={{
+                        margin: wp( 1 )
+                      }}>
+                        {value.avatar}
+                      </View>
 
-                        }}>
+                      <View>
+                        <Text style={styles.titleText}>
                           {value.title}
                         </Text>
-                        {/* <Text style={styles.subText}>
-                    {walletName ?? 'Lorem ipsum dolor'}
-                  </Text> */}
+                        <Text style={styles.subText}>
+                          { 'Lorem ipsum dolor'}
+                        </Text>
                       </View>
                     </View>
                   </View>
@@ -346,6 +360,12 @@ const GiftDetails = ( { navigation } ) => {
 }
 
 const styles = StyleSheet.create( {
+  titleText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginHorizontal: wp( 2 )
+  },
   dropdownBox: {
     flexDirection: 'row',
     borderColor: Colors.white,
@@ -442,6 +462,7 @@ const styles = StyleSheet.create( {
     color: Colors.lightTextColor,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
+    marginHorizontal: wp( 2 )
   },
   dot: {
     height: 8,
