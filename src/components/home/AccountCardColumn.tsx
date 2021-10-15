@@ -52,6 +52,7 @@ const AccountCardColumn: React.FC<Props> = ( {
               onPress={() => onAccountCardSelected( accountShell )}
               onLongPress={() => onCardLongPressed( accountShell )}
               delayPressIn={0}
+              activeOpacity={0.85}
             >
               <HomeAccountsListCard
                 accountShell={accountShell}

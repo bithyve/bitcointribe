@@ -18,7 +18,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
   const { translations } = useContext( LocalizationContext )
   const add_new = translations[ 'home' ].add_new
   return (
-    <TouchableOpacity onPress={onPress} style={containerStyle}>
+    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={containerStyle}>
       <View style={styles.cardContainer}>
         <View
           style={{
