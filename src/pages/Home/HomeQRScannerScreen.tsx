@@ -26,13 +26,16 @@ import ModalContainer from '../../components/home/ModalContainer'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import { NavigationActions, StackActions } from 'react-navigation'
 import AcceptGift from '../FriendsAndFamily/AcceptGift'
+import { launchImageLibrary } from 'react-native-image-picker'
+import LocalQRCode from '@remobile/react-native-qrcode-local-image'
+import Toast from '../../components/Toast'
 
 export type Props = {
   navigation: any;
@@ -100,6 +103,31 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }
 
 
+  function importImage() {
+    launchImageLibrary(
+      {
+        title: null,
+        mediaType: 'photo',
+        takePhotoButtonTitle: null,
+        selectionLimit: 1,
+      },
+      response => {
+        if ( response.assets[ 0 ].uri ) {
+          const uri = response.assets[ 0 ].uri.toString().replace( 'file://', '' )
+          LocalQRCode.decode( uri, ( error, result ) => {
+            if ( !error ) {
+              handleBarcodeRecognized( {
+                data: result
+              } )
+            } else {
+              Toast( 'No QR code found in the selected image' )
+            }
+          } )
+        }
+      },
+    )
+  }
+
   return (
     <View style={styles.rootContainer}>
       <ScrollView>
@@ -147,6 +175,15 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <View
             style={styles.floatingActionButtonContainer}
           >
+            <TouchableOpacity onPress={importImage} style={styles.btnImport}>
+              <Ionicons
+                name="image"
+                size={22}
+                color="gray"
+              />
+              <Text style={styles.textImport}>Import From Gallery</Text>
+            </TouchableOpacity>
+
             <Button
               raised
               title={strings.Receivebitcoin}
@@ -264,7 +301,21 @@ const styles = StyleSheet.create( {
     right: 0,
     marginLeft: 'auto',
     padding: heightPercentageToDP( 1.5 ),
+    //flexDirection: 'row'
   },
+  btnImport: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
+  textImport: {
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginHorizontal: 2,
+  }
 } )
 
 export default HomeQRScannerScreen
