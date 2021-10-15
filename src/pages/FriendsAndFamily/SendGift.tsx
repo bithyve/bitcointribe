@@ -38,7 +38,7 @@ export default function SendGift( props ) {
   const note = props.navigation.getParam( 'note' )
   const contact = props.navigation.getParam( 'contact' )
   const senderName = props.navigation.getParam( 'senderName' )
-
+  const themeId = props.navigation.getParam( 'themeId' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
@@ -148,6 +148,7 @@ export default function SendGift( props ) {
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
+        themeId={themeId}
         senderName={senderName}
         contact={{
         }}

@@ -71,7 +71,7 @@ export default function AddContactSendRequest( props ) {
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT )
   const [ isOTPType, setIsOTPType ] = useState( false )
-
+  const themeId = props.navigation.getParam( 'themeId' )
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
@@ -433,6 +433,7 @@ export default function AddContactSendRequest( props ) {
           subHeaderText={ giftId ? 'You can send it to anyone using the QR or the link' : Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
           contactText={strings.adding}
           isGift={ giftId}
+          themeId={themeId}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}

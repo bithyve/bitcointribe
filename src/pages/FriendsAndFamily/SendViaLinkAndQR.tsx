@@ -76,6 +76,8 @@ export default function SendViaLinkAndQR( props ) {
   function onPress() {
     if( type === 'QR'  && qrCode ) {
       capture()
+    } else {
+      shareOption()
     }
   }
 

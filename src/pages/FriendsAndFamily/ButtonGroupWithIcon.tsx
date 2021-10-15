@@ -56,7 +56,7 @@ const ButtonGroupWithIcon = ( props ) => {
           fontFamily: Fonts.FiraSansRegular,
           marginHorizontal: wp( 2 )
         }}>
-          {props.buttonOneText}
+          {props.buttonTwoText}
         </Text>
       </TouchableOpacity>
     </View>

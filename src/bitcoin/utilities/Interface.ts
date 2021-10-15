@@ -946,7 +946,9 @@ export enum DeepLinkEncryptionType {
 
 export enum GiftThemeId {
   ONE = 'ONE',
-  TWO = 'TWO'
+  TWO = 'TWO',
+  THREE = 'THREE',
+  FOUR = 'FOUR'
 }
 
 export enum GiftType {
