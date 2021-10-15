@@ -294,7 +294,7 @@ export default function AddContactAddressBook( props ) {
           image: selectedContacts[ 0 ].image
         } ) )
         props.navigation.navigate( 'ContactDetails', {
-          contact: selectedContacts,
+          contact: selectedContacts[ 0 ],
         } )
       } else if ( props.navigation.state.params?.fromScreen === 'Gift' )  {
         props.navigation.navigate( 'EnterGiftDetails', {

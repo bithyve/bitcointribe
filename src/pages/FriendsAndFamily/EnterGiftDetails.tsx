@@ -38,7 +38,7 @@ const GiftDetails = ( { navigation } ) => {
   const { giftId, contact } = navigation.state.params
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const strings = translations[ 'f&f' ]
-  const login = translations[ 'login' ]
+  // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
   const [ note, setNote ] = useState( '' )
   const [ name, setName ] = useState( '' )
