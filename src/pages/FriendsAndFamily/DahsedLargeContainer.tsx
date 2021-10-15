@@ -20,7 +20,8 @@ const DashedLargeContainer = ( props ) => {
 
   return(
     <TouchableOpacity
-      onPress={() => props.onPress ? props.onPress() : () => {}}
+      activeOpacity={0.7}
+      onPress={() => props.onPress() ? props.onPress() : () => {}}
       key={props.key}
       style={{
         width: '90%',

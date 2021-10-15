@@ -22,6 +22,7 @@ function ManageBackupCard( props ) {
   const selectedId = props.selectedId
   const { translations } = useContext( LocalizationContext )
   const common = translations[ 'common' ]
+  const strings = translations[ 'bhr' ]
   const keeperButtonText = ( buttonText, number ) =>{
     if( !buttonText ) return 'Share Recovery Key ' + number
     else return buttonText
@@ -138,7 +139,7 @@ function ManageBackupCard( props ) {
                   color: textColor,
                 }}
               >
-                {value.levelName}
+                {strings[ value.levelName ]}
               </Text>
               <Text
                 style={{
@@ -147,7 +148,7 @@ function ManageBackupCard( props ) {
                   width: wp( '55%' ),
                 }}
               >
-                {value.info}
+                {strings[ value.info ]}
               </Text>
             </View>
             <TouchableOpacity
@@ -201,7 +202,7 @@ function ManageBackupCard( props ) {
                     fontSize: RFValue( 10 ),
                   }}
                 >
-                  {value.note}
+                  {strings[ value.note ]}
                 </Text>
               </View>
               <View

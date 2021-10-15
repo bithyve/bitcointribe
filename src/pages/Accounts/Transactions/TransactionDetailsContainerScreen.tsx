@@ -39,7 +39,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   const account: Account = useSelector( state => state.accounts.accounts[ primarySubAccount.id ] )
 
   useEffect( () => {
-    if( transaction.isNew ) dispatch( markReadTx( transaction.txid, accountShellID ) )
+    if( transaction.isNew ) dispatch( markReadTx( [ transaction.txid ], accountShellID ) )
   }, [ transaction.isNew ] )
 
   const confirmationsText = useCallback( () => {

@@ -40,7 +40,7 @@ const ContactImage = 'ContactImage'
 const Gifts = 'Gifts'
 const GiftSenderReceiver = 'GiftSenderReceiver'
 const GiftDeepLinkConfig = 'GiftDeepLinkConfig'
-
+const GiftTimeStamps = 'GiftTimeStamps'
 export const AccountSchema: ObjectSchema = {
   name: Account,
   primaryKey: 'id',
@@ -819,6 +819,24 @@ export const GiftDeepLinkConfigSchema : ObjectSchema = {
   },
 }
 
+export const GiftTimeStampsSchema : ObjectSchema = {
+  name: GiftTimeStamps,
+  properties: {
+    created: {
+      type: 'int', optional: true
+    },
+    sent: {
+      type: 'int', optional: true
+    },
+    accepted: {
+      type: 'int', optional: true
+    },
+    reclaimed: {
+      type: 'int', optional: true
+    },
+  },
+}
+
 export const GiftsSchema: ObjectSchema = {
   name: Gifts,
   primaryKey: 'id',
@@ -855,7 +873,13 @@ export const GiftsSchema: ObjectSchema = {
     },
     deepLinkConfig: {
       type: GiftDeepLinkConfig, optional: true
-    }
+    },
+    themeId: {
+      type: 'string', optional: true
+    },
+    timestamps: {
+      type: GiftTimeStamps, optional: true
+    },
   },
 }
 

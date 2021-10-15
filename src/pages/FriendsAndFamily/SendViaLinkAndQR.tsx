@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import {
   View,
   StyleSheet,
@@ -26,6 +26,7 @@ import HeaderTitle from '../../components/HeaderTitle'
 import DashedLargeContainer from './DahsedLargeContainer'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import { RFValue } from 'react-native-responsive-fontsize'
+import ViewShot from 'react-native-view-shot'
 
 export default function SendViaLinkAndQR( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -35,6 +36,12 @@ export default function SendViaLinkAndQR( props ) {
   const link = props.navigation.getParam( 'link' )
   const amt = props.navigation.getParam( 'amt' )
   const senderName = props.navigation.getParam( 'senderName' )
+  const viewRef = useRef( null )
+
+  useEffect( () => {
+    onPress()
+  }, [ qrCode ] )
+
   // useEffect( () => {
   //   setShareLink( props.link.replace( /\s+/g, '' ) )
   // }, [ props.link ] )
@@ -64,6 +71,38 @@ export default function SendViaLinkAndQR( props ) {
       // console.log(error);
 
     }
+  }
+
+  function onPress() {
+    if( type === 'QR'  && qrCode ) {
+      capture()
+    }
+  }
+
+  function capture() {
+    viewRef.current.capture().then( uri => {
+      Share.open(
+        Platform.select( {
+          default: {
+            title: 'Share Gift Card',
+            message: `${link}`,
+            url: `file://${uri}`,
+          },
+          ios: {
+            activityItemSources: [
+              {
+                placeholderItem: {
+                  type: 'url',
+                  content: `file://${uri}`,
+                },
+              }
+            ],
+          }
+        }, )
+      )
+        .then( ( res ) => {
+        } )
+    } )
   }
 
   const numberWithCommas = ( x ) => {
@@ -108,17 +147,22 @@ export default function SendViaLinkAndQR( props ) {
         infoTextNormal1={''}
         step={''}
       />
-      <DashedLargeContainer
-        titleText={'Gift Card'}
-        titleTextColor={Colors.black}
-        subText={props.senderName}
-        extraText={'This is to get you started!\nWelcome to Bitcoin'}
-        amt={numberWithCommas( amt )}
-        image={<GiftCard />}
-        renderQrOrLink={() => {
-          return (
-            <>
-              {type === 'QR' &&
+      <ViewShot ref={viewRef} options={{
+        format: 'jpg', quality: 1
+      }}>
+
+        <DashedLargeContainer
+          titleText={'Gift Card'}
+          titleTextColor={Colors.black}
+          subText={props.senderName}
+          extraText={'This is to get you started!\nWelcome to Bitcoin'}
+          amt={numberWithCommas( amt )}
+          onPress={onPress}
+          image={<GiftCard />}
+          renderQrOrLink={() => {
+            return (
+              <>
+                {type === 'QR' &&
             <View
               style={[ styles.mainContainer,
                 {
@@ -132,14 +176,14 @@ export default function SendViaLinkAndQR( props ) {
                   <ActivityIndicator size="large" color={Colors.babyGray} />
                 ) : (
                   <QRCode
-                    title={'Gift Address'}
+                    title={'Gift card'}
                     value={qrCode}
-                    size={hp( '22%' )} />
+                    size={hp( '24%' )} />
                 )}
               </View>
             </View>
-              }
-              {/* {!props.isGift &&
+                }
+                {/* {!props.isGift &&
             <HeaderTitle
               firstLineTitle={strings.orShare}
               secondLineTitle={strings.WithContact}
@@ -149,7 +193,7 @@ export default function SendViaLinkAndQR( props ) {
               step={''}
             />
             } */}
-              {type === 'Link' &&
+                {type === 'Link' &&
             // <CopyThisText
             //   openLink={link ? shareOption : () => { }}
             //   backgroundColor={Colors.white}
@@ -179,11 +223,13 @@ export default function SendViaLinkAndQR( props ) {
                 {link ? link : strings.Creating}
               </Text>
             </View>
-              }
-            </>
-          )
-        }}
-      />
+                }
+              </>
+            )
+          }}
+        />
+      </ViewShot>
+
 
       {/* <RequestKeyFromContact
         isModal={false}
