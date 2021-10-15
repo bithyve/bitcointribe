@@ -300,7 +300,7 @@ export default function AddContactAddressBook( props ) {
         props.navigation.navigate( 'EnterGiftDetails', {
           fromScreen: 'Gift',
           giftId: props.navigation.state.params?.giftId,
-          contact: selectedContacts[ 0 ],
+          contact: selectedContacts,
         } )
 
       } else {
@@ -341,7 +341,7 @@ export default function AddContactAddressBook( props ) {
       <SafeAreaView />
       {/* <View style={styles.modalHeaderTitleView}> */}
       <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.white
+        backgroundColor: Colors.backgroundColor
       } ]}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
@@ -549,11 +549,12 @@ export default function AddContactAddressBook( props ) {
             style={{
               position: 'absolute',
               bottom: 0,
-              left: hp( 5 ),
-              width: wp( '50%' ),
+              left: hp( 1 ),
+              // width: wp( '50%' ),
               // alignSelf: 'center',
               flexDirection: 'row',
-              // alignItems: 'flex-start',
+              alignItems: 'center',
+              // backgroundColor: 'red'
             }}
           >
             <AppBottomSheetTouchableWrapper
@@ -585,6 +586,14 @@ export default function AddContactAddressBook( props ) {
                   {common.skip}
                 </Text>
               </AppBottomSheetTouchableWrapper>
+            }
+            {props.navigation.state.params?.fromScreen === 'Gift' &&
+<View style={styles.statusIndicatorView}>
+
+  <View style={styles.statusIndicatorActiveView} />
+  <View style={styles.statusIndicatorInactiveView} />
+  <View style={styles.statusIndicatorInactiveView} />
+</View>
             }
           </View>
           {/* )} */}
@@ -634,6 +643,26 @@ export default function AddContactAddressBook( props ) {
 }
 
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '6%' ),
+    marginBottom: hp( 3 )
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 5,
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
@@ -641,7 +670,7 @@ const styles = StyleSheet.create( {
   },
   modalContentContainer: {
     height: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

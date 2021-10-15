@@ -42,6 +42,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import Secure2FA from './Secure2FAModal'
 import * as ExpoContacts from 'expo-contacts'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { AccountsState } from '../../store/reducers/accounts'
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
@@ -62,8 +63,9 @@ export default function AddContactSendRequest( props ) {
   )
   const [ timerModal, setTimerModal ] = useState( false )
   const [ renderTimer, setRenderTimer ] = useState( false )
-
+  const accountsState: AccountsState = useSelector( state => state.accounts )
   const giftId = props.navigation.getParam( 'giftId' )
+  const giftToSend = accountsState.gifts[ giftId ]
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
@@ -309,6 +311,9 @@ export default function AddContactSendRequest( props ) {
     }
   }, [ Contact, trustedLink ] )
 
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
 
 
   const renderSendViaQRContents = useCallback( () => {
@@ -377,7 +382,9 @@ export default function AddContactSendRequest( props ) {
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <ScrollView >
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor,
+          flexDirection: 'row',
+          justifyContent: 'space-between'
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -393,12 +400,39 @@ export default function AddContactSendRequest( props ) {
               />
             </View>
           </TouchableOpacity>
+          {giftId &&
+          <TouchableOpacity
+            onPress={() => props.navigation.pop( giftId ? 4 : 3 )}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              backgroundColor: Colors.lightBlue,
+              paddingHorizontal: wp( 4 ),
+              paddingVertical: wp( 2 ),
+              marginRight: wp( 5 ),
+              borderRadius: wp( 2 )
+            }}
+          >
+            <Text
+              style={{
+                ...{
+                  color: Colors.backgroundColor1,
+                  fontSize: RFValue( 12 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                }
+              }}
+            >
+            Done
+            </Text>
+          </TouchableOpacity>
+          }
         </View>
         <RequestKeyFromContact
           isModal={false}
-          // headerText={'Request Recovery Secret from trusted contact'}
-          subHeaderText={Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
+          headerText={giftId ? 'Send gift' : null}
+          subHeaderText={ giftId ? 'You can send it to anyone using the QR or the link' : Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
           contactText={strings.adding}
+          isGift={ giftId}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
@@ -409,6 +443,7 @@ export default function AddContactSendRequest( props ) {
           onPressDone={() => {
             // openTimer()
           }}
+          amt={numberWithCommas( giftToSend?.amount )}
           onPressShare={() => {
             setTimeout( () => {
               setRenderTimer( true )
@@ -420,6 +455,7 @@ export default function AddContactSendRequest( props ) {
             }
           }}
         />
+        {!giftId &&
         <TouchableOpacity
           onPress={() => setSecure2FAModal( true )}
           style={{
@@ -441,6 +477,7 @@ export default function AddContactSendRequest( props ) {
             backgroundColor={Colors.white}
           />
         </TouchableOpacity>
+        }
         {/* <View style={{
           marginTop: 'auto'
         }}>

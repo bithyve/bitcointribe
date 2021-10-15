@@ -28,6 +28,7 @@ import { updateWalletImageHealth } from '../../store/actions/BHR'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import dbManager from '../../storage/realm/dbManager'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -35,7 +36,9 @@ export default function SendGift( props ) {
 
   const giftId = props.navigation.getParam( 'giftId' )
   const note = props.navigation.getParam( 'note' )
-  const isContact = props.navigation.getParam( 'isContact' )
+  const contact = props.navigation.getParam( 'contact' )
+  const senderName = props.navigation.getParam( 'senderName' )
+
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
@@ -114,7 +117,7 @@ export default function SendGift( props ) {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => props.navigation.pop( isContact ? 4 : 3 )}
           style={{
             justifyContent: 'center',
@@ -137,7 +140,7 @@ export default function SendGift( props ) {
           >
             Done
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <RequestKeyFromContact
         isModal={false}
@@ -145,6 +148,7 @@ export default function SendGift( props ) {
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
+        senderName={senderName}
         contact={{
         }}
         QR={giftQR}
