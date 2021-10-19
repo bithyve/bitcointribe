@@ -32,6 +32,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ManageGiftsList from './ManageGiftsList'
 import IconAdd from '../../assets/images/svgs/icon_add.svg'
+import IconAddLight from '../../assets/images/svgs/icon_add_light.svg'
 import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -53,7 +54,7 @@ const ManageGifts = ( { navigation } ) => {
 
   const dispatch = useDispatch()
 
-  useEffect( ()=> {
+  useEffect( () => {
     if ( timer ) {
       setTimeout( () => {
         setTimer( false )
@@ -61,12 +62,12 @@ const ManageGifts = ( { navigation } ) => {
     }
   }, [] )
 
-  useEffect( ()=> {
+  useEffect( () => {
     const availableGifts = []
     const receivedArr = []
     const sentAndClaimed = []
     const expiredArr = []
-    const sortedGifts = Object.values( gifts?? {
+    const sortedGifts = Object.values( gifts ?? {
     } ).sort( function ( left: Gift, right: Gift ) {
       return moment.utc( right.timestamps.created ).unix() - moment.utc( left.timestamps.created ).unix()
     } )
@@ -98,7 +99,7 @@ const ManageGifts = ( { navigation } ) => {
     getIsVisited()
   }, [] )
 
-  const getIsVisited = async() => {
+  const getIsVisited = async () => {
     const isVisited = await AsyncStorage.getItem( 'GiftVisited' )
     if ( !isVisited ) {
       setKnowMore( true )
@@ -111,7 +112,7 @@ const ManageGifts = ( { navigation } ) => {
 
   const processGift = ( selectedGift: Gift, title, walletName ) => {
 
-    switch( selectedGift.status ){
+    switch ( selectedGift.status ) {
         case GiftStatus.CREATED:
           navigation.navigate( 'GiftDetails', {
             title, walletName, gift: selectedGift, avatar: false
@@ -246,23 +247,23 @@ const ManageGifts = ( { navigation } ) => {
           }}
           horizontal>
           {
-            Object.keys( giftsArr?? {
+            Object.keys( giftsArr ?? {
             } ).map( ( item ) => {
-              return(
+              return (
                 <TouchableOpacity
                   key={item}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor
                   } ]}
-                  onPress={() =>buttonPress( item )}
+                  onPress={() => buttonPress( item )}
                 >
                   <Text style={[ styles.buttonText, {
                     color: active === item ? Colors.white : Colors.gray2
                   } ]}>
-                    {item === GiftStatus.CREATED && 'Available' }
-                    {item === GiftStatus.EXPIRED && 'Expired' }
-                    {item === GiftStatus.SENT && 'Sent' }
-                    {item === GiftType.RECEIVED && 'Received' }
+                    {item === GiftStatus.CREATED && 'Available'}
+                    {item === GiftStatus.EXPIRED && 'Expired'}
+                    {item === GiftStatus.SENT && 'Sent'}
+                    {item === GiftType.RECEIVED && 'Received'}
                   </Text>
                 </TouchableOpacity>
               )
@@ -272,7 +273,20 @@ const ManageGifts = ( { navigation } ) => {
         {/* <View style={{
           height: 'auto'
         }}> */}
-
+        {Object.values( gifts ?? {
+        } ).length > 0 && active === GiftStatus.CREATED &&
+        <TouchableOpacity
+          onPress={() => navigation.navigate( 'CreateGift' )}
+          style={{
+            flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
+            marginVertical: hp( 3 )
+          }}>
+          <IconAddLight />
+          <Text style={styles.createGiftText}>
+          Create New Gift
+          </Text>
+        </TouchableOpacity>
+        }
 
         <FlatList
           // extraData={selectedDestinationID}
@@ -288,7 +302,7 @@ const ManageGifts = ( { navigation } ) => {
           renderItem={( { item, index } ) => {
             const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
             const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
-            return(
+            return (
               <>
                 {active === GiftStatus.CREATED ?
                   <ManageGiftsList
@@ -297,7 +311,7 @@ const ManageGifts = ( { navigation } ) => {
                     amt={numberWithCommas( item.amount )}
                     date={item.timestamps?.created}
                     image={<GiftCard />}
-                    onPress={ () => processGift( item, title, walletName )}
+                    onPress={() => processGift( item, title, walletName )}
                   />
                   :
                   <View
@@ -391,7 +405,7 @@ const ManageGifts = ( { navigation } ) => {
           }}
         />
         {/* </View> */}
-        { Object.values( gifts?? {
+        {Object.values( gifts ?? {
         } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
           <BottomInfoBox
             // backgroundColor={Colors.white}
@@ -399,110 +413,92 @@ const ManageGifts = ( { navigation } ) => {
             infoText={getText()}
           />
         }
-        {Object.values( gifts?? {
+
+        {Object.values( gifts ?? {
         } ).length === 0 &&
-        <View style={{
-          // marginTop: hp( '45%' )
-        }}>
-          <BottomInfoBox
-            // backgroundColor={Colors.white}
-            // title={'Note'}
-            infoText={getText()}
-          />
-          <View style={styles.centeredView}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate( 'CreateGift' )}
-              style={{
-                flexDirection: 'row', alignItems: 'center'
-              }}>
-              <IconAdd />
-              <Text style={styles.createGiftText}>
-              Create New Gift
-              </Text>
-            </TouchableOpacity>
-            {/* <ScrollView style={{
+          <View style={{
+            // marginTop: hp( '45%' )
+          }}>
+            <BottomInfoBox
+              // backgroundColor={Colors.white}
+              // title={'Note'}
+              infoText={getText()}
+            />
+            <View style={styles.centeredView}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate( 'CreateGift' )}
+                style={{
+                  flexDirection: 'row', alignItems: 'center'
+                }}>
+                <IconAdd />
+                <Text style={styles.createGiftText}>
+                  Create New Gift
+                </Text>
+              </TouchableOpacity>
+              {/* <ScrollView style={{
               flex: 1
             }}> */}
-            {timer && [ 1, 2, 3 ].map( ( value, index ) => {
-              return (
-                <View key={index} style={styles.scrollViewContainer}>
+              {timer && [ 1, 2, 3 ].map( ( value, index ) => {
+                return (
+                  <View key={index} style={styles.scrollViewContainer}>
 
-                  <View>
-                    <View style={styles.roundedView} />
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp( '4%' ),
-                        width: wp( '22%' ),
-                        borderRadius: 10,
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp( '4%' ),
-                        width: wp( '34%' ),
-                        borderRadius: 10,
-                        marginTop: hp( 1 ),
-                      }}
-                    />
-
-                  </View>
-                  <View>
-
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp( '4%' ),
-                        width: wp( '35%' ),
-                        borderRadius: 10,
-                        marginTop: hp( 0.5 ),
-                        alignSelf: 'flex-end'
-                      }}
-                    />
-                    <View style={{
-                      flexDirection: 'row', marginTop: hp( 5 ), flex: 1, alignItems: 'flex-end'
-                    }}>
+                    <View>
+                      <View style={styles.roundedView} />
                       <View
                         style={{
                           backgroundColor: Colors.backgroundColor,
-                          height: wp( '8%' ),
-                          width: wp( '32%' ),
-                          borderRadius: 20,
-
+                          height: wp( '4%' ),
+                          width: wp( '22%' ),
+                          borderRadius: 10,
                         }}
                       />
-                      <View style={styles.roundedViewSmall} />
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp( '4%' ),
+                          width: wp( '34%' ),
+                          borderRadius: 10,
+                          marginTop: hp( 1 ),
+                        }}
+                      />
+
+                    </View>
+                    <View>
+
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp( '4%' ),
+                          width: wp( '35%' ),
+                          borderRadius: 10,
+                          marginTop: hp( 0.5 ),
+                          alignSelf: 'flex-end'
+                        }}
+                      />
+                      <View style={{
+                        flexDirection: 'row', marginTop: hp( 5 ), flex: 1, alignItems: 'flex-end'
+                      }}>
+                        <View
+                          style={{
+                            backgroundColor: Colors.backgroundColor,
+                            height: wp( '8%' ),
+                            width: wp( '32%' ),
+                            borderRadius: 20,
+
+                          }}
+                        />
+                        <View style={styles.roundedViewSmall} />
+                      </View>
                     </View>
                   </View>
-                </View>
-              )
-            } )}
-            {/* </ScrollView> */}
-          </View>
+                )
+              } )}
+              {/* </ScrollView> */}
+            </View>
 
-        </View>
+          </View>
         }
       </View>
-      {Object.values( gifts?? {
-      } ).length !== 0 &&
-          <TouchableOpacity
-            onPress={() => navigation.navigate( 'CreateGift' )}
-            style={{
-              ...styles.createView,
-            }}
-          >
-            <Text style={[ styles.contactText, {
-              fontSize: RFValue( 24 ),
-            } ]}>+</Text>
-            {/* <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                  /> */}
-            <Text style={styles.contactText}>{strings[ 'creatnew' ]}</Text>
-
-          </TouchableOpacity>
-      }
     </View>
   )
 }
@@ -511,14 +507,14 @@ const styles = StyleSheet.create( {
   roundedView: {
     width: wp( 12 ),
     height: wp( 12 ),
-    borderRadius: wp( 12/2 ),
+    borderRadius: wp( 12 / 2 ),
     backgroundColor: Colors.backgroundColor,
     marginBottom: hp( 2 )
   },
   roundedViewSmall: {
     width: wp( 9 ),
     height: wp( 9 ),
-    borderRadius: wp( 9/2 ),
+    borderRadius: wp( 9 / 2 ),
     backgroundColor: Colors.backgroundColor,
     marginHorizontal: wp( 1 )
   },
@@ -537,11 +533,12 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  createGiftText:{
+  createGiftText: {
     color: Colors.darkBlue,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.3,
     fontFamily: Fonts.FiraSansRegular,
+    marginHorizontal: wp( 2 )
   },
   centeredView: {
     // alignSelf: 'center',
@@ -551,7 +548,7 @@ const styles = StyleSheet.create( {
     color: Colors.gray2,
     fontFamily: Fonts.FiraSansMedium
   },
-  buttonNavigator:{
+  buttonNavigator: {
     width: wp( '20%' ),
     height: 64,
     marginRight: wp( 3 ),
@@ -577,13 +574,13 @@ const styles = StyleSheet.create( {
   avatarContainer: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 9 )/2,
+    borderRadius: wp( 9 ) / 2,
   },
   listItem: {
     marginVertical: hp( 0.5 ),
     // borderRadius: wp( 2 ),
     // padding: wp( 3 ),
-    alignItems:'center',
+    alignItems: 'center',
     // backgroundColor: Colors.backgroundColor1,
     flexDirection: 'row'
   },
@@ -601,7 +598,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: Colors.lightBlue,
-    borderRadius: wp ( 2 ),
+    borderRadius: wp( 2 ),
     height: hp( 4 ),
     paddingHorizontal: wp( 2 ),
     marginRight: wp( 4 )
@@ -614,7 +611,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: Colors.lightBlue,
-    borderRadius: wp ( 2 ),
+    borderRadius: wp( 2 ),
     height: hp( 5 ),
     paddingHorizontal: wp( 2 ),
     marginRight: wp( 4 )
