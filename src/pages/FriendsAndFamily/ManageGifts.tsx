@@ -274,12 +274,20 @@ const ManageGifts = ( { navigation } ) => {
           height: 'auto'
         }}> */}
         {Object.values( gifts ?? {
+        } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
+          <BottomInfoBox
+            // backgroundColor={Colors.white}
+            // title={'Note'}
+            infoText={getText()}
+          />
+        }
+        {Object.values( gifts ?? {
         } ).length > 0 && active === GiftStatus.CREATED &&
         <TouchableOpacity
           onPress={() => navigation.navigate( 'CreateGift' )}
           style={{
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
-            marginVertical: hp( 3 )
+            marginVertical: hp( 2 )
           }}>
           <IconAddLight />
           <Text style={styles.createGiftText}>
@@ -405,14 +413,7 @@ const ManageGifts = ( { navigation } ) => {
           }}
         />
         {/* </View> */}
-        {Object.values( gifts ?? {
-        } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
-          <BottomInfoBox
-            // backgroundColor={Colors.white}
-            // title={'Note'}
-            infoText={getText()}
-          />
-        }
+
 
         {Object.values( gifts ?? {
         } ).length === 0 &&
