@@ -18,7 +18,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
@@ -79,9 +79,6 @@ export default function SendGift( props ) {
       version: DeviceInfo.getVersion(),
     } ) )
     setEncryptionOTP( deepLinkEncryptionOTP )
-
-    // TODO: remove alert and show OTP on the UI
-    Alert.alert( 'OTP: ', deepLinkEncryptionOTP )
   }
 
   useEffect( () => {
@@ -148,6 +145,8 @@ export default function SendGift( props ) {
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
+        encryptLinkWith={DeepLinkEncryptionType.OTP}
+        encryptionKey={encryptionOTP}
         themeId={themeId}
         senderName={senderName}
         contact={{

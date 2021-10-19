@@ -29,6 +29,7 @@ import ButtonGroupWithIcon from '../pages/FriendsAndFamily/ButtonGroupWithIcon'
 import ThemeList from '../pages/FriendsAndFamily/Theme'
 import { withNavigation } from 'react-navigation'
 import { nameToInitials } from '../common/CommonFunctions'
+import { DeepLinkEncryptionType } from '../bitcoin/utilities/Interface'
 
 function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
@@ -100,7 +101,7 @@ function RequestKeyFromContact( props ) {
       type, qrCode: props.QR, link: shareLink, ...props
     } )
   }
-  const setPhoneNumber = () =>{
+  const setPhoneNumber = () => {
     const phoneNumber = Contact.phoneNumbers[ 0 ].number
     let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
     number = number.slice( number.length - 10 ) // last 10 digits only
@@ -110,7 +111,7 @@ function RequestKeyFromContact( props ) {
   return (
     <View style={styles.modalContainer}>
       <HeaderTitle
-        firstLineTitle={strings.scanQR}
+        firstLineTitle={props.headerText ? props.headerText : strings.scanQR}
         secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
         infoTextNormal={''}
         infoTextBold={''}
@@ -118,116 +119,169 @@ function RequestKeyFromContact( props ) {
         step={''}
       />
       {props.isGift &&
-      <>
-        <View
-          style={{
-            width: '90%',
-            backgroundColor: Colors.gray7,
-            shadowOpacity: 0.06,
-            shadowOffset: {
-              width: 10, height: 10
-            },
-            shadowRadius: 10,
-            elevation: 2,
-            alignSelf: 'center',
-            borderRadius: wp( 2 ),
-            marginTop: hp( 1 ),
-            marginBottom: hp( 1 ),
-            paddingVertical: hp( 2 ),
-            paddingHorizontal: wp( 3 ),
-            flexDirection: 'row',
-            alignItems: 'center'
-          }}>
-          {contact ? contact.imageAvailable ?
-            <Image
-              source={contact.image}
-              style={{
-                ...styles.contactProfileImage
-              }}
-            />
-            : (
-              <View
+        <>
+          <TouchableOpacity
+            onPress={() => props.onSelectionChange && props.onSelectionChange( true )}
+            style={{
+              width: '90%',
+              backgroundColor: Colors.gray7,
+              shadowOpacity: 0.06,
+              shadowOffset: {
+                width: 10, height: 10
+              },
+              shadowRadius: 10,
+              elevation: 2,
+              alignSelf: 'center',
+              borderRadius: wp( 2 ),
+              marginTop: hp( 1 ),
+              marginBottom: hp( 1 ),
+              paddingVertical: hp( 2 ),
+              paddingHorizontal: wp( 3 ),
+              flexDirection: 'row',
+              alignItems: 'center'
+            }}>
+            {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
+              <Image
+                source={contact.image}
                 style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 2, height: 2
-                  },
+                  ...styles.contactProfileImage
                 }}
-              >
-                <Text
+              />
+              : (
+                <View
                   style={{
-                    textAlign: 'center',
-                    fontSize: RFValue( 20 ),
-                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.backgroundColor,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 70 / 2,
+                    shadowColor: Colors.shadowBlue,
+                    shadowOpacity: 1,
+                    shadowOffset: {
+                      width: 2, height: 2
+                    },
                   }}
                 >
-                  {nameToInitials(
-                    Contact && Contact.firstName && Contact.lastName
-                      ? Contact.firstName + ' ' + Contact.lastName
-                      : Contact && Contact.firstName && !Contact.lastName
-                        ? Contact.firstName
-                        : Contact && !Contact.firstName && Contact.lastName
-                          ? Contact.lastName
-                          : '',
-                  )}
-                </Text>
-              </View>
-            )
-            : <GiftCard />
-          }
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: RFValue( 20 ),
+                      lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                    }}
+                  >
+                    {nameToInitials(
+                      Contact && Contact.firstName && Contact.lastName
+                        ? Contact.firstName + ' ' + Contact.lastName
+                        : Contact && Contact.firstName && !Contact.lastName
+                          ? Contact.firstName
+                          : Contact && !Contact.firstName && Contact.lastName
+                            ? Contact.lastName
+                            : '',
+                    )}
+                  </Text>
+                </View>
+              )
+              : <GiftCard /> :  <GiftCard />
+            }
 
-          <View style={{
-            marginHorizontal: wp( 3 )
-          }}>
-            {contact && contact.name ?
-              <Text style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansMediumItalic,
-              }}>
-                {contact.name}
-              </Text>
-              :
+            <View style={{
+              marginHorizontal: wp( 3 )
+            }}>
+              {Object.keys( contact ).length !== 0 &&
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansRegular,
+                marginTop: hp( 0.3 ),
+                lineHeight: 12
               }}>
-                from <Text style={{
+              Friends & Family
+              </Text>
+              }
+              {Contact &&
+                  Contact.phoneNumbers &&
+                  Contact.phoneNumbers.length && props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? (
+                  <Text style={{
+                    color: Colors.blue,
+                    fontSize: RFValue( 14 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: hp( 0.01 ),
+                    letterSpacing: 5,
+                    lineHeight: 30,
+                    width: wp( '54%' )
+                  }}>
+
+                    {setPhoneNumber()}
+                  </Text>
+                ) : Contact && Contact.emails && Contact.emails.length && props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? (
+                  <Text style={{
+                    color: Colors.blue,
+                    fontSize: RFValue( 14 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: hp( 0.01 ),
+                    lineHeight: 30, width: wp( '54%' )
+                  }}>
+                    {Contact && Contact.emails[ 0 ].email}
+                  </Text>
+
+                ): Object.keys( contact ).length !== 0 && props.encryptLinkWith === DeepLinkEncryptionType.OTP ?
+                  <Text style={{
+                    color: Colors.blue,
+                    fontSize: RFValue( 14 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: hp( 0.01 ),
+                    letterSpacing: 5,
+                    lineHeight: 30,
+                    width: wp( '54%' )
+                  }}>
+                    {props.encryptionKey}
+                  </Text>
+                  :
+                  null}
+
+              {contact && contact.name ?
+                <Text style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue( 11 ),
                   fontFamily: Fonts.FiraSansMediumItalic,
                 }}>
-                Checking Account
+                  {contact.name}
                 </Text>
-              </Text>
-            }
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-              marginTop: hp( 0.5 )
-            }}>
-              {Contact &&
-                Contact.phoneNumbers &&
-                Contact.phoneNumbers.length ? (
-                  setPhoneNumber()
-                ) : Contact && Contact.emails && Contact.emails.length ? ( Contact && Contact.emails[ 0 ].email
-                ) : moment(  ).format( 'lll' )}
-            </Text>
-          </View>
+                :
+                <>
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    lineHeight: 27
+                  }}>
+                  from <Text style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue( 11 ),
+                      fontFamily: Fonts.FiraSansMediumItalic,
+                    }}>
+                    Checking Account
+                    </Text>
+                  </Text>
+                  <Text style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: hp( 0.3 ),
+                    lineHeight: 12
+                  }}>
+                    {moment().format( 'lll' )}
+                  </Text>
+                </>
+              }
 
-          <View style={{
-            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 'auto'
-          }}>
-            {/* <Text style={{
+            </View>
+
+            <View style={{
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: 'auto'
+            }}>
+              {/* <Text style={{
               color: Colors.black,
               fontSize: RFValue( 24 ),
               fontFamily: Fonts.FiraSansRegular
@@ -240,63 +294,68 @@ function RequestKeyFromContact( props ) {
               }}> sats
               </Text>
             </Text> */}
-            <More/>
-          </View>
+              <More />
+            </View>
 
-        </View>
-      </>
+          </TouchableOpacity>
+        </>
       }
       {props.isGift &&
-      <BottomInfoBox
-        infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
-      />
+        // <BottomInfoBox
+        //   infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
+        // />
+        <BottomInfoBox
+          infoText={
+            `Your friend will be prompted to enter ${props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'their phone number' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'their email' : `OTP ${props.encryptionKey}`}`
+          }
+        />
       }
       {!props.isGift &&
-      <View
-        style={[ styles.mainContainer,
-          {
-            marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-            marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-          } ]}
-      >
-        <View style={[ styles.qrContainer, {
-          marginVertical: hp( '4%' )
-        } ]}>
-          {!props.QR ? (
-            <ActivityIndicator size="large" color={Colors.babyGray} />
-          ) : (
-            <QRCode
-              title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
-              value={props.QR}
-              size={hp( '27%' )} />
-          )}
+        <View
+          style={[ styles.mainContainer,
+            {
+              marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+              marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+            } ]}
+        >
+          <View style={[ styles.qrContainer, {
+            marginVertical: hp( '4%' )
+          } ]}>
+            {!props.QR ? (
+              <ActivityIndicator size="large" color={Colors.babyGray} />
+            ) : (
+              <QRCode
+                title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
+                value={props.QR}
+                size={hp( '27%' )} />
+            )}
+          </View>
+          {props.OR ? <CopyThisText
+            backgroundColor={Colors.backgroundColor}
+            text={props.OR}
+            width={'20%'}
+            height={'15%'}
+          /> : null}
         </View>
-        {props.OR ?<CopyThisText
-          backgroundColor={Colors.backgroundColor}
-          text={props.OR}
+      }
+      {!props.isGift &&
+        <HeaderTitle
+          firstLineTitle={strings.orShare}
+          secondLineTitle={strings.WithContact}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+      }
+      {!props.isGift &&
+        <CopyThisText
+          openLink={shareLink ? shareOption : () => { }}
+          backgroundColor={Colors.white}
+          text={shareLink ? shareLink : strings.Creating}
           width={'20%'}
-          height={'15%'}
-        /> : null}
-      </View>
-      }
-      {!props.isGift &&
-      <HeaderTitle
-        firstLineTitle={strings.orShare}
-        secondLineTitle={strings.WithContact}
-        infoTextNormal={''}
-        infoTextBold={''}
-        infoTextNormal1={''}
-        step={''}
-      />
-      }
-      {!props.isGift &&
-      <CopyThisText
-        openLink={shareLink ? shareOption : () => { }}
-        backgroundColor={Colors.white}
-        text={shareLink ? shareLink : strings.Creating}
-        width={'20%'}
-        height={'18%'}
-      />
+          height={'18%'}
+        />
       }
       {/* <TouchableOpacity
         onPress={() => {}}
@@ -305,34 +364,34 @@ function RequestKeyFromContact( props ) {
         </View>
       </TouchableOpacity> */}
       {props.isGift &&
-      <DashedLargeContainer
-        titleText={'Gift Card'}
-        titleTextColor={Colors.black}
-        subText={props.senderName}
-        extraText={'This is to get you started!\nWelcome to Bitcoin'}
-        amt={numberWithCommas( props.amt )}
-        image={<GiftCard />}
-        theme={getTheme()}
-      />
+        <DashedLargeContainer
+          titleText={'Gift Card'}
+          titleTextColor={Colors.black}
+          subText={props.senderName}
+          extraText={'This is to get you started!\nWelcome to Bitcoin'}
+          amt={numberWithCommas( props.amt )}
+          image={<GiftCard />}
+          theme={getTheme()}
+        />
       }
       {props.isGift &&
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
-      }}>
-        <ButtonGroupWithIcon
-          buttonOneIcon={<Link />}
-          buttonOneText={'Share Link'}
-          onButtonPress={( type ) => shareViaLinkOrQR( type )}
-          buttonTwoIcon={<Link />}
-          buttonTwoText={'Share Image'}
-        />
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
+        }}>
+          <ButtonGroupWithIcon
+            buttonOneIcon={<Link />}
+            buttonOneText={'Share Link'}
+            onButtonPress={( type ) => shareViaLinkOrQR( type )}
+            buttonTwoIcon={<Link />}
+            buttonTwoText={'Share Image'}
+          />
 
-        <View style={styles.statusIndicatorView}>
-          <View style={styles.statusIndicatorInactiveView} />
-          <View style={styles.statusIndicatorInactiveView} />
-          <View style={styles.statusIndicatorActiveView} />
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorActiveView} />
+          </View>
         </View>
-      </View>
       }
     </View>
   )
@@ -479,7 +538,7 @@ const styles = StyleSheet.create( {
   containerTextQr: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 5, paddingHorizontal:5,
+    paddingVertical: 5, paddingHorizontal: 5,
   },
   mainContainer: {
     marginLeft: 20,

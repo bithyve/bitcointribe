@@ -240,7 +240,7 @@ const CreateGift = ( { navigation } ) => {
 
         </View>
         <View style={{
-          marginVertical: hp( 5 ),
+          marginBottom: hp( 4 ),
           marginHorizontal: wp( 7 ),
           flexDirection: 'row'
         }}>

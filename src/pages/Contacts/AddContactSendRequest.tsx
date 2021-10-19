@@ -43,6 +43,7 @@ import Secure2FA from './Secure2FAModal'
 import * as ExpoContacts from 'expo-contacts'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
+import ChangeSelection from '../FriendsAndFamily/ChangeSelection'
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
@@ -51,6 +52,7 @@ export default function AddContactSendRequest( props ) {
   const [ shareOtpWithTrustedContactModel, setShareOtpWithTrustedContactModel ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
   const [ secure2FAModal, setSecure2FAModal ] = useState( false )
+  const [ changeSelection, setChangeSelection ] = useState( false )
   const [ SendViaLinkBottomSheet ] = useState(
     React.createRef(),
   )
@@ -69,7 +71,7 @@ export default function AddContactSendRequest( props ) {
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
-  const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT )
+  const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.NUMBER: DeepLinkEncryptionType.DEFAULT )
   const [ isOTPType, setIsOTPType ] = useState( false )
   const themeId = props.navigation.getParam( 'themeId' )
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
@@ -145,14 +147,14 @@ export default function AddContactSendRequest( props ) {
     getContact()
   }, [] )
 
-  useEffect( () => {
-    if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
-      // TODO: remove alert and show OTP on the UI
-      // setIsOTPType( true )
-      // setShareOtpWithTrustedContactModel( true )
-      if( encryptionKey ) Alert.alert( 'OTP: ', encryptionKey )
-    }
-  }, [ encryptionKey ] )
+  // useEffect( () => {
+  //   if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
+  //     // TODO: remove alert and show OTP on the UI
+  //     // setIsOTPType( true )
+  //     // setShareOtpWithTrustedContactModel( true )
+  //     if( encryptionKey ) Alert.alert( 'OTP: ', encryptionKey )
+  //   }
+  // }, [ encryptionKey ] )
 
   useEffect( ()=> {
     if ( !Contact ) return
@@ -400,7 +402,7 @@ export default function AddContactSendRequest( props ) {
               />
             </View>
           </TouchableOpacity>
-          {giftId &&
+          {/* {giftId &&
           <TouchableOpacity
             onPress={() => props.navigation.pop( giftId ? 4 : 3 )}
             style={{
@@ -425,7 +427,7 @@ export default function AddContactSendRequest( props ) {
             Done
             </Text>
           </TouchableOpacity>
-          }
+          } */}
         </View>
         <RequestKeyFromContact
           isModal={false}
@@ -434,6 +436,9 @@ export default function AddContactSendRequest( props ) {
           contactText={strings.adding}
           isGift={ giftId}
           themeId={themeId}
+          encryptLinkWith={encryptLinkWith}
+          encryptionKey={encryptionKey}
+          onSelectionChange ={() => setChangeSelection( true )}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
@@ -594,6 +599,20 @@ export default function AddContactSendRequest( props ) {
               setEncryptLinkWith( type ); setSecure2FAModal( false )
             }}
             Contact={contactInfo}
+          />
+        </ModalContainer>
+        <ModalContainer visible={changeSelection} closeBottomSheet={() => {}} >
+          <ChangeSelection
+            closeBottomSheet={()=> setChangeSelection( false )}
+            onConfirm={( index ) => {
+              setChangeSelection( false )
+              if ( index === 0 ) {
+                props.navigation.navigate( 'AddContact' )
+              } else{
+                setSecure2FAModal( true )
+              }
+
+            }}
           />
         </ModalContainer>
         <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
