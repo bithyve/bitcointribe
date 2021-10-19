@@ -21,6 +21,8 @@ import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import DashedLargeContainer from './DahsedLargeContainer'
+import ThemeList from './Theme'
 
 export type Props = {
   navigation: any;
@@ -32,10 +34,11 @@ export type Props = {
   inputType: string;
   hint: string;
   note: string,
+  themeId: string
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId }: Props ) {
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
@@ -317,11 +320,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const renderGiftAcceptedtModal = () => {
     return (
       <>
-        <View style={{
+        {/* <View style={{
           marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
         }}>
           <Illustration/>
-        </View>
+        </View> */}
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
@@ -338,17 +341,21 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         </TouchableOpacity>
         <View style={{
           marginLeft: wp( 6 ),
+          marginBottom: hp( 3 )
         }}>
           <Text style={styles.modalTitleText}>Gift Sats Accepted</Text>
           <Text style={{
             ...styles.modalInfoText,
           }}>The sats have been added to the account</Text>
         </View>
-        <DashedContainer
-          titleText={'Gift Accepted'}
-          // subText={'Lorem ipsum dolor sit amet'}
+        <DashedLargeContainer
+          titleText={'Gift Card'}
+          titleTextColor={Colors.black}
+          subText={walletName}
+          extraText={'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( giftAmount )}
-          image={<GiftCard width={63} height={63} />}
+          image={<GiftCard width={100} />}
+          theme={getTheme()}
         />
         <BottomInfoBox
           containerStyle={{
@@ -357,11 +364,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }}
           infoText={''}
         />
-        <View style={{
+        {/* <View style={{
           marginLeft: wp( 6 ),
         }}>
           {renderButton( 'View Account' )}
-        </View>
+        </View> */}
       </>
     )
   }
@@ -407,6 +414,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       }
     }
   }
+  const getTheme = () => {
+    // props.themeId
+    const filteredArr = ThemeList.filter( ( item => item.id === themeId ) )
+    return filteredArr[ 0 ]
+  }
   const renderAcceptModal = () => {
     return (
       <>
@@ -433,7 +445,16 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               ...styles.modalInfoText,
             }}>You have received a gift. Accept it to add to your selected account balance</Text>
           </View>
-          <View
+          <DashedLargeContainer
+            titleText={'Gift Card'}
+            titleTextColor={Colors.black}
+            subText={walletName}
+            extraText={'This is to get you started!\nWelcome to Bitcoin'}
+            amt={numberWithCommas( giftAmount )}
+            image={<GiftCard height={60} width={60} />}
+            theme={getTheme()}
+          />
+          {/* <View
             style={{
               width: '95%',
               backgroundColor: Colors.gray7,
@@ -504,7 +525,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 </Text>
               </View>
             </View>
-          </View>
+          </View> */}
           <TouchableOpacity
             style={{
               width: '95%',
@@ -557,6 +578,15 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           </TouchableOpacity>
 
         </View>
+        <Text style={{
+          color: Colors.gray4,
+          fontSize: RFValue( 12 ),
+          letterSpacing: 0.6,
+          fontFamily: Fonts.FiraSansRegular,
+          marginHorizontal: wp( 5 )
+        }}>
+          {`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'OTP'}`}
+        </Text>
         {/* {props.inputNotRequired ? null: ( */}
         <View style={{
           marginLeft: wp( '8%' ), marginRight: wp( '8%' )

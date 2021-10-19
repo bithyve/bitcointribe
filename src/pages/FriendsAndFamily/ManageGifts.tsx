@@ -439,7 +439,7 @@ const ManageGifts = ( { navigation } ) => {
               {/* <ScrollView style={{
               flex: 1
             }}> */}
-              {timer && [ 1, 2, 3 ].map( ( value, index ) => {
+              {/* {timer && [ 1, 2, 3 ].map( ( value, index ) => {
                 return (
                   <View key={index} style={styles.scrollViewContainer}>
 
@@ -493,7 +493,7 @@ const ManageGifts = ( { navigation } ) => {
                     </View>
                   </View>
                 )
-              } )}
+              } )} */}
               {/* </ScrollView> */}
             </View>
 

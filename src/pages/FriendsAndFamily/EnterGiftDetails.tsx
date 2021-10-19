@@ -44,33 +44,20 @@ const GiftDetails = ( { navigation } ) => {
   const common = translations[ 'common' ]
   const [ note, setNote ] = useState( '' )
   const [ name, setName ] = useState( '' )
-  // const QuestionList = login.questionList
-  // const ThemeList= [
-  //   {
-  //     'id': '1', 'title': 'Bitcoin', 'subText': 'Lorem ipsum dolor', 'avatar': <GiftCard />, color: Colors.lightBlue
-  //   },
-  //   {
-  //     'id': '2', 'title': 'Halloween', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />, color: Colors.greenShade
-  //   },
-  //   {
-  //     'id': '3', 'title': 'Birthday', 'subText': 'Lorem ipsum dolor', 'avatar': <Halloween />, color: Colors.pink
-  //   },
-  //   {
-  //     'id': '4', 'title': 'Wedding', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />, color: Colors.lightBlue
-  //   },
-  //   // {
-  //   //   "id": "5","title": "Congratulations", "subText": "Lorem ipsum dolor", "avatar": <Birthday />
-  //   // }
-  // ]
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
-    id: '',
-    title: '',
-    subText: '',
-    avatar: ImagePropTypes,
-    color: ''
+    id: GiftThemeId.ONE,
+    title: 'Bitcoin',
+    subText: 'Lorem ipsum dolor',
+    avatar: <GiftCard />,
+    color: Colors.lightBlue
+    // id: '',
+    // title: '',
+    // subText: '',
+    // avatar: ImagePropTypes,
+    // color: ''
   } )
 
   useEffect( () => {
@@ -207,8 +194,12 @@ const GiftDetails = ( { navigation } ) => {
         </Text>
         <TouchableOpacity
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
-          style={styles.dashedContainer}>
-          <View style={styles.dashedStyle}>
+          style={[ styles.dashedContainer, {
+            borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
+          } ]}>
+          <View style={[ styles.dashedStyle, {
+            borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
+          } ]}>
             <View style={{
               flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
             }}>
@@ -269,7 +260,7 @@ const GiftDetails = ( { navigation } ) => {
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
               style={{
-                height: hp( '36%' )
+                height: hp( '38%' )
               }}
             >
               {dropdownBoxList.map( ( value, index ) => (

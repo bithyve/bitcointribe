@@ -27,6 +27,7 @@ import DashedLargeContainer from './DahsedLargeContainer'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ViewShot from 'react-native-view-shot'
+import ThemeList from './Theme'
 
 export default function SendViaLinkAndQR( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -36,6 +37,8 @@ export default function SendViaLinkAndQR( props ) {
   const link = props.navigation.getParam( 'link' )
   const amt = props.navigation.getParam( 'amt' )
   const senderName = props.navigation.getParam( 'senderName' )
+  const themeId = props.navigation.getParam( 'themeId' )
+
   const viewRef = useRef( null )
 
   useEffect( () => {
@@ -110,6 +113,11 @@ export default function SendViaLinkAndQR( props ) {
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
+  const getTheme = () => {
+    // props.themeId
+    const filteredArr = ThemeList.filter( ( item => item.id === themeId ) )
+    return filteredArr[ 0 ]
+  }
 
   return (
     <ScrollView style={{
@@ -156,11 +164,12 @@ export default function SendViaLinkAndQR( props ) {
         <DashedLargeContainer
           titleText={'Gift Card'}
           titleTextColor={Colors.black}
-          subText={props.senderName}
+          subText={senderName}
           extraText={'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( amt )}
           onPress={onPress}
-          image={<GiftCard />}
+          image={<GiftCard height={60} width={60} />}
+          theme={getTheme()}
           renderQrOrLink={() => {
             return (
               <>

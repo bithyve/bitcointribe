@@ -370,7 +370,7 @@ function RequestKeyFromContact( props ) {
           subText={props.senderName}
           extraText={'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( props.amt )}
-          image={<GiftCard />}
+          image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
         />
       }

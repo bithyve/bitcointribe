@@ -115,7 +115,6 @@ const CreateGift = ( { navigation } ) => {
       }
     }
 
-    dispatch( updateUserName( 'Sam' ) )
   }, [ accountsState.selectedGiftId, initGiftCreation ] )
 
   useEffect( () => {

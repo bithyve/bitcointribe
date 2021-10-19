@@ -38,7 +38,7 @@ const DashedLargeContainer = ( props ) => {
         marginBottom: hp( 1 ),
         paddingVertical: wp( 1 ),
         paddingHorizontal: wp( 1 ),
-        borderColor: Colors.lightBlue,
+        borderColor: props.theme ? props.theme?.color : Colors.lightBlue,
         borderWidth: 1,
       }}>
       <View style={{
@@ -46,7 +46,7 @@ const DashedLargeContainer = ( props ) => {
         borderRadius: wp( 2 ),
         paddingVertical: hp( 2 ),
         paddingHorizontal: wp( 4 ),
-        borderColor: Colors.lightBlue,
+        borderColor: props.theme ? props.theme?.color : Colors.lightBlue,
         borderWidth: 1,
         borderStyle: 'dashed',
         padding: wp( 3 )

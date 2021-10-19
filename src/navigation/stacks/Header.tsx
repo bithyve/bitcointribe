@@ -1489,6 +1489,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               inputType={giftRequest.encryptionType}
               hint={giftRequest.encryptionHint}
               note={giftRequest.note}
+              themeId={giftRequest.themeId}
             />
           )
 
