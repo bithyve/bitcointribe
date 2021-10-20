@@ -74,6 +74,7 @@ export default function AddContactSendRequest( props ) {
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.NUMBER: DeepLinkEncryptionType.DEFAULT )
   const [ isOTPType, setIsOTPType ] = useState( false )
   const themeId = props.navigation.getParam( 'themeId' )
+  const senderEditedName = props.navigation.getParam( 'senderName' )
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
@@ -439,6 +440,7 @@ export default function AddContactSendRequest( props ) {
           encryptLinkWith={encryptLinkWith}
           encryptionKey={encryptionKey}
           onSelectionChange ={() => setChangeSelection( true )}
+          senderName={senderEditedName}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}

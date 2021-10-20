@@ -15,7 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -33,10 +33,12 @@ import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import Halloween from '../../assets/images/svgs/halloween.svg'
 import Birthday from '../../assets/images/svgs/birthday.svg'
 import ThemeList from './Theme'
+import { updateUserName } from '../../store/actions/storage'
 
 import { translations } from '../../common/content/LocContext'
 
 const GiftDetails = ( { navigation } ) => {
+  const dispatch = useDispatch()
   const { giftId, contact } = navigation.state.params
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const strings = translations[ 'f&f' ]
@@ -76,6 +78,7 @@ const GiftDetails = ( { navigation } ) => {
         disabled={isDisabled}
         onPress={()=>{
           if ( contact ) {
+            dispatch( updateUserName( name ) )
             navigation.navigate( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
@@ -83,7 +86,8 @@ const GiftDetails = ( { navigation } ) => {
               subHeaderText:strings.send,
               contactText:strings.adding,
               showDone:true,
-              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+              senderName: name,
             } )
           } else {
             navigation.navigate( 'SendGift', {

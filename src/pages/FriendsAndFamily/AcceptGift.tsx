@@ -6,7 +6,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { AccountType, DeepLinkEncryptionType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import { AccountType, DeepLinkEncryptionType, Gift, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -35,10 +35,11 @@ export type Props = {
   hint: string;
   note: string,
   themeId: string
+  giftId: string
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId }: Props ) {
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
@@ -49,6 +50,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ acceptGift, setAcceptGiftModal ] = useState( true )
   const [ giftAccepted, setGiftAcceptedModel ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
+  // const acceptedGifts = useSelector( ( state ) => state.accounts.gifts )
+
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
 
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
@@ -70,6 +73,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ inputType ] )
+
+  // useEffect( () => {
+  //   setGiftAcceptedModel( true )
+  // }, [] )
 
   const getStyle = ( i ) => {
     if ( i == 0 ) {
@@ -143,6 +150,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             onBlur={() => {
               checkForValidation( EmailId )
               setOnBlurFocus( false )
+
             }}
             value={EmailId}
             autoCorrect={false}
@@ -292,6 +300,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const renderButton = ( text ) => {
     return (
       <TouchableOpacity
+        disabled={isDisabled}
         onPress={() => {
           if ( text === 'View Account' ) {
             setGiftAcceptedModel( false )
@@ -305,7 +314,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }
         }}
         style={{
-          ...styles.buttonView
+          ...styles.buttonView,
+          backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
         }}
       >
         <Text style={styles.buttonText}>{text}</Text>
@@ -354,7 +364,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           subText={walletName}
           extraText={'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( giftAmount )}
-          image={<GiftCard width={100} />}
+          image={<GiftCard />}
           theme={getTheme()}
         />
         <BottomInfoBox
