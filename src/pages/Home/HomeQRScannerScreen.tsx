@@ -112,7 +112,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         selectionLimit: 1,
       },
       response => {
-        if ( response.assets[ 0 ].uri ) {
+        if ( response.assets ) {
           const uri = response.assets[ 0 ].uri.toString().replace( 'file://', '' )
           LocalQRCode.decode( uri, ( error, result ) => {
             if ( !error ) {
