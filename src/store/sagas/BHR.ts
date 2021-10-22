@@ -884,7 +884,7 @@ function* getPDFDataWorker( { payload } ) {
       const qrData = [
         JSON.stringify( recoveryData ),
       ]
-      console.log( 'PDF recoveryData', JSON.stringify( recoveryData ) )
+      console.warn( 'PDF recoveryData', JSON.stringify( recoveryData ) )
       const pdfData = {
         qrData: qrData,
       }
@@ -957,7 +957,7 @@ function* sharePDFWorker( { payload } ) {
               message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
               url:
               Platform.OS == 'android'
-                ? 'file://' + pdfInfo.filePath
+                ? 'file:/' + pdfInfo.filePath
                 : pdfInfo.filePath,
               type: 'application/pdf',
               showAppsToView: true,
