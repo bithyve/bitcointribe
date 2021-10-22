@@ -946,7 +946,9 @@ export enum DeepLinkEncryptionType {
 
 export enum GiftThemeId {
   ONE = 'ONE',
-  TWO = 'TWO'
+  TWO = 'TWO',
+  THREE = 'THREE',
+  FOUR = 'FOUR'
 }
 
 export enum GiftType {
@@ -980,13 +982,14 @@ export interface Gift {
   sender: {
     walletId: string,
     accountId: string,
-    walletName: string
+    walletName: string,
+    contactId?: string // permanentAddress of the contact
   },
   receiver: {
     walletId?: string,
     accountId?: string,
     walletName?: string,
-    contactId?: string
+    contactId?: string // permanentAddress of the contact
   },
   note?: string,
   deepLinkConfig?: {

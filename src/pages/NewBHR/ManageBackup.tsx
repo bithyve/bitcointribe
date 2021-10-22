@@ -629,7 +629,7 @@ export default function ManageBackup( props ) {
             paddingLeft: wp ( '6%' ),
             paddingBottom: hp( 3 )
           }}>
-            <Text style={styles.pageTitle}>I am the Keeper of</Text>
+            <Text style={styles.pageTitle}>{strings.IamtheKeeper}</Text>
             <Text style={styles.pageInfoText}>
               {strings[ 'Contactswhose' ]}
             </Text>

@@ -320,9 +320,7 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
   };
   } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
   const { metaData: giftMetaData } = synchedGiftChannels[ gift.channelAddress ]
-  console.log( {
-    giftMetaData
-  } )
+
   if( giftMetaData.status === GiftStatus.RECLAIMED ){
     gift.status = giftMetaData.status
     gift.timestamps.reclaimed = Date.now()
@@ -851,6 +849,13 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
     const giftToSend = gifts[ giftId ]
     const senderName = wallet.userName? wallet.userName: wallet.walletName
+
+    const permanentChannelAddress = crypto
+      .createHash( 'sha256' )
+      .update( contactInfo.channelKey )
+      .digest( 'hex' )
+    giftToSend.sender.contactId = permanentChannelAddress
+    giftToSend.receiver.contactId = permanentChannelAddress
     const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, GiftThemeId.ONE, '' )
     yield put( updateGift( updatedGift ) )
     yield call( dbManager.createGift, updatedGift )

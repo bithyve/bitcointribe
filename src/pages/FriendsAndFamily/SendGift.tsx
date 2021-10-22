@@ -18,7 +18,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
@@ -28,6 +28,7 @@ import { updateWalletImageHealth } from '../../store/actions/BHR'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import dbManager from '../../storage/realm/dbManager'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -35,7 +36,9 @@ export default function SendGift( props ) {
 
   const giftId = props.navigation.getParam( 'giftId' )
   const note = props.navigation.getParam( 'note' )
-  const isContact = props.navigation.getParam( 'isContact' )
+  const contact = props.navigation.getParam( 'contact' )
+  const senderName = props.navigation.getParam( 'senderName' )
+  const themeId = props.navigation.getParam( 'themeId' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
@@ -54,6 +57,12 @@ export default function SendGift( props ) {
   const sendGift  = async () => {
     const senderName = wallet.userName? wallet.userName: wallet.walletName
     const generateShortLink = true
+
+    // nullify pre-existing properties(case: re-send)
+    giftToSend.receiver = {
+    }
+    giftToSend.sender.contactId = null
+
     const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
@@ -76,9 +85,6 @@ export default function SendGift( props ) {
       version: DeviceInfo.getVersion(),
     } ) )
     setEncryptionOTP( deepLinkEncryptionOTP )
-
-    // TODO: remove alert and show OTP on the UI
-    Alert.alert( 'OTP: ', deepLinkEncryptionOTP )
   }
 
   useEffect( () => {
@@ -114,7 +120,7 @@ export default function SendGift( props ) {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => props.navigation.pop( isContact ? 4 : 3 )}
           style={{
             justifyContent: 'center',
@@ -137,7 +143,7 @@ export default function SendGift( props ) {
           >
             Done
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <RequestKeyFromContact
         isModal={false}
@@ -145,6 +151,10 @@ export default function SendGift( props ) {
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
+        encryptLinkWith={DeepLinkEncryptionType.OTP}
+        encryptionKey={encryptionOTP}
+        themeId={themeId}
+        senderName={senderName}
         contact={{
         }}
         QR={giftQR}

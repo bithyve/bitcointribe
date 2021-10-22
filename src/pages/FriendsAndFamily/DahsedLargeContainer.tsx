@@ -14,12 +14,13 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { LocalizationContext } from '../../common/content/LocContext'
 
-const DashedContainer = ( props ) => {
+const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
 
   return(
     <TouchableOpacity
+      activeOpacity={0.7}
       onPress={() => props.onPress ? props.onPress() : () => {}}
       key={props.key}
       style={{
@@ -55,28 +56,48 @@ const DashedContainer = ( props ) => {
         }}>
           <View>
             <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
+              color: Colors.black,
+              fontSize: RFValue( 14 ),
               fontFamily: Fonts.FiraSansRegular,
-              fontWeight: '700',
-              letterSpacing: 0.8,
-
+              // fontWeight: '700',
+              letterSpacing: 0.01,
+              lineHeight: 18
             }}>
               {props.titleText}
             </Text>
             <Text style={{
               color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
+              fontSize: RFValue( 11 ),
+              letterSpacing: 0.55,
+              lineHeight: RFValue( 15 ),
               fontFamily: Fonts.FiraSansRegular,
-              width: wp( '45%' )
+              marginRight: wp( 9 )
             }}>
-              {props.subText}
+              {'You have recieved gift from '}
+              <Text style={{
+                color: Colors.blue,
+                fontSize: RFValue( 11 ),
+                fontFamily: Fonts.FiraSansItalic,
+              }}>
+                {props.subText}
+              </Text>
+              {'\nThe gift would be valid for 30 days and the sats would revert to '}
+              <Text style={{
+                color: Colors.blue,
+                fontSize: RFValue( 11 ),
+                fontFamily: Fonts.FiraSansItalic,
+              }}>
+                {props.subText}
+              </Text>
+              {' if unclaimed'}
             </Text>
           </View>
           {props.date &&
           <Text style={{
             color: Colors.lightTextColor,
             fontSize: RFValue( 10 ),
+            letterSpacing: 0.12,
+            lineHeight: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
 
           }}>
@@ -87,26 +108,51 @@ const DashedContainer = ( props ) => {
         <View style={{
           flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: hp( 1 )
         }}>
-          <Text style={{
-            color: Colors.black,
-            fontSize: RFValue( 24 ),
-            fontFamily: Fonts.FiraSansRegular
-          }}>
-            {props.amt}
+
+          <View>
             <Text style={{
               color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular
-            }}> sats
+              fontSize: RFValue( 12 ),
+              letterSpacing: 0.12,
+              lineHeight: 18,
+              fontFamily: Fonts.FiraSansRegular,
+              width: wp( '63%' )
+            }}>
+              {props.extraText}
             </Text>
-          </Text>
-          {props.image}
+            <Text style={{
+              color: Colors.blue,
+              fontSize: RFValue( 24 ),
+              fontFamily: Fonts.FiraSansRegular,
+              marginVertical: hp( 1 )
+            }}>
+              {props.amt}
+              <Text style={{
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular
+              }}> sats
+              </Text>
+            </Text>
+          </View>
+          <View style={{
+            alignSelf: 'flex-end'
+          }}>
+            {props.theme ? props.theme?.avatar : props.image}
+          </View>
+
         </View>
+        {props.renderQrOrLink &&
+        <View style={{
+          height: 2, borderWidth: 1, borderColor: Colors.lightBlue, borderStyle: 'dotted', marginTop: hp( 2 )
+        }}/>
+        }
+        {props.renderQrOrLink && props.renderQrOrLink()}
 
       </View>
     </TouchableOpacity>
   )
 }
 
-export default DashedContainer
+export default DashedLargeContainer
 

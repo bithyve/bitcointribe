@@ -32,6 +32,7 @@ import { translations } from '../../../common/content/LocContext'
 import SendGift from '../../../pages/FriendsAndFamily/SendGift'
 import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
 import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
+import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -55,6 +56,7 @@ const FriendsAndFamily = createStackNavigator(
     ManageGifts,
     EnterGiftDetails,
     GiftDetails,
+    SendViaLinkAndQR,
     CreateGift,
     SendGift,
     Login,
