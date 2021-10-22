@@ -25,17 +25,21 @@ const getPdfPath = async ( pdfData: any ) => {
       const PdfPassword = await NativeModules.PdfPassword
       return await PdfPassword.createPdfKeeper( JSON.stringify( pdfData ) )
     } else {
+      // alert( 'ANDROID'+JSON.stringify( pdfData ) )
       const PdfPassword = await NativeModules.PdfPassword
       await PdfPassword.createPdfKeeper(
         JSON.stringify( pdfData ),
         async ( err: any ) => {
+          // alert( 'ERROR'+err )
           return await err
         },
         async ( path: any ) => {
-          return await path
+          const data = await path
+          // alert( path+ ' => '+ data )
+          return path
         },
       )
-      return '/storage/emulated/0/' + pdfData.fileName
+      // return '/storage/emulated/0/' + pdfData.fileName
     }
   }
 }

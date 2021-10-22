@@ -1063,6 +1063,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               channelKey: trustedContactRequest.channelKey,
               contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
               isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
+              isKeeper: trustedContactRequest.isKeeper
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
