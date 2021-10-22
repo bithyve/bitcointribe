@@ -894,12 +894,19 @@ function* getPDFDataWorker( { payload } ) {
         `Hexa_Recovery_Key_${wallet.walletName}.pdf`,
         `Hexa Recovery Key for ${wallet.walletName}'s Wallet`
       )
-      yield put( setPDFInfo( {
-        filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
-      } ) )
+      if( pdfPath ){
+        yield put( pdfSuccessfullyCreated( true ) )
+
+        yield put( setPDFInfo( {
+          filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
+        } ) )
+      }
+      // yield put( setPDFInfo( {
+      //   filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
+      // } ) )
     }
 
-    yield put( pdfSuccessfullyCreated( true ) )
+    //yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
@@ -957,7 +964,7 @@ function* sharePDFWorker( { payload } ) {
               message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
               url:
               Platform.OS == 'android'
-                ? 'file:/' + pdfInfo.filePath
+                ? 'file://' + pdfInfo.filePath
                 : pdfInfo.filePath,
               type: 'application/pdf',
               showAppsToView: true,

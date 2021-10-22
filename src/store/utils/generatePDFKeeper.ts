@@ -17,6 +17,7 @@ export default async ( pdfData, fileName, title ) => {
     qrCodeString,
   }
   const pdfPath = await getPdfPath( pdfDatas )
+  console.log( 'pdfPath: ', pdfPath )
   return pdfPath
 }
 const getPdfPath = async ( pdfData: any ) => {
@@ -30,13 +31,18 @@ const getPdfPath = async ( pdfData: any ) => {
       await PdfPassword.createPdfKeeper(
         JSON.stringify( pdfData ),
         async ( err: any ) => {
-          // alert( 'ERROR'+err )
+          alert( 'ERROR'+err )
           return await err
         },
         async ( path: any ) => {
-          const data = await path
-          // alert( path+ ' => '+ data )
+          console.log( 'PATH', path )
           return path
+
+          // const data = await path
+          // alert( path+ ' => '+ data )
+          // console.log( 'PATH', path )
+          // console.log( 'DATA', data )
+          // return path
         },
       )
       // return '/storage/emulated/0/' + pdfData.fileName
