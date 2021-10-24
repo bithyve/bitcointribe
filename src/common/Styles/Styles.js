@@ -38,7 +38,7 @@ export default StyleSheet.create( {
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: heightPercentageToDP( 1 ),
+    marginTop: heightPercentageToDP( 0.5 ),
     letterSpacing: 0.6
   },
   headerInfoText: {

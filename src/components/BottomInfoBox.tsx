@@ -4,6 +4,7 @@ import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
+import ArrowRight from '../assets/images/svgs/icon_arrow_right.svg'
 
 export default function BottomInfoBox( props ) {
   return (
@@ -65,15 +66,7 @@ export default function BottomInfoBox( props ) {
         </Text>
       </View>
       {props.icon &&
-      <Image source={require( '../assets/images/icons/icon_arrow.png' )}
-        style={{
-          width: widthPercentageToDP( '3.6%' ),
-          height: widthPercentageToDP( '3.6%' ),
-          alignSelf: 'center',
-          marginLeft: 'auto',
-          resizeMode: 'contain'
-        }}
-      />
+      <ArrowRight />
       }
     </View>
   )

@@ -132,30 +132,37 @@ function RequestKeyFromContact( props ) {
               shadowRadius: 10,
               elevation: 2,
               alignSelf: 'center',
-              borderRadius: wp( 2 ),
+              borderTopRightRadius: wp( 2 ),
+              borderBottomRightRadius: wp( 2 ),
+              borderTopLeftRadius: contact && contact.imageAvailablehp ? wp( 90/2 ) : wp( 2 ),
+              borderBottomLeftRadius: contact && contact.imageAvailablehp ? wp( 90/2 ) : wp( 2 ),
               marginTop: hp( 1 ),
               marginBottom: hp( 1 ),
-              paddingVertical: hp( 2 ),
-              paddingHorizontal: wp( 3 ),
+              paddingVertical: contact && contact.imageAvailablehp ? hp( 0 ) : hp( 2 ),
+              paddingRight: wp( 3 ),
               flexDirection: 'row',
-              alignItems: 'center'
+              alignItems: 'center',
+              paddingHorizontal: contact && contact.imageAvailablehp ? hp( 0 ) : wp( 3 )
             }}>
             {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
-              <Image
-                source={contact.image}
-                style={{
-                  ...styles.contactProfileImage
-                }}
-              />
+              <View style={styles.contactProfileImageContainer}>
+                <Image
+                  source={contact.image}
+                  style={{
+                    ...styles.contactProfileImage
+                  }}
+                />
+              </View>
+
               : (
                 <View
                   style={{
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: Colors.backgroundColor,
-                    width: 70,
-                    height: 70,
-                    borderRadius: 70 / 2,
+                    width: 90,
+                    height: 90,
+                    borderRadius: 90 / 2,
                     shadowColor: Colors.shadowBlue,
                     shadowOpacity: 1,
                     shadowOffset: {
@@ -398,10 +405,21 @@ function RequestKeyFromContact( props ) {
 }
 const styles = StyleSheet.create( {
   contactProfileImage: {
-    width: 70,
-    height: 70,
+    width: 81,
+    height: 81,
     resizeMode: 'cover',
-    borderRadius: 70 / 2,
+    borderRadius: 81 / 2,
+  },
+  contactProfileImageContainer: {
+    width: 90,
+    height: 90,
+    resizeMode: 'cover',
+    borderRadius: 90 / 2,
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: Colors.offWhite,
+    borderWidth: 1
   },
   dashedStyle: {
     backgroundColor: Colors.gray7,

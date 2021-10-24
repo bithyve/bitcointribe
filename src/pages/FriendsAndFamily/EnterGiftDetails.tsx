@@ -54,7 +54,7 @@ const GiftDetails = ( { navigation } ) => {
     title: 'Bitcoin',
     subText: 'Lorem ipsum dolor',
     avatar: <GiftCard />,
-    color: Colors.lightBlue
+    color: Colors.darkBlue
     // id: '',
     // title: '',
     // subText: '',
@@ -143,7 +143,7 @@ const GiftDetails = ( { navigation } ) => {
           flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginRight: wp( 4 )
         }}>
           <HeaderTitle
-            firstLineTitle={'Message details'}
+            firstLineTitle={'Enter gift details'}
             secondLineTitle={'Who are we delighting today?'}
             infoTextNormal={''}
             infoTextBold={''}
@@ -226,7 +226,6 @@ const GiftDetails = ( { navigation } ) => {
                     {dropdownBoxValue?.title
                       ? dropdownBoxValue?.title
                       : 'Greeting Bitcoin'}
-
                   </Text>
                   <Text style={styles.subText}>
                     {dropdownBoxValue?.subText
@@ -267,7 +266,7 @@ const GiftDetails = ( { navigation } ) => {
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
               style={{
-                height: hp( '38%' )
+                height: hp( '40%' )
               }}
             >
               {dropdownBoxList.map( ( value, index ) => (
@@ -409,10 +408,10 @@ const styles = StyleSheet.create( {
     margin: 15,
     height: 'auto',
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
+    shadowColor: Colors.gray2,
+    shadowOpacity: 0.1,
     shadowOffset: {
-      width: 0, height: 10
+      width: 10, height: 10
     },
     backgroundColor: Colors.white,
   },
@@ -506,7 +505,7 @@ const styles = StyleSheet.create( {
     paddingVertical: wp( 1 ),
     paddingHorizontal: wp( 1 ),
     borderColor: Colors.lightBlue,
-    borderWidth: 1,
+    borderWidth: 0.7,
   },
   avatarContainer: {
     ...ImageStyles.circledAvatarContainer,

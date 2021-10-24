@@ -114,7 +114,8 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
-    marginLeft: wp( 6 )
+    marginLeft: wp( 6 ),
+    marginTop: hp( 1 )
   },
   modalTitleText: {
     color: Colors.blue,
