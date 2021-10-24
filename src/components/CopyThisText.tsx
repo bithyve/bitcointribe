@@ -14,6 +14,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { translations } from '../common/content/LocContext'
+import Link from '../assets/images/svgs/link_blue.svg'
 
 export default function CopyThisText( props ) {
   const common  = translations[ 'common' ]
@@ -77,16 +78,19 @@ export default function CopyThisText( props ) {
             alignItems: 'center',
           }}
         >
-          <Image
-            style={{
-              width: props.openLink ? wp( 6 ) : 18, height: props.openLink ? wp( 6 ) : 20
-            }}
-            source={
-              props.openLink
-                ? require( '../assets/images/icons/openlink.png' )
-                : require( '../assets/images/icons/icon-copy.png' )
-            }
-          />
+          {!props.openLink ?
+            <Image
+              style={{
+                width: 18, height: 20
+              }}
+              source={require( '../assets/images/icons/icon-copy.png' )}
+            />
+            :
+
+            <Link style={{
+              color:props.text.includes( 'http' ) ? Colors.blue : Colors.babyGray
+            }}/>
+          }
         </View>
       </AppBottomSheetTouchableWrapper>
     </View>

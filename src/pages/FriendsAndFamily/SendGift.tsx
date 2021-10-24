@@ -57,13 +57,12 @@ export default function SendGift( props ) {
   const sendGift  = async () => {
     const senderName = wallet.userName? wallet.userName: wallet.walletName
     const generateShortLink = true
-
     // nullify pre-existing properties(case: re-send)
     giftToSend.receiver = {
     }
     giftToSend.sender.contactId = null
 
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink, senderEditedName )
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
     dispatch( updateWalletImageHealth( {
@@ -77,8 +76,7 @@ export default function SendGift( props ) {
       encryptedChannelKeys: encryptedChannelKeys,
       encryptionType,
       encryptionHint,
-      walletName: wallet.walletName,
-      senderName,
+      walletName: senderName,
       channelAddress,
       amount: giftToSend.amount,
       note,

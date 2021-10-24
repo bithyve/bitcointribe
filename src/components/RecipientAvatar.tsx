@@ -16,6 +16,9 @@ const RecipientAvatar: React.FC<Props> = ( {
   recipient,
   contentContainerStyle
 }: Props ) => {
+  if ( !recipient ) {
+    return null
+  }
   if ( recipient.avatarImageSource || recipient.image ) {
     return (
       <View

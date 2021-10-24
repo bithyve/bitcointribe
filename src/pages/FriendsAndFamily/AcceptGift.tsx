@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import {  useSelector } from 'react-redux'
+import {  useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -23,6 +23,11 @@ import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import DashedLargeContainer from './DahsedLargeContainer'
 import ThemeList from './Theme'
+import { giftAccepted } from '../../store/actions/accounts'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import { RootSiblingParent } from 'react-native-root-siblings'
+import AccountSelection from './AccountSelection'
 
 export type Props = {
   navigation: any;
@@ -40,6 +45,7 @@ export type Props = {
 
 
 export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId }: Props ) {
+  const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
@@ -48,11 +54,15 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [] )
   const [ acceptGift, setAcceptGiftModal ] = useState( true )
-  const [ giftAccepted, setGiftAcceptedModel ] = useState( false )
+  const [ showAccounts, setShowAccounts ] = useState( false )
+  const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
+  const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
-  // const acceptedGifts = useSelector( ( state ) => state.accounts.gifts )
-
-  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+  const acceptedGifts = useSelector( ( state ) => state.accounts.acceptedGiftId )
+  // const activeAccounts = useActiveAccountShells()
+  // console.log( 'activeAccounts >>>>>>', activeAccounts )
+  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
+  // console.log( 'sendingAccount', sendingAccount )
 
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
@@ -74,9 +84,13 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     else setIsDisabled( true )
   }, [ inputType ] )
 
-  // useEffect( () => {
-  //   setGiftAcceptedModel( true )
-  // }, [] )
+  useEffect( () => {
+    if ( giftId === acceptedGifts ) {
+      setAcceptGiftModal( false )
+      setGiftAcceptedModel( true )
+    }
+
+  }, [ acceptedGifts ] )
 
   const getStyle = ( i ) => {
     if ( i == 0 ) {
@@ -309,8 +323,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             } )
           } else if( text === 'Accept Gift' ) {
             onGiftRequestAccepted( passcode )
-            setAcceptGiftModal( false )
-            setGiftAcceptedModel( true )
+            // setAcceptGiftModal( false )
+            // setGiftAcceptedModel( true )
           }
         }}
         style={{
@@ -339,7 +353,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           activeOpacity={1}
           onPress={() => {
             setGiftAcceptedModel( false )
-            closeModal()}}
+            closeModal()
+            dispatch( giftAccepted( '' ) )
+          }
+          }
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -384,7 +401,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   }
 
   const checkForValidation = ( text ) => {
-    console.log( 'TEXT', text.charAt( 0 ) + text.substring( 8 ), hint )
+    // console.log( 'TEXT', text.charAt( 0 ) + text.substring( 8 ), hint )
     if ( inputType == DeepLinkEncryptionType.NUMBER ) {
       if ( text.length == 0 ) {
         setWrongInputError( '' )
@@ -434,7 +451,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => { setAcceptGiftModal( false ); closeModal()}}
+          onPress={() => { setAcceptGiftModal( false ); closeModal(); dispatch( giftAccepted( '' ) )} }
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -537,6 +554,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             </View>
           </View> */}
           <TouchableOpacity
+            onPress={() => {setShowAccounts( true );  setAcceptGiftModal( false )}}
             style={{
               width: '95%',
               // height: '54%',
@@ -551,11 +569,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               borderRadius: wp( 2 ),
               marginVertical: hp( 2 ),
               paddingVertical: hp( 2 ),
-              paddingHorizontal: wp( 2 ),
+              paddingHorizontal: wp( 4 ),
               flexDirection: 'row',
               alignItems: 'center'
             }}>
-            <CheckingAccount width={54} height={54} />
+            {getAvatarForSubAccount( sourcePrimarySubAccount, false, true )}
             <View style={{
               marginHorizontal: wp( 3 )
             }}>
@@ -581,9 +599,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 {sourceAccountHeadlineText}
               </Text>
               <Text style={styles.availableToSpendText}>
-                Available to spend
+                Balance
                 <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
               </Text>
+
             </View>
           </TouchableOpacity>
 
@@ -640,15 +659,47 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       </>
     )
   }
+  // const renderMessage = () => {
+  //   return(
+  //     <View style={{
+  //       height: hp( '20%' )
+  //     }}>
+  //       <View style={{
+  //         marginLeft: wp( 6 ), marginTop: hp( 2 )
+  //       }}>
+  //         <Text style={styles.modalTitleText}>Accepting Gift inprogress...</Text>
+  //         <Text style={{
+  //           ...styles.modalInfoText,
+  //         }}>You will get confirmation in some time</Text>
+  //       </View>
+  //     </View>
+  //   )
+  // }
+
   return (
-    <View style={styles.modalContentContainer}>
+    <RootSiblingParent>
       {acceptGift &&
-          renderAcceptModal()
+        <View style={styles.modalContentContainer}>
+          {renderAcceptModal()}
+        </View>
       }
-      {giftAccepted &&
-            renderGiftAcceptedtModal()
+      {giftAcceptedModel &&
+        <View style={styles.modalContentContainer}>
+          {renderGiftAcceptedtModal()}
+        </View>
       }
-    </View>
+      {/* {!acceptGift && !giftAcceptedModel && !showAccounts &&
+       renderMessage()
+      } */}
+      {showAccounts &&
+        <View style={styles.modalContentContainer}>
+          <AccountSelection
+            onClose={(  ) => {setShowAccounts( false ); setAcceptGiftModal( true )}}
+            onChangeType={( type ) => { setAccType( type ); setShowAccounts( false ); setAcceptGiftModal( true ) }}
+          />
+        </View>
+      }
+    </RootSiblingParent>
   )
 }
 

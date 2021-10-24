@@ -524,7 +524,7 @@ const FNFToKeeper = ( props ) => {
         }}>{strings.Selectfromaddressbook} </Text>
         <View style={{
         }}>
-          {contact.length > 0 && !contact[ 0 ].isExisting &&
+          {/* {contact.length > 0 && !contact[ 0 ].isExisting &&
           <View style={styles.selectedContactContainer}>
             {contact.map( ( value, index ) => {
               return (
@@ -546,7 +546,7 @@ const FNFToKeeper = ( props ) => {
               )
             } )}
           </View>
-          }
+          } */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons

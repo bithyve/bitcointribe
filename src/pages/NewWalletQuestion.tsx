@@ -1267,6 +1267,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
               index={0}
+              italicText={''}
+              changeBgColor={true}
             />
             <CardWithRadioBtn
               geticon={() => {if( activeIndex === 0 ) { return <PassInActive /> } else { return <PassActive/>}}}
@@ -1275,6 +1277,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
+              italicText={''}
+              changeBgColor={true}
             />
           </TouchableOpacity>
 

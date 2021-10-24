@@ -585,6 +585,7 @@ export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 export const BLIND_REFRESH_STARTED = 'BLIND_REFRESH_STARTED'
 export const UPDATE_GIFT = 'UPDATE_GIFT'
+export const GIFT_ACCEPTED = 'GIFT_ACCEPTED'
 export const SET_GIFTS = 'SET_GIFTS'
 
 export const testcoinsReceived = ( ) => {
@@ -821,6 +822,12 @@ export const updateGift = ( gift: Gift ) => {
     payload: {
       gift
     }
+  }
+}
+export const giftAccepted = ( channelAddress ) => {
+  return {
+    type: GIFT_ACCEPTED,
+    payload: channelAddress
   }
 }
 

@@ -433,7 +433,7 @@ export default function AddContactAddressBook( props ) {
         <View style={{
           height: '95%', ...props.style
         }}>
-          <View style={styles.selectedContactContainer}>
+          {/* <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
               ? selectedContacts.map( ( value, index ) => {
                 return (
@@ -459,7 +459,7 @@ export default function AddContactAddressBook( props ) {
                 )
               } )
               : null}
-          </View>
+          </View> */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons

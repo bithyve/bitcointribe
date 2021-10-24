@@ -78,7 +78,7 @@ const GiftDetails = ( { navigation } ) => {
         disabled={isDisabled}
         onPress={()=>{
           if ( contact ) {
-            dispatch( updateUserName( name ) )
+
             navigation.navigate( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
@@ -182,6 +182,9 @@ const GiftDetails = ( { navigation } ) => {
               autoCapitalize="none"
               onChangeText={( txt ) => {
                 setName( txt )
+              }}
+              onBlur={() => {
+                dispatch( updateUserName( name ) )
               }}
             />
           </View>

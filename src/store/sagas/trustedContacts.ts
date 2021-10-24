@@ -54,7 +54,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
-import { exchangeRatesCalculated, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
+import { exchangeRatesCalculated, giftAccepted, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
@@ -167,7 +167,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
 
   for( const giftId in storedGifts ){
     if( channelAddress === storedGifts[ giftId ].channelAddress ) {
-      Toast( 'Gift already exist' )
+      Toast( 'Gift already added' )
       return
     }
   }
@@ -208,6 +208,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     gift.timestamps.accepted = Date.now()
 
     yield put( updateGift( gift ) )
+    yield put( giftAccepted( gift.channelAddress ) )
     yield call( associateGiftWorker, {
       payload: {
         giftId: gift.id
