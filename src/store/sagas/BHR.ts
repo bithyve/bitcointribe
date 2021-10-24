@@ -884,7 +884,7 @@ function* getPDFDataWorker( { payload } ) {
       const qrData = [
         JSON.stringify( recoveryData ),
       ]
-      console.log( 'PDF recoveryData', JSON.stringify( recoveryData ) )
+      console.warn( 'PDF recoveryData', JSON.stringify( recoveryData ) )
       const pdfData = {
         qrData: qrData,
       }
@@ -894,12 +894,19 @@ function* getPDFDataWorker( { payload } ) {
         `Hexa_Recovery_Key_${wallet.walletName}.pdf`,
         `Hexa Recovery Key for ${wallet.walletName}'s Wallet`
       )
-      yield put( setPDFInfo( {
-        filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
-      } ) )
+      if( pdfPath ){
+        yield put( pdfSuccessfullyCreated( true ) )
+
+        yield put( setPDFInfo( {
+          filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
+        } ) )
+      }
+      // yield put( setPDFInfo( {
+      //   filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
+      // } ) )
     }
 
-    yield put( pdfSuccessfullyCreated( true ) )
+    //yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
@@ -1015,7 +1022,7 @@ function* sharePDFWorker( { payload } ) {
 
         case 'Other':
           const shareOptions = {
-            title: 'Recovery Key  '+walletName,
+            title: 'Recovery Key '+walletName,
             message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
             url:
             Platform.OS == 'android'
@@ -1023,7 +1030,7 @@ function* sharePDFWorker( { payload } ) {
               : pdfInfo.filePath,
             type: 'application/pdf',
             showAppsToView: true,
-            subject: 'Recovery Key  '+walletName,
+            subject: 'Recovery Key '+walletName,
           }
 
           try {
@@ -1114,11 +1121,14 @@ function* updatedKeeperInfoWorker( { payload } ) {
   try {
     const { keeperData } = payload
     const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
-    if( keeperInfo && keeperInfo.length > 0 ) {
-      if( keeperInfo.find( value=>value && value.shareId == keeperData.shareId ) && keeperInfo.find( value=>value && value.shareId == keeperData.shareId ).type == 'pdf' && keeperData.type != 'pdf' ) yield put( setPDFInfo( {
+    const keeperInfoTemp: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
+    if( keeperInfoTemp && keeperInfoTemp.length > 0 && keeperInfoTemp.find( value=>value && value.shareId == keeperData.shareId && value.type == 'pdf' ) && keeperData.type != 'pdf' ) {
+      yield put( setPDFInfo( {
         filePath: '', updatedAt: 0, shareId: ''
       } ) )
+      yield put( pdfSuccessfullyCreated( false ) )
     }
+
     let flag = false
     if ( keeperInfo.length > 0 ) {
       for ( let i = 0; i < keeperInfo.length; i++ ) {
@@ -1424,7 +1434,7 @@ function* createChannelAssetsWorker( { payload } ) {
     const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
-    if( MetaShares && MetaShares.length ){
+    if( MetaShares && MetaShares.length && shareId ){
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
       const secondaryShareDownloadedVar = yield select( ( state ) => state.bhr.secondaryShareDownloaded )

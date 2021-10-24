@@ -234,7 +234,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
               OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
           shareType: isPrimaryKeeper ? 'primaryKeeper' : 'device',
           status: 'notAccessible',
-          name: Contact && Contact.name ? Contact.name : ''
+          name: Contact && Contact.name ? Contact.name : '',
+          updatedAt: 0
         }
 
         dispatch( updateMSharesHealth( shareObj, isChange ) )
@@ -450,11 +451,24 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
     setKeeperTypeModal( false )
+    const navigationParams = {
+      selectedTitle: name,
+      selectedLevelId: selectedLevelId,
+      selectedKeeper: {
+        shareType: type,
+        name: name,
+        reshareVersion: 0,
+        status: 'notSetup',
+        updatedAt: 0,
+        shareId: selectedKeeper.shareId,
+        data: {
+        },
+      },
+      index: changeIndex,
+    }
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
@@ -468,8 +482,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
     if ( type == 'pdf' ) {
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
