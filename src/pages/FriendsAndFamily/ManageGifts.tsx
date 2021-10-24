@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   Text,
   ScrollView,
-  FlatList
+  FlatList, Image
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -33,8 +33,11 @@ import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ManageGiftsList from './ManageGiftsList'
 import IconAdd from '../../assets/images/svgs/icon_add.svg'
 import IconAddLight from '../../assets/images/svgs/icon_add_light.svg'
+import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
 import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -46,6 +49,11 @@ const ManageGifts = ( { navigation } ) => {
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
+  const trustedContacts: Trusted_Contacts = useSelector(
+    ( state ) => state.trustedContacts.contacts,
+  )
+  const trustedContactsArr = Object.values( trustedContacts ?? {
+  } )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
   const [ knowMore, setKnowMore ] = useState( false )
@@ -76,8 +84,8 @@ const ManageGifts = ( { navigation } ) => {
       if ( gift.type === GiftType.RECEIVED ) {
         receivedArr.push( gift )
       } else {
-        if ( gift.status === GiftStatus.CREATED ) availableGifts.push( gift )
-        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
+        if ( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ) availableGifts.push( gift )
+        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
       }
     } )
@@ -114,6 +122,7 @@ const ManageGifts = ( { navigation } ) => {
 
     switch ( selectedGift.status ) {
         case GiftStatus.CREATED:
+        case GiftStatus.RECLAIMED:
           navigation.navigate( 'GiftDetails', {
             title, walletName, gift: selectedGift, avatar: false
           } )
@@ -309,7 +318,30 @@ const ManageGifts = ( { navigation } ) => {
           keyExtractor={listItemKeyExtractor}
           renderItem={( { item, index } ) => {
             const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
-            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
+            let walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
+            // let image
+            let contactDetails : RecipientDescribing
+            if ( item.type === GiftType.SENT && item.receiver?.contactId ) {
+              const arr =trustedContactsArr.filter( value => {
+                return item.permanentChannelAddress === value.receiver?.contactId
+              } )
+              contactDetails = arr[ 0 ]?.contactDetails
+              walletName = arr[ 0 ]?.contactDetails?.contactName
+              // image = arr[ 0 ]?.contactDetails?.image?.uri
+            }
+            if ( item.type === GiftType.RECEIVED && item.sender?.contactId ) {
+              const arr =trustedContactsArr.filter( value => {
+                console.log( value.permanentChannelAddress, value.sender?.contactId )
+
+                return item.permanentChannelAddress === value.sender?.contactId
+              } )
+              contactDetails = arr[ 0 ]?.contactDetails
+              walletName = arr[ 0 ]?.contactDetails?.contactName
+              // image = arr[ 0 ]?.contactDetails?.image?.uri
+            }
+            if( contactDetails ) {
+              contactDetails.displayedName = walletName
+            }
             return (
               <>
                 {active === GiftStatus.CREATED ?
@@ -330,7 +362,7 @@ const ManageGifts = ( { navigation } ) => {
                       key={index}
                       onPress={() => {
                         navigation.navigate( 'GiftDetails', {
-                          title, walletName, gift: item, avatar: true
+                          title, walletName, gift: item, avatar: true, contactDetails
                         } )
                       }
                       }
@@ -367,16 +399,20 @@ const ManageGifts = ( { navigation } ) => {
                         ...styles.listItem
                       }}
                       >
-                        <View style={styles.avatarContainer}>
-                          {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-                        </View>
+                        {walletName ?
+                          <View style={styles.avatarContainer}>
+                            <RecipientAvatar recipient={contactDetails} contentContainerStyle={styles.avatarImage} />
+                          </View>
+                          :
+                          <CheckingAcc />
+                        }
                         <View style={{
                           alignItems: 'flex-start', marginHorizontal: wp( 2 )
                         }}>
                           <Text style={{
                             textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
                           }}>
-                            {walletName}
+                            {walletName ? walletName : 'from Checking Account'}
                           </Text>
                           <Text style={{
                             ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
@@ -439,7 +475,7 @@ const ManageGifts = ( { navigation } ) => {
               {/* <ScrollView style={{
               flex: 1
             }}> */}
-              {timer && [ 1, 2, 3 ].map( ( value, index ) => {
+              {/* {timer && [ 1, 2, 3 ].map( ( value, index ) => {
                 return (
                   <View key={index} style={styles.scrollViewContainer}>
 
@@ -493,7 +529,7 @@ const ManageGifts = ( { navigation } ) => {
                     </View>
                   </View>
                 )
-              } )}
+              } )} */}
               {/* </ScrollView> */}
             </View>
 

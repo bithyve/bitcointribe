@@ -37,7 +37,7 @@ export default function SendGift( props ) {
   const giftId = props.navigation.getParam( 'giftId' )
   const note = props.navigation.getParam( 'note' )
   const contact = props.navigation.getParam( 'contact' )
-  const senderName = props.navigation.getParam( 'senderName' )
+  const senderEditedName = props.navigation.getParam( 'senderName' )
   const themeId = props.navigation.getParam( 'themeId' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
@@ -47,7 +47,7 @@ export default function SendGift( props ) {
   const [ encryptionOTP, setEncryptionOTP ] = useState( '' )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
-  const [ giftThemeId, setGiftThemeId ] = useState( GiftThemeId.ONE )
+  const [ giftThemeId, setGiftThemeId ] = useState( themeId?? GiftThemeId.ONE )
   const dispatch = useDispatch()
 
   const numberWithCommas = ( x ) => {
@@ -57,7 +57,6 @@ export default function SendGift( props ) {
   const sendGift  = async () => {
     const senderName = wallet.userName? wallet.userName: wallet.walletName
     const generateShortLink = true
-
     // nullify pre-existing properties(case: re-send)
     giftToSend.receiver = {
     }
@@ -77,7 +76,7 @@ export default function SendGift( props ) {
       encryptedChannelKeys: encryptedChannelKeys,
       encryptionType,
       encryptionHint,
-      walletName: wallet.walletName,
+      walletName: senderName,
       channelAddress,
       amount: giftToSend.amount,
       note,
@@ -154,7 +153,7 @@ export default function SendGift( props ) {
         encryptLinkWith={DeepLinkEncryptionType.OTP}
         encryptionKey={encryptionOTP}
         themeId={themeId}
-        senderName={senderName}
+        senderName={senderEditedName}
         contact={{
         }}
         QR={giftQR}

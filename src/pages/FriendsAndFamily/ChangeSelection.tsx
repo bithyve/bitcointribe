@@ -59,6 +59,8 @@ export default function ChangeSelection( props ) {
           setActiveIndex={setActiveIndex}
           index={0}
           geticon={''}
+          italicText={''}
+          changeBgColor={true}
         />
         <CardWithRadioBtn
           mainText={'Change confirmation method'}
@@ -67,6 +69,8 @@ export default function ChangeSelection( props ) {
           setActiveIndex={setActiveIndex}
           index={1}
           geticon={''}
+          italicText={''}
+          changeBgColor={true}
         />
       </View>
       <BottomInfoBox

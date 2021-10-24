@@ -407,7 +407,7 @@ export default function ContactList( props ) {
       ...props.style, height: '95%'
     }}>
       <SafeAreaView />
-      <View style={styles.selectedContactContainer}>
+      {/* <View style={styles.selectedContactContainer}>
         {selectedContacts.length > 0
           ? selectedContacts.map( ( value, index ) => {
             return (
@@ -429,7 +429,7 @@ export default function ContactList( props ) {
             )
           } )
           : null}
-      </View>
+      </View> */}
 
       <View style={[ styles.searchBoxContainer ]}>
         <View style={styles.searchBoxIcon}>
@@ -645,6 +645,7 @@ const styles = StyleSheet.create( {
     marginRight: 10,
     height: 40,
     justifyContent: 'center',
+    marginTop: hp( 2 )
   },
   searchBoxIcon: {
     justifyContent: 'center',

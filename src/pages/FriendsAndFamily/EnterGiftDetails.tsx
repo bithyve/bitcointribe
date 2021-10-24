@@ -15,7 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -33,10 +33,12 @@ import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import Halloween from '../../assets/images/svgs/halloween.svg'
 import Birthday from '../../assets/images/svgs/birthday.svg'
 import ThemeList from './Theme'
+import { updateUserName } from '../../store/actions/storage'
 
 import { translations } from '../../common/content/LocContext'
 
 const GiftDetails = ( { navigation } ) => {
+  const dispatch = useDispatch()
   const { giftId, contact } = navigation.state.params
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const strings = translations[ 'f&f' ]
@@ -44,33 +46,20 @@ const GiftDetails = ( { navigation } ) => {
   const common = translations[ 'common' ]
   const [ note, setNote ] = useState( '' )
   const [ name, setName ] = useState( '' )
-  // const QuestionList = login.questionList
-  // const ThemeList= [
-  //   {
-  //     'id': '1', 'title': 'Bitcoin', 'subText': 'Lorem ipsum dolor', 'avatar': <GiftCard />, color: Colors.lightBlue
-  //   },
-  //   {
-  //     'id': '2', 'title': 'Halloween', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />, color: Colors.greenShade
-  //   },
-  //   {
-  //     'id': '3', 'title': 'Birthday', 'subText': 'Lorem ipsum dolor', 'avatar': <Halloween />, color: Colors.pink
-  //   },
-  //   {
-  //     'id': '4', 'title': 'Wedding', 'subText': 'Lorem ipsum dolor', 'avatar': <Birthday />, color: Colors.lightBlue
-  //   },
-  //   // {
-  //   //   "id": "5","title": "Congratulations", "subText": "Lorem ipsum dolor", "avatar": <Birthday />
-  //   // }
-  // ]
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
-    id: '',
-    title: '',
-    subText: '',
-    avatar: ImagePropTypes,
-    color: ''
+    id: GiftThemeId.ONE,
+    title: 'Bitcoin',
+    subText: 'Lorem ipsum dolor',
+    avatar: <GiftCard />,
+    color: Colors.lightBlue
+    // id: '',
+    // title: '',
+    // subText: '',
+    // avatar: ImagePropTypes,
+    // color: ''
   } )
 
   useEffect( () => {
@@ -89,6 +78,7 @@ const GiftDetails = ( { navigation } ) => {
         disabled={isDisabled}
         onPress={()=>{
           if ( contact ) {
+
             navigation.navigate( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
@@ -96,7 +86,8 @@ const GiftDetails = ( { navigation } ) => {
               subHeaderText:strings.send,
               contactText:strings.adding,
               showDone:true,
-              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+              senderName: name,
             } )
           } else {
             navigation.navigate( 'SendGift', {
@@ -192,6 +183,9 @@ const GiftDetails = ( { navigation } ) => {
               onChangeText={( txt ) => {
                 setName( txt )
               }}
+              onBlur={() => {
+                dispatch( updateUserName( name ) )
+              }}
             />
           </View>
 
@@ -207,8 +201,12 @@ const GiftDetails = ( { navigation } ) => {
         </Text>
         <TouchableOpacity
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
-          style={styles.dashedContainer}>
-          <View style={styles.dashedStyle}>
+          style={[ styles.dashedContainer, {
+            borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
+          } ]}>
+          <View style={[ styles.dashedStyle, {
+            borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
+          } ]}>
             <View style={{
               flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
             }}>
@@ -269,7 +267,7 @@ const GiftDetails = ( { navigation } ) => {
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
               style={{
-                height: hp( '36%' )
+                height: hp( '38%' )
               }}
             >
               {dropdownBoxList.map( ( value, index ) => (

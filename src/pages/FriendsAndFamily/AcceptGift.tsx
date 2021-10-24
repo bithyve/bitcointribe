@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import {  useSelector } from 'react-redux'
+import {  useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { AccountType, DeepLinkEncryptionType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import { AccountType, DeepLinkEncryptionType, Gift, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -21,6 +21,13 @@ import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import DashedLargeContainer from './DahsedLargeContainer'
+import ThemeList from './Theme'
+import { giftAccepted } from '../../store/actions/accounts'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import { RootSiblingParent } from 'react-native-root-siblings'
+import AccountSelection from './AccountSelection'
 
 export type Props = {
   navigation: any;
@@ -32,10 +39,13 @@ export type Props = {
   inputType: string;
   hint: string;
   note: string,
+  themeId: string
+  giftId: string
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId }: Props ) {
+  const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
@@ -44,9 +54,15 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [] )
   const [ acceptGift, setAcceptGiftModal ] = useState( true )
-  const [ giftAccepted, setGiftAcceptedModel ] = useState( false )
+  const [ showAccounts, setShowAccounts ] = useState( false )
+  const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
+  const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
-  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+  const acceptedGifts = useSelector( ( state ) => state.accounts.acceptedGiftId )
+  // const activeAccounts = useActiveAccountShells()
+  // console.log( 'activeAccounts >>>>>>', activeAccounts )
+  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
+  // console.log( 'sendingAccount', sendingAccount )
 
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
@@ -67,6 +83,14 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ inputType ] )
+
+  useEffect( () => {
+    if ( giftId === acceptedGifts ) {
+      setAcceptGiftModal( false )
+      setGiftAcceptedModel( true )
+    }
+
+  }, [ acceptedGifts ] )
 
   const getStyle = ( i ) => {
     if ( i == 0 ) {
@@ -140,6 +164,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             onBlur={() => {
               checkForValidation( EmailId )
               setOnBlurFocus( false )
+
             }}
             value={EmailId}
             autoCorrect={false}
@@ -289,6 +314,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const renderButton = ( text ) => {
     return (
       <TouchableOpacity
+        disabled={isDisabled}
         onPress={() => {
           if ( text === 'View Account' ) {
             setGiftAcceptedModel( false )
@@ -297,12 +323,13 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             } )
           } else if( text === 'Accept Gift' ) {
             onGiftRequestAccepted( passcode )
-            setAcceptGiftModal( false )
-            setGiftAcceptedModel( true )
+            // setAcceptGiftModal( false )
+            // setGiftAcceptedModel( true )
           }
         }}
         style={{
-          ...styles.buttonView
+          ...styles.buttonView,
+          backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
         }}
       >
         <Text style={styles.buttonText}>{text}</Text>
@@ -317,16 +344,19 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const renderGiftAcceptedtModal = () => {
     return (
       <>
-        <View style={{
+        {/* <View style={{
           marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
         }}>
           <Illustration/>
-        </View>
+        </View> */}
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
             setGiftAcceptedModel( false )
-            closeModal()}}
+            closeModal()
+            dispatch( giftAccepted( '' ) )
+          }
+          }
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -338,17 +368,21 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         </TouchableOpacity>
         <View style={{
           marginLeft: wp( 6 ),
+          marginBottom: hp( 3 )
         }}>
           <Text style={styles.modalTitleText}>Gift Sats Accepted</Text>
           <Text style={{
             ...styles.modalInfoText,
           }}>The sats have been added to the account</Text>
         </View>
-        <DashedContainer
-          titleText={'Gift Accepted'}
-          // subText={'Lorem ipsum dolor sit amet'}
+        <DashedLargeContainer
+          titleText={'Gift Card'}
+          titleTextColor={Colors.black}
+          subText={walletName}
+          extraText={'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( giftAmount )}
-          image={<GiftCard width={63} height={63} />}
+          image={<GiftCard />}
+          theme={getTheme()}
         />
         <BottomInfoBox
           containerStyle={{
@@ -357,17 +391,17 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }}
           infoText={''}
         />
-        <View style={{
+        {/* <View style={{
           marginLeft: wp( 6 ),
         }}>
           {renderButton( 'View Account' )}
-        </View>
+        </View> */}
       </>
     )
   }
 
   const checkForValidation = ( text ) => {
-    console.log( 'TEXT', text.charAt( 0 ) + text.substring( 8 ), hint )
+    // console.log( 'TEXT', text.charAt( 0 ) + text.substring( 8 ), hint )
     if ( inputType == DeepLinkEncryptionType.NUMBER ) {
       if ( text.length == 0 ) {
         setWrongInputError( '' )
@@ -407,12 +441,17 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       }
     }
   }
+  const getTheme = () => {
+    // props.themeId
+    const filteredArr = ThemeList.filter( ( item => item.id === themeId ) )
+    return filteredArr[ 0 ]
+  }
   const renderAcceptModal = () => {
     return (
       <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => { setAcceptGiftModal( false ); closeModal()}}
+          onPress={() => { setAcceptGiftModal( false ); closeModal(); dispatch( giftAccepted( '' ) )} }
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -433,7 +472,16 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               ...styles.modalInfoText,
             }}>You have received a gift. Accept it to add to your selected account balance</Text>
           </View>
-          <View
+          <DashedLargeContainer
+            titleText={'Gift Card'}
+            titleTextColor={Colors.black}
+            subText={walletName}
+            extraText={'This is to get you started!\nWelcome to Bitcoin'}
+            amt={numberWithCommas( giftAmount )}
+            image={<GiftCard height={60} width={60} />}
+            theme={getTheme()}
+          />
+          {/* <View
             style={{
               width: '95%',
               backgroundColor: Colors.gray7,
@@ -504,8 +552,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 </Text>
               </View>
             </View>
-          </View>
+          </View> */}
           <TouchableOpacity
+            onPress={() => {setShowAccounts( true );  setAcceptGiftModal( false )}}
             style={{
               width: '95%',
               // height: '54%',
@@ -520,11 +569,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               borderRadius: wp( 2 ),
               marginVertical: hp( 2 ),
               paddingVertical: hp( 2 ),
-              paddingHorizontal: wp( 2 ),
+              paddingHorizontal: wp( 4 ),
               flexDirection: 'row',
               alignItems: 'center'
             }}>
-            <CheckingAccount width={54} height={54} />
+            {getAvatarForSubAccount( sourcePrimarySubAccount, false, true )}
             <View style={{
               marginHorizontal: wp( 3 )
             }}>
@@ -550,13 +599,23 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 {sourceAccountHeadlineText}
               </Text>
               <Text style={styles.availableToSpendText}>
-                Available to spend
+                Balance
                 <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
               </Text>
+
             </View>
           </TouchableOpacity>
 
         </View>
+        <Text style={{
+          color: Colors.gray4,
+          fontSize: RFValue( 12 ),
+          letterSpacing: 0.6,
+          fontFamily: Fonts.FiraSansRegular,
+          marginHorizontal: wp( 5 )
+        }}>
+          {`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'OTP'}`}
+        </Text>
         {/* {props.inputNotRequired ? null: ( */}
         <View style={{
           marginLeft: wp( '8%' ), marginRight: wp( '8%' )
@@ -600,15 +659,47 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       </>
     )
   }
+  // const renderMessage = () => {
+  //   return(
+  //     <View style={{
+  //       height: hp( '20%' )
+  //     }}>
+  //       <View style={{
+  //         marginLeft: wp( 6 ), marginTop: hp( 2 )
+  //       }}>
+  //         <Text style={styles.modalTitleText}>Accepting Gift inprogress...</Text>
+  //         <Text style={{
+  //           ...styles.modalInfoText,
+  //         }}>You will get confirmation in some time</Text>
+  //       </View>
+  //     </View>
+  //   )
+  // }
+
   return (
-    <View style={styles.modalContentContainer}>
+    <RootSiblingParent>
       {acceptGift &&
-          renderAcceptModal()
+        <View style={styles.modalContentContainer}>
+          {renderAcceptModal()}
+        </View>
       }
-      {giftAccepted &&
-            renderGiftAcceptedtModal()
+      {giftAcceptedModel &&
+        <View style={styles.modalContentContainer}>
+          {renderGiftAcceptedtModal()}
+        </View>
       }
-    </View>
+      {/* {!acceptGift && !giftAcceptedModel && !showAccounts &&
+       renderMessage()
+      } */}
+      {showAccounts &&
+        <View style={styles.modalContentContainer}>
+          <AccountSelection
+            onClose={(  ) => {setShowAccounts( false ); setAcceptGiftModal( true )}}
+            onChangeType={( type ) => { setAccType( type ); setShowAccounts( false ); setAcceptGiftModal( true ) }}
+          />
+        </View>
+      }
+    </RootSiblingParent>
   )
 }
 

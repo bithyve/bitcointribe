@@ -14,12 +14,12 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import CheckMark from '../assets/images/svgs/checkmark.svg'
 
-export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, mainText, subText, isSelected, index } ) {
+export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, mainText, subText, italicText, isSelected, index, changeBgColor } ) {
   return (
     <TouchableOpacity
       onPress={() => setActiveIndex( index )}
       style={{
-        width: '90%', height: hp( '11%' ), backgroundColor: isSelected ? Colors.lightBlue : Colors.backgroundColor1,
+        width: '90%', height: hp( '11%' ), backgroundColor: isSelected && changeBgColor ? Colors.lightBlue : Colors.backgroundColor1,
         alignSelf: 'center', justifyContent: 'center',
         borderRadius: wp( '4' ),
         marginVertical: hp( '1%' ),
@@ -68,20 +68,33 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
         }}>
           <Text style={{
             fontSize: RFValue( 13 ),
-            fontFamily: isSelected ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
-            color: isSelected ? Colors.backgroundColor1 : Colors.blue,
+            fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
+            color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.blue,
             marginBottom: hp( 0.5 ), letterSpacing: 0.01
           }}>
             {mainText}
           </Text>
+          {subText !== '' &&
           <Text style={{
             fontSize: RFValue( 11 ),
             fontFamily: Fonts.FiraSansRegular,
-            color: isSelected ? Colors.backgroundColor1 : Colors.textColorGrey,
+            color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
             width: wp( 65 )
           }}>
             {subText}
           </Text>
+          }
+          {italicText !== '' &&
+          <Text style={{
+            fontSize: RFValue( 11 ),
+            fontFamily: Fonts.FiraSansItalic,
+            color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
+            width: wp( 65 ),
+            fontWeight: '600'
+          }}>
+            {italicText}
+          </Text>
+          }
         </View>
       </View>
       {/* {isSelected && ( */}

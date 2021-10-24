@@ -28,10 +28,12 @@ import { reclaimGift } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
+import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import RecipientAvatar from '../../components/RecipientAvatar'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
+  const { title, walletName, gift, avatar, contactDetails }: { title: string, walletName: string, gift: Gift, avatar: boolean, contactDetails:any } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
@@ -114,22 +116,24 @@ const GiftDetails = ( { navigation } ) => {
               <View style={{
                 flexDirection: 'row',
               }}>
-                {avatar ?
+                {avatar && walletName ?
                   <View style={styles.avatarContainer}>
-                    {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
+                    <RecipientAvatar recipient={contactDetails} contentContainerStyle={styles.avatarImage} />
                   </View>
                   :
-                  <GiftCard />
+                  <CheckingAcc />
                 }
                 <View style={{
-                  marginLeft: wp( 1 )
+                  marginLeft: wp( 1 ),
+                  alignSelf: 'center'
                 }}>
                   <Text style={{
                     color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
+                    fontSize: RFValue( 11 ),
                     fontFamily: Fonts.FiraSansRegular,
+                    fontWeight: '600'
                   }}>
-                    {walletName ? walletName : 'from Checking Account'}
+                    {walletName ? walletName : 'Checking Account'}
                   </Text>
                   {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
@@ -224,7 +228,6 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           {Object.entries( gift.timestamps ?? {
           } ).reverse().map( ( item, index ) => {
-
             return(
               <View key={index} style={styles.timeInfo}>
                 <View style={{
@@ -332,6 +335,11 @@ const GiftDetails = ( { navigation } ) => {
 }
 
 const styles = StyleSheet.create( {
+  avatarImage: {
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp( 9 ) / 2,
+    marginHorizontal: wp( 1 ),
+  },
   line: {
     height: hp( 9 ),
     width: wp( 0.09 ),

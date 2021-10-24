@@ -44,7 +44,8 @@ import {
   RECOMPUTE_NET_BALANCE,
   UPDATE_GIFT,
   GENERATE_GIFTS,
-  SET_GIFTS
+  SET_GIFTS,
+  GIFT_ACCEPTED
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -67,7 +68,7 @@ export type AccountsState = {
     [id: string]: Gift
   }
   selectedGiftId: string,
-
+  acceptedGiftId: string,
   isGeneratingNewAccountShell: boolean;
   hasNewAccountShellGenerationSucceeded: boolean;
   hasNewAccountShellGenerationFailed: boolean;
@@ -113,7 +114,7 @@ const initialState: AccountsState = {
   gifts: {
   },
   selectedGiftId: null,
-
+  acceptedGiftId: '',
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
   hasNewAccountShellGenerationFailed: false,
@@ -557,6 +558,11 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             [ gift.id ]: gift
           },
           selectedGiftId: gift.id
+        }
+      case GIFT_ACCEPTED:
+        return{
+          ...state,
+          acceptedGiftId: action.payload
         }
       case SET_GIFTS:
         return {
