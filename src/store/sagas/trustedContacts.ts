@@ -305,6 +305,8 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
   const gift: Gift = storedGifts[ payload.giftId ]
 
+  if( gift.status === GiftStatus.ACCEPTED || gift.status === GiftStatus.RECLAIMED ) throw new Error( 'Cannot reclaim gift' )
+
   const giftChannelsToSync = {
     [ gift.channelAddress ]: {
       creator: true,
@@ -322,17 +324,22 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
   } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
   const { metaData: giftMetaData } = synchedGiftChannels[ gift.channelAddress ]
 
-  if( giftMetaData.status === GiftStatus.RECLAIMED ){
+  if( giftMetaData.status !== gift.status ){
     gift.status = giftMetaData.status
-    gift.timestamps.reclaimed = Date.now()
+
+    if( giftMetaData.status === GiftStatus.RECLAIMED ) gift.timestamps.reclaimed = Date.now()
+    else if ( giftMetaData.status === GiftStatus.ACCEPTED ) gift.timestamps.accepted = Date.now()
+
     yield put( updateGift( gift ) )
     yield call( dbManager.createGift, gift )
     yield put( updateWalletImageHealth( {
       updateGifts: true,
       giftIds: [ gift.id ]
     } ) )
-    Toast( 'Gift reclaimed' )
-  } else throw new Error( 'Unable to reclaim gift' )
+
+    if( giftMetaData.status === GiftStatus.RECLAIMED ) Toast( 'Gift reclaimed' )
+    if( giftMetaData.status === GiftStatus.ACCEPTED ) Toast( 'Gift already accepted' )
+  }
 }
 
 export const reclaimGiftWatcher = createWatcher(
@@ -382,6 +389,8 @@ function* syncGiftsStatusWorker() {
       const giftToUpdate = storedGifts[ giftChannelToGiftIdMap[ channelAddress ] ]
       if( giftToUpdate.status !== giftMetaData.status ){
         giftToUpdate.status = giftMetaData.status
+        if ( giftMetaData.status === GiftStatus.ACCEPTED ) giftToUpdate.timestamps.accepted = Date.now()
+
         yield put( updateGift( giftToUpdate ) )
         yield call( dbManager.createGift, giftToUpdate )
         yield put( updateWalletImageHealth( {
