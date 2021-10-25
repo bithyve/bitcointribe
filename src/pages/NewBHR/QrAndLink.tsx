@@ -360,7 +360,7 @@ export default function QrAndLink( props ) {
             backgroundColor={Colors.white}
           />
         </TouchableOpacity>
-        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => {}} >
+        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => setSecure2FAModal( false )} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}
             onConfirm={( type ) => {
@@ -372,10 +372,10 @@ export default function QrAndLink( props ) {
             Contact={Contact}
           />
         </ModalContainer>
-        <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
+        <ModalContainer visible={timerModal}  closeBottomSheet={() => setTimerModal( false )} >
           {renderTimerModalContents()}
         </ModalContainer>
-        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
+        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => setShareOtpWithTrustedContactModel( false )} >
           {renderShareOtpWithTrustedContactContent()}
         </ModalContainer>
       </ScrollView>

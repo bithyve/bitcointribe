@@ -618,17 +618,17 @@ const PersonalCopyHistory = ( props ) => {
           }}
         />
       </View>
-      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => setPersonalCopyShareModal( false )} >
         {renderPersonalCopyShareModalContent()}
       </ModalContainer>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={errorModal} closeBottomSheet={() => setErrorModal( false )} >
         {renderErrorModalContent()}
       </ModalContainer>
 
       <ModalContainer visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
         {renderHelpContent()}
       </ModalContainer>
-      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )} >
         <KeeperTypeModalContents
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
@@ -642,10 +642,10 @@ const PersonalCopyHistory = ( props ) => {
           keeper={selectedKeeper}
         />
       </ModalContainer>
-      <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={qrModal} closeBottomSheet={() => setQRModal( false )} >
         {renderQrContent()}
       </ModalContainer>
-      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
+      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=> setStoragePermissionModal( false )} >
         {renderStoragePermissionModalContent()}
       </ModalContainer>
     </View>
