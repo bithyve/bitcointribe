@@ -247,7 +247,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
       </TouchableOpacity>
     )
   }
-  console.log( swanModal )
+
 
   return (
     <View style={rootContainerStyle}>
