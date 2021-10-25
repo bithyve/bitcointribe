@@ -362,6 +362,7 @@ export default class Relay {
     updated: boolean;
   }> => {
     try {
+      if( !gift.channelAddress ) throw new Error( 'channel address missing' )
       const encryptedGift = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( gift ), encryptionKey )
       let res: AxiosResponse
       try {

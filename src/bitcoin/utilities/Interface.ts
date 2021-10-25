@@ -783,7 +783,8 @@ export enum QRCodeTypes {
   RECOVERY_REQUEST = 'RECOVERY_REQUEST',
   EXISTING_CONTACT = 'EXISTING_CONTACT',
   APPROVE_KEEPER = 'APPROVE_KEEPER',
-  GIFT = 'GIFT'
+  GIFT = 'GIFT',
+  KEEPER_GIFT = 'KEEPER_GIFT'
 }
 
 export interface UTXO {
@@ -934,7 +935,8 @@ export enum DeepLinkKind {
   PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
   EXISTING_CONTACT = 'EXISTING_CONTACT',
-  GIFT = 'GIFT'
+  GIFT = 'GIFT',
+  KEEPER_GIFT = 'KEEPER_GIFT'
 }
 
 export enum DeepLinkEncryptionType {
@@ -968,7 +970,7 @@ export interface Gift {
   id: string,
   privateKey: string,
   address: string,
-  channelAddress: string,
+  channelAddress?: string,
   amount: number,
   type: GiftType,
   status: GiftStatus,
