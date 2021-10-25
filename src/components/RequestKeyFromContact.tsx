@@ -134,15 +134,15 @@ function RequestKeyFromContact( props ) {
               alignSelf: 'center',
               borderTopRightRadius: wp( 2 ),
               borderBottomRightRadius: wp( 2 ),
-              borderTopLeftRadius: contact && contact.imageAvailablehp ? wp( 90/2 ) : wp( 2 ),
-              borderBottomLeftRadius: contact && contact.imageAvailablehp ? wp( 90/2 ) : wp( 2 ),
+              borderTopLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 2 ),
+              borderBottomLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 2 ),
               marginTop: hp( 1 ),
               marginBottom: hp( 1 ),
-              paddingVertical: contact && contact.imageAvailablehp ? hp( 0 ) : hp( 2 ),
+              paddingVertical: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : hp( 2 ),
               paddingRight: wp( 3 ),
               flexDirection: 'row',
               alignItems: 'center',
-              paddingHorizontal: contact && contact.imageAvailablehp ? hp( 0 ) : wp( 3 )
+              paddingHorizontal: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : wp( 3 )
             }}>
             {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
               <View style={styles.contactProfileImageContainer}>
@@ -155,38 +155,40 @@ function RequestKeyFromContact( props ) {
               </View>
 
               : (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: Colors.backgroundColor,
-                    width: 90,
-                    height: 90,
-                    borderRadius: 90 / 2,
-                    shadowColor: Colors.shadowBlue,
-                    shadowOpacity: 1,
-                    shadowOffset: {
-                      width: 2, height: 2
-                    },
-                  }}
-                >
-                  <Text
+                <View style={styles.contactProfileImageContainer}>
+                  <View
                     style={{
-                      textAlign: 'center',
-                      fontSize: RFValue( 20 ),
-                      lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: Colors.backgroundColor,
+                      width: 80,
+                      height: 80,
+                      borderRadius: 80 / 2,
+                      // shadowColor: Colors.shadowBlue,
+                      // shadowOpacity: 1,
+                      // shadowOffset: {
+                      //   width: 2, height: 2
+                      // },
                     }}
                   >
-                    {nameToInitials(
-                      Contact && Contact.firstName && Contact.lastName
-                        ? Contact.firstName + ' ' + Contact.lastName
-                        : Contact && Contact.firstName && !Contact.lastName
-                          ? Contact.firstName
-                          : Contact && !Contact.firstName && Contact.lastName
-                            ? Contact.lastName
-                            : '',
-                    )}
-                  </Text>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontSize: RFValue( 20 ),
+                        lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                      }}
+                    >
+                      {nameToInitials(
+                        Contact && Contact.firstName && Contact.lastName
+                          ? Contact.firstName + ' ' + Contact.lastName
+                          : Contact && Contact.firstName && !Contact.lastName
+                            ? Contact.firstName
+                            : Contact && !Contact.firstName && Contact.lastName
+                              ? Contact.lastName
+                              : '',
+                      )}
+                    </Text>
+                  </View>
                 </View>
               )
               : <GiftCard /> :  <GiftCard />
@@ -311,11 +313,24 @@ function RequestKeyFromContact( props ) {
         // <BottomInfoBox
         //   infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
         // />
-        <BottomInfoBox
-          infoText={
-            `Your friend will be prompted to enter ${props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'their phone number' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'their email' : `OTP ${props.encryptionKey}`}`
-          }
-        />
+        <Text style={{
+          color: Colors.textColorGrey,
+          fontSize: RFValue( 12 ),
+          letterSpacing: 0.6,
+          // marginBottom: 2,
+          // fontFamily: Fonts.FiraSansRegular,
+          marginHorizontal: wp( 6 ),
+          lineHeight: 18,
+          marginVertical: hp( 2 )
+        }}>
+          {'Your friend will be prompted to enter '}
+          <Text style={{
+            fontWeight: '600'
+          }}>
+            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
+          </Text>
+          while acceptin the gift card
+        </Text>
       }
       {!props.isGift &&
         <View
@@ -390,7 +405,7 @@ function RequestKeyFromContact( props ) {
             buttonOneText={'Share Link'}
             onButtonPress={( type ) => shareViaLinkOrQR( type )}
             buttonTwoIcon={<Link />}
-            buttonTwoText={'Share Image'}
+            buttonTwoText={'Share QR'}
           />
 
           <View style={styles.statusIndicatorView}>

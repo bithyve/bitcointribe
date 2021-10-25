@@ -50,11 +50,11 @@ export default function ChangeSelection( props ) {
             marginTop: wp( 1.5 ),
             marginBottom: wp( 3 ),
             marginRight: wp( 13 )
-          }}>{'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit'}</Text>
+          }}>{'Send the gift to someone else or change the confirmation method'}</Text>
         </View>
         <CardWithRadioBtn
           mainText={'Change contact'}
-          subText={'Lorem ipsum dolor'}
+          subText={'Send the gift to a different person'}
           isSelected={activeIndex === 0}
           setActiveIndex={setActiveIndex}
           index={0}
@@ -64,7 +64,7 @@ export default function ChangeSelection( props ) {
         />
         <CardWithRadioBtn
           mainText={'Change confirmation method'}
-          subText={'Lorem ipsum dolor'}
+          subText={'Use 2FA instead'}
           isSelected={activeIndex === 1}
           setActiveIndex={setActiveIndex}
           index={1}
@@ -75,7 +75,7 @@ export default function ChangeSelection( props ) {
       </View>
       <BottomInfoBox
         // title={common.note}
-        infoText={'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit'}
+        infoText={''}
         // backgroundColor={Colors.white}
       />
       <View style={{

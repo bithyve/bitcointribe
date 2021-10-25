@@ -66,7 +66,7 @@ export default function AccountSelection( { onClose, onChangeType } ) {
           <Text style={styles.modalTitleText}>Select Account</Text>
           <Text style={{
             ...styles.modalInfoText,
-          }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+          }}>Choose the account where you'd like to stack the sats</Text>
         </View>
         <ScrollView style={{
           height: hp( '45%' )
