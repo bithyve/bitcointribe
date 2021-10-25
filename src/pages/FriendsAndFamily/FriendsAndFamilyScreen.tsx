@@ -54,6 +54,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { LocalizationContext } from '../../common/content/LocContext'
 import Gift from '../../assets/images/svgs/icon_gift.svg'
+import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
@@ -645,8 +646,9 @@ class FriendsAndFamilyScreen extends React.Component<
                   }}>
                     {this.strings[ 'giftSubText' ]}
                   </Text>
-                </View>
 
+                </View>
+                <RightArrow />
               </View>
 
               {/* <View style={styles.subInfo}>
@@ -1027,7 +1029,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // marginHorizontal: wp ( 6 ),
+    marginRight: wp ( 3 ),
     flex: 1,
     marginBottom: 2
   },

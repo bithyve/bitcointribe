@@ -66,7 +66,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '1%' ),
               }}
             >
-              Hexa allows you to create bitcoin Gifts in a form of a link or QR code that you can send to anyone even if they are not in your Friends & Family list
+              Hexa creates a link or QR code for you that allows you to send bitcoin as gifts to anyone using Hexa wallet.
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'

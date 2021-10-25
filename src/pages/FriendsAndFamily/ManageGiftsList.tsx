@@ -36,10 +36,10 @@ const ManageGiftsList = ( props ) => {
         alignSelf: 'center',
         borderRadius: wp( 2 ),
         marginTop: hp( 1 ),
-        marginBottom: hp( 1 ),
+        marginBottom: hp( 0.5 ),
         paddingVertical: wp( 1 ),
         paddingHorizontal: wp( 1 ),
-        borderColor: Colors.lightBlue,
+        borderColor: Colors.darkBlue,
         borderWidth: 1,
       }}>
       <View style={{

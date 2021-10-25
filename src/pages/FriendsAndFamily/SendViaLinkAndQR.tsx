@@ -151,7 +151,7 @@ export default function SendViaLinkAndQR( props ) {
       </View>
       <HeaderTitle
         firstLineTitle={`Share via ${type === 'Link' ? 'link' : 'QR'}`}
-        secondLineTitle={'Lorem ipsum dolor sit amet'}
+        secondLineTitle={type === 'Link' ? 'Send the link to your contact from any app below' : ''}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}

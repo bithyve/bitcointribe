@@ -525,7 +525,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             if( nextAppState === 'background' ) {
               this.closeBottomSheet()
             }
-            console.log( 'inside if nextAppState', nextAppState )
+            // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,

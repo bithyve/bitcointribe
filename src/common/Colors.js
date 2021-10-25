@@ -30,6 +30,7 @@ const Colors = {
   currencyGray: '#d0d0d0',
   seaBlue: '#CFE8F8',
   deepBlue: '#04578B',
+  blueText: '#1582C4',
   babyGray: '#BCB6B6',
   greyTextColor: '#656565',
   coral: '#D35400',

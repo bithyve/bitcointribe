@@ -115,15 +115,12 @@ const AccountDetailsCard: React.FC<Props> = ( {
       onAppStateChange
     )
     return () => AppState.removeEventListener( 'change', onAppStateChange )
-  } )
+  }, [] )
 
   const  onAppStateChange = ( state ) => {
-    if( state === 'background' && swanModal && !primarySubAccount.isUsable &&
-    primarySubAccount.kind === SubAccountKind.SERVICE &&
-  ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
-    ) {
-      showSwanModal( false )
+    if( state === 'active' && ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN ) {
       navigation.pop()
+      // showSwanModal( false )
     }
   }
   useEffect( () => {
@@ -251,8 +248,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
     )
   }
 
+
   return (
     <View style={rootContainerStyle}>
+      {swanModal &&
       <ModalContainer visible={swanModal} closeBottomSheet={() => {}} >
         <BottomSheetSwanInfo
           swanDeepLinkContent={swanDeepLinkContent}
@@ -268,6 +267,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           }}
         />
       </ModalContainer>
+      }
       <ImageBackground
         source={backgroundImageForAccountKind( primarySubAccount )}
         style={{
