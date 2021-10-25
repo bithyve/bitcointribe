@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {  useDispatch, useSelector } from 'react-redux'
 import {
@@ -311,20 +311,22 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     }
   }
 
-  const renderButton = ( text ) => {
+  const renderButton = ( text, buttonIsDisabled ) => {
     return (
       <TouchableOpacity
-        disabled={isDisabled}
+        disabled={!buttonIsDisabled ? buttonIsDisabled : isDisabled}
         onPress={() => {
-          if ( text === 'View Account' ) {
+          if ( text === 'Add to Account' ) {
             setGiftAcceptedModel( false )
-            navigation.navigate( 'AccountDetails', {
-              accountShellID: sourcePrimarySubAccount.accountShellID,
-            } )
+            setShowAccounts( true )
+            // navigation.navigate( 'AccountDetails', {
+            //   accountShellID: sourcePrimarySubAccount.accountShellID,
+            // } )
           } else if( text === 'Accept Gift' ) {
             onGiftRequestAccepted( passcode )
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
+            setIsDisabled( false )
           }
         }}
         style={{
@@ -371,9 +373,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           marginBottom: hp( 3 )
         }}>
           <Text style={styles.modalTitleText}>Gift Sats Accepted</Text>
-          <Text style={{
+          {/* <Text style={{
             ...styles.modalInfoText,
-          }}>The sats have been added to the account</Text>
+          }}>The sats have been added to the account</Text> */}
         </View>
         <DashedLargeContainer
           titleText={'Gift Card'}
@@ -391,11 +393,12 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }}
           infoText={''}
         />
-        {/* <View style={{
+        {/* {renderButton( 'Add to Account' )} */}
+        <View style={{
           marginLeft: wp( 6 ),
         }}>
-          {renderButton( 'View Account' )}
-        </View> */}
+          {renderButton( 'Add to Account', false )}
+        </View>
       </>
     )
   }
@@ -470,7 +473,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             <Text style={styles.modalTitleText}>Accept Gift</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>You have received a gift. Accept it to add to your selected account balance</Text>
+            }}>{`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'OTP'}`}</Text>
           </View>
           <DashedLargeContainer
             titleText={'Gift Card'}
@@ -553,7 +556,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               </View>
             </View>
           </View> */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {setShowAccounts( true );  setAcceptGiftModal( false )}}
             style={{
               width: '95%',
@@ -577,10 +580,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             <View style={{
               marginHorizontal: wp( 3 )
             }}>
-              {/* <View style={styles.accImage} >
-            {getAvatarForSubAccount( usePrimarySubAccountForShell( accountInfo ) )}
-          </View> */}
-
               <Text style={{
                 color: Colors.gray4,
                 fontSize: RFValue( 10 ),
@@ -604,10 +603,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               </Text>
 
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
         </View>
-        <Text style={{
+        {/* <Text style={{
           color: Colors.gray4,
           fontSize: RFValue( 12 ),
           letterSpacing: 0.6,
@@ -615,7 +614,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           marginHorizontal: wp( 5 )
         }}>
           {`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'OTP'}`}
-        </Text>
+        </Text> */}
         {/* {props.inputNotRequired ? null: ( */}
         <View style={{
           marginLeft: wp( '8%' ), marginRight: wp( '8%' )
@@ -694,8 +693,31 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       {showAccounts &&
         <View style={styles.modalContentContainer}>
           <AccountSelection
-            onClose={(  ) => {setShowAccounts( false ); setAcceptGiftModal( true )}}
-            onChangeType={( type ) => { setAccType( type ); setShowAccounts( false ); setAcceptGiftModal( true ) }}
+            onClose={(  ) => {
+              setShowAccounts( false )
+              setGiftAcceptedModel( true )
+            }}
+            onChangeType={( type ) => {
+              setAccType( type )
+              setShowAccounts( false )
+              // setAcceptGiftModal( true )
+              setTimeout( () => {
+                Alert.alert(
+                  '',
+                  `Are you sure you want to add gift to your ${type} account?`,
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => setTimeout( () => {setGiftAcceptedModel( true )}, 200 ),
+                      style: 'cancel'
+                    },
+                    {
+                      text: 'YES', onPress: () => closeModal()
+                    }
+                  ],
+                )
+              }, 500 )
+            }}
           />
         </View>
       }

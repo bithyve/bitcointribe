@@ -37,8 +37,8 @@ const DashedContainer = ( props ) => {
         marginBottom: hp( 1 ),
         paddingVertical: wp( 1 ),
         paddingHorizontal: wp( 1 ),
-        borderColor: Colors.lightBlue,
-        borderWidth: 1,
+        borderColor: Colors.darkBlue,
+        borderWidth: 0.63,
       }}>
       <View style={{
         backgroundColor: Colors.gray7,

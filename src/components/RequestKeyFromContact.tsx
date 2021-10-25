@@ -132,54 +132,63 @@ function RequestKeyFromContact( props ) {
               shadowRadius: 10,
               elevation: 2,
               alignSelf: 'center',
-              borderRadius: wp( 2 ),
+              borderTopRightRadius: wp( 2 ),
+              borderBottomRightRadius: wp( 2 ),
+              borderTopLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 2 ),
+              borderBottomLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 2 ),
               marginTop: hp( 1 ),
               marginBottom: hp( 1 ),
-              paddingVertical: hp( 2 ),
-              paddingHorizontal: wp( 3 ),
+              paddingVertical: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : hp( 2 ),
+              paddingRight: wp( 3 ),
               flexDirection: 'row',
-              alignItems: 'center'
+              alignItems: 'center',
+              paddingHorizontal: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : wp( 3 )
             }}>
             {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
-              <Image
-                source={contact.image}
-                style={{
-                  ...styles.contactProfileImage
-                }}
-              />
-              : (
-                <View
+              <View style={styles.contactProfileImageContainer}>
+                <Image
+                  source={contact.image}
                   style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: Colors.backgroundColor,
-                    width: 70,
-                    height: 70,
-                    borderRadius: 70 / 2,
-                    shadowColor: Colors.shadowBlue,
-                    shadowOpacity: 1,
-                    shadowOffset: {
-                      width: 2, height: 2
-                    },
+                    ...styles.contactProfileImage
                   }}
-                >
-                  <Text
+                />
+              </View>
+
+              : (
+                <View style={styles.contactProfileImageContainer}>
+                  <View
                     style={{
-                      textAlign: 'center',
-                      fontSize: RFValue( 20 ),
-                      lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: Colors.backgroundColor,
+                      width: 80,
+                      height: 80,
+                      borderRadius: 80 / 2,
+                      // shadowColor: Colors.shadowBlue,
+                      // shadowOpacity: 1,
+                      // shadowOffset: {
+                      //   width: 2, height: 2
+                      // },
                     }}
                   >
-                    {nameToInitials(
-                      Contact && Contact.firstName && Contact.lastName
-                        ? Contact.firstName + ' ' + Contact.lastName
-                        : Contact && Contact.firstName && !Contact.lastName
-                          ? Contact.firstName
-                          : Contact && !Contact.firstName && Contact.lastName
-                            ? Contact.lastName
-                            : '',
-                    )}
-                  </Text>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontSize: RFValue( 20 ),
+                        lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                      }}
+                    >
+                      {nameToInitials(
+                        Contact && Contact.firstName && Contact.lastName
+                          ? Contact.firstName + ' ' + Contact.lastName
+                          : Contact && Contact.firstName && !Contact.lastName
+                            ? Contact.firstName
+                            : Contact && !Contact.firstName && Contact.lastName
+                              ? Contact.lastName
+                              : '',
+                      )}
+                    </Text>
+                  </View>
                 </View>
               )
               : <GiftCard /> :  <GiftCard />
@@ -304,11 +313,24 @@ function RequestKeyFromContact( props ) {
         // <BottomInfoBox
         //   infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
         // />
-        <BottomInfoBox
-          infoText={
-            `Your friend will be prompted to enter ${props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'their phone number' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'their email' : `OTP ${props.encryptionKey}`}`
-          }
-        />
+        <Text style={{
+          color: Colors.textColorGrey,
+          fontSize: RFValue( 12 ),
+          letterSpacing: 0.6,
+          // marginBottom: 2,
+          // fontFamily: Fonts.FiraSansRegular,
+          marginHorizontal: wp( 6 ),
+          lineHeight: 18,
+          marginVertical: hp( 2 )
+        }}>
+          {'Your friend will be prompted to enter '}
+          <Text style={{
+            fontWeight: '600'
+          }}>
+            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
+          </Text>
+          while acceptin the gift card
+        </Text>
       }
       {!props.isGift &&
         <View
@@ -383,7 +405,7 @@ function RequestKeyFromContact( props ) {
             buttonOneText={'Share Link'}
             onButtonPress={( type ) => shareViaLinkOrQR( type )}
             buttonTwoIcon={<Link />}
-            buttonTwoText={'Share Image'}
+            buttonTwoText={'Share QR'}
           />
 
           <View style={styles.statusIndicatorView}>
@@ -398,10 +420,21 @@ function RequestKeyFromContact( props ) {
 }
 const styles = StyleSheet.create( {
   contactProfileImage: {
-    width: 70,
-    height: 70,
+    width: 81,
+    height: 81,
     resizeMode: 'cover',
-    borderRadius: 70 / 2,
+    borderRadius: 81 / 2,
+  },
+  contactProfileImageContainer: {
+    width: 90,
+    height: 90,
+    resizeMode: 'cover',
+    borderRadius: 90 / 2,
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: Colors.offWhite,
+    borderWidth: 1
   },
   dashedStyle: {
     backgroundColor: Colors.gray7,

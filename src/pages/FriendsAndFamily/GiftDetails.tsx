@@ -6,7 +6,8 @@ import {
   SafeAreaView,
   Text,
   StatusBar,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -30,11 +31,14 @@ import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
 import RecipientAvatar from '../../components/RecipientAvatar'
+import AccountSelection from './AccountSelection'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
   const { title, walletName, gift, avatar, contactDetails }: { title: string, walletName: string, gift: Gift, avatar: boolean, contactDetails:any } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
+  const [ acceptGift, setAcceptGiftModal ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
 
@@ -87,7 +91,7 @@ const GiftDetails = ( { navigation } ) => {
             // position: isOpen ? 'absolute': 'relative'
           } ] : [ styles.dashedContainer, {
             borderColor: Colors.white,
-            // position: isOpen ? 'absolute': 'relative'
+            shadowOpacity: isOpen ? 1 : 0,
           } ]}>
           <View style={gift.status === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle}>
 
@@ -116,7 +120,7 @@ const GiftDetails = ( { navigation } ) => {
               <View style={{
                 flexDirection: 'row',
               }}>
-                {avatar && walletName ?
+                {avatar && walletName && contactDetails ?
                   <View style={styles.avatarContainer}>
                     <RecipientAvatar recipient={contactDetails} contentContainerStyle={styles.avatarImage} />
                   </View>
@@ -128,7 +132,7 @@ const GiftDetails = ( { navigation } ) => {
                   alignSelf: 'center'
                 }}>
                   <Text style={{
-                    color: Colors.lightTextColor,
+                    color: Colors.textColorGrey,
                     fontSize: RFValue( 11 ),
                     fontFamily: Fonts.FiraSansRegular,
                     fontWeight: '600'
@@ -159,7 +163,8 @@ const GiftDetails = ( { navigation } ) => {
                   }}> sats
                   </Text>
                 </Text>
-                {isOpen ? <ArrowDown /> : <ArrowUp />}
+                {gift.status !== GiftStatus.CREATED ?
+                  isOpen ? <ArrowUp /> : <ArrowDown /> : null}
               </View>
             </View>
           </View>
@@ -298,8 +303,7 @@ const GiftDetails = ( { navigation } ) => {
             </TouchableOpacity>
           </View>
         ) : null}
-      { ( gift.status === GiftStatus.CREATED ||
-       gift.status === GiftStatus.RECLAIMED ) ?
+      {gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ?
         (
           <View style={{
             ...styles.keeperViewStyle
@@ -331,6 +335,72 @@ const GiftDetails = ( { navigation } ) => {
             </TouchableOpacity>
           </View>
         ) : null}
+      {gift.status === GiftStatus.ACCEPTED ?
+        (
+          <View style={{
+            ...styles.keeperViewStyle
+          }}><TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {
+              // dispatch( reclaimGift( gift.id ) )
+                navigation.navigate( 'EnterGiftDetails', {
+                  giftId: ( gift as Gift ).id,
+                } )
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Send Gift Card</Text>
+              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                ...styles.bottomButton,
+              }}
+              onPress={() => {setAcceptGiftModal( true )
+              }}
+            >
+              <Text style={[ styles.buttonText, {
+              } ]}>Add To Account</Text>
+              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
+            </TouchableOpacity>
+          </View>
+        ) : null}
+      <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
+        <View style={styles.modalContentContainer}>
+          <AccountSelection
+            onClose={( ) => {setAcceptGiftModal( false )}}
+            onChangeType={( type ) => {
+              setAcceptGiftModal( false )
+              setTimeout( () => {
+                Alert.alert(
+                  '',
+                  `Are you sure you want to add gift to your ${type} account?`,
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => console.log( 'Cancel Pressed' ),
+                      style: 'cancel'
+                    },
+                    {
+                      text: 'YES', onPress: () => console.log( 'OK Pressed' )
+                    }
+                  ],
+                )
+              }, 500 )
+            }}
+          />
+        </View>
+      </ModalContainer>
+      {/* <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
+        <View style={styles.modalContentContainer}>
+          <AccountSelection
+            onClose={(  ) => {setAcceptGiftModal( false )}}
+            onChangeType={( type ) => { }}
+          />
+        </View>
+      </ModalContainer> */}
     </ScrollView>
   )
 }
@@ -342,8 +412,8 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 1 ),
   },
   line: {
-    height: hp( 9 ),
-    width: wp( 0.09 ),
+    height: hp( 7.2 ),
+    width: wp( 0.05 ),
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 3 ),
   },
@@ -382,12 +452,13 @@ const styles = StyleSheet.create( {
   dashedContainer: {
     width: '90%',
     backgroundColor: Colors.gray7,
-    // shadowOpacity: 0.06,
-    // shadowOffset: {
-    //   width: 10, height: 10
-    // },
-    // shadowRadius: 10,
-    // elevation: 2,
+    shadowColor: '#6C6C6C1A',
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 6,
     alignSelf: 'center',
     borderRadius: wp( 2 ),
     marginTop: hp( 1 ),

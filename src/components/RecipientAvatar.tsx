@@ -46,6 +46,7 @@ const RecipientAvatar: React.FC<Props> = ( {
           style={{
             textAlign: 'center',
             fontSize: 14,
+            fontWeight: '500'
           }}
         >
           {nameToInitials(

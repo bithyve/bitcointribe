@@ -221,19 +221,7 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setKnowMore( true )}
-            style={{
-              ...styles.selectedContactsView,
-            }}
-          >
-            {/* <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                  /> */}
-            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
 
-          </TouchableOpacity>
         </View>
 
         <View style={{
@@ -247,12 +235,20 @@ const ManageGifts = ( { navigation } ) => {
             infoTextNormal1={''}
             step={''}
           />
+          <TouchableOpacity
+            onPress={() => setKnowMore( true )}
+            style={{
+              ...styles.selectedContactsView,
+            }}
+          >
+            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
 
+          </TouchableOpacity>
 
         </View>
         <ScrollView
           style={{
-            marginHorizontal: wp( 4 )
+            marginHorizontal: wp( 4 ), paddingVertical: hp( 2 )
           }}
           horizontal>
           {
@@ -262,7 +258,14 @@ const ManageGifts = ( { navigation } ) => {
                 <TouchableOpacity
                   key={item}
                   style={[ styles.buttonNavigator, {
-                    backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor
+                    backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
+                    shadowColor: active === item ? '#77B9EB96' : Colors.white,
+                    shadowOpacity: 0.9,
+                    shadowOffset: {
+                      width: 5, height: 6
+                    },
+                    shadowRadius: 10,
+                    elevation: 6,
                   } ]}
                   onPress={() => buttonPress( item )}
                 >
@@ -373,33 +376,10 @@ const ManageGifts = ( { navigation } ) => {
                       }}
                     >
                       <View style={{
-                        flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
-                      }}>
-                        <Text style={{
-                          color: Colors.lightTextColor,
-                          fontSize: RFValue( 10 ),
-                          letterSpacing: 0.7,
-                          fontFamily: Fonts.FiraSansRegular,
-                          fontWeight: '700'
-                        }}>
-                          {title}
-                        </Text>
-                        <Text style={{
-                          color: Colors.lightTextColor,
-                          fontSize: RFValue( 10 ),
-                          letterSpacing: 0.1,
-                          fontFamily: Fonts.FiraSansRegular,
-                          alignSelf: 'flex-end'
-                        }}>
-                          {moment( item.createdAt ).format( 'lll' )}
-                        </Text>
-                      </View>
-
-                      <View style={{
                         ...styles.listItem
                       }}
                       >
-                        {walletName ?
+                        {walletName && contactDetails ?
                           <View style={styles.avatarContainer}>
                             <RecipientAvatar recipient={contactDetails} contentContainerStyle={styles.avatarImage} />
                           </View>
@@ -410,13 +390,27 @@ const ManageGifts = ( { navigation } ) => {
                           alignItems: 'flex-start', marginHorizontal: wp( 2 )
                         }}>
                           <Text style={{
-                            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                            color: Colors.lightTextColor,
+                            fontSize: RFValue( 10 ),
+                            letterSpacing: 0.8,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontWeight: '600'
                           }}>
-                            {walletName ? walletName : 'from Checking Account'}
+                            {title}
                           </Text>
                           <Text style={{
-                            ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
-                          }}>Lorem ipsum dolor sit amet</Text>
+                            fontSize: RFValue( 12 ), textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                          }}>
+                            {walletName ? walletName : 'Checking Account'}
+                          </Text>
+                          <Text style={{
+                            color: Colors.lightTextColor,
+                            fontSize: RFValue( 10 ),
+                            letterSpacing: 0.1,
+                            fontFamily: Fonts.FiraSansRegular,
+                          }}>
+                            {moment( item.createdAt ).format( 'lll' )}
+                          </Text>
                         </View>
                         <View style={{
                           marginLeft: 'auto',
@@ -436,7 +430,9 @@ const ManageGifts = ( { navigation } ) => {
                             </Text>
                           </Text>
                         </View>
-                        <RightArrow />
+                        <RightArrow style={{
+                          marginHorizontal: wp( 1 )
+                        }}/>
                       </View>
 
                     </TouchableOpacity>
@@ -571,10 +567,10 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
   },
   createGiftText: {
-    color: Colors.darkBlue,
+    color: Colors.blueText,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.3,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansMedium,
     marginHorizontal: wp( 2 )
   },
   centeredView: {
@@ -592,7 +588,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.borderColor,
-    borderRadius: wp( 3 )
+    borderRadius: wp( 3 ),
   },
   modalTitleText: {
     color: Colors.blue,
@@ -609,9 +605,9 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 1 ),
   },
   avatarContainer: {
-    ...ImageStyles.circledAvatarContainer,
-    ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 9 ) / 2,
+    width: wp( 10 ),
+    height: wp( 10 ),
+    borderRadius: wp( 10 ) / 2,
   },
   listItem: {
     marginVertical: hp( 0.5 ),
@@ -636,9 +632,11 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-around',
     backgroundColor: Colors.lightBlue,
     borderRadius: wp( 2 ),
-    height: hp( 4 ),
+    height: hp( 3.6 ),
     paddingHorizontal: wp( 2 ),
-    marginRight: wp( 4 )
+    marginTop: wp( 2.7 ),
+    marginRight: wp( 4 ),
+    alignSelf: 'flex-start'
   },
   createView: {
     position: 'absolute',
