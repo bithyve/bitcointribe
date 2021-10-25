@@ -298,7 +298,8 @@ const GiftDetails = ( { navigation } ) => {
             </TouchableOpacity>
           </View>
         ) : null}
-      {gift.status === GiftStatus.CREATED ?
+      { ( gift.status === GiftStatus.CREATED ||
+       gift.status === GiftStatus.RECLAIMED ) ?
         (
           <View style={{
             ...styles.keeperViewStyle
