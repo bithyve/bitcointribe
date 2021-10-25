@@ -154,6 +154,7 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
     updateGifts: true,
     giftIds: [ gift.id ]
   } ) )
+  Toast( 'Gift is added to account' )
 }
 
 export const associateGiftWatcher = createWatcher(
@@ -209,11 +210,11 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
 
     yield put( updateGift( gift ) )
     yield put( giftAccepted( gift.channelAddress ) )
-    yield call( associateGiftWorker, {
-      payload: {
-        giftId: gift.id
-      }
-    } )
+    // yield call( associateGiftWorker, {
+    //   payload: {
+    //     giftId: gift.id
+    //   }
+    // } )
     yield call( dbManager.createGift, gift )
     yield put( updateWalletImageHealth( {
       updateGifts: true,

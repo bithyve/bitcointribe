@@ -25,7 +25,7 @@ import { AccountType, Gift, GiftStatus } from '../../bitcoin/utilities/Interface
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import { reclaimGift } from '../../store/actions/trustedContacts'
+import { associateGift, reclaimGift } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
@@ -371,24 +371,25 @@ const GiftDetails = ( { navigation } ) => {
         <View style={styles.modalContentContainer}>
           <AccountSelection
             onClose={( ) => {setAcceptGiftModal( false )}}
-            onChangeType={( type ) => {
+            onChangeType={( type, accId ) => {
               setAcceptGiftModal( false )
-              setTimeout( () => {
-                Alert.alert(
-                  '',
-                  `Are you sure you want to add gift to your ${type} account?`,
-                  [
-                    {
-                      text: 'Cancel',
-                      onPress: () => console.log( 'Cancel Pressed' ),
-                      style: 'cancel'
-                    },
-                    {
-                      text: 'YES', onPress: () => console.log( 'OK Pressed' )
-                    }
-                  ],
-                )
-              }, 500 )
+              dispatch( associateGift( ( gift as Gift ).id, accId ) )
+              // setTimeout( () => {
+              //   Alert.alert(
+              //     '',
+              //     `Are you sure you want to add gift to your ${type} account?`,
+              //     [
+              //       {
+              //         text: 'Cancel',
+              //         onPress: () => console.log( 'Cancel Pressed' ),
+              //         style: 'cancel'
+              //       },
+              //       {
+              //         text: 'YES', onPress: () => console.log( 'OK Pressed' )
+              //       }
+              //     ],
+              //   )
+              // }, 500 )
             }}
           />
         </View>

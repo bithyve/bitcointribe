@@ -32,11 +32,12 @@ export type Props = {
 export default function AccountSelection( { onClose, onChangeType } ) {
 //   const dispatch = useDispatch()
   const [ activeIndex, setActiveIndex ] = useState( AccountType.CHECKING_ACCOUNT )
+  const [ activeId, setActiveId ] = useState( '' )
   const activeAccounts = useActiveAccountShells()
   const renderButton = ( text ) => {
     return (
       <TouchableOpacity
-        onPress={( ) => {onChangeType( activeIndex )}}
+        onPress={( ) => {onChangeType( activeIndex, activeId )}}
         style={{
           ...styles.buttonView,
         }}
@@ -81,7 +82,10 @@ export default function AccountSelection( { onClose, onChangeType } ) {
                   subText={''}
                   italicText={`Balance: ${item.primarySubAccount?.balances?.confirmed} sats`}
                   isSelected={activeIndex === item.primarySubAccount.type}
-                  setActiveIndex={setActiveIndex}
+                  setActiveIndex={( index ) => {
+                    setActiveIndex( index )
+                    setActiveId( item.primarySubAccount.id )
+                  }}
                   index={item.primarySubAccount.type}
                   changeBgColor={false}
                 />

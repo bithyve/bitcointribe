@@ -28,6 +28,7 @@ import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/U
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import AccountSelection from './AccountSelection'
+import { associateGift } from '../../store/actions/trustedContacts'
 
 export type Props = {
   navigation: any;
@@ -55,29 +56,29 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ passcodeArray, setPasscodeArray ] = useState( [] )
   const [ acceptGift, setAcceptGiftModal ] = useState( true )
   const [ showAccounts, setShowAccounts ] = useState( false )
-  const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
+  // const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   const acceptedGifts = useSelector( ( state ) => state.accounts.acceptedGiftId )
   // const activeAccounts = useActiveAccountShells()
   // console.log( 'activeAccounts >>>>>>', activeAccounts )
-  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
+  // const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
   // console.log( 'sendingAccount', sendingAccount )
 
-  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
-  const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
+  // const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
+  // const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
 
-  const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
-  } )
+  // const formattedUnitText = useFormattedUnitText( {
+  //   bitcoinUnit: BitcoinUnit.SATS,
+  // } )
 
-  const sourceAccountHeadlineText = useMemo( () => {
-    const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
+  // const sourceAccountHeadlineText = useMemo( () => {
+  //   const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title}`
-    // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+  //   return `${title}`
+  //   // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
 
-  }, [ sourcePrimarySubAccount ] )
+  // }, [ sourcePrimarySubAccount ] )
 
   useEffect( () => {
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
@@ -88,6 +89,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     if ( giftId === acceptedGifts ) {
       setAcceptGiftModal( false )
       setGiftAcceptedModel( true )
+      setIsDisabled( false )
     }
 
   }, [ acceptedGifts ] )
@@ -323,10 +325,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             //   accountShellID: sourcePrimarySubAccount.accountShellID,
             // } )
           } else if( text === 'Accept Gift' ) {
+            setIsDisabled( true )
             onGiftRequestAccepted( passcode )
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
-            setIsDisabled( false )
           }
         }}
         style={{
@@ -632,7 +634,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
           marginTop: hp( 5 )
         }}>
-          {renderButton( 'Accept Gift' )}
+          {renderButton( 'Accept Gift', true )}
           <TouchableOpacity
             onPress={() => {
               onGiftRequestRejected()
@@ -697,26 +699,27 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               setShowAccounts( false )
               setGiftAcceptedModel( true )
             }}
-            onChangeType={( type ) => {
-              setAccType( type )
-              setShowAccounts( false )
+            onChangeType={( type, accId ) => {
               // setAcceptGiftModal( true )
-              setTimeout( () => {
-                Alert.alert(
-                  '',
-                  `Are you sure you want to add gift to your ${type} account?`,
-                  [
-                    {
-                      text: 'Cancel',
-                      onPress: () => setTimeout( () => {setGiftAcceptedModel( true )}, 200 ),
-                      style: 'cancel'
-                    },
-                    {
-                      text: 'YES', onPress: () => closeModal()
-                    }
-                  ],
-                )
-              }, 500 )
+              // setTimeout( () => {
+              //   Alert.alert(
+              //     '',
+              //     `Are you sure you want to add gift to your ${type} account?`,
+              //     [
+              //       {
+              //         text: 'Cancel',
+              //         onPress: () => setTimeout( () => {setGiftAcceptedModel( true )}, 200 ),
+              //         style: 'cancel'
+              //       },
+              //       {
+              //         text: 'YES', onPress: () => {
+              closeModal()
+              dispatch( associateGift( giftId, accId ) )
+              //         }
+              //       }
+              //     ],
+              //   )
+              // }, 500 )
             }}
           />
         </View>
