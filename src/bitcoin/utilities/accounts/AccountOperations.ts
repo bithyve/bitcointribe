@@ -1052,7 +1052,6 @@ export default class AccountOperations {
         id,
         privateKey,
         address,
-        channelAddress: id.slice( 0, 10 ),
         amount,
         type: GiftType.SENT,
         status: GiftStatus.CREATED,
