@@ -342,7 +342,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       }
     } else {
       security = {
-        questionId: 0,
+        questionId: '0',
         question: hintText,
         answer: pswd,
       }
