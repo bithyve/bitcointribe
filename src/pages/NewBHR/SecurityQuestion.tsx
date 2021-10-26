@@ -42,7 +42,7 @@ function SecurityQuestion( props ) {
   const stringsLogin = translations[ 'login' ]
 
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
-  const securityQuestion = security.question ? stringsLogin.questionList.find( x => x.id === security.questionId ).question : ''
+  const securityQuestion = security.question ? security.question : ''
   const securityAnswer = security.answer ? security.answer : ''
   const showAnswerProp = props.showAnswer
   const [ showAnswer, setShowAnswer ] = useState( props.showAnswer ? props.showAnswer : false )

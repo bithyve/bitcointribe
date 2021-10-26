@@ -666,7 +666,7 @@ export default function ManageBackup( props ) {
           </View>
         </ScrollView>
 
-        <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
+        <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
           <KeeperTypeModalContents
             headerText={'Backup Recovery Key'}
             subHeader={strings[ 'saveyourRecovery' ]}
@@ -712,8 +712,8 @@ export default function ManageBackup( props ) {
             }}
             selectedLevelId={selectedLevelId}
           />
-        </ModalContainer >
-        <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+        </ModalContainer>
+        <ModalContainer visible={errorModal} closeBottomSheet={() => setErrorModal( false )}>
           <ErrorModalContents
             title={errorTitle}
             info={errorInfo}
@@ -731,7 +731,7 @@ export default function ManageBackup( props ) {
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />
         </ModalContainer>
-        <ModalContainer visible={knowMoreModal} closeBottomSheet={() => {}} >
+        <ModalContainer visible={knowMoreModal} closeBottomSheet={() => setKnowMoreModal( false )} >
           <MBNewBhrKnowMoreSheetContents
             type={knowMoreType}
             titleClicked={()=> setKnowMoreModal( false ) }

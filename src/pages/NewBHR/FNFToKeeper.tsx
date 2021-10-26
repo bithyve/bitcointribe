@@ -658,10 +658,10 @@ const FNFToKeeper = ( props ) => {
           }
         </View>
       </View>
-      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => setPermissionsErrModal( false )} >
         {renderContactListErrorModalContent()}
       </ModalContainer>
-      <ModalContainer visible={permissionsModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={permissionsModal} closeBottomSheet={() => setPermissionsModal( false )} >
         {renderContactPermissionModalContent()}
       </ModalContainer>
       {/* </SafeAreaView> */}
