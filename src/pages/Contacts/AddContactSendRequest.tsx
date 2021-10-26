@@ -31,7 +31,7 @@ import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
-import { DeepLinkEncryptionType, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, DeepLinkKind, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 import idx from 'idx'
@@ -231,7 +231,7 @@ export default function AddContactSendRequest( props ) {
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
     const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
-      deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      deepLinkKind: giftId? DeepLinkKind.KEEPER_GIFT: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
@@ -241,9 +241,17 @@ export default function AddContactSendRequest( props ) {
     const link = shortLink !== '' ? shortLink: deepLink
     setTrustedLink( link )
     const appVersion = DeviceInfo.getVersion()
+
+    let qrType: string
+    if( giftId ) qrType = QRCodeTypes.KEEPER_GIFT
+    else if( existingContact ) qrType = QRCodeTypes.EXISTING_CONTACT
+    else if( isPrimary ) qrType = QRCodeTypes.PRIMARY_KEEPER_REQUEST
+    else if( isKeeper ) qrType = QRCodeTypes.KEEPER_REQUEST
+    else qrType = QRCodeTypes.CONTACT_REQUEST
+
     setTrustedQR(
       JSON.stringify( {
-        type: existingContact ? QRCodeTypes.EXISTING_CONTACT : isPrimary ? QRCodeTypes.PRIMARY_KEEPER_REQUEST : isKeeper ? QRCodeTypes.KEEPER_REQUEST : QRCodeTypes.CONTACT_REQUEST,
+        type: qrType,
         encryptedChannelKeys: encryptedChannelKeys,
         encryptionType,
         encryptionHint,

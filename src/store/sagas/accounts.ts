@@ -141,6 +141,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
     giftToSend.themeId = themeId
+    giftToSend.channelAddress = giftToSend.id.slice( 0, 10 ) + Math.floor( Math.random() * 10e4 )
 
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
