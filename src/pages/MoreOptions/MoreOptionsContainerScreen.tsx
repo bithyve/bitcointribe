@@ -1,17 +1,11 @@
-import React, { useMemo, useState, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import openLink from '../../utils/OpenLink'
-import Header from '../../navigation/stacks/Header'
-import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { useSelector, useDispatch } from 'react-redux'
-import { currencyKindSet } from '../../store/actions/preferences'
+import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
 import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
 import Node from '../../assets/images/svgs/node.svg'
@@ -132,13 +126,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       navigation.navigate( menuOption.screenName )
     }
   }
-  const dispatch = useDispatch()
-
-  const currencyKind: CurrencyKind = useCurrencyKind()
-
-  const prefersBitcoin = useMemo( () => {
-    return currencyKind === CurrencyKind.BITCOIN
-  }, [ currencyKind ] )
 
   const findImage = ( name ) => {
     switch ( name ){

@@ -565,7 +565,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           onPressChange={() => { setKeeperTypeModal( true ) }}
         />
       </View>
-      <ModalContainer visible={showQr} closeBottomSheet={() => {}} >
+      <ModalContainer visible={showQr} closeBottomSheet={() => setShowQr( false )} >
         {renderSecondaryDeviceContents()}
       </ModalContainer>
       {/* <BottomSheet
