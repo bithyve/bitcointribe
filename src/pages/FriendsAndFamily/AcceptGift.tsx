@@ -40,6 +40,8 @@ export type Props = {
   closeModal: () => void;
   onGiftRequestAccepted: ( otp ) => void;
   onGiftRequestRejected: () => void;
+  onPressAccept: ( key ) => void;
+  onPressReject: () => void;
   walletName: string;
   giftAmount: string;
   inputType: string;
@@ -47,11 +49,11 @@ export type Props = {
   note: string,
   themeId: string
   giftId: string;
-  isGiftWithFnF: boolean
+  isGiftWithFnF: boolean;
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, onPressAccept, onPressReject }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -61,20 +63,22 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [] )
   const [ acceptGift, setAcceptGiftModal ] = useState( !isGiftWithFnF )
+  const [ downloadedGiftid, seDownloadedGiftId ] = useState( '' )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
   const [ giftAddedModal, setGiftAddedModel ] = useState( false )
   const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ accId, setAccId ] = useState( '' )
-  const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( isGiftWithFnF )
+  const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
   const [ addGiftToAccountFlow, setAddGiftToAccountFlow ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   const acceptedGifts = useSelector( ( state ) => state.accounts.acceptedGiftId )
+  const gifts = useSelector( ( state ) => state.accounts.gifts )
+
   const addedGift = useSelector( ( state ) => state.accounts.addedGift )
   const activeAccounts = useActiveAccountShells()
   // console.log( 'activeAccounts >>>>>>', activeAccounts )
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
   // console.log( 'sendingAccount', sendingAccount )
-  console.log( 'giftIdgiftIdgiftIdgiftIdgiftIdgiftIdgiftId', giftId )
 
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
@@ -105,6 +109,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   useEffect( () => {
     if ( giftId === acceptedGifts ) {
       setAcceptGiftModal( false )
+      const filterGift = Object.values( gifts ?? {
+      } ).find( ( item ) =>  giftId === item.channelAddress )
+      seDownloadedGiftId( filterGift?.id )
       setGiftAcceptedModel( true )
       setIsDisabled( false )
     }
@@ -353,7 +360,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             // } )
           } else if( text === 'Accept Gift' ) {
             setIsDisabled( true )
-            onGiftRequestAccepted( passcode )
+            if ( isGiftWithFnF ) {
+              onPressAccept( passcode )
+            } else {
+              onGiftRequestAccepted( passcode )
+            }
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
           }
@@ -687,7 +698,12 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           {renderButton( 'Accept Gift', true )}
           <TouchableOpacity
             onPress={() => {
-              onGiftRequestRejected()
+              if ( isGiftWithFnF ) {
+                onPressReject()
+              } else {
+                onGiftRequestRejected()
+              }
+
             }}
             style={{
               height: wp( '12%' ),
@@ -747,7 +763,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         getTheme={getTheme}
         navigation={navigation}
         giftAmount={giftAmount}
-        giftId={giftId}
+        giftId={downloadedGiftid}
+        closeModal={closeModal}
         onCancel={() =>{ setAddGiftToAccountFlow( false ); setGiftAcceptedModel( true )}}
       />
       }

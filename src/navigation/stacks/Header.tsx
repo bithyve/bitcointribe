@@ -328,10 +328,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             trustedContactRequest
           },
           () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
+            if ( trustedContactRequest.isKeeperGift ) {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.GIFT_REQUEST,
+                1
+              )
+            } else {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+
           }
           )
         }
@@ -679,16 +687,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       },
       () => {
         if ( trustedContactRequest.isKeeperGift ) {
-          this.setState( {
-            giftRequest: {
-              ...trustedContactRequest, isGiftWithFnF: true
-            },
-          } )
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
+            1
+          )
+        } else{
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
         }
-        this.openBottomSheetOnLaunch(
-          BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-          1
-        )
+
       }
       )
     } else if ( giftRequest ) {
@@ -1491,7 +1500,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.GIFT_REQUEST:
-          const giftRequest = this.state.giftRequest
+          const giftRequest = this.state.giftRequest ?? this.state.trustedContactRequest
           console.log( 'giftRequestgiftRequestgiftRequestgiftRequestgiftRequest', giftRequest )
 
           return (
@@ -1507,7 +1516,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               note={giftRequest.note}
               themeId={giftRequest.themeId}
               giftId={giftRequest.channelAddress}
-              isGiftWithFnF={giftRequest.isGiftWithFnF}
+              isGiftWithFnF={giftRequest.isKeeperGift}
+              onPressAccept={this.onTrustedContactRequestAccepted}
+              onPressReject={this.onTrustedContactRejected}
             />
           )
 

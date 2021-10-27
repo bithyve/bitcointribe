@@ -29,10 +29,11 @@ export type Props = {
   giftId: string
   getTheme: () => void;
   onCancel: () => void;
+  closeModal: () => void;
 };
 
 
-export default function AddGiftToAccount( { getTheme, navigation, giftAmount, giftId, onCancel }: Props ) {
+export default function AddGiftToAccount( { getTheme, navigation, giftAmount, giftId, onCancel, closeModal }: Props ) {
   const dispatch = useDispatch()
   const [ showAccounts, setShowAccounts ] = useState( true )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
@@ -78,6 +79,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             dispatch( associateGift( giftId, accId ) )
           } else {
             setGiftAddedModel( false )
+            closeModal()
             navigation.dispatch(
               resetStackToAccountDetails( {
                 accountShellID: sourcePrimarySubAccount.accountShellID,
@@ -98,6 +100,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
+
   return (
     <>
       {showAccounts &&
