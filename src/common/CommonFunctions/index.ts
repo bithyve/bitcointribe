@@ -376,7 +376,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 
   let deepLink: string
 
-  if( deepLinkKind === DeepLinkKind.GIFT || deepLink === DeepLinkKind.KEEPER_GIFT ){
+  if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.KEEPER_GIFT ){
     deepLink =
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
