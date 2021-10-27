@@ -54,7 +54,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
-import { exchangeRatesCalculated, giftAccepted, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
+import { exchangeRatesCalculated, giftAccepted, giftAddedToAccount, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
@@ -154,6 +154,8 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
     updateGifts: true,
     giftIds: [ gift.id ]
   } ) )
+  // Toast( 'Gift is added to account' )
+  yield put( giftAddedToAccount( payload.giftId ) )
 }
 
 export const associateGiftWatcher = createWatcher(

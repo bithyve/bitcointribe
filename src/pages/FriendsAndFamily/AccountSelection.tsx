@@ -32,11 +32,12 @@ export type Props = {
 export default function AccountSelection( { onClose, onChangeType } ) {
 //   const dispatch = useDispatch()
   const [ activeIndex, setActiveIndex ] = useState( AccountType.CHECKING_ACCOUNT )
+  const [ activeId, setActiveId ] = useState( '' )
   const activeAccounts = useActiveAccountShells()
   const renderButton = ( text ) => {
     return (
       <TouchableOpacity
-        onPress={( ) => {onChangeType( activeIndex )}}
+        onPress={( ) => {onChangeType( activeIndex, activeId )}}
         style={{
           ...styles.buttonView,
         }}
@@ -46,7 +47,9 @@ export default function AccountSelection( { onClose, onChangeType } ) {
     )
   }
   return (
-    <>
+    <View style={{
+      backgroundColor: Colors.bgColor
+    }}>
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {onClose( activeIndex ) }}
@@ -69,10 +72,10 @@ export default function AccountSelection( { onClose, onChangeType } ) {
           }}>Choose the account where you'd like to stack the sats</Text>
         </View>
         <ScrollView style={{
-          height: hp( '45%' )
+          height: hp( '36%' )
         }}>
           {activeAccounts.map( ( item, index ) => {
-            if ( item.primarySubAccount.type === AccountType.SWAN_ACCOUNT ) return
+            if ( item.primarySubAccount.type === AccountType.SWAN_ACCOUNT || !item.primarySubAccount.isUsable ) return
             return(
               <View key={index}>
                 <CardWithRadioBtn
@@ -81,7 +84,10 @@ export default function AccountSelection( { onClose, onChangeType } ) {
                   subText={''}
                   italicText={`Balance: ${item.primarySubAccount?.balances?.confirmed} sats`}
                   isSelected={activeIndex === item.primarySubAccount.type}
-                  setActiveIndex={setActiveIndex}
+                  setActiveIndex={( index ) => {
+                    setActiveIndex( index )
+                    setActiveId( item.primarySubAccount.id )
+                  }}
                   index={item.primarySubAccount.type}
                   changeBgColor={false}
                 />
@@ -89,21 +95,49 @@ export default function AccountSelection( { onClose, onChangeType } ) {
             )
           } )}
         </ScrollView>
-        {renderButton( 'Move Funds' )}
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
+        }}>
+          {renderButton( 'Proceed' )}
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            {/* <View style={styles.statusIndicatorInactiveView} /> */}
+
+          </View>
+        </View>
       </View>
 
-    </>
+    </View>
   )
 }
 
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '1%' ),
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   buttonView: {
-    height: wp( '12%' ),
+    height: wp( '14%' ),
     width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
@@ -129,7 +163,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginRight: wp( 12 ),
-    letterSpacing: 0.6
+    letterSpacing: 0.6,
+    marginBottom: hp( 2 )
   },
 } )
 

@@ -107,7 +107,7 @@ export const storeMessagesTimeStamp = () => {
 }
 
 export const messageFetched = ( messages ) => {
-  console.log( 'messagesFetched messages', messages )
+  // console.log( 'messagesFetched messages', messages )
   return {
     type: MESSAGES_FETCHED,
     payload: {

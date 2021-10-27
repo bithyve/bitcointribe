@@ -235,7 +235,7 @@ const GiftDetails = ( { navigation } ) => {
                 </View>
               </View>
               {
-                dropdownBoxOpenClose ? <ArrowDown /> : <ArrowUp />
+                dropdownBoxOpenClose ? <ArrowUp />  : <ArrowDown />
               }
             </View>
           </View>

@@ -328,10 +328,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             trustedContactRequest
           },
           () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
+            if ( trustedContactRequest.isContactGift ) {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.GIFT_REQUEST,
+                1
+              )
+            } else {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+
           }
           )
         }
@@ -678,10 +686,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest,
       },
       () => {
-        this.openBottomSheetOnLaunch(
-          BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-          1
-        )
+        if ( trustedContactRequest.isContactGift ) {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
+            1
+          )
+        } else{
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
+        }
+
       }
       )
     } else if ( giftRequest ) {
@@ -1067,6 +1083,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
+            if ( trustedContactRequest.isContactGift ) {
+              this.setState( {
+                trustedContactRequest: {
+                  ...trustedContactRequest, isAssociated: true
+                }
+              } )
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.GIFT_REQUEST,
+                1
+              )
+            }
           }
         } )
       }
@@ -1112,7 +1139,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       // this.closeBottomSheet()
       const { giftRequest } = this.state
-
       let decryptionKey: string
       try{
         switch( giftRequest.encryptionType ){
@@ -1478,7 +1504,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.GIFT_REQUEST:
-          const giftRequest = this.state.giftRequest
+          const giftRequest = this.state.giftRequest ?? this.state.trustedContactRequest
+
           return (
             <AcceptGift
               navigation={this.props.navigation}
@@ -1492,6 +1519,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               note={giftRequest.note}
               themeId={giftRequest.themeId}
               giftId={giftRequest.channelAddress}
+              isGiftWithFnF={giftRequest.isContactGift}
+              isContactAssociated={giftRequest.isAssociated}
+              onPressAccept={this.onTrustedContactRequestAccepted}
+              onPressReject={this.onTrustedContactRejected}
             />
           )
 

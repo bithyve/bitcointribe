@@ -28,23 +28,33 @@ import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/U
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import AccountSelection from './AccountSelection'
+import { associateGift } from '../../store/actions/trustedContacts'
+import DashedContainerSmall from './DashedContainerSmall'
+import { resetStackToAccountDetails,  } from '../../navigation/actions/NavigationActions'
+import AccountSelected from './AccountSelected'
+import AddGiftToAccount from './AddGiftToAccount'
+
 
 export type Props = {
   navigation: any;
   closeModal: () => void;
   onGiftRequestAccepted: ( otp ) => void;
   onGiftRequestRejected: () => void;
+  onPressAccept: ( key ) => void;
+  onPressReject: () => void;
   walletName: string;
   giftAmount: string;
   inputType: string;
   hint: string;
   note: string,
   themeId: string
-  giftId: string
+  giftId: string;
+  isGiftWithFnF: boolean;
+  isContactAssociated: boolean;
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -53,13 +63,20 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ onBlurFocus, setOnBlurFocus ] = useState( false )
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [] )
-  const [ acceptGift, setAcceptGiftModal ] = useState( true )
-  const [ showAccounts, setShowAccounts ] = useState( false )
+  const [ acceptGift, setAcceptGiftModal ] = useState( !isContactAssociated )
+  const [ downloadedGiftid, seDownloadedGiftId ] = useState( '' )
+  const [ confirmAccount, setConfirmAccount ] = useState( false )
+  const [ giftAddedModal, setGiftAddedModel ] = useState( false )
   const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
+  const [ accId, setAccId ] = useState( '' )
   const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
+  const [ addGiftToAccountFlow, setAddGiftToAccountFlow ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   const acceptedGifts = useSelector( ( state ) => state.accounts.acceptedGiftId )
-  // const activeAccounts = useActiveAccountShells()
+  const gifts = useSelector( ( state ) => state.accounts.gifts )
+
+  const addedGift = useSelector( ( state ) => state.accounts.addedGift )
+  const activeAccounts = useActiveAccountShells()
   // console.log( 'activeAccounts >>>>>>', activeAccounts )
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
   // console.log( 'sendingAccount', sendingAccount )
@@ -80,6 +97,12 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   }, [ sourcePrimarySubAccount ] )
 
   useEffect( () => {
+    setAccId( sourcePrimarySubAccount.id )
+    // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
+
+  }, [ sourcePrimarySubAccount ] )
+
+  useEffect( () => {
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ inputType ] )
@@ -87,10 +110,22 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   useEffect( () => {
     if ( giftId === acceptedGifts ) {
       setAcceptGiftModal( false )
+      const filterGift = Object.values( gifts ?? {
+      } ).find( ( item ) =>  giftId === item.channelAddress )
+      seDownloadedGiftId( filterGift?.id )
       setGiftAcceptedModel( true )
+      setIsDisabled( false )
     }
 
   }, [ acceptedGifts ] )
+
+  useEffect( () => {
+    if ( giftId === addedGift ) {
+      setConfirmAccount( false )
+      setGiftAddedModel( true )
+      setIsDisabled( false )
+    }
+  }, [ addedGift ] )
 
   const getStyle = ( i ) => {
     if ( i == 0 ) {
@@ -316,22 +351,37 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <TouchableOpacity
         disabled={!buttonIsDisabled ? buttonIsDisabled : isDisabled}
         onPress={() => {
+
           if ( text === 'Add to Account' ) {
             setGiftAcceptedModel( false )
-            setShowAccounts( true )
+            // setShowAccounts( true )
+            setAddGiftToAccountFlow( true )
             // navigation.navigate( 'AccountDetails', {
             //   accountShellID: sourcePrimarySubAccount.accountShellID,
             // } )
           } else if( text === 'Accept Gift' ) {
-            onGiftRequestAccepted( passcode )
+            setIsDisabled( true )
+            if ( isGiftWithFnF ) {
+              const key =
+                  inputType === DeepLinkEncryptionType.NUMBER
+                    ? PhoneNumber
+                    : inputType === DeepLinkEncryptionType.EMAIL
+                      ? EmailId
+                      : passcode.toUpperCase()
+              setTimeout( () => {
+                setPhoneNumber( '' )
+              }, 2 )
+              onPressAccept( key )
+            } else {
+              onGiftRequestAccepted( passcode )
+            }
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
-            setIsDisabled( false )
           }
         }}
         style={{
           ...styles.buttonView,
-          backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+          backgroundColor: isDisabled && buttonIsDisabled ? Colors.lightBlue : Colors.blue,
         }}
       >
         <Text style={styles.buttonText}>{text}</Text>
@@ -351,7 +401,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         }}>
           <Illustration/>
         </View> */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
             setGiftAcceptedModel( false )
@@ -367,10 +417,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19}/>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View style={{
           marginLeft: wp( 6 ),
-          marginBottom: hp( 3 )
+          marginVertical: hp( 3.5 )
         }}>
           <Text style={styles.modalTitleText}>Gift Sats Accepted</Text>
           {/* <Text style={{
@@ -395,9 +445,32 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         />
         {/* {renderButton( 'Add to Account' )} */}
         <View style={{
-          marginLeft: wp( 6 ),
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
         }}>
           {renderButton( 'Add to Account', false )}
+          <TouchableOpacity
+            onPress={() => {
+              // onGiftRequestRejected()
+              setGiftAcceptedModel( false )
+              closeModal()
+            }}
+            style={{
+              height: wp( '12%' ),
+              width: wp( '27%' ),
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingLeft: wp( '8%' ),
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: Fonts.FiraSansMedium,
+                color: Colors.blue
+              }}
+            >
+              {'Add Later'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </>
     )
@@ -632,10 +705,15 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
           marginTop: hp( 5 )
         }}>
-          {renderButton( 'Accept Gift' )}
+          {renderButton( 'Accept Gift', true )}
           <TouchableOpacity
             onPress={() => {
-              onGiftRequestRejected()
+              if ( isGiftWithFnF ) {
+                onPressReject()
+              } else {
+                onGiftRequestRejected()
+              }
+
             }}
             style={{
               height: wp( '12%' ),
@@ -690,42 +768,39 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       {/* {!acceptGift && !giftAcceptedModel && !showAccounts &&
        renderMessage()
       } */}
-      {showAccounts &&
-        <View style={styles.modalContentContainer}>
-          <AccountSelection
-            onClose={(  ) => {
-              setShowAccounts( false )
-              setGiftAcceptedModel( true )
-            }}
-            onChangeType={( type ) => {
-              setAccType( type )
-              setShowAccounts( false )
-              // setAcceptGiftModal( true )
-              setTimeout( () => {
-                Alert.alert(
-                  '',
-                  `Are you sure you want to add gift to your ${type} account?`,
-                  [
-                    {
-                      text: 'Cancel',
-                      onPress: () => setTimeout( () => {setGiftAcceptedModel( true )}, 200 ),
-                      style: 'cancel'
-                    },
-                    {
-                      text: 'YES', onPress: () => closeModal()
-                    }
-                  ],
-                )
-              }, 500 )
-            }}
-          />
-        </View>
+      {addGiftToAccountFlow &&
+      <AddGiftToAccount
+        getTheme={getTheme}
+        navigation={navigation}
+        giftAmount={giftAmount}
+        giftId={downloadedGiftid}
+        closeModal={closeModal}
+        onCancel={() =>{ setAddGiftToAccountFlow( false ); setGiftAcceptedModel( true )}}
+      />
       }
     </RootSiblingParent>
   )
 }
 
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '1%' ),
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
   box: {
     flex: 1,
     height: 60,
@@ -864,7 +939,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium,
   },
   buttonView: {
-    height: wp( '12%' ),
+    height: wp( '14%' ),
     width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
@@ -899,11 +974,12 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginRight: wp( 12 ),
-    letterSpacing: 0.6
+    letterSpacing: 0.6,
+    marginBottom: hp( 2 )
   },
   modalContentContainer: {
     // height: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.bgColor,
     paddingBottom: hp( 4 ),
   },
   rootContainer: {

@@ -21,11 +21,11 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { AccountType, Gift, GiftStatus } from '../../bitcoin/utilities/Interface'
+import { AccountType, Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import { reclaimGift } from '../../store/actions/trustedContacts'
+import { associateGift, reclaimGift } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
@@ -33,6 +33,8 @@ import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import AccountSelection from './AccountSelection'
 import ModalContainer from '../../components/home/ModalContainer'
+import AddGiftToAccount from './AddGiftToAccount'
+import ThemeList from './Theme'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -46,6 +48,12 @@ const GiftDetails = ( { navigation } ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
+
+  const getTheme = () => {
+    // props.themeId
+    const filteredArr = ThemeList.filter( ( item => item.id === gift.themeId ) )
+    return filteredArr[ 0 ]
+  }
 
   return (
     <ScrollView contentContainerStyle={{
@@ -168,7 +176,7 @@ const GiftDetails = ( { navigation } ) => {
               </View>
             </View>
           </View>
-          {isOpen && gift.status !== GiftStatus.CREATED && gift?.deepLinkConfig?.encryptionType === 'OTP' &&
+          {isOpen && gift.status !== GiftStatus.CREATED && gift.type === GiftType.SENT && gift?.deepLinkConfig?.encryptionType === 'OTP' &&
             <View style={{
               marginHorizontal: wp( 1 )
             }}>
@@ -200,7 +208,7 @@ const GiftDetails = ( { navigation } ) => {
               </View>
             </View>
           }
-          {isOpen && gift.status !== GiftStatus.CREATED && gift.note !== '' &&
+          {isOpen && gift.status !== GiftStatus.CREATED && gift.type === GiftType.SENT &&  gift.note !== '' &&
             <View style={{
               marginHorizontal: wp( 1 ),
             }}>
@@ -233,6 +241,10 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           {Object.entries( gift.timestamps ?? {
           } ).reverse().map( ( item, index ) => {
+
+            if ( gift.type === GiftType.RECEIVED && ( item[ 0 ] == 'created' || item[ 0 ] == 'sent' || item[ 0 ] == 'reclaimed' ) ) {
+              return null
+            }
             return(
               <View key={index} style={styles.timeInfo}>
                 <View style={{
@@ -273,7 +285,7 @@ const GiftDetails = ( { navigation } ) => {
         </View>
       </SafeAreaView>
 
-      {gift.status === GiftStatus.SENT ?
+      {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ?
         (
           <View style={{
             ...styles.keeperViewStyle
@@ -335,28 +347,14 @@ const GiftDetails = ( { navigation } ) => {
             </TouchableOpacity>
           </View>
         ) : null}
-      {gift.status === GiftStatus.ACCEPTED ?
+      {gift.status === GiftStatus.ACCEPTED && !gift.receiver.accountId ?
         (
           <View style={{
-            ...styles.keeperViewStyle
-          }}><TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-              }}
-              onPress={() => {
-              // dispatch( reclaimGift( gift.id ) )
-                navigation.navigate( 'EnterGiftDetails', {
-                  giftId: ( gift as Gift ).id,
-                } )
-              }}
-            >
-              <Text style={[ styles.buttonText, {
-              } ]}>Send Gift Card</Text>
-              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
-            </TouchableOpacity>
+            backgroundColor: Colors.backgroundColor, width: '100%',
+          }}>
             <TouchableOpacity
               style={{
-                ...styles.bottomButton,
+                ...styles.bottomButton, marginBottom: hp( 3 )
               }}
               onPress={() => {setAcceptGiftModal( true )
               }}
@@ -369,27 +367,12 @@ const GiftDetails = ( { navigation } ) => {
         ) : null}
       <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
         <View style={styles.modalContentContainer}>
-          <AccountSelection
-            onClose={( ) => {setAcceptGiftModal( false )}}
-            onChangeType={( type ) => {
-              setAcceptGiftModal( false )
-              setTimeout( () => {
-                Alert.alert(
-                  '',
-                  `Are you sure you want to add gift to your ${type} account?`,
-                  [
-                    {
-                      text: 'Cancel',
-                      onPress: () => console.log( 'Cancel Pressed' ),
-                      style: 'cancel'
-                    },
-                    {
-                      text: 'YES', onPress: () => console.log( 'OK Pressed' )
-                    }
-                  ],
-                )
-              }, 500 )
-            }}
+          <AddGiftToAccount
+            getTheme={getTheme}
+            navigation={navigation}
+            giftAmount={gift.amount}
+            giftId={( gift as Gift ).id}
+            onCancel={() =>{ setAcceptGiftModal( false ) }}
           />
         </View>
       </ModalContainer>
@@ -413,7 +396,7 @@ const styles = StyleSheet.create( {
   },
   line: {
     height: hp( 7.2 ),
-    width: wp( 0.05 ),
+    width: wp( 0.07 ),
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 3 ),
   },
@@ -508,7 +491,7 @@ const styles = StyleSheet.create( {
   keeperViewStyle: {
     flexDirection: 'row',
     backgroundColor: Colors.backgroundColor,
-    paddingHorizontal: wp( '4%' ),
+    paddingHorizontal:wp( '4%' ),
     justifyContent: 'space-between',
     height: wp( '30' ),
   },
