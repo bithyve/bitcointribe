@@ -19,7 +19,8 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
     <TouchableOpacity
       onPress={() => setActiveIndex( index )}
       style={{
-        width: '90%', height: hp( '11%' ), backgroundColor: isSelected && changeBgColor ? Colors.lightBlue : Colors.backgroundColor1,
+        width: '90%', height: hp( '11%' ),
+        backgroundColor: isSelected && changeBgColor ? Colors.lightBlue : Colors.white,
         alignSelf: 'center', justifyContent: 'center',
         borderRadius: wp( '4' ),
         marginVertical: hp( '1%' ),

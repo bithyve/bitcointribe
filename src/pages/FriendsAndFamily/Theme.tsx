@@ -8,7 +8,7 @@ import { GiftThemeId } from '../../bitcoin/utilities/Interface'
 
 const ThemeList = [
   {
-    'id': GiftThemeId.ONE, 'title': 'Bitcoin', 'subText': 'Lorem ipsum dolor', 'avatar': <GiftCard />, color: Colors.lightBlue
+    'id': GiftThemeId.ONE, 'title': 'Bitcoin', 'subText': 'Lorem ipsum dolor', 'avatar': <GiftCard />, color: Colors.darkBlue
   },
   {
     'id': GiftThemeId.TWO, 'title': 'Halloween', 'subText': 'Lorem ipsum dolor', 'avatar': <Halloween />, color: Colors.greenShade

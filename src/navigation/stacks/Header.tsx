@@ -678,6 +678,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest,
       },
       () => {
+        if ( trustedContactRequest.isKeeperGift ) {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
+            1
+          )
+        }
         this.openBottomSheetOnLaunch(
           BottomSheetKind.TRUSTED_CONTACT_REQUEST,
           1
@@ -1479,6 +1485,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         case BottomSheetKind.GIFT_REQUEST:
           const giftRequest = this.state.giftRequest
+          console.log( 'giftRequestgiftRequestgiftRequestgiftRequestgiftRequest', giftRequest )
+
           return (
             <AcceptGift
               navigation={this.props.navigation}
