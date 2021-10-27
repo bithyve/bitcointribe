@@ -1505,7 +1505,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         case BottomSheetKind.GIFT_REQUEST:
           const giftRequest = this.state.giftRequest ?? this.state.trustedContactRequest
-          console.log( 'giftRequestgiftRequestgiftRequestgiftRequestgiftRequest', giftRequest )
 
           return (
             <AcceptGift
