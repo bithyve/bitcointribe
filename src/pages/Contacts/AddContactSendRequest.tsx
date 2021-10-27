@@ -230,13 +230,21 @@ export default function AddContactSendRequest( props ) {
       }
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+    const extraData = giftToSend?  {
+      channelAddress: giftToSend.channelAddress,
+      amount: giftToSend.amount,
+      note: giftToSend.note,
+      themeId: giftToSend.themeId
+    }: null
+
     const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
-      deepLinkKind: giftId? DeepLinkKind.KEEPER_GIFT: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      deepLinkKind: giftToSend? DeepLinkKind.KEEPER_GIFT: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
       keysToEncrypt,
       generateShortLink: true,
+      extraData
     } )
     const link = shortLink !== '' ? shortLink: deepLink
     setTrustedLink( link )
@@ -249,16 +257,31 @@ export default function AddContactSendRequest( props ) {
     else if( isKeeper ) qrType = QRCodeTypes.KEEPER_REQUEST
     else qrType = QRCodeTypes.CONTACT_REQUEST
 
-    setTrustedQR(
+    if( giftToSend ){
       JSON.stringify( {
         type: qrType,
         encryptedChannelKeys: encryptedChannelKeys,
         encryptionType,
         encryptionHint,
         walletName: wallet.walletName,
+        channelAddress: giftToSend.channelAddress,
+        amount: giftToSend.amount,
+        note: giftToSend.note,
+        themeId: giftToSend.themeId,
         version: appVersion,
       } )
-    )
+    } else{
+      setTrustedQR(
+        JSON.stringify( {
+          type: qrType,
+          encryptedChannelKeys: encryptedChannelKeys,
+          encryptionType,
+          encryptionHint,
+          walletName: wallet.walletName,
+          version: appVersion,
+        } )
+      )
+    }
 
     // update deeplink configuration for the contact
     if( !currentContact.deepLinkConfig || currentContact.deepLinkConfig.encryptionType !== encryptLinkWith )

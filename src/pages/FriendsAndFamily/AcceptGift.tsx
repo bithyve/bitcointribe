@@ -46,11 +46,12 @@ export type Props = {
   hint: string;
   note: string,
   themeId: string
-  giftId: string
+  giftId: string;
+  isGiftWithFnF: boolean
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -59,13 +60,12 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ onBlurFocus, setOnBlurFocus ] = useState( false )
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [] )
-  const [ acceptGift, setAcceptGiftModal ] = useState( true )
-  const [ showAccounts, setShowAccounts ] = useState( false )
+  const [ acceptGift, setAcceptGiftModal ] = useState( !isGiftWithFnF )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
   const [ giftAddedModal, setGiftAddedModel ] = useState( false )
   const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ accId, setAccId ] = useState( '' )
-  const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
+  const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( isGiftWithFnF )
   const [ addGiftToAccountFlow, setAddGiftToAccountFlow ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   const acceptedGifts = useSelector( ( state ) => state.accounts.acceptedGiftId )
@@ -360,7 +360,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         }}
         style={{
           ...styles.buttonView,
-          backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+          backgroundColor: isDisabled && buttonIsDisabled ? Colors.lightBlue : Colors.blue,
         }}
       >
         <Text style={styles.buttonText}>{text}</Text>

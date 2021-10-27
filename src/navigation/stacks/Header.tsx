@@ -679,10 +679,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       },
       () => {
         if ( trustedContactRequest.isKeeperGift ) {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.GIFT_REQUEST,
-            1
-          )
+          this.setState( {
+            giftRequest: {
+              ...trustedContactRequest, isGiftWithFnF: true
+            },
+          } )
         }
         this.openBottomSheetOnLaunch(
           BottomSheetKind.TRUSTED_CONTACT_REQUEST,
@@ -1073,6 +1074,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
+            console.log( 'ContactsListForAssociateContact after >>>>' )
+            if ( trustedContactRequest.isKeeperGift ) {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.GIFT_REQUEST,
+                1
+              )
+            }
           }
         } )
       }
@@ -1118,7 +1126,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       // this.closeBottomSheet()
       const { giftRequest } = this.state
-
       let decryptionKey: string
       try{
         switch( giftRequest.encryptionType ){
@@ -1500,6 +1507,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               note={giftRequest.note}
               themeId={giftRequest.themeId}
               giftId={giftRequest.channelAddress}
+              isGiftWithFnF={giftRequest.isGiftWithFnF}
             />
           )
 

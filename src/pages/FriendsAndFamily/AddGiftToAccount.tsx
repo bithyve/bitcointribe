@@ -134,7 +134,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
         </View>
       }
       {giftAddedModal &&
-      // <View style={styles.modalContentContainer}>
+      <View style={styles.modalContentContainer}>
         <GiftAddedModal
           getTheme={getTheme}
           sourcePrimarySubAccount={sourcePrimarySubAccount}
@@ -144,7 +144,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
           spendableBalance={spendableBalance}
           onCancel={onCancel}
         />
-      // </View>
+      </View>
       }
     </>
   )
