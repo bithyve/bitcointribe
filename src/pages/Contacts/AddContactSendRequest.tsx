@@ -238,7 +238,7 @@ export default function AddContactSendRequest( props ) {
     }: null
 
     const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
-      deepLinkKind: giftToSend? DeepLinkKind.KEEPER_GIFT: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      deepLinkKind: giftToSend? DeepLinkKind.CONTACT_GIFT: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
@@ -251,14 +251,14 @@ export default function AddContactSendRequest( props ) {
     const appVersion = DeviceInfo.getVersion()
 
     let qrType: string
-    if( giftId ) qrType = QRCodeTypes.KEEPER_GIFT
+    if( giftToSend ) qrType = QRCodeTypes.CONTACT_GIFT
     else if( existingContact ) qrType = QRCodeTypes.EXISTING_CONTACT
     else if( isPrimary ) qrType = QRCodeTypes.PRIMARY_KEEPER_REQUEST
     else if( isKeeper ) qrType = QRCodeTypes.KEEPER_REQUEST
     else qrType = QRCodeTypes.CONTACT_REQUEST
 
     if( giftToSend ){
-      JSON.stringify( {
+      setTrustedQR( JSON.stringify( {
         type: qrType,
         encryptedChannelKeys: encryptedChannelKeys,
         encryptionType,
@@ -269,7 +269,7 @@ export default function AddContactSendRequest( props ) {
         note: giftToSend.note,
         themeId: giftToSend.themeId,
         version: appVersion,
-      } )
+      } ) )
     } else{
       setTrustedQR(
         JSON.stringify( {

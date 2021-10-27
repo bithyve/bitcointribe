@@ -211,11 +211,6 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
 
     yield put( updateGift( gift ) )
     yield put( giftAccepted( gift.channelAddress ) )
-    // yield call( associateGiftWorker, {
-    //   payload: {
-    //     giftId: gift.id
-    //   }
-    // } )
     yield call( dbManager.createGift, gift )
     yield put( updateWalletImageHealth( {
       updateGifts: true,
