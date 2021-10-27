@@ -35,7 +35,6 @@ function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( '' )
   const contact = props.contact
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
@@ -134,28 +133,28 @@ function RequestKeyFromContact( props ) {
               alignSelf: 'center',
               borderTopRightRadius: wp( 2 ),
               borderBottomRightRadius: wp( 2 ),
-              borderTopLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 2 ),
-              borderBottomLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 2 ),
+              borderTopLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 90/2  ),
+              borderBottomLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 90/2  ),
               marginTop: hp( 1 ),
               marginBottom: hp( 1 ),
-              paddingVertical: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : hp( 2 ),
+              paddingVertical: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : hp( 0 ),
               paddingRight: wp( 3 ),
               flexDirection: 'row',
               alignItems: 'center',
-              paddingHorizontal: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : wp( 3 )
+              paddingHorizontal: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : wp( 0 )
             }}>
-            {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
-              <View style={styles.contactProfileImageContainer}>
+            <View style={styles.contactProfileImageContainer}>
+              {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
+
                 <Image
                   source={contact.image}
                   style={{
                     ...styles.contactProfileImage
                   }}
                 />
-              </View>
 
-              : (
-                <View style={styles.contactProfileImageContainer}>
+
+                : (
                   <View
                     style={{
                       alignItems: 'center',
@@ -189,10 +188,10 @@ function RequestKeyFromContact( props ) {
                       )}
                     </Text>
                   </View>
-                </View>
-              )
-              : <GiftCard /> :  <GiftCard />
-            }
+                )
+                : <GiftCard /> :  <GiftCard />
+              }
+            </View>
 
             <View style={{
               marginHorizontal: wp( 3 )
@@ -320,8 +319,10 @@ function RequestKeyFromContact( props ) {
           // marginBottom: 2,
           // fontFamily: Fonts.FiraSansRegular,
           marginHorizontal: wp( 6 ),
+          marginRight: wp( 10 ),
           lineHeight: 18,
-          marginVertical: hp( 2 )
+          marginVertical: hp( 2 ),
+          marginBottom: hp( 6 )
         }}>
           {'Your friend will be prompted to enter '}
           <Text style={{
@@ -329,7 +330,7 @@ function RequestKeyFromContact( props ) {
           }}>
             {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
           </Text>
-          while acceptin the gift card
+          while accepting the gift card
         </Text>
       }
       {!props.isGift &&

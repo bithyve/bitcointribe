@@ -50,10 +50,11 @@ export type Props = {
   themeId: string
   giftId: string;
   isGiftWithFnF: boolean;
+  isContactAssociated: boolean;
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, onPressAccept, onPressReject }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -62,7 +63,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ onBlurFocus, setOnBlurFocus ] = useState( false )
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [] )
-  const [ acceptGift, setAcceptGiftModal ] = useState( !isGiftWithFnF )
+  const [ acceptGift, setAcceptGiftModal ] = useState( !isContactAssociated )
   const [ downloadedGiftid, seDownloadedGiftId ] = useState( '' )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
   const [ giftAddedModal, setGiftAddedModel ] = useState( false )
@@ -361,7 +362,16 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           } else if( text === 'Accept Gift' ) {
             setIsDisabled( true )
             if ( isGiftWithFnF ) {
-              onPressAccept( passcode )
+              const key =
+                  inputType === DeepLinkEncryptionType.NUMBER
+                    ? PhoneNumber
+                    : inputType === DeepLinkEncryptionType.EMAIL
+                      ? EmailId
+                      : passcode.toUpperCase()
+              setTimeout( () => {
+                setPhoneNumber( '' )
+              }, 2 )
+              onPressAccept( key )
             } else {
               onGiftRequestAccepted( passcode )
             }
@@ -964,7 +974,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginRight: wp( 12 ),
-    letterSpacing: 0.6
+    letterSpacing: 0.6,
+    marginBottom: hp( 2 )
   },
   modalContentContainer: {
     // height: '100%',

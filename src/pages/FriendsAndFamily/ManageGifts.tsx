@@ -402,7 +402,7 @@ const ManageGifts = ( { navigation } ) => {
                             {title}
                           </Text>
                           <Text style={{
-                            fontSize: RFValue( 12 ), textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                            fontSize: RFValue( 12 ), textAlign: 'center', color: Colors.textColorGrey
                           }}>
                             {walletName ? walletName : 'Checking Account'}
                           </Text>
@@ -412,7 +412,7 @@ const ManageGifts = ( { navigation } ) => {
                             letterSpacing: 0.1,
                             fontFamily: Fonts.FiraSansRegular,
                           }}>
-                            {moment( item.createdAt ).format( 'lll' )}
+                            {moment( item.timestamps?.created ).format( 'lll' )}
                           </Text>
                         </View>
                         <View style={{
@@ -612,6 +612,8 @@ const styles = StyleSheet.create( {
     width: wp( 10 ),
     height: wp( 10 ),
     borderRadius: wp( 10 ) / 2,
+    borderWidth: 0.6,
+    borderColor: Colors.gray2
   },
   listItem: {
     marginVertical: hp( 0.5 ),

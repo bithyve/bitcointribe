@@ -163,7 +163,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginRight: wp( 12 ),
-    letterSpacing: 0.6
+    letterSpacing: 0.6,
+    marginBottom: hp( 2 )
   },
 } )
 

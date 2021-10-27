@@ -328,7 +328,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             trustedContactRequest
           },
           () => {
-            if ( trustedContactRequest.isKeeperGift ) {
+            if ( trustedContactRequest.isContactGift ) {
               this.openBottomSheetOnLaunch(
                 BottomSheetKind.GIFT_REQUEST,
                 1
@@ -686,7 +686,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest,
       },
       () => {
-        if ( trustedContactRequest.isKeeperGift ) {
+        if ( trustedContactRequest.isContactGift ) {
           this.openBottomSheetOnLaunch(
             BottomSheetKind.GIFT_REQUEST,
             1
@@ -1083,8 +1083,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
-            console.log( 'ContactsListForAssociateContact after >>>>' )
-            if ( trustedContactRequest.isKeeperGift ) {
+            if ( trustedContactRequest.isContactGift ) {
+              this.setState( {
+                trustedContactRequest: {
+                  ...trustedContactRequest, isAssociated: true
+                }
+              } )
               this.openBottomSheetOnLaunch(
                 BottomSheetKind.GIFT_REQUEST,
                 1
@@ -1516,7 +1520,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               note={giftRequest.note}
               themeId={giftRequest.themeId}
               giftId={giftRequest.channelAddress}
-              isGiftWithFnF={giftRequest.isKeeperGift}
+              isGiftWithFnF={giftRequest.isContactGift}
+              isContactAssociated={giftRequest.isAssociated}
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
             />

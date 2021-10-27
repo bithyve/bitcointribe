@@ -21,6 +21,7 @@ import { associateGift } from '../../store/actions/trustedContacts'
 import { resetStackToAccountDetails,  } from '../../navigation/actions/NavigationActions'
 import AccountSelected from './AccountSelected'
 import GiftAddedModal from './GiftAddedModal'
+import { giftAccepted } from '../../store/actions/accounts'
 
 
 export type Props = {
@@ -79,6 +80,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             dispatch( associateGift( giftId, accId ) )
           } else {
             setGiftAddedModel( false )
+            dispatch( giftAccepted( '' ) )
             closeModal()
             navigation.dispatch(
               resetStackToAccountDetails( {

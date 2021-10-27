@@ -213,7 +213,7 @@ const CreateGift = ( { navigation } ) => {
         </TouchableOpacity>
         <View>
           <View style={{
-            marginLeft: wp( 6 ),
+            marginLeft: wp( 7 ),
           }}>
             <Text style={styles.modalTitleText}>Gift Created</Text>
             <Text style={{
@@ -232,7 +232,8 @@ const CreateGift = ( { navigation } ) => {
           <BottomInfoBox
             containerStyle={{
               paddingRight: wp( 15 ),
-              backgroundColor: 'transparent'
+              backgroundColor: 'transparent',
+              marginTop: hp( -1 )
             }}
             infoText={'The Gift is ready to be sent to anyone you choose. If unclaimed, the sats would revert to your wallet.'}
           />
@@ -679,7 +680,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginRight: wp( 10 ),
-    letterSpacing: 0.6
+    letterSpacing: 0.6,
+    marginBottom: hp( 2 )
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor,
@@ -695,8 +697,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium,
   },
   buttonView: {
-    height: wp( '12%' ),
-    width: wp( '27%' ),
+    height: wp( '14%' ),
+    width: wp( '35%' ),
     paddingHorizontal: wp( 2 ),
     justifyContent: 'center',
     alignItems: 'center',
