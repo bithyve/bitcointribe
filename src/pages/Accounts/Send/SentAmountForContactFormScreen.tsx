@@ -34,6 +34,8 @@ import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store
 import RecipientKind from '../../../common/data/enums/RecipientKind'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { translations } from '../../../common/content/LocContext'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { NetworkType } from '../../../bitcoin/utilities/Interface'
 
 export type NavigationParams = {
 };
@@ -58,12 +60,13 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  const sourceAccount = useAccountByAccountShell( sourceAccountShell )
   const spendableBalance = useSpendableBalanceForAccountShell( sourceAccountShell )
   const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const sendingState = useSendingState()
   const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
+    bitcoinUnit: sourceAccount.networkType === NetworkType.TESTNET? BitcoinUnit.TSATS: BitcoinUnit.SATS,
   } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
