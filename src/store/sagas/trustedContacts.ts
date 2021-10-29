@@ -690,6 +690,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
             title: notifTitle,
             body: notifBody,
             data: {
+              channelKey: contact.channelKey
             },
             tag: notificationTag.IMP,
           }
