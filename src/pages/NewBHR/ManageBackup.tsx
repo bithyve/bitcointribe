@@ -462,7 +462,7 @@ export default function ManageBackup( props ) {
           {
             selectedTime: value.keeper2.updatedAt
               ? getTime( value.keeper2.updatedAt )
-              : 'never',
+              : 'Never',
           }
         )
       }
@@ -472,7 +472,7 @@ export default function ManageBackup( props ) {
         {
           selectedTime: value.keeper1.updatedAt
             ? getTime( value.keeper1.updatedAt )
-            : 'never',
+            : 'Never',
         }
       )
     } else {

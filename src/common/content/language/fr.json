@@ -497,7 +497,7 @@
       "NotNow": "Pas maintenant"
   },
   "bhr": {
-      "Pleaseapprovethis": "Veuillez approuver cette demande en scannant la clé secondaire stockée avec l'une des autres sauvegardes",
+      "Pleaseapprovethis": "Veuillez approuver cette demande en scannant la clé approbation stockée avec l'une des autres sauvegardes",
       "Generatingyour": "Génération de votre",
       "Itmaytake": "Cela peut prendre un peu de temps car le portefeuille crée des clés de récupération. Ne fermez pas l'application et ne revenez pas en arrière",
       "SecurityPrivacy": "Sécurité & Confidentialité",
@@ -544,7 +544,7 @@
       "changetheKeeper": "Vous pouvez changer le Keeper que vous avez sélectionné pour envoyer votre clé de récupération",
       "QRscanner": "Scanner QR",
       "ScanQRCode": "Scannez le code QR",
-      "approvethisrequest": "Veuillez approuver cette demande en scannant la clé secondaire stockée avec l'une des autres sauvegardes",
+      "approvethisrequest": "Veuillez approuver cette demande en scannant la clé approbation stockée avec l'une des autres sauvegardes",
       "Resharewithsamedevice": "Partager de nouveau avec le même appareil ?",
       "ifyouwanttoreshare": "Continuez si vous souhaitez partager le lien/ QR avec le même appareil",
       "differentdevice": "Pour un autre appareil, veuillez revenir en arrière et choisir « Changer d'appareil",
@@ -552,7 +552,7 @@
       "Changebackupmethod": "Changer de méthode de sauvegarde",
       "withanewcontact": "Partagez votre clé de récupération avec un nouveau contact ou un autre appareil",
       "OpentheQRscanner": "Ouvrez le scanner QR en haut à droite de l'écran d'accueil d'un autre appareil personnel exécutant l'application Hexa, et scannez ce QR",
-      "Ihavescanned": "Oui, j'ai scanné",
+      "Ihavescanned": "Numérisation QR terminée",
       "IamtheKeeper": "Je suis le gardien de",
       "Level 1": "Niveau 1",
       "Set Password": "Définir le mot de passe",

@@ -670,7 +670,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         selectedTitle={selectedTitle}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
-          : 'never'}
+          : 'Never'}
         moreInfo={selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
         imageIcon={getImageIcon}

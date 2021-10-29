@@ -534,7 +534,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         selectedTitle={props.navigation.state.params.selectedTitle}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
-          : 'never'}
+          : 'Never'}
         moreInfo={props.navigation.state.params.selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />

@@ -50,6 +50,10 @@ import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
 import { isEmpty } from '../../common/CommonFunctions'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -403,7 +407,7 @@ const PersonalCopyHistory = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={storagePermissionBottomSheet}
-        title={'Why do we need access to your files and storage?'}
+        title={'Why does the wallet need access to your files and storage?'}
         info={'File and Storage access will let Hexa save a pdf with your Recovery Keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n'}
         otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
         proceedButtonText={'Continue'}
@@ -414,6 +418,14 @@ const PersonalCopyHistory = ( props ) => {
         onPressIgnore={() => {
         }}
         isBottomImage={true}
+        isBottomImageStyle={{
+          width: wp( '29%' ),
+          height: wp( '30%' ),
+          marginLeft: 'auto',
+          resizeMode: 'stretch',
+          marginRight: wp( -2 ),
+          marginBottom: wp( -2 ),
+        }}
         bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
       />
     )
@@ -581,7 +593,7 @@ const PersonalCopyHistory = ( props ) => {
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
-          : 'never'}
+          : 'Never'}
         moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />

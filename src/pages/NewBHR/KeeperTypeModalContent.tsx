@@ -208,7 +208,7 @@ export default function KeeperTypeModalContents( props ) {
               />
               <View>
                 <Text style={styles.keeperTypeTitle}>{value.name}</Text>
-                <Text numberOfLines={2} style={styles.keeperTypeInfo}>
+                <Text numberOfLines={3} style={styles.keeperTypeInfo}>
                   {value.info}
                 </Text>
               </View>

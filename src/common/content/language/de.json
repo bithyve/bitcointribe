@@ -497,7 +497,7 @@
       "NotNow": "Nicht jetzt"
   },
   "bhr": {
-      "Pleaseapprovethis": "Bitte genehmige diese Anfrage, indem du den Sekundärschlüssel scannst, der mit einem der anderen Backups gespeichert ist",
+      "Pleaseapprovethis": "Bitte genehmige diese Anfrage, indem du den die Genehmigung scannst, der mit einem der anderen Backups gespeichert ist",
       "Generatingyour": "Generiere deine",
       "Itmaytake": "Es kann eine Weile dauern, da die Wallet Wiederherstellungsschlüssel erstellt. Schließe die App nicht und gehe nicht zurück",
       "SecurityPrivacy": "Sicherheit und Privatsphäre",
@@ -544,7 +544,7 @@
       "changetheKeeper": "Du kannst den Bewahrer ändern, den du zum Senden deines Wiederherstellungsschlüssels ausgewählt hast",
       "QRscanner": "QR-Scanner",
       "ScanQRCode": "QR-Code scannen",
-      "approvethisrequest": "Bitte genehmige diese Anfrage, indem Du den Sekundärschlüssel scannst, der mit einem der anderen Backups gespeichert ist",
+      "approvethisrequest": "Bitte genehmige diese Anfrage, indem Du den die Genehmigung scannst, der mit einem der anderen Backups gespeichert ist",
       "Resharewithsamedevice": "Mit demselben Gerät erneut teilen?",
       "ifyouwanttoreshare": "Fortfahren, wenn Du den Link/QR mit demselben Gerät erneut freigeben möchtest",
       "differentdevice": "Um ein anderes Gerät zu wählen, zurück gehen und 'Gerät ändern' wählen",
@@ -552,7 +552,7 @@
       "Changebackupmethod": "Backup-Methode ändern",
       "withanewcontact": "Teile deinen Wiederherstellungsschlüssel mit einem neuen Kontakt oder einem anderen Gerät",
       "OpentheQRscanner": "Öffne den QR-Scanner oben rechts auf dem Startbildschirm auf einem anderen persönlichen Gerät, auf dem die Hexa-App ausgeführt wird, und scanne diesen QR-Code",
-      "Ihavescanned": "Ja, ich habe eingescannt",
+      "Ihavescanned": "QR-Scan abgeschlossen",
       "IamtheKeeper": "Ich bin der Hüter von",
       "Level 1": "Level 1",
       "Set Password": "Passwort festlegen",
