@@ -197,6 +197,7 @@
       "confirmpin": "confirmar PIN",
       "Incorrectpasscode": "Código de acceso incorrecto, inténtelo de nuevo.",
       "Answerisincorrect": "La respuesta es incorrecta",
+      "passwordisincorrect": "La contraseña es incorrecta",
       "Specifythe": "Especifique la respuesta como lo hizo en el momento de configurar la billetera",
       "Enteranswer": "Ingrese la respuesta"
   },
@@ -497,7 +498,7 @@
       "NotNow": "Ahora no"
   },
   "bhr": {
-      "Pleaseapprovethis": "Apruebe esta solicitud escaneando la clave secundaria almacenada con cualquiera de las otras copias de seguridad",
+      "Pleaseapprovethis": "Apruebe esta solicitud escaneando la clave aprobación almacenada con cualquiera de las otras copias de seguridad",
       "Generatingyour": "Generando tu",
       "Itmaytake": "Es posible que la billetera tarde un poco en crear claves de recuperación. No cierres la aplicación ni vuelvas atrás",
       "SecurityPrivacy": "Seguridad y Privacidad",
@@ -544,7 +545,7 @@
       "changetheKeeper": "Puede cambiar el Keeper que seleccionó para enviar su clave de recuperación",
       "QRscanner": "Escáner QR",
       "ScanQRCode": "Escanear código QR",
-      "approvethisrequest": "Apruebe esta solicitud escaneando la clave secundaria almacenada con cualquiera de las otras copias de seguridad",
+      "approvethisrequest": "Apruebe esta solicitud escaneando la clave aprobación almacenada con cualquiera de las otras copias de seguridad",
       "Resharewithsamedevice": "¿Volver a compartir con el mismo dispositivo?",
       "ifyouwanttoreshare": "Continúe si desea volver a compartir el enlace / QR con el mismo dispositivo",
       "differentdevice": "Para un dispositivo diferente, regrese y seleccione \"Cambiar dispositivo",
@@ -552,7 +553,7 @@
       "Changebackupmethod": "Cambiar el método de copia de seguridad",
       "withanewcontact": "Comparta su clave de recuperación con un nuevo contacto o un dispositivo diferente",
       "OpentheQRscanner": "Abra el escáner QR en la parte superior derecha de la pantalla de inicio en otro dispositivo personal que ejecute la aplicación Hexa y escanee este QR",
-      "Ihavescanned": "Si, he escaneado",
+      "Ihavescanned": "Terminado de escanear QR",
       "IamtheKeeper": "Yo soy el guardián de",
       "Level 1": "Nivel 1",
       "Set Password": "Configurar la clave",

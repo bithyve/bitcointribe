@@ -197,6 +197,7 @@
       "confirmpin": "confirme o pin",
       "Incorrectpasscode": "Senha incorreta, tente novamente!",
       "Answerisincorrect": "Resposta está incorreta",
+      "passwordisincorrect": "senha é incorreta",
       "Specifythe": "Especifique a resposta como você fez no momento de configurar a carteira",
       "Enteranswer": "Digite a resposta"
   },
@@ -497,7 +498,7 @@
       "NotNow": "Agora não"
   },
   "bhr": {
-      "Pleaseapprovethis": "Aprove esta solicitação examinando a chave secundária armazenada com qualquer um dos outros backups",
+      "Pleaseapprovethis": "Aprove esta solicitação examinando a chave aprovação armazenada com qualquer um dos outros backups",
       "Generatingyour": "Gerando seu",
       "Itmaytake": "Pode demorar um pouco enquanto a carteira cria Chaves de Recuperação. Não feche o aplicativo ou volte",
       "SecurityPrivacy": "Segurança e Privacidade",
@@ -544,7 +545,7 @@
       "changetheKeeper": "Você pode alterar o Keeper que você selecionou para enviar sua chave de recuperação",
       "QRscanner": "Scanner QR",
       "ScanQRCode": "Leia o código QR",
-      "approvethisrequest": "Aprove esta solicitação examinando a chave secundária armazenada com qualquer um dos outros backups",
+      "approvethisrequest": "Aprove esta solicitação examinando a chave aprovação armazenada com qualquer um dos outros backups",
       "Resharewithsamedevice": "Compartilhar de novo com o mesmo dispositivo?",
       "ifyouwanttoreshare": "Continue se quiser compartilhar o link / QR com o mesmo dispositivo",
       "differentdevice": "Para um dispositivo diferente, volte e escolha ‘Alterar dispositivo",
@@ -552,7 +553,7 @@
       "Changebackupmethod": "Alterar método de backup",
       "withanewcontact": "Compartilhe sua chave de recuperação com um novo contato ou um dispositivo diferente",
       "OpentheQRscanner": "Abra o scanner QR no canto superior direito da tela inicial em outro dispositivo pessoal executando o aplicativo Hexa e faça a leitura deste QR",
-      "Ihavescanned": "Sim, eu fiz a digitalização",
+      "Ihavescanned": "Digitalização QR concluída",
       "IamtheKeeper": "Eu sou o guardião de",
       "Level 1": "Nível 1",
       "Set Password": "Configurar senha",
