@@ -197,6 +197,7 @@
       "confirmpin": "bestätige die PIN",
       "Incorrectpasscode": "Falsches Passwort, versuchen Sie es erneut!",
       "Answerisincorrect": "Antwort ist falsch",
+      "passwordisincorrect": "Das Passwort ist inkorrekt",
       "Specifythe": "Gebe die Antwort so an, wie Du sie bei der Einrichtung der Brieftasche angegeben hast",
       "Enteranswer": "Antwort eingeben"
   },

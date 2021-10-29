@@ -197,6 +197,7 @@
       "confirmpin": "confirmar PIN",
       "Incorrectpasscode": "Código de acceso incorrecto, inténtelo de nuevo.",
       "Answerisincorrect": "La respuesta es incorrecta",
+      "passwordisincorrect": "La contraseña es incorrecta",
       "Specifythe": "Especifique la respuesta como lo hizo en el momento de configurar la billetera",
       "Enteranswer": "Ingrese la respuesta"
   },

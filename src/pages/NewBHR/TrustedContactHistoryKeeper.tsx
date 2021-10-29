@@ -103,7 +103,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ isNavigation, setNavigation ] = useState( false )
   const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
   const [ selectedTitle, setSelectedTitle ] = useState( props.navigation.getParam( 'selectedTitle' ) )
-  const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
@@ -134,7 +134,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const dispatch = useDispatch()
 
   useEffect( () => {
-    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
     setIsChange(
@@ -595,7 +595,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     setKeeperTypeModal( false )
     const navigationParams = {
       selectedTitle: name,
-      selectedLevelId: selectedLevelId,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
       selectedKeeper: {
         shareType: type,
         name: name,
@@ -854,7 +854,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
-          selectedLevelId={selectedLevelId}
           keeper={selectedKeeper}
         />
       </ModalContainer>

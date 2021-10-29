@@ -107,6 +107,7 @@ export default function ManageBackup( props ) {
   }, any ] = useState( defaultKeeperObj )
   const [ selectedId, setSelectedId ] = useState( 0 )
   const [ selectedLevelId, setSelectedLevelId ] = useState( 0 )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( 0 )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isEnabled, setIsEnabled ] = useState( false )
@@ -307,17 +308,17 @@ export default function ManageBackup( props ) {
       } else {
         setTimeout( () => {
           setKeeperTypeModal( true )
-        }, 1000 )
+        }, 500 )
       }
     }
   }, [ navigationObj ] )
 
   useEffect( () => {
     if( isTypeBottomSheetOpen === true && onKeeperButtonClick ){
-      setShowLoader( false )
-      setTimeout( () => {
-        setKeeperTypeModal( true )
-      }, 1000 )
+      // setShowLoader( false )
+      // setTimeout( () => {
+      setKeeperTypeModal( true )
+      // }, 500 )
       dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
     }
   }, [ isTypeBottomSheetOpen ] )
@@ -450,6 +451,7 @@ export default function ManageBackup( props ) {
   }
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
+    setSelectedRecoveryKeyNumber( keeperNumber )
     // requestAnimationFrame( () => {
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
@@ -476,7 +478,7 @@ export default function ManageBackup( props ) {
         }
       )
     } else {
-      setShowLoader( true )
+      // setShowLoader( true )
       setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
       onPressKeeperButton( value, keeperNumber )
     }
@@ -494,7 +496,7 @@ export default function ManageBackup( props ) {
     setShowLoader( false )
     const navigationParams = {
       selectedTitle: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName,
-      selectedLevelId: id,
+      SelectedRecoveryKeyNumber,
       selectedKeeper,
     }
     let index = 1
@@ -710,7 +712,6 @@ export default function ManageBackup( props ) {
               dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
               setKeeperTypeModal( false )
             }}
-            selectedLevelId={selectedLevelId}
           />
         </ModalContainer>
         <ModalContainer visible={errorModal} closeBottomSheet={() => setErrorModal( false )}>

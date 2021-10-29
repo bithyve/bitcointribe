@@ -197,6 +197,7 @@
       "confirmpin": "पिन की पुष्टि करें",
       "Incorrectpasscode": "गलत पासकोड, फिर से कोशिश करें!",
       "Answerisincorrect": "उत्तर गलत है",
+      "passwordisincorrect": "पासवर्ड गलत है",
       "Specifythe": "उत्तर निर्दिष्ट करें जैसा आपने वॉलेट सेट करते समय किया था",
       "Enteranswer": "उत्तर एंटर करें"
   },

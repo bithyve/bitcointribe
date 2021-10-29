@@ -197,6 +197,7 @@
       "confirmpin": "confirme o pin",
       "Incorrectpasscode": "Senha incorreta, tente novamente!",
       "Answerisincorrect": "Resposta está incorreta",
+      "passwordisincorrect": "senha é incorreta",
       "Specifythe": "Especifique a resposta como você fez no momento de configurar a carteira",
       "Enteranswer": "Digite a resposta"
   },

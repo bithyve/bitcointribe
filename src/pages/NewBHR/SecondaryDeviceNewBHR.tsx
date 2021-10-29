@@ -76,7 +76,7 @@ export default function SecondaryDeviceModelContents( props ) {
             <ActivityIndicator size="large" animating color={Colors.gray1}/>
           </View>
         ) : (
-          <QRCode title="Keeper request" value={props.secondaryQR} size={hp( '27%' )} />
+          <QRCode title={props.qrTitle ? props.qrTitle : 'Keeper request'} value={props.secondaryQR} size={hp( '27%' )} />
         )}
         {!props.secondaryQR?<Text style={{
           fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 13 ), color: Colors.textColorGrey, marginTop: 5

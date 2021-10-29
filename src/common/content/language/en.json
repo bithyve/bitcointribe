@@ -190,6 +190,7 @@
         "confirmpin": "confirm pin",
         "Incorrectpasscode": "Incorrect passcode, try again!",
         "Answerisincorrect": "Answer is incorrect",
+        "passwordisincorrect": "Password is incorrect",
         "Specifythe": "Specify the answer as you did at the time of setting up the wallet",
         "Enteranswer": "Enter answer"
     },

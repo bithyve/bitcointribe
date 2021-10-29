@@ -2369,7 +2369,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
       yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
       return
     } else if( currentLevel === 1 && value.id === 2 && number == 2 && levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt==0 ){
-      yield put( setLevelCompletionError( 'Please complete Primary Keeper', 'It seems you have not completed primary keeper setup. Please complete primary keeper setup to proceed', LevelStatus.FAILED ) )
+      yield put( setLevelCompletionError( 'Please back up Recovery Key 1 ', 'Please share Recovery Key 1 and ensure it is accepted on another device running Hexa before proceeding to backup Recovery Key 2', LevelStatus.FAILED ) )
       return
     }
     else if( currentLevel === 0 && ( value.id === 2 || value.id === 3 ) ){

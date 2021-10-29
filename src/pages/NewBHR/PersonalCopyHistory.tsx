@@ -86,8 +86,8 @@ const PersonalCopyHistory = ( props ) => {
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
-  const [ selectedLevelId, setSelectedLevelId ] = useState(
-    props.navigation.state.params.selectedLevelId
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState(
+    props.navigation.state.params.SelectedRecoveryKeyNumber
   )
   const [ selectedKeeper, setSelectedKeeper ] = useState(
     props.navigation.state.params.selectedKeeper
@@ -124,7 +124,7 @@ const PersonalCopyHistory = ( props ) => {
   const [ isConfirm, setIsConfirm ] = useState( false )
 
   useEffect( () => {
-    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare(
       props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
@@ -496,7 +496,7 @@ const PersonalCopyHistory = ( props ) => {
     setKeeperTypeModal( false )
     const navigationParams = {
       selectedTitle: name,
-      selectedLevelId: selectedLevelId,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
       selectedKeeper: {
         shareType: type,
         name: name,
@@ -650,7 +650,6 @@ const PersonalCopyHistory = ( props ) => {
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
-          selectedLevelId={selectedLevelId}
           keeper={selectedKeeper}
         />
       </ModalContainer>

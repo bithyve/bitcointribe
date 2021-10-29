@@ -199,6 +199,7 @@
     "confirmpin": "পিন নিশ্চিত করুন",
     "Incorrectpasscode": "ভুল পাসকোড, আবার চেষ্টা করুন!",
     "Answerisincorrect": "উত্তরটি ভুল",
+    "passwordisincorrect": "পাসওয়ার্ড ভুল",
     "Specifythe": "মানিব্যাগ সেট আপ করার সময় আপনি যেমন উত্তরটি উল্লেখ করেছিলেন",
     "Enteranswer": "উত্তর লিখুন"
   },

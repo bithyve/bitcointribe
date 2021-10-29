@@ -197,6 +197,7 @@
       "confirmpin": "confirmer le code PIN",
       "Incorrectpasscode": "Code d'accès incorrect, réessayez !",
       "Answerisincorrect": "La réponse est incorrecte",
+      "passwordisincorrect": "Le mot de passe est incorrect",
       "Specifythe": "Précisez la réponse comme vous l'avez fait lors de la configuration du portefeuille",
       "Enteranswer": "Entrez la réponse"
   },

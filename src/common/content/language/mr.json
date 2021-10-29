@@ -199,6 +199,7 @@
     "confirmpin": "पिनची पुष्टी करा",
     "Incorrectpasscode": "चुकीचा पासकोड, पुन्हा प्रयत्न करा!",
     "Answerisincorrect": "उत्तर चुकीचे आहे",
+    "passwordisincorrect": "पासवर्ड चुकीचा आहे",
     "Specifythe": "वॉलेट सेट करताना आपण जसे उत्तर दिले तसे निर्दिष्ट करा",
     "Enteranswer": "उत्तर प्रविष्ट करा"
   },

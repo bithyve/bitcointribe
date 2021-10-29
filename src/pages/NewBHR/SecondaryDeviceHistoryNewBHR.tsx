@@ -71,7 +71,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ keeperQR, setKeeperQR ] = useState( '' )
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
-  const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
 
@@ -103,7 +103,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const next = props.navigation.getParam( 'next' )
 
   useEffect( () => {
-    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
     setIsChange(
@@ -249,6 +249,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     console.log( keeperQR )
     return (
       <SecondaryDevice
+        qrTitle={`Recovery Key ${SelectedRecoveryKeyNumber}`}
         secondaryQR={keeperQR}
         onPressOk={async () => {
           setIsShareClicked( true )
@@ -453,7 +454,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     setKeeperTypeModal( false )
     const navigationParams = {
       selectedTitle: name,
-      selectedLevelId: selectedLevelId,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
       selectedKeeper: {
         shareType: type,
         name: name,
@@ -633,7 +634,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
-          selectedLevelId={selectedLevelId}
         />
       </ModalContainer>
     </View>

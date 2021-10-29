@@ -131,7 +131,7 @@ function* cloudWorker( { payload } ) {
               share
             }
           } )
-          const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+          const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
           const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
           //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
@@ -142,12 +142,12 @@ function* cloudWorker( { payload } ) {
                 share
               }
             } )
-            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
 
             yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
           } else {
-            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
             yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
             yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
@@ -160,29 +160,29 @@ function* cloudWorker( { payload } ) {
                 share
               }
             } )
-            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
             //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
             yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
           } else {
-            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
             yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
             yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
             yield delay( 200 )
-            const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( isCloudBackupCompleted.errorCode )}` : 'GoogleDrive backup failed'
+            const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( isCloudBackupCompleted.errorCode )}` : 'Google Drive backup failed'
             yield put( setCloudErrorMessage( message ) )
           //Alert.alert( 'Error', message )
           }
         }
       } else{
-        const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+        const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
         const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
         yield delay( 200 )
-        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( '' )}` : 'GoogleDrive backup failed'
+        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( '' )}` : 'Google Drive backup failed'
         yield put( setCloudErrorMessage( message ) )
       }
     }
@@ -278,7 +278,7 @@ function* getCloudBackupRecoveryWorker () {
       }
       if( backedJson.errorCode ) {
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( backedJson.errorCode )}` : 'GoogleDrive backup failed'
+        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( backedJson.errorCode )}` : 'Google Drive backup failed'
         yield put( setCloudErrorMessage( message ) )
         // if( backedJson === 'failure' ) {
         //   yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
@@ -486,7 +486,7 @@ function* updateDataWorker( { payload } ) {
         id: googleData.id,
       }
       const result = yield call( GoogleDrive.updateFile, JSON.stringify( metaData )  )
-      console.log( 'GoogleDrive.updateFile result', result )
+      console.log( 'Google Drive.updateFile result', result )
       if ( result.eventName == 'successFullyUpdate' ) {
         return 'successFullyUpdate'
         //this.callBack( share )
@@ -496,7 +496,7 @@ function* updateDataWorker( { payload } ) {
         yield put( setCloudErrorMessage( message ) )
         throw new Error( result.eventName )
       }
-      console.log( 'GoogleDrive.updateFile', result )
+      console.log( 'Google Drive.updateFile', result )
 
     }
     console.log( 'newArray', newArray )
@@ -746,7 +746,7 @@ function* uplaodFileWorker( { payload } ) {
           yield put( setCloudErrorMessage( message ) )
           throw new Error( result.eventName )
         }
-        console.log( 'GoogleDrive.updateFile', result )
+        console.log( 'Google Drive.updateFile', result )
       }
     }
 

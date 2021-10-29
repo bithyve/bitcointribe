@@ -64,7 +64,7 @@ function SecurityQuestion( props ) {
         setErrorText( '' )
         return
       }
-      setErrorText( stringsLogin.Answerisincorrect )
+      setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
     } else {
       setErrorText( '' )
     }
@@ -242,9 +242,9 @@ function SecurityQuestion( props ) {
                   props.onPressConfirm()
                 } )
               } else if ( validateAllowedCharacters( answer ) == false ) {
-                setErrorText( strings.Answersmust )
+                setErrorText( stringsLogin.Answersmust )
               } else {
-                setErrorText( strings.Answerisincorrect )
+                setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
               }
               setIsDisabled( false )
             }}
