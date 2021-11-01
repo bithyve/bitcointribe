@@ -457,7 +457,6 @@ export const processDeepLink = ( deepLink: string ) => {
             isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
             isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
             isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-            isContactGift: DeepLinkKind.CONTACT_GIFT? true: false,
             isQR: false,
             deepLinkKind: splits[ 4 ],
             version,
@@ -493,7 +492,7 @@ export const processDeepLink = ( deepLink: string ) => {
             isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
             isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
             isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-            isContactGift: DeepLinkKind.CONTACT_GIFT? true: false,
+            isContactGift: true,
             isQR: false,
             deepLinkKind: splits[ 4 ],
             channelAddress: splits[ 8 ],
@@ -528,7 +527,6 @@ export const processRequestQR = ( qrData: string ) => {
             encryptionHint: parsedData.encryptionHint,
             isKeeper: parsedData.type === QRCodeTypes.KEEPER_REQUEST || parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
             isPrimaryKeeper: parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
-            isContactGift: DeepLinkKind.CONTACT_GIFT? true: false,
             isExistingContact: false,
             isQR: true,
             version: parsedData.version,
@@ -586,7 +584,7 @@ export const processRequestQR = ( qrData: string ) => {
             encryptionHint: parsedData.encryptionHint,
             isKeeper: parsedData.type === QRCodeTypes.KEEPER_REQUEST || parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
             isPrimaryKeeper: parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
-            isContactGift: DeepLinkKind.CONTACT_GIFT? true: false,
+            isContactGift: true,
             channelAddress: parsedData.channelAddress,
             amount: parsedData.amount,
             note: parsedData.note,
