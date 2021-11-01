@@ -244,7 +244,7 @@ export default function SendViaLinkAndQR( props ) {
 
       {/* <RequestKeyFromContact
         isModal={false}
-        headerText={'Send gift'}
+        headerText={'Send Gift'}
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}

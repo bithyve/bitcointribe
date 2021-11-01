@@ -144,7 +144,7 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           <HeaderTitle
             firstLineTitle={'Enter gift details'}
-            secondLineTitle={'Who are we delighting today?'}
+            secondLineTitle= ''//{'Who are we delighting today?'}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
@@ -160,7 +160,7 @@ const GiftDetails = ( { navigation } ) => {
               color: Colors.black,
               width: wp( '54%' ),
             }}
-          >You have recieved gift from
+          >You have received gift from
           </Text>
           <View
             style={[ styles.inputBox ]}
