@@ -158,15 +158,16 @@ const GiftDetails = ( { navigation } ) => {
             style={{
               fontSize: RFValue( 14 ),
               color: Colors.black,
-              width: wp( '54%' ),
             }}
-          >You have received gift from
+          >You have received gift from{' '}
           </Text>
           <View
-            style={[ styles.inputBox ]}
+            style={styles.inputBox}
           >
             <TextInput
-              style={styles.modalInputBox}
+              style={name ? [ styles.modalInputBox ] : [ styles.modalInputBox, {
+                fontSize: RFValue( 15 ),
+              } ]}
               placeholder={'Enter name'}
               placeholderTextColor={Colors.gray1}
               value={name}

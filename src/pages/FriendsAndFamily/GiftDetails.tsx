@@ -119,7 +119,7 @@ const GiftDetails = ( { navigation } ) => {
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansRegular,
               }}>
-                at {moment( gift.timestamps.created ).format( 'lll' )}
+                {moment( gift.timestamps.created ).format( 'lll' )}
               </Text>
             </View>
             <View style={{
@@ -265,19 +265,21 @@ const GiftDetails = ( { navigation } ) => {
                   flexDirection: 'row', alignItems: 'flex-start'
                 }}>
                   <View style={styles.line} />
-                  <View style={[ styles.normalStyle, {
-                    width: wp( '80%' ), borderRadius: wp( 2 ), paddingVertical: hp( 1 ), marginTop: hp( 1 )
+                  <View style={[ {
+                    width: wp( '80%' ),
+                    borderRadius: wp( 2 ),
+                    paddingVertical: hp( 1.5 ),
+                    marginTop: hp( 1 ),
+                    marginBottom: hp( 1 ),
+                    backgroundColor: Colors.gray7,
+                    paddingHorizontal: hp( 1.5 ),
                   } ]}>
-                    <Text style={[ styles.modalInfoText, {
-                      marginBottom: hp( 1 )
-                    } ]}>
+                    <Text style={styles.modalInfoText}>
                       Gift Card {item[ 0 ]}
                     </Text>
                     {/* <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text> */}
                   </View>
                 </View>
-
-
               </View>
             )
           } )}

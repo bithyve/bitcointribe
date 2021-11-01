@@ -170,13 +170,13 @@ const ManageGifts = ( { navigation } ) => {
       return 'Gifts that you create, ready to be sent, would be visible below'
     }
     if ( active === GiftStatus.SENT ) {
-      return 'Gifts you\'ve sent are visible below'
+      return 'Gifts you\'ve sent would be visible below'
     }
     if ( active === GiftStatus.EXPIRED ) {
-      return 'Gifts that were unclaimed and thus expired are visible below'
+      return 'Gifts that were unclaimed and thus expired would be visible below'
     }
     if ( active === GiftType.RECEIVED ) {
-      return 'Gifts you\'ve received are visible below'
+      return 'Gifts you\'ve received would be visible below'
     }
   }
 

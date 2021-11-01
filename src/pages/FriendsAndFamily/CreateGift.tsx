@@ -384,7 +384,7 @@ const CreateGift = ( { navigation } ) => {
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
             }}>
-                Bitcoin will be deducted from
+                Sats would be deducted from
             </Text>
             <Text
               style={{
@@ -396,7 +396,7 @@ const CreateGift = ( { navigation } ) => {
               {sourceAccountHeadlineText}
             </Text>
             <Text style={styles.availableToSpendText}>
-              {'Available to spend '}
+              {'Available to spend: '}
               <Text style={styles.balanceText}>
                 {prefersBitcoin
                   ? UsNumberFormat( spendableBalance )
@@ -732,7 +732,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 10,
+    elevation: 6,
     shadowOpacity: 0.1,
     shadowOffset: {
       width: 1, height: 1
