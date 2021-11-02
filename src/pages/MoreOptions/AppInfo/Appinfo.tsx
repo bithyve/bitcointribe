@@ -148,6 +148,7 @@ const AppInfo = ( props ) => {
           showSecurityQuestion( false )
           showSecurityPin( true )
         }}
+        isNeedAuthentication={true}
       />
     )
   }, [] )
