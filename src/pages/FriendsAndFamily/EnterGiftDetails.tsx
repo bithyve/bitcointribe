@@ -51,15 +51,10 @@ const GiftDetails = ( { navigation } ) => {
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
-    title: 'Bitcoin',
-    subText: 'Lorem ipsum dolor',
+    title: 'Gift sats',
+    subText: 'Here\'s some sats for your stack',
     avatar: <GiftCard />,
     color: Colors.darkBlue
-    // id: '',
-    // title: '',
-    // subText: '',
-    // avatar: ImagePropTypes,
-    // color: ''
   } )
 
   useEffect( () => {
@@ -307,7 +302,7 @@ const GiftDetails = ( { navigation } ) => {
                           {value.title}
                         </Text>
                         <Text style={styles.subText}>
-                          { 'Lorem ipsum dolor'}
+                          {value.subText}
                         </Text>
                       </View>
                     </View>
