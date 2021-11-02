@@ -413,7 +413,7 @@ const HomeHeader = ( {
       </View>
       <TouchableOpacity style={{
         alignItems:'center', padding: 5, marginBottom: -wp( 3 )
-      }} onPress={()=> Platform.OS=='android'? Linking.openURL( 'https://www.google.com/' ) : Linking.openURL( 'https://in.search.yahoo.com/?fr2=inr' )}><Text style={{
+      }} onPress={()=> Platform.OS=='android'? Linking.openURL( 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en' ) : Linking.openURL( 'https://apps.apple.com/us/app/bitcoin-wallet-hexa-2-0/id1586334138' )}><Text style={{
           color: Colors.white, fontSize: RFValue( 13 ), fontFamily: Fonts.FiraSansMedium
         }}>{'Please download Hexa 2.0, our new improved app'}</Text></TouchableOpacity>
     </View>
