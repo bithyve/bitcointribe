@@ -30,7 +30,7 @@ import DashedContainer from './DashedContainer'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
-import { generateGifts } from '../../store/actions/accounts'
+import { generateGifts, giftCreationSuccess } from '../../store/actions/accounts'
 import { AccountsState } from '../../store/reducers/accounts'
 import { Account, AccountType, Gift, TxPriority } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
@@ -55,6 +55,7 @@ import { translations } from '../../common/content/LocContext'
 import FormStyles from '../../common/Styles/FormStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { updateUserName } from '../../store/actions/storage'
+import Loader from '../../components/loader'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -76,12 +77,14 @@ const CreateGift = ( { navigation } ) => {
   const [ giftModal, setGiftModal ] =useState( false )
   const [ createdGift, setCreatedGift ] = useState( null )
   const accountState: AccountsState = useSelector( ( state ) => idx( state, ( _ ) => _.accounts ) )
+  const giftCreationStatus = useSelector( state => state.accounts.giftCreationStatus )
   const accountShells: AccountShell[] = accountState.accountShells
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
   const account: Account = accountState.accounts[ sourcePrimarySubAccount.id ]
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
+  const [ showLoader, setShowLoader ] = useState( false )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
@@ -106,16 +109,25 @@ const CreateGift = ( { navigation } ) => {
   }, [ sourcePrimarySubAccount ] )
 
   useEffect( () => {
-    if( accountsState.selectedGiftId && initGiftCreation ) {
+    if( accountsState.selectedGiftId && initGiftCreation && giftCreationStatus ) {
       const createdGift = accountsState.gifts[ accountsState.selectedGiftId ]
       if( createdGift ){
         setCreatedGift( createdGift )
         setGiftModal( true )
         setInitGiftCreation( false )
+        setShowLoader( false )
+        dispatch( giftCreationSuccess( false ) )
       }
     }
+  }, [ accountsState.selectedGiftId, initGiftCreation, giftCreationStatus ] )
 
-  }, [ accountsState.selectedGiftId, initGiftCreation ] )
+  useEffect( ()=>{
+    setInitGiftCreation( false )
+    setShowLoader( false )
+    if( giftCreationStatus ){
+      dispatch( giftCreationSuccess( false ) )
+    }
+  }, [ giftCreationStatus ] )
 
   useEffect( () => {
     if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
@@ -130,7 +142,6 @@ const CreateGift = ( { navigation } ) => {
     accountsState.exchangeRates[ currencyCode ].last
     ).toFixed( 2 )
 
-
     const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
     return(
       <TouchableOpacity
@@ -143,6 +154,7 @@ const CreateGift = ( { navigation } ) => {
                   includeFee: includeFees
                 } ) )
                 setInitGiftCreation( true )
+                setShowLoader( true )
                 break
 
               case 'Add F&F and Send':
@@ -634,6 +646,7 @@ const CreateGift = ( { navigation } ) => {
         </View>
         }
       </SafeAreaView>
+      {showLoader ? <Loader /> : null}
     </ScrollView>
   )
 }

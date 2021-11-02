@@ -47,6 +47,7 @@ import {
   recomputeNetBalance,
   updateGift,
   GENERATE_GIFTS,
+  giftCreationSuccess,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -1225,8 +1226,10 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       updateGifts: true,
       giftIds: giftIds
     } ) )
+    yield put( giftCreationSuccess( true ) )
   } else {
     console.log( 'Gifts generation failed' )
+    yield put( giftCreationSuccess( false ) )
   }
 }
 

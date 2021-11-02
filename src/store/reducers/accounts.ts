@@ -46,7 +46,8 @@ import {
   GENERATE_GIFTS,
   SET_GIFTS,
   GIFT_ACCEPTED,
-  GIFT_ADDED
+  GIFT_ADDED,
+  GIFT_CREATION_STATUS
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -69,6 +70,7 @@ export type AccountsState = {
     [id: string]: Gift
   }
   selectedGiftId: string,
+  giftCreationStatus: boolean,
   acceptedGiftId: string,
   addedGift: string,
   isGeneratingNewAccountShell: boolean;
@@ -116,6 +118,7 @@ const initialState: AccountsState = {
   gifts: {
   },
   selectedGiftId: null,
+  giftCreationStatus: false,
   acceptedGiftId: '',
   addedGift: '',
   isGeneratingNewAccountShell: false,
@@ -550,6 +553,12 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
           selectedGiftId: null
+        }
+
+      case GIFT_CREATION_STATUS:
+        return {
+          ...state,
+          giftCreationStatus: action.payload.flag,
         }
 
       case UPDATE_GIFT:
