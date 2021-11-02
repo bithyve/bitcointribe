@@ -175,14 +175,14 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <View
             style={styles.floatingActionButtonContainer}
           >
-            <TouchableOpacity onPress={importImage} style={styles.btnImport}>
+            {/* <TouchableOpacity onPress={importImage} style={styles.btnImport}>
               <Ionicons
                 name="image"
                 size={22}
                 color="gray"
               />
               <Text style={styles.textImport}>Import From Gallery</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <Button
               raised
