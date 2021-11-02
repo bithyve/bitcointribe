@@ -697,8 +697,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium,
   },
   buttonView: {
-    height: wp( '14%' ),
-    width: wp( '35%' ),
+    height: wp( '12%' ),
+    width: wp( '27%' ),
     paddingHorizontal: wp( 2 ),
     justifyContent: 'center',
     alignItems: 'center',
