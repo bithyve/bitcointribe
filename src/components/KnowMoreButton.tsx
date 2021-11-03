@@ -28,8 +28,10 @@ export default function KnowMoreButton( props ) {
 
 const styles = StyleSheet.create( {
   knowMoreButton: {
-    height: wp( '6%' ),
-    width: wp( '20%' ),
+    // height: wp( '6%' ),
+    // width: wp( '20%' ),
+    paddingHorizontal: wp( 2 ),
+    paddingVertical: wp( 1.5 ),
     backgroundColor: Colors.lightBlue,
     justifyContent: 'center',
     alignItems: 'center',

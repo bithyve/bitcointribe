@@ -12,13 +12,15 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
+import CheckMark from '../assets/images/svgs/checkmark.svg'
 
-export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subText, isSelected, index } ) {
+export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, mainText, subText, italicText, isSelected, index, changeBgColor } ) {
   return (
     <TouchableOpacity
       onPress={() => setActiveIndex( index )}
       style={{
-        width: '90%', height: hp( '11%' ), backgroundColor: isSelected ? Colors.lightBlue : Colors.backgroundColor1,
+        width: '90%', height: hp( '11%' ),
+        backgroundColor: isSelected && changeBgColor ? Colors.lightBlue : Colors.white,
         alignSelf: 'center', justifyContent: 'center',
         borderRadius: wp( '4' ),
         marginVertical: hp( '1%' ),
@@ -49,41 +51,51 @@ export default function CardWithRadioBtn( { setActiveIndex, icon, mainText, subT
           },
         }}>
           {isSelected &&
-          <Image
-            style={{
-              width: '100%', height: '100%'
-            }}
-            source={require( '../assets/images/icons/checkmark.png' )}
-          />
+          <CheckMark style={{
+            marginLeft: 6,
+            marginTop: 6
+          }} />
           }
         </View>
-        {icon !== '' &&
-        <Image
-          style={{
-            width: 27, height: 27, resizeMode: 'contain', marginLeft: wp( '3%' )
-          }}
-          source={icon}
-        />
+        {geticon !== '' &&
+        <View style={{
+          marginLeft: wp( '3%' )
+        }} >
+          {geticon()}
+        </View>
         }
         <View style={{
           marginLeft: wp( '4%' )
         }}>
           <Text style={{
             fontSize: RFValue( 13 ),
-            fontFamily: isSelected ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
-            color: isSelected ? Colors.backgroundColor1 : Colors.blue,
+            fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
+            color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.blue,
             marginBottom: hp( 0.5 ), letterSpacing: 0.01
           }}>
             {mainText}
           </Text>
+          {subText !== '' &&
           <Text style={{
             fontSize: RFValue( 11 ),
             fontFamily: Fonts.FiraSansRegular,
-            color: isSelected ? Colors.backgroundColor1 : Colors.textColorGrey,
+            color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
             width: wp( 65 )
           }}>
             {subText}
           </Text>
+          }
+          {italicText !== '' &&
+          <Text style={{
+            fontSize: RFValue( 11 ),
+            fontFamily: Fonts.FiraSansItalic,
+            color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
+            width: wp( 65 ),
+            fontWeight: '600'
+          }}>
+            {italicText}
+          </Text>
+          }
         </View>
       </View>
       {/* {isSelected && ( */}

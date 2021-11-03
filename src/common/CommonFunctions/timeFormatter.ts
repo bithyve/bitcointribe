@@ -49,7 +49,7 @@ export const createRandomString = ( length, characters = 'ABCDEFGHIJKLMNOPQRSTUV
 
 export const getTime = ( item ) => {
   return ( item.toString() && item.toString() == '0' ) ||
-    item.toString() == 'never'
-    ? 'never'
+    item.toString() == 'never' || item.toString() == 'Never'
+    ? 'Never'
     : timeFormatter( moment( new Date() ), moment( new Date( item ) ) )
 }

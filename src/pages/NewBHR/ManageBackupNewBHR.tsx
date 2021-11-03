@@ -863,7 +863,7 @@ class ManageBackupNewBHR extends Component<
             {
               selectedTime: value.keeper2.updatedAt
                 ? getTime( value.keeper2.updatedAt )
-                : 'never',
+                : 'Never',
             }
           )
         }
@@ -873,7 +873,7 @@ class ManageBackupNewBHR extends Component<
           {
             selectedTime: value.keeper1.updatedAt
               ? getTime( value.keeper1.updatedAt )
-              : 'never',
+              : 'Never',
           }
         )
       } else {

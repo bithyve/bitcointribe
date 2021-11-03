@@ -34,7 +34,7 @@ import { updateTrustedContacts } from '../../store/actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import idx from 'idx'
-import { generateDeepLink } from '../../common/CommonFunctions'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import DeviceInfo from 'react-native-device-info'
 import { LocalizationContext } from '../../common/content/LocContext'
 
@@ -70,8 +70,10 @@ export default function QrAndLink( props ) {
   const isReshare = props.navigation.getParam( 'isReshare' )
   const oldChannelKey = props.navigation.getParam( 'oldChannelKey' )
   const index = props.navigation.getParam( 'index' )
+  const recreateChannel = props.navigation.getParam( 'recreateChannel' )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 
@@ -87,28 +89,30 @@ export default function QrAndLink( props ) {
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
-      if ( contact.contactDetails.id === Contact.id && shareType != 'existingContact' ) return
+      if ( contact.channelKey === channelKey && shareType != 'existingContact' ) return
     }
-    createGuardian( {
-      isChangeTemp: isChange, chosenContactTmp: Contact
-    } )
+    createGuardian( )
   }, [ Contact ] )
 
-  const createGuardian = ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+  const createGuardian = ( ) => {
     const isChangeKeeper = isChange ? isChange : false
-    if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
+    if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper && !recreateChannel ) return
     setIsGuardianCreationClicked( true )
-    const channelKeyTemp: string = shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    const channelKeyTemp: string = recreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     setChannelKey( channelKeyTemp )
 
     const obj: KeeperInfoInterface = {
       shareId: selectedKeeper.shareId,
       name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
       type: shareType,
-      scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+      scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
       currentLevel: currentLevel,
       createdAt: moment( new Date() ).valueOf(),
-      sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+      sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+        MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+        OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+          2,
       data: {
         ...Contact, index
       },
@@ -128,21 +132,22 @@ export default function QrAndLink( props ) {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
+    if( trustedLink ) generate()  // prevents multiple generation as trusted-contact updates twice during init
+  }, [ Contact, trustedContacts ] )
+
+  useEffect( ()=> {
+    generate() // re-generate deeplink if encryption key changes
+  }, [ encryptLinkWith, trustedContacts ] )
+
+  const generate = async () => {
     console.log( 'useEffect Contact', Contact )
     // capture the contact
     if( !Contact ) return
     console.log( 'Contact', Contact )
     const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
+    const currentContact: TrustedContact = contacts[ channelKey ]
 
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === Contact.id ){
-          currentContact = contacts[ ck ]
-          break
-        }
-      }
-    if ( !currentContact || ( shareType == 'existingContact' && ( currentContact.relationType != TrustedContactRelationTypes.EXISTING_CONTACT && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) ) return
+    if ( !currentContact || ( shareType == 'existingContact' && ( currentContact.relationType != TrustedContactRelationTypes.EXISTING_CONTACT && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) || ( currentContact && !currentContact.isActive ) ) {console.log( 'RETURN FROM CONTACT' );return}
 
     // generate deep link & QR for the contact
     let encryption_key: string
@@ -181,7 +186,14 @@ export default function QrAndLink( props ) {
             break
       }
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
+    const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
+      deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      encryptionType: encryptLinkWith,
+      encryptionKey: encryption_key,
+      walletName: wallet.walletName,
+      keysToEncrypt,
+    } )
     setTrustedLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
@@ -208,9 +220,12 @@ export default function QrAndLink( props ) {
       } ) )
     if( isGuardianCreationClicked ) {
       const shareObj: LevelInfo = {
-        walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+        walletId: wallet.walletId,
         shareId: selectedKeeper.shareId,
-        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion :
+          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
         shareType: shareType,
         status: 'notAccessible',
         name: Contact && Contact.name ? Contact.name : ''
@@ -218,10 +233,10 @@ export default function QrAndLink( props ) {
       if( shareType == 'existingContact' ) shareObj.updatedAt = 0
       dispatch( updateMSharesHealth( shareObj, isChange ) )
       dispatch( setChannelAssets( {
-      } ) )
+      }, null ) )
       // saveInTransitHistory()
     }
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
+  }
 
   const openTimer = async () => {
     setTimeout( () => {
@@ -345,7 +360,7 @@ export default function QrAndLink( props ) {
             backgroundColor={Colors.white}
           />
         </TouchableOpacity>
-        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => {}} >
+        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => setSecure2FAModal( false )} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}
             onConfirm={( type ) => {
@@ -357,10 +372,10 @@ export default function QrAndLink( props ) {
             Contact={Contact}
           />
         </ModalContainer>
-        <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
+        <ModalContainer visible={timerModal}  closeBottomSheet={() => setTimerModal( false )} >
           {renderTimerModalContents()}
         </ModalContainer>
-        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
+        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => setShareOtpWithTrustedContactModel( false )} >
           {renderShareOtpWithTrustedContactContent()}
         </ModalContainer>
       </ScrollView>

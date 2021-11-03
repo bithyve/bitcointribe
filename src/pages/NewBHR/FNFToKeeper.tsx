@@ -13,7 +13,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import CommonStyles from '../../common/Styles/Styles'
 import HeaderTitle from '../../components/HeaderTitle'
-import { TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { StreamData, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import trustedContacts from '../../store/reducers/trustedContacts'
 import { useSelector, useDispatch } from 'react-redux'
 import ImageStyles from '../../common/Styles/ImageStyles'
@@ -33,6 +33,7 @@ import RadioButton from '../../components/RadioButton'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import DeviceInfo from 'react-native-device-info'
 import { LocalizationContext } from '../../common/content/LocContext'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 
 const FNFToKeeper = ( props ) => {
@@ -54,26 +55,23 @@ const FNFToKeeper = ( props ) => {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const dispatch = useDispatch()
+  const recreateChannel = props.navigation.getParam( 'recreateChannel' )
 
   useEffect( () => {
     const contacts: Trusted_Contacts = trustedContacts
-    // getContact( contacts )
     const c = []
     for ( const channelKey of Object.keys( contacts ) ) {
       const contact = contacts[ channelKey ]
       if ( ( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) && contact.contactDetails.contactName ) {
-        c.push( {
+        const instream: StreamData = useStreamFromContact( contact, wallet.walletId, true )
+        if( instream ) c.push( {
           ...contact, channelKey
         } )
       }
     }
-    // if ( c.length === 0 ) {
-    //   props.navigation.state.params.selectContact( 'AddContact', {
-    //   } )
-    //   props.navigation.goBack()
-    // }
     setContacts( c )
   }, [] )
 
@@ -81,7 +79,7 @@ const FNFToKeeper = ( props ) => {
     const contactDummy = {
       id: uuid(),
     }
-    props.navigation.state.params.onPressContinue( [ contactDummy ] )
+    props.navigation.state.params.onPressContinue( [ contactDummy ], recreateChannel )
     props.navigation.goBack()
   }
 
@@ -170,7 +168,7 @@ const FNFToKeeper = ( props ) => {
   }, [] )
 
   const onPressContinue = () => {
-    props.navigation.state.params.onPressContinue( contact )
+    props.navigation.state.params.onPressContinue( contact, recreateChannel )
     props.navigation.goBack()
   }
 
@@ -338,11 +336,12 @@ const FNFToKeeper = ( props ) => {
 
   async function onContactSelect( index ) {
     let contactTemp = []
-    const contacts = filterContactData
+    const contacts = [ ...filterContactData ]
     if ( contact.length && contacts[ index ].id == contact[ 0 ].id && !contact[ 0 ].isExisting ) {
       contactTemp = []
       contacts[ index ].checked = false
     } else {
+      if( filterContactData.findIndex( value=>value.checked == true ) > -1 )contacts[ filterContactData.findIndex( value=>value.checked == true ) ].checked = false
       contactTemp[ 0 ] = contacts[ index ]
       contacts[ index ].checked = true
     }
@@ -382,7 +381,7 @@ const FNFToKeeper = ( props ) => {
         info={strings.Ifyouwantto}
         otherText={strings.Weneither}
         proceedButtonText={common.continue}
-        isIgnoreButton={false}
+        isIgnoreButton={true}
         onPressProceed={() => {
           getContactPermission()
           // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
@@ -480,7 +479,7 @@ const FNFToKeeper = ( props ) => {
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-        {/* {contacts.length ? <View>
+        {contacts.length ? <View>
           <Text style={{
             marginHorizontal: wp( 2 ),
             color: Colors.blue,
@@ -513,7 +512,7 @@ const FNFToKeeper = ( props ) => {
               }
             </ScrollView>
           </View>
-        </View> : null} */}
+        </View> : null}
         <Text style={{
           marginHorizontal: wp( 2 ),
           color: Colors.blue,
@@ -525,7 +524,7 @@ const FNFToKeeper = ( props ) => {
         }}>{strings.Selectfromaddressbook} </Text>
         <View style={{
         }}>
-          {contact.length > 0 && !contact[ 0 ].isExisting &&
+          {/* {contact.length > 0 && !contact[ 0 ].isExisting &&
           <View style={styles.selectedContactContainer}>
             {contact.map( ( value, index ) => {
               return (
@@ -547,7 +546,7 @@ const FNFToKeeper = ( props ) => {
               )
             } )}
           </View>
-          }
+          } */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -580,7 +579,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            height: DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
+            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '47%' ) : DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
           }}>
             {filterContactData ? (
               <FlatList
@@ -639,7 +638,7 @@ const FNFToKeeper = ( props ) => {
           <View
             style={{
               position: 'absolute',
-              bottom: contacts.length ? hp( 10 ) : hp ( 5 ),
+              bottom: DeviceInfo.hasNotch() ? hp( 2 ) : hp( 0 ),
               flex:1,
               width: wp( '50%' ),
               alignSelf: 'center',
@@ -659,10 +658,10 @@ const FNFToKeeper = ( props ) => {
           }
         </View>
       </View>
-      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => setPermissionsErrModal( false )} >
         {renderContactListErrorModalContent()}
       </ModalContainer>
-      <ModalContainer visible={permissionsModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={permissionsModal} closeBottomSheet={() => setPermissionsModal( false )} >
         {renderContactPermissionModalContent()}
       </ModalContainer>
       {/* </SafeAreaView> */}

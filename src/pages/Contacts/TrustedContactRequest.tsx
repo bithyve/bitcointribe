@@ -161,6 +161,7 @@ export default function TrustedContactRequest( props ) {
           {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
             return (
               <TextInput
+                key={i}
                 maxLength={1}
                 returnKeyType="done"
                 returnKeyLabel="Done"
@@ -332,9 +333,9 @@ export default function TrustedContactRequest( props ) {
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
-                {props.inputType
-                  ? 'Accept the request to add your contact to Friends & Family'
-                  : 'You have a request for securing the Recovery Key'}
+                {props.isGuardian
+                  ? 'Accept the request to backup Recovery Key'
+                  : 'Accept the request to add your contact to Friends & Family'}
               </Text>
             </View>
             <View style={styles.box}>

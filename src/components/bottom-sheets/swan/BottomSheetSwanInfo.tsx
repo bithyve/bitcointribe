@@ -21,6 +21,7 @@ import openLink from '../../../utils/OpenLink'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
 import { ListItem } from 'react-native-elements'
 import BottomInfoBox from '../../BottomInfoBox'
+import { translations } from '../../../common/content/LocContext'
 
 const swanAccountCount = 0
 
@@ -32,11 +33,13 @@ type Props = {
 
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
+  const common  = translations[ 'common' ]
+  const strings  = translations[ 'accounts' ]
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const [ isConfirm, setIsConfirm ] = useState( false )
-  let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country\n\n\nBy proceeding you understand that you will be taken to Swan Bitcoin to complete registration'
-  let swanTitle = 'Stack Sats with\n Swan Bitcoin'
+  let swanMessage = strings.swanMessage
+  let swanTitle = strings.StackSats
   let  showNote = true
   let accountName = ''
   let accountDescription = ''
@@ -94,38 +97,38 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const renderMessage = () => {
     switch ( swanAccountCreationStatus ) {
         case SwanAccountCreationStatus.ERROR:
-          swanMessage = 'We had a problem communicating with Swan.\n\n'
-          swanTitle = 'Something went wrong'
+          swanMessage = strings.problemcommunicatingwithSwan
+          swanTitle = strings.Somethingwentwrong
           showNote = false
           break
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
-          swanTitle = 'Your Hexa Wallet is communicating with Swan Bitcoin...'
-          swanMessage = 'This account is being linked with your profile on Swan Bitcoin.\n\nThis may take a few seconds, please do not close the application.'
+          swanTitle = strings.communicatingwithSwan
+          swanMessage = strings.accountisbeinglinked
           showNote = false
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          swanMessage = 'Your Hexa Wallet is now successfully linked to your Swan Bitcoin account. Sats will be transferred to Hexa as soon as you accumulate 1 million sats or 0.01 btc'
-          swanTitle = 'Successfully linked'
+          swanMessage = strings.HexaWalletLinked
+          swanTitle = strings.Successfullylinked
           accountName = 'Swan Bitcoin'
           accountDescription = 'Stack sats with Swan'
           showNote = false
           break
         case SwanAccountCreationStatus.ACCOUNT_CREATED:
-          swanMessage = 'Swan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
-          swanTitle = 'Hexa Wallet and your Swan Account are linked'
+          swanMessage = strings.Swanwilltransfer
+          swanTitle = strings.swanlinked
           showNote = false
           // TODO: uncomment once able to access current-swan acc
           // accountName = currentSwanSubAccount.defaultTitle
           // accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.'
-          swanTitle = 'Stack Sats\nwith Swan'
+          swanMessage = strings.swanautowithdrawal
+          swanTitle = 'Stack Sats with\nSwan Bitcoin'
           showNote = true
     }
     if( isConfirm ) {
-      swanMessage = 'By proceeding you understand that you will be taken to Swan Bitcoin to complete the process.\n\nPlease check the available payment methods along with Terms and Conditions for using Swan Bitcoin as per your jurisdiction.'
+      swanMessage = strings.Byproceeding
     }
     return (
       <>
@@ -158,9 +161,9 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
                 marginTop: hp( 6 ),
                 marginRight: wp( '1%' ),
               }}
-              title={'Note'}
+              title={common.note}
               infoText={
-                'Once you complete the registration process or login in to your Swan Bitcoin account, you can use this wallet'
+                strings.Onceyoucomplete
               }
             />
           }
@@ -224,7 +227,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>{'Sign Me Up'}</Text>
+        <Text style={styles.proceedButtonText}>{'Link Swan Account'}</Text>
       </AppBottomSheetTouchableWrapper>
       <AppBottomSheetTouchableWrapper
         onPress={() => {onPress()}}
@@ -242,7 +245,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             color: Colors.blue
           }}
         >
-          {'Not Now'}
+          {strings.NotNow}
         </Text>
       </AppBottomSheetTouchableWrapper>
       {/* <View style={{
@@ -404,7 +407,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansMedium
   },
   errorImage: {

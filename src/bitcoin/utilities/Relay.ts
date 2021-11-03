@@ -1,8 +1,10 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, EncryptedImage, NewWalletImage } from './Interface'
+import { Gift, GiftMetaData, INotification, NewWalletImage } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
+import crypto from 'crypto'
+import TrustedContactsOperations from './TrustedContactsOperations'
 
 const { HEXA_ID } = config
 export default class Relay {
@@ -353,6 +355,100 @@ export default class Relay {
       }
     } catch ( err ) {
       throw new Error( 'Failed to fetch Wallet Image' )
+    }
+  };
+
+  public static updateGiftChannel = async ( encryptionKey: string, gift: Gift, metaData: GiftMetaData ): Promise<{
+    updated: boolean;
+  }> => {
+    try {
+      if( !gift.channelAddress ) throw new Error( 'channel address missing' )
+      const encryptedGift = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( gift ), encryptionKey )
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'updateGiftChannel', {
+          HEXA_ID,
+          channelAddress: gift.channelAddress,
+          encryptedGift,
+          metaData
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { updated } = res.data
+      return {
+        updated,
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to update gift channel' )
+    }
+  };
+
+  public static fetchGiftChannel = async ( channelAddress: string, decryptionKey: string ): Promise<{
+    gift: Gift,
+    metaData: GiftMetaData;
+  }> => {
+    try {
+
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'fetchGiftChannel', {
+          HEXA_ID,
+          channelAddress,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { encryptedGift, metaData } = res.data
+
+      let gift: Gift
+      if( encryptedGift )
+        gift = JSON.parse( TrustedContactsOperations.decryptViaPsuedoKey( encryptedGift, decryptionKey ) )
+
+      return {
+        gift,
+        metaData
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch gift channel' )
+    }
+  };
+
+  public static syncGiftChannelsMetaData = async (
+    giftChannelsToSync: {
+      [channelAddress: string]: {
+        creator?: boolean,
+        metaDataUpdates?: GiftMetaData,
+    }
+  } ): Promise<{
+    synchedGiftChannels:  {
+      [channelAddress: string]: {
+        metaData: GiftMetaData
+    }
+  } }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'syncGiftChannelsMetaData', {
+          HEXA_ID,
+          giftChannelsToSync,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { synchedGiftChannels }: { synchedGiftChannels: {
+        [channelAddress: string]: {
+          metaData: GiftMetaData
+      } }} = res.data
+
+      return {
+        synchedGiftChannels
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to sync gift channels meta-data' )
     }
   };
 }

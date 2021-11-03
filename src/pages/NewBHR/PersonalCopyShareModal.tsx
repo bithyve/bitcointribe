@@ -39,7 +39,7 @@ export default function PersonalCopyShareModal( props ) {
     },
     {
       id: 2,
-      title: 'Print a copy',
+      title: 'Printing a copy',
       type: 'Print',
       flagShare: false,
       info: 'Keep all the pages of the printed copy safe',
@@ -47,11 +47,10 @@ export default function PersonalCopyShareModal( props ) {
     },
     {
       id: 3,
-      title: 'Store/ send pdf using other options',
+      title: 'Other options',
       type: 'Other',
       flagShare: false,
-      info:
-        'Make sure that you delete the message from your device once it is sent',
+      info: 'Make sure that you delete the message from your device once it is sent',
       imageIcon: Icons.manageBackup.PersonalCopy.icloud,
     },
   ] )
@@ -138,7 +137,7 @@ export default function PersonalCopyShareModal( props ) {
             fontFamily: Fonts.FiraSansMedium,
           }}
         >
-          Store personal copy PDF
+          Store PDF via
         </Text>
       </View>
       <View style={{
@@ -198,6 +197,16 @@ export default function PersonalCopyShareModal( props ) {
           )}
           keyExtractor={( item, index ) => index.toString()}
         />
+        <View style={{
+          marginTop: hp( '3%' )
+        }}>
+          <BottomInfoBox
+            title={'Security question and answer'}
+            infoText={
+              'Share the PDF via any of the methods above. Then click on the button below.'
+            }
+          />
+        </View>
         <AppBottomSheetTouchableWrapper
           disabled={isShared? false : true}
           onPress={() => {
@@ -214,12 +223,7 @@ export default function PersonalCopyShareModal( props ) {
           <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
         </AppBottomSheetTouchableWrapper>
       </View>
-      <BottomInfoBox
-        title={'Security question and answer'}
-        infoText={
-          'The answer to your security question is used to password protect personal copies. Please use your answer (case sensitive) to open these copies'
-        }
-      />
+
       <BottomSheet
         enabledInnerScrolling={false}
         ref={mailOptionsBottomSheet as any}
@@ -312,8 +316,8 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
   },
   proceedButtonView: {
-    marginTop: hp( '4%' ),
-    marginBottom: hp( '2%' ),
+    marginTop: hp( '2%' ),
+    marginBottom: hp( '4%' ),
     height: wp( '13%' ),
     width: wp( '40%' ),
     alignSelf: 'center',

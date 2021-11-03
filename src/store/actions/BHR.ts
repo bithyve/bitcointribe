@@ -71,6 +71,7 @@ export const GENERATE_LEVEL1_SHARES = 'GENERATE_LEVEL1_SHARES'
 export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
 export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
+export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -170,7 +171,9 @@ export const updateWalletImageHealth = ( payload: {
   updateSmShare?: boolean,
   update2fa?: boolean,
   updateAccounts?: boolean,
-  accountIds?: string[]
+  accountIds?: string[],
+  updateGifts?: boolean,
+  giftIds?: string[]
 } ) => {
   return {
     type: UPDATE_WALLET_IMAGE_HEALTH,
@@ -494,10 +497,10 @@ export const modifyLevelData = ( levelHealth?: LevelHealthInterface[], currentLe
   }
 }
 
-export const setChannelAssets = ( channelAssets ) => {
+export const setChannelAssets = ( channelAssets, secondaryShareDownloaded ) => {
   return {
     type: SET_CHANNEL_ASSETS, payload: {
-      channelAssets
+      channelAssets, secondaryShareDownloaded
     }
   }
 }
@@ -696,6 +699,14 @@ export const setSecondaryDataInfoStatus = ( flag ) =>{
   return {
     type: SET_SECONDARY_DATA_INFO_STATUS, payload: {
       flag
+    }
+  }
+}
+
+export const rejectedExistingContactRequest = ( channelKey ) => {
+  return {
+    type: REJECTED_EC_REQUEST, payload: {
+      channelKey
     }
   }
 }

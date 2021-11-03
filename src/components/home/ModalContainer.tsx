@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard, Platform } from 'react-native'
+import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard, Platform, AppState } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { ScreenCornerRadius } from 'react-native-screen-corner-radius'
@@ -8,9 +8,23 @@ const ModalContainer = ( {
   visible,
   closeBottomSheet,
   background = 'rgba(0,0,0,0.5)',
-  children
+  children,
+  onBackground
 } ) => {
   const [ height, setHeight ] = useState( 6 )
+  const  onAppStateChange = ( state ) => {
+    if ( state === 'background' || state === 'inactive' ){
+      onBackground ? onBackground() : closeBottomSheet()
+    }
+  }
+
+  useEffect( () => {
+    AppState.addEventListener(
+      'change',
+      onAppStateChange
+    )
+    return () => AppState.removeEventListener( 'change', onAppStateChange )
+  }, [] )
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',

@@ -60,31 +60,37 @@ export default function Secure2FA( props ) {
         </View>
         {phoneNumbers && phoneNumbers.length && phoneNumbers[ 0 ].number ?
           <CardWithRadioBtn
-            icon={''}
             mainText={strings.ConfirmPhone}
             subText={phoneNumbers[ 0 ].number}
             isSelected={activeType === DeepLinkEncryptionType.NUMBER}
             setActiveIndex={setActiveType}
             index={DeepLinkEncryptionType.NUMBER}
+            geticon={''}
+            italicText={''}
+            changeBgColor={true}
           />
           : null}
         {emails && emails.length && emails[ 0 ].email ?
           <CardWithRadioBtn
-            icon={''}
             mainText={strings.ConfirmEmail}
             subText={emails[ 0 ].email}
             isSelected={activeType === DeepLinkEncryptionType.EMAIL}
             setActiveIndex={setActiveType}
             index={DeepLinkEncryptionType.EMAIL}
+            geticon={''}
+            italicText={''}
+            changeBgColor={true}
           />
           : null }
         <CardWithRadioBtn
-          icon={''}
           mainText={strings.ConfirmOTP}
           subText={strings.subText}
           isSelected={activeType === DeepLinkEncryptionType.OTP}
           setActiveIndex={setActiveType}
           index={DeepLinkEncryptionType.OTP}
+          geticon={''}
+          italicText={''}
+          changeBgColor={true}
         />
       </View>
       <BottomInfoBox

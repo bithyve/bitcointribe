@@ -262,7 +262,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const renderSecureAccountKnowMoreContent = () => {
     return (
       <SavingAccountAlertBeforeLevel2
-        titleClicked={()=>{setSecureAccountAlert( true ); setSecureAccountKnowMore( false ) }}
+        titleClicked={()=>{
+          setSecureAccountAlert( true )
+          setSecureAccountKnowMore( false )
+        }}
         containerStyle={{
         }}
       />
@@ -405,12 +408,36 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           {showDonationWebViewSheet()}
         </RootSiblingParent>
       </ModalContainer>
-      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {}} >
-        {renderSecureAccountAlertContent()}
-      </ModalContainer>
-      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => { setSecureAccountAlert( true ); setSecureAccountKnowMore( false )  }} >
-        {renderSecureAccountKnowMoreContent()}
-      </ModalContainer>
+      {
+        primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && (
+          <ModalContainer
+            onBackground={()=>{
+              setSecureAccountAlert( false )
+              setTimeout( () => {
+                setSecureAccountAlert( true )
+              }, 200 )
+            }}
+            visible={secureAccountAlert} closeBottomSheet={() => {
+
+            }} >
+            {renderSecureAccountAlertContent()}
+          </ModalContainer>
+        )
+      }
+
+      {
+        primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && (
+          <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {
+            if( !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ){
+              setSecureAccountAlert( true )
+            }
+            setSecureAccountKnowMore( false )
+          }} >
+            {renderSecureAccountKnowMoreContent()}
+          </ModalContainer>
+        )
+      }
+
     </View>
   )
 }

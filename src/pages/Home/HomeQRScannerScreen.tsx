@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
@@ -18,10 +18,24 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
 import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
-import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import { AccountType, DeepLinkEncryptionType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { AccountsState } from '../../store/reducers/accounts'
 import { translations } from '../../common/content/LocContext'
+import ModalContainer from '../../components/home/ModalContainer'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
+import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import DashedContainer from '../FriendsAndFamily/DashedContainer'
+import Illustration from '../../assets/images/svgs/illustration.svg'
+import { NavigationActions, StackActions } from 'react-navigation'
+import AcceptGift from '../FriendsAndFamily/AcceptGift'
+import { launchImageLibrary } from 'react-native-image-picker'
+import LocalQRCode from '@remobile/react-native-qrcode-local-image'
+import Toast from '../../components/Toast'
 
 export type Props = {
   navigation: any;
@@ -41,17 +55,17 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
   const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
-  const common  = translations[ 'common' ]
-  const strings  = translations[ 'accounts' ]
+  const common = translations[ 'common' ]
+  const strings = translations[ 'accounts' ]
   function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
     console.log( 'scannedData', scannedData )
     const networkType: NetworkType = AccountUtilities.networkType( scannedData )
     if ( networkType ) {
       const network = AccountUtilities.getNetworkByType( networkType )
       const { type } = AccountUtilities.addressDiff( scannedData, network )
-      if ( type===ScannedAddressKind.ADDRESS ) {
+      if ( type === ScannedAddressKind.ADDRESS ) {
         onSend( scannedData, 0 )
-      } else if( type===ScannedAddressKind.PAYMENT_URI )  {
+      } else if ( type === ScannedAddressKind.PAYMENT_URI ) {
         const res = AccountUtilities.decodePaymentURI( scannedData )
         const address = res.address
         const options = res.options
@@ -88,6 +102,32 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     )
   }
 
+
+  function importImage() {
+    launchImageLibrary(
+      {
+        title: null,
+        mediaType: 'photo',
+        takePhotoButtonTitle: null,
+        selectionLimit: 1,
+      },
+      response => {
+        if ( response.assets ) {
+          const uri = response.assets[ 0 ].uri.toString().replace( 'file://', '' )
+          LocalQRCode.decode( uri, ( error, result ) => {
+            if ( !error ) {
+              handleBarcodeRecognized( {
+                data: result
+              } )
+            } else {
+              Toast( 'No QR code found in the selected image' )
+            }
+          } )
+        }
+      },
+    )
+  }
+
   return (
     <View style={styles.rootContainer}>
       <ScrollView>
@@ -98,7 +138,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           scrollEnabled={false}
           style={styles.rootContainer}
         >
-          <HeaderSection title={strings.ScanaBitcoinaddress}/>
+          <HeaderSection title={strings.ScanaBitcoinaddress} />
 
           <CoveredQRCodeScanner
             onCodeScanned={handleBarcodeRecognized}
@@ -135,6 +175,15 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <View
             style={styles.floatingActionButtonContainer}
           >
+            {/* <TouchableOpacity onPress={importImage} style={styles.btnImport}>
+              <Ionicons
+                name="image"
+                size={22}
+                color="gray"
+              />
+              <Text style={styles.textImport}>Import From Gallery</Text>
+            </TouchableOpacity> */}
+
             <Button
               raised
               title={strings.Receivebitcoin}
@@ -148,6 +197,9 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                   }}
                 />
               }
+              containerStyle={{
+                borderRadius: 9999,
+              }}
               buttonStyle={{
                 ...ButtonStyles.floatingActionButton,
                 borderRadius: 9999,
@@ -157,12 +209,12 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                 ...ButtonStyles.floatingActionButtonText,
                 marginLeft: 8,
               }}
-              onPress={() => { navigation.navigate( 'ReceiveQR' )}}
+              onPress={() => { navigation.navigate( 'ReceiveQR' ) }}
             />
           </View>
           {
             __DEV__ && (
-              <TouchableOpacity onPress={()=>{
+              <TouchableOpacity onPress={() => {
                 const qrScannedData = {
                   data: '{"type":"KEEPER_REQUEST","channelKey":"nBeLSFNLxhRmuq4JWNQTBWgv","walletName":"Scas","secondaryChannelKey":"HcB1rVJrYMss0QjlyDD1KRPA","version":"1.9.0"}'
                 }
@@ -189,6 +241,54 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 }
 
 const styles = StyleSheet.create( {
+  buttonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  buttonView: {
+    height: widthPercentageToDP( '12%' ),
+    width: widthPercentageToDP( '35%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+    backgroundColor: Colors.blue,
+  },
+  availableToSpendText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
+    lineHeight: 15,
+  },
+  balanceText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
+  },
+  modalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  modalInfoText: {
+    // marginTop: hp( '3%' ),
+    marginTop: heightPercentageToDP( 0.5 ),
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: widthPercentageToDP( 12 ),
+    letterSpacing: 0.6
+  },
+  modalContentContainer: {
+    // height: '100%',
+    backgroundColor: Colors.backgroundColor,
+    paddingBottom: heightPercentageToDP( 4 ),
+  },
   rootContainer: {
     flex: 1
   },
@@ -204,7 +304,21 @@ const styles = StyleSheet.create( {
     right: 0,
     marginLeft: 'auto',
     padding: heightPercentageToDP( 1.5 ),
+    //flexDirection: 'row'
   },
+  btnImport: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
+  textImport: {
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginHorizontal: 2,
+  }
 } )
 
 export default HomeQRScannerScreen

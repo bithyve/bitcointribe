@@ -21,6 +21,7 @@ import java.util.Date;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.print.PrintManager;
+import android.util.Log;
 
 
 import com.itextpdf.text.Anchor;
@@ -80,9 +81,13 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         try {
             JSONObject jsonObj = new JSONObject(pdfData);
             Document document = new Document(PageSize.A4);
-            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            Context context = this.getCurrentActivity().getApplicationContext();
+
+            String path = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath() +"/"+jsonObj.getString("fileName");
+            Log.d("createPdf: ", path);
+            //String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
             //Create PDFWriter instance.
-            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
+            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(path));
             //Add password protection.
             pdfWriter.setEncryption(jsonObj.getString("password").getBytes(), jsonObj.getString("password").getBytes(),
                     PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
@@ -90,8 +95,9 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             addMetaData(document);
             addTitlePage(document,pdfData);
             document.close();
-            successCallback.invoke(outPath);
+            successCallback.invoke(path);
         } catch (Exception e) {
+            Log.e("createPdf: ", e.toString());
             errorCallback.invoke(e.getMessage());
         }
     }
@@ -242,7 +248,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 //                qrCodeString.getString(7),
 //                smallBold));
 //        document.add(preface);
-        document.newPage();
+        //document.newPage();
         // Secondary Xpub and 2FA Secret
         /*preface = new Paragraph();
         preface.add(new Paragraph(
@@ -266,7 +272,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         document.add(preface);*/
 
 
-        // Exit Key and BitHyve Xpub
+        /*  // Exit Key and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Exit/Regenerate 2FA Key:",
@@ -286,7 +292,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 //        document.add(preface);
 
 
-        /*preface = new Paragraph();
+        preface = new Paragraph();
         preface.add(new Paragraph(
                 "BitHyve Xpub:",
                 catFont));
@@ -313,15 +319,19 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         try {
             JSONObject jsonObj = new JSONObject(pdfData);
             Document document = new Document(PageSize.A4);
-            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            //String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            Context context = this.getCurrentActivity().getApplicationContext();
+            String path = context.getExternalFilesDir(null).getPath() +"/"+jsonObj.getString("fileName");
+            Log.d("createPdf: ", path);
             //Create PDFWriter instance.
-            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
+            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
             addMetaData(document);
             addTitlePageKeeper(document,pdfData);
             document.close();
-            successCallback.invoke(outPath);
+            successCallback.invoke(path);
         } catch (Exception e) {
+            Log.d("createPdf: ", e.toString());
             errorCallback.invoke(e.getMessage());
         }
     }
@@ -348,7 +358,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
 
-        // Exit Key and BitHyve Xpub
+        /*// Exit Key and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Exit/Regenerate 2FA Key:",
@@ -361,6 +371,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
+        */
     }
 
 

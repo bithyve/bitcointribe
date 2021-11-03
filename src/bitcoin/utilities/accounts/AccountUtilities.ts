@@ -58,7 +58,7 @@ export default class AccountUtilities {
     bitcoinJS.ECPair.fromWIF( privateKey, network )
 
   static deriveAddressFromKeyPair = (
-    keyPair: bip32.BIP32Interface,
+    keyPair: bip32.BIP32Interface | bitcoinJS.ECPairInterface,
     standard: number,
     network: bitcoinJS.Network
   ): string => {
@@ -190,6 +190,10 @@ export default class AccountUtilities {
     for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
         return AccountUtilities.getPrivateKeyByIndex( xpriv, true, itr, network )
+    }
+
+    for( const importedAddress in account.importedAddresses ){
+      if( address === importedAddress ) return account.importedAddresses[ importedAddress ].privateKey
     }
 
     throw new Error( 'Could not find private key for: ' + address )

@@ -31,6 +31,9 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
   const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
+  const AllowSecureAccount = useSelector(
+    ( state ) => state.bhr.AllowSecureAccount,
+  )
 
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo( () => {
     return secondarySubAccounts
@@ -43,14 +46,16 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         style={styles.headerAccountSync}
         source={getAccountSyncIcon( accountShell.syncStatus )}
       />
-      <Image
-        style={styles.headerAccountImage}
-        source={getAvatarForSubAccount( primarySubAccount, false, true )}
-      />
+      <View style={styles.headerAccountImage} >
+        {getAvatarForSubAccount( primarySubAccount, false, true )}
+      </View>
       {
-        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited && !primarySubAccount.isUsable ) && (
+        accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited && !primarySubAccount.isUsable )  && (
           <View style={styles.dot}/>
         )
+      }
+      {( primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && AllowSecureAccount ) &&
+      <View style={styles.dot}/>
       }
       <View style={styles.headerBadgeContainer}>
 

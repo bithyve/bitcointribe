@@ -360,6 +360,8 @@ export enum notificationType {
   FNF_KEEPER_REQUEST='FNF_KEEPER_REQUEST',
   FNF_KEEPER_REQUEST_ACCEPTED='FNF_KEEPER_REQUEST_ACCEPTED',
   FNF_KEEPER_REQUEST_REJECTED='FNF_KEEPER_REQUEST_REJECTED',
+  GIFT_ACCEPTED = 'GIFT_ACCEPTED',
+  GIFT_REJECTED = 'GIFT_REJECTED'
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -529,10 +531,11 @@ export interface PrimaryStreamData {
   walletName?: string,
   relationType?: TrustedContactRelationTypes,
   FCM?: string,
+  contactDetails?: ContactDetails,
   paymentAddresses?: {
     [accountType: string]: string
   },
-  contactDetails?: ContactDetails,
+  giftDeepLink?: string,
 
   // primary keeper exclusives
   secondarySetupData? :{
@@ -623,6 +626,7 @@ export interface Trusted_Contacts {
 export interface NewWalletImage {
   walletId: string;
   name: string;
+  userName?: string,
   accounts?: {
     [accountId: string]: {
       encryptedData: string
@@ -632,6 +636,7 @@ export interface NewWalletImage {
   contacts?:string;
   versionHistory?: string;
   SM_share?: string,
+  gifts?:object;
 }
 
 export interface EncryptedImage {
@@ -777,7 +782,9 @@ export enum QRCodeTypes {
   PRIMARY_KEEPER_REQUEST = 'PRIMARY_KEEPER_REQUEST',
   RECOVERY_REQUEST = 'RECOVERY_REQUEST',
   EXISTING_CONTACT = 'EXISTING_CONTACT',
-  APPROVE_KEEPER = 'APPROVE_KEEPER'
+  APPROVE_KEEPER = 'APPROVE_KEEPER',
+  GIFT = 'GIFT',
+  CONTACT_GIFT = 'CONTACT_GIFT'
 }
 
 export interface UTXO {
@@ -788,8 +795,12 @@ export interface UTXO {
   status?: any;
 }
 
+
+export enum ActiveAddressAssigneeType  {
+    GIFT = 'GIFT'
+}
 export interface ActiveAddressAssignee{
-    type: AccountType;
+    type: AccountType | ActiveAddressAssigneeType;
     id?: string;
     senderInfo?: {
       name: string,
@@ -821,6 +832,7 @@ export enum NetworkType {
 export interface Wallet {
   walletId: string,
   walletName: string,
+  userName?: string,
   security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
   primarySeed: string,
@@ -863,6 +875,12 @@ export interface Account {
   hasNewTxn?: boolean;                  // indicates new txns
   transactionsNote : {
     [txId: string]: string
+  },
+  importedAddresses: {                  // non-xpub/imported addresses
+    [address: string]: {
+      address: string,
+      privateKey: string
+    }
   }
 }
 export interface MultiSigAccount extends Account {
@@ -916,7 +934,9 @@ export enum DeepLinkKind {
   KEEPER = 'KEEPER',
   PRIMARY_KEEPER = 'PRIMARY_KEEPER',
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
-  EXISTING_CONTACT = 'EXISTING_CONTACT'
+  EXISTING_CONTACT = 'EXISTING_CONTACT',
+  GIFT = 'GIFT',
+  CONTACT_GIFT = 'CONTACT_GIFT'
 }
 
 export enum DeepLinkEncryptionType {
@@ -924,6 +944,68 @@ export enum DeepLinkEncryptionType {
   NUMBER = 'NUM',
   EMAIL = 'EMAIL',
   OTP = 'OTP'
+}
+
+export enum GiftThemeId {
+  ONE = 'ONE',
+  TWO = 'TWO',
+  THREE = 'THREE',
+  FOUR = 'FOUR'
+}
+
+export enum GiftType {
+  SENT = 'SENT',
+  RECEIVED = 'RECEIVED'
+}
+
+export enum GiftStatus {
+  CREATED = 'CREATED',
+  SENT = 'SENT',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  RECLAIMED = 'RECLAIMED',
+  EXPIRED = 'EXPIRED',
+}
+export interface Gift {
+  id: string,
+  privateKey: string,
+  address: string,
+  channelAddress?: string,
+  amount: number,
+  type: GiftType,
+  status: GiftStatus,
+  themeId: GiftThemeId,
+  timestamps: {
+    created: number,
+    sent?: number,
+    accepted?: number,
+    reclaimed?: number,
+  }
+  sender: {
+    walletId: string,
+    accountId: string,
+    walletName: string,
+    contactId?: string // permanentAddress of the contact
+  },
+  receiver: {
+    walletId?: string,
+    accountId?: string,
+    walletName?: string,
+    contactId?: string // permanentAddress of the contact
+  },
+  note?: string,
+  deepLinkConfig?: {
+    encryptionType: string,
+    encryptionKey: string,
+  }
+}
+
+export interface GiftMetaData {
+  status: GiftStatus,
+  notificationInfo?: {
+    walletId: string,
+    FCM: string,
+  }
 }
 
 export interface cloudDataInterface {
@@ -937,4 +1019,14 @@ export interface cloudDataInterface {
   shares?: any;
   secondaryShare?: string;
   seed?: string;
+}
+
+export enum ShortLinkKind {
+  CONTACT = 'request',
+  KEEPER = 'keeper',
+  PRIMARY_KEEPER = 'keeper',
+  RECIPROCAL_KEEPER = 'keeper',
+  EXISTING_CONTACT = 'request',
+  GIFT = 'gift',
+  DONATION = 'donation'
 }

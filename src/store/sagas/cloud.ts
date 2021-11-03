@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { NativeModules, Platform } from 'react-native'
-import { call, delay, put, select } from 'redux-saga/effects'
+import { call, delay, put, select, race } from 'redux-saga/effects'
 import { WIEncryption, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
@@ -110,66 +110,81 @@ function* cloudWorker( { payload } ) {
         keeperData: JSON.stringify( keeperInfo ),
         bhXpub,
       }
-      console.log( 'ICLOUD data', data )
-      const isCloudBackupCompleted = yield call ( checkCloudBackupWorker, {
-        payload: {
-          data, share
-        }
-      } )
 
-      if( typeof isCloudBackupCompleted === 'boolean' ) {
-        yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
-        yield call( updateHealthForCloudStatusWorker, {
-          payload : {
-            share
+      const { response, timeout } = yield race( {
+        response: call( checkCloudBackupWorker, {
+          payload: {
+            data, share
           }
-        } )
-        const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
-        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-        //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
+        } ),
+        timeout: delay( 40000 )
+      } )
+      console.log( 'response', response )
+      console.log( 'timeout', timeout )
+      if ( !timeout ){
+        const isCloudBackupCompleted = response
 
-        if( isCloudBackupCompleted ) {
+        if( typeof isCloudBackupCompleted === 'boolean' ) {
           yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
           yield call( updateHealthForCloudStatusWorker, {
             payload : {
               share
             }
           } )
-          const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
-          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-
-          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-        } else {
-          const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
-          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-          yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-        }
-      } else {
-        if( isCloudBackupCompleted.status ) {
-          yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
-          yield call( updateHealthForCloudStatusWorker, {
-            payload : {
-              share
-            }
-          } )
-          const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+          const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
           const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
           //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
-          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-        } else {
-          const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
-          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-          yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-          yield delay( 200 )
-          const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( isCloudBackupCompleted.errorCode )}` : 'GoogleDrive backup failed'
-          yield put( setCloudErrorMessage( message ) )
-          //Alert.alert( 'Error', message )
-        }
-      }
+          if( isCloudBackupCompleted ) {
+            yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
+            yield call( updateHealthForCloudStatusWorker, {
+              payload : {
+                share
+              }
+            } )
+            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
 
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+          } else {
+            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+            yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+          }
+        } else {
+          if( isCloudBackupCompleted.status ) {
+            yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
+            yield call( updateHealthForCloudStatusWorker, {
+              payload : {
+                share
+              }
+            } )
+            const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+            //console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
+
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+          } else {
+            const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
+            const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+            yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+            yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+            yield delay( 200 )
+            const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( isCloudBackupCompleted.errorCode )}` : 'Google Drive backup failed'
+            yield put( setCloudErrorMessage( message ) )
+          //Alert.alert( 'Error', message )
+          }
+        }
+      } else{
+        const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
+        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+        yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+        yield delay( 200 )
+        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( '' )}` : 'Google Drive backup failed'
+        yield put( setCloudErrorMessage( message ) )
+      }
     }
   }
   catch ( error ) {
@@ -215,21 +230,16 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 function* updateHealthForCloudWorker( { payload } ) {
   try {
     const { share } = payload
-    const levelHealth = yield select( ( state ) => state.bhr.levelHealth )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-    let levelHealthVar = levelHealth[ 0 ].levelInfo[ 1 ]
+    let levelHealthVar: LevelInfo = levelHealth[ 0 ].levelInfo[ 1 ]
     if (
       share &&
       !( Object.keys( share ).length === 0 && share.constructor === Object ) &&
       levelHealth.length > 0
     ) {
-      levelHealthVar = levelHealth[ levelHealth.length - 1 ].levelInfo[ 1 ]
+      levelHealthVar = levelHealth[ levelHealth.findIndex( value=>value.levelInfo.find( temp=>temp.shareId == share.shareId ) ) ].levelInfo[ 1 ]
     }
-    // health update for 1st upload to cloud
-    // if (
-    //   levelHealth.length &&
-    //   levelHealthVar.status != 'accessible'
-    // ) {
     if ( levelHealthVar.shareType == 'cloud' ) {
       levelHealthVar.updatedAt = moment( new Date() ).valueOf()
       levelHealthVar.status = 'accessible'
@@ -246,7 +256,6 @@ function* updateHealthForCloudWorker( { payload } ) {
       name: levelHealthVar.name
     }
     yield put( updateMSharesHealth( shareObj ) )
-    // }
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
@@ -269,7 +278,7 @@ function* getCloudBackupRecoveryWorker () {
       }
       if( backedJson.errorCode ) {
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( backedJson.errorCode )}` : 'GoogleDrive backup failed'
+        const message = Platform.OS == 'ios' ? `${getiCloudErrorMessage( backedJson.errorCode )}` : 'Google Drive backup failed'
         yield put( setCloudErrorMessage( message ) )
         // if( backedJson === 'failure' ) {
         //   yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
@@ -477,7 +486,7 @@ function* updateDataWorker( { payload } ) {
         id: googleData.id,
       }
       const result = yield call( GoogleDrive.updateFile, JSON.stringify( metaData )  )
-      console.log( 'GoogleDrive.updateFile result', result )
+      console.log( 'Google Drive.updateFile result', result )
       if ( result.eventName == 'successFullyUpdate' ) {
         return 'successFullyUpdate'
         //this.callBack( share )
@@ -487,7 +496,7 @@ function* updateDataWorker( { payload } ) {
         yield put( setCloudErrorMessage( message ) )
         throw new Error( result.eventName )
       }
-      console.log( 'GoogleDrive.updateFile', result )
+      console.log( 'Google Drive.updateFile', result )
 
     }
     console.log( 'newArray', newArray )
@@ -737,7 +746,7 @@ function* uplaodFileWorker( { payload } ) {
           yield put( setCloudErrorMessage( message ) )
           throw new Error( result.eventName )
         }
-        console.log( 'GoogleDrive.updateFile', result )
+        console.log( 'Google Drive.updateFile', result )
       }
     }
 

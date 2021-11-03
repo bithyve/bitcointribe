@@ -45,7 +45,7 @@ const HistoryHeaderComponent = ( props ) => {
             flex: 1, justifyContent: 'center'
           }}>
             <Text style={styles.infoText}>
-              {`${strings.Lastbackup} `}
+              {`${strings.Lastbackup}: `}
               <Text style={{
                 fontFamily: Fonts.FiraSansMediumItalic
               }}>

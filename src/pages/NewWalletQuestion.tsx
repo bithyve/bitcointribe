@@ -49,6 +49,12 @@ import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAut
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../common/content/LocContext'
 
+import PassActive from '../assets/images/svgs/icon_password_active.svg'
+import PassInActive from '../assets/images/svgs/icon_password.svg'
+import QueActive from '../assets/images/svgs/icon_question.svg'
+import QueInActive from '../assets/images/svgs/question_inactive.svg'
+import ButtonStyles from '../common/Styles/ButtonStyles'
+
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
 }
@@ -336,7 +342,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       }
     } else {
       security = {
-        questionId: 0,
+        questionId: '0',
         question: hintText,
         answer: pswd,
       }
@@ -727,14 +733,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           marginTop: showNote ? hp( '0%' ) :hp( '2%' ),
           marginBottom: hp( 1 )
         }}>
-          {/* {pswd.length === 0 && confirmPswd.length === 0 && */}
+          {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
             title={common.note}
             infoText={strings.Makesure}
             italicText={''}
             backgroundColor={Colors.white}
           />
-          {/* } */}
+          }
         </View>
           }
         </View>
@@ -1255,20 +1261,24 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               step={''}
             />
             <CardWithRadioBtn
-              icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
+              geticon={() => {if( activeIndex === 0 ) { return <QueActive /> } else { return <QueInActive/>}}}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
               index={0}
+              italicText={''}
+              changeBgColor={true}
             />
             <CardWithRadioBtn
-              icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
+              geticon={() => {if( activeIndex === 0 ) { return <PassInActive /> } else { return <PassActive/>}}}
               mainText={strings.Useencryptionpassword}
               subText={strings.Createapassword}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
+              italicText={''}
+              changeBgColor={true}
             />
           </TouchableOpacity>
 
@@ -1299,14 +1309,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '4%' ),
         flexDirection: 'row', marginTop: hp( 2 )
       }}>
-        <ButtonBlue
-          buttonText={common.confirmProceed}
-          handleButtonPress={confirmAction}
-          buttonDisable={false}
-        />
+        <TouchableOpacity
+          onPress={() => {confirmAction()}}
+          style={ButtonStyles.primaryActionButton}
+        >
+          <Text style={{
+            fontSize: RFValue( 13 ),
+            color: Colors.white,
+            fontFamily: Fonts.FiraSansMedium,
+            alignSelf: 'center',
+          }}>{`${common.confirmProceed}`}</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            console.log( 'asfds' )
             setIsSkipClicked( true )
             dispatch( updateCloudPermission( false ) )
             onPressProceed( true )

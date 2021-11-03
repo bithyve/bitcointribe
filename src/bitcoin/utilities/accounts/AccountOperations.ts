@@ -1,5 +1,6 @@
 import * as bitcoinJS from 'bitcoinjs-lib'
 import * as bip32 from 'bip32'
+import crypto from 'crypto'
 import coinselect from 'coinselect'
 import {
   Transaction,
@@ -16,6 +17,10 @@ import {
   ActiveAddresses,
   ActiveAddressAssignee,
   Balances,
+  Gift,
+  GiftType,
+  GiftStatus,
+  GiftThemeId,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
@@ -84,6 +89,19 @@ export default class AccountOperations {
     }
   };
 
+  static importAddress = async ( account: Account | MultiSigAccount, privateKey: string, address: string, requester: ActiveAddressAssignee ) => {
+    if( !account.importedAddresses ) account.importedAddresses = {
+    }
+    account.importedAddresses[ address ] = {
+      address,
+      privateKey
+    }
+    account.activeAddresses.external[ address ] = {
+      index: -1,
+      assignee: requester
+    }
+  }
+
   static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
     txsFound: Transaction[],
@@ -143,6 +161,14 @@ export default class AccountOperations {
         externalAddresses[ address ] = itr
         ownedAddresses.push( address )
       }
+
+      // include imported external addresses
+      if( !account.importedAddresses ) account.importedAddresses = {
+      }
+      Object.keys( account.importedAddresses ).forEach( address => {
+        externalAddresses[ address ] = -1
+        ownedAddresses.push( address )
+      } )
 
       const internalAddresses :{[address: string]: number}  = {
       }// all internal addresses(till closingIntIndex)
@@ -675,12 +701,17 @@ export default class AccountOperations {
     customTxFeePerByte: number,
   ): TransactionPrerequisiteElements => {
     const inputUTXOs = account.confirmedUTXOs
+    console.log( {
+      inputUTXOs, outputUTXOs, customTxFeePerByte
+    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
       customTxFeePerByte,
     )
-
+    console.log( {
+      inputs, outputs, fee
+    } )
     if ( !inputs ) return {
       fee
     }
@@ -701,7 +732,7 @@ export default class AccountOperations {
   }> => {
     try {
       let inputs, outputs
-      if ( txnPriority === 'custom' && customTxPrerequisites ) {
+      if ( txnPriority === TxPriority.CUSTOM && customTxPrerequisites ) {
         inputs = customTxPrerequisites.inputs
         outputs = customTxPrerequisites.outputs
       } else {
@@ -978,4 +1009,102 @@ export default class AccountOperations {
       txid
     }
   };
+
+  static generateGifts = async (
+    walletDetails: {
+      walletId: string,
+      walletName: string,
+    },
+    account: Account | MultiSigAccount,
+    amounts: number[],
+    averageTxFees: AverageTxFees,
+    includeFee?: boolean,
+  ): Promise<{
+    txid: string;
+    gifts: Gift[];
+   }> => {
+
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+    const txPriority = TxPriority.LOW
+
+    const recipients = []
+    const gifts: Gift[] = []
+    amounts.forEach( amount => {
+      const keyPair = bitcoinJS.ECPair.makeRandom( {
+        network: network
+      } )
+
+      const privateKey = keyPair.toWIF()
+      const address = AccountUtilities.deriveAddressFromKeyPair(
+        keyPair,
+        config.DPATH_PURPOSE,
+        network
+      )
+
+      recipients.push( {
+        address,
+        amount,
+        name: 'Gift',
+      } )
+
+      const id = crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' )
+      const createdGift: Gift = {
+        id,
+        privateKey,
+        address,
+        amount,
+        type: GiftType.SENT,
+        status: GiftStatus.CREATED,
+        themeId: GiftThemeId.ONE,
+        timestamps: {
+          created: Date.now(),
+        },
+        sender: {
+          walletId: walletDetails.walletId,
+          walletName: walletDetails.walletName,
+          accountId: account.id,
+        },
+        receiver: {
+        }
+      }
+
+      gifts.push( createdGift )
+    } )
+
+    const { txPrerequisites } = await AccountOperations.transferST1( account, recipients, averageTxFees )
+    let feeDeductedFromAddress: string
+    const priorityBasedTxPrerequisites = txPrerequisites[ txPriority ]
+
+    if( includeFee ){
+      priorityBasedTxPrerequisites.outputs.forEach( output => {
+        if( !output.address ){
+          // adding back fee to the change address
+          output.value += priorityBasedTxPrerequisites.fee
+        } else {
+          // deducting fee from the gift(or one of the gifts)
+          if( !feeDeductedFromAddress ){
+            output.value -= priorityBasedTxPrerequisites.fee
+            if( output.value <= 0 ) throw new Error( 'Failed to generate gifts, inclusion fee is greater than gift amount' )
+            feeDeductedFromAddress = output.address
+          }
+        }
+      } )
+    }
+
+    if( feeDeductedFromAddress ){
+      recipients.forEach( recipient => {
+        if( recipient.address === feeDeductedFromAddress ) recipient.amount -= priorityBasedTxPrerequisites.fee
+      } )
+
+      gifts.forEach( gift => {
+        if( gift.address === feeDeductedFromAddress ) gift.amount -= priorityBasedTxPrerequisites.fee
+      } )
+    }
+
+    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, txPriority, network, recipients )
+
+    return {
+      txid, gifts
+    }
+  }
 }

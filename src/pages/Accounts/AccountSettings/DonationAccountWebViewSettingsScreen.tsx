@@ -324,7 +324,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 source={require( '../../../assets/images/icons/icon_donation_total.png' )}
               />
               <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Incoming Transactions</Text>
+                <Text style={styles.titleTextStyle}>Transactions</Text>
                 <Text
                   style={{
                     ...styles.modalInfoText,
@@ -332,7 +332,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                     color: Colors.lightTextColor,
                   }}
                 >
-                  Show incoming donation transactions
+                  Show donation transactions
                 </Text>
               </View>
               <CurrencyKindToggleSwitch
@@ -344,15 +344,16 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                   isIncomingTxnEnabled ? Colors.blue : Colors.white
                 }
                 onpress={() =>{
-                  if( isIncomingTxnEnabled ) setIsOutgoingTxnEnabled( false )
+                  // if( isIncomingTxnEnabled ) setIsOutgoingTxnEnabled( false ) // turn off outgoing txs if incoming is turned off
                   setIsIncomingTxnEnabled( ( prevState ) => !prevState )
+                  setIsOutgoingTxnEnabled( ( prevState ) => !prevState ) // temporary single switch
                 }
                 }
                 isOn={isIncomingTxnEnabled}
               />
             </View>
 
-            <View style={{
+            {/* <View style={{
               ...styles.rowContainer, marginTop: 10
             }}>
               <Image
@@ -385,7 +386,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 }
                 isOn={isOutgoingTxnEnabled}
               />
-            </View>
+            </View> */}
 
             <View style={styles.rowContainer}>
               <View
