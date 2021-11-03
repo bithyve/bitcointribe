@@ -166,10 +166,11 @@ export const associateGiftWatcher = createWatcher(
 function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
   const { channelAddress } = payload
-
+  const wallet: Wallet = yield select( state => state.storage.wallet )
   for( const giftId in storedGifts ){
     if( channelAddress === storedGifts[ giftId ].channelAddress ) {
-      Toast( 'Gift already added' )
+      if( storedGifts[ giftId ].sender.walletId == wallet.walletId ) Toast( 'You are the owner of this gift' )
+      else Toast( 'Gift already added' )
       return
     }
   }
