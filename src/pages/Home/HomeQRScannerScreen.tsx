@@ -197,6 +197,9 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                   }}
                 />
               }
+              containerStyle={{
+                borderRadius: 9999,
+              }}
               buttonStyle={{
                 ...ButtonStyles.floatingActionButton,
                 borderRadius: 9999,
