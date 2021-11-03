@@ -168,11 +168,13 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: widthPercentageToDP( 5.4 ),
-    height: widthPercentageToDP( 5.4 ),
+    width: 30,
+    height: 30,
     marginBottom: 10,
     marginTop: 5,
-    resizeMode: 'contain'
+    resizeMode: 'contain',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   cardContainer: {
