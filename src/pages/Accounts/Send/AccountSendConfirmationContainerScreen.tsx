@@ -179,7 +179,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     onSuccess: ( txid: string | null ) => {
 
       if ( txid ) {
-        dispatch( sendTxNotification() )
+        dispatch( sendTxNotification( txid ) )
         // showSendSuccessBottomSheet()
         setSuccess( true )
       }

@@ -73,7 +73,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginRight: wp( 9 )
             }}>
-              {'You have recieved gift from '}
+              {'You have received gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),

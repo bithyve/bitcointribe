@@ -293,7 +293,9 @@ export default function ManageBackup( props ) {
       setErrorInfo( errorInfoProp )
       setShowLoader( false )
       dispatch( setLevelCompletionError( null, null, LevelStatus.PENDING ) )
-      setErrorModal( true )
+      setTimeout( () => {
+        setErrorModal( true )
+      }, 600 )
     }
   }, [ status ] )
 

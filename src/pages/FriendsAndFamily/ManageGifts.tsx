@@ -167,16 +167,16 @@ const ManageGifts = ( { navigation } ) => {
 
   const getText = () => {
     if ( active === GiftStatus.CREATED ) {
-      return 'Gifts that you have created and are ready to be sent are visible below'
+      return 'Gifts that you create, ready to be sent, would be visible below'
     }
     if ( active === GiftStatus.SENT ) {
-      return 'Gifts you\'ve sent are visible below'
+      return 'Gifts you\'ve sent would be visible below'
     }
     if ( active === GiftStatus.EXPIRED ) {
-      return 'Gifts that were unclaimed and thus expired are visible below'
+      return 'Gifts that were unclaimed and thus expired would be visible below'
     }
     if ( active === GiftType.RECEIVED ) {
-      return 'Gifts you\'ve received are visible below'
+      return 'Gifts you\'ve received would be visible below'
     }
   }
 
@@ -455,11 +455,21 @@ const ManageGifts = ( { navigation } ) => {
           <View style={{
             // marginTop: hp( '45%' )
           }}>
-            <BottomInfoBox
-              // backgroundColor={Colors.white}
-              // title={'Note'}
-              infoText={getText()}
-            />
+            <View style={{
+              height: hp( '12%' ),
+              padding: 20,
+              marginLeft: 12,
+              marginRight: 20,
+              justifyContent:'center',
+            }}>
+              <Text style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue( 12 ),
+                fontFamily: Fonts.FiraSansRegular,
+                letterSpacing: 0.6,
+                lineHeight: 18,
+              }}>{getText()}</Text>
+            </View>
             <View style={styles.centeredView}>
               <TouchableOpacity
                 onPress={() => navigation.navigate( 'CreateGift' )}

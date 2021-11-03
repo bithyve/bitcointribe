@@ -463,7 +463,7 @@ export default function AddContactSendRequest( props ) {
         </View>
         <RequestKeyFromContact
           isModal={false}
-          headerText={giftId ? 'Send gift' : null}
+          headerText={giftId ? 'Send Gift' : null}
           subHeaderText={ giftId ? 'You can send it to anyone using the QR or the link' : Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
           contactText={strings.adding}
           isGift={ giftId}

@@ -458,8 +458,8 @@ function* updateDataWorker( { payload } ) {
         }
         newArray.push( tempData )
       } else {
-        newArray[ index ].questionId = data.questionId,
-        newArray[ index ].question = data.question,
+        newArray[ index ].questionId = data.questionId
+        newArray[ index ].question = data.question
         newArray[ index ].levelStatus = data.levelStatus
         newArray[ index ].data = data.encryptedCloudDataJson
         newArray[ index ].seed = data.seed ? data.seed : '',
@@ -468,6 +468,7 @@ function* updateDataWorker( { payload } ) {
         newArray[ index ].dateTime = moment( new Date() )
         newArray[ index ].secondaryShare = data.secondaryShare
         newArray[ index ].bhXpub = data.bhXpub
+        newArray[ index ].walletName = data.walletName
       }
       if ( Platform.OS == 'ios' ) {
         if( newArray.length ) {
