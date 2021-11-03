@@ -227,7 +227,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>{'Sign Me Up'}</Text>
+        <Text style={styles.proceedButtonText}>{'Link Swan Account'}</Text>
       </AppBottomSheetTouchableWrapper>
       <AppBottomSheetTouchableWrapper
         onPress={() => {onPress()}}
@@ -407,7 +407,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansMedium
   },
   errorImage: {

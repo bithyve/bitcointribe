@@ -8,12 +8,13 @@ const ModalContainer = ( {
   visible,
   closeBottomSheet,
   background = 'rgba(0,0,0,0.5)',
-  children
+  children,
+  onBackground
 } ) => {
   const [ height, setHeight ] = useState( 6 )
   const  onAppStateChange = ( state ) => {
     if ( state === 'background' || state === 'inactive' ){
-      closeBottomSheet()
+      onBackground ? onBackground() : closeBottomSheet()
     }
   }
 
