@@ -993,7 +993,7 @@ export default class AccountUtilities {
   static getSecondSignature = async (
     walletId: string,
     token: number,
-    partiallySignedTxHex: string,
+    psbtBase: string,
     childIndexArray: Array<{
       childIndex: number;
       inputIdentifier: {
@@ -1007,11 +1007,11 @@ export default class AccountUtilities {
     let res: AxiosResponse
 
     try {
-      res = await SIGNING_AXIOS.post( 'secureHDTransaction', {
+      res = await SIGNING_AXIOS.post( 'securePSBTTransaction', {
         HEXA_ID: config.HEXA_ID,
         walletID: walletId,
         token,
-        txHex: partiallySignedTxHex,
+        psbtBase,
         childIndexArray,
       } )
     } catch ( err ) {

@@ -759,14 +759,14 @@ export default class AccountOperations {
       }
 
       inputs.forEach( ( input )=> {
-        let privateKey: string
+        let keyPair
         if( ( account as MultiSigAccount ).is2FA ){
           const { primaryPriv, childIndex } = AccountUtilities.signingEssentialsForMultiSig(
             ( account as MultiSigAccount ),
             input.address,
           )
-          privateKey = primaryPriv
 
+          keyPair = bip32.fromBase58( primaryPriv, network )
           childIndexArray.push( {
             childIndex,
             inputIdentifier: {
@@ -776,16 +776,16 @@ export default class AccountOperations {
             },
           } )
         } else {
-          privateKey = AccountUtilities.addressToPrivateKey(
+          const privateKey = AccountUtilities.addressToPrivateKey(
             input.address,
             account
           )
+          keyPair = AccountUtilities.getKeyPair(
+            privateKey,
+            network
+          )
         }
 
-        const keyPair = AccountUtilities.getKeyPair(
-          privateKey,
-          network
-        )
         inputKeyPairs[ input.address ] = keyPair
         const pubkey = keyPair.publicKey
         const p2wpkh = bitcoinJS.payments.p2wpkh( {
@@ -856,10 +856,10 @@ export default class AccountOperations {
 
   static multiSignTransaction = (
     account: MultiSigAccount,
+    PSBT: bitcoinJS.Psbt,
     inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
   ): {
-    signedTxb: bitcoinJS.TransactionBuilder;
+    signedPSBT: bitcoinJS.Psbt,
   } => {
     let vin = 0
 
@@ -867,30 +867,21 @@ export default class AccountOperations {
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
     inputs.forEach( ( input ) => {
-      const { multiSig, primaryPriv, secondaryPriv } = AccountUtilities.signingEssentialsForMultiSig(
+      const { secondaryPriv } = AccountUtilities.signingEssentialsForMultiSig(
         account,
         input.address,
       )
 
-      for( const priv of [ primaryPriv, secondaryPriv ] ){
-        const keyPair = bip32.fromBase58( priv, network )
-        const redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
-        const witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
-
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript,
-          null,
-          input.value,
-          witnessScript,
-        )
-      }
+      const keyPair = bip32.fromBase58( secondaryPriv, network )
+      PSBT.signInput(
+        vin,
+        keyPair,
+      )
       vin += 1
     } )
 
     return {
-      signedTxb: txb
+      signedPSBT: PSBT
     }
   };
 
@@ -990,24 +981,25 @@ export default class AccountOperations {
 
     const { signedPSBT } = AccountOperations.signTransaction( PSBT, inputs, inputKeyPairs )
     if( ( account as MultiSigAccount ).is2FA ){
-      // if( token ){
-      //   const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
-      //   const { signedTxHex } =  await AccountUtilities.getSecondSignature(
-      //     account.walletId,
-      //     token,
-      //     partiallySignedTxHex,
-      //     childIndexArray,
-      //   )
-      //   txHex = signedTxHex
-      // } else if( ( account as MultiSigAccount ).xprivs.secondary ){
-      //   const { signedTxb } = AccountOperations.multiSignTransaction(
-      //     ( account as MultiSigAccount ),
-      //     inputs,
-      //     txb,
-      //   )
-      //   txHex = signedTxb.build().toHex()
-      //   delete ( account as MultiSigAccount ).xprivs.secondary
-      // } else throw new Error( 'Multi-sig transaction failed: token/secondary-key missing' )
+
+      if( token ){
+        const psbtBase = PSBT.toBase64()
+        const { signedTxHex } = await AccountUtilities.getSecondSignature(
+          account.walletId,
+          token,
+          psbtBase,
+          childIndexArray,
+        )
+        txHex = signedTxHex
+      } else if( ( account as MultiSigAccount ).xprivs.secondary ){
+        const { signedPSBT: multiSignedPSBT } = AccountOperations.multiSignTransaction(
+          ( account as MultiSigAccount ),
+          signedPSBT,
+          inputs,
+        )
+        txHex = multiSignedPSBT.finalizeAllInputs().extractTransaction().toHex()
+        delete ( account as MultiSigAccount ).xprivs.secondary
+      } else throw new Error( 'Multi-sig transaction failed: token/secondary-key missing' )
     } else {
       txHex = signedPSBT.finalizeAllInputs().extractTransaction().toHex()
     }
