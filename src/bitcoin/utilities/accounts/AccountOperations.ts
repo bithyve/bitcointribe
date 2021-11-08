@@ -25,6 +25,7 @@ import {
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
 import idx from 'idx'
+import { ExecOptionsWithStringEncoding } from 'child_process'
 export default class AccountOperations {
 
   static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ): { updatedAccount: Account | MultiSigAccount, receivingAddress: string} => {
@@ -728,7 +729,15 @@ export default class AccountOperations {
     customTxPrerequisites?: TransactionPrerequisiteElements,
     nSequence?: number,
   ): Promise<{
-    txb: bitcoinJS.TransactionBuilder;
+    PSBT: bitcoinJS.Psbt;
+    childIndexArray: Array<{
+      childIndex: number;
+      inputIdentifier: {
+        txId: string;
+        vout: number;
+      };
+    }> | null;
+    inputKeyPairs:  {[address: string]: bitcoinJS.ECPair.ECPairInterface },
   }> => {
     try {
       let inputs, outputs
@@ -741,66 +750,23 @@ export default class AccountOperations {
       }
 
       const network = AccountUtilities.getNetworkByType( account.networkType )
-
-      // console.log({ inputs, outputs });
-      const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
-        network,
-      )
-
-      for ( const input of inputs ) {
-        txb.addInput( input.txId, input.vout, nSequence )
-      }
-
-      const sortedOuts = await AccountUtilities.sortOutputs(
-        account,
-        outputs,
-        account.nextFreeChangeAddressIndex,
+      const PSBT = new bitcoinJS.Psbt( {
         network
-      )
+      } )
 
-      for ( const output of sortedOuts ) {
-        txb.addOutput( output.address, output.value )
-      }
-
-      return {
-        txb,
-      }
-    } catch ( err ) {
-      throw new Error( `Transaction creation failed: ${err.message}` )
-    }
-  };
-
-  static signTransaction = (
-    account: Account | MultiSigAccount,
-    inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
-    witnessScript?: any,
-  ): {
-    signedTxb: bitcoinJS.TransactionBuilder;
-    childIndexArray: Array<{
-      childIndex: number;
-      inputIdentifier: {
-        txId: string;
-        vout: number;
-      };
-    }> | null;
-  } => {
-    try {
-      let vin = 0
       const childIndexArray = []
-      const network = AccountUtilities.getNetworkByType( account.networkType )
+      const inputKeyPairs: {[address: string]: bitcoinJS.ECPair.ECPairInterface } = {
+      }
 
-      for ( const input of inputs ) {
-        let keyPair, redeemScript
+      inputs.forEach( ( input )=> {
+        let privateKey: string
         if( ( account as MultiSigAccount ).is2FA ){
-          const { multiSig, primaryPriv, childIndex } = AccountUtilities.signingEssentialsForMultiSig(
+          const { primaryPriv, childIndex } = AccountUtilities.signingEssentialsForMultiSig(
             ( account as MultiSigAccount ),
             input.address,
           )
+          privateKey = primaryPriv
 
-          keyPair = bip32.fromBase58( primaryPriv, network )
-          redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
-          witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
           childIndexArray.push( {
             childIndex,
             inputIdentifier: {
@@ -810,31 +776,78 @@ export default class AccountOperations {
             },
           } )
         } else {
-          const privateKey = AccountUtilities.addressToPrivateKey(
+          privateKey = AccountUtilities.addressToPrivateKey(
             input.address,
             account
           )
-
-          keyPair = AccountUtilities.getKeyPair(
-            privateKey,
-            network
-          )
-          redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
         }
 
-        txb.sign(
+        const keyPair = AccountUtilities.getKeyPair(
+          privateKey,
+          network
+        )
+        inputKeyPairs[ input.address ] = keyPair
+        const pubkey = keyPair.publicKey
+        const p2wpkh = bitcoinJS.payments.p2wpkh( {
+          pubkey
+        } )
+        const p2sh = bitcoinJS.payments.p2sh( {
+          redeem: p2wpkh
+        } )
+
+        PSBT.addInput( {
+          hash: input.txId,
+          index: input.vout,
+          sequence: nSequence,
+          witnessUtxo: {
+            script: p2sh.output,
+            value: input.value,
+          },
+          redeemScript: p2wpkh.output,
+        } )
+      } )
+
+      const sortedOuts = await AccountUtilities.sortOutputs(
+        account,
+        outputs,
+        account.nextFreeChangeAddressIndex,
+        network
+      )
+
+      sortedOuts.forEach( ( output ) => {
+        PSBT.addOutput( {
+          address: output.address,
+          value: output.value
+        } )
+      } )
+
+      return {
+        PSBT, childIndexArray, inputKeyPairs
+      }
+    } catch ( err ) {
+      throw new Error( `Transaction creation failed: ${err.message}` )
+    }
+  };
+
+  static signTransaction = (
+    PSBT: bitcoinJS.Psbt,
+    inputs: any,
+    inputKeyPairs: {[address: string]: bitcoinJS.ECPair.ECPairInterface },
+  ): {
+    signedPSBT: bitcoinJS.Psbt,
+  } => {
+    try {
+      for( let vin = 0; vin < inputs.length; vin++ ){
+        const input = inputs[ vin ]
+        const keyPair = inputKeyPairs[ input.address ]
+        PSBT.signInput(
           vin,
           keyPair,
-          redeemScript,
-          null,
-          input.value,
-          witnessScript,
         )
-        vin++
       }
 
       return {
-        signedTxb: txb, childIndexArray: childIndexArray.length? childIndexArray: null
+        signedPSBT: PSBT
       }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )
@@ -962,44 +975,41 @@ export default class AccountOperations {
       txid: string;
      }
   > => {
-    const { txb } = await AccountOperations.createTransaction(
+    const { PSBT, childIndexArray, inputKeyPairs } = await AccountOperations.createTransaction(
       account,
       txPrerequisites,
       txnPriority,
       customTxPrerequisites,
-      nSequence,
+      nSequence
     )
 
+    let txHex
     let inputs
     if ( txnPriority === TxPriority.CUSTOM && customTxPrerequisites ) inputs = customTxPrerequisites.inputs
     else inputs = txPrerequisites[ txnPriority ].inputs
 
-
-    const { signedTxb, childIndexArray } = AccountOperations.signTransaction( account, inputs, txb )
-    let txHex
-
+    const { signedPSBT } = AccountOperations.signTransaction( PSBT, inputs, inputKeyPairs )
     if( ( account as MultiSigAccount ).is2FA ){
-      if( token ){
-        const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
-        const { signedTxHex } =  await AccountUtilities.getSecondSignature(
-          account.walletId,
-          token,
-          partiallySignedTxHex,
-          childIndexArray,
-        )
-        txHex = signedTxHex
-      } else if( ( account as MultiSigAccount ).xprivs.secondary ){
-        const { signedTxb } = AccountOperations.multiSignTransaction(
-          ( account as MultiSigAccount ),
-          inputs,
-          txb,
-        )
-        txHex = signedTxb.build().toHex()
-        delete ( account as MultiSigAccount ).xprivs.secondary
-      } else throw new Error( 'Multi-sig transaction failed: token/secondary-key missing' )
-
+      // if( token ){
+      //   const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
+      //   const { signedTxHex } =  await AccountUtilities.getSecondSignature(
+      //     account.walletId,
+      //     token,
+      //     partiallySignedTxHex,
+      //     childIndexArray,
+      //   )
+      //   txHex = signedTxHex
+      // } else if( ( account as MultiSigAccount ).xprivs.secondary ){
+      //   const { signedTxb } = AccountOperations.multiSignTransaction(
+      //     ( account as MultiSigAccount ),
+      //     inputs,
+      //     txb,
+      //   )
+      //   txHex = signedTxb.build().toHex()
+      //   delete ( account as MultiSigAccount ).xprivs.secondary
+      // } else throw new Error( 'Multi-sig transaction failed: token/secondary-key missing' )
     } else {
-      txHex = signedTxb.build().toHex()
+      txHex = signedPSBT.finalizeAllInputs().extractTransaction().toHex()
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
