@@ -55,10 +55,13 @@ import { translations } from '../../common/content/LocContext'
 import FormStyles from '../../common/Styles/FormStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { updateUserName } from '../../store/actions/storage'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import Loader from '../../components/loader'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
+  const activeAccounts = useActiveAccountShells()
   const currencyKind: CurrencyKind = useCurrencyKind()
 
   const strings  = translations[ 'accounts' ]
@@ -85,6 +88,8 @@ const CreateGift = ( { navigation } ) => {
   const account: Account = accountState.accounts[ sourcePrimarySubAccount.id ]
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ showLoader, setShowLoader ] = useState( false )
+  const [ accountListModal, setAccountListModal ] = useState( false )
+  const [ selectedAccount, setSelectedAccount ]: [AccountShell, any] = useState( )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
@@ -138,11 +143,12 @@ const CreateGift = ( { navigation } ) => {
   }
 
   const renderButton = ( text, condn ) => {
-    const actualAmount = ( ( spendableBalance / SATOSHIS_IN_BTC ) *
+    const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
+    const actualAmount = ( ( availableToSpend / SATOSHIS_IN_BTC ) *
     accountsState.exchangeRates[ currencyCode ].last
     ).toFixed( 2 )
 
-    const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
+    const isDisabled = availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
     return(
       <TouchableOpacity
         disabled={isDisabled}
@@ -151,6 +157,7 @@ const CreateGift = ( { navigation } ) => {
               case 'Create Gift':
                 dispatch( generateGifts( {
                   amounts: [ Number( amount ) ],
+                  accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
                   includeFee: includeFees
                 } ) )
                 setInitGiftCreation( true )
@@ -323,6 +330,103 @@ const CreateGift = ( { navigation } ) => {
     }
   }
 
+  const renderAccountList = () =>{
+    return <ScrollView style={{
+      height: 'auto'
+    }}>
+      { activeAccounts.map( ( item, index ) => {
+        if ( item.primarySubAccount.type === AccountType.SWAN_ACCOUNT || !item.primarySubAccount.isUsable ) return
+        return(
+          <View key={index} style={{
+            backgroundColor: Colors.white
+          }}>
+            {accountElement( item, ()=>{ setSelectedAccount( item )
+              setAccountListModal( false )} )}
+          </View>
+        )
+      } )}
+    </ScrollView>
+  }
+
+  const accountElement = ( item, onPressCallBack ) =>{
+    if( item ){
+      return <TouchableOpacity
+        style={styles.accountSelectionView}
+        onPress={()=>onPressCallBack()}
+      >
+        <View style={{
+          width: wp( 13 ),
+          height: wp( 13 ),
+          marginTop: hp( 0.5 ),
+        }} >
+          {getAvatarForSubAccount( item.primarySubAccount, false, true )}
+        </View>
+        <View style={{
+          marginHorizontal: wp( 3 )
+        }}>
+          <Text style={{
+            color: Colors.gray4,
+            fontSize: RFValue( 10 ),
+            fontFamily: Fonts.FiraSansRegular,
+          }}>
+            Sats would be deducted from
+          </Text>
+          <Text
+            style={{
+              color: Colors.black,
+              fontSize: RFValue( 14 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+          >
+            {item.primarySubAccount.customDisplayName ?? item.primarySubAccount.defaultTitle}
+          </Text>
+          <Text style={styles.availableToSpendText}>
+            {'Available to spend: '}
+            <Text style={styles.balanceText}>
+              {prefersBitcoin
+                ? UsNumberFormat( item.primarySubAccount?.balances?.confirmed )
+                : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
+                  ? (
+                    ( item.primarySubAccount?.balances?.confirmed / SATOSHIS_IN_BTC ) *
+                      accountsState.exchangeRates[ currencyCode ].last
+                  ).toFixed( 2 )
+                  : 0}
+            </Text>
+            <Text>
+              {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
+            </Text>
+          </Text>
+        </View>
+      </TouchableOpacity>
+    } else {
+      return <TouchableOpacity
+        style={styles.accountSelectionView}
+        onPress={()=>onPressCallBack()}
+      >
+        <View style={{
+          marginHorizontal: wp( 3 )
+        }}>
+          <Text style={{
+            color: Colors.gray4,
+            fontSize: RFValue( 10 ),
+            fontFamily: Fonts.FiraSansRegular,
+          }}>
+            Sats would be deducted from
+          </Text>
+          <Text
+            style={{
+              color: Colors.black,
+              fontSize: RFValue( 14 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+          >
+            {'Selected Account. Please Select Account'}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    }
+  }
+
   return (
     <ScrollView contentContainerStyle={{
       flexGrow: 1
@@ -368,63 +472,7 @@ const CreateGift = ( { navigation } ) => {
             step={''}
           />
         </View>
-        <TouchableOpacity
-          style={{
-            width: '90%',
-            // height: '54%',
-            backgroundColor: Colors.gray7,
-            shadowOpacity: 0.06,
-            shadowOffset: {
-              width: 10, height: 10
-            },
-            shadowRadius: 10,
-            elevation: 2,
-            alignSelf: 'center',
-            borderRadius: wp( 2 ),
-            marginTop: hp( 3 ),
-            marginBottom: hp( 1 ),
-            paddingVertical: hp( 2 ),
-            paddingHorizontal: wp( 2 ),
-            flexDirection: 'row'
-          }}>
-          <CheckingAccount />
-          <View style={{
-            marginHorizontal: wp( 3 )
-          }}>
-            <Text style={{
-              color: Colors.gray4,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>
-                Sats would be deducted from
-            </Text>
-            <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue( 14 ),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              {sourceAccountHeadlineText}
-            </Text>
-            <Text style={styles.availableToSpendText}>
-              {'Available to spend: '}
-              <Text style={styles.balanceText}>
-                {prefersBitcoin
-                  ? UsNumberFormat( spendableBalance )
-                  : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
-                    ? (
-                      ( spendableBalance / SATOSHIS_IN_BTC ) *
-                      accountsState.exchangeRates[ currencyCode ].last
-                    ).toFixed( 2 )
-                    : 0}
-              </Text>
-              <Text>
-                {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
-              </Text>
-            </Text>
-          </View>
-        </TouchableOpacity>
+        {accountElement( selectedAccount, ()=> setAccountListModal( !accountListModal ) )}
         <KeyboardAvoidingView
           style={{
             ...inputStyle,
@@ -438,7 +486,6 @@ const CreateGift = ( { navigation } ) => {
           }}
         >
           <BalanceCurrencyIcon />
-
           <View style={{
             width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
           }} />
@@ -497,14 +544,11 @@ const CreateGift = ( { navigation } ) => {
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )
         }}>
-
-
           {renderButton( 'Create Gift',  'Create Gift' )}
         </View>
         {showKeyboard &&
         <View style={{
         }}>
-
           <View style={styles.keyPadRow}>
             <TouchableOpacity
               onPress={() => onPressNumber( '1' )}
@@ -646,6 +690,9 @@ const CreateGift = ( { navigation } ) => {
         </View>
         }
       </SafeAreaView>
+      <ModalContainer visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
+        {renderAccountList()}
+      </ModalContainer>
       {showLoader ? <Loader /> : null}
     </ScrollView>
   )
@@ -812,6 +859,23 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
+  accountSelectionView: {
+    width: '90%',
+    backgroundColor: Colors.gray7,
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 2,
+    alignSelf: 'center',
+    borderRadius: wp( 2 ),
+    marginTop: hp( 3 ),
+    marginBottom: hp( 1 ),
+    paddingVertical: hp( 2 ),
+    paddingHorizontal: wp( 2 ),
+    flexDirection: 'row'
+  }
 } )
 
 export default CreateGift
