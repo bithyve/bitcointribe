@@ -755,18 +755,34 @@ export default class AccountOperations {
       } )
 
       const childIndexArray = []
-      const inputKeyPairs: {[address: string]: bitcoinJS.ECPair.ECPairInterface } = {
+      const inputKeyPairs = {
       }
 
       inputs.forEach( ( input )=> {
-        let keyPair
+        let witnessScript, redeemScript
         if( ( account as MultiSigAccount ).is2FA ){
-          const { primaryPriv, childIndex } = AccountUtilities.signingEssentialsForMultiSig(
+          const { multiSig, primaryPriv, childIndex } = AccountUtilities.signingEssentialsForMultiSig(
             ( account as MultiSigAccount ),
             input.address,
           )
 
-          keyPair = bip32.fromBase58( primaryPriv, network )
+          const keyPair = bip32.fromBase58( primaryPriv, network )
+          inputKeyPairs[ input.address ] = keyPair
+          redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
+          witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
+
+          PSBT.addInput( {
+            hash: input.txId,
+            index: input.vout,
+            sequence: nSequence,
+            witnessUtxo: {
+              script: redeemScript,
+              value: input.value,
+            },
+            redeemScript,
+            witnessScript
+          } )
+
           childIndexArray.push( {
             childIndex,
             inputIdentifier: {
@@ -780,31 +796,31 @@ export default class AccountOperations {
             input.address,
             account
           )
-          keyPair = AccountUtilities.getKeyPair(
+          const keyPair = AccountUtilities.getKeyPair(
             privateKey,
             network
           )
+
+          inputKeyPairs[ input.address ] = keyPair
+          const pubkey = keyPair.publicKey
+          const p2wpkh = bitcoinJS.payments.p2wpkh( {
+            pubkey
+          } )
+          const p2sh = bitcoinJS.payments.p2sh( {
+            redeem: p2wpkh
+          } )
+
+          PSBT.addInput( {
+            hash: input.txId,
+            index: input.vout,
+            sequence: nSequence,
+            witnessUtxo: {
+              script: p2sh.output,
+              value: input.value,
+            },
+            redeemScript: p2wpkh.output,
+          } )
         }
-
-        inputKeyPairs[ input.address ] = keyPair
-        const pubkey = keyPair.publicKey
-        const p2wpkh = bitcoinJS.payments.p2wpkh( {
-          pubkey
-        } )
-        const p2sh = bitcoinJS.payments.p2sh( {
-          redeem: p2wpkh
-        } )
-
-        PSBT.addInput( {
-          hash: input.txId,
-          index: input.vout,
-          sequence: nSequence,
-          witnessUtxo: {
-            script: p2sh.output,
-            value: input.value,
-          },
-          redeemScript: p2wpkh.output,
-        } )
       } )
 
       const sortedOuts = await AccountUtilities.sortOutputs(

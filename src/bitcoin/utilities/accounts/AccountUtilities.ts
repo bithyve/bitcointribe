@@ -241,7 +241,7 @@ export default class AccountUtilities {
     return {
       scripts: {
         redeem: p2sh.redeem.output.toString( 'hex' ),
-        witness: p2wsh.redeem.output.toString( 'hex' ),
+        witness: p2sh.redeem.redeem.output.toString( 'hex' ),
       },
       address: p2sh.address,
     }
