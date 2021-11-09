@@ -167,21 +167,20 @@ export default function UpdateApp( props ) {
     props.navigation.goBack()
   }
 
+  const remindMeLater = () => {
+    props.navigation.goBack()
+    // if ( isOpenFromNotificationList ) props.navigation.goBack()
+    // else onClick( true, false )
+  }
+
   return (
     <SafeAreaView style={{
       flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
 
-      <View style={{
-        ...styles.modalContentContainer
-      }}>
-        <View
-          style={{
-            ...styles.successModalHeaderView,
-
-          }}
-        >
+      <View style={styles.modalContentContainer}>
+        <View style={styles.successModalHeaderView}>
           <View style={{
             flexDirection: 'row', alignItems: 'center', marginRight: wp( '4%' ),
             marginLeft: wp( '4%' ),
@@ -220,18 +219,10 @@ export default function UpdateApp( props ) {
                   alignItems: 'center',
                   flexDirection: 'row',
                 }}
-                onPress={() => {
-                  if ( isOpenFromNotificationList ) props.navigation.goBack()
-                  else
-                    onClick( true, false )
-                }}
+                onPress={() => remindMeLater()}
               >
                 <Text
-                  onPress={() => {
-                    if ( isOpenFromNotificationList ) props.navigation.goBack()
-                    else
-                      onClick( true, false )
-                  }}
+                  onPress={() => remindMeLater()}
                   style={{
                     color: Colors.white,
                     fontSize: RFValue( 12 ),
@@ -260,25 +251,30 @@ export default function UpdateApp( props ) {
               key={index}
               style={{
                 flexDirection: 'row',
-                alignItems: 'center',
                 marginLeft: wp( '8%' ),
+                marginRight: wp( '5%' )
               }}
             >
               <Octicons
                 name={'primitive-dot'}
                 size={RFValue( 10 )}
                 color={Colors.blue}
-              />
-              <Text
                 style={{
-                  marginLeft: wp( '2%' ),
-                  color: Colors.blue,
-                  fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  marginTop: wp( '1%' )
                 }}
-              >
-                {value}
-              </Text>
+              />
+              <View>
+                <Text
+                  style={{
+                    marginLeft: wp( '2%' ),
+                    color: Colors.blue,
+                    fontSize: RFValue( 13 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {value+'\n'}
+                </Text>
+              </View>
             </View>
           )
         } )}
@@ -308,42 +304,32 @@ export default function UpdateApp( props ) {
                 onPress={() => {
                   upgradeNow()
                 }}
-                style={{
-                  ...styles.successModalButtonView
-                }}
+                style={styles.successModalButtonView}
               >
-                <Text style={styles.proceedButtonText}>Download Now</Text>
+                <Text style={styles.proceedButtonText}>Download Hexa 2.0</Text>
               </TouchableOpacity> ) : null}
 
-            {!isUpdateMandotary && !isUpdateInValid ? (
-              <TouchableOpacity
-                onPress={() => {
-                  if ( isOpenFromNotificationList ) props.navigation.goBack()
-                  else
-                    onClick( false, true )
-                }}
+            {/* {!isUpdateMandotary && !isUpdateInValid ? ( */}
+            <TouchableOpacity
+              onPress={() => remindMeLater()}
+              style={{
+                height: wp( '13%' ),
+                width: wp( '35%' ),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: 15,
+              }}
+            >
+              <Text
+                onPress={() => remindMeLater()}
                 style={{
-                  height: wp( '13%' ),
-                  width: wp( '35%' ),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginLeft: 15,
+                  ...styles.proceedButtonText, color: Colors.blue
                 }}
               >
-                <Text
-                  onPress={() => {
-                    if ( isOpenFromNotificationList ) props.navigation.goBack()
-                    else
-                      onClick( false, true )
-                  }}
-                  style={{
-                    ...styles.proceedButtonText, color: Colors.blue
-                  }}
-                >
                   Remind me Later
-                </Text>
-              </TouchableOpacity>
-            ) : null}
+              </Text>
+            </TouchableOpacity>
+            {/* ) : null} */}
           </View>
         </View>
       </View>
