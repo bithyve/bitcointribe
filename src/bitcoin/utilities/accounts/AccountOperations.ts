@@ -1037,7 +1037,6 @@ export default class AccountOperations {
       const privateKey = keyPair.toWIF()
       const address = AccountUtilities.deriveAddressFromKeyPair(
         keyPair,
-        config.DPATH_PURPOSE,
         network
       )
 
