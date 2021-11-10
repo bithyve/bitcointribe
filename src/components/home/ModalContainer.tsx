@@ -10,6 +10,12 @@ const ModalContainer = ( {
   background = 'rgba(0,0,0,0.5)',
   children,
   onBackground
+}:{
+  visible?: boolean;
+  closeBottomSheet?: any
+  background?: string;
+  children?: any;
+  onBackground?: any;
 } ) => {
   const [ height, setHeight ] = useState( 6 )
   const  onAppStateChange = ( state ) => {
