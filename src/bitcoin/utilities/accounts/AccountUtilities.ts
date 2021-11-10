@@ -417,9 +417,9 @@ export default class AccountUtilities {
     contactName?: string,
     primaryAccType?: string,
     accountName?: string,
+    hardRefresh?: boolean
     }},
     network: bitcoinJS.Network,
-    hardRefresh?: boolean
   ): Promise<
   {
     synchedAccounts: {
@@ -455,7 +455,7 @@ export default class AccountUtilities {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { activeAddresses, externalAddresses, internalAddresses, ownedAddresses, cachedTxs } = accounts[ accountId ]
+        const { activeAddresses, externalAddresses, internalAddresses, ownedAddresses, cachedTxs, hardRefresh } = accounts[ accountId ]
         const upToDateTxs: Transaction[] = []
         const txsToUpdate: Transaction[] = []
         const newTxs : Transaction[] = []
