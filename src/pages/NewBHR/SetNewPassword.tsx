@@ -1028,7 +1028,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               changeBgColor={true}
             />
             <CardWithRadioBtn
-              geticon={() => {if( activeIndex === 0 ) { return <PassActive /> } else { return <PassInActive/>}}}
+              geticon={() => {if( activeIndex === 0 ) { return  <PassInActive/>} else { return <PassActive />}}}
               mainText={strings.Useencryptionpassword}
               subText={strings.Createapassword}
               isSelected={activeIndex === 1}
