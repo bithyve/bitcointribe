@@ -139,7 +139,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   function performRefreshOnPullDown() {
     dispatch( refreshAccountShells( [ accountShell ], {
-      hardRefresh: true
+      hardRefresh: true,
+      syncDonationAccount: accountShell.primarySubAccount.type === AccountType.DONATION_ACCOUNT
     } ) )
   }
 
