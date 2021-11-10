@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, FlatList, TouchableOpacity, Text } from 'react-native'
 import Colors from '../common/Colors'
 import { Button } from 'react-native-elements'
 import ButtonStyles from '../common/Styles/ButtonStyles'
@@ -17,28 +17,31 @@ const ButtonBlue: React.FC<Props> = ( {
   buttonDisable
 }: Props ) => {
   return (
-    <View style={styles.rootContainer}>
-      <Button
-          raised
-          buttonStyle={ButtonStyles.primaryActionButton}
-          disabledStyle={ButtonStyles.disabledPrimaryActionButton}
-          disabledTitleStyle={ButtonStyles.actionButtonText}
-          title={buttonText}
-          titleStyle={ButtonStyles.actionButtonText}
-          onPress={handleButtonPress}
-          disabled={!buttonDisable ? false : true}
-        />
-    </View>
+    <TouchableOpacity style={buttonDisable ? styles.disabledPrimaryActionButton : styles.primaryActionButton}>
+      <Text style={ButtonStyles.actionButtonText}>{buttonText}</Text>
+    </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create( {
-    rootContainer: {
-        shadowColor: Colors.shadowBlue,
-        shadowOpacity: 1,
-        shadowOffset: { width: 15, height: 15 },
-        elevation: 5
-      },
+  disabledPrimaryActionButton: {
+    ...ButtonStyles.disabledPrimaryActionButton,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 5,
+    shadowOffset: {
+      width: 12, height: 12
+    },
+    elevation: 5,
+  },
+  primaryActionButton:{
+    ...ButtonStyles.primaryActionButton,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 5,
+    shadowOffset: {
+      width: 12, height: 12
+    },
+    elevation: 5,
+  }
 } )
 
 export default ButtonBlue

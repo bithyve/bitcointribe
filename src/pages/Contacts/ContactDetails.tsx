@@ -245,7 +245,7 @@ class ContactDetails extends PureComponent<
     this.setState( {
       showQRClicked: true
     } )
-    this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
+    if( this.props.navigation.state.params.contactsType == 'I am the Keeper of' ) this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
     this.setIsSendDisabledListener = this.props.navigation.addListener(
       'didFocus',
       () => {

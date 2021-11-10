@@ -11,11 +11,11 @@ const ModalContainer = ( {
   children,
   onBackground
 }:{
-  visible: boolean;
-  closeBottomSheet: any;
+  visible?: boolean;
+  closeBottomSheet?: any
   background?: string;
   children?: any;
-  onBackground?: any
+  onBackground?: any;
 } ) => {
   const [ height, setHeight ] = useState( 6 )
   const  onAppStateChange = ( state ) => {

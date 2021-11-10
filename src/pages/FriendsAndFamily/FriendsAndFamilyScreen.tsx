@@ -603,7 +603,7 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }}
           >
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
               style={{
                 width: '90%',
@@ -651,7 +651,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 <RightArrow />
               </View>
 
-              {/* <View style={styles.subInfo}>
+               <View style={styles.subInfo}>
                 <View style={{
                   flex: 1
                 }}>
@@ -685,24 +685,24 @@ class FriendsAndFamilyScreen extends React.Component<
                   }}
                 >
                 */}
-              {/* <Text style={[ styles.contactText, {
+            {/* <Text style={[ styles.contactText, {
                     fontSize: RFValue( 20 ), padding: wp( 0 )
                   } ]}>+</Text> */}
-              {/* <Image
+            {/* <Image
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/Holidays_Gift.png' )}
                   /> */}
 
-              {/* <FontAwesome name="gift" color={Colors.white} size={19} style={{
+            {/* <FontAwesome name="gift" color={Colors.white} size={19} style={{
                     marginLeft: hp( 0.5 )
                   }} />
                   <View>
                     <Text style={styles.contactText}>Gift Sats</Text>
                   </View>
                 </TouchableOpacity>
-              </View>  */}
+              </View>
 
-            </TouchableOpacity>
+            </TouchableOpacity>*/}
 
             <View>
 
