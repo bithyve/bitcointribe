@@ -72,7 +72,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     return {
       ...styles.descriptionTextContainer,
       flex: isDisabled ? 0 : 1,
-      marginBottom: isDisabled ? -8 : 8,
+      marginBottom: isDisabled ? -8 : 5,
       // backgroundColor: 'red',
     }
   }, [ isSelected ] )
