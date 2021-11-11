@@ -1510,6 +1510,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
         case BottomSheetKind.NOTIFICATION_INFO:
+          let { notificationType} = this.state
+          let isIgnoreButton = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' || notificationType == NotificationType.FNF_REQUEST_ACCEPTED || notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? true : false
+          let proceedButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? "Proceed" : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? "Proceed" : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? "Proceed" : ''
+          let cancelButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? "Ok" : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? "Ok" : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? "Ok" : ''
+
+
           return (
             <NotificationInfoContents
               title={notificationTitle}
@@ -1533,6 +1539,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
                       this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'I am the Keeper of' )
                       break
+                    
+                    default:
+                      break
                 }
               }}
               onPressIgnore={()=> {
@@ -1541,8 +1550,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onPressClose={()=>{
                 this.closeBottomSheet()
               }}
-              proceedButtonText={notificationProceedText}
-              cancelButtonText={notificationIgnoreText}
+              proceedButtonText={proceedButtonText}
+              cancelButtonText={cancelButtonText}
               isIgnoreButton={isIgnoreButton}
               note={notificationNote}
               bottomSheetRef={this.bottomSheetRef}
