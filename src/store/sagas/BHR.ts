@@ -2529,12 +2529,12 @@ function* getApprovalFromKeeperWorker( { payload } ) {
       } else { yield put( setOpenToApproval( false, [], null ) ) }
       yield put( setSecondaryDataInfoStatus( false ) )
     } else {
-      Toast( 'Network Error' )
+      // Toast( 'Network Error' )
       yield put( setOpenToApproval( null, [], null ) )
       yield put( setSecondaryDataInfoStatus( false ) )
     }
   } catch ( error ) {
-    Toast( 'Network Error' )
+    // Toast( 'Network Error' )
     yield put( setOpenToApproval( null, [], null ) )
     yield put( setSecondaryDataInfoStatus( false ) )
   }

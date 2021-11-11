@@ -87,16 +87,10 @@ class HexaConfig {
   public CHECKSUM_ITR: number = Config.BIT_CHECKSUM_ITR ? parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 ) : 2;
   public HEXA_ID: string = Config.BIT_HEXA_ID ? Config.BIT_HEXA_ID.trim() : 'dfe56bf7922efec670a5a860995561da8d82c801ca14be4f194b440c5d741259';
   public ENC_KEY_STORAGE_IDENTIFIER: string = Config.ENC_KEY_STORAGE_IDENTIFIER ? Config.ENC_KEY_STORAGE_IDENTIFIER.trim() : 'HEXA-KEY';
-  public DPATH_PURPOSE: number = Config.BIT_DPATH_PURPOSE ? parseInt( Config.BIT_DPATH_PURPOSE.trim(), 10 ) : 49;
   public SSS_METASHARE_SPLITS: number = Config.BIT_SSS_METASHARE_SPLITS ? parseInt( Config.BIT_SSS_METASHARE_SPLITS.trim(), 10 ) : 8;
   public STATUS = {
     SUCCESS: Config.BIT_SUCCESS_STATUS_CODE ? parseInt( Config.BIT_SUCCESS_STATUS_CODE.trim(), 10 ) : 200,
     ERROR: Config.BIT_ERROR_STATUS_CODE ? parseInt( Config.BIT_ERROR_STATUS_CODE.trim(), 10 ) : 400,
-  };
-  public STANDARD = {
-    BIP44: Config.BIT_STANDARD_BIP44 ? parseInt( Config.BIT_STANDARD_BIP44.trim(), 10 ) : 44,
-    BIP49: Config.BIT_STANDARD_BIP49 ? parseInt( Config.BIT_STANDARD_BIP49.trim(), 10 ) : 49,
-    BIP84: Config.BIT_STANDARD_BIP84 ? parseInt( Config.BIT_STANDARD_BIP84.trim(), 10 ) : 84,
   };
 
   public HEALTH_STATUS = {

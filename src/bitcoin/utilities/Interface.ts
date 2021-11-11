@@ -2,6 +2,12 @@ import { ImageSourcePropType } from 'react-native'
 import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
+export enum DerivationPurpose {
+  BIP44 = 44,
+  BIP49 = 49,
+  BIP84 = 84
+}
+
 export interface InputUTXOs {
   txId: string;
   vout: number;
