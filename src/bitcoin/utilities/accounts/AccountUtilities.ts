@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses, TransactionType } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses, TransactionType, DerivationPurpose } from '../Interface'
 import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -59,15 +59,15 @@ export default class AccountUtilities {
 
   static deriveAddressFromKeyPair = (
     keyPair: bip32.BIP32Interface | bitcoinJS.ECPairInterface,
-    standard: number,
-    network: bitcoinJS.Network
+    network: bitcoinJS.Network,
+    purpose: DerivationPurpose = DerivationPurpose.BIP49,
   ): string => {
-    if ( standard === config.STANDARD.BIP44 ) {
+    if ( purpose === DerivationPurpose.BIP44 ) {
       return bitcoinJS.payments.p2pkh( {
         pubkey: keyPair.publicKey,
         network,
       } ).address
-    } else if ( standard === config.STANDARD.BIP49 ) {
+    } else if ( purpose === DerivationPurpose.BIP49 ) {
       return bitcoinJS.payments.p2sh( {
         redeem: bitcoinJS.payments.p2wpkh( {
           pubkey: keyPair.publicKey,
@@ -75,7 +75,7 @@ export default class AccountUtilities {
         } ),
         network,
       } ).address
-    } else if ( standard === config.STANDARD.BIP84 ) {
+    } else if ( purpose === DerivationPurpose.BIP84 ) {
       return bitcoinJS.payments.p2wpkh( {
         pubkey: keyPair.publicKey,
         network,
@@ -112,7 +112,8 @@ export default class AccountUtilities {
     xpub: string,
     internal: boolean,
     index: number,
-    network: bitcoinJS.networks.Network
+    network: bitcoinJS.networks.Network,
+    purpose?: DerivationPurpose
   ): string => {
     const node = bip32.fromBase58(
       xpub,
@@ -121,8 +122,8 @@ export default class AccountUtilities {
     const keyPair = node.derive( internal ? 1 : 0 ).derive( index )
     return AccountUtilities.deriveAddressFromKeyPair(
       keyPair,
-      config.DPATH_PURPOSE,
-      network
+      network,
+      purpose
     )
   };
 
@@ -416,9 +417,9 @@ export default class AccountUtilities {
     contactName?: string,
     primaryAccType?: string,
     accountName?: string,
+    hardRefresh?: boolean
     }},
     network: bitcoinJS.Network,
-    hardRefresh?: boolean
   ): Promise<
   {
     synchedAccounts: {
@@ -454,7 +455,7 @@ export default class AccountUtilities {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { activeAddresses, externalAddresses, internalAddresses, ownedAddresses, cachedTxs } = accounts[ accountId ]
+        const { activeAddresses, externalAddresses, internalAddresses, ownedAddresses, cachedTxs, hardRefresh } = accounts[ accountId ]
         const upToDateTxs: Transaction[] = []
         const txsToUpdate: Transaction[] = []
         const newTxs : Transaction[] = []
