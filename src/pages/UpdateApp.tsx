@@ -288,7 +288,7 @@ export default function UpdateApp( props ) {
           <Text style={{
             ...styles.modalInfoText, marginBottom: hp( '3%' )
           }}>
-            For updating you will be taken to the App Store/ Play Store
+            {`You will be taken to the ${Platform.OS == 'ios'? 'App store' : 'Play Store'}`}
           </Text>
 
           <View
@@ -402,7 +402,7 @@ const styles = StyleSheet.create( {
   },
   successModalButtonView: {
     height: wp( '13%' ),
-    width: wp( '35%' ),
+    width: 'auto',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -414,6 +414,8 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
+    paddingLeft: wp( '3%' ),
+    paddingRight: wp( '3%' )
   },
   proceedButtonText: {
     color: Colors.white,
