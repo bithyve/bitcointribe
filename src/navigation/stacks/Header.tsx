@@ -1512,7 +1512,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.NOTIFICATION_INFO:
           let { notificationType} = this.state
           let isIgnoreButton = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' || notificationType == NotificationType.FNF_REQUEST_ACCEPTED || notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? true : false
-          let proceedButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? "Proceed" : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? "Proceed" : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? "Proceed" : ''
+          let proceedButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? "Proceed" : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? "Proceed" : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? "Proceed" : 'Okay'
           let cancelButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? "Ok" : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? "Ok" : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? "Ok" : ''
 
 
