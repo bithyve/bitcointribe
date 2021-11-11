@@ -1319,10 +1319,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToAccount = ( txid ) => {
-    // this.props.navigation.navigate( 'AccountDetails', {
-    //   accountShellID: accountId,
-    //   swanDeepLinkContent: this.props.swanDeepLinkContent
-    // } )
+    const accountShellId = this.props.accountShells.find( value=>value.primarySubAccount.transactions.find( v => v.txid == txid ) )?this.props.accountShells.find( value=>value.primarySubAccount.transactions.find( v => v.txid == txid ) ).id : ''
+    if( accountShellId )
+      this.props.navigation.navigate( 'AccountDetails', {
+        accountShellID: accountShellId,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      } )
   }
 
   renderBottomSheetContent() {
