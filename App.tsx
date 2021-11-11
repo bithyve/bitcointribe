@@ -154,7 +154,7 @@ function AppContent() {
           }
         }}
       />
-      <ModalContainer visible={noInternetModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={noInternetModal} closeBottomSheet={() => {showNoInternetModal( false )}} >
         <NoInternetModalContents
           onPressTryAgain={() => {
             showNoInternetModal( false )

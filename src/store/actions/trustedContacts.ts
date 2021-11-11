@@ -15,6 +15,12 @@ export const RESTORE_TRUSTED_CONTACTS = 'RESTORE_TRUSTED_CONTACTS'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
 export const UPDATE_WALLET_NAME = 'UPDATE_WALLET_NAME'
+export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
+export const ASSOCIATE_GIFT = 'ASSOCIATE_GIFT'
+export const FETCH_GIFT_FROM_CHANNEL = 'FETCH_GIFT_FROM_CHANNEL'
+export const SYNC_GIFTS_STATUS = 'SYNC_GIFTS_STATUS'
+export const REJECT_GIFT = 'REJECT_GIFT'
+export const RECLAIM_GIFT = 'RECLAIM_GIFT'
 
 export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
@@ -66,6 +72,7 @@ export const initializeTrustedContact = (
     channelKey,
     contactsSecondaryChannelKey,
     shareId,
+    giftId,
   }:{
       contact: any,
       flowKind: InitTrustedContactFlowKind,
@@ -73,7 +80,8 @@ export const initializeTrustedContact = (
       isPrimaryKeeper?: boolean,
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
-      shareId?: string
+      shareId?: string,
+      giftId?: string,
     },
 ) => {
   return {
@@ -86,6 +94,7 @@ export const initializeTrustedContact = (
       channelKey,
       contactsSecondaryChannelKey,
       shareId,
+      giftId
     },
   }
 }
@@ -135,6 +144,50 @@ export const walletCheckIn = ( currencyCode?: string ) => {
     payload: {
       currencyCode
     },
+  }
+}
+
+export const associateGift = ( giftId: string, accountId?: string ) => {
+  return {
+    type: ASSOCIATE_GIFT,
+    payload: {
+      giftId,
+      accountId
+    },
+  }
+}
+
+export const fetchGiftFromTemporaryChannel = ( channelAddress: string, decryptionKey: string ) => {
+  return {
+    type: FETCH_GIFT_FROM_CHANNEL,
+    payload: {
+      channelAddress,
+      decryptionKey
+    },
+  }
+}
+
+export const rejectGift = ( channelAddress: string ) => {
+  return {
+    type: REJECT_GIFT,
+    payload: {
+      channelAddress
+    }
+  }
+}
+
+export const reclaimGift = ( giftId: string ) => {
+  return {
+    type: RECLAIM_GIFT,
+    payload: {
+      giftId
+    }
+  }
+}
+
+export const syncGiftsStatus = () => {
+  return {
+    type: SYNC_GIFTS_STATUS
   }
 }
 

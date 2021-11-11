@@ -72,7 +72,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     return {
       ...styles.descriptionTextContainer,
       flex: isDisabled ? 0 : 1,
-      marginBottom: isDisabled ? -8 : 8,
+      marginBottom: isDisabled ? -8 : 5,
       // backgroundColor: 'red',
     }
   }, [ isSelected ] )
@@ -123,11 +123,10 @@ const SubAccountOptionCard: React.FC<Props> = ( {
             {specialTag}
           </Card.Title>
         )}
+        <View style={styles.image} >
+          {getAvatarForSubAccount( subAccountInfo, isSelected )}
+        </View>
 
-        <Image
-          style={styles.image}
-          source={getAvatarForSubAccount( subAccountInfo, isSelected )}
-        />
 
         <View style={descriptionTextContainerStyle}>
           <Card.Title style={titleTextStyle} numberOfLines={1}>
@@ -169,11 +168,13 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: widthPercentageToDP( 5.4 ),
-    height: widthPercentageToDP( 5.4 ),
+    width: 30,
+    height: 30,
     marginBottom: 10,
     marginTop: 5,
-    resizeMode: 'contain'
+    resizeMode: 'contain',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   cardContainer: {

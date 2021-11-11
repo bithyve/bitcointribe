@@ -245,7 +245,7 @@ class ContactDetails extends PureComponent<
     this.setState( {
       showQRClicked: true
     } )
-    this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
+    if( this.props.navigation.state.params.contactsType == 'I am the Keeper of' ) this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
     this.setIsSendDisabledListener = this.props.navigation.addListener(
       'didFocus',
       () => {
@@ -1409,7 +1409,7 @@ class ContactDetails extends PureComponent<
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
-              this.state.availableKeepersName ? 'Please approve this request by scanning the Secondary Key stored with '+ this.state.availableKeepersName : 'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+              this.state.availableKeepersName ? 'Please approve this request by scanning the Approval Key stored with '+ this.state.availableKeepersName : 'Please approve this request by scanning the Approval Key stored with any of the other backups'
             }
             isOpenedFlag={this.state.showQRScanner}
             onQrScan={async( qrScannedData ) => {

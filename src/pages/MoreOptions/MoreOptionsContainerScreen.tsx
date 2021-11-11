@@ -1,27 +1,19 @@
-import React, { useMemo, useState, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import openLink from '../../utils/OpenLink'
-import Header from '../../navigation/stacks/Header'
-import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { useSelector, useDispatch } from 'react-redux'
-import { currencyKindSet } from '../../store/actions/preferences'
+import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
+import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
+import Node from '../../assets/images/svgs/node.svg'
+import Wallet from '../../assets/images/svgs/icon_settings.svg'
+import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import QueActive from '../../assets/images/svgs/question_inactive.svg'
+import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
-import Languages from '../../common/content/availableLanguages'
-
-import ModalContainer from '../../components/home/ModalContainer'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation: any;
@@ -31,24 +23,19 @@ export type Props = {
 interface MenuOption {
   title: string;
   subtitle: string;
-  imageSource: ImageSourcePropType;
   screenName?: string;
   name ?: string,
   onOptionPressed?: () => void;
   // isSwitch: boolean;
+  imageSource: ImageSourcePropType;
 }
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
 const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  const {
-    translations,
-    appLanguage,
-    setAppLanguage,
-  } = useContext( LocalizationContext )
+  const { translations, } = useContext( LocalizationContext )
   // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
   const [ isEnabled, setIsEnabled ] = useState( false )
-  const [ showLangModal, setShowLangModal ] = useState( false )
   const toggleSwitch = () => setIsEnabled( previousState => !previousState )
   const currencyCode = useSelector(
     ( state ) => state.preferences.currencyCode,
@@ -56,20 +43,20 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const strings = translations[ 'settings' ]
   const common = translations[ 'common' ]
   const menuOptions: MenuOption[] = [
-  // {
-  //   title: 'Use FaceId',
-  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
-  //   subtitle: 'Unlock your wallet using FaceId',
-  //   // screenName: 'FriendsAndFamily',
-  //   isSwitch: true
-  // },
-  // {
-  //   title: 'Dark Mode',
-  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
-  //   subtitle: 'Use dark Mode on your wallet',
-  //   // screenName: 'FriendsAndFamily',
-  //   isSwitch: true
-  // },
+    // {
+    //   title: 'Use FaceId',
+    //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+    //   subtitle: 'Unlock your wallet using FaceId',
+    //   // screenName: 'FriendsAndFamily',
+    //   isSwitch: true
+    // },
+    // {
+    //   title: 'Dark Mode',
+    //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+    //   subtitle: 'Use dark Mode on your wallet',
+    //   // screenName: 'FriendsAndFamily',
+    //   isSwitch: true
+    // },
     {
       title: strings.accountManagement,
       imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
@@ -77,16 +64,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       screenName: 'AccountManagement',
     },
     /*
-  Commenting this out as per https://github.com/bithyve/hexa/issues/2560
-  leaving the option here so that it can be enabled in a future release.
-
-  {
-    title: 'Friends & Family',
-    imageSource: require( '../../assets/images/icons/addressbook.png' ),
-    subtitle: 'View and manage your contacts',
-    screenName: 'FriendsAndFamily',
-  },
-  */
+    Commenting this out as per https://github.com/bithyve/hexa/issues/2560
+    leaving the option here so that it can be enabled in a future release.
+    {
+      title: 'Friends & Family',
+      imageSource: require( '../../assets/images/icons/addressbook.png' ),
+      subtitle: 'View and manage your contacts',
+      screenName: 'FriendsAndFamily',
+    },
+    */
     {
       title: strings.node,
       imageSource: require( '../../assets/images/icons/own-node.png' ),
@@ -94,16 +80,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       screenName: 'NodeSettings',
     },
     /*
-  Commenting this out as per https://github.com/bithyve/hexa/issues/2560
-  leaving the option here so that it can be enabled in a future release.
-
-  {
-    title: 'Funding Sources',
-    imageSource: require( '../../assets/images/icons/existing_saving_method.png' ),
-    subtitle: 'Buying methods integrated in your wallet',
-    screenName: 'FundingSources',
-  },
-  */
+    Commenting this out as per https://github.com/bithyve/hexa/issues/2560
+    leaving the option here so that it can be enabled in a future release.
+    {
+      title: 'Funding Sources',
+      imageSource: require( '../../assets/images/icons/existing_saving_method.png' ),
+      subtitle: 'Buying methods integrated in your wallet',
+      screenName: 'FundingSources',
+    },
+    */
     // {
     //   title: 'Hexa Community (Telegram)',
     //   imageSource: require( '../../assets/images/icons/telegram.png' ),
@@ -130,6 +115,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     },
   ]
 
+  const listItemKeyExtractor = ( item: MenuOption ) => item.title
+
+
   //const [ strings, setstrings ] = useState( content.settings )
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
@@ -138,14 +126,21 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       navigation.navigate( menuOption.screenName )
     }
   }
-  const dispatch = useDispatch()
 
-  const currencyKind: CurrencyKind = useCurrencyKind()
-
-  const prefersBitcoin = useMemo( () => {
-    return currencyKind === CurrencyKind.BITCOIN
-  }, [ currencyKind ] )
-
+  const findImage = ( name ) => {
+    switch ( name ){
+        case 'Account Management':
+          return ( <AccManagement /> )
+        case 'Node Settings':
+          return ( <Node /> )
+        case 'Wallet Settings':
+          return ( <Wallet /> )
+        case 'App Info':
+          return ( <AppInfo /> )
+        default:
+          return null //You might want to return something else here//
+    }
+  }
   return (
     <View style={{
       backgroundColor: Colors.blue
@@ -153,48 +148,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
       <View style={styles.accountCardsSectionContainer}>
-        <ModalContainer visible={showLangModal} closeBottomSheet={() => {setShowLangModal( false )}} >
-          <View style={styles.modalContentContainer}>
-            <Text
-              style={{
-                color:Colors.blue,
-                fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular,
-                marginVertical: wp( 2 ),
-              }}
-              numberOfLines={1}
-            >
-              {strings.changeLanguage}
-            </Text>
-            <FlatList
-              data={Languages}
-              contentContainerStyle={styles.list}
-              renderItem={( { item, } ) => (
-                <TouchableOpacity
-                  key={item.iso}
-                  activeOpacity={0.6}
-                  style={appLanguage === item.iso ? styles.containerItemSelected : styles.containerItem}
-                  onPress={() => setAppLanguage( item.iso )}>
-                  <Text style={styles.flag}>{item.flag}</Text>
-                  <Text style={styles.textLanName}>{item.displayTitle}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            <TouchableOpacity
-              activeOpacity={0.6}
-              onPress={() => setShowLangModal( false )}
-              style={{
-                height: 45, borderRadius: wp( 7/2 ),
-                backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-                margin: wp( 3 ),
-              }}
-            >
-              <Text style={{
-                color: 'white'
-              }}>{common.done}</Text>
-            </TouchableOpacity>
-          </View>
-        </ModalContainer>
+
         <Text style={{
           color: Colors.blue,
           fontSize: RFValue( 18 ),
@@ -261,12 +215,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   <View style={{
                     justifyContent: 'center',
                   }}>
-                    <Image
-                      source={menuOption.imageSource}
-                      style={{
-                        width: 25, height: 25, resizeMode: 'contain'
-                      }}
-                    />
+                    {findImage( menuOption.title )}
                   </View>
                   <View style={{
                     justifyContent: 'center', marginLeft: 10
@@ -304,44 +253,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
           />
           <TouchableOpacity
-            onPress={() => setShowLangModal( true )}
-            style={[ styles.otherCards, styles.extraHeight ]}
-          >
-            <Image
-              source={require( '../../assets/images/icons/translate.png' )}
-              style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
-              }}
-            />
-            <View style={{
-              marginLeft: 10
-            }}>
-              <View style={{
-                flexDirection: 'row'
-              }}>
-                <Text style={styles.addModalTitleText}>
-                  {strings.Language}
-                </Text>
-                {/* <View style={styles.containerBeta}>
-                  <Text style={styles.textBeta}>Beta</Text>
-                </View> */}
-              </View>
-              <Text style={styles.addModalInfoText}>
-                {strings.changeLanguage }
-              </Text>
-            </View>
-            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
-              style={{
-                width: widthPercentageToDP( '2.5%' ),
-                height: widthPercentageToDP( '2.5%' ),
-                alignSelf: 'center',
-                marginLeft: 'auto',
-                resizeMode: 'contain'
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
             onPress={() => {
               Linking.openURL( 'https://hexawallet.io/faq/' )
                 .then( ( _data ) => { } )
@@ -351,13 +262,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={[ styles.otherCards, styles.extraHeight ]}
           >
-            <Image
-              source={require( '../../assets/images/icons/question_active.png' )}
-              style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
-              }}
-            />
+            <QueActive/>
             <View style={{
               marginLeft: 10
             }}>
@@ -388,14 +293,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={styles.otherCards}
           >
-            <Image
-              source={require( '../../assets/images/icons/icon_telegram.png' )}
-              style={{
-                width: widthPercentageToDP( 7 ),
-                height: widthPercentageToDP( 7 ),
-                resizeMode: 'contain'
-              }}
-            />
+            <Telegram />
             <View style={{
               marginLeft: 10
             }}>

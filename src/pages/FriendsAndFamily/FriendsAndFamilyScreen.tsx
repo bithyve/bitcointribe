@@ -53,7 +53,8 @@ import Header from '../../navigation/stacks/Header'
 import ModalContainer from '../../components/home/ModalContainer'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { LocalizationContext } from '../../common/content/LocContext'
-
+import Gift from '../../assets/images/svgs/icon_gift.svg'
+import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
@@ -551,13 +552,41 @@ class FriendsAndFamilyScreen extends React.Component<
               </Text>
               <ToggleContainer />
             </View> */}
-          <Text
-            style={[ styles.pageTitle, {
-              marginTop: hp( 4 ),
-            } ]}
-          >
-            {this.strings[ 'f&f' ]}
-          </Text>
+          <View style={{
+            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp( 3.5 ), marginRight: wp( 6 )
+          }}>
+            <Text
+              style={[ styles.pageTitle, {
+
+              } ]}
+            >
+              {this.strings[ 'f&f' ]}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState( {
+                  isLoadContacts: true,
+                // addFnF: true
+                }, () => {
+                  navigation.navigate( 'AddContact' )
+
+                } )
+              }}
+              style={{
+                ...styles.selectedContactsView,
+              }}
+            >
+              <Text style={[ styles.contactText, {
+                fontSize: RFValue( 24 ),
+              } ]}>+</Text>
+              {/* <Image
+                    style={styles.addGrayImage}
+                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
+                  /> */}
+              <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
+
+            </TouchableOpacity>
+          </View>
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -574,74 +603,55 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }}
           >
-            <View style={{
-              width: '90%',
-              // height: '54%',
-              backgroundColor: Colors.gray7,
-              shadowOpacity: 0.06,
-              shadowOffset: {
-                width: 10, height: 10
-              },
-              shadowRadius: 10,
-              elevation: 2,
-              alignSelf: 'center',
-              borderRadius: wp( 2 ),
-              marginTop: hp( 3 ),
-              marginBottom: hp( 1 ),
-              paddingVertical: hp( 4 ),
-              paddingHorizontal: wp( 4.5 )
-            }}>
+            {/* <TouchableOpacity
+              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
+              style={{
+                width: '90%',
+                // height: '54%',
+                backgroundColor: Colors.gray7,
+                shadowOpacity: 0.06,
+                shadowOffset: {
+                  width: 10, height: 10
+                },
+                shadowRadius: 10,
+                elevation: 2,
+                alignSelf: 'center',
+                borderRadius: wp( 2 ),
+                marginTop: hp( 3 ),
+                marginBottom: hp( 1 ),
+                paddingVertical: hp( 4 ),
+                paddingHorizontal: wp( 4.5 )
+              }}>
               <View style={[ styles.subInfo, {
                 // marginBottom: hp( 3 )
               } ]}>
+                <Gift />
                 <View style={{
-                  flex: 1
+                  flex: 1, marginHorizontal: wp( 2 )
                 }}>
                   <Text style={[ styles.pageTitle, {
-                    fontSize: RFValue( 13 ),
+                    fontSize: RFValue( 11 ),
                     marginHorizontal: wp ( 0 ),
                   } ]}>
                     {this.strings[
-                      'addContact'
+                      'giftsats'
                     ]}
                   </Text>
                   <Text style={{
                     color: Colors.textColorGrey,
-                    fontSize: RFValue( 11 ),
+                    fontSize: RFValue( 10 ),
                     fontFamily: Fonts.FiraSansRegular,
                     marginTop: 3,
-                    width: '100%',
+                    width: '85%',
                   }}>
-                    {this.strings[ 'addressbook' ]}
+                    {this.strings[ 'giftSubText' ]}
                   </Text>
+
                 </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setState( {
-                      isLoadContacts: true,
-                      // addFnF: true
-                    }, () => {
-                      navigation.navigate( 'AddContact' )
-
-                    } )
-                  }}
-                  style={{
-                    ...styles.selectedContactsView,
-                  }}
-                >
-                  <Text style={[ styles.contactText, {
-                    fontSize: RFValue( 24 ),
-                  } ]}>+</Text>
-                  {/* <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                  /> */}
-                  <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
-
-                </TouchableOpacity>
+                <RightArrow />
               </View>
 
-              {/* <View style={styles.subInfo}>
+               <View style={styles.subInfo}>
                 <View style={{
                   flex: 1
                 }}>
@@ -675,24 +685,24 @@ class FriendsAndFamilyScreen extends React.Component<
                   }}
                 >
                 */}
-              {/* <Text style={[ styles.contactText, {
+            {/* <Text style={[ styles.contactText, {
                     fontSize: RFValue( 20 ), padding: wp( 0 )
                   } ]}>+</Text> */}
-              {/* <Image
+            {/* <Image
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/Holidays_Gift.png' )}
                   /> */}
 
-              {/* <FontAwesome name="gift" color={Colors.white} size={19} style={{
+            {/* <FontAwesome name="gift" color={Colors.white} size={19} style={{
                     marginLeft: hp( 0.5 )
                   }} />
                   <View>
                     <Text style={styles.contactText}>Gift Sats</Text>
                   </View>
                 </TouchableOpacity>
-              </View>  */}
+              </View>
 
-            </View>
+            </TouchableOpacity>*/}
 
             <View>
 
@@ -1019,7 +1029,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // marginHorizontal: wp ( 6 ),
+    marginRight: wp ( 3 ),
     flex: 1,
     marginBottom: 2
   },

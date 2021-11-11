@@ -85,7 +85,7 @@ export default function Login( props ) {
   const existingFCMToken = useSelector(
     ( state ) => state.preferences.fcmTokenValue,
   )
-  const [ requestName, setRequestName ] = useState( null )
+  const [ processedLink, setProcessedLink ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
   const [ creationFlag, setCreationFlag ] = useState( false )
 
@@ -132,8 +132,8 @@ export default function Login( props ) {
       return
     }
     setCreationFlag( true )
-    const requestName = await processDeepLink( url )
-    setRequestName( requestName )
+    const processedLink = await processDeepLink( url )
+    setProcessedLink( processedLink )
   }
 
   useEffect( () => {
@@ -221,15 +221,13 @@ export default function Login( props ) {
           props.navigation.navigate( 'Home', {
             screen: 'Home'
           } )
-        } else if( requestName ){
+        } else if( processedLink ){
           props.navigation.navigate( 'Home', {
             screen: 'Home',
             params: {
-              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-              userKey: requestName && requestName.userKey ? requestName.userKey : null,
-              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+              trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
+              giftRequest: processedLink ? processedLink.giftRequest: null,
+              swanRequest: processedLink ? processedLink.swanRequest: null,
             }
           } )
         }
@@ -238,7 +236,7 @@ export default function Login( props ) {
         dispatch( autoSyncShells() )
       }
     }
-  }, [ isAuthenticated, walletExists, requestName ] )
+  }, [ isAuthenticated, walletExists, processedLink ] )
 
   const bootStrapNotifications = async () => {
     dispatch( setIsPermissionGiven( true ) )

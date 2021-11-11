@@ -53,7 +53,7 @@ export default [
     iso: 'hi',
     flag: '🇮🇳',
     country: 'India',
-    country_code: 'hi',
+    country_code: 'in',
   },
   /*{
     language: 'Marathi',

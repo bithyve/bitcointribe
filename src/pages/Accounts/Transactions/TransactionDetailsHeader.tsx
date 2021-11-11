@@ -11,7 +11,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import { Icon } from 'react-native-elements'
 import moment from 'moment'
 import TransactionKind from '../../../common/data/enums/TransactionKind'
-import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForTransaction'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 
@@ -49,17 +49,17 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
 
   const title = useMemo( () => {
     if( transaction.transactionType === TransactionKind.RECEIVE ) {
-      return transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType )
+      return transaction.sender || 'External address'
     } else {
       let name = ''
       if( transaction.receivers ) {
         if( transaction.receivers.length > 1 ) {
           name = `${transaction.receivers.length} Recipients`
         } else {
-          name = transaction.receivers[ 0 ].name ||  transaction.accountType || transaction.accountName
+          name = transaction.receivers[ 0 ].name ||  'External address'
         }
       } else {
-        name = transaction.accountName? transaction.accountName: transaction.accountType
+        name = 'External address'
       }
       return name
     }
@@ -68,11 +68,11 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
   return (
     <View style={styles.rootContainer}>
       <View style={styles.contentContainer}>
-        <Image
-          source={getAvatarForSubAccount( primarySubAccount, false, true )}
-          style={styles.avatarImage}
-          resizeMode="contain"
-        />
+        <View style={{
+          marginRight: 14,
+        }} >
+          {getAvatarForSubAccount( primarySubAccount, false, true, false, transaction )}
+        </View>
 
         <View style={{
           flex: 1

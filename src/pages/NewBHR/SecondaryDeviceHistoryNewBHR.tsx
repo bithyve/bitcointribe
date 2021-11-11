@@ -41,7 +41,7 @@ import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
-import { generateDeepLink } from '../../common/CommonFunctions'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import { translations } from '../../common/content/LocContext'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 
@@ -71,7 +71,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ keeperQR, setKeeperQR ] = useState( '' )
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
-  const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
 
@@ -103,7 +103,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const next = props.navigation.getParam( 'next' )
 
   useEffect( () => {
-    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
     setIsChange(
@@ -188,19 +188,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
+    if( !keeperQR ) generate()  // prevents multiple generation as trusted-contact updates twice during init
+  }, [ Contact, trustedContacts ] )
+
+  const generate = async () => {
     if( !Contact ) return
 
     const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
-    let channelKey: string
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === Contact.id ){
-          currentContact = contacts[ ck ]
-          channelKey = ck
-          break
-        }
-      }
+    const currentContact: TrustedContact = contacts[ channelKey ]
 
     if ( currentContact ) {
       const appVersion = DeviceInfo.getVersion()
@@ -211,7 +206,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       }
 
       if( !encryption_key ){
-        const { encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( DeepLinkEncryptionType.DEFAULT, encryption_key, currentContact, wallet.walletName )
+        const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+        const { encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
+          deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+          encryptionType: DeepLinkEncryptionType.DEFAULT,
+          encryptionKey: encryption_key,
+          walletName: wallet.walletName,
+          keysToEncrypt,
+        } )
         const QRData = JSON.stringify( {
           type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
           encryptedChannelKeys: encryptedChannelKeys,
@@ -232,7 +234,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
               OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
           shareType: isPrimaryKeeper ? 'primaryKeeper' : 'device',
           status: 'notAccessible',
-          name: Contact && Contact.name ? Contact.name : ''
+          name: Contact && Contact.name ? Contact.name : '',
+          updatedAt: 0
         }
 
         dispatch( updateMSharesHealth( shareObj, isChange ) )
@@ -240,12 +243,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }, null ) )
       }
     }
-  }, [ Contact, trustedContacts ] )
+  }
 
   const renderSecondaryDeviceContents = useCallback( () => {
     console.log( keeperQR )
     return (
       <SecondaryDevice
+        qrTitle={`Recovery Key ${SelectedRecoveryKeyNumber}`}
         secondaryQR={keeperQR}
         onPressOk={async () => {
           setIsShareClicked( true )
@@ -448,11 +452,24 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
     setKeeperTypeModal( false )
+    const navigationParams = {
+      selectedTitle: name,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
+      selectedKeeper: {
+        shareType: type,
+        name: name,
+        reshareVersion: 0,
+        status: 'notSetup',
+        updatedAt: 0,
+        shareId: selectedKeeper.shareId,
+        data: {
+        },
+      },
+      index: changeIndex,
+    }
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
@@ -466,8 +483,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
     if ( type == 'pdf' ) {
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
@@ -519,7 +535,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         selectedTitle={props.navigation.state.params.selectedTitle}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
-          : 'never'}
+          : 'Never'}
         moreInfo={props.navigation.state.params.selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />
@@ -550,7 +566,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           onPressChange={() => { setKeeperTypeModal( true ) }}
         />
       </View>
-      <ModalContainer visible={showQr} closeBottomSheet={() => {}} >
+      <ModalContainer visible={showQr} closeBottomSheet={() => setShowQr( false )} >
         {renderSecondaryDeviceContents()}
       </ModalContainer>
       {/* <BottomSheet
@@ -618,7 +634,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
-          selectedLevelId={selectedLevelId}
         />
       </ModalContainer>
     </View>

@@ -112,7 +112,7 @@ import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
-import { restoreAccountShells, updateAccountShells } from '../actions/accounts'
+import { restoreAccountShells, updateAccountShells, setGifts } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
@@ -504,6 +504,7 @@ function* recoverWalletWorker( { payload } ) {
     }
 
     const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+    console.log( 'getWI', getWI )
     if( getWI.status == 200 ) {
       image = getWI.data.walletImage
     }
@@ -536,6 +537,7 @@ function* recoverWalletWorker( { payload } ) {
         questionId: selectedBackup.questionId,
         answer: answer
       },
+      userName: image.userName ? image.userName: '',
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: DeviceInfo.getVersion(),
@@ -561,7 +563,6 @@ function* recoverWalletWorker( { payload } ) {
     // Version histroy Restore
     if( image.versionHistory ) yield put( setVersionHistory( JSON.parse( BHROperations.decryptWithAnswer( image.versionHistory, decryptionKey ).decryptedData ) ) )
     // restore Accounts
-    yield put( restoreAccountShells( acc ) )
     // restore health
     yield call( setupLevelHealthWorker, {
       payload: {
@@ -572,6 +573,21 @@ function* recoverWalletWorker( { payload } ) {
     // restore Metashres
     if( level > 1 ) yield put( retrieveMetaShares( shares ) )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    // restore gifts
+    if( image.gifts ) {
+      const gifts = {
+      }
+      Object.keys( image.gifts ).forEach( ( giftId ) => {
+        const decryptedData = BHROperations.decryptWithAnswer( image.gifts[ giftId ], decryptionKey ).decryptedData
+        gifts[ giftId ] = JSON.parse( decryptedData )
+      } )
+      yield put( setGifts( gifts ) )
+      const data = Object.keys( gifts ).map( ( key ) => gifts[ key ] )
+      yield call( dbManager.createGifts, data )
+    }
+
+    yield put( restoreAccountShells( acc ) )
+
   } catch ( err ) {
     console.log( err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
@@ -691,13 +707,16 @@ function* updateWalletImageWorker( { payload } ) {
     updateSmShare,
     update2fa,
     updateAccounts,
-    accountIds
+    accountIds,
+    updateGifts,
+    giftIds,
   } = payload
   yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
   const wallet = yield call( dbManager.getWallet )
   const walletImage : NewWalletImage = {
     name: wallet.walletName,
     walletId : wallet.walletId,
+    userName: wallet.userName ? wallet.userName : ''
   }
   const encryptionKey = bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' )
   if( updateSmShare ) {
@@ -761,6 +780,16 @@ function* updateWalletImageWorker( { payload } ) {
   if( updateVersion ) {
     const STATE_DATA = yield call( stateDataToBackup )
     walletImage.versionHistory = BHROperations.encryptWithAnswer( JSON.stringify( STATE_DATA.versionHistory ), encryptionKey ).encryptedData
+  }
+  if( updateGifts ) {
+    const gitfsRef = yield call( dbManager.getGifts, giftIds )
+    const gitfs = gitfsRef.toJSON()
+    const data = {
+    }
+    gitfs.forEach( gitf => {
+      data[ gitf.id ] = BHROperations.encryptWithAnswer( JSON.stringify( gitf ), encryptionKey ).encryptedData
+    } )
+    walletImage.gifts = data
   }
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
@@ -855,7 +884,7 @@ function* getPDFDataWorker( { payload } ) {
       const qrData = [
         JSON.stringify( recoveryData ),
       ]
-      console.log( 'PDF recoveryData', JSON.stringify( recoveryData ) )
+      console.warn( 'PDF recoveryData', JSON.stringify( recoveryData ) )
       const pdfData = {
         qrData: qrData,
       }
@@ -865,12 +894,19 @@ function* getPDFDataWorker( { payload } ) {
         `Hexa_Recovery_Key_${wallet.walletName}.pdf`,
         `Hexa Recovery Key for ${wallet.walletName}'s Wallet`
       )
-      yield put( setPDFInfo( {
-        filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
-      } ) )
+      if( pdfPath ){
+        yield put( pdfSuccessfullyCreated( true ) )
+
+        yield put( setPDFInfo( {
+          filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
+        } ) )
+      }
+      // yield put( setPDFInfo( {
+      //   filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
+      // } ) )
     }
 
-    yield put( pdfSuccessfullyCreated( true ) )
+    //yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
@@ -986,7 +1022,7 @@ function* sharePDFWorker( { payload } ) {
 
         case 'Other':
           const shareOptions = {
-            title: 'Recovery Key  '+walletName,
+            title: 'Recovery Key '+walletName,
             message: `Recovery Key for ${walletName}'s Wallet is attached as a Personal Copy PDF. This may be used when you want to restore the wallet. Keep it safe.`,
             url:
             Platform.OS == 'android'
@@ -994,7 +1030,7 @@ function* sharePDFWorker( { payload } ) {
               : pdfInfo.filePath,
             type: 'application/pdf',
             showAppsToView: true,
-            subject: 'Recovery Key  '+walletName,
+            subject: 'Recovery Key '+walletName,
           }
 
           try {
@@ -1085,11 +1121,14 @@ function* updatedKeeperInfoWorker( { payload } ) {
   try {
     const { keeperData } = payload
     const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
-    if( keeperInfo && keeperInfo.length > 0 ) {
-      if( keeperInfo.find( value=>value && value.shareId == keeperData.shareId ) && keeperInfo.find( value=>value && value.shareId == keeperData.shareId ).type == 'pdf' && keeperData.type != 'pdf' ) yield put( setPDFInfo( {
+    const keeperInfoTemp: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
+    if( keeperInfoTemp && keeperInfoTemp.length > 0 && keeperInfoTemp.find( value=>value && value.shareId == keeperData.shareId && value.type == 'pdf' ) && keeperData.type != 'pdf' ) {
+      yield put( setPDFInfo( {
         filePath: '', updatedAt: 0, shareId: ''
       } ) )
+      yield put( pdfSuccessfullyCreated( false ) )
     }
+
     let flag = false
     if ( keeperInfo.length > 0 ) {
       for ( let i = 0; i < keeperInfo.length; i++ ) {
@@ -1395,7 +1434,7 @@ function* createChannelAssetsWorker( { payload } ) {
     const s3 = yield call( dbManager.getBHR )
     const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
-    if( MetaShares && MetaShares.length ){
+    if( MetaShares && MetaShares.length && shareId ){
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
       const secondaryShareDownloadedVar = yield select( ( state ) => state.bhr.secondaryShareDownloaded )
@@ -2330,7 +2369,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
       yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
       return
     } else if( currentLevel === 1 && value.id === 2 && number == 2 && levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt==0 ){
-      yield put( setLevelCompletionError( 'Please complete Primary Keeper', 'It seems you have not completed primary keeper setup. Please complete primary keeper setup to proceed', LevelStatus.FAILED ) )
+      yield put( setLevelCompletionError( 'Please back up Recovery Key 1 ', 'Please share Recovery Key 1 and ensure it is accepted on another device running Hexa before proceeding to backup Recovery Key 2', LevelStatus.FAILED ) )
       return
     }
     else if( currentLevel === 0 && ( value.id === 2 || value.id === 3 ) ){
@@ -2490,12 +2529,12 @@ function* getApprovalFromKeeperWorker( { payload } ) {
       } else { yield put( setOpenToApproval( false, [], null ) ) }
       yield put( setSecondaryDataInfoStatus( false ) )
     } else {
-      Toast( 'Network Error' )
+      // Toast( 'Network Error' )
       yield put( setOpenToApproval( null, [], null ) )
       yield put( setSecondaryDataInfoStatus( false ) )
     }
   } catch ( error ) {
-    Toast( 'Network Error' )
+    // Toast( 'Network Error' )
     yield put( setOpenToApproval( null, [], null ) )
     yield put( setSecondaryDataInfoStatus( false ) )
   }

@@ -103,7 +103,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ isNavigation, setNavigation ] = useState( false )
   const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
   const [ selectedTitle, setSelectedTitle ] = useState( props.navigation.getParam( 'selectedTitle' ) )
-  const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
@@ -134,7 +134,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const dispatch = useDispatch()
 
   useEffect( () => {
-    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
     setIsChange(
@@ -562,15 +562,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     // capture the contact
     if( !chosenContact ) return
     const contacts: Trusted_Contacts = trustedContacts
-    let currentContact: TrustedContact
-
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === chosenContact.id ){
-          currentContact = contacts[ ck ]
-          break
-        }
-      }
+    const currentContact: TrustedContact = contacts[ channelKey ]
 
     if ( !currentContact || ( currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) return
 
@@ -601,22 +593,34 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
     setKeeperTypeModal( false )
+    const navigationParams = {
+      selectedTitle: name,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
+      selectedKeeper: {
+        shareType: type,
+        name: name,
+        reshareVersion: 0,
+        status: 'notSetup',
+        updatedAt: 0,
+        shareId: selectedKeeper.shareId,
+        data: {
+        },
+      },
+      index: changeIndex,
+    }
 
     if ( type == 'contact' ) {
       setChangeModal( true )
     }
     if ( type == 'device' ) {
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
+        ...navigationParams,
         isChangeKeeperType: true,
-        index: changeIndex
       } )
     }
     if ( type == 'pdf' ) {
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
@@ -666,7 +670,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         selectedTitle={selectedTitle}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
-          : 'never'}
+          : 'Never'}
         moreInfo={selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
         imageIcon={getImageIcon}
@@ -850,7 +854,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
-          selectedLevelId={selectedLevelId}
           keeper={selectedKeeper}
         />
       </ModalContainer>

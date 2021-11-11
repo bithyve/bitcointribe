@@ -381,7 +381,7 @@ const FNFToKeeper = ( props ) => {
         info={strings.Ifyouwantto}
         otherText={strings.Weneither}
         proceedButtonText={common.continue}
-        isIgnoreButton={false}
+        isIgnoreButton={true}
         onPressProceed={() => {
           getContactPermission()
           // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
@@ -524,7 +524,7 @@ const FNFToKeeper = ( props ) => {
         }}>{strings.Selectfromaddressbook} </Text>
         <View style={{
         }}>
-          {contact.length > 0 && !contact[ 0 ].isExisting &&
+          {/* {contact.length > 0 && !contact[ 0 ].isExisting &&
           <View style={styles.selectedContactContainer}>
             {contact.map( ( value, index ) => {
               return (
@@ -546,7 +546,7 @@ const FNFToKeeper = ( props ) => {
               )
             } )}
           </View>
-          }
+          } */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -579,7 +579,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            height: DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '50%' ),
+            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '47%' ) : DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
           }}>
             {filterContactData ? (
               <FlatList
@@ -638,7 +638,7 @@ const FNFToKeeper = ( props ) => {
           <View
             style={{
               position: 'absolute',
-              bottom: contacts.length ? hp( 10 ) : hp ( 5 ),
+              bottom: DeviceInfo.hasNotch() ? hp( 2 ) : hp( 0 ),
               flex:1,
               width: wp( '50%' ),
               alignSelf: 'center',
@@ -658,10 +658,10 @@ const FNFToKeeper = ( props ) => {
           }
         </View>
       </View>
-      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={permissionsErrModal} closeBottomSheet={() => setPermissionsErrModal( false )} >
         {renderContactListErrorModalContent()}
       </ModalContainer>
-      <ModalContainer visible={permissionsModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={permissionsModal} closeBottomSheet={() => setPermissionsModal( false )} >
         {renderContactPermissionModalContent()}
       </ModalContainer>
       {/* </SafeAreaView> */}

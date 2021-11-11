@@ -171,7 +171,9 @@ export const updateWalletImageHealth = ( payload: {
   updateSmShare?: boolean,
   update2fa?: boolean,
   updateAccounts?: boolean,
-  accountIds?: string[]
+  accountIds?: string[],
+  updateGifts?: boolean,
+  giftIds?: string[]
 } ) => {
   return {
     type: UPDATE_WALLET_IMAGE_HEALTH,

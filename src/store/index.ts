@@ -55,6 +55,7 @@ import {
   restoreAccountShellsWatcher,
   accountCheckWatcher,
   txnReadWatcher,
+  generateGiftsWatcher
 } from './sagas/accounts'
 
 import {
@@ -82,6 +83,11 @@ import {
   restoreTrustedContactsWatcher,
   updateWalletNameToChannelWatcher,
   updateWalletWatcher,
+  fetchGiftFromChannelWatcher,
+  syncGiftsStatusWatcher,
+  rejectGiftWatcher,
+  associateGiftWatcher,
+  reclaimGiftWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -165,6 +171,7 @@ import {
 } from './sagas/upgradeToNewBhr'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
+import { updateUserNameWatcher } from './sagas/storage'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -192,6 +199,7 @@ const rootSaga = function* () {
     validateTwoFAWatcher,
     createSmNResetTFAOrXPrivWatcher,
     updateAccountSettingsWatcher,
+    generateGiftsWatcher,
 
     //fBTC
     accountSyncWatcher,
@@ -221,6 +229,12 @@ const rootSaga = function* () {
     restoreTrustedContactsWatcher,
     updateWalletNameToChannelWatcher,
     updateWalletWatcher,
+    associateGiftWatcher,
+    fetchGiftFromChannelWatcher,
+    syncGiftsStatusWatcher,
+    rejectGiftWatcher,
+    reclaimGiftWatcher,
+
     // bhr
     initHealthWatcher,
     updateSharesHealthWatcher,
@@ -300,6 +314,8 @@ const rootSaga = function* () {
     autoShareContactKeeperWatcher,
     updateAvailableKeeperDataWatcher,
 
+    // storage
+    updateUserNameWatcher,
   ]
 
   yield all(

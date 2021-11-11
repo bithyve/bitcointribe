@@ -35,6 +35,10 @@ import {
   RecipientSchema,
   TransactionsNoteSchema,
   ContactImageSchema,
+  GiftSenderReceiverSchema,
+  GiftsSchema,
+  GiftDeepLinkConfigSchema,
+  GiftTimeStampsSchema
 } from './Schema'
 
 export default
@@ -74,5 +78,9 @@ export default
   RecipientInfoSchema,
   RecipientSchema,
   TransactionsNoteSchema,
-  ContactImageSchema
+  ContactImageSchema,
+  GiftSenderReceiverSchema,
+  GiftsSchema,
+  GiftDeepLinkConfigSchema,
+  GiftTimeStampsSchema
 ]

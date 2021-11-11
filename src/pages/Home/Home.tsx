@@ -25,7 +25,6 @@ import {
 } from '../../store/actions/BHR'
 import { connect } from 'react-redux'
 import {
-  initializeTrustedContact,
   rejectTrustedContact,
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
@@ -148,7 +147,6 @@ interface HomePropsTypes {
   navigation: any;
   notificationList: any;
   exchangeRates?: any[];
-  initializeTrustedContact: any;
   accountsState: AccountsState;
   cloudPermissionGranted: any;
   wallet: Wallet;
@@ -597,7 +595,6 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
-    initializeTrustedContact,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,

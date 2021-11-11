@@ -107,6 +107,7 @@ export default function ManageBackup( props ) {
   }, any ] = useState( defaultKeeperObj )
   const [ selectedId, setSelectedId ] = useState( 0 )
   const [ selectedLevelId, setSelectedLevelId ] = useState( 0 )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( 0 )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isEnabled, setIsEnabled ] = useState( false )
@@ -307,17 +308,17 @@ export default function ManageBackup( props ) {
       } else {
         setTimeout( () => {
           setKeeperTypeModal( true )
-        }, 1000 )
+        }, 500 )
       }
     }
   }, [ navigationObj ] )
 
   useEffect( () => {
     if( isTypeBottomSheetOpen === true && onKeeperButtonClick ){
-      setShowLoader( false )
-      setTimeout( () => {
-        setKeeperTypeModal( true )
-      }, 1000 )
+      // setShowLoader( false )
+      // setTimeout( () => {
+      setKeeperTypeModal( true )
+      // }, 500 )
       dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
     }
   }, [ isTypeBottomSheetOpen ] )
@@ -347,8 +348,10 @@ export default function ManageBackup( props ) {
       setCloudErrorModal( true )
       //setErrorMsg( cloudErrorMessage )
       dispatch( setCloudErrorMessage( '' ) )
+    } else if( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.IN_PROGRESS ){
+      setCloudErrorModal( false )
     }
-  }, [ cloudErrorMessage ] )
+  }, [ cloudErrorMessage, cloudBackupStatus ] )
 
   const handleContactSelection = (
     contactDescription: ContactRecipientDescribing,
@@ -447,20 +450,21 @@ export default function ManageBackup( props ) {
     }
   }
 
-  const onKeeperButtonPress = ( value, keeperNumber ) =>{
+  const onKeeperButtonPress = ( value, keeperNumber ) => {
+    setSelectedRecoveryKeyNumber( keeperNumber )
     // requestAnimationFrame( () => {
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return
     }
-    if( value.id == 1 && keeperNumber == 2 ){
+    if( value.id == 1 && keeperNumber == 2 ) {
       if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
         props.navigation.navigate(
           'CloudBackupHistory',
           {
             selectedTime: value.keeper2.updatedAt
               ? getTime( value.keeper2.updatedAt )
-              : 'never',
+              : 'Never',
           }
         )
       }
@@ -470,11 +474,11 @@ export default function ManageBackup( props ) {
         {
           selectedTime: value.keeper1.updatedAt
             ? getTime( value.keeper1.updatedAt )
-            : 'never',
+            : 'Never',
         }
       )
     } else {
-      setShowLoader( true )
+      // setShowLoader( true )
       setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
       onPressKeeperButton( value, keeperNumber )
     }
@@ -492,7 +496,7 @@ export default function ManageBackup( props ) {
     setShowLoader( false )
     const navigationParams = {
       selectedTitle: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName,
-      selectedLevelId: id,
+      SelectedRecoveryKeyNumber,
       selectedKeeper,
     }
     let index = 1
@@ -627,7 +631,7 @@ export default function ManageBackup( props ) {
             paddingLeft: wp ( '6%' ),
             paddingBottom: hp( 3 )
           }}>
-            <Text style={styles.pageTitle}>I am the Keeper of</Text>
+            <Text style={styles.pageTitle}>{strings.IamtheKeeper}</Text>
             <Text style={styles.pageInfoText}>
               {strings[ 'Contactswhose' ]}
             </Text>
@@ -664,7 +668,7 @@ export default function ManageBackup( props ) {
           </View>
         </ScrollView>
 
-        <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
+        <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
           <KeeperTypeModalContents
             headerText={'Backup Recovery Key'}
             subHeader={strings[ 'saveyourRecovery' ]}
@@ -708,10 +712,9 @@ export default function ManageBackup( props ) {
               dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
               setKeeperTypeModal( false )
             }}
-            selectedLevelId={selectedLevelId}
           />
-        </ModalContainer >
-        <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+        </ModalContainer>
+        <ModalContainer visible={errorModal} closeBottomSheet={() => setErrorModal( false )}>
           <ErrorModalContents
             title={errorTitle}
             info={errorInfo}
@@ -729,7 +732,7 @@ export default function ManageBackup( props ) {
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />
         </ModalContainer>
-        <ModalContainer visible={knowMoreModal} closeBottomSheet={() => {}} >
+        <ModalContainer visible={knowMoreModal} closeBottomSheet={() => setKnowMoreModal( false )} >
           <MBNewBhrKnowMoreSheetContents
             type={knowMoreType}
             titleClicked={()=> setKnowMoreModal( false ) }
@@ -745,9 +748,12 @@ export default function ManageBackup( props ) {
             note={errorMsg}
             onPressProceed={()=>{
               setCloudErrorModal( false )
-              autoCloudUpload()
+              setTimeout( () => {
+                setLoaderModal( true )
+              }, 500 )
+              dispatch( updateCloudData() )
             }}
-            onPressIgnore={()=> setCloudErrorModal( false )}
+            onPressIgnore={()=> setTimeout( ()=>{setCloudErrorModal( false )}, 500 )}
             proceedButtonText={common.tryAgain}
             cancelButtonText={common.ok}
             isIgnoreButton={true}

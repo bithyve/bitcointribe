@@ -34,7 +34,7 @@ import { updateTrustedContacts } from '../../store/actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import idx from 'idx'
-import { generateDeepLink } from '../../common/CommonFunctions'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import DeviceInfo from 'react-native-device-info'
 import { LocalizationContext } from '../../common/content/LocContext'
 
@@ -89,7 +89,7 @@ export default function QrAndLink( props ) {
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
-      if ( contact.channelKey === channelKey && shareType != 'existingContact' ) {alert( 'retrun' ); return}
+      if ( contact.channelKey === channelKey && shareType != 'existingContact' ) return
     }
     createGuardian( )
   }, [ Contact ] )
@@ -132,6 +132,14 @@ export default function QrAndLink( props ) {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
+    if( trustedLink ) generate()  // prevents multiple generation as trusted-contact updates twice during init
+  }, [ Contact, trustedContacts ] )
+
+  useEffect( ()=> {
+    generate() // re-generate deeplink if encryption key changes
+  }, [ encryptLinkWith, trustedContacts ] )
+
+  const generate = async () => {
     console.log( 'useEffect Contact', Contact )
     // capture the contact
     if( !Contact ) return
@@ -178,7 +186,14 @@ export default function QrAndLink( props ) {
             break
       }
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
+    const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
+      deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      encryptionType: encryptLinkWith,
+      encryptionKey: encryption_key,
+      walletName: wallet.walletName,
+      keysToEncrypt,
+    } )
     setTrustedLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
@@ -221,7 +236,7 @@ export default function QrAndLink( props ) {
       }, null ) )
       // saveInTransitHistory()
     }
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
+  }
 
   const openTimer = async () => {
     setTimeout( () => {
@@ -345,7 +360,7 @@ export default function QrAndLink( props ) {
             backgroundColor={Colors.white}
           />
         </TouchableOpacity>
-        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => {}} >
+        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => setSecure2FAModal( false )} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}
             onConfirm={( type ) => {
@@ -357,10 +372,10 @@ export default function QrAndLink( props ) {
             Contact={Contact}
           />
         </ModalContainer>
-        <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
+        <ModalContainer visible={timerModal}  closeBottomSheet={() => setTimerModal( false )} >
           {renderTimerModalContents()}
         </ModalContainer>
-        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
+        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => setShareOtpWithTrustedContactModel( false )} >
           {renderShareOtpWithTrustedContactContent()}
         </ModalContainer>
       </ScrollView>

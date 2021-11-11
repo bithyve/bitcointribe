@@ -23,12 +23,10 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ( { sourceShell, }
       <ListItem pad={4} containerStyle={{
         marginBottom: 36
       }}>
+        <View style={styles.avatarImage} >
+          {getAvatarForSubAccount( primarySubAccount )}
+        </View>
 
-        <Image
-          source={getAvatarForSubAccount( primarySubAccount )}
-          style={styles.avatarImage}
-          resizeMode="contain"
-        />
 
         <ListItem.Content>
           <ListItem.Subtitle

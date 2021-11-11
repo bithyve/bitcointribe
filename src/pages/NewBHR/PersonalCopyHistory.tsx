@@ -50,6 +50,10 @@ import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
 import { isEmpty } from '../../common/CommonFunctions'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -82,8 +86,8 @@ const PersonalCopyHistory = ( props ) => {
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
-  const [ selectedLevelId, setSelectedLevelId ] = useState(
-    props.navigation.state.params.selectedLevelId
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState(
+    props.navigation.state.params.SelectedRecoveryKeyNumber
   )
   const [ selectedKeeper, setSelectedKeeper ] = useState(
     props.navigation.state.params.selectedKeeper
@@ -120,7 +124,7 @@ const PersonalCopyHistory = ( props ) => {
   const [ isConfirm, setIsConfirm ] = useState( false )
 
   useEffect( () => {
-    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare(
       props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
@@ -403,7 +407,7 @@ const PersonalCopyHistory = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={storagePermissionBottomSheet}
-        title={'Why do we need access to your files and storage?'}
+        title={'Why does the wallet need access to your files and storage?'}
         info={'File and Storage access will let Hexa save a pdf with your Recovery Keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n'}
         otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
         proceedButtonText={'Continue'}
@@ -414,6 +418,14 @@ const PersonalCopyHistory = ( props ) => {
         onPressIgnore={() => {
         }}
         isBottomImage={true}
+        isBottomImageStyle={{
+          width: wp( '29%' ),
+          height: wp( '30%' ),
+          marginLeft: 'auto',
+          resizeMode: 'stretch',
+          marginRight: wp( -2 ),
+          marginBottom: wp( -2 ),
+        }}
         bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
       />
     )
@@ -482,19 +494,30 @@ const PersonalCopyHistory = ( props ) => {
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
     setKeeperTypeModal( false )
+    const navigationParams = {
+      selectedTitle: name,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
+      selectedKeeper: {
+        shareType: type,
+        name: name,
+        reshareVersion: 0,
+        status: 'notSetup',
+        updatedAt: 0,
+        shareId: selectedKeeper.shareId,
+        data: {
+        },
+      },
+      index: changeIndex,
+    }
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
     if ( type == 'device' ) {
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
@@ -533,7 +556,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asaqw","channelId":"49609cdcfec0edd70a89c561ffa4d874731d0e9e0e4acc45522918e045a04c99","streamId":"9dd969edd","channelKey":"JFupDEybfz1a5FsliKU9MAUb","secondaryChannelKey":"LCc6dVLgVk8zPrR8wCY5RFFr","version":"2.0.0","walletId":"af5fc360fff2b6400a11d5909ecef0e44c0330908418fd334bea003205269051","encryptedKey":"94a645ed2156f237fe2f9c4f8b13568e6016d72bd5243a5ceb322f61c93e92e037137aba7a8522e70ea655e98b1f13f6214b15b970857df201c4e08325a2f631a2b446d763c7d56a51442d799bcaf875"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asda","channelId":"dc9986c392da183bcbe1811aa6232a8d8f2fe7f1f4a21ee4852505a591d5cd5e","streamId":"07a7d807c","channelKey":"N7KUMNsPZSmvZGPczYmO1c6L","secondaryChannelKey":"VBK1kByohkx5C5386NQ2UO1G","version":"2.0.1","walletId":"1c2e8a04d13056c6eb5cdb6d7b16b16c90a2e8c3158ad50fc7fdeba5f903d719","encryptedKey":"92817fe2b172943568b5f304ac954434e66c98a01b5e76d93782757fa89e285f18797ec689369b6bc2d570d85d73bf826eea44620277640995e936da076e5e42b70b060a118ace9e8ab36fb14ad6e41b"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
@@ -570,7 +593,7 @@ const PersonalCopyHistory = ( props ) => {
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
-          : 'never'}
+          : 'Never'}
         moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />
@@ -607,17 +630,17 @@ const PersonalCopyHistory = ( props ) => {
           }}
         />
       </View>
-      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => setPersonalCopyShareModal( false )} >
         {renderPersonalCopyShareModalContent()}
       </ModalContainer>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={errorModal} closeBottomSheet={() => setErrorModal( false )} >
         {renderErrorModalContent()}
       </ModalContainer>
 
       <ModalContainer visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
         {renderHelpContent()}
       </ModalContainer>
-      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )} >
         <KeeperTypeModalContents
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
@@ -627,14 +650,13 @@ const PersonalCopyHistory = ( props ) => {
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
-          selectedLevelId={selectedLevelId}
           keeper={selectedKeeper}
         />
       </ModalContainer>
-      <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={qrModal} closeBottomSheet={() => setQRModal( false )} >
         {renderQrContent()}
       </ModalContainer>
-      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
+      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=> setStoragePermissionModal( false )} >
         {renderStoragePermissionModalContent()}
       </ModalContainer>
     </View>

@@ -71,7 +71,6 @@ const HomeHeader = ( {
   netBalance,
   getCurrencyImageByRegion,
   exchangeRates,
-  CurrencyCode,
   navigation,
   currentLevel,
 } ) => {
@@ -89,6 +88,10 @@ const HomeHeader = ( {
 
   const cloudBackupStatus = useSelector(
     ( state ) => state.cloud.cloudBackupStatus
+  )
+
+  const CurrencyCode = useSelector(
+    ( state ) => state.preferences.currencyCode
   )
 
   const getMessage = () => {
@@ -249,7 +252,7 @@ const HomeHeader = ( {
                       ( netBalance / SATOSHIS_IN_BTC ) *
                     exchangeRates[ CurrencyCode ].last
                     ).toFixed( 2 )
-                    : 0}
+                    : ''}
               </Text>
               <Text style={styles.homeHeaderAmountUnitText}>
                 {prefersBitcoin ? 'sats' : fiatCurrencyCode}

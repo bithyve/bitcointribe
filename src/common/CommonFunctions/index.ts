@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkKind, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -9,6 +9,7 @@ import Toast from '../../components/Toast'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import crypto from 'crypto'
 import { getVersions } from '../utilities'
+import dynamicLinks from '@react-native-firebase/dynamic-links'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -323,29 +324,9 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
   return levelHealthVar[ currentLevel - 1 ].levelInfo
 }
 
-export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryptionKey: string, correspondingTrustedContact: TrustedContact, walletName: string ) => {
-  const keysToEncrypt = correspondingTrustedContact.channelKey + '-' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' )
-  let encryptedChannelKeys: string
-  let encryptionHint: string
-  switch ( encryptionType ) {
-      case DeepLinkEncryptionType.DEFAULT:
-        encryptionHint = ''
-        encryptedChannelKeys = keysToEncrypt
-        break
-
-      case DeepLinkEncryptionType.NUMBER:
-      case DeepLinkEncryptionType.EMAIL:
-      case DeepLinkEncryptionType.OTP:
-        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
-        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
-          keysToEncrypt,
-          encryptionKey
-        )
-        break
-  }
-
+export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: TrustedContactRelationTypes ) => {
   let deepLinkKind: DeepLinkKind
-  switch( correspondingTrustedContact.relationType ){
+  switch( contactRelationType ){
       case TrustedContactRelationTypes.CONTACT:
         deepLinkKind = DeepLinkKind.CONTACT
         break
@@ -366,129 +347,259 @@ export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryp
         deepLinkKind = DeepLinkKind.EXISTING_CONTACT
   }
 
+  return deepLinkKind
+}
+
+export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any } ) => {
+
+  let encryptedChannelKeys: string
+  let encryptionHint: string
+  switch ( encryptionType ) {
+      case DeepLinkEncryptionType.DEFAULT:
+        encryptionHint = ''
+        encryptedChannelKeys = keysToEncrypt
+        break
+
+      case DeepLinkEncryptionType.NUMBER:
+      case DeepLinkEncryptionType.EMAIL:
+      case DeepLinkEncryptionType.OTP:
+        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
+        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+          keysToEncrypt,
+          encryptionKey
+        )
+        break
+  }
+
   const appType = config.APP_STAGE
   const appVersion = DeviceInfo.getVersion()
 
-  const deepLink =
-      `https://hexawallet.io
-      /${appType}
-      /${deepLinkKind}` +
-      `/${walletName}` +
-      `/${encryptedChannelKeys}` +
-      `/${encryptionType}-${encryptionHint}` +
-      `/v${appVersion}`
+  let deepLink: string
+
+  if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
+    deepLink =
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
+  } else {
+    deepLink =
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
+  }
+
+  let shortLink = ''
+  if( generateShortLink ) {
+    try {
+      const url = deepLink.replace( /\s+/g, '' )
+      const domain = 'https://hexawallet.page.link'
+      shortLink = await dynamicLinks().buildShortLink( {
+        link: url,
+        domainUriPrefix: domain,
+        android: {
+          packageName: DeviceInfo.getBundleId(),
+          fallbackUrl: url,
+        },
+        ios: {
+          fallbackUrl: url,
+          bundleId: DeviceInfo.getBundleId()
+        },
+        navigation: {
+          forcedRedirectEnabled: false
+        }
+      }, dynamicLinks.ShortLinkType.SHORT )
+    } catch ( error ) {
+      shortLink = ''
+    }
+  }
 
   return {
-    deepLink, encryptedChannelKeys, encryptionType, encryptionHint
+    deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink: shortLink? shortLink.replace( /\s+/g, '' ): ''
   }
 }
 
-export const processDeepLink = async ( deepLink: string ) =>{
+export const processDeepLink = ( deepLink: string ) => {
   try {
     const splits = deepLink.split( '/' )
-    if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
-      if ( splits[ 3 ] !== config.APP_STAGE ) {
-        Alert.alert(
-          'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[ 3 ]
-          }`,
-        )
-      } else {
-        const version = splits.pop().slice( 1 )
-        const encryptionMetaSplits = splits[ 7 ].split( '-' )
-        const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
-        const encryptionHint = encryptionMetaSplits[ 1 ]
 
-        const trustedContactRequest = {
-          walletName: splits[ 5 ],
-          encryptedChannelKeys: splits[ 6 ],
-          encryptionType,
-          encryptionHint,
-          isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
-          isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
-          isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-          isQR: false,
-          version,
-        }
-        return {
-          trustedContactRequest
-        }
-      }
-    } else if ( splits.includes( 'swan' ) )
+    // swan link(external)
+    if ( splits.includes( 'swan' ) )
       return {
         swanRequest: {
           deepLink
         }
       }
+
+    // hexa links
+    if ( splits[ 3 ] !== config.APP_STAGE ){
+      Alert.alert(
+        'Invalid deeplink',
+        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+          splits[ 3 ].toUpperCase()
+        }`,
+      )
+      return
+    }
+
+
+    const version = splits.pop().slice( 1 )
+    const encryptionMetaSplits = splits[ 7 ].split( '-' )
+    const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
+    const encryptionHint = encryptionMetaSplits[ 1 ]
+
+    switch( splits[ 4 ] as DeepLinkKind ){
+        case DeepLinkKind.CONTACT:
+        case DeepLinkKind.KEEPER:
+        case DeepLinkKind.PRIMARY_KEEPER:
+        case DeepLinkKind.RECIPROCAL_KEEPER:
+        case DeepLinkKind.EXISTING_CONTACT:
+          const trustedContactRequest = {
+            walletName: splits[ 5 ],
+            encryptedChannelKeys: splits[ 6 ],
+            encryptionType,
+            encryptionHint,
+            isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
+            isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+            isQR: false,
+            deepLinkKind: splits[ 4 ],
+            version,
+          }
+          return {
+            trustedContactRequest
+          }
+
+        case DeepLinkKind.GIFT:
+          const giftRequest = {
+            walletName: splits[ 5 ],
+            encryptedChannelKeys: splits[ 6 ],
+            encryptionType,
+            encryptionHint,
+            isQR: false,
+            deepLinkKind: splits[ 4 ],
+            channelAddress: splits[ 8 ],
+            amount: splits[ 9 ],
+            note: splits[ 10 ],
+            themeId: splits[ 11 ],
+            version,
+          }
+          return {
+            giftRequest
+          }
+
+        case DeepLinkKind.CONTACT_GIFT:
+          const trustedContactGiftRequest = {
+            walletName: splits[ 5 ],
+            encryptedChannelKeys: splits[ 6 ],
+            encryptionType,
+            encryptionHint,
+            isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.PRIMARY_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ), // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: DeepLinkKind.PRIMARY_KEEPER === splits[ 4 ],
+            isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+            isContactGift: true,
+            isQR: false,
+            deepLinkKind: splits[ 4 ],
+            channelAddress: splits[ 8 ],
+            amount: splits[ 9 ],
+            note: splits[ 10 ],
+            themeId: splits[ 11 ],
+            version,
+          }
+          return {
+            trustedContactRequest: trustedContactGiftRequest
+          }
+    }
   }
   catch ( error ) {
     Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
   }
 }
 
-export const processFriendsAndFamilyQR = ( qrData: string ) => {
+export const processRequestQR = ( qrData: string ) => {
   try {
-    const scannedData = JSON.parse( qrData )
-    // disabled check version compatibility
-    // if ( scannedData.version ) {
-    //   const isAppVersionCompatible = await checkAppVersionCompatibility( {
-    //     relayCheckMethod: scannedData.type,
-    //     version: scannedData.ver,
-    //   } )
+    const parsedData = JSON.parse( qrData )
 
-    //   if ( !isAppVersionCompatible ) {
-    //     return
-    //   }
-    // }
-
-    let trustedContactRequest
-    switch ( scannedData.type ) {
+    let trustedContactRequest, giftRequest
+    switch ( parsedData.type ) {
         case QRCodeTypes.CONTACT_REQUEST:
         case QRCodeTypes.PRIMARY_KEEPER_REQUEST:
         case QRCodeTypes.KEEPER_REQUEST:
           trustedContactRequest = {
-            walletName: scannedData.walletName,
-            encryptedChannelKeys: scannedData.encryptedChannelKeys,
-            encryptionType: scannedData.encryptionType,
-            encryptionHint: scannedData.encryptionHint,
-            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST || scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
-            isPrimaryKeeper: scannedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
+            walletName: parsedData.walletName,
+            encryptedChannelKeys: parsedData.encryptedChannelKeys,
+            encryptionType: parsedData.encryptionType,
+            encryptionHint: parsedData.encryptionHint,
+            isKeeper: parsedData.type === QRCodeTypes.KEEPER_REQUEST || parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
             isExistingContact: false,
             isQR: true,
-            version: scannedData.version,
-            type: scannedData.type,
+            version: parsedData.version,
+            type: parsedData.type,
           }
           break
 
         case QRCodeTypes.EXISTING_CONTACT:
           trustedContactRequest = {
-            walletName: scannedData.walletName,
-            channelKey: scannedData.channelKey,
-            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            walletName: parsedData.walletName,
+            channelKey: parsedData.channelKey,
+            contactsSecondaryChannelKey: parsedData.secondaryChannelKey,
             isKeeper: true,
             isQR: true,
-            version: scannedData.version,
-            type: scannedData.type,
+            version: parsedData.version,
+            type: parsedData.type,
             isExistingContact: true
           }
           break
 
         case QRCodeTypes.APPROVE_KEEPER:
           trustedContactRequest = {
-            walletName: scannedData.walletName,
-            channelKey: scannedData.channelKey,
-            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            walletName: parsedData.walletName,
+            channelKey: parsedData.channelKey,
+            contactsSecondaryChannelKey: parsedData.secondaryChannelKey,
             isKeeper: false,
             isQR: true,
-            version: scannedData.version,
-            type: scannedData.type,
+            version: parsedData.version,
+            type: parsedData.type,
             isExistingContact: false
+          }
+          break
+
+        case QRCodeTypes.GIFT:
+          giftRequest = {
+            walletName: parsedData.walletName,
+            encryptedChannelKeys: parsedData.encryptedChannelKeys,
+            encryptionType: parsedData.encryptionType,
+            encryptionHint: parsedData.encryptionHint,
+            channelAddress: parsedData.channelAddress,
+            amount: parsedData.amount,
+            note: parsedData.note,
+            themeId: parsedData.themeId,
+            version: parsedData.version,
+            type: parsedData.type,
+            isQR: true,
+          }
+          break
+
+        case QRCodeTypes.CONTACT_GIFT:
+          trustedContactRequest = {
+            walletName: parsedData.walletName,
+            encryptedChannelKeys: parsedData.encryptedChannelKeys,
+            encryptionType: parsedData.encryptionType,
+            encryptionHint: parsedData.encryptionHint,
+            isKeeper: parsedData.type === QRCodeTypes.KEEPER_REQUEST || parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST, // only used as a flag for the UI(not to be passed to initTC during approval)
+            isPrimaryKeeper: parsedData.type === QRCodeTypes.PRIMARY_KEEPER_REQUEST,
+            isContactGift: true,
+            channelAddress: parsedData.channelAddress,
+            amount: parsedData.amount,
+            note: parsedData.note,
+            themeId: parsedData.themeId,
+            isExistingContact: false,
+            isQR: true,
+            version: parsedData.version,
+            type: parsedData.type,
           }
           break
     }
 
-    return trustedContactRequest
+    return {
+      trustedContactRequest, giftRequest
+    }
   } catch ( err ) {
     Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
   }

@@ -35,6 +35,7 @@ public class MainActivity extends ReactActivity {
         super.onCreate(savedInstanceState);
         View v = findViewById(android.R.id.content);
         v.setFilterTouchesWhenObscured(true);
+        getWindow().setNavigationBarColor(getResources().getColor(R.color.blue));
     }
 
     @Override

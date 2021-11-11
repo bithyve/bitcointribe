@@ -21,6 +21,7 @@ import java.util.Date;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.print.PrintManager;
+import android.util.Log;
 
 
 import com.itextpdf.text.Anchor;
@@ -80,9 +81,13 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         try {
             JSONObject jsonObj = new JSONObject(pdfData);
             Document document = new Document(PageSize.A4);
-            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            Context context = this.getCurrentActivity().getApplicationContext();
+
+            String path = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath() +"/"+jsonObj.getString("fileName");
+            Log.d("createPdf: ", path);
+            //String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
             //Create PDFWriter instance.
-            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
+            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(path));
             //Add password protection.
             pdfWriter.setEncryption(jsonObj.getString("password").getBytes(), jsonObj.getString("password").getBytes(),
                     PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
@@ -90,8 +95,9 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             addMetaData(document);
             addTitlePage(document,pdfData);
             document.close();
-            successCallback.invoke(outPath);
+            successCallback.invoke(path);
         } catch (Exception e) {
+            Log.e("createPdf: ", e.toString());
             errorCallback.invoke(e.getMessage());
         }
     }
@@ -313,15 +319,19 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         try {
             JSONObject jsonObj = new JSONObject(pdfData);
             Document document = new Document(PageSize.A4);
-            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            //String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            Context context = this.getCurrentActivity().getApplicationContext();
+            String path = context.getExternalFilesDir(null).getPath() +"/"+jsonObj.getString("fileName");
+            Log.d("createPdf: ", path);
             //Create PDFWriter instance.
-            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
+            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
             addMetaData(document);
             addTitlePageKeeper(document,pdfData);
             document.close();
-            successCallback.invoke(outPath);
+            successCallback.invoke(path);
         } catch (Exception e) {
+            Log.d("createPdf: ", e.toString());
             errorCallback.invoke(e.getMessage());
         }
     }

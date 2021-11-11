@@ -298,6 +298,51 @@ const updateBHR = async ( data ) => {
   }
 }
 
+const createGifts = async ( gifts ) => {
+  try {
+    gifts.forEach( gift => {
+      createGift( gift )
+    } )
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+const createGift = async ( gift ) => {
+  try {
+    db.create( schema.Gifts, gift, true )
+    return true
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+const updateGift = ( id, gift  ) => {
+  try {
+    let giftRef = db.objects( schema.Gifts ).filtered( `id = "${id}"` )
+    if( giftRef.length > 0 ) {
+      db.write( ()=> {
+        giftRef = gift
+      } )
+    }
+    //db.create( schema.Gifts, gift, true )
+    return true
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+const getGifts = ( ids ) => {
+  if( ids ) {
+    const idsQuery = ids.map( id => `id = "${id}"` ).join( ' OR ' )
+    const giftsRef = db.objects( schema.Gifts ).filtered( `(${idsQuery})` )
+    return giftsRef
+  } else {
+    const giftsRef = db.objects( schema.Gifts )
+    return giftsRef
+  }
+}
+
 const getWallet = () => {
   const walletsRef = db.objects( schema.Wallet )
   const wallets = Array.from( walletsRef )
@@ -354,5 +399,9 @@ export default {
   updateBHR,
   markAccountChecked,
   updateTransaction,
-  updateTransactions
+  updateTransactions,
+  getGifts,
+  createGifts,
+  createGift,
+  updateGift
 }

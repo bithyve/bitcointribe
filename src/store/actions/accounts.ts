@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Account, Accounts, ContactInfo, DonationAccount } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, ContactInfo, DonationAccount, Gift } from '../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -64,6 +64,8 @@ export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
 export const SET_SHOW_ALL_ACCOUNT = 'SET_SHOW_ALL_ACCOUNT'
 export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
 export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
+
+export const GENERATE_GIFTS = 'GENERATE_GIFTS'
 
 export const getAllAccountsData = () => {
   return {
@@ -551,6 +553,15 @@ export const accountShellOrderedToFront = (
   }
 }
 
+export const generateGifts = ( { amounts, accountId, includeFee }:{amounts: number[], accountId?: string, includeFee?: boolean } ) => {
+  return {
+    type: GENERATE_GIFTS,
+    payload: {
+      accountId, amounts, includeFee
+    }
+  }
+}
+
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED'
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED'
@@ -573,6 +584,10 @@ export const TRANSACTION_REASSIGNMENT_FAILED =
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 export const BLIND_REFRESH_STARTED = 'BLIND_REFRESH_STARTED'
+export const UPDATE_GIFT = 'UPDATE_GIFT'
+export const GIFT_ACCEPTED = 'GIFT_ACCEPTED'
+export const GIFT_ADDED = 'GIFT_ADDED'
+export const SET_GIFTS = 'SET_GIFTS'
 
 export const testcoinsReceived = ( ) => {
   return {
@@ -798,6 +813,38 @@ export const setResetTwoFALoader = ( flag ) => {
   return {
     type: RESET_TWO_FA_LOADER, payload:{
       flag
+    }
+  }
+}
+
+export const updateGift = ( gift: Gift ) => {
+  return {
+    type: UPDATE_GIFT,
+    payload: {
+      gift
+    }
+  }
+}
+export const giftAccepted = ( channelAddress ) => {
+  return {
+    type: GIFT_ACCEPTED,
+    payload: channelAddress
+  }
+}
+export const giftAddedToAccount = ( channelAddress ) => {
+  return {
+    type: GIFT_ADDED,
+    payload: channelAddress
+  }
+}
+
+export const setGifts = ( gifts:{
+    [id: string]: Gift
+  } ) => {
+  return {
+    type: SET_GIFTS,
+    payload: {
+      gifts
     }
   }
 }

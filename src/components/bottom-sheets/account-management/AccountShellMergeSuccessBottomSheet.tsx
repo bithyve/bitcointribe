@@ -31,11 +31,7 @@ const AccountShellItem: React.FC<ItemProps> = ( { accountShell, }: ItemProps ) =
 
   return (
     <ListItem>
-      <Image
-        source={getAvatarForSubAccount( primarySubAccount )}
-        style={styles.avatarImage}
-        resizeMode="contain"
-      />
+      {getAvatarForSubAccount( primarySubAccount )}
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title
@@ -99,10 +95,10 @@ const AccountShellMergeSuccessBottomSheet: React.FC<Props> = ( {
         </View>
 
         <View style={styles.actionButtonContainer}>
-        <ButtonBlue
-          buttonText="View Account"
-          handleButtonPress={onViewAccountDetailsPressed}
-        />
+          <ButtonBlue
+            buttonText="View Account"
+            handleButtonPress={onViewAccountDetailsPressed}
+          />
         </View>
       </View>
     </View>

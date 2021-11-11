@@ -56,12 +56,13 @@ import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
 import { getCloudDataRecovery, clearCloudCache, setCloudBackupStatus, setCloudErrorMessage } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setVersion } from '../../store/actions/versionHistory'
-import QuestionList from '../../common/QuestionList'
+//import QuestionList from '../../common/QuestionList'
 import SecurityQuestion from './SecurityQuestion'
 import { completedWalletSetup, initializeRecovery } from '../../store/actions/setupAndAuth'
 import ModalContainer from '../../components/home/ModalContainer'
 import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import { translations } from '../../common/content/LocContext'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -136,6 +137,8 @@ interface RestoreWithICloudStateTypes {
   currentLevel: number;
   errorModalTitle: string,
   errorModalInfo: string,
+  strings: object;
+  common: object;
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -229,7 +232,8 @@ class RestoreWithICloud extends Component<
       renderTimer: false,
       walletName: '',
       loaderMessage: {
-        heading: 'Creating your wallet', text: 'This may take a short time, while the app sets it all up for you:'
+        heading: translations[ 'bhr' ].Creatingyourwallet,
+        text: translations[ 'bhr' ].Thismaytake
       },
       question: '',
       answer: '',
@@ -246,12 +250,14 @@ class RestoreWithICloud extends Component<
       backupModal: false,
       errorModalTitle: '',
       errorModalInfo: '',
+      strings: translations [ 'bhr' ],
+      common: translations [ 'common' ],
     }
-    this.bottomTextMessage = 'Hexa encrypts and secures all the data on the app and any communication that goes out'
+    this.bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
     this.subPoints = [
-      'Setting up multiple accounts',
-      'Automatically creating backup on the cloud',
-      'Preloading the Test Account with test sats',
+      translations[ 'bhr' ].Settingupmultipleaccounts,
+      translations[ 'bhr' ].Automaticallycreatingbackup,
+      translations[ 'bhr' ].Preloading,
     ]
   }
 
@@ -448,7 +454,7 @@ class RestoreWithICloud extends Component<
   };
 
   getQuestion = ( questionId ) => {
-    return QuestionList.filter( item => {
+    return translations.login.questionList.filter( item => {
       if ( item.id === questionId ) return item.question
     } )
   }
@@ -496,8 +502,11 @@ class RestoreWithICloud extends Component<
       setTimeout( () => {
         this.setState( {
           errorModal: true,
-          errorModalTitle: 'Cloud Restore failed',
-          errorModalInfo: this.props.cloudErrorMessage,
+          errorModalTitle: this.state.strings[ 'CloudRestorefailed' ],
+          errorModalInfo: Platform.select( {
+            ios: translations.iCloudErrors[ this.props.cloudErrorMessage ],
+            android: translations.driveErrors[ this.props.cloudErrorMessage ],
+          } ),
         }, () => {
           this.props.setCloudErrorMessage( '' )
         } )
@@ -554,8 +563,8 @@ class RestoreWithICloud extends Component<
         // ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
         this.setState( {
           errorModal: true,
-          errorModalTitle: 'Error receiving Recovery Key',
-          errorModalInfo: 'There was an error while receiving your Recovery Key, please try again',
+          errorModalTitle: this.state.strings[ 'ErrorreceivingRecoveryKey' ],
+          errorModalInfo: this.state.strings[ 'errorwhilereceiving' ],
         } )
       }
     }
@@ -805,23 +814,23 @@ class RestoreWithICloud extends Component<
   }
 
   renderContent = () => {
-    const { selectedBackup, hideShow } = this.state
+    const { selectedBackup, hideShow, strings, common } = this.state
     const { navigation } = this.props
     return (
       <RestoreFromICloud
-        title={`Recover from ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
+        title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText={
-          'Clicking on Recover would source your Recovery Key from iCloud'
+          strings[ 'Clickingon' ]
         }
-        cardInfo={'Restoring Wallet from'}
+        cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
         levelStatus={
           `${selectedBackup &&selectedBackup.levelStatus
             ? `${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'} backup at Level ${selectedBackup.levelStatus}`
             : ''}`
         }
-        proceedButtonText={'Recover'}
-        backButtonText={'Back'}
+        proceedButtonText={strings[ 'Recover' ]}
+        backButtonText={common[ 'back' ]}
         modalRef={this.RestoreFromICloud}
         onPressProceed={() => {
           //(this.RestoreFromICloud as any).current.snapTo(0);
@@ -880,7 +889,9 @@ class RestoreWithICloud extends Component<
       shareOTPModal,
       restoreWallet,
       contactListModal,
-      backupModal
+      backupModal,
+      common,
+      strings
     } = this.state
     const { navigation } = this.props
     return (
@@ -916,10 +927,10 @@ class RestoreWithICloud extends Component<
               justifyContent: 'center', width: wp( '80%' )
             }}>
               <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
-                {'Recover using keys'}
+                {strings[ 'Recoverusingkeys' ]}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-                The status of your Recovery Key request is visible below
+                {strings[ 'statusofyourRecovery' ]}
               </Text>
             </View>
           </View>
@@ -983,7 +994,7 @@ class RestoreWithICloud extends Component<
                     </Text>
                     <Text style={styles.cardsInfoText}>{item.info}</Text>
                     <Text style={styles.cardsInfoText}>
-                      Last backup {item.time}
+                      {strings[ 'Lastbackup' ]} {item.time}
                     </Text>
                   </View>
                   {item.status == 'received' ? (
@@ -1000,7 +1011,7 @@ class RestoreWithICloud extends Component<
                           backgroundColor: Colors.lightGreen,
                         }}
                       >
-                        <Text style={styles.statusText}>Key Received</Text>
+                        <Text style={styles.statusText}>{strings[ 'KeyReceived' ]}</Text>
                       </View>
                       <View
                         style={{
@@ -1022,7 +1033,7 @@ class RestoreWithICloud extends Component<
                     </View>
                   ) : (
                     <View style={styles.statusTextView}>
-                      <Text style={styles.statusText}>Waiting for Key</Text>
+                      <Text style={styles.statusText}>{strings[ 'WaitingforKey' ]}</Text>
                     </View>
                   )}
                 </View>
@@ -1040,7 +1051,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <Text style={styles.modalHeaderInfoText}>
-            Use Send Request to share a link with a contact. If the person you wish to backup your Recovery Key with, is with you in person, use Scan Key. Or they could also send you a screenshot of the QR for you to scan
+            {strings[ 'UseSendRequest' ]}
           </Text>
         </View>
         <View
@@ -1078,7 +1089,7 @@ class RestoreWithICloud extends Component<
               source={require( '../../assets/images/icons/openlink.png' )}
               style={styles.buttonImage}
             />
-            <Text style={styles.buttonText}>Send Request</Text>
+            <Text style={styles.buttonText}>{strings[ 'SendRequest' ]}</Text>
           </TouchableOpacity>
           <View
             style={{
@@ -1099,7 +1110,7 @@ class RestoreWithICloud extends Component<
               source={require( '../../assets/images/icons/qr-code.png' )}
               style={styles.buttonImage}
             />
-            <Text style={styles.buttonText}>Scan Key</Text>
+            <Text style={styles.buttonText}>{strings[ 'ScanKey' ]}</Text>
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
@@ -1113,9 +1124,9 @@ class RestoreWithICloud extends Component<
         </ModalContainer>
         <ModalContainer visible={contactListModal} closeBottomSheet={() => { }} >
           <ContactListForRestore
-            title={'Select Contact'}
+            title={strings[ 'SelectContact' ]}
             subText={
-              'Select contact to send a Wallet Recovery request link'
+              strings[ 'Selectcontactto' ]
             }
             contactList={contactList}
             modalRef={this.ContactListForRestore}
@@ -1264,10 +1275,10 @@ class RestoreWithICloud extends Component<
             modalRef={this.ErrorBottomSheet}
             title={this.state.errorModalTitle}
             info={this.state.errorModalInfo}
-            proceedButtonText={'Try again'}
+            proceedButtonText={this.state.common[ 'tryAgain' ]}
             onPressProceed={() => {
               // ( this.ErrorBottomSheet as any ).current.snapTo( 0 )
-              if( this.state.errorModalTitle === 'Cloud Restore failed' ) {
+              if( this.state.errorModalTitle === this.state.strings[ 'CloudRestorefailed' ] ) {
                 this.cloudData()
               }
               this.setState( {
@@ -1280,9 +1291,9 @@ class RestoreWithICloud extends Component<
         </ModalContainer>
         <ModalContainer visible={sendViaLinkModal} closeBottomSheet={() => { }} >
           {selectedContact.data && <SendViaLink
-            headerText={'Send Request'}
-            subHeaderText={'Send a recovery request link'}
-            contactText={'Requesting for recovery:'}
+            headerText={strings[ 'SendRequest' ]}
+            subHeaderText={strings[ 'Sendrecoveryrequestlink' ]}
+            contactText={strings[ 'Requestingforrecovery' ]}
             contact={selectedContact.data ? selectedContact.data : null}
             contactEmail={''}
             infoText={`Click here to accept Keeper request for ${this.state.walletName
