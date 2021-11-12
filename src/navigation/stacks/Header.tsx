@@ -1319,7 +1319,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToAccount = ( txid ) => {
-    const accountShellId = this.props.accountShells.find( value=>value.primarySubAccount.transactions.find( v => v.txid == txid ) )?this.props.accountShells.find( value=>value.primarySubAccount.transactions.find( v => v.txid == txid ) ).id : ''
+    const accountShellId = this.props.accountShells.find( value=>value.primarySubAccount.transactions.find( v => v.txid == txid ) ) ? this.props.accountShells.find( value=>value.primarySubAccount.transactions.find( v => v.txid == txid ) ).id : this.props.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 ) ? this.props.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 ).id : ''
     if( accountShellId )
       this.props.navigation.navigate( 'AccountDetails', {
         accountShellID: accountShellId,
@@ -1510,11 +1510,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
         case BottomSheetKind.NOTIFICATION_INFO:
-          let { notificationType} = this.state
-          let isIgnoreButton = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' || notificationType == NotificationType.FNF_REQUEST_ACCEPTED || notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? true : false
-          let proceedButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? "Proceed" : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? "Proceed" : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? "Proceed" : 'Okay'
-          let cancelButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? "Ok" : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? "Ok" : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? "Ok" : ''
-
+          const { notificationType } = this.state
+          const isIgnoreButton = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' || notificationType == NotificationType.FNF_REQUEST_ACCEPTED || notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? true : false
+          const proceedButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? 'Proceed' : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? 'Proceed' : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? 'Proceed' : 'Okay'
+          const cancelButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? 'Ok' : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? 'Ok' : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? 'Ok' : ''
 
           return (
             <NotificationInfoContents
@@ -1539,7 +1538,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
                       this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'I am the Keeper of' )
                       break
-                    
+
                     default:
                       break
                 }
