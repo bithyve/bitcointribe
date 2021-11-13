@@ -393,12 +393,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if( this.currentNotificationId !== '' ) {
         const message = messages.find( message => message.notificationId === this.currentNotificationId )
         if( message ){
+          console.log( 'ON NOTIFICATION 1' )
           this.handleNotificationBottomSheetSelection( message )
         }
         this.currentNotificationId = ''
       } else {
         const message = messages.find( message => message.additionalInfo === null &&  message.status === 'unread' )
         if( message ){
+          console.log( 'ON NOTIFICATION 2' )
           this.handleNotificationBottomSheetSelection( message )
         }
       }
@@ -605,15 +607,32 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // largeIcon: 'ic_launcher',
       // smallIcon:'ic_notification',
       onNotification: ( notification ) => {
+        console.log( 'notification', notification )
         this.props.getMessages()
+        let additionalData: any
         if( notification.data && notification.data.content ){
           const { content } = notification.data
+          additionalData = JSON.parse( content )
           const notificationId = JSON.parse( content ).notificationId
           this.currentNotificationId = notificationId
         } else if( notification.data[ 'google.message_id' ] ){
           const notificationId = notification.data[ 'google.message_id' ]
           this.currentNotificationId = notificationId
         }
+
+        this.setState( {
+          notificationTitle: 'message.title',
+          notificationInfo: 'message.info',
+          notificationNote: '',
+          notificationAdditionalInfo: additionalData,
+          notificationProceedText: 'Okay',
+          notificationIgnoreText: '',
+          isIgnoreButton: false,
+          notificationType: additionalData.notificationType
+        }, () => {
+          this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+        } )
+        console.log( 'ON NOTIFICATION 4' )
         this.notificationCheck()
         // process the notification
         if ( notification.data ) {
@@ -1048,6 +1067,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     console.log( 'value', value )
     // if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
     // if( value.type !== NotificationType.FNF_KEEPER_REQUEST )
+    console.log( 'ON NOTIFICATION 3' )
     this.handleNotificationBottomSheetSelection( value )
   };
 
@@ -1510,10 +1530,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
         case BottomSheetKind.NOTIFICATION_INFO:
+          this.readAllNotifications()
           const { notificationType } = this.state
           const isIgnoreButton = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' || notificationType == NotificationType.FNF_REQUEST_ACCEPTED || notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? true : false
           const proceedButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? 'Proceed' : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? 'Proceed' : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? 'Proceed' : 'Okay'
           const cancelButtonText = notificationType == NotificationType.FNF_TRANSACTION || notificationType == 'contact' ? 'Ok' : notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? 'Ok' : notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? 'Ok' : ''
+          console.log( 'NOTIFICATION_INFO notificationType', notificationType )
 
           return (
             <NotificationInfoContents
