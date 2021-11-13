@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Image, Text, StyleSheet, } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, } from 'react-native'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -8,15 +8,13 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export default function NotificationInfoContents( props ) {
 
   return (
-    <View style={{
-      ...styles.modalContentContainer
-    }}>
-      <View style={{
-      }}>
+    <View style={styles.modalContentContainer}>
+      <>
         <View style={styles.successModalHeaderView}>
           <Text
             style={{
@@ -31,50 +29,22 @@ export default function NotificationInfoContents( props ) {
           </Text>
           {
             props.cancelButtonText !== '' && (
-              <AppBottomSheetTouchableWrapper
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => props.onPressClose()}
                 style={{
-                  height: wp( '8%' ),
-                  width: wp( '20%' ),
+                  width: wp( 7 ), height: wp( 7 ),
+                  borderRadius: wp( 7/2 ),
+                  alignSelf: 'flex-end',
                   backgroundColor: Colors.lightBlue,
-                  borderWidth: 1,
-                  borderColor: Colors.borderColor,
-                  borderRadius: 7,
-                  marginLeft: 'auto',
-                  justifyContent: 'center',
                   alignItems: 'center',
-                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  marginLeft:'auto',
                 }}
-                onPress={() => {
-                  props.onPressClose()
-                }
-                }
               >
-                <Text
-                  onPress={() => {
-                    props.onPressClose()
-                  }
-                  }
-                  style={{
-                    color: Colors.white,
-                    fontSize: RFValue( 12 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                    Close
-                </Text>
-                <Image
-                  style={{
-                    width: 12,
-                    height: 12,
-                    resizeMode: 'contain',
-                    marginLeft: 5,
-                  }}
-                  source={require( '../assets/images/icons/icon_remove.png' )}
-                />
-              </AppBottomSheetTouchableWrapper>
-            )
+                <FontAwesome name="close" color={Colors.white} size={19}/>
+              </TouchableOpacity> )
           }
-
         </View>
 
         {props.info &&
@@ -83,11 +53,11 @@ export default function NotificationInfoContents( props ) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 marginLeft: wp( '8%' ),
+                marginRight: wp( '8%' )
               }}
             >
               <Text
                 style={{
-                  marginLeft: wp( '2%' ),
                   color: Colors.greyTextColor,
                   fontSize: RFValue( 13 ),
                   fontFamily: Fonts.FiraSansRegular,
@@ -97,6 +67,7 @@ export default function NotificationInfoContents( props ) {
               </Text>
             </View>
         }
+
         <View
           style={{
             flexDirection: 'row',
@@ -106,7 +77,6 @@ export default function NotificationInfoContents( props ) {
         >
           <Text
             style={{
-              marginLeft: wp( '2%' ),
               color: Colors.blue,
               fontSize: RFValue( 13 ),
               fontFamily: Fonts.FiraSansRegular,
@@ -115,48 +85,14 @@ export default function NotificationInfoContents( props ) {
             {props.releaseNotes}
           </Text>
         </View>
-        {/* {props.info && props.info.map( ( value, index ) => {
-          return (
-            <View
-              key={index}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginLeft: wp( '8%' ),
-              }}
-            >
-              <Octicons
-                name={'primitive-dot'}
-                size={RFValue( 10 )}
-                color={Colors.blue}
-              />
-              <Text
-                style={{
-                  marginLeft: wp( '2%' ),
-                  color: Colors.blue,
-                  fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {value}
-              </Text>
-            </View>
-          )
-        } )} */}
-
         <View
           style={{
-            marginTop: 'auto',
+            marginTop: wp( '3%' ),
             marginBottom: hp( '5%' ),
             marginLeft: wp( '8%' ),
           }}
         >
-          <Text style={{
-            ...styles.modalInfoText, marginBottom: hp( '3%' )
-          }}>
-            {props.note}
-          </Text>
-
+          {props.note ?<Text style={styles.modalInfoText}>{props.note}</Text>: null}
           <View
             style={{
               flexDirection: 'row',
@@ -167,39 +103,26 @@ export default function NotificationInfoContents( props ) {
             <AppBottomSheetTouchableWrapper
               disabled={false}
               onPress={props.onPressProceed}
-              style={{
-                ...styles.successModalButtonView
-              }}
+              style={styles.successModalButtonView}
             >
-              <Text style={styles.proceedButtonText}>
-                {props.proceedButtonText}</Text>
+              <Text style={styles.proceedButtonText}>{props.proceedButtonText}</Text>
             </AppBottomSheetTouchableWrapper>
-
-
             {
               props.cancelButtonText !== '' && (
                 <AppBottomSheetTouchableWrapper
-                  onPress={() => {
-                    props.onPressIgnore()
-                  // if ( isOpenFromNotificationList ) props.navigation.goBack()
-                  // else
-                  //   onClick( false, true )
-                  }}
+                  onPress={() => props.onPressIgnore()}
                   style={{
                     height: wp( '13%' ),
-                    width: wp( '35%' ),
+                    width: 'auto',
                     justifyContent: 'center',
                     alignItems: 'center',
                     marginLeft: 15,
+                    paddingRight: wp( '5%' ),
+                    paddingLeft: wp( '5%' ),
                   }}
                 >
                   <Text
-                    onPress={() => {
-                      props.onPressIgnore()
-                    // if ( isOpenFromNotificationList ) props.navigation.goBack()
-                    // else
-                    //   onClick( false, true )
-                    }}
+                    onPress={() => props.onPressIgnore()}
                     style={{
                       ...styles.proceedButtonText, color: Colors.blue
                     }}
@@ -212,7 +135,7 @@ export default function NotificationInfoContents( props ) {
 
           </View>
         </View>
-      </View>
+      </>
     </View>
   )
 }
@@ -222,13 +145,17 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
-    margin: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: wp( '8%' ),
+    marginBottom: wp( '4%' ),
+    marginRight: wp( '6%' ),
     flexDirection:'row'
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
+    marginBottom: hp( '3%' )
   },
   successModalAmountView: {
     justifyContent: 'center',
@@ -250,7 +177,6 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
-    marginLeft: wp( '4%' ),
   },
   successModalImage: {
     width: wp( '30%' ),

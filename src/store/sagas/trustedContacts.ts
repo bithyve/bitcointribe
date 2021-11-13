@@ -595,6 +595,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         if( fcmToken && walletID ){
           let notifType, notifBody, notifTitle
           switch( temporaryContact.relationType ){
+              case TrustedContactRelationTypes.WARD:
               case TrustedContactRelationTypes.KEEPER:
                 notifType = notificationType.FNF_KEEPER_REQUEST_REJECTED
                 notifTitle = 'Friends & Family notification'
@@ -604,7 +605,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               default:
                 notifType = notificationType.FNF_REQUEST_REJECTED
                 notifTitle = 'Friends & Family notification'
-                notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
+                notifBody = `Friends & Family request rejected by ${nameAssociatedByContact || wallet.walletName}`
           }
 
           const notification: INotification = {

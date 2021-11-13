@@ -160,6 +160,7 @@ class ContactDetails extends PureComponent<
   strings: object;
   common: object;
   isFromApproval: boolean;
+  trustedContact: TrustedContact;
 
   constructor( props ) {
     super( props )
@@ -234,9 +235,11 @@ class ContactDetails extends PureComponent<
     if ( this.contactsType == 'Keeper' ) {
       this.isExistingContact = this.contact.channelKey && this.props.keeperInfo.find( value => value.channelKey == this.contact.channelKey ) ? true : false
     }
+    this.trustedContact = this.props.trustedContacts[ this.contact.channelKey ]
   }
 
   componentDidMount() {
+    console.log( 'this.trustedContact', this.trustedContact )
     this.props.setSecondaryDataInfoStatus( false )
     this.setState( {
       showLoader: false
@@ -887,6 +890,16 @@ class ContactDetails extends PureComponent<
             <Text style={styles.titleSubText}>
             18 June ‘21
             </Text> */}
+          {this.contact.lastSeenActive &&
+          <>
+            <Text style={styles.titleText}>
+              {'Last Seen'}
+            </Text>
+            <Text style={styles.titleSubText}>
+              {`${moment( this.contact.lastSeenActive ).format( 'dddd, MMMM Do YYYY, h:mm:ss a' )}`}
+            </Text>
+          </>
+          }
           {this.contact.walletName &&
           <>
             <Text style={styles.titleText}>

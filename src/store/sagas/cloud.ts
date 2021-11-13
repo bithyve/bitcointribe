@@ -30,6 +30,7 @@ const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[]
 
 
 function* cloudWorker( { payload } ) {
+  const cloudBackupHistory = yield select( ( state ) => state.cloud.cloudBackupHistory )
   try{
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -64,7 +65,7 @@ function* cloudWorker( { payload } ) {
         keeperInfo.push( obj )
       }
       yield put( putKeeperInfo( keeperInfo ) )
-      const cloudBackupHistory = yield select( ( state ) => state.cloud.cloudBackupHistory )
+
       const wallet: Wallet = yield select(
         ( state ) => state.storage.wallet
       )
@@ -188,6 +189,9 @@ function* cloudWorker( { payload } ) {
     }
   }
   catch ( error ) {
+    const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
+    const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+    yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     console.log( 'ERROR cloudWorker', error )
   }
