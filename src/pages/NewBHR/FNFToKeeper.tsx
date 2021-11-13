@@ -579,7 +579,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '47%' ) : DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
+            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '47%' ) : DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '73%' ),
           }}>
             {filterContactData ? (
               <FlatList
