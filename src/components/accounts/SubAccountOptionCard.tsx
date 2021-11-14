@@ -57,6 +57,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     return {
       ...styles.titleText,
       color: isSelected ? Colors.white : Colors.primaryText,
+      fontFamily: Fonts.FiraSansMedium
     }
   }, [ isSelected ] )
 
@@ -64,6 +65,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     return {
       ...styles.subtitleText,
       color: isSelected ? Colors.offWhite : Colors.secondaryText,
+      fontFamily: Fonts.FiraSansRegular
     }
   }, [ isSelected ] )
 

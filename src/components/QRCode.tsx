@@ -8,6 +8,8 @@ import QR from 'react-native-qrcode-svg'
 import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import Fonts from '../../src/common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 export type Props = {
   value: string;
@@ -47,9 +49,10 @@ const styles = StyleSheet.create( {
   },
   textQr: {
     color: '#6c6c6c',
-    fontSize: 17,
+    fontSize: RFValue( 17 ),
     textAlign: 'center',
     paddingVertical: 7,
+    fontFamily: Fonts.FiraSansRegular
   },
 } )
 
