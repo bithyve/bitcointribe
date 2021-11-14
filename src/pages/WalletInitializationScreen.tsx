@@ -17,8 +17,11 @@ import Colors from '../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../components/BottomInfoBox'
 import openLink from '../utils/OpenLink'
+import { useDispatch } from 'react-redux'
+import { setCloudDataRecovery } from '../store/actions/cloud'
 
 const WalletInitializationScreen = props => {
+  const dispatch = useDispatch()
   return (
     <SafeAreaView style={{
       flex: 1
@@ -69,6 +72,7 @@ const WalletInitializationScreen = props => {
           </Text>
           <TouchableOpacity
             onPress={async () => {
+              dispatch( setCloudDataRecovery( null ) )
               // if ( await AsyncStorage.getItem( 'recoveryExists' ) ) {
               props.navigation.navigate( 'RestoreWithICloud' )
               //props.navigation.navigate('RestoreSelectedContactsList');
