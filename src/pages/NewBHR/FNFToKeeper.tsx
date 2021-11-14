@@ -4,22 +4,17 @@ import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
-import ContactList from '../../components/ContactList'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import CommonStyles from '../../common/Styles/Styles'
-import HeaderTitle from '../../components/HeaderTitle'
 import { StreamData, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import trustedContacts from '../../store/reducers/trustedContacts'
 import { useSelector, useDispatch } from 'react-redux'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import LastSeenActiveIndicator from '../../components/LastSeenActiveIndicator'
-import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
 import idx from 'idx'
 import { v4 as uuid } from 'uuid'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
@@ -30,7 +25,6 @@ import * as ExpoContacts from 'expo-contacts'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalContainer from '../../components/home/ModalContainer'
 import RadioButton from '../../components/RadioButton'
-import AntDesign from 'react-native-vector-icons/AntDesign'
 import DeviceInfo from 'react-native-device-info'
 import { LocalizationContext } from '../../common/content/LocContext'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
@@ -94,12 +88,10 @@ const FNFToKeeper = ( props ) => {
   const renderContactListItem = useCallback( ( {
     contactDescription,
     index,
-    contact
   }: {
     contactDescription: any;
     index: number;
     contactsType: string;
-    contact: any
   }
   ) => {
     const instreamId = contactDescription.streamId
@@ -111,7 +103,6 @@ const FNFToKeeper = ( props ) => {
     return <TouchableOpacity style={{
       ...styles.listItem, backgroundColor: contact.length && contact[ 0 ].id == contactDescription.contactDetails.id && contact[ 0 ].isExisting ? Colors.primaryAccent : Colors.backgroundColor1
     }} onPress={() => {
-
       const obj = {
         name: contactDescription.contactDetails.contactName,
         imageAvailable: contactDescription.contactDetails.imageAvailable ? true : false,
@@ -124,14 +115,16 @@ const FNFToKeeper = ( props ) => {
       if( contact.length && contact[ 0 ].id == obj.id && contact[ 0 ].isExisting ) {
         setContact( [ ] )
         contactTemp=[]
-      } else {setContact( [ obj ] );contactTemp=[ obj ]}
-      const contacts = filterContactData
-      if( contactTemp.length && contacts.find( ( value )=> value.checked == true ) ){
-        contacts[ contacts.findIndex( ( value )=>value.checked == true ) ].checked = false
+      } else {
+        setContact( [ obj ] )
+        contactTemp=[ obj ]
+      }
+      if( contactTemp.length && filterContactData.find( ( value )=> value.checked == true ) ){
+        filterContactData[ filterContactData.findIndex( ( value )=>value.checked == true ) ].checked = false
       }
       setRadioOnOff( !radioOnOff )
-      setFilterContactData( contacts )
       setIsExistingContact( true )
+      setFilterContactData( filterContactData )
     }}
     >
       <View style={styles.avatarContainer}>
@@ -165,7 +158,7 @@ const FNFToKeeper = ( props ) => {
       </View>
     </TouchableOpacity>
 
-  }, [] )
+  }, [ filterContactData, contact ] )
 
   const onPressContinue = () => {
     props.navigation.state.params.onPressContinue( contact, recreateChannel )
@@ -188,7 +181,6 @@ const FNFToKeeper = ( props ) => {
       }
       setRadioOnOff( !radioOnOff )
       setFilterContactData( filterContactData )
-      // props.onSelectContact( selectedcontactlist )
     }
   }, [ filterContactData ] )
 
@@ -196,16 +188,13 @@ const FNFToKeeper = ( props ) => {
     dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
-      //console.log("chckContactPermission",chckContactPermission)
       if ( !chckContactPermission ) {
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setPermissionsModal( true )
       } else {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
       if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setPermissionsModal( true )
       }
       else {
@@ -217,11 +206,9 @@ const FNFToKeeper = ( props ) => {
   const getContact = () => {
     ExpoContacts.getContactsAsync().then( async ( { data } ) => {
       if ( !data.length ) {
-        //Alert.alert('No contacts found!');
         setErrorMessage(
           strings.Nocontacts,
         )
-        // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
       }
       setContactData( data )
@@ -243,7 +230,6 @@ const FNFToKeeper = ( props ) => {
       const granted = await requestContactsPermission()
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
         setErrorMessage( strings.cannotSelect )
-        // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
         setContactPermissionAndroid( false )
         return
@@ -255,7 +241,6 @@ const FNFToKeeper = ( props ) => {
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
         setErrorMessage( strings.cannotSelect )
-        // ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
         setPermissionsErrModal( true )
         return
       } else {
@@ -360,11 +345,9 @@ const FNFToKeeper = ( props ) => {
         isIgnoreButton={true}
         onPressProceed={() => {
           Linking.openURL( 'app-settings:' )
-          // ( contactListErrorBottomSheet as any ).current.snapTo( 0 )
           setPermissionsErrModal( false )
         }}
         onPressIgnore={() => {
-          // ( contactListErrorBottomSheet as any ).current.snapTo( 0 )
           setPermissionsErrModal( false )
         }}
         isBottomImage={true}
@@ -500,7 +483,6 @@ const FNFToKeeper = ( props ) => {
                   contactDescription: item,
                   index,
                   contactsType: 'Contact',
-                  contact
                 } )
               } ) ) ||
               <View style={styles.noContacts} >
@@ -524,29 +506,6 @@ const FNFToKeeper = ( props ) => {
         }}>{strings.Selectfromaddressbook} </Text>
         <View style={{
         }}>
-          {/* {contact.length > 0 && !contact[ 0 ].isExisting &&
-          <View style={styles.selectedContactContainer}>
-            {contact.map( ( value, index ) => {
-              return (
-                <View key={index} style={styles.selectedContactView}>
-                  <Text style={styles.selectedContactNameText}>
-                    {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
-                    <Text style={{
-                      fontFamily: Fonts.FiraSansMedium
-                    }}>
-                      {value.name ? value.name.split( ' ' )[ 1 ] : ''}
-                    </Text>
-                  </Text>
-                  <AppBottomSheetTouchableWrapper
-                    onPress={() => onCancel( value )}
-                  >
-                    <AntDesign name="close" size={17} color={Colors.white} />
-                  </AppBottomSheetTouchableWrapper>
-                </View>
-              )
-            } )}
-          </View>
-          } */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -593,13 +552,6 @@ const FNFToKeeper = ( props ) => {
                 extraData={radioOnOff}
                 showsVerticalScrollIndicator={false}
                 renderItem={( { item, index } ) => {
-                  let selected = false
-                  if (
-                    contact.findIndex( ( temp ) => temp.id == item.id && !temp.isExisting ) > -1
-                  ) {
-                    selected = true
-                  }
-                  //  if (item.phoneNumbers || item.emails) {
                   return (
                     <AppBottomSheetTouchableWrapper
                       onPress={() => onContactSelect( index )}
@@ -626,10 +578,6 @@ const FNFToKeeper = ( props ) => {
                       </Text>
                     </AppBottomSheetTouchableWrapper>
                   )
-                  // }
-                  // else {
-                  //   return null;
-                  // }
                 }}
               />
             ) : null}
