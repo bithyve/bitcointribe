@@ -40,7 +40,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const [ isConfirm, setIsConfirm ] = useState( false )
   let swanMessage = strings.swanMessage
   let swanTitle = strings.StackSats
-  let  showNote = true
+  let showNote = true
   let accountName = ''
   let accountDescription = ''
   function handleProceedButtonPress() {
@@ -147,13 +147,31 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }} />
         </TouchableOpacity> */}
         <View style={styles.successModalHeaderView}>
-
-          <Text style={styles.modalTitleText}>{swanTitle}</Text>
-
-          <Text style={{
-            ...styles.modalInfoText,
-
-          }}>{swanMessage}</Text>
+          <View style={{
+            flexDirection: 'row',
+          }}>
+            <Text style={{
+              ...styles.modalTitleText,
+            }}>{swanTitle}</Text>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={()=>onPress()}
+              style={{
+                width: wp( 7 ),
+                height: wp( 7 ),
+                borderRadius: wp( 7/2 ),
+                backgroundColor: Colors.lightBlue,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: 'auto',
+              }}
+            >
+              <FontAwesome name="close" color={Colors.white} size={19} style={{
+                // marginTop: hp( 0.5 )
+              }} />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.modalInfoText}>{swanMessage}</Text>
           {showNote &&
             <BottomInfoBox
               // backgroundColor={Colors.white}
@@ -232,11 +250,12 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       <AppBottomSheetTouchableWrapper
         onPress={() => {onPress()}}
         style={{
-          height: wp( '15%' ),
-          width: wp( '36%' ),
+          height: wp( '13%' ),
+          width: 'auto',
           justifyContent: 'center',
           alignItems: 'center',
-          paddingLeft: wp( '8%' ),
+          paddingLeft: wp( '5%' ),
+          paddingRight: wp( '5%' ),
         }}
       >
         <Text
@@ -359,7 +378,7 @@ const styles = StyleSheet.create( {
     color: Colors.black,
   },
   successModalHeaderView: {
-    marginRight: wp( '7%' ),
+    marginRight: wp( '5%' ),
     // marginLeft: wp( '5%' ),
     marginTop: wp( '3.6%' ),
     // flex: 1.7

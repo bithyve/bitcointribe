@@ -244,7 +244,8 @@ const styles = StyleSheet.create( {
   subtitleText: {
     fontSize: RFValue( 10 ),
     letterSpacing: 0.3,
-    color: Colors.gray2
+    color: Colors.gray2,
+    fontFamily: Fonts.FiraSansRegular,
   },
 
   bitcoinImage: {
