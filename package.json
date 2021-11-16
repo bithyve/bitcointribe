@@ -91,7 +91,6 @@
     "mobx": "^6.3.7",
     "mobx-react": "^7.2.1",
     "moment": "^2.27.0",
-    "npm": "^8.1.3",
     "otplib": "^12.0.1",
     "path-browserify": "0.0.0",
     "pkce-utils": "https://github.com/bithyve/pkce-utils.git",
