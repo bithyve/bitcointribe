@@ -262,10 +262,10 @@ const CloudBackupHistory = ( props ) => {
           showButton={showButton}
         />
       </View>
-      <ModalContainer visible={confirmationModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
         {renderCloudPermissionContent()}
       </ModalContainer>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {setErrorModal( false )}}>
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => {setErrorModal( false )}}>
         {renderCloudErrorContent()}
       </ModalContainer>
       {/* <BottomSheet

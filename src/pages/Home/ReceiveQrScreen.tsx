@@ -226,7 +226,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           </AppBottomSheetTouchableWrapper>
 
         </View>}
-        <ModalContainer visible={receiveModal} closeBottomSheet={() => {} } >
+        <ModalContainer onBackground={()=>setReceiveModal( false )} visible={receiveModal} closeBottomSheet={() => {} } >
           {showReceiveAmountBottomSheet()}
         </ModalContainer>
         <BottomInfoBox

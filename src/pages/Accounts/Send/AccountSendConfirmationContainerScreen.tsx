@@ -202,10 +202,10 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       }}
       style={styles.rootContainer}
     >
-      <ModalContainer visible={sendSuccessModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setSuccess( false )} visible={sendSuccessModal} closeBottomSheet={() => {}} >
         {showSendSuccessBottomSheet()}
       </ModalContainer>
-      <ModalContainer visible={sendFailureModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
         {showSendFailureBottomSheet()}
       </ModalContainer>
       <View style={{

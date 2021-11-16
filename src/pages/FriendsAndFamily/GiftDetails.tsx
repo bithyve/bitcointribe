@@ -467,7 +467,7 @@ const GiftDetails = ( { navigation } ) => {
           }, 'Add To Account' )
         ) : null}
       </View>
-      <ModalContainer visible={acceptGift} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
         <View style={styles.modalContentContainer}>
           <AddGiftToAccount
             getTheme={getTheme}

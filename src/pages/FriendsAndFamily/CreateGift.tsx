@@ -436,7 +436,7 @@ const CreateGift = ( { navigation } ) => {
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
         {giftModal &&
-      <ModalContainer visible={giftModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setGiftModal( false )} visible={giftModal} closeBottomSheet={() => {}} >
         {renderCreateGiftModal()}
       </ModalContainer>
         }
@@ -690,7 +690,7 @@ const CreateGift = ( { navigation } ) => {
         </View>
         }
       </SafeAreaView>
-      <ModalContainer visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
+      <ModalContainer onBackground={()=>setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
         {renderAccountList()}
       </ModalContainer>
       {showLoader ? <Loader /> : null}

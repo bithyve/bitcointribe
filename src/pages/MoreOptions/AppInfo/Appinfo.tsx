@@ -164,10 +164,10 @@ const AppInfo = ( props ) => {
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <ModalContainer visible={securityQue} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>showSecurityQuestion( false )} visible={securityQue} closeBottomSheet={() => {}}>
         {requestSecurityQuestionModal()}
       </ModalContainer>
-      <ModalContainer visible={securityPin} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>showSecurityPin( false )} visible={securityPin} closeBottomSheet={() => {}}>
         <EnterPasscodeScreen
           closeBottomSheet={() => showSecurityPin( false )}
           onPressConfirm={async () => {
@@ -177,7 +177,7 @@ const AppInfo = ( props ) => {
           }}
         />
       </ModalContainer>
-      <ModalContainer visible={editName} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>showEditName( false )} visible={editName} closeBottomSheet={() => {}}>
         <EditWalletName
           closeBottomSheet={() => showEditName( false )}
           onPressConfirm={async ( newName ) => {
@@ -191,7 +191,7 @@ const AppInfo = ( props ) => {
           }}
         />
       </ModalContainer>
-      <ModalContainer visible={success} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setSuccess( false )} visible={success} closeBottomSheet={() => {}}>
         <EditWalletSuccess
           closeBottomSheet={() => setSuccess( false )}
           onPressConfirm={() => {

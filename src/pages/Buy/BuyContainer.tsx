@@ -361,7 +361,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
             {/* </View> */}
             {this.state.currentBottomSheetKind != null && (
-              <ModalContainer visible={this.state.currentBottomSheetKind != null} closeBottomSheet={this.closeBottomSheet} >
+              <ModalContainer onBackground={()=>this.setState( {
+                currentBottomSheetKind: null
+              } )} visible={this.state.currentBottomSheetKind != null} closeBottomSheet={this.closeBottomSheet} >
 
                 {/* <View style={styles.containerStyle}> */}
                 {this.renderBottomSheetContent()}
