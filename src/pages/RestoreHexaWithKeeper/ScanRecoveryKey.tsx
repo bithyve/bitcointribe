@@ -218,15 +218,9 @@ class ScanRecoveryKey extends Component<
                 alignSelf: 'center'
               }}
               onPress={() => {
-                // this.barcodeRecognized('{"encryptedKey":"588c2e1a8bdeb88c1708f6c9adb6a59b8668d014f2a78cdafb0f742d6455af0a","otp":"GVVDFB","publicKey":"418184b47230a9673a67451652a185ae984ae6939effaa87d3aae17623008f3a","walletName":"Mac Pro"}');
-
-
-                // this.barcodeRecognized(JSON.stringify({
-                //   encryptedKey: "0cbd51c1a8f5d95d4d35c3304808b4da3df4534c4167838605aca7f01b232ec0",
-                //   otp: "F8D6C5",
-                //   publicKey: "51a5a4b0d33f719cd039eb9421d4bd23b1f0551b0b6e1f8a283291bfbb3b1825",
-                //   walletName: "Mac"
-                // }));
+                // this.barcodeRecognized( {
+                //   data: '{"type":"RECOVERY_REQUEST","walletName":"saa","channelId":"14dca15627cc10722b71181077cf9fb6a8f5558b26dc3e52982fd8e886546eb5","streamId":"7ff00bdcd","channelKey":"eQon5vv7G1yOcS1ARsDgcHuS","secondaryChannelKey":"k8GSj7PBNAM0ty6cZVUAmcQv","version":"2.0.0","walletId":"3f4cc2d8de0fe50ceb7dcb16b8dcee30761c6d296d6ec3d1d14ae39b1954572c"}'
+                // } )
                 this.setState( {
                   isScanned: true
                 } )}}

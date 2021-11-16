@@ -53,7 +53,7 @@ const ModalContainer = ( {
   return(
     <Modal
       visible={visible}
-      onRequestClose={() => { closeBottomSheet() }}
+      onRequestClose={() => { closeBottomSheet ? closeBottomSheet(): null }}
       transparent={true}
       style={{
         flex: 1,

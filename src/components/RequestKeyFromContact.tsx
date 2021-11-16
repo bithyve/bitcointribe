@@ -270,7 +270,7 @@ function RequestKeyFromContact( props ) {
                       fontSize: RFValue( 11 ),
                       fontFamily: Fonts.FiraSansMediumItalic,
                     }}>
-                    Checking Account
+                      {props.accountName}
                     </Text>
                   </Text>
                   <Text style={{
@@ -280,7 +280,7 @@ function RequestKeyFromContact( props ) {
                     marginTop: hp( 0.3 ),
                     lineHeight: 12
                   }}>
-                    {moment().format( 'lll' )}
+                    {moment( ).format( 'lll' )}
                   </Text>
                 </>
               }
@@ -303,7 +303,7 @@ function RequestKeyFromContact( props ) {
               }}> sats
               </Text>
             </Text> */}
-              <More />
+              {!props.isGift &&<More />}
             </View>
 
           </TouchableOpacity>

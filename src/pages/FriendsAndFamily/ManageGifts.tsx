@@ -186,7 +186,7 @@ const ManageGifts = ( { navigation } ) => {
       flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
-      <ModalContainer visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
+      <ModalContainer onBackground={()=>setKnowMore( false )} visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
         <GiftKnowMore closeModal={() => setKnowMore( false )} />
       </ModalContainer>
       <View style={{

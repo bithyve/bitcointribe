@@ -529,7 +529,9 @@ class FriendsAndFamilyScreen extends React.Component<
         {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
-            <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
+            <ModalContainer onBackground={()=>this.setState( {
+              showIndicator: false
+            } )} visible={showIndicator} closeBottomSheet={() => {}}>
               <ActivityIndicator color={Colors.white} size='large'/>
             </ModalContainer>
           }

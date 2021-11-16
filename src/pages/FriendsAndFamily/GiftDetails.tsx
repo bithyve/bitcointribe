@@ -439,7 +439,7 @@ const GiftDetails = ( { navigation } ) => {
       </SafeAreaView>
       <View style={{
         marginBottom: wp( '3%' ), marginTop: wp( '3%' ), flexDirection: 'row',
-        justifyContent: 'space-between', paddingHorizontal: wp( '2%' ),
+        justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ),
         paddingVertical: wp( '2%' ),
       }}>
         {/* Reclaim */}
@@ -456,10 +456,10 @@ const GiftDetails = ( { navigation } ) => {
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift Card' ) ) : null}
         {/* Expire */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
+        {/* {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
           alert( 'Expire' )
         }, 'Expire' )
-        ) : null}
+        ) : null} */}
         {/* Add To Account */}
         {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.REJECTED ) && !gift.receiver.accountId ? (
           bottomButton( () => {
@@ -467,16 +467,15 @@ const GiftDetails = ( { navigation } ) => {
           }, 'Add To Account' )
         ) : null}
       </View>
-      <ModalContainer visible={acceptGift} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
         <View style={styles.modalContentContainer}>
           <AddGiftToAccount
             getTheme={getTheme}
             navigation={navigation}
             giftAmount={gift.amount}
             giftId={( gift as Gift ).id}
-            onCancel={() => {
-              setAcceptGiftModal( false )
-            }}
+            onCancel={() => setAcceptGiftModal( false )}
+            closeModal={()=>setAcceptGiftModal( false )}
           />
         </View>
       </ModalContainer>
