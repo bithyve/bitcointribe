@@ -148,6 +148,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const createGuardian = useCallback(
     async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      setIsChange( isChangeKeeper )
       const isReshareTemp = payload && payload.isReshare ? payload.isReshare : undefined
       if( ( keeperQR || isReshare ) && !isChangeKeeper && !isReshareTemp ) return
       setIsGuardianCreationClicked( true )
@@ -561,9 +562,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 && isPrimaryKeeper ) && ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           isVersionMismatch={isVersionMismatch}
-          onPressChange={() => { setKeeperTypeModal( true ) }}
+          onPressChange={isPrimaryKeeper ? () => { setTimeout( () => {
+            setIsChange( true )
+            setKeeperQR( '' )
+            setIsReshare( false )
+          }, 2 )
+          setChangeModal( true ) } : setKeeperTypeModal( true )}
         />
       </View>
       <ModalContainer onBackground={()=>setShowQr( false )} visible={showQr} closeBottomSheet={() => setShowQr( false )} >
