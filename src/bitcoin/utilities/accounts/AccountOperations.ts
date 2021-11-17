@@ -767,7 +767,22 @@ export default class AccountOperations {
       )
 
       for ( const input of inputs ) {
-        txb.addInput( input.txId, input.vout, nSequence )
+        if( account.type === AccountType.SWAN_ACCOUNT ){
+          // native segwit
+          const privateKey = AccountUtilities.addressToPrivateKey(
+            input.address,
+            account
+          )
+          const keyPair = AccountUtilities.getKeyPair(
+            privateKey,
+            network
+          )
+          const p2wpkh = bitcoinJS.payments.p2wpkh( {
+            pubkey: keyPair.publicKey,
+            network,
+          } )
+          txb.addInput( input.txId, input.vout, nSequence, p2wpkh.output )
+        } else txb.addInput( input.txId, input.vout, nSequence )
       }
 
       const sortedOuts = await AccountUtilities.sortOutputs(
@@ -841,14 +856,26 @@ export default class AccountOperations {
           redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
         }
 
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript,
-          null,
-          input.value,
-          witnessScript,
-        )
+        if( account.type === AccountType.SWAN_ACCOUNT ){
+          // native segwit
+          txb.sign(
+            vin,
+            keyPair,
+            null,
+            null,
+            input.value,
+          )
+        } else {
+          txb.sign(
+            vin,
+            keyPair,
+            redeemScript,
+            null,
+            input.value,
+            witnessScript,
+          )
+        }
+
         vin++
       }
 
