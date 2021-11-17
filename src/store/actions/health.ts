@@ -400,10 +400,10 @@ export const recoverWallet = ( level?, keeperData?, decryptedCloudDataJson? ) =>
   }
 }
 
-export const fetchWalletImage = (  s3Service: S3Service ) => {
+export const fetchWalletImage = (  s3Service: S3Service, WI?: WalletImage ) => {
   return {
     type: FETCH_WALLET_IMAGE_HEALTH, payload: {
-      s3Service
+      s3Service, WI
     }
   }
 }

@@ -1668,7 +1668,7 @@ export default class LevelHealth {
         walletImage
       }
     } catch ( err ) {
-      throw new Error( 'Failed to fetch Wallet Image' )
+      // throw new Error( 'Failed to fetch Wallet Image' )
     }
   };
 

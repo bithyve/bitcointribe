@@ -632,7 +632,7 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     )
     console.log( 's3Service', s3Service )
 
-    yield put( fetchWalletImage( s3Service ) )
+    yield put( fetchWalletImage( s3Service, payload.icloudData.walletImage ) )
 
     yield call(
       AsyncStorage.setItem,
@@ -1354,21 +1354,25 @@ export const updateWalletImageHealthWatcher = createWatcher(
 function* fetchWalletImageWorker( { payload } ) {
   try {
     const s3Service: S3Service = payload.s3Service
-
+    const WITemp: WalletImage = payload.WI
+    let walletImage: WalletImage
     const res = yield call( s3Service.fetchWalletImageKeeper )
     console.log( {
       res
     } )
     //const { walletImage } = payload
-    if ( res.status === 200 ) {
-      const walletImage: WalletImage = res.data.walletImage
+    if ( res.status === 200 && res.data ) {
+      walletImage = res.data.walletImage
       console.log( {
         walletImage
       } )
 
       if ( !Object.keys( walletImage ).length )
         console.log( 'Failed fetch: Empty Wallet Image' )
-
+    } else if( WITemp ){
+      walletImage = WITemp
+    }
+    if( walletImage ){
       // restore DB, Async and State data
       const {
         DECENTRALIZED_BACKUP,
