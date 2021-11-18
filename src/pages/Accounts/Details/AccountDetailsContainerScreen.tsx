@@ -48,6 +48,7 @@ import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets
 import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import { markReadTx } from '../../../store/actions/accounts'
+import ButtonBlue from '../../../components/ButtonBlue'
 
 export type Props = {
   navigation: any;
@@ -138,7 +139,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   function performRefreshOnPullDown() {
     dispatch( refreshAccountShells( [ accountShell ], {
-      hardRefresh: true
+      hardRefresh: true,
+      syncDonationAccount: accountShell.primarySubAccount.type === AccountType.DONATION_ACCOUNT
     } ) )
   }
 
@@ -262,7 +264,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const renderSecureAccountKnowMoreContent = () => {
     return (
       <SavingAccountAlertBeforeLevel2
-        titleClicked={()=>{setSecureAccountAlert( true ); setSecureAccountKnowMore( false ) }}
+        titleClicked={()=>{
+          setSecureAccountAlert( true )
+          setSecureAccountKnowMore( false )
+        }}
         containerStyle={{
         }}
       />
@@ -356,13 +361,17 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                     alignItems: 'center',
                     marginTop: 36,
                   }}>
-                    <Button
+                    <ButtonBlue
+                      buttonText={'Donation Webpage'}
+                      handleButtonPress={()=>showWebView( true )}
+                    />
+                    {/* <Button
                       raised
                       buttonStyle={ButtonStyles.floatingActionButton}
                       title="Donation Webpage"
                       titleStyle={ButtonStyles.actionButtonText}
                       onPress={() => showWebView( true )}
-                    />
+                    /> */}
                   </View>
                 )}
               </View>
@@ -397,20 +406,44 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         stickySectionHeadersEnabled={false}
         keyExtractor={sectionListItemKeyExtractor}
       />
-      <ModalContainer visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
+      <ModalContainer onBackground={()=>setShowMore( false )} visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
         {showKnowMoreSheet()}
       </ModalContainer>
-      <ModalContainer visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
+      <ModalContainer onBackground={()=>showWebView( false )} visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
         <RootSiblingParent>
           {showDonationWebViewSheet()}
         </RootSiblingParent>
       </ModalContainer>
-      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {}} >
-        {renderSecureAccountAlertContent()}
-      </ModalContainer>
-      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => { setSecureAccountAlert( true ); setSecureAccountKnowMore( false )  }} >
-        {renderSecureAccountKnowMoreContent()}
-      </ModalContainer>
+      {
+        primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && (
+          <ModalContainer
+            onBackground={()=>{
+              setSecureAccountAlert( false )
+              setTimeout( () => {
+                setSecureAccountAlert( true )
+              }, 200 )
+            }}
+            visible={secureAccountAlert} closeBottomSheet={() => {
+
+            }} >
+            {renderSecureAccountAlertContent()}
+          </ModalContainer>
+        )
+      }
+
+      {
+        primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && (
+          <ModalContainer onBackground={()=>setSecureAccountKnowMore( false )} visible={secureAccountKnowMore} closeBottomSheet={() => {
+            if( !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ){
+              setSecureAccountAlert( true )
+            }
+            setSecureAccountKnowMore( false )
+          }} >
+            {renderSecureAccountKnowMoreContent()}
+          </ModalContainer>
+        )
+      }
+
     </View>
   )
 }

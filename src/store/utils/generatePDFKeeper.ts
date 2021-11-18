@@ -1,6 +1,7 @@
 import { Platform, NativeModules } from 'react-native'
 import { getFormattedString } from '../../common/CommonFunctions'
 
+let pdfFilePath = ''
 
 export default async ( pdfData, fileName, title ) => {
   const { qrData } = pdfData
@@ -16,26 +17,29 @@ export default async ( pdfData, fileName, title ) => {
     qrcode,
     qrCodeString,
   }
-  const pdfPath = await getPdfPath( pdfDatas )
-  return pdfPath
+  if( Platform.OS=='ios' ){
+    const pdfPath = await getPdfPath( pdfDatas )
+    return pdfPath
+  } else {
+    const PdfPassword = await NativeModules.PdfPassword
+    await PdfPassword.createPdfKeeper(
+      JSON.stringify( pdfDatas ),
+      async ( err: any ) => {
+        return await err
+      },
+      async ( path: any ) => {
+        pdfFilePath = path
+      },
+    )
+    return pdfFilePath
+  }
 }
+
 const getPdfPath = async ( pdfData: any ) => {
   if( pdfData ){
     if ( Platform.OS == 'ios' ) {
       const PdfPassword = await NativeModules.PdfPassword
       return await PdfPassword.createPdfKeeper( JSON.stringify( pdfData ) )
-    } else {
-      const PdfPassword = await NativeModules.PdfPassword
-      await PdfPassword.createPdfKeeper(
-        JSON.stringify( pdfData ),
-        async ( err: any ) => {
-          return await err
-        },
-        async ( path: any ) => {
-          return await path
-        },
-      )
-      return '/storage/emulated/0/' + pdfData.fileName
     }
   }
 }

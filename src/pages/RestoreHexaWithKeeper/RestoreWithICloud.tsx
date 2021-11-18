@@ -10,9 +10,7 @@ import {
   ScrollView,
   Platform,
   ImageBackground,
-  Alert,
   RefreshControl,
-  Modal,
   Keyboard,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -32,52 +30,39 @@ import {
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
-import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
 import RestoreFromICloud from './RestoreFromICloud'
-import DeviceInfo from 'react-native-device-info'
 import RestoreSuccess from './RestoreSuccess'
 import ICloudBackupNotFound from './ICloudBackupNotFound'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import { requestTimedout } from '../../store/utils/utilities'
 import RestoreWallet from './RestoreWallet'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { isEmpty } from '../../common/CommonFunctions'
-import CloudBackup from '../../common/CommonFunctions/CloudBackup'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { decrypt, decrypt1 } from '../../common/encryption'
+import { decrypt } from '../../common/encryption'
 import LoaderModal from '../../components/LoaderModal'
-import TransparentHeaderModal from '../../components/TransparentHeaderModal'
 import Loader from '../../components/loader'
 import {
   recoverWalletUsingIcloud,
   recoverWallet,
-  updateCloudMShare,
   downloadBackupData,
   putKeeperInfo,
-  setupHealth
+  setupHealth,
+  setDownloadedBackupData
 } from '../../store/actions/BHR'
-import axios from 'axios'
-import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/BHR'
+import { initNewBHRFlow } from '../../store/actions/BHR'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import { BackupStreamData, KeeperInfoInterface, MetaShare, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { BackupStreamData, KeeperInfoInterface, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
-import { textWithoutEncoding, email } from 'react-native-communications'
 import ContactListForRestore from './ContactListForRestore'
 import SendViaLink from '../../components/SendViaLink'
 import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
 import { getCloudDataRecovery, clearCloudCache, setCloudBackupStatus, setCloudErrorMessage } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setVersion } from '../../store/actions/versionHistory'
-import QuestionList from '../../common/QuestionList'
+//import QuestionList from '../../common/QuestionList'
 import SecurityQuestion from './SecurityQuestion'
 import { completedWalletSetup, initializeRecovery } from '../../store/actions/setupAndAuth'
 import ModalContainer from '../../components/home/ModalContainer'
-
 import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { translations } from '../../common/content/LocContext'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -122,13 +107,11 @@ const loaderMessages = [
   // }
 ]
 interface RestoreWithICloudStateTypes {
-  selectedIds: any[];
   listData: any[];
   walletsArray: any[];
   cloudBackup: boolean;
   hideShow: boolean;
   selectedBackup: any;
-  metaShares: any[];
   showLoader: boolean;
   refreshControlLoader: boolean;
   selectedContact: any;
@@ -137,7 +120,6 @@ interface RestoreWithICloudStateTypes {
   isOtpType: boolean;
   otp: string;
   renderTimer: boolean;
-  isLinkCreated: boolean;
   loaderMessage: { heading: string; text: string; subText?: string; };
   walletName: string;
   question: string;
@@ -155,6 +137,8 @@ interface RestoreWithICloudStateTypes {
   currentLevel: number;
   errorModalTitle: string,
   errorModalInfo: string,
+  strings: object;
+  common: object;
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -163,16 +147,9 @@ interface RestoreWithICloudPropsTypes {
   database: any;
   security: any;
   recoverWalletUsingIcloud: any;
-  accounts: any;
-  walletImageChecked: any;
-  SERVICES: any;
-  calculateExchangeRate: any;
-  initializeHealthSetup: any;
   recoverWallet: any;
-  updateCloudMShare: any;
   walletRecoveryFailed: boolean;
   requestShare: any;
-  downloadMetaShare: Boolean;
   errorReceiving: Boolean;
   getCloudDataRecovery: any;
   cloudData: any;
@@ -194,8 +171,9 @@ interface RestoreWithICloudPropsTypes {
   keeperInfo: KeeperInfoInterface[];
   setupHealth: any;
   wallet: Wallet;
-  cloudErrorMessage: string,
-  setCloudErrorMessage: any,
+  cloudErrorMessage: string;
+  setCloudErrorMessage: any;
+  setDownloadedBackupData: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -229,7 +207,6 @@ class RestoreWithICloud extends Component<
     this.shareOtpWithTrustedContactBottomSheet = React.createRef()
 
     this.state = {
-      selectedIds: [],
       listData: [],
       walletsArray: [],
       cloudBackup: false,
@@ -244,7 +221,6 @@ class RestoreWithICloud extends Component<
         shares: '',
         keeperData: '',
       },
-      metaShares: [],
       showLoader: false,
       refreshControlLoader: false,
       selectedContact: {
@@ -254,10 +230,10 @@ class RestoreWithICloud extends Component<
       isOtpType: false,
       otp: '',
       renderTimer: false,
-      isLinkCreated: false,
       walletName: '',
       loaderMessage: {
-        heading: 'Creating your wallet', text: 'This may take a short time, while the app sets it all up for you:'
+        heading: translations[ 'bhr' ].Creatingyourwallet,
+        text: translations[ 'bhr' ].Thismaytake
       },
       question: '',
       answer: '',
@@ -274,16 +250,19 @@ class RestoreWithICloud extends Component<
       backupModal: false,
       errorModalTitle: '',
       errorModalInfo: '',
+      strings: translations [ 'bhr' ],
+      common: translations [ 'common' ],
     }
-    this.bottomTextMessage = 'Hexa encrypts and secures all the data on the app and any communication that goes out'
+    this.bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
     this.subPoints = [
-      'Setting up multiple accounts',
-      'Automatically creating backup on the cloud',
-      'Preloading the Test Account with test sats',
+      translations[ 'bhr' ].Settingupmultipleaccounts,
+      translations[ 'bhr' ].Automaticallycreatingbackup,
+      translations[ 'bhr' ].Preloading,
     ]
   }
 
   componentDidMount = () => {
+    this.props.setDownloadedBackupData( [] )
     this.cloudData()
   };
 
@@ -297,8 +276,6 @@ class RestoreWithICloud extends Component<
 
   componentDidUpdate = async ( prevProps, prevState ) => {
     const {
-      walletImageChecked,
-      SERVICES,
       walletRecoveryFailed,
       cloudData,
       walletCheckIn,
@@ -328,19 +305,6 @@ class RestoreWithICloud extends Component<
       } ) )
       this.showCloudRestoreError( )
       this.props.setCloudBackupStatus( CloudBackupStatus.PENDING )
-    }
-    if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
-      completedWalletSetup()
-      await AsyncStorage.setItem( 'walletRecovered', 'true' )
-      setVersion( 'Restored' )
-      initNewBHRFlow( true )
-      walletCheckIn()
-      // if ( this.loaderBottomSheet as any )
-      //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
-      this.setState( {
-        loaderModal: false
-      } )
-      this.props.navigation.navigate( 'HomeNav' )
     }
 
     if( prevProps.wallet != this.props.wallet ){
@@ -382,18 +346,6 @@ class RestoreWithICloud extends Component<
         loaderModal: false
       } )
     }
-
-    // if (
-    //   !this.state.isLinkCreated &&
-    //   this.state.contactList.length &&
-    //   this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ] &&
-    //   this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ].META_SHARE
-    // ) {
-    //   this.setState( {
-    //     isLinkCreated: true
-    //   } )
-    //   this.onCreatLink()
-    // }
 
     if ( prevProps.downloadedBackupData.length == 0 && prevProps.downloadedBackupData != this.props.downloadedBackupData && this.props.downloadedBackupData.length == 1 ) {
       if ( this.props.keeperInfo.length == 0 ) {
@@ -502,7 +454,7 @@ class RestoreWithICloud extends Component<
   };
 
   getQuestion = ( questionId ) => {
-    return QuestionList.filter( item => {
+    return translations.login.questionList.filter( item => {
       if ( item.id === questionId ) return item.question
     } )
   }
@@ -533,25 +485,28 @@ class RestoreWithICloud extends Component<
     } )
   }
 
-  setSecurityQuestionAndName = async () => {
-    const { answer, question, walletName, } = this.state
-    if ( answer && question && walletName ) {
-      const security = {
-        question,
-        answer,
-      }
-      this.props.initializeRecovery( walletName, security )
-    }
+  // setSecurityQuestionAndName = async () => {
+  //   const { answer, question, walletName, } = this.state
+  //   if ( answer && question && walletName ) {
+  //     const security = {
+  //       question,
+  //       answer,
+  //     }
+  //     this.props.initializeRecovery( walletName, security )
+  //   }
 
-  }
+  // }
 
   showCloudRestoreError = () => {
     if( this.props.cloudErrorMessage !== '' ) {
       setTimeout( () => {
         this.setState( {
           errorModal: true,
-          errorModalTitle: 'Cloud Restore failed',
-          errorModalInfo: this.props.cloudErrorMessage,
+          errorModalTitle: this.state.strings[ 'CloudRestorefailed' ],
+          errorModalInfo: Platform.select( {
+            ios: translations.iCloudErrors[ this.props.cloudErrorMessage ],
+            android: translations.driveErrors[ this.props.cloudErrorMessage ],
+          } ),
         }, () => {
           this.props.setCloudErrorMessage( '' )
         } )
@@ -560,16 +515,14 @@ class RestoreWithICloud extends Component<
   }
 
   decryptCloudJson = () => {
-    const { recoverWalletUsingIcloud, accounts } = this.props
+    const { recoverWalletUsingIcloud } = this.props
     const { answer, selectedBackup }: {answer: string, selectedBackup:any} = this.state
     try {
       const key = BHROperations.strechKey( answer )
       const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
-      if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
+      // if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
       const KeeperData: KeeperInfoInterface[] = JSON.parse( selectedBackup.keeperData )
-      if ( this.props.keeperInfo.length == 0 ) {
-        this.setKeeperInfoList( selectedBackup.levelStatus, KeeperData, selectedBackup.dateTime )
-      }
+      this.setKeeperInfoList( selectedBackup.levelStatus, KeeperData, selectedBackup.dateTime )
       if (
         decryptedCloudDataJson && ( selectedBackup.levelStatus == 2 || selectedBackup.levelStatus == 3 )
       ) {
@@ -597,9 +550,6 @@ class RestoreWithICloud extends Component<
         this.props.downloadBackupData( {
           backupData: downloadedBackupDataTmp
         } )
-        // this.props.updateCloudMShare( JSON.parse( selectedBackup.shares ), 0 );
-        // if(selectedBackup.type == "device"){
-        // ( this.RestoreFromICloud as any ).current.snapTo( 0 )
         this.setState( {
           restoreModal: false
         } )
@@ -613,8 +563,8 @@ class RestoreWithICloud extends Component<
         // ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
         this.setState( {
           errorModal: true,
-          errorModalTitle: 'Error receiving Recovery Key',
-          errorModalInfo: 'There was an error while receiving your Recovery Key, please try again',
+          errorModalTitle: this.state.strings[ 'ErrorreceivingRecoveryKey' ],
+          errorModalInfo: this.state.strings[ 'errorwhilereceiving' ],
         } )
       }
     }
@@ -864,23 +814,23 @@ class RestoreWithICloud extends Component<
   }
 
   renderContent = () => {
-    const { selectedBackup, hideShow } = this.state
+    const { selectedBackup, hideShow, strings, common } = this.state
     const { navigation } = this.props
     return (
       <RestoreFromICloud
-        title={`Recover from ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
+        title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText={
-          'Clicking on Recover would source your Recovery Key from iCloud'
+          strings[ 'Clickingon' ]
         }
-        cardInfo={'Restoring Wallet from'}
+        cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
         levelStatus={
           `${selectedBackup &&selectedBackup.levelStatus
             ? `${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'} backup at Level ${selectedBackup.levelStatus}`
             : ''}`
         }
-        proceedButtonText={'Recover'}
-        backButtonText={'Back'}
+        proceedButtonText={strings[ 'Recover' ]}
+        backButtonText={common[ 'back' ]}
         modalRef={this.RestoreFromICloud}
         onPressProceed={() => {
           //(this.RestoreFromICloud as any).current.snapTo(0);
@@ -920,9 +870,7 @@ class RestoreWithICloud extends Component<
 
   render() {
     const {
-      hideShow,
       cloudBackup,
-      walletsArray,
       selectedBackup,
       showLoader,
       refreshControlLoader,
@@ -941,9 +889,11 @@ class RestoreWithICloud extends Component<
       shareOTPModal,
       restoreWallet,
       contactListModal,
-      backupModal
+      backupModal,
+      common,
+      strings
     } = this.state
-    const { navigation, database } = this.props
+    const { navigation } = this.props
     return (
       <View
         style={{
@@ -977,10 +927,10 @@ class RestoreWithICloud extends Component<
               justifyContent: 'center', width: wp( '80%' )
             }}>
               <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
-                {'Recover using keys'}
+                {strings[ 'Recoverusingkeys' ]}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-                The status of your Recovery Key request is visible below
+                {strings[ 'statusofyourRecovery' ]}
               </Text>
             </View>
           </View>
@@ -1044,7 +994,7 @@ class RestoreWithICloud extends Component<
                     </Text>
                     <Text style={styles.cardsInfoText}>{item.info}</Text>
                     <Text style={styles.cardsInfoText}>
-                      Last backup {item.time}
+                      {strings[ 'Lastbackup' ]} {item.time}
                     </Text>
                   </View>
                   {item.status == 'received' ? (
@@ -1061,7 +1011,7 @@ class RestoreWithICloud extends Component<
                           backgroundColor: Colors.lightGreen,
                         }}
                       >
-                        <Text style={styles.statusText}>Key Received</Text>
+                        <Text style={styles.statusText}>{strings[ 'KeyReceived' ]}</Text>
                       </View>
                       <View
                         style={{
@@ -1083,7 +1033,7 @@ class RestoreWithICloud extends Component<
                     </View>
                   ) : (
                     <View style={styles.statusTextView}>
-                      <Text style={styles.statusText}>Waiting for Key</Text>
+                      <Text style={styles.statusText}>{strings[ 'WaitingforKey' ]}</Text>
                     </View>
                   )}
                 </View>
@@ -1101,7 +1051,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <Text style={styles.modalHeaderInfoText}>
-            Use Send Request to share a link with a contact. If the person you wish to backup your Recovery Key with, is with you in person, use Scan Key. Or they could also send you a screenshot of the QR for you to scan
+            {strings[ 'UseSendRequest' ]}
           </Text>
         </View>
         <View
@@ -1139,7 +1089,7 @@ class RestoreWithICloud extends Component<
               source={require( '../../assets/images/icons/openlink.png' )}
               style={styles.buttonImage}
             />
-            <Text style={styles.buttonText}>Send Request</Text>
+            <Text style={styles.buttonText}>{strings[ 'SendRequest' ]}</Text>
           </TouchableOpacity>
           <View
             style={{
@@ -1160,23 +1110,35 @@ class RestoreWithICloud extends Component<
               source={require( '../../assets/images/icons/qr-code.png' )}
               style={styles.buttonImage}
             />
-            <Text style={styles.buttonText}>Scan Key</Text>
+            <Text style={styles.buttonText}>{strings[ 'ScanKey' ]}</Text>
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
 
-        <ModalContainer visible={restoreModal} closeBottomSheet={() => {
+        <ModalContainer onBackground={()=>{this.setState( {
+          restoreModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            restoreModal:true
+          } )
+        }, 200 )}} visible={restoreModal} closeBottomSheet={() => {
           this.setState( {
             restoreModal: false
           } )
         }} >
           {this.renderContent()}
         </ModalContainer>
-        <ModalContainer visible={contactListModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          contactListModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            contactListModal:true
+          } )
+        }, 200 )}} visible={contactListModal} closeBottomSheet={() => { }} >
           <ContactListForRestore
-            title={'Select Contact'}
+            title={strings[ 'SelectContact' ]}
             subText={
-              'Select contact to send a Wallet Recovery request link'
+              strings[ 'Selectcontactto' ]
             }
             contactList={contactList}
             modalRef={this.ContactListForRestore}
@@ -1196,7 +1158,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={this.state.restoreSuccess} closeBottomSheet={() => { this.setState( {
+        <ModalContainer onBackground={()=>{this.setState( {
+          restoreSuccess:false
+        } );setTimeout( () => {
+          this.setState( {
+            restoreSuccess:true
+          } )
+        }, 200 )}} visible={this.state.restoreSuccess} closeBottomSheet={() => { this.setState( {
           restoreSuccess: false
         } )}} >
           <RestoreSuccess
@@ -1215,7 +1183,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={backupModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          backupModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            backupModal:true
+          } )
+        }, 200 )}} visible={backupModal} closeBottomSheet={() => { }} >
           <ICloudBackupNotFound
             modalRef={this.BackupNotFound}
             onPressProceed={() => {
@@ -1233,7 +1207,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={restoreWallet} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          restoreWallet:false
+        } );setTimeout( () => {
+          this.setState( {
+            restoreWallet:true
+          } )
+        }, 200 )}} visible={restoreWallet} closeBottomSheet={() => { }} >
           <RestoreWallet
             modalRef={this.RestoreWallet}
             onPressProceed={() => {
@@ -1250,7 +1230,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={loaderModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          loaderModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            loaderModal:true
+          } )
+        }, 200 )}} visible={loaderModal} closeBottomSheet={() => { }} >
           <LoaderModal
             headerText={this.state.loaderMessage.heading}
             messageText={this.state.loaderMessage.text}
@@ -1283,7 +1269,13 @@ class RestoreWithICloud extends Component<
             />
           )}
         /> */}
-        <ModalContainer visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
+        <ModalContainer onBackground={()=>{this.setState( {
+          securityQuestionModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            securityQuestionModal:true
+          } )
+        }, 200 )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
           securityQuestionModal: false
         } ) }} >
           <SecurityQuestion
@@ -1320,15 +1312,17 @@ class RestoreWithICloud extends Component<
           /> )}
         /> */}
         </ModalContainer>
-        <ModalContainer visible={errorModal} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>{this.setState( {
+          errorModal:false
+        } )}} visible={errorModal} closeBottomSheet={() => { }}>
           <ErrorModalContents
             modalRef={this.ErrorBottomSheet}
             title={this.state.errorModalTitle}
             info={this.state.errorModalInfo}
-            proceedButtonText={'Try again'}
+            proceedButtonText={this.state.common[ 'tryAgain' ]}
             onPressProceed={() => {
               // ( this.ErrorBottomSheet as any ).current.snapTo( 0 )
-              if( this.state.errorModalTitle === 'Cloud Restore failed' ) {
+              if( this.state.errorModalTitle === this.state.strings[ 'CloudRestorefailed' ] ) {
                 this.cloudData()
               }
               this.setState( {
@@ -1339,13 +1333,15 @@ class RestoreWithICloud extends Component<
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />
         </ModalContainer>
-        <ModalContainer visible={sendViaLinkModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          sendViaLinkModal:false
+        } )}} visible={sendViaLinkModal} closeBottomSheet={() => { }} >
           {selectedContact.data && <SendViaLink
-            headerText={'Send Request'}
-            subHeaderText={'Send a recovery request link'}
-            contactText={'Requesting for recovery:'}
+            headerText={strings[ 'SendRequest' ]}
+            subHeaderText={strings[ 'Sendrecoveryrequestlink' ]}
+            contactText={strings[ 'Requestingforrecovery' ]}
             contact={selectedContact.data ? selectedContact.data : null}
-            contactEmail={''}//database.WALLET_SETUP.walletName
+            contactEmail={''}
             infoText={`Click here to accept Keeper request for ${this.state.walletName
             } Hexa wallet- link will expire in ${config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
             } hours`}
@@ -1383,7 +1379,9 @@ class RestoreWithICloud extends Component<
             }}
           />}
         </ModalContainer>
-        <ModalContainer visible={shareOTPModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          shareOTPModal:false
+        } )}} visible={shareOTPModal} closeBottomSheet={() => { }} >
           <ShareOtpWithTrustedContact
             renderTimer={renderTimer}
             onPressOk={() => {
@@ -1414,20 +1412,11 @@ class RestoreWithICloud extends Component<
 
 const mapStateToProps = ( state ) => {
   return {
-    accounts: state.accounts || [],
-    cloudBackupStatus:
-      idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    database: idx( state, ( _ ) => _.storage.database ) || {
-    },
+    cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     security: idx( state, ( _ ) => _.storage.wallet.security ),
-    overallHealth: idx( state, ( _ ) => _.bhr.overallHealth ),
-    walletImageChecked: idx( state, ( _ ) => _.bhr.walletImageChecked ),
-    SERVICES: idx( state, ( _ ) => _.storage.database.SERVICES ),
     walletRecoveryFailed: idx( state, ( _ ) => _.bhr.walletRecoveryFailed ),
-    errorReceiving:
-      idx( state, ( _ ) => _.bhr.errorReceiving ) || {
-      },
-    downloadMetaShare: idx( state, ( _ ) => _.bhr.loading.downloadMetaShare ),
+    errorReceiving: idx( state, ( _ ) => _.bhr.errorReceiving ) || {
+    },
     cloudData: idx( state, ( _ ) => _.cloud.cloudData ),
     downloadedBackupData: idx( state, ( _ ) => _.bhr.downloadedBackupData ),
     keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
@@ -1439,9 +1428,7 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     recoverWalletUsingIcloud,
-    initializeHealthSetup,
     recoverWallet,
-    updateCloudMShare,
     getCloudDataRecovery,
     clearCloudCache,
     initNewBHRFlow,
@@ -1453,7 +1440,8 @@ export default withNavigationFocus(
     downloadBackupData,
     putKeeperInfo,
     setupHealth,
-    setCloudErrorMessage
+    setCloudErrorMessage,
+    setDownloadedBackupData,
   } )( RestoreWithICloud )
 )
 

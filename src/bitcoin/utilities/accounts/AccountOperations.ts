@@ -1,5 +1,6 @@
 import * as bitcoinJS from 'bitcoinjs-lib'
 import * as bip32 from 'bip32'
+import crypto from 'crypto'
 import coinselect from 'coinselect'
 import {
   Transaction,
@@ -16,6 +17,11 @@ import {
   ActiveAddresses,
   ActiveAddressAssignee,
   Balances,
+  Gift,
+  GiftType,
+  GiftStatus,
+  GiftThemeId,
+  DerivationPurpose,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
@@ -29,7 +35,10 @@ export default class AccountOperations {
       primary: account.xpub,
       ...( account as MultiSigAccount ).xpubs
     }, 2, network, account.nextFreeAddressIndex, false ).address
-    else receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
+    else {
+      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+      receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
+    }
 
     account.activeAddresses.external[ receivingAddress ] = {
       index: account.nextFreeAddressIndex,
@@ -50,12 +59,13 @@ export default class AccountOperations {
     const hardGapLimit = 10
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
+    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
     let externalAddress: string
     if( ( account as MultiSigAccount ).is2FA ) externalAddress = AccountUtilities.createMultiSig( {
       primary: account.xpub,
       ...( account as MultiSigAccount ).xpubs
     }, 2, network, account.nextFreeAddressIndex + hardGapLimit - 1, false ).address
-    else externalAddress = AccountUtilities.getAddressByIndex( account.xpub, false,  account.nextFreeAddressIndex + hardGapLimit - 1, network )
+    else externalAddress = AccountUtilities.getAddressByIndex( account.xpub, false,  account.nextFreeAddressIndex + hardGapLimit - 1, network, purpose )
 
 
     let internalAddress: string
@@ -63,7 +73,7 @@ export default class AccountOperations {
       primary: account.xpub,
       ...( account as MultiSigAccount ).xpubs
     }, 2, network, account.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
-    else internalAddress = AccountUtilities.getAddressByIndex( account.xpub, true, account.nextFreeChangeAddressIndex + hardGapLimit - 1, network )
+    else internalAddress = AccountUtilities.getAddressByIndex( account.xpub, true, account.nextFreeChangeAddressIndex + hardGapLimit - 1, network, purpose )
 
     const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], network )
 
@@ -83,6 +93,19 @@ export default class AccountOperations {
       )
     }
   };
+
+  static importAddress = async ( account: Account | MultiSigAccount, privateKey: string, address: string, requester: ActiveAddressAssignee ) => {
+    if( !account.importedAddresses ) account.importedAddresses = {
+    }
+    account.importedAddresses[ address ] = {
+      address,
+      privateKey
+    }
+    account.activeAddresses.external[ address ] = {
+      index: -1,
+      assignee: requester
+    }
+  }
 
   static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
@@ -116,6 +139,7 @@ export default class AccountOperations {
         contactName?: string,
         primaryAccType?: string,
         accountName?: string,
+        hardRefresh?: boolean,
         }
     } = {
     }
@@ -127,6 +151,7 @@ export default class AccountOperations {
     }
 
     for( const account of Object.values( accounts ) ){
+      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
       const ownedAddresses = [] // owned address mapping
       // owned addresses are used for apt tx categorization and transfer amount calculation
 
@@ -139,10 +164,18 @@ export default class AccountOperations {
           primary: account.xpub,
           ...( account as MultiSigAccount ).xpubs
         }, 2, network, itr, false ).address
-        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
+        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
         externalAddresses[ address ] = itr
         ownedAddresses.push( address )
       }
+
+      // include imported external addresses
+      if( !account.importedAddresses ) account.importedAddresses = {
+      }
+      Object.keys( account.importedAddresses ).forEach( address => {
+        externalAddresses[ address ] = -1
+        ownedAddresses.push( address )
+      } )
 
       const internalAddresses :{[address: string]: number}  = {
       }// all internal addresses(till closingIntIndex)
@@ -152,7 +185,7 @@ export default class AccountOperations {
           primary: account.xpub,
           ...( account as MultiSigAccount ).xpubs
         }, 2, network, itr, true ).address
-        else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+        else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
         internalAddresses[ address ] = itr
         ownedAddresses.push( address )
       }
@@ -162,6 +195,12 @@ export default class AccountOperations {
       const cachedTxIdMap = account.txIdMap
       const cachedTxs = account.transactions
       const cachedAQL = account.addressQueryList
+
+      let shouldHardRefresh = hardRefresh
+      if( !shouldHardRefresh ){
+        // hard-refresh SWAN account(default)
+        if( account.type === AccountType.SWAN_ACCOUNT ) shouldHardRefresh = true
+      }
 
       accountInstances[ account.id ] = {
         activeAddresses: account.activeAddresses,
@@ -177,6 +216,7 @@ export default class AccountOperations {
         transactionsNote: account.transactionsNote,
         accountType: account.type,
         accountName: account.accountName,
+        hardRefresh: shouldHardRefresh,
       }
 
       accountsInternals[ account.id ] = {
@@ -184,7 +224,7 @@ export default class AccountOperations {
       }
     }
 
-    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network, hardRefresh )
+    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network )
 
     const txsFound: Transaction[] = []
     const activeAddressesWithNewTxsMap: {[accountId: string]: ActiveAddresses} = {
@@ -202,6 +242,7 @@ export default class AccountOperations {
         hasNewTxn
       } = synchedAccounts[ account.id ]
       const { internalAddresses } = accountsInternals[ account.id ]
+      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
 
       // update utxo sets and balances
       const balances: Balances = {
@@ -212,7 +253,7 @@ export default class AccountOperations {
       const unconfirmedUTXOs = []
       for ( const utxo of UTXOs ) {
         if ( account.type === AccountType.TEST_ACCOUNT ) {
-          if( utxo.address === AccountUtilities.getAddressByIndex( account.xpub, false, 0, network ) ){
+          if( utxo.address === AccountUtilities.getAddressByIndex( account.xpub, false, 0, network, purpose ) ){
             confirmedUTXOs.push( utxo ) // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
             balances.confirmed += utxo.value
             continue
@@ -249,7 +290,7 @@ export default class AccountOperations {
         primary: account.xpub,
         ...( account as MultiSigAccount ).xpubs
       }, 2, network, account.nextFreeAddressIndex, false ).address
-      else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
+      else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
 
       // find tx delta(missing txs): hard vs soft refresh
       // if( hardRefresh ){
@@ -339,6 +380,7 @@ export default class AccountOperations {
     const startingExtIndex = account.nextFreeAddressIndex - softGapLimit >= 0? account.nextFreeAddressIndex - softGapLimit : 0
     const startingIntIndex = account.nextFreeChangeAddressIndex - softGapLimit >= 0? account.nextFreeChangeAddressIndex - softGapLimit : 0
 
+    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
     for( const consumedUTXO of Object.values( consumedUTXOs ) ){
       let found = false
       // is out of bound external address?
@@ -349,7 +391,7 @@ export default class AccountOperations {
             primary: account.xpub,
             ...( account as MultiSigAccount ).xpubs
           }, 2, network, itr, false ).address
-          else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
+          else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
 
           if( consumedUTXO.address === address ){
             account.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
@@ -366,7 +408,7 @@ export default class AccountOperations {
             primary: account.xpub,
             ...( account as MultiSigAccount ).xpubs
           }, 2, network, itr, true ).address
-          else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+          else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
 
           if( consumedUTXO.address === address ){
             account.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
@@ -398,6 +440,7 @@ export default class AccountOperations {
         }} ),
     }
 
+    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
     for( const consumedUTXO of Object.values( consumedUTXOs ) ){
       let found = false
       // is out of bound external address?
@@ -407,7 +450,7 @@ export default class AccountOperations {
           primary: account.xpub,
           ...( account as MultiSigAccount ).xpubs
         }, 2, network, itr, false ).address
-        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
+        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
 
         if( consumedUTXO.address === address ){
           if( !activeExternalAddresses[ address ] )
@@ -443,7 +486,7 @@ export default class AccountOperations {
             primary: account.xpub,
             ...( account as MultiSigAccount ).xpubs
           }, 2, network, itr, true ).address
-          else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+          else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
 
           if( consumedUTXO.address === address ){
             if( !activeInternalAddresses[ address ] )
@@ -474,6 +517,7 @@ export default class AccountOperations {
 
     // add internal address used for change utxo to activeAddresses.internal
     let changeAddress: string
+
     if( ( account as MultiSigAccount ).is2FA ) changeAddress = AccountUtilities.createMultiSig(  {
       primary: account.xpub,
       ...( account as MultiSigAccount ).xpubs
@@ -482,7 +526,8 @@ export default class AccountOperations {
       account.xpub,
       true,
       account.nextFreeChangeAddressIndex,
-      network
+      network,
+      purpose
     )
 
     activeInternalAddresses[ changeAddress ] = {
@@ -675,12 +720,17 @@ export default class AccountOperations {
     customTxFeePerByte: number,
   ): TransactionPrerequisiteElements => {
     const inputUTXOs = account.confirmedUTXOs
+    console.log( {
+      inputUTXOs, outputUTXOs, customTxFeePerByte
+    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
       customTxFeePerByte,
     )
-
+    console.log( {
+      inputs, outputs, fee
+    } )
     if ( !inputs ) return {
       fee
     }
@@ -701,7 +751,7 @@ export default class AccountOperations {
   }> => {
     try {
       let inputs, outputs
-      if ( txnPriority === 'custom' && customTxPrerequisites ) {
+      if ( txnPriority === TxPriority.CUSTOM && customTxPrerequisites ) {
         inputs = customTxPrerequisites.inputs
         outputs = customTxPrerequisites.outputs
       } else {
@@ -717,7 +767,22 @@ export default class AccountOperations {
       )
 
       for ( const input of inputs ) {
-        txb.addInput( input.txId, input.vout, nSequence )
+        if( account.type === AccountType.SWAN_ACCOUNT ){
+          // native segwit
+          const privateKey = AccountUtilities.addressToPrivateKey(
+            input.address,
+            account
+          )
+          const keyPair = AccountUtilities.getKeyPair(
+            privateKey,
+            network
+          )
+          const p2wpkh = bitcoinJS.payments.p2wpkh( {
+            pubkey: keyPair.publicKey,
+            network,
+          } )
+          txb.addInput( input.txId, input.vout, nSequence, p2wpkh.output )
+        } else txb.addInput( input.txId, input.vout, nSequence )
       }
 
       const sortedOuts = await AccountUtilities.sortOutputs(
@@ -791,14 +856,26 @@ export default class AccountOperations {
           redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
         }
 
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript,
-          null,
-          input.value,
-          witnessScript,
-        )
+        if( account.type === AccountType.SWAN_ACCOUNT ){
+          // native segwit
+          txb.sign(
+            vin,
+            keyPair,
+            null,
+            null,
+            input.value,
+          )
+        } else {
+          txb.sign(
+            vin,
+            keyPair,
+            redeemScript,
+            null,
+            input.value,
+            witnessScript,
+          )
+        }
+
         vin++
       }
 
@@ -978,4 +1055,101 @@ export default class AccountOperations {
       txid
     }
   };
+
+  static generateGifts = async (
+    walletDetails: {
+      walletId: string,
+      walletName: string,
+    },
+    account: Account | MultiSigAccount,
+    amounts: number[],
+    averageTxFees: AverageTxFees,
+    includeFee?: boolean,
+  ): Promise<{
+    txid: string;
+    gifts: Gift[];
+   }> => {
+
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+    const txPriority = TxPriority.LOW
+
+    const recipients = []
+    const gifts: Gift[] = []
+    amounts.forEach( amount => {
+      const keyPair = bitcoinJS.ECPair.makeRandom( {
+        network: network
+      } )
+
+      const privateKey = keyPair.toWIF()
+      const address = AccountUtilities.deriveAddressFromKeyPair(
+        keyPair,
+        network
+      )
+
+      recipients.push( {
+        address,
+        amount,
+        name: 'Gift',
+      } )
+
+      const id = crypto.createHash( 'sha256' ).update( privateKey ).digest( 'hex' )
+      const createdGift: Gift = {
+        id,
+        privateKey,
+        address,
+        amount,
+        type: GiftType.SENT,
+        status: GiftStatus.CREATED,
+        themeId: GiftThemeId.ONE,
+        timestamps: {
+          created: Date.now(),
+        },
+        sender: {
+          walletId: walletDetails.walletId,
+          walletName: walletDetails.walletName,
+          accountId: account.id,
+        },
+        receiver: {
+        }
+      }
+
+      gifts.push( createdGift )
+    } )
+
+    const { txPrerequisites } = await AccountOperations.transferST1( account, recipients, averageTxFees )
+    let feeDeductedFromAddress: string
+    const priorityBasedTxPrerequisites = txPrerequisites[ txPriority ]
+
+    if( includeFee ){
+      priorityBasedTxPrerequisites.outputs.forEach( output => {
+        if( !output.address ){
+          // adding back fee to the change address
+          output.value += priorityBasedTxPrerequisites.fee
+        } else {
+          // deducting fee from the gift(or one of the gifts)
+          if( !feeDeductedFromAddress ){
+            output.value -= priorityBasedTxPrerequisites.fee
+            if( output.value <= 0 ) throw new Error( 'Failed to generate gifts, inclusion fee is greater than gift amount' )
+            feeDeductedFromAddress = output.address
+          }
+        }
+      } )
+    }
+
+    if( feeDeductedFromAddress ){
+      recipients.forEach( recipient => {
+        if( recipient.address === feeDeductedFromAddress ) recipient.amount -= priorityBasedTxPrerequisites.fee
+      } )
+
+      gifts.forEach( gift => {
+        if( gift.address === feeDeductedFromAddress ) gift.amount -= priorityBasedTxPrerequisites.fee
+      } )
+    }
+
+    const { txid } = await AccountOperations.transferST2( account, txPrerequisites, txPriority, network, recipients )
+
+    return {
+      txid, gifts
+    }
+  }
 }

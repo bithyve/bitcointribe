@@ -107,22 +107,24 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
               screen: 'Home',
             } )
           } else {
-            const requestName = await processDeepLink( this.url )
+            const processedLink = await processDeepLink( this.url )
             this.props.navigation.replace( 'Home', {
               screen: 'Home',
               params: {
-                trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+                trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
+                giftRequest: processedLink ? processedLink.giftRequest: null,
+                swanRequest: processedLink ? processedLink.swanRequest: null,
               }
             } )
           }
         } else if ( !this.url ){
           this.props.navigation.replace( 'Login' )
         } else {
-          const requestName = await processDeepLink( this.url )
+          const processedLink = await processDeepLink( this.url )
           this.props.navigation.replace( 'Login', {
-            trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-            swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+            trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
+            giftRequest: processedLink ? processedLink.giftRequest: null,
+            swanRequest: processedLink ? processedLink.swanRequest: null,
           } )
         }
 

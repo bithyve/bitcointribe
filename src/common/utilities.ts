@@ -166,9 +166,12 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
           }
         } : selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length ? selectedKeeperInfo.data : {
         }
-        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
+        if ( element.status != 'notSetup' && keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
+        else element.data = {
+        }
         // Channel Key
-        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = channelKey
+        if ( element.status != 'notSetup' && keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = channelKey
+        else element.channelKey = ''
       }
     }
   }
@@ -206,44 +209,33 @@ export const arrayChunks = ( arr, size ) => {
   )
 }
 
-export const getIndex = ( levelHealth, type, selectedKeeper, keeperInfo ) => {
-  let changeIndex = 1
-  let contactCount = 0
-  let deviceCount = 0
-  for ( let i = 0; i < levelHealth.length; i++ ) {
-    const element = levelHealth[ i ]
-    for ( let j = 2; j < element.levelInfo.length; j++ ) {
-      const element2 = element.levelInfo[ j ]
-      if (
-        element2.shareType == 'contact' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelHealth[ i ]
-      ) {
-        contactCount++
+export const getIndex = ( levelData, type, selectedKeeper, keeperInfo ) => {
+  let index = 1
+  let count = 0
+  if ( type == 'primaryKeeper' || type == 'device' || type == 'contact' || type == 'existingContact' ) {
+    for ( let i = 0; i < levelData.length; i++ ) {
+      const element = levelData[ i ]
+      if( type == 'contact' || type == 'existingContact' ) {
+        if ( ( element.keeper1.shareType == 'contact' || element.keeper1.shareType == 'existingContact' ) && selectedKeeper.shareId != element.keeper1.shareId ) count++
+        if ( ( element.keeper2.shareType == 'contact' || element.keeper2.shareType == 'existingContact' ) && selectedKeeper.shareId != element.keeper2.shareId ) count++
       }
-      if (
-        element2.shareType == 'device' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelHealth[ i ]
-      ) {
-        deviceCount++
-      }
-      const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
-      if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-        if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
-          changeIndex = 2
-        } else changeIndex = 1
-      }
-      if( type == 'device' ){
-        if ( element2.shareType == 'device' && deviceCount == 1 ) {
-          changeIndex = 3
-        } else if( element2.shareType == 'device' && deviceCount == 2 ){
-          changeIndex = 4
-        }
+      if( type == 'device' || type == 'primaryKeeper' ) {
+        if ( ( element.keeper1.shareType == 'device' || element.keeper1.shareType == 'primaryKeeper' ) && selectedKeeper.shareId != element.keeper1.shareId ) count++
+        if ( element.keeper2.shareType == 'device' && selectedKeeper.shareId != element.keeper2.shareId ) count++
       }
     }
+    if( type == 'contact' || type == 'existingContact' ) {
+      if ( count == 1 ) index = 2
+      else if ( count == 0 ) index = 1
+      else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
+    }
+    if( type == 'device' || type == 'primaryKeeper' ) {
+      if ( count == 0 ) index = 0
+      else if ( count == 1 ) index = 3
+      else if ( count == 2 ) index = 4
+      else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 0
+    }
+    if( type == 'primaryKeeper' ) index = 0
   }
-  return changeIndex
+  return index
 }

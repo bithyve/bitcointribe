@@ -13,7 +13,10 @@ import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { useSelector } from 'react-redux'
 import Fonts from '../../common/Fonts'
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 export interface Props {
   subAccountInfo: SubAccountDescribing;
   isDisabled?: boolean;
@@ -72,8 +75,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     return {
       ...styles.descriptionTextContainer,
       flex: isDisabled ? 0 : 1,
-      marginBottom: isDisabled ? -8 : 8,
-      // backgroundColor: 'red',
+      marginBottom: isDisabled ? hp( '-8%' ) : hp( '0.5%' ),
     }
   }, [ isSelected ] )
 
@@ -123,11 +125,10 @@ const SubAccountOptionCard: React.FC<Props> = ( {
             {specialTag}
           </Card.Title>
         )}
+        <View style={styles.image} >
+          {getAvatarForSubAccount( subAccountInfo, isSelected )}
+        </View>
 
-        <Image
-          style={styles.image}
-          source={getAvatarForSubAccount( subAccountInfo, isSelected )}
-        />
 
         <View style={descriptionTextContainerStyle}>
           <Card.Title style={titleTextStyle} numberOfLines={1}>
@@ -169,11 +170,13 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: widthPercentageToDP( 5.4 ),
-    height: widthPercentageToDP( 5.4 ),
+    width: 30,
+    height: 30,
     marginBottom: 10,
     marginTop: 5,
-    resizeMode: 'contain'
+    resizeMode: 'contain',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   cardContainer: {

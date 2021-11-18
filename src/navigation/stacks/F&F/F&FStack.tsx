@@ -20,6 +20,8 @@ import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
+import ManageGifts from '../../../pages/FriendsAndFamily/ManageGifts'
+import CreateGift from '../../../pages/FriendsAndFamily/CreateGift'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
@@ -27,7 +29,10 @@ import ReLogin from '../../../pages/ReLogin'
 import Intermediate from '../../../pages/Intermediate'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
-
+import SendGift from '../../../pages/FriendsAndFamily/SendGift'
+import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
+import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
+import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -48,6 +53,12 @@ const FriendsAndFamily = createStackNavigator(
         // tabBarVisibl
       },
     },
+    ManageGifts,
+    EnterGiftDetails,
+    GiftDetails,
+    SendViaLinkAndQR,
+    CreateGift,
+    SendGift,
     Login,
     Launch,
     Intermediate,

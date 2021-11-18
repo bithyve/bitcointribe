@@ -45,6 +45,9 @@ import {
   autoSyncShells,
   setResetTwoFALoader,
   recomputeNetBalance,
+  updateGift,
+  GENERATE_GIFTS,
+  giftCreationSuccess,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -56,7 +59,13 @@ import {
   ActiveAddressAssignee,
   ActiveAddresses,
   ContactInfo,
+  DeepLinkEncryptionType,
+  DeepLinkKind,
   DonationAccount,
+  Gift,
+  GiftMetaData,
+  GiftStatus,
+  GiftThemeId,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -93,6 +102,7 @@ import { syncPermanentChannelsWorker } from './trustedContacts'
 import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import { generateDeepLink } from '../../common/CommonFunctions'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -122,6 +132,85 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   } ) )
   yield call( dbManager.updateAccount, ( updatedAccount as Account ).id, updatedAccount )
   return receivingAddress
+}
+
+export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
+  const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+  try{
+    giftToSend.timestamps.sent = Date.now()
+    giftToSend.note = note
+    giftToSend.sender.walletName = walletName
+    giftToSend.themeId = themeId
+    giftToSend.channelAddress = giftToSend.id.slice( 0, 10 ) + Math.floor( Math.random() * 10e4 )
+
+    const giftMetaData: GiftMetaData = {
+      status: giftToSend.status,
+      notificationInfo: {
+        walletId: giftToSend.sender.walletId,
+        FCM: fcmToken,
+      }
+    }
+
+    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
+
+    let deepLinkEncryptionOTP
+    if( shouldEncrypt ) {
+      deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+      giftToSend.deepLinkConfig = {
+        encryptionType: DeepLinkEncryptionType.OTP,
+        encryptionKey: deepLinkEncryptionOTP,
+      }
+    } else {
+      giftToSend.deepLinkConfig = null // removes previous link config(if any)
+    }
+
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
+      deepLinkKind: DeepLinkKind.GIFT,
+      encryptionType: shouldEncrypt? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT,
+      encryptionKey: deepLinkEncryptionOTP,
+      walletName: walletName,
+      keysToEncrypt: encryptionKey,
+      generateShortLink,
+      extraData: {
+        channelAddress: giftToSend.channelAddress,
+        amount: giftToSend.amount,
+        note,
+        themeId: giftToSend.themeId
+      }
+    } )
+    return {
+      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
+    }
+  } catch( err ){
+    console.log( 'An error occured while generating gift: ', err )
+  }
+}
+
+export async function changeGiftStatus( encryptionKey: string, giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string ) {
+  try{
+    console.log( 'giftToSend', giftToSend )
+    giftToSend.status = GiftStatus.SENT
+    giftToSend.timestamps.sent = Date.now()
+    giftToSend.note = note
+    giftToSend.themeId = themeId
+    giftToSend.sender.walletName = walletName
+
+    const giftMetaData: GiftMetaData = {
+      status: giftToSend.status,
+      notificationInfo: {
+        walletId: giftToSend.sender.walletId,
+        FCM: fcmToken,
+      }
+    }
+
+    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
+
+    return {
+      updatedGift: giftToSend
+    }
+  } catch( err ){
+    console.log( 'An error occured while upadting gift: ', err )
+  }
 }
 
 function* updatePaymentAddressesToChannels( activeAddressesWithNewTxsMap: {
@@ -281,6 +370,7 @@ function* syncTxAfterRestore( restoredAccounts ) {
           accountShells[ shellIndex ].primarySubAccount.transactions.splice( i, 1 )
         }
       } )
+      console.log( 'AFTER', accountShells )
     }
   }
 
@@ -1018,16 +1108,60 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
+function parseAA( addresses ) {
+  try {
+    if( addresses.length > 0 ) {
+      const obj = {
+      }
+      addresses.forEach( aa => {
+        const tmp = {
+          index : aa.index
+        }
+        if( aa.assignee ) {
+          const assignee = {
+            ...aa.assignee
+          }
+          if( aa.assignee.recipientInfo ) {
+            const recipientInfo = {
+            }
+            aa.assignee.recipientInfo.forEach( info => {
+              recipientInfo[ info.txid ] = info.recipient
+            } )
+            assignee.recipientInfo = recipientInfo
+            tmp.assignee = assignee
+          }
+        }
+        obj[ aa.address ] = tmp
+      } )
+      return obj
+    } else {
+      return {
+      }
+    }
+  } catch ( error ) {
+    console.log( error )
+    return {
+    }
+  }
+}
+
+function getAA( activeAddresses:{external: [], internal: []} ) {
+  return {
+    external: parseAA( activeAddresses.external ),
+    internal: parseAA( activeAddresses.internal  )
+  }
+}
+
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
-  console.log( 'restoredAccounts', restoredAccounts )
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
   }
-
   // restore account shells for respective accountss
   for ( const account of restoredAccounts ){
     const accountShell: AccountShell = yield call( generateShellFromAccount, account )
     accountShell.primarySubAccount.visibility = account.accountVisibility
+    const aa = getAA( account.activeAddresses )
+    account.activeAddresses = aa
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
   }
@@ -1061,15 +1195,71 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account's balance and transactions
   const syncAll = true
   const hardRefresh = true
+
   yield call( autoSyncShellsWorker, {
     payload: {
       syncAll, hardRefresh
     }
   } )
-  yield call( syncTxAfterRestore, restoredAccounts )
+  //yield call( syncTxAfterRestore, restoredAccounts )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(
   restoreAccountShellsWorker,
   RESTORE_ACCOUNT_SHELLS,
+)
+
+export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean }} ) {
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const accounts: Accounts = accountsState.accounts
+
+  let accountId = payload.accountId
+  if( !accountId ){
+    for( const id in accounts ){
+      const account = accounts[ id ]
+      if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
+        accountId = id
+        break
+      }
+    }
+  }
+
+  const account = accounts[ accountId ]
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
+  const walletDetails = {
+    walletId: wallet.walletId,
+    walletName: wallet.walletName
+  }
+
+  const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
+  if( txid ) {
+    const giftIds = []
+    for( const giftId in gifts ){
+      giftIds.push( gifts[ giftId ].id )
+      yield put( updateGift( gifts[ giftId ] ) )
+    }
+
+    // refersh the account
+    let shellToSync: AccountShell
+    for( const accountShell of accountsState.accountShells ){
+      if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
+    }
+    yield put( refreshAccountShells( [ shellToSync ], {
+    } ) )
+    yield call( dbManager.createGifts, gifts )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: giftIds
+    } ) )
+    yield put( giftCreationSuccess( true ) )
+  } else {
+    console.log( 'Gifts generation failed' )
+    yield put( giftCreationSuccess( false ) )
+  }
+}
+
+export const generateGiftsWatcher = createWatcher(
+  generateGiftstWorker,
+  GENERATE_GIFTS,
 )

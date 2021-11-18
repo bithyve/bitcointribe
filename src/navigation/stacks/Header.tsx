@@ -6,7 +6,9 @@ import {
   ImageBackground,
   AppState,
   Alert,
-  StyleSheet
+  StyleSheet,
+  TouchableOpacity,
+  Text
 } from 'react-native'
 import {
   heightPercentageToDP, widthPercentageToDP,
@@ -15,6 +17,7 @@ import {
 import DeviceInfo from 'react-native-device-info'
 import * as RNLocalize from 'react-native-localize'
 import { connect } from 'react-redux'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import messaging from '@react-native-firebase/messaging'
 import {
   initializeTrustedContact,
@@ -22,9 +25,11 @@ import {
   InitTrustedContactFlowKind,
   PermanentChannelsSyncKind,
   syncPermanentChannels,
+  fetchGiftFromTemporaryChannel,
+  rejectGift,
 } from '../../store/actions/trustedContacts'
 import {
-  getCurrencyImageByRegion, processFriendsAndFamilyQR,
+  getCurrencyImageByRegion, processRequestQR,
 } from '../../common/CommonFunctions/index'
 import NotificationListContent from '../../components/NotificationListContent'
 // import AddContactAddressBook from '../Contacts/AddContactAddressBook'
@@ -63,7 +68,8 @@ import {
   initializeHealthSetup,
   updateCloudPermission,
   acceptExistingContactRequest,
-  updateSecondaryShard
+  updateSecondaryShard,
+  rejectedExistingContactRequest
 } from '../../store/actions/BHR'
 import {
   updateFCMTokens,
@@ -91,7 +97,9 @@ import {
   DeepLinkEncryptionType,
   KeeperInfoInterface,
   LevelHealthInterface,
+  notificationType,
   QRCodeTypes,
+  Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import {
@@ -110,7 +118,12 @@ import {
   updateLastSeen
 } from '../../store/actions/preferences'
 import QRModal from '../../pages/Accounts/QRModal'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
+import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -129,6 +142,7 @@ export enum BottomSheetKind {
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
+  GIFT_REQUEST
 }
 
 interface HomeStateTypes {
@@ -142,12 +156,13 @@ interface HomeStateTypes {
   currencyCode: string;
   notificationDataChange: boolean;
   trustedContactRequest: any;
+  giftRequest: any;
   recoveryRequest: any;
-  custodyRequest: any;
   isLoadContacts: boolean;
   notificationTitle: string | null;
   notificationInfo: string | null;
   notificationNote: string | null;
+  notificationType: string | null;
   notificationAdditionalInfo: any;
   notificationProceedText: string | null;
   notificationIgnoreText: string | null;
@@ -182,6 +197,8 @@ interface HomePropsTypes {
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
   initializeTrustedContact: any;
+  fetchGiftFromTemporaryChannel: any,
+  rejectGift: any,
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   currentLevel: number;
@@ -244,7 +261,9 @@ interface HomePropsTypes {
   updateSecondaryShard: any;
   openApproval: boolean;
   availableKeepers: KeeperInfoInterface[]
-  approvalContactData: ContactRecipientDescribing
+  approvalContactData: ContactRecipientDescribing;
+  rejectedExistingContactRequest: any;
+  trustedContacts: Trusted_Contacts;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -274,13 +293,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currencyCode: 'USD',
       notificationDataChange: false,
       trustedContactRequest: null,
+      giftRequest: null,
       recoveryRequest: null,
-      custodyRequest: null,
       isLoadContacts: false,
       notificationLoading: true,
       notificationTitle: null,
       notificationInfo: null,
       notificationNote: null,
+      notificationType: null,
       notificationAdditionalInfo: null,
       notificationProceedText: null,
       notificationIgnoreText:null,
@@ -308,19 +328,36 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
       onCodeScanned:  ( qrData )=>{
-        console.log( 'qrData', qrData )
-        const trustedContactRequest = processFriendsAndFamilyQR( qrData )
+        const { trustedContactRequest, giftRequest } = processRequestQR( qrData )
         if( trustedContactRequest ){
           this.setState( {
             trustedContactRequest
           },
           () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
+            if ( trustedContactRequest.isContactGift ) {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.GIFT_REQUEST,
+                1
+              )
+            } else {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+
           }
           )
+        }
+        if( giftRequest ){
+          this.setState( {
+            giftRequest
+          },  () => {
+            this.openBottomSheetOnLaunch(
+              BottomSheetKind.GIFT_REQUEST,
+              1
+            )
+          } )
         }
       },
     } )
@@ -335,6 +372,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, 500 )
     this.notificationCheck()
     this.openBottomSheetOnLaunch( BottomSheetKind.NOTIFICATIONS_LIST )
+    const notificationRejection = this.props.messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
+    console.log( 'notificationRejection', notificationRejection )
+    if( notificationRejection ) {
+      this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
+    }
   };
 
   notificationCheck = () =>{
@@ -360,6 +402,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.handleNotificationBottomSheetSelection( message )
         }
       }
+    }
+    const notificationRejection = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
+    console.log( 'notificationRejection', notificationRejection )
+    if( notificationRejection ) {
+      this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
   }
 
@@ -397,11 +444,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.FNF_KEEPER_REQUEST:
           this.setState( {
             trustedContactRequest: {
-              ...message.additionalInfo,
+              walletName: message.additionalInfo.walletName,
+              encryptedChannelKeys: message.additionalInfo.channelKey+'-'+message.additionalInfo.contactsSecondaryChannelKey,
               isExistingContact: true,
               isQR: true,
               type: QRCodeTypes.EXISTING_CONTACT,
               isKeeper: true,
+              encryptionType: DeepLinkEncryptionType.DEFAULT,
+              encryptionHint: ''
             }
           }, () => {
             this.openBottomSheet( BottomSheetKind.TRUSTED_CONTACT_REQUEST )
@@ -420,14 +470,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.RESHARE_RESPONSE:
         case NotificationType.SM_UPLOADED_FOR_PK:
         case NotificationType.NEW_KEEPER_INFO:
+          console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
             notificationNote: '',
-            notificationAdditionalInfo: message.AdditionalInfo,
+            notificationAdditionalInfo: message.additionalInfo,
             notificationProceedText: 'Okay',
             notificationIgnoreText: '',
-            isIgnoreButton: false
+            isIgnoreButton: false,
+            notificationType: message.type
           }, () => {
             this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
           } )
@@ -437,10 +489,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             notificationTitle: message.title,
             notificationInfo: message.info,
             notificationNote: '',
-            notificationAdditionalInfo: message.AdditionalInfo,
+            notificationAdditionalInfo: message.additionalInfo,
             notificationProceedText: 'Go to Account',
             notificationIgnoreText: '',
-            isIgnoreButton: false
+            isIgnoreButton: false,
+            notificationType: message.type
           }, () => {
             this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
           } )
@@ -453,11 +506,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               notificationTitle: message.title,
               notificationInfo: message.info,
               notificationNote: 'For updating you will be taken to the ' + storeName,
-              notificationAdditionalInfo: message.AdditionalInfo,
+              notificationAdditionalInfo: message.additionalInfo,
               notificationProceedText: 'Upgrade',
               notificationIgnoreText: Number( current ) <= Number( mandatoryFor ) ? '' : 'Remind me later',
               isIgnoreButton: true,
               releaseNotes: Platform.OS === 'android' ?  message.additionalInfo.notes.android : message.additionalInfo.notes.ios,
+              notificationType: message.type
             }, () => {
               this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
             } )
@@ -489,7 +543,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             if( nextAppState === 'background' ) {
               this.closeBottomSheet()
             }
-            console.log( 'inside if nextAppState', nextAppState )
+            // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
@@ -636,20 +690,38 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
-    const { trustedContactRequest, swanRequest } = await processDeepLink( url )
+    const { trustedContactRequest, swanRequest, giftRequest } = await processDeepLink( url )
     if( trustedContactRequest ){
       this.setState( {
-        trustedContactRequest
+        trustedContactRequest,
+      },
+      () => {
+        if ( trustedContactRequest.isContactGift ) {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
+            1
+          )
+        } else{
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
+        }
+
+      }
+      )
+    } else if ( giftRequest ) {
+      this.setState( {
+        giftRequest,
       },
       () => {
         this.openBottomSheetOnLaunch(
-          BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+          BottomSheetKind.GIFT_REQUEST,
           1
         )
       }
       )
-    }
-    else if ( swanRequest ) {
+    } else if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
@@ -658,7 +730,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     }
   }
+
   componentDidMount = async() => {
+    // this.openBottomSheetOnLaunch(
+    //   BottomSheetKind.GIFT_REQUEST,
+    //   1
+    // )
     const {
       navigation,
       initializeHealthSetup,
@@ -728,6 +805,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if ( Platform.OS === 'ios' ) {
       PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
     }
+    const notification = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST && value.status == 'unread' )
+    if( notification && notification.status == 'unread' ){
+      this.setState( {
+        trustedContactRequest: {
+          walletName: notification.additionalInfo.walletName,
+          encryptedChannelKeys: notification.additionalInfo.channelKey+'-'+notification.additionalInfo.contactsSecondaryChannelKey,
+          isExistingContact: true,
+          isQR: true,
+          type: QRCodeTypes.EXISTING_CONTACT,
+          isKeeper: true,
+          encryptionType: DeepLinkEncryptionType.DEFAULT,
+          encryptionHint: ''
+        }
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.TRUSTED_CONTACT_REQUEST )
+      } )
+      this.readAllNotifications()
+    }
   }
 
 
@@ -787,6 +882,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   handleDeepLinkModal = () => {
     const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
     const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const giftRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.giftRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
     const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
     const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
     if ( swanRequest ) {
@@ -800,7 +896,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     }
 
-    if ( recoveryRequest || trustedContactRequest ) {
+    if ( trustedContactRequest || recoveryRequest ) {
       this.setState(
         {
           recoveryRequest,
@@ -809,6 +905,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         () => {
           this.openBottomSheetOnLaunch(
             BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
+        }
+      )
+    } else if( giftRequest ){
+      this.setState(
+        {
+          giftRequest,
+        },
+        () => {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
             1
           )
         }
@@ -835,35 +943,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.firebaseNotificationListener()
     }
   }
-  // handleDeepLinking = async ( url ) => {
-  //   const { trustedContactRequest } = await processDeepLink( url )
-  //   if( trustedContactRequest )
-  //     this.setState( {
-  //       trustedContactRequest
-  //     },
-  //     () => {
-  //       this.openBottomSheetOnLaunch(
-  //         BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-  //         1
-  //       )
-  //     }
-  //     )
-  // }
-
-  // handleDeepLinkEvent = async ( { url } ) => {
-  //   const { navigation, isFocused } = this.props
-  //   // If the user is on one of Home's nested routes, and a
-  //   // deep link is opened, we will navigate back to Home first.
-  //   if ( !isFocused ) {
-  //     navigation.dispatch(
-  //       resetToHomeAction( {
-  //         unhandledDeepLinkURL: url,
-  //       } )
-  //     )
-  //   } else {
-  //     this.handleDeepLinking( url )
-  //   }
-  // };
 
   componentWillUnmount() {
     this.cleanupListeners()
@@ -966,8 +1045,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async ( value ) => {
-    if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
-      this.handleNotificationBottomSheetSelection( value )
+    console.log( 'value', value )
+    // if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
+    // if( value.type !== NotificationType.FNF_KEEPER_REQUEST )
+    this.handleNotificationBottomSheetSelection( value )
   };
 
 
@@ -1010,9 +1091,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               channelKey: trustedContactRequest.channelKey,
               contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
               isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
+              isKeeper: trustedContactRequest.isKeeper
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
+            if ( trustedContactRequest.isContactGift ) {
+              this.setState( {
+                trustedContactRequest: {
+                  ...trustedContactRequest, isAssociated: true
+                }
+              } )
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.GIFT_REQUEST,
+                1
+              )
+            }
           }
         } )
       }
@@ -1025,9 +1118,66 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       this.closeBottomSheet()
       const { trustedContactRequest } = this.state
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
       this.props.rejectTrustedContact( {
-        channelKey: trustedContactRequest.channelKey,
+        channelKey: trustedContactRequest.channelKey, isExistingContact: trustedContactRequest.isExistingContact
       } )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  };
+
+  onGiftRequestAccepted = ( key? ) => {
+    try {
+      // this.closeBottomSheet()
+      const { giftRequest } = this.state
+      let decryptionKey: string
+      try{
+        switch( giftRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              decryptionKey = giftRequest.encryptedChannelKeys
+              break
+
+            case DeepLinkEncryptionType.OTP:
+              decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, key )
+              break
+        }
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+
+      this.props.fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  };
+
+  onGiftRequestRejected = ( ) => {
+    try {
+      this.closeBottomSheet()
+      const { giftRequest } = this.state
+      this.props.rejectGift( giftRequest.channelAddress )
     } catch ( error ) {
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
@@ -1080,6 +1230,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
 
 
   onBackPress = () => {
@@ -1115,11 +1268,66 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
   };
+  renderButton = ( text ) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          if ( text === 'View Account' ) {
+            // setGiftAcceptedModel( true )
+            const resetAction = StackActions.reset( {
+              index: 0,
+              actions: [
+                NavigationActions.navigate( {
+                  routeName: 'Landing'
+                } )
+              ],
+            } )
 
+            this.props.navigation.dispatch( resetAction )
+            // navigation.navigate( 'AccountDetails', {
+            //   accountShellID: primarySubAccount.accountShellID,
+            // } )
+          } else {
+            // setAcceptGiftModal( false )
+            // setGiftAcceptedModel( true )
+          }
+        }}
+        style={{
+          ...styles.buttonView
+        }}
+      >
+        <Text style={styles.buttonText}>{text}</Text>
+      </TouchableOpacity>
+    )
+  }
+
+  renderAcceptModal = () => {
+
+  }
+
+  moveToContactDetails = ( channelKey, type ) => {
+    const contactData = makeContactRecipientDescription(
+      channelKey,
+      this.props.trustedContacts[ channelKey ],
+      ContactTrustKind.OTHER,
+    )
+    this.props.navigation.navigate( 'ContactDetails', {
+      contact: contactData,
+      contactsType: type,
+      isFromApproval: true
+    } )
+  }
+
+  moveToAccount = ( txid ) => {
+    // this.props.navigation.navigate( 'AccountDetails', {
+    //   accountShellID: accountId,
+    //   swanDeepLinkContent: this.props.swanDeepLinkContent
+    // } )
+  }
 
   renderBottomSheetContent() {
-    const { UNDER_CUSTODY, navigation } = this.props
-    const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
+    const { navigation } = this.props
+    const { notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
     // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
@@ -1310,6 +1518,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 if( this.state.notificationProceedText === 'Upgrade' ) {
                   this.upgradeNow()
                 }
+                switch ( this.state.notificationType ) {
+                    case 'contact':
+                    case NotificationType.FNF_TRANSACTION:
+                      this.moveToAccount( notificationAdditionalInfo.txid )
+                      break
+
+                    case NotificationType.FNF_REQUEST_ACCEPTED:
+                      this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'Contact' )
+                      break
+
+                    case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
+                      this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'I am the Keeper of' )
+                      break
+                }
               }}
               onPressIgnore={()=> {
                 this.closeBottomSheet()
@@ -1323,6 +1545,29 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               note={notificationNote}
               bottomSheetRef={this.bottomSheetRef}
               releaseNotes={releaseNotes}
+            />
+          )
+
+        case BottomSheetKind.GIFT_REQUEST:
+          const giftRequest = this.state.giftRequest ?? this.state.trustedContactRequest
+
+          return (
+            <AcceptGift
+              navigation={this.props.navigation}
+              closeModal={() => this.closeBottomSheet()}
+              onGiftRequestAccepted={this.onGiftRequestAccepted}
+              onGiftRequestRejected={this.onGiftRequestRejected}
+              walletName={giftRequest.walletName}
+              giftAmount={giftRequest.amount}
+              inputType={giftRequest.encryptionType}
+              hint={giftRequest.encryptionHint}
+              note={giftRequest.note}
+              themeId={giftRequest.themeId}
+              giftId={giftRequest.channelAddress}
+              isGiftWithFnF={giftRequest.isContactGift}
+              isContactAssociated={giftRequest.isAssociated}
+              onPressAccept={this.onTrustedContactRequestAccepted}
+              onPressReject={this.onTrustedContactRejected}
             />
           )
 
@@ -1342,6 +1587,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if ( !this.props.showContent ) {
       return (
         <ModalContainer
+          onBackground={()=>this.setState( {
+            currentBottomSheetKind: null
+          } )}
           visible={this.state.currentBottomSheetKind != null}
           closeBottomSheet={() => {}}
         >
@@ -1399,6 +1647,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // overallHealth={overallHealth}
           />
           <ModalContainer
+            onBackground={()=>this.setState( {
+              currentBottomSheetKind: null
+            } )}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
           >
@@ -1411,6 +1662,54 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 }
 
 const styles = StyleSheet.create( {
+  buttonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  buttonView: {
+    height: widthPercentageToDP( '12%' ),
+    width: widthPercentageToDP( '35%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+    backgroundColor: Colors.blue,
+  },
+  availableToSpendText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
+    lineHeight: 15,
+  },
+  balanceText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
+  },
+  modalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  modalInfoText: {
+    // marginTop: hp( '3%' ),
+    marginTop: heightPercentageToDP( 0.5 ),
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: widthPercentageToDP( 12 ),
+    letterSpacing: 0.6
+  },
+  modalContentContainer: {
+    // height: '100%',
+    backgroundColor: Colors.backgroundColor,
+    paddingBottom: heightPercentageToDP( 4 ),
+  },
   cloudErrorModalImage: {
     width: widthPercentageToDP( '27%' ),
     height: widthPercentageToDP( '27%' ),
@@ -1435,6 +1734,7 @@ const mapStateToProps = ( state ) => {
     openApproval: idx( state, ( _ ) => _.bhr.openApproval ),
     availableKeepers: idx( state, ( _ ) => _.bhr.availableKeepers ),
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
   }
 }
 
@@ -1442,6 +1742,8 @@ export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
     initializeTrustedContact,
+    fetchGiftFromTemporaryChannel,
+    rejectGift,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
@@ -1471,7 +1773,8 @@ export default withNavigationFocus(
     getMessages,
     syncPermanentChannels,
     updateLastSeen,
-    updateSecondaryShard
+    updateSecondaryShard,
+    rejectedExistingContactRequest
   } )( Home )
 )
 

@@ -274,25 +274,27 @@ export default class TrustedContactsOperations {
         ( _ ) => _.walletID
       )
 
-    const relationshipType = idx(
+    const incomingRelationshipType = idx(
       ( unencryptedInstream as UnecryptedStreamData ).primaryData,
       ( _ ) => _.relationType
     )
 
-    if( relationshipType ){
+    if( incomingRelationshipType ){
       if (
         [
           TrustedContactRelationTypes.WARD,
           TrustedContactRelationTypes.KEEPER_WARD,
         ].includes( contact.relationType ) &&
-        [ TrustedContactRelationTypes.CONTACT ].includes( relationshipType )
-      )
-        delete contact.contactsSecondaryChannelKey
-      if ( [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( relationshipType ) )
+        [ TrustedContactRelationTypes.CONTACT ].includes( incomingRelationshipType )
+      ) delete contact.contactsSecondaryChannelKey  // delete secondaryCH-key if you're no longer the keeper
+
+      if ( incomingRelationshipType === TrustedContactRelationTypes.WARD )
+        contact.secondaryChannelKey = null // remove secondaryCH-key post keeper setup
+
+      if ( [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( incomingRelationshipType ) )
         contact.relationType = TrustedContactRelationTypes.WARD
-      else if ( relationshipType === TrustedContactRelationTypes.WARD )
-        contact.secondaryChannelKey = null
-      else contact.relationType = relationshipType
+
+      if( !contact.relationType ) contact.relationType = incomingRelationshipType
     }
   };
 
@@ -321,38 +323,14 @@ export default class TrustedContactsOperations {
         channelKey,
         streamId,
         contact,
-        contactDetails,
         secondaryChannelKey,
         unEncryptedOutstreamUpdates,
         contactsSecondaryChannelKey,
         metaSync,
       } of channelSyncDetails ) {
 
-        if ( !contact ) { // initialize contact
-          if ( !contactDetails )
-            throw new Error( 'Init failed: contact details missing' )
-          const newContact: TrustedContact = {
-            contactDetails,
-            channelKey,
-            permanentChannelAddress: crypto
-              .createHash( 'sha256' )
-              .update( channelKey )
-              .digest( 'hex' ),
-            relationType: idx(
-              unEncryptedOutstreamUpdates,
-              ( _ ) => _.primaryData.relationType
-            ),
-            secondaryChannelKey,
-            contactsSecondaryChannelKey,
-            isActive: true,
-            hasNewData: true,
-          }
-          contact = newContact
-        }
-
         if ( !contact.isActive ) continue // skip non-active contacts
         if( contactsSecondaryChannelKey ) contact.contactsSecondaryChannelKey = contactsSecondaryChannelKey // execution case: when a contact is upgraded to a keeper
-
         // auto-update last seen(if flags aren't already present)
         if ( !unEncryptedOutstreamUpdates || !idx( unEncryptedOutstreamUpdates, _ => _.metaData.flags ) ){
           if( !unEncryptedOutstreamUpdates ) unEncryptedOutstreamUpdates = {

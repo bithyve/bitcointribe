@@ -1,25 +1,21 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, Image } from 'react-native';
-import { ListItem, Avatar } from 'react-native-elements';
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces';
-import ListStyles from '../../common/Styles/ListStyles';
-import ImageStyles from '../../common/Styles/ImageStyles';
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind';
+import React, { useMemo } from 'react'
+import { StyleSheet, Image, View } from 'react-native'
+import { ListItem, Avatar } from 'react-native-elements'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import ListStyles from '../../common/Styles/ListStyles'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 
 export type Props = {
   subAccountInfo: SubAccountDescribing;
 };
 
-const DesignatedSourceListItemContent: React.FC<Props> = ({
-  subAccountInfo,
-}: Props) => {
+const DesignatedSourceListItemContent: React.FC<Props> = ( { subAccountInfo, }: Props ) => {
   return (
     <>
-      <Image
-        source={getAvatarForSubAccount(subAccountInfo)}
-        style={styles.avatarImage}
-        resizeMode="contain"
-      />
+      <View style={styles.avatarImage} >
+        {getAvatarForSubAccount( subAccountInfo )}
+      </View>
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title
@@ -37,10 +33,10 @@ const DesignatedSourceListItemContent: React.FC<Props> = ({
         </ListItem.Subtitle>
       </ListItem.Content>
     </>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.thumbnailImageMedium,
     marginRight: 14,
@@ -50,7 +46,7 @@ const styles = StyleSheet.create({
   titleSection: {
     flex: 1,
   },
-});
+} )
 
 
-export default DesignatedSourceListItemContent;
+export default DesignatedSourceListItemContent

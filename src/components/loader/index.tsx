@@ -1,19 +1,34 @@
-import React from 'react'
-import { View, ActivityIndicator, StyleSheet, Modal } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, ActivityIndicator, StyleSheet, Modal, AppState } from 'react-native'
 import PropTypes from 'prop-types'
 import Color from '../../common/Colors'
-const Loader = ( { backgroundColor, indicatorColor, isLoading } ) => (
-  <Modal
+
+const Loader = ( { backgroundColor, indicatorColor, isLoading } ) => {
+  const [ visibility, setVisibility ] = useState( true )
+  useEffect( () => {
+    AppState.addEventListener(
+      'change',
+      onAppStateChange
+    )
+    return () => AppState.removeEventListener( 'change', onAppStateChange )
+  }, [] )
+
+  const  onAppStateChange = ( state ) => {
+    if ( state === 'background' || state === 'inactive' ) setVisibility( false )
+    if( state == 'active' ) setVisibility( true )
+  }
+
+  return <Modal
     animationType='fade'
     transparent={true}
-    visible={true}>
+    visible={visibility}>
     <View style={[ styles.container, {
       backgroundColor
     } ]}>
       {isLoading ? <ActivityIndicator size="large" animating color={indicatorColor} /> : null}
     </View>
   </Modal>
-)
+}
 
 export default Loader
 

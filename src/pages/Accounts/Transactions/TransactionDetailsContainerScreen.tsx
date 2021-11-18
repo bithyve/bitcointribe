@@ -19,7 +19,7 @@ import Fonts from '../../../common/Fonts'
 import { useSelector, useDispatch } from 'react-redux'
 import { markReadTx } from '../../../store/actions/accounts'
 import { update } from '../../../storage/database'
-import { Account, TransactionType } from '../../../bitcoin/utilities/Interface'
+import { Account, AccountType, TransactionType } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
@@ -39,7 +39,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   const account: Account = useSelector( state => state.accounts.accounts[ primarySubAccount.id ] )
 
   useEffect( () => {
-    if( transaction.isNew ) dispatch( markReadTx( transaction.txid, accountShellID ) )
+    if( transaction.isNew ) dispatch( markReadTx( [ transaction.txid ], accountShellID ) )
   }, [ transaction.isNew ] )
 
   const confirmationsText = useCallback( () => {
@@ -152,7 +152,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
           <Text style={ListStyles.listItemSubtitle} onPress={() =>
             openLink(
               `https://blockstream.info${
-                transaction.accountType === 'Test Account' ? '/testnet' : ''
+                transaction.accountType === AccountType.TEST_ACCOUNT ? '/testnet' : ''
               }/tx/${transaction.txid}`,
             )}>{transaction.txid}</Text>
         </View>

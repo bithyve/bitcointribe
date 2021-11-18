@@ -16,7 +16,6 @@ import PersonalCopyShareModal from './PersonalCopyShareModal'
 import moment from 'moment'
 import _ from 'underscore'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import {
@@ -27,9 +26,8 @@ import {
   updatedKeeperInfo,
   updateMSharesHealth,
   createChannelAssets,
-  setApprovalStatus,
   createOrChangeGuardian,
-  downloadSMShare,
+  setChannelAssets,
 } from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -37,10 +35,10 @@ import {
   KeeperInfoInterface,
   MetaShare,
   Trusted_Contacts,
+  Wallet,
 } from '../../bitcoin/utilities/Interface'
 import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
-import ApproveSetup from './ApproveSetup'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
 import { v4 as uuid } from 'uuid'
@@ -51,6 +49,11 @@ import ModalContainer from '../../components/home/ModalContainer'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import dbManager from '../../storage/realm/dbManager'
+import { isEmpty } from '../../common/CommonFunctions'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -83,8 +86,8 @@ const PersonalCopyHistory = ( props ) => {
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
-  const [ selectedLevelId, setSelectedLevelId ] = useState(
-    props.navigation.state.params.selectedLevelId
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState(
+    props.navigation.state.params.SelectedRecoveryKeyNumber
   )
   const [ selectedKeeper, setSelectedKeeper ] = useState(
     props.navigation.state.params.selectedKeeper
@@ -92,19 +95,22 @@ const PersonalCopyHistory = ( props ) => {
   const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false :
     props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
-  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
+  const levelData = useSelector( ( state ) => state.bhr.levelData )
+
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const pdfInfo = useSelector( ( state ) => state.bhr.pdfInfo )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const pdfDataConfirm = useSelector( ( state ) => state.bhr.loading.pdfDataConfirm )
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.bhr.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const s3 = dbManager.getBHR()
   const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useSelector(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -118,7 +124,7 @@ const PersonalCopyHistory = ( props ) => {
   const [ isConfirm, setIsConfirm ] = useState( false )
 
   useEffect( () => {
-    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare(
       props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
@@ -224,6 +230,8 @@ const PersonalCopyHistory = ( props ) => {
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
         // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
         setPersonalCopyShareModal( true )
+        dispatch( setChannelAssets ( {
+        }, null ) )
       }
     }
   }, [ pdfCreatedSuccessfully ] )
@@ -269,9 +277,12 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressShare={() => {
           const shareObj = {
-            walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+            walletId: wallet.walletId,
             shareId: selectedKeeper.shareId,
-            reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+            reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+              MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion:
+              OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId )?
+                OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion: 0,
             shareType: 'pdf',
             status: 'notAccessible',
             name: 'Personal Copy'
@@ -396,7 +407,7 @@ const PersonalCopyHistory = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={storagePermissionBottomSheet}
-        title={'Why do we need access to your files and storage?'}
+        title={'Why does the wallet need access to your files and storage?'}
         info={'File and Storage access will let Hexa save a pdf with your Recovery Keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n'}
         otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
         proceedButtonText={'Continue'}
@@ -407,6 +418,14 @@ const PersonalCopyHistory = ( props ) => {
         onPressIgnore={() => {
         }}
         isBottomImage={true}
+        isBottomImageStyle={{
+          width: wp( '29%' ),
+          height: wp( '30%' ),
+          marginLeft: 'auto',
+          resizeMode: 'stretch',
+          marginRight: wp( -2 ),
+          marginBottom: wp( -2 ),
+        }}
         bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
       />
     )
@@ -424,10 +443,14 @@ const PersonalCopyHistory = ( props ) => {
         shareId: selectedKeeper.shareId,
         name: 'Personal Copy',
         type: 'pdf',
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+          MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+            OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
+            2,
         data: {
           ...Contact, index
         },
@@ -440,7 +463,8 @@ const PersonalCopyHistory = ( props ) => {
   )
 
   useEffect( ()=> {
-    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && !isEmpty( channelAssets ) && channelAssets.shareId == selectedKeeper.shareId ){
+      setIsGuardianCreationClicked( false )
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
       } ) )
@@ -467,36 +491,41 @@ const PersonalCopyHistory = ( props ) => {
   }, [ Contact, trustedContacts ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
-    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
+    setKeeperTypeModal( false )
+    const navigationParams = {
+      selectedTitle: name,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
+      selectedKeeper: {
+        shareType: type,
+        name: name,
+        reshareVersion: 0,
+        status: 'notSetup',
+        updatedAt: 0,
+        shareId: selectedKeeper.shareId,
+        data: {
+        },
+      },
+      index: changeIndex,
+    }
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
     if ( type == 'device' ) {
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
-        ...props.navigation.state.params,
-        selectedTitle: name,
-        index: changeIndex,
+        ...navigationParams,
         isChangeKeeperType: true,
       } )
     }
     if ( type == 'pdf' ) {
-      // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
-      setPersonalCopyShareModal( true )
+      setTimeout( () => {
+        setPersonalCopyShareModal( true )
+      }, 1000 )
     }
-  }
-  const sendApprovalRequestToPK = ( ) => {
-    setQrBottomSheetsFlag( true )
-    setIsConfirm( false )
-    // ( QrBottomSheet as any ).current.snapTo( 1 )
-    setQRModal( true )
-    // ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
-    setKeeperTypeModal( false )
   }
 
   const renderQrContent = () => {
@@ -518,9 +547,6 @@ const PersonalCopyHistory = ( props ) => {
               n: isChange ? 2 : 1
             } )
             props.navigation.dispatch( popAction )
-          } else {
-            dispatch( setApprovalStatus( false ) )
-            dispatch( downloadSMShare( qrScannedData ) )
           }
         }}
         onBackPress={() => {
@@ -530,38 +556,18 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Assa","channelId":"71a5d2b39c9396f8023c19070d70d0f78594d31d9eb137c524ab20ccc653b8f6","streamId":"def0d8970","channelKey":"lSiTUPAsqBCdgH6P6PzXzJ50","secondaryChannelKey":"lRm8RJ3vdm6dFvM6iNtrveoe","version":"1.9.5","walletId":"8a428172e0983cc1425aaaa122c74333022e9fad12bd30f28969659b03f2b3ed","encryptedKey":"6e8282c13d1f33cabad34fc8e5c91ad941944fa11e2207e907e6ef8b57c0966c092fd3e5bf5c99e7ed8a2dd3ac87eed377c31779f3c261927c415775dfed42c72ceb9d927c5fce69020b43c6ff71a635"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asda","channelId":"dff8eb3978c08ad72dc515ec5b71d145e5e6d9c1884f6f58739dd08d26f31b4b","streamId":"646625378","channelKey":"OewqnyQaNretrYLeUDvIGmNj","secondaryChannelKey":"3QcSSriLtO95lgYvZs1VvVkM","version":"2.0.1","walletId":"c08a0692304a8aadaef62f00796778b646f2a3190c524d78507d14b6a68c4d1e","encryptedKey":"c217fd0163cac758b8ae585653d3bdf328de633f9b4dc5f42efd7a12e786bff2ecfd1aace2b8d07add7d42d4004bac08bda0fa8c307541b7d17f200d426333a3a81ce98ec7a6d91561afd216c67f015f"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
               n: isChange ? 2 : 1
             } )
             props.navigation.dispatch( popAction )
-          } else {
-            setQRModal( false )
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
-            dispatch( setApprovalStatus( false ) )
-            dispatch( downloadSMShare( qrScannedData ) )
           }
         }}
       />
     )
   }
-
-
-  useEffect( ()=>{
-    if( approvalStatus && isChangeClicked ){
-      console.log( 'APPROVe' )
-      setQRModal( false )
-      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-    }
-  }, [ approvalStatus ] )
-
-  useEffect( ()=>{
-    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
-      dispatch( setApprovalStatus( true ) )
-    }
-  }, [ channelAssets ] )
 
   const deviceText = ( text ) => {
     switch ( text ) {
@@ -587,7 +593,7 @@ const PersonalCopyHistory = ( props ) => {
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
-          : 'never'}
+          : 'Never'}
         moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />
@@ -595,6 +601,7 @@ const PersonalCopyHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
+          showButton={true}
           type={'copy'}
           IsReshare={isReshare}
           data={sortedHistory( personalCopyHistory )}
@@ -615,7 +622,7 @@ const PersonalCopyHistory = ( props ) => {
             // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
             setPersonalCopyShareModal( true )
           }}
-          isChangeKeeperAllow={isChangeKeeperAllow}
+          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           changeButtonText={'Change'}
           onPressChange={() => {
             // ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
@@ -623,35 +630,33 @@ const PersonalCopyHistory = ( props ) => {
           }}
         />
       </View>
-      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setPersonalCopyShareModal( false )} visible={personalCopyShareModal} closeBottomSheet={() => setPersonalCopyShareModal( false )} >
         {renderPersonalCopyShareModalContent()}
       </ModalContainer>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => setErrorModal( false )} >
         {renderErrorModalContent()}
       </ModalContainer>
 
-      <ModalContainer visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
+      <ModalContainer onBackground={()=>setHelpModal( false )} visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
         {renderHelpContent()}
       </ModalContainer>
-      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )} >
         <KeeperTypeModalContents
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
-          selectedLevelId={selectedLevelId}
           keeper={selectedKeeper}
         />
       </ModalContainer>
-      <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setQRModal( false )} visible={qrModal} closeBottomSheet={() => setQRModal( false )} >
         {renderQrContent()}
       </ModalContainer>
-      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
+      <ModalContainer onBackground={()=>setStoragePermissionModal( false )} visible={storagePermissionModal} closeBottomSheet={()=> setStoragePermissionModal( false )} >
         {renderStoragePermissionModalContent()}
       </ModalContainer>
     </View>

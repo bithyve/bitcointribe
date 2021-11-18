@@ -42,10 +42,16 @@ import {
   READ_TRANSACTION,
   ACCOUNT_CHECKED,
   RECOMPUTE_NET_BALANCE,
+  UPDATE_GIFT,
+  GENERATE_GIFTS,
+  SET_GIFTS,
+  GIFT_ACCEPTED,
+  GIFT_ADDED,
+  GIFT_CREATION_STATUS
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import { Account, Accounts } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, Gift } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 export type AccountsState = {
@@ -60,7 +66,13 @@ export type AccountsState = {
       twoFAValid: boolean | null;
       twoFAResetted: boolean | null;
   };
-
+  gifts : {
+    [id: string]: Gift
+  }
+  selectedGiftId: string,
+  giftCreationStatus: boolean,
+  acceptedGiftId: string,
+  addedGift: string,
   isGeneratingNewAccountShell: boolean;
   hasNewAccountShellGenerationSucceeded: boolean;
   hasNewAccountShellGenerationFailed: boolean;
@@ -103,7 +115,12 @@ const initialState: AccountsState = {
     twoFAValid: null,
     twoFAResetted: null,
   },
-
+  gifts: {
+  },
+  selectedGiftId: null,
+  giftCreationStatus: false,
+  acceptedGiftId: '',
+  addedGift: '',
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
   hasNewAccountShellGenerationFailed: false,
@@ -530,6 +547,44 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
           resetTwoFALoader: action.payload.flag,
+        }
+
+      case GENERATE_GIFTS:
+        return {
+          ...state,
+          selectedGiftId: null
+        }
+
+      case GIFT_CREATION_STATUS:
+        return {
+          ...state,
+          giftCreationStatus: action.payload.flag,
+        }
+
+      case UPDATE_GIFT:
+        const gift: Gift = action.payload.gift
+        return {
+          ...state,
+          gifts: {
+            ...state.gifts,
+            [ gift.id ]: gift
+          },
+          selectedGiftId: gift.id
+        }
+      case GIFT_ACCEPTED:
+        return{
+          ...state,
+          acceptedGiftId: action.payload
+        }
+      case GIFT_ADDED:
+        return{
+          ...state,
+          addedGift: action.payload
+        }
+      case SET_GIFTS:
+        return {
+          ...state,
+          gifts: action.payload.gifts,
         }
       default:
         return state

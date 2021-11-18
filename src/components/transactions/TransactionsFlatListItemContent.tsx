@@ -12,9 +12,10 @@ import TransactionDescribing from '../../common/data/models/Transactions/Interfa
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 import { AccountType } from '../../bitcoin/utilities/Interface'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForTransaction'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   transaction: TransactionDescribing;
@@ -61,7 +62,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
   const getTitle = useMemo( () => {
     if( transaction.transactionType === TransactionKind.RECEIVE ) {
-      return transaction.sender || ( transaction.accountName? transaction.accountName: transaction.accountType )
+      return transaction.sender || 'External address'
     } else {
       let name = ''
       if( transaction.receivers ) {
@@ -69,7 +70,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
           name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length - 1} other`
         } else {
           name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name :
-            transaction.recipientAddresses ? transaction.recipientAddresses[ 0 ] : transaction.accountType || transaction.accountName : '' ||  transaction.accountType || transaction.accountName
+            transaction.recipientAddresses ? 'External address' : transaction.accountType || transaction.accountName : '' ||  transaction.accountType || transaction.accountName
         }
       } else {
         name =  transaction.accountName? transaction.accountName: transaction.accountType
@@ -80,7 +81,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
   }, [ transaction.transactionType ] )
 
   const formattedDateText = useMemo( () => {
-    return moment( transaction.date ).format( 'DD/MM/YYYY • hh:MMa' )
+    return moment( transaction.date ).format( 'DD/MM/YY • hh:MMa' )
   }, [ transaction.transactionType ] )
 
   const getReceiversCount = useMemo( () => {
@@ -117,11 +118,10 @@ const TransactionListItemContent: React.FC<Props> = ( {
       /> */}
 
       <View style={styles.containerImg}>
-        <Image
-          source={getAvatarForSubAccount( primarySubAccount, false, true )}
-          style={styles.avatarImage}
-          resizeMode="contain"
-        />
+        {/* <View style={styles.avatarImage} > */}
+        {getAvatarForSubAccount( primarySubAccount, false, true, false, transaction )}
+        {/* </View> */}
+
 
         {
           transaction.isNew &&(
@@ -176,7 +176,7 @@ const styles = StyleSheet.create( {
   },
 
   titleSection: {
-    flex: 1,
+    flex: 1, width: widthPercentageToDP( '35%' )
   },
 
   containerImg: {
@@ -235,13 +235,16 @@ const styles = StyleSheet.create( {
 
   titleText: {
     color: Colors.greyTextColor,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     marginBottom: 2,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
+    fontFamily: Fonts.FiraSansRegular,
   },
 
   subtitleText: {
     fontSize: RFValue( 10 ),
+    letterSpacing: 0.3,
+    color: Colors.gray2
   },
 
   bitcoinImage: {

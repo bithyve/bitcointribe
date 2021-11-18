@@ -35,15 +35,22 @@ const initialState: TrustedContactsState = {
 export default ( state: TrustedContactsState = initialState, action ): TrustedContactsState => {
   switch ( action.type ) {
       case UPDATE_TRUSTED_CONTACTS:
-        const updatedContacts = {
+        const updatedContacts: Trusted_Contacts = action.payload.contacts
+        const storedContacts = {
           ...state.contacts,
-          ...action.payload.contacts
         }
+        for( const key in updatedContacts ){
+          storedContacts[ key ] = {
+            ...storedContacts[ key ],
+            ...updatedContacts[ key ]
+          }
+        }
+
         return {
           ...state,
-          contacts: updatedContacts,
+          contacts: storedContacts,
           trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
-            trustedContacts: updatedContacts,
+            trustedContacts: storedContacts,
           } ),
         }
 

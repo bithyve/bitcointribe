@@ -109,7 +109,7 @@ interface ContactDetailsPropTypes {
   newBHRFlowStarted: any;
   keeperInfo: KeeperInfoInterface[];
   availableKeepers: KeeperInfoInterface[];
-  openApproval: boolean;
+  openApproval: any;
   approvalContactData: ContactRecipientDescribing;
   updateSecondaryShard: any;
   getApprovalFromKeepers: any;
@@ -242,7 +242,10 @@ class ContactDetails extends PureComponent<
       showLoader: false
     } )
     const { trustedContacts } = this.props
-    this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
+    this.setState( {
+      showQRClicked: true
+    } )
+    if( this.props.navigation.state.params.contactsType == 'I am the Keeper of' ) this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
     this.setIsSendDisabledListener = this.props.navigation.addListener(
       'didFocus',
       () => {
@@ -251,12 +254,6 @@ class ContactDetails extends PureComponent<
         this.setState( {
           isSendDisabled: false,
         } )
-        if( this.isFromApproval ) {
-          this.setState( {
-            showQRClicked: true
-          } )
-        }
-        this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
       }
     )
 
@@ -272,7 +269,6 @@ class ContactDetails extends PureComponent<
   }
 
   componentWillUnmount() {
-    this.props.setOpenToApproval( false, [], null )
     this.setIsSendDisabledListener.remove()
   }
 
@@ -1038,7 +1034,9 @@ class ContactDetails extends PureComponent<
         </View>
 
         {showContactDetails &&
-          <ModalContainer visible={showContactDetails} closeBottomSheet={() => {
+          <ModalContainer onBackground={()=>this.setState( {
+            showContactDetails:false
+          } )} visible={showContactDetails} closeBottomSheet={() => {
             this.setState( {
               showContactDetails: false
             } )
@@ -1226,7 +1224,7 @@ class ContactDetails extends PureComponent<
             )}
           </View>
         )}
-        { this.contactsType == 'I am the Keeper of' && !this.props.openApproval && this.props.availableKeepers.length == 0 && (
+        {this.contactsType == 'I am the Keeper of' && this.props.openApproval != null && this.props.availableKeepers.length == 0 && (
           <View style={styles.keeperViewStyle}>
             {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
               disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING )}
@@ -1297,18 +1295,17 @@ class ContactDetails extends PureComponent<
             ) : null}
           </View>
         )}
-        {this.props.openApproval && this.props.availableKeepers.length && <View style={{
+        {this.props.openApproval && this.props.openApproval != null && this.props.availableKeepers.length && <View style={{
           ...styles.keeperViewStyle, justifyContent: 'flex-start', paddingLeft: wp( 5 )
         }}><TouchableOpacity
             style={{
               ...styles.bottomButton,
             }}
             onPress={() => {
-              this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
-
               this.setState( {
                 showQRClicked: true
               } )
+              this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
             }}
           >
             <Text style={[ styles.buttonText, {
@@ -1330,13 +1327,19 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderSendViaLinkContents}
           renderHeader={this.renderSendViaLinkHeader}
         />
-        <ModalContainer visible={sendViaQRModel} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>this.setState( {
+          sendViaQRModel: false
+        } )} visible={sendViaQRModel} closeBottomSheet={() => { }}>
           {this.renderSendViaQRContents()}
         </ModalContainer>
-        <ModalContainer visible={exitKeyModel} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>this.setState( {
+          exitKeyModel: false
+        } )} visible={exitKeyModel} closeBottomSheet={() => { }}>
           {this.renderExitKeyQRContents()}
         </ModalContainer>
-        <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          edit: false
+        } )} visible={edit} closeBottomSheet={() => this.setState( {
           edit: false
         } )}>
           <EditContactScreen contact={this.contact} closeModal={( name ) => {
@@ -1349,7 +1352,9 @@ class ContactDetails extends PureComponent<
             } )
           }} />
         </ModalContainer>
-        <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          reshareModal: false
+        } )} visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
         } )}>
           <ErrorModalContents
@@ -1401,12 +1406,16 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderErrorModalContent}
           renderHeader={this.renderErrorModalHeader}
         />
-        <ModalContainer visible={this.state.showQRCode} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          showQRCode: false
+        } )} visible={this.state.showQRCode} closeBottomSheet={() => this.setState( {
           showQRCode: false
         } )}>
           {this.SendShareModalFunction}
         </ModalContainer>
-        <ModalContainer visible={this.state.showQRScanner} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          showQRScanner: false
+        } )} visible={this.state.showQRScanner} closeBottomSheet={() => this.setState( {
           showQRScanner: false, showQRClicked: false
         } )}>
           <QRModal
@@ -1414,7 +1423,7 @@ class ContactDetails extends PureComponent<
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
-              this.state.availableKeepersName ? 'Please approve this request by scanning the Secondary Key stored with '+ this.state.availableKeepersName : 'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+              this.state.availableKeepersName ? 'Please approve this request by scanning the Approval Key stored with '+ this.state.availableKeepersName : 'Please approve this request by scanning the Approval Key stored with any of the other backups'
             }
             isOpenedFlag={this.state.showQRScanner}
             onQrScan={async( qrScannedData ) => {
@@ -1426,7 +1435,7 @@ class ContactDetails extends PureComponent<
               } )
             }}
             onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Saaaaaaaa","channelId":"1033c8a86e92232fd979cfa3ca0108c6c9e172dfc27380e31d04c6ed9280a8d6","streamId":"ae1d2a9b5","secondaryChannelKey":"zFtHWgh0NbCYRDxGJiTkKdOW","version":"2.0.0","walletId":"5c4da7520f27cea7689956531ca7bae5ea5c8fe819c68336ad04a1b63fad2276"}'
+              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Test","channelId":"b6fda5fccdcd52d4bf7791f629d5de30d9f559ad6733ff9a0e7d2429745f4ccc","streamId":"765087d33","secondaryChannelKey":"TGfS9qqRHcaQOzOQ6WR1Plhc","version":"2.0.0","walletId":"5999171c4129eca5a12a0221712a708c66a8507ff81c139a33812f3383982766"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />

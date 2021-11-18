@@ -231,6 +231,7 @@ const SecurityQuestionHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
+          showButton={true}
           infoBoxTitle={strings.PasswordHistory}
           infoBoxInfo={strings.Thehistory}
           type={'security'}
@@ -253,10 +254,10 @@ const SecurityQuestionHistory = ( props ) => {
           }}
         />
       </View>
-      <ModalContainer visible={questionModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
         {renderSecurityQuestionContent()}
       </ModalContainer>
-      <ModalContainer visible={successModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>showSuccessModal( false )} visible={successModal} closeBottomSheet={() => {showSuccessModal( false )}} >
         {renderHealthCheckSuccessModalContent()}
       </ModalContainer>
     </View>

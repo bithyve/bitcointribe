@@ -25,7 +25,6 @@ import {
 } from '../../store/actions/BHR'
 import { connect } from 'react-redux'
 import {
-  initializeTrustedContact,
   rejectTrustedContact,
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
@@ -148,7 +147,6 @@ interface HomePropsTypes {
   navigation: any;
   notificationList: any;
   exchangeRates?: any[];
-  initializeTrustedContact: any;
   accountsState: AccountsState;
   cloudPermissionGranted: any;
   wallet: Wallet;
@@ -516,6 +514,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <ModalContainer
+          onBackground={()=>this.setState( {
+            currentBottomSheetKind:null
+          } )}
           visible={this.state.currentBottomSheetKind !== null}
           closeBottomSheet={() => {}}
         >
@@ -597,7 +598,6 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
-    initializeTrustedContact,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,

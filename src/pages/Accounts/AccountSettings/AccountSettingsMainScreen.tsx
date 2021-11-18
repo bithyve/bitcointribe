@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert } from 'react-native'
+import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
 import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
@@ -14,7 +14,10 @@ import { updateAccountSettings } from '../../../store/actions/accounts'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
-
+import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
+import Archive from '../../../assets/images/svgs/icon_archive.svg'
+import Xpub from '../../../assets/images/svgs/xpub.svg'
+import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.ARCHIVED,
@@ -28,7 +31,7 @@ export type Props = {
 export type SettingsListItem = {
   title: string;
   subtitle: string;
-  imageSource: ImageSourcePropType;
+  imageSource: any;
   screenName?: string;
   screenParams?: Record<string, unknown>;
   onOptionPressed?: () => void;
@@ -69,7 +72,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           screenParams: {
             accountShellID: accountShell.id,
           },
-          imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
+          imageSource: () => <NameNDesc />,
         },
         ...( !accountShell.primarySubAccount.isTFAEnabled ? [
           {
@@ -80,7 +83,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
               primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
               accountShellID: accountShell.id,
             },
-            imageSource: require( '../../../assets/images/icons/xpub.png' ),
+            imageSource: () => <Xpub />,
           }
         ] : [] ),
         // {
@@ -98,7 +101,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           screenParams: {
             accountShellID: accountShell.id,
           },
-          imageSource: require( '../../../assets/images/icons/icon_merge_blue.png' ),
+          imageSource: () => <Xpub />,
         }
       ] : [] ),
 
@@ -118,7 +121,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         screenParams: {
           accountShellID: accountShell.id,
         },
-        imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
+        imageSource: () =><Visibilty />,
       },
       // {
       //   title: 'Merge Account',
@@ -130,7 +133,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         title: 'Archive Account',
         subtitle: strings.ArchiveSub,
         onOptionPressed: showArchiveModal,
-        imageSource: require( '../../../assets/images/icons/icon_archive.png' ),
+        imageSource: () => <Archive />,
       },
     ]
   }, [ accountShell ] )
@@ -155,11 +158,9 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         onPress={() => { handleListItemPress( listItem ) }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
-        <Image
-          source={listItem.imageSource}
-          style={ListStyles.thumbnailImageSmall}
-          resizeMode="contain"
-        />
+        <View style={ListStyles.thumbnailImageSmall}>
+          {listItem.imageSource()}
+        </View>
 
         <ListItem.Content style={[ ListStyles.listItemContentContainer, {
           paddingVertical: 10,
@@ -281,19 +282,19 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         keyExtractor={listItemKeyExtractor}
         renderItem={renderItem}
       />
-      <ModalContainer visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setShowAccountArchiveModal( false )} visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
         {showAccountArchiveBottomSheet()}
       </ModalContainer>
 
-      <ModalContainer visible={checkAccountModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
         {checkAccountBalance()}
       </ModalContainer>
 
-      {/* <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => {}}>
+      {/* <ModalContainer onBackground={()=>setShowRescanningPrompt( false )} visible={showRescanningPrompt} closeBottomSheet={() => {}}>
         {showRescanningPromptBottomSheet()}
       </ModalContainer>
 
-      <ModalContainer visible={showRescanning} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setShowRescanning( false )} visible={showRescanning} closeBottomSheet={() => {}}>
         {showRescanningBottomSheet()}
       </ModalContainer> */}
     </>

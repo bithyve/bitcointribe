@@ -7,7 +7,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -23,14 +24,14 @@ import NavStyles from '../../common/Styles/NavStyles'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import SendViaLink from '../../components/SendViaLink'
-import { generateDeepLink, isEmpty } from '../../common/CommonFunctions'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType, isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
-import { DeepLinkEncryptionType, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, DeepLinkKind, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 import idx from 'idx'
@@ -41,15 +42,17 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import Secure2FA from './Secure2FAModal'
 import * as ExpoContacts from 'expo-contacts'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { AccountsState } from '../../store/reducers/accounts'
+import ChangeSelection from '../FriendsAndFamily/ChangeSelection'
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const [ isOTPType, setIsOTPType ] = useState( false )
   const [ shareOtpWithTrustedContactModel, setShareOtpWithTrustedContactModel ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
   const [ secure2FAModal, setSecure2FAModal ] = useState( false )
+  const [ changeSelection, setChangeSelection ] = useState( false )
   const [ SendViaLinkBottomSheet ] = useState(
     React.createRef(),
   )
@@ -62,12 +65,16 @@ export default function AddContactSendRequest( props ) {
   )
   const [ timerModal, setTimerModal ] = useState( false )
   const [ renderTimer, setRenderTimer ] = useState( false )
-
+  const accountsState: AccountsState = useSelector( state => state.accounts )
+  const giftId = props.navigation.getParam( 'giftId' )
+  const giftToSend = accountsState.gifts[ giftId ]
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
-  const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
-
+  const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.NUMBER: DeepLinkEncryptionType.DEFAULT )
+  const [ isOTPType, setIsOTPType ] = useState( false )
+  const themeId = props.navigation.getParam( 'themeId' )
+  const senderEditedName = props.navigation.getParam( 'senderName' )
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
@@ -123,30 +130,32 @@ export default function AddContactSendRequest( props ) {
       // await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
     } )
   }
+
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
-
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
-    // if ( fromEdit ) {
-    //   dispatch( editTrustedContact( {
-    //     channelKey: Contact.channelKey,
-    //     contactName: Contact.name,
-    //     image: Contact.image
-    //   } ) )
-    // } else {
+
     dispatch( initializeTrustedContact( {
       contact: Contact,
-      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
+      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+      giftId
     } ) )
-    // }
+  }, [ Contact, giftId ] )
 
-  }, [ Contact ] )
-
-  useEffect( () => {
+  useEffect( ()=> {
     getContact()
   }, [] )
+
+  // useEffect( () => {
+  //   if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
+  //     // TODO: remove alert and show OTP on the UI
+  //     // setIsOTPType( true )
+  //     // setShareOtpWithTrustedContactModel( true )
+  //     if( encryptionKey ) Alert.alert( 'OTP: ', encryptionKey )
+  //   }
+  // }, [ encryptionKey ] )
 
   useEffect( ()=> {
     if ( !Contact ) return
@@ -158,10 +167,16 @@ export default function AddContactSendRequest( props ) {
   }, [ Contact ] )
 
   useEffect( () => {
-    console.log( 'useEffect Contact', Contact )
+    if( !trustedLink ) generate()  // prevents multiple generation as trusted-contact updates twice during init
+  }, [ Contact, trustedContacts ] )
+
+  useEffect( ()=> {
+    generate() // re-generate deeplink if encryption key changes
+  }, [ encryptLinkWith ] )
+
+  const generate = async () => {
     // capture the contact
     if( !Contact ) return
-    console.log( 'Contact', Contact )
     const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
@@ -214,19 +229,59 @@ export default function AddContactSendRequest( props ) {
             break
       }
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName )
-    setTrustedLink( deepLink )
+    const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+    const extraData = giftToSend?  {
+      channelAddress: giftToSend.channelAddress,
+      amount: giftToSend.amount,
+      note: giftToSend.note,
+      themeId: giftToSend.themeId
+    }: null
+
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
+      deepLinkKind: giftToSend? DeepLinkKind.CONTACT_GIFT: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      encryptionType: encryptLinkWith,
+      encryptionKey: encryption_key,
+      walletName: wallet.walletName,
+      keysToEncrypt,
+      generateShortLink: true,
+      extraData
+    } )
+    const link = shortLink !== '' ? shortLink: deepLink
+    setTrustedLink( link )
     const appVersion = DeviceInfo.getVersion()
-    setTrustedQR(
-      JSON.stringify( {
-        type: existingContact ? QRCodeTypes.EXISTING_CONTACT : isPrimary ? QRCodeTypes.PRIMARY_KEEPER_REQUEST : isKeeper ? QRCodeTypes.KEEPER_REQUEST : QRCodeTypes.CONTACT_REQUEST,
+
+    let qrType: string
+    if( giftToSend ) qrType = QRCodeTypes.CONTACT_GIFT
+    else if( existingContact ) qrType = QRCodeTypes.EXISTING_CONTACT
+    else if( isPrimary ) qrType = QRCodeTypes.PRIMARY_KEEPER_REQUEST
+    else if( isKeeper ) qrType = QRCodeTypes.KEEPER_REQUEST
+    else qrType = QRCodeTypes.CONTACT_REQUEST
+
+    if( giftToSend ){
+      setTrustedQR( JSON.stringify( {
+        type: qrType,
         encryptedChannelKeys: encryptedChannelKeys,
         encryptionType,
         encryptionHint,
         walletName: wallet.walletName,
+        channelAddress: giftToSend.channelAddress,
+        amount: giftToSend.amount,
+        note: giftToSend.note,
+        themeId: giftToSend.themeId,
         version: appVersion,
-      } )
-    )
+      } ) )
+    } else{
+      setTrustedQR(
+        JSON.stringify( {
+          type: qrType,
+          encryptedChannelKeys: encryptedChannelKeys,
+          encryptionType,
+          encryptionHint,
+          walletName: wallet.walletName,
+          version: appVersion,
+        } )
+      )
+    }
 
     // update deeplink configuration for the contact
     if( !currentContact.deepLinkConfig || currentContact.deepLinkConfig.encryptionType !== encryptLinkWith )
@@ -239,8 +294,7 @@ export default function AddContactSendRequest( props ) {
           }
         }
       } ) )
-
-  }, [ Contact, trustedContacts, encryptLinkWith ] )
+  }
 
   const openTimer = async () => {
     setTimeout( () => {
@@ -291,6 +345,9 @@ export default function AddContactSendRequest( props ) {
     }
   }, [ Contact, trustedLink ] )
 
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
 
 
   const renderSendViaQRContents = useCallback( () => {
@@ -359,7 +416,9 @@ export default function AddContactSendRequest( props ) {
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <ScrollView >
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor,
+          flexDirection: 'row',
+          justifyContent: 'space-between'
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -375,12 +434,44 @@ export default function AddContactSendRequest( props ) {
               />
             </View>
           </TouchableOpacity>
+          {/* {giftId &&
+          <TouchableOpacity
+            onPress={() => props.navigation.pop( giftId ? 4 : 3 )}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              backgroundColor: Colors.lightBlue,
+              paddingHorizontal: wp( 4 ),
+              paddingVertical: wp( 2 ),
+              marginRight: wp( 5 ),
+              borderRadius: wp( 2 )
+            }}
+          >
+            <Text
+              style={{
+                ...{
+                  color: Colors.backgroundColor1,
+                  fontSize: RFValue( 12 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                }
+              }}
+            >
+            Done
+            </Text>
+          </TouchableOpacity>
+          } */}
         </View>
         <RequestKeyFromContact
           isModal={false}
-          // headerText={'Request Recovery Secret from trusted contact'}
-          subHeaderText={Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
+          headerText={giftId ? 'Send Gift' : null}
+          subHeaderText={ giftId ? 'You can send it to anyone using the QR or the link' : Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
           contactText={strings.adding}
+          isGift={ giftId}
+          themeId={themeId}
+          encryptLinkWith={encryptLinkWith}
+          encryptionKey={encryptionKey}
+          onSelectionChange ={() => setChangeSelection( true )}
+          senderName={senderEditedName}
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
@@ -391,6 +482,7 @@ export default function AddContactSendRequest( props ) {
           onPressDone={() => {
             // openTimer()
           }}
+          amt={numberWithCommas( giftToSend?.amount )}
           onPressShare={() => {
             setTimeout( () => {
               setRenderTimer( true )
@@ -402,6 +494,7 @@ export default function AddContactSendRequest( props ) {
             }
           }}
         />
+        {!giftId &&
         <TouchableOpacity
           onPress={() => setSecure2FAModal( true )}
           style={{
@@ -423,6 +516,7 @@ export default function AddContactSendRequest( props ) {
             backgroundColor={Colors.white}
           />
         </TouchableOpacity>
+        }
         {/* <View style={{
           marginTop: 'auto'
         }}>
@@ -528,7 +622,7 @@ export default function AddContactSendRequest( props ) {
           renderContent={renderContactRequest}
           renderHeader={renderContactRequestHeader}
         /> */}
-        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>setSecure2FAModal( false )} visible={secure2FAModal} closeBottomSheet={() => {}} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}
             onConfirm={( type ) => {
@@ -540,10 +634,28 @@ export default function AddContactSendRequest( props ) {
             Contact={contactInfo}
           />
         </ModalContainer>
-        <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>setChangeSelection( false )} visible={changeSelection} closeBottomSheet={() => {}} >
+          <ChangeSelection
+            closeBottomSheet={()=> setChangeSelection( false )}
+            onConfirm={( index ) => {
+              setChangeSelection( false )
+              if ( index === 0 ) {
+                props.navigation.navigate( 'AddContact' )
+              } else{
+                setSecure2FAModal( true )
+              }
+
+            }}
+          />
+        </ModalContainer>
+        <ModalContainer onBackground={()=>{setTimerModal( false ); setTimeout( () => {
+          setTimerModal( true )
+        }, 200 )}} visible={timerModal }  closeBottomSheet={() => {}} >
           {renderTimerModalContents()}
         </ModalContainer>
-        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>{setShareOtpWithTrustedContactModel( false ); setTimeout( () => {
+          setShareOtpWithTrustedContactModel( true )
+        }, 200 )}} visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
           {renderShareOtpWithTrustedContactContent()}
         </ModalContainer>
       </ScrollView>

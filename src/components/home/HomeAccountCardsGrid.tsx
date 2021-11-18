@@ -105,6 +105,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       if ( index == shellCount - 1 && currentColumn.length > 0 ) {
         columns.push( currentColumn )
       }
+      // }
     } )
     if( columns[ columns.length - 1 ].length === 1 && columns.length !== 1 ) {
       columns[ columns.length - 1 ].push( 'add new' )

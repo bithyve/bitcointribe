@@ -28,7 +28,8 @@ export default StyleSheet.create( {
 
   headerTitles: {
     color: Colors.blue,
-    fontSize: RFValue( 22 ),
+    fontSize: RFValue( 24 ),
+    letterSpacing: 0.01,
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },
@@ -37,7 +38,7 @@ export default StyleSheet.create( {
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: heightPercentageToDP( 1 ),
+    marginTop: heightPercentageToDP( 0.5 ),
     letterSpacing: 0.6
   },
   headerInfoText: {

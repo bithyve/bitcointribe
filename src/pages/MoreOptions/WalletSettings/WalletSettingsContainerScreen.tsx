@@ -120,10 +120,10 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       <ScrollView style={{
         flex: 1
       }}>
-        <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>setShowRescanningModal( false )} visible={showRescanningPrompt} closeBottomSheet={() => { }}>
           {showRescanningPromptBottomSheet()}
         </ModalContainer>
-        <ModalContainer visible={showRescanningModal} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>setShowRescanningModal( false )} visible={showRescanningModal} closeBottomSheet={() => { }}>
           {showRescanningBottomSheet()}
         </ModalContainer>
         {menuOptions.map( ( menuOption, index ) => {

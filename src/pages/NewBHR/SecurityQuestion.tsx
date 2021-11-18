@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -35,6 +36,11 @@ function SecurityQuestion( props ) {
   const { security }: Wallet = useSelector(
     ( state ) => state.storage.wallet,
   )
+  const { translations } = useContext( LocalizationContext )
+  const common = translations[ 'common' ]
+  const strings = translations[ 'bhr' ]
+  const stringsLogin = translations[ 'login' ]
+
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question ? security.question : ''
   const securityAnswer = security.answer ? security.answer : ''
@@ -58,7 +64,7 @@ function SecurityQuestion( props ) {
         setErrorText( '' )
         return
       }
-      setErrorText( 'Answer is incorrect' )
+      setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
     } else {
       setErrorText( '' )
     }
@@ -118,13 +124,12 @@ function SecurityQuestion( props ) {
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                Health Check{'\n'}Confirm Password
+                {strings.HealthCheckConfirmPassword}
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
-                Specify the password{'\n'}as you did at
-                the time of setting up the wallet
+                {strings.Specifythepassword}
               </Text>
             </View>
           </View>
@@ -133,7 +138,7 @@ function SecurityQuestion( props ) {
           }}>
             <View style={styles.dropdownBox}>
               {parseInt( security.questionId ) > 0 ? <Text style={styles.dropdownBoxText}>{securityQuestion}</Text> :
-                <Text style={styles.dropdownBoxText}>Hint: {securityQuestion}</Text>
+                <Text style={styles.dropdownBoxText}>{`${strings.Hint}: ${securityQuestion}`}</Text>
               }
             </View>
             <KeyboardAwareScrollView
@@ -154,11 +159,11 @@ function SecurityQuestion( props ) {
                   width: '100%',
                   marginBottom: hp( '1%' ),
                   borderColor:
-                    errorText == 'Answer is incorrect'
+                    errorText == stringsLogin.Answerisincorrect
                       ? Colors.red
                       : Colors.borderColor,
                 }}
-                placeholder={'Enter answer'}
+                placeholder={stringsLogin.Enteranswer}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 textContentType="none"
@@ -173,7 +178,7 @@ function SecurityQuestion( props ) {
                 }}
                 onBlur={() => {
                   if ( validateAllowedCharacters( answer ) == false ) {
-                    setErrorText( 'Answer must contain lowercase characters(a-z) and digits (0-9)' )
+                    setErrorText( stringsLogin.Answersmust )
                   }
                 }}
                 keyboardType={
@@ -237,9 +242,9 @@ function SecurityQuestion( props ) {
                   props.onPressConfirm()
                 } )
               } else if ( validateAllowedCharacters( answer ) == false ) {
-                setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
+                setErrorText( stringsLogin.Answersmust )
               } else {
-                setErrorText( 'Answer is incorrect' )
+                setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
               }
               setIsDisabled( false )
             }}
@@ -249,7 +254,7 @@ function SecurityQuestion( props ) {
             }}
           >
             <Text style={styles.proceedButtonText}>
-              {!errorText ? 'Confirm' : 'Try Again'}
+              {!errorText ? common.confirm : common.tryAgain}
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>

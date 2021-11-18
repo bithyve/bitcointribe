@@ -223,11 +223,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           backgroundColor: Colors.backgroundColor
         }}
       >
-        <Image
-          source={getAvatarForSubAccount( primarySubAccount, false, true )}
-          style={ImageStyles.thumbnailImageLarge}
-          resizeMode="contain"
-        />
+        {getAvatarForSubAccount( primarySubAccount, false, true )}
 
         <ListItem.Content>
           <ListItem.Title
@@ -291,10 +287,10 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   return (
     <SafeAreaView style={styles.rootContainer}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <ModalContainer visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
+      <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
         {showUnHideArchiveAccountBottomSheet()}
       </ModalContainer>
-      <ModalContainer visible={successModel} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>showSuccessModel( false )} visible={successModel} closeBottomSheet={() => {}} >
         {showSuccessAccountBottomSheet()}
       </ModalContainer>
       <ScrollView>

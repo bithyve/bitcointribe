@@ -39,6 +39,8 @@ import {
 import { autoSyncShells } from '../store/actions/accounts'
 import Relay from '../bitcoin/utilities/Relay'
 import { LocalizationContext } from '../common/content/LocContext'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import { setCloudBackupStatus } from '../store/actions/cloud'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -83,7 +85,7 @@ export default function Login( props ) {
   const existingFCMToken = useSelector(
     ( state ) => state.preferences.fcmTokenValue,
   )
-  const [ requestName, setRequestName ] = useState( null )
+  const [ processedLink, setProcessedLink ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
   const [ creationFlag, setCreationFlag ] = useState( false )
 
@@ -109,6 +111,7 @@ export default function Login( props ) {
   }, [] )
 
   useEffect( () => {
+    dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
@@ -129,8 +132,8 @@ export default function Login( props ) {
       return
     }
     setCreationFlag( true )
-    const requestName = await processDeepLink( url )
-    setRequestName( requestName )
+    const processedLink = await processDeepLink( url )
+    setProcessedLink( processedLink )
   }
 
   useEffect( () => {
@@ -218,15 +221,13 @@ export default function Login( props ) {
           props.navigation.navigate( 'Home', {
             screen: 'Home'
           } )
-        } else if( requestName ){
+        } else if( processedLink ){
           props.navigation.navigate( 'Home', {
             screen: 'Home',
             params: {
-              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-              userKey: requestName && requestName.userKey ? requestName.userKey : null,
-              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+              trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
+              giftRequest: processedLink ? processedLink.giftRequest: null,
+              swanRequest: processedLink ? processedLink.swanRequest: null,
             }
           } )
         }
@@ -235,7 +236,7 @@ export default function Login( props ) {
         dispatch( autoSyncShells() )
       }
     }
-  }, [ isAuthenticated, walletExists, requestName ] )
+  }, [ isAuthenticated, walletExists, processedLink ] )
 
   const bootStrapNotifications = async () => {
     dispatch( setIsPermissionGiven( true ) )
@@ -689,11 +690,18 @@ export default function Login( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'}>
+        <ModalContainer
+          visible={loaderModal}
+          closeBottomSheet={() => {}}
+          background={'rgba(42,42,42,0.4)'}
+          onBackground={()=>{setloaderModal( false ); setTimeout( () => {
+            setloaderModal( true )
+          }, 200 )}}
+        >
           {renderLoaderModalContent()}
         </ModalContainer>
       </View>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => {}}>
         {renderErrorModalContent()}
       </ModalContainer>
       {/* <BottomSheet

@@ -282,6 +282,7 @@ export default function AddContactAddressBook( props ) {
 
   const onPressContinue= () => {
     if ( selectedContacts && selectedContacts.length ) {
+
       if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
         selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
         selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
@@ -295,10 +296,17 @@ export default function AddContactAddressBook( props ) {
         props.navigation.navigate( 'ContactDetails', {
           contact: selectedContacts[ 0 ],
         } )
+      } else if ( props.navigation.state.params?.fromScreen === 'Gift' )  {
+        props.navigation.navigate( 'EnterGiftDetails', {
+          fromScreen: 'Gift',
+          giftId: props.navigation.state.params?.giftId,
+          contact: selectedContacts,
+        } )
 
       } else {
         props.navigation.navigate( 'AddContactSendRequest', {
           SelectedContact: selectedContacts,
+          giftId: props.navigation.state.params?.giftId,
           headerText: strings.addContact,
           subHeaderText:strings.send,
           contactText:strings.adding,
@@ -318,9 +326,9 @@ export default function AddContactAddressBook( props ) {
     const skippedContact = {
       id: uuid(),
     }
-
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: [ skippedContact ],
+      giftId: props.navigation.state.params?.giftId,
       headerText: strings.addContact,
       subHeaderText:strings.send,
       contactText:strings.adding,
@@ -333,12 +341,12 @@ export default function AddContactAddressBook( props ) {
       <SafeAreaView />
       {/* <View style={styles.modalHeaderTitleView}> */}
       <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.white
+        backgroundColor: Colors.backgroundColor
       } ]}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack()
+            props.navigation.pop( props.navigation.state.params?.fromScreen === 'Gift' ? 2 : 1 )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -425,7 +433,7 @@ export default function AddContactAddressBook( props ) {
         <View style={{
           height: '95%', ...props.style
         }}>
-          <View style={styles.selectedContactContainer}>
+          {/* <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
               ? selectedContacts.map( ( value, index ) => {
                 return (
@@ -451,7 +459,7 @@ export default function AddContactAddressBook( props ) {
                 )
               } )
               : null}
-          </View>
+          </View> */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -541,11 +549,12 @@ export default function AddContactAddressBook( props ) {
             style={{
               position: 'absolute',
               bottom: 0,
-              left: hp( 5 ),
-              width: wp( '50%' ),
+              left: hp( 1 ),
+              // width: wp( '50%' ),
               // alignSelf: 'center',
               flexDirection: 'row',
-              // alignItems: 'flex-start',
+              alignItems: 'center',
+              // backgroundColor: 'red'
             }}
           >
             <AppBottomSheetTouchableWrapper
@@ -578,9 +587,17 @@ export default function AddContactAddressBook( props ) {
                 </Text>
               </AppBottomSheetTouchableWrapper>
             }
+            {props.navigation.state.params?.fromScreen === 'Gift' &&
+<View style={styles.statusIndicatorView}>
+
+  <View style={styles.statusIndicatorActiveView} />
+  <View style={styles.statusIndicatorInactiveView} />
+  <View style={styles.statusIndicatorInactiveView} />
+</View>
+            }
           </View>
           {/* )} */}
-          <ModalContainer visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
+          <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
               title={strings.erroraAccessing}
               info={errorMessage}
@@ -598,14 +615,14 @@ export default function AddContactAddressBook( props ) {
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           </ModalContainer>
-          <ModalContainer visible={permissionModal} closeBottomSheet={() => {}}>
+          <ModalContainer onBackground={()=>setModal( false )} visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
               title={strings.why}
               info={strings.info}
               otherText={strings.otherText}
               proceedButtonText={common.continue}
-              isIgnoreButton={false}
+              isIgnoreButton={true}
               onPressProceed={() => {
                 getContactPermission()
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
@@ -626,6 +643,26 @@ export default function AddContactAddressBook( props ) {
 }
 
 const styles = StyleSheet.create( {
+  statusIndicatorView: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginHorizontal: wp( '6%' ),
+    marginBottom: hp( 3 )
+  },
+  statusIndicatorActiveView: {
+    height: 5,
+    width: 25,
+    backgroundColor: Colors.blue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 5,
+    width: 5,
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
@@ -633,7 +670,7 @@ const styles = StyleSheet.create( {
   },
   modalContentContainer: {
     height: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

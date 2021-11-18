@@ -53,7 +53,8 @@ import Header from '../../navigation/stacks/Header'
 import ModalContainer from '../../components/home/ModalContainer'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { LocalizationContext } from '../../common/content/LocContext'
-
+import Gift from '../../assets/images/svgs/icon_gift.svg'
+import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
@@ -528,7 +529,9 @@ class FriendsAndFamilyScreen extends React.Component<
         {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
-            <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
+            <ModalContainer onBackground={()=>this.setState( {
+              showIndicator: false
+            } )} visible={showIndicator} closeBottomSheet={() => {}}>
               <ActivityIndicator color={Colors.white} size='large'/>
             </ModalContainer>
           }
@@ -551,13 +554,41 @@ class FriendsAndFamilyScreen extends React.Component<
               </Text>
               <ToggleContainer />
             </View> */}
-          <Text
-            style={[ styles.pageTitle, {
-              marginTop: hp( 4 ),
-            } ]}
-          >
-            {this.strings[ 'f&f' ]}
-          </Text>
+          <View style={{
+            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp( 3.5 ), marginRight: wp( 6 )
+          }}>
+            <Text
+              style={[ styles.pageTitle, {
+
+              } ]}
+            >
+              {this.strings[ 'f&f' ]}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState( {
+                  isLoadContacts: true,
+                // addFnF: true
+                }, () => {
+                  navigation.navigate( 'AddContact' )
+
+                } )
+              }}
+              style={{
+                ...styles.selectedContactsView,
+              }}
+            >
+              <Text style={[ styles.contactText, {
+                fontSize: RFValue( 24 ),
+              } ]}>+</Text>
+              {/* <Image
+                    style={styles.addGrayImage}
+                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
+                  /> */}
+              <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
+
+            </TouchableOpacity>
+          </View>
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -574,189 +605,54 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }}
           >
-            <View style={{
-              width: '90%',
-              // height: '54%',
-              backgroundColor: Colors.gray7,
-              shadowOpacity: 0.06,
-              shadowOffset: {
-                width: 10, height: 10
-              },
-              shadowRadius: 10,
-              elevation: 2,
-              alignSelf: 'center',
-              borderRadius: wp( 2 ),
-              marginTop: hp( 3 ),
-              marginBottom: hp( 1 ),
-              paddingVertical: hp( 4 ),
-              paddingHorizontal: wp( 4.5 )
-            }}>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
+              style={{
+                width: '90%',
+                // height: '54%',
+                backgroundColor: Colors.gray7,
+                shadowOpacity: 0.06,
+                shadowOffset: {
+                  width: 10, height: 10
+                },
+                shadowRadius: 10,
+                elevation: 2,
+                alignSelf: 'center',
+                borderRadius: wp( 2 ),
+                marginTop: hp( 3 ),
+                marginBottom: hp( 1 ),
+                paddingVertical: hp( 4 ),
+                paddingHorizontal: wp( 4.5 )
+              }}>
               <View style={[ styles.subInfo, {
                 // marginBottom: hp( 3 )
               } ]}>
+                <Gift />
                 <View style={{
-                  flex: 1
+                  flex: 1, marginHorizontal: wp( 2 )
                 }}>
                   <Text style={[ styles.pageTitle, {
-                    fontSize: RFValue( 13 ),
+                    fontSize: RFValue( 11 ),
                     marginHorizontal: wp ( 0 ),
                   } ]}>
                     {this.strings[
-                      'addContact'
+                      'giftsats'
                     ]}
                   </Text>
                   <Text style={{
                     color: Colors.textColorGrey,
-                    fontSize: RFValue( 11 ),
+                    fontSize: RFValue( 10 ),
                     fontFamily: Fonts.FiraSansRegular,
                     marginTop: 3,
-                    width: '100%',
+                    width: '85%',
                   }}>
-                    {this.strings[ 'addressbook' ]}
+                    {this.strings[ 'giftSubText' ]}
                   </Text>
+
                 </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setState( {
-                      isLoadContacts: true,
-                      // addFnF: true
-                    }, () => {
-                      navigation.navigate( 'AddContact' )
-
-                    } )
-                  }}
-                  style={{
-                    ...styles.selectedContactsView,
-                  }}
-                >
-                  <Text style={[ styles.contactText, {
-                    fontSize: RFValue( 24 ),
-                  } ]}>+</Text>
-                  {/* <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                  /> */}
-                  <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
-
-                </TouchableOpacity>
+                <RightArrow />
               </View>
-
-              {/* <View style={styles.subInfo}>
-                <View style={{
-                  flex: 1
-                }}>
-                  <Text style={[ styles.pageTitle, {
-                    fontSize: RFValue( 13 ),
-                    marginHorizontal: wp ( 0 ),
-                  } ]}>
-              Send Sats
-                  </Text>
-                  <Text style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue( 11 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginTop: 3,
-                    width: '100%',
-                  }}>
-      Send with a link, get back if not claimed
-                  </Text>
-                </View>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    // this.setState( {
-                    //   isLoadContacts: true,
-                    // }, () => {
-                    //   navigation.navigate( 'AddContact' )
-                    // } )
-                  }}
-                  style={{
-                    ...styles.selectedContactsView,
-                  }}
-                >
-                */}
-              {/* <Text style={[ styles.contactText, {
-                    fontSize: RFValue( 20 ), padding: wp( 0 )
-                  } ]}>+</Text> */}
-              {/* <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/Holidays_Gift.png' )}
-                  /> */}
-
-              {/* <FontAwesome name="gift" color={Colors.white} size={19} style={{
-                    marginLeft: hp( 0.5 )
-                  }} />
-                  <View>
-                    <Text style={styles.contactText}>Gift Sats</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>  */}
-
-            </View>
-
-            <View>
-
-              {/* <Text style={styles.pageTitle}>Keeper</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who can help me restore my wallet
-            </Text>
-
-            <View style={{
-              marginBottom: 15
-            }}>
-              <View style={{
-                height: 'auto'
-              }}>
-                {( keepers.length && keepers.map( ( item, index ) => {
-                  return this.renderContactListItem( {
-                    contactDescription: item,
-                    index,
-                    contactsType: 'Keeper',
-                  } )
-                } ) ) || <View style={{
-                  height: wp( '22%' ) + 30
-                }} />}
-              </View>
-            </View> */}
-            </View>
-            {/* {otherContacts.length > 0 &&
-            <View style={{
-              width: wp ( '95%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center'
-            }}>
-              <View style={{
-                flexDirection: 'row',  justifyContent: 'space-between'
-              }}>
-                <Text
-                  style={styles.cardTitle}
-                >
-            Recently Sent
-                </Text>
-                <TouchableOpacity>
-                  <Image
-                    style={styles.moreImage}
-                    source={require( '../../assets/images/icons/icon_more.png' )}
-                  />
-                </TouchableOpacity>
-              </View>
-
-
-              <View style={{
-                flexDirection: 'row',  alignSelf: 'flex-start', flex: 1, marginLeft: wp( 1 )
-              }}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  {otherContacts.map( ( item, index ) => {
-                    return this.renderContactItem( {
-                      contactDescription: item,
-                      index,
-                      contactsType: 'Other Contacts',
-                    } )
-                  } )}
-                </ScrollView>
-
-              </View>
-            </View>
-            } */}
-
+            </TouchableOpacity>
             <View style={{
               marginTop: wp( '5%' )
             }}>
@@ -816,32 +712,6 @@ class FriendsAndFamilyScreen extends React.Component<
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
-        {/* <ModalContainer visible={showModal} closeBottomSheet={() => this.setState( {
-          showModal: false,
-        } )} >
-          <AddContactAddressBook
-            isLoadContacts={isLoadContacts}
-            proceedButtonText={'Confirm & Proceed'}
-          />
-        </ModalContainer> */}
-        {/* <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.helpBottomSheetRef}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '87%' )
-              : hp( '89%' ),
-          ]}
-          renderContent={this.renderHelpContent}
-          renderHeader={this.renderHelpHeader}
-          onCloseEnd={() => {
-            this.setState( {
-              isShowingKnowMoreSheet: false
-            } )
-          }}
-        /> */}
       </View>
     /* feature/2.0 */
     )
@@ -1019,7 +889,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // marginHorizontal: wp ( 6 ),
+    marginRight: wp ( 3 ),
     flex: 1,
     marginBottom: 2
   },
