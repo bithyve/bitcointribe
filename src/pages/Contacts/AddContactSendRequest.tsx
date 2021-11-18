@@ -67,7 +67,7 @@ export default function AddContactSendRequest( props ) {
   const [ renderTimer, setRenderTimer ] = useState( false )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const giftId = props.navigation.getParam( 'giftId' )
-  const giftToSend = accountsState.gifts[ giftId ]
+  const giftToSend = giftId? accountsState.gifts[ giftId ]: null
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
