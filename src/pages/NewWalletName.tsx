@@ -287,7 +287,7 @@ export default function NewWalletName( props ) {
         isVisible={bottomSheetState === BottomSheetState.Open}
         onPress={closeBottomSheet}
       /> */}
-      <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setCurrentBottomSheetKind( null )} visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
       </ModalContainer>
     </SafeAreaView>

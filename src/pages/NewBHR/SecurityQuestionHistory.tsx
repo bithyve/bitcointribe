@@ -254,10 +254,10 @@ const SecurityQuestionHistory = ( props ) => {
           }}
         />
       </View>
-      <ModalContainer visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
+      <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
         {renderSecurityQuestionContent()}
       </ModalContainer>
-      <ModalContainer visible={successModal} closeBottomSheet={() => {showSuccessModal( false )}} >
+      <ModalContainer onBackground={()=>showSuccessModal( false )} visible={successModal} closeBottomSheet={() => {showSuccessModal( false )}} >
         {renderHealthCheckSuccessModalContent()}
       </ModalContainer>
     </View>

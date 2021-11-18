@@ -1051,7 +1051,9 @@ class ManageBackupNewBHR extends Component<
             </View>
           </ScrollView>
 
-          <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}}>
+          <ModalContainer onBackground={()=>this.setState( {
+            keeperTypeModal:false
+          } )} visible={keeperTypeModal} closeBottomSheet={() => {}}>
             <KeeperTypeModalContents
               headerText={'Backup Recovery Key'}
               subHeader={strings[ 'saveyourRecovery' ]}
@@ -1108,7 +1110,9 @@ class ManageBackupNewBHR extends Component<
               selectedLevelId={selectedLevelId}
             />
           </ModalContainer >
-          <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+          <ModalContainer onBackground={()=>this.setState( {
+            errorModal:false
+          } )} visible={errorModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               modalRef={this.ErrorBottomSheet as any}
               title={this.state.errorTitle}
@@ -1133,13 +1137,19 @@ class ManageBackupNewBHR extends Component<
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           </ModalContainer>
-          <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
+          <ModalContainer onBackground={()=>this.setState( {
+            showQRModal:false
+          } )} visible={showQRModal} closeBottomSheet={() => {}} >
             {this.renderQrContent()}
           </ModalContainer>
-          <ModalContainer visible={knwowMoreModal} closeBottomSheet={() => {}} >
+          <ModalContainer onBackground={()=>this.setState( {
+            knwowMoreModal:false
+          } )} visible={knwowMoreModal} closeBottomSheet={() => {}} >
             {this.renderKnowMoreModalContent()}
           </ModalContainer>
-          <ModalContainer visible={cloudErrorModal} closeBottomSheet={() => {this.setState( {
+          <ModalContainer onBackground={()=>this.setState( {
+            cloudErrorModal:false
+          } )} visible={cloudErrorModal} closeBottomSheet={() => {this.setState( {
             cloudErrorModal: false
           } )}}>
             {this.renderCloudErrorContent()}

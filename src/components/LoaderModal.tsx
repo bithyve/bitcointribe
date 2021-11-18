@@ -13,7 +13,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 export default function LoaderModal( props ) {
   return ( <View style={{
-    maxHeight: hp( '72%' ), backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    maxHeight: 'auto', backgroundColor: 'rgba(0, 0, 0, 0.3)'
   }}>
     <View style={styles.modalContentContainer}>
       <View style={{

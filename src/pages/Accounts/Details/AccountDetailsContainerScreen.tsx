@@ -406,10 +406,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         stickySectionHeadersEnabled={false}
         keyExtractor={sectionListItemKeyExtractor}
       />
-      <ModalContainer visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
+      <ModalContainer onBackground={()=>setShowMore( false )} visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
         {showKnowMoreSheet()}
       </ModalContainer>
-      <ModalContainer visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
+      <ModalContainer onBackground={()=>showWebView( false )} visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
         <RootSiblingParent>
           {showDonationWebViewSheet()}
         </RootSiblingParent>
@@ -433,7 +433,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
       {
         primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && (
-          <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {
+          <ModalContainer onBackground={()=>setSecureAccountKnowMore( false )} visible={secureAccountKnowMore} closeBottomSheet={() => {
             if( !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ){
               setSecureAccountAlert( true )
             }

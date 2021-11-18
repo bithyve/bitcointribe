@@ -690,11 +690,18 @@ export default function Login( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'}>
+        <ModalContainer
+          visible={loaderModal}
+          closeBottomSheet={() => {}}
+          background={'rgba(42,42,42,0.4)'}
+          onBackground={()=>{setloaderModal( false ); setTimeout( () => {
+            setloaderModal( true )
+          }, 200 )}}
+        >
           {renderLoaderModalContent()}
         </ModalContainer>
       </View>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => {}}>
         {renderErrorModalContent()}
       </ModalContainer>
       {/* <BottomSheet

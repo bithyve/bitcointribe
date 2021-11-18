@@ -135,6 +135,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ isDisabled, setIsDisabled ] = useState( false )
   // const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ loaderModal, setLoaderModal ] = useState( false )
+  const [ signUpStarted, setSignUpStarted ] = useState( false )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ confirmPswdTextInput ] = useState( React.createRef() )
   const [ hint ] = useState( React.createRef() )
@@ -196,10 +197,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     // }
     if( walletSetupCompleted ) {
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
+      // setTimeout( () => {
+      setSignUpStarted( false )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
+      // }, 5000 )
+
     }
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
@@ -280,23 +285,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }
 
-
-  const handleHintSubmit = () => {
-    if ( pswd && confirmPswd && confirmPswd != pswd ) {
-      setPswdError( 'Password do not match' )
-    } else if (
-      validateAllowedCharacters( pswd ) == false ||
-      validateAllowedCharacters( tempPswd ) == false
-    ) {
-      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
-    } else {
-      setTimeout( () => {
-        setPswdError( '' )
-      }, 2 )
-    }
-  }
-
-
   useEffect( () => {
     if ( answer.trim() == confirmAnswer.trim() && answer && confirmAnswer && answerError.length == 0 ) {
       setVisibleButton( true )
@@ -332,6 +320,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ confirmPswd ] )
 
   const onPressProceed = ( isSkip? ) => {
+    setSignUpStarted( true )
     showLoader()
     let security = null
     if ( activeIndex === 0 ) {
@@ -405,23 +394,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const renderLoaderModalContent = useCallback( () => {
     return <LoaderModal headerText={message} messageText={subTextMessage} subPoints={subPoints} bottomText={bottomTextMessage} />
-  }, [ message, subTextMessage ] )
-
-  const renderLoaderModalHeader = () => {
-    return (
-      <View
-        style={{
-          marginTop: 'auto',
-          flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp( '75%' ),
-          zIndex: 9999,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      />
-    )
-  }
+  }, [ message, subTextMessage, loaderModal,  ] )
 
   const confirmAction = () => {
     dispatch( updateCloudPermission( true ) )
@@ -1206,6 +1179,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   //   }
   // }
 
+  const onBackgroundOfLoader = () => {
+    console.log( 'onBackground' )
+    setLoaderModal( false )
+    if( signUpStarted ) setTimeout( () => {
+      console.log( 'TIMEOUT' )
+      setLoaderModal( true )
+    }, 100 )
+  }
+
   return (
     <View style={{
       flex: 1,
@@ -1336,28 +1318,20 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}>{`${common.skip} Backup`}</Text>
         </TouchableOpacity>
       </View>
-      {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
-        {renderBottomSheetContent()}
-      </ModalContainer> */}
-      <ModalContainer visible={securityQue} closeBottomSheet={() => {}} >
-        {renderSecurityQuestion()}
-      </ModalContainer>
-      <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {}} >
-        {renderEncryptionPswd()}
-      </ModalContainer>
-      <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
+
+      <ModalContainer
+        onBackground={()=>onBackgroundOfLoader()}
+        visible={loaderModal}
+        closeBottomSheet={null}
+      >
         {renderLoaderModalContent()}
       </ModalContainer>
-      {/* <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={loaderBottomSheet}
-        snapPoints={[ -50, hp( '100%' ) ]}
-        renderContent={renderLoaderModalContent}
-        renderHeader={renderLoaderModalHeader}
-      /> */}
-
+      <ModalContainer onBackground={()=>showSecurityQue( false )} visible={securityQue} closeBottomSheet={null} >
+        {renderSecurityQuestion()}
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{showEncryptionPswd( false )}} visible={encryptionPswd} closeBottomSheet={null} >
+        {renderEncryptionPswd()}
+      </ModalContainer>
     </View>
   )
 }

@@ -419,14 +419,14 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         renderHeader={renderQrHeader}
       /> */}
       {qrModal &&
-        <ModalContainer visible={qrModal} closeBottomSheet={() => {}}>
+        <ModalContainer onBackground={()=>showQRModel( false )} visible={qrModal} closeBottomSheet={() => {}}>
           {renderQrContent()}
         </ModalContainer>
       }
-      <ModalContainer visible={reset2FAModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setReset2FAModal( false )}  visible={reset2FAModal} closeBottomSheet={() => {}} >
         {renderErrorModalContent()}
       </ModalContainer>
-      <ModalContainer visible={serverNotRespondingModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>showServerNotRespondingModal( false )}  visible={serverNotRespondingModal} closeBottomSheet={() => {}}>
         {renderServerNotRespondingContent()}
       </ModalContainer>
     </SafeAreaView>

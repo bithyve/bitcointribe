@@ -514,6 +514,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <ModalContainer
+          onBackground={()=>this.setState( {
+            currentBottomSheetKind:null
+          } )}
           visible={this.state.currentBottomSheetKind !== null}
           closeBottomSheet={() => {}}
         >

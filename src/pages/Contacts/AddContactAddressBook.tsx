@@ -597,7 +597,7 @@ export default function AddContactAddressBook( props ) {
             }
           </View>
           {/* )} */}
-          <ModalContainer visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
+          <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
               title={strings.erroraAccessing}
               info={errorMessage}
@@ -615,7 +615,7 @@ export default function AddContactAddressBook( props ) {
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           </ModalContainer>
-          <ModalContainer visible={permissionModal} closeBottomSheet={() => {}}>
+          <ModalContainer onBackground={()=>setModal( false )} visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
               title={strings.why}
