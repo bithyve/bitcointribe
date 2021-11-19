@@ -293,7 +293,9 @@ export default function ManageBackup( props ) {
       setErrorInfo( errorInfoProp )
       setShowLoader( false )
       dispatch( setLevelCompletionError( null, null, LevelStatus.PENDING ) )
-      setErrorModal( true )
+      setTimeout( () => {
+        setErrorModal( true )
+      }, 600 )
     }
   }, [ status ] )
 
@@ -668,7 +670,7 @@ export default function ManageBackup( props ) {
           </View>
         </ScrollView>
 
-        <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
+        <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
           <KeeperTypeModalContents
             headerText={'Backup Recovery Key'}
             subHeader={strings[ 'saveyourRecovery' ]}
@@ -714,7 +716,7 @@ export default function ManageBackup( props ) {
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={errorModal} closeBottomSheet={() => setErrorModal( false )}>
+        <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => setErrorModal( false )}>
           <ErrorModalContents
             title={errorTitle}
             info={errorInfo}
@@ -732,7 +734,7 @@ export default function ManageBackup( props ) {
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />
         </ModalContainer>
-        <ModalContainer visible={knowMoreModal} closeBottomSheet={() => setKnowMoreModal( false )} >
+        <ModalContainer onBackground={()=>setKnowMoreModal( false )} visible={knowMoreModal} closeBottomSheet={() => setKnowMoreModal( false )} >
           <MBNewBhrKnowMoreSheetContents
             type={knowMoreType}
             titleClicked={()=> setKnowMoreModal( false ) }
@@ -741,7 +743,7 @@ export default function ManageBackup( props ) {
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={cloudErrorModal} closeBottomSheet={() => setCloudErrorModal( false ) }>
+        <ModalContainer onBackground={()=>setCloudErrorModal( false )} visible={cloudErrorModal} closeBottomSheet={() => setCloudErrorModal( false ) }>
           <ErrorModalContents
             title={strings[ 'CloudBackupError' ]}
             //info={cloudErrorMessage}

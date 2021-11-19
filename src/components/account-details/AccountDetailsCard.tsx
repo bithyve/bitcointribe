@@ -252,7 +252,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
   return (
     <View style={rootContainerStyle}>
       {swanModal &&
-      <ModalContainer visible={swanModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>{showSwanModal( false )
+        setTimeout( () => {
+          showSwanModal( true )
+        }, 200 )}} visible={swanModal} closeBottomSheet={() => {}} >
         <BottomSheetSwanInfo
           swanDeepLinkContent={swanDeepLinkContent}
           onClickSetting={() => {

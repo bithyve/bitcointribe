@@ -21,11 +21,19 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { AccountType, Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
+import {
+  AccountType,
+  Gift,
+  GiftStatus,
+  GiftType,
+} from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import { associateGift, reclaimGift } from '../../store/actions/trustedContacts'
+import {
+  associateGift,
+  reclaimGift,
+} from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
@@ -38,34 +46,66 @@ import ThemeList from './Theme'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { title, walletName, gift, avatar, contactDetails }: { title: string, walletName: string, gift: Gift, avatar: boolean, contactDetails:any } = navigation.state.params
+  const {
+    title,
+    walletName,
+    gift,
+    avatar,
+    contactDetails,
+  }: {
+    title: string;
+    walletName: string;
+    gift: Gift;
+    avatar: boolean;
+    contactDetails: any;
+  } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
-  const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
+  const accountShells: AccountShell[] = useSelector( ( state ) =>
+    idx( state, ( _ ) => _.accounts.accountShells )
+  )
   //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-
   const getTheme = () => {
     // props.themeId
-    const filteredArr = ThemeList.filter( ( item => item.id === gift.themeId ) )
+    const filteredArr = ThemeList.filter( ( item ) => item.id === gift.themeId )
     return filteredArr[ 0 ]
   }
 
+  const bottomButton = ( onPressButton, text ) =>{
+    return <TouchableOpacity
+      style={styles.bottomButton}
+      onPress={() => onPressButton()}
+    >
+      <Text style={styles.buttonText}>{text}</Text>
+    </TouchableOpacity>
+  }
+
   return (
-    <ScrollView contentContainerStyle={{
-      flexGrow: 1, height: '100%'
-    }}
-    keyboardShouldPersistTaps='handled'
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        height: '100%',
+      }}
+      keyboardShouldPersistTaps="handled"
     >
       <SafeAreaView style={styles.viewContainer}>
-        <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-        <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
-        } ]}>
+        <StatusBar
+          backgroundColor={Colors.backgroundColor}
+          barStyle="dark-content"
+        />
+        <View
+          style={[
+            CommonStyles.headerContainer,
+            {
+              backgroundColor: Colors.backgroundColor,
+            },
+          ]}
+        >
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
@@ -81,9 +121,14 @@ const GiftDetails = ( { navigation } ) => {
             </View>
           </TouchableOpacity>
         </View>
-        <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginRight: wp( 4 )
-        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            marginRight: wp( 4 ),
+          }}
+        >
           <HeaderTitle
             firstLineTitle={'Gift Card Details'}
             secondLineTitle={'Logs of Gift status appear here'}
@@ -95,284 +140,342 @@ const GiftDetails = ( { navigation } ) => {
         </View>
         <TouchableOpacity
           onPress={() => setIsOpen( !isOpen )}
-          style={gift.status === GiftStatus.CREATED ? [ styles.dashedContainer, {
-            // position: isOpen ? 'absolute': 'relative'
-          } ] : [ styles.dashedContainer, {
-            borderColor: Colors.white,
-            shadowOpacity: isOpen ? 1 : 0,
-          } ]}>
-          <View style={gift.status === GiftStatus.CREATED ? styles.dashedStyle : styles.normalStyle}>
-
-            <View style={{
-              marginHorizontal: wp( 1 ), flexDirection: 'row', justifyContent: 'space-between',
-            }}>
-              <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-                fontWeight: '600'
-              }}>
+          style={
+            gift.status === GiftStatus.CREATED
+              ? [
+                styles.dashedContainer,
+                {
+                  // position: isOpen ? 'absolute': 'relative'
+                },
+              ]
+              : [
+                styles.dashedContainer,
+                {
+                  borderColor: Colors.white,
+                  shadowOpacity: isOpen ? 1 : 0,
+                },
+              ]
+          }
+        >
+          <View
+            style={
+              gift.status === GiftStatus.CREATED
+                ? styles.dashedStyle
+                : styles.normalStyle
+            }
+          >
+            <View
+              style={{
+                marginHorizontal: wp( 1 ),
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontWeight: '600',
+                }}
+              >
                 {title}
               </Text>
-              <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-              }}>
-                at {moment( gift.timestamps.created ).format( 'lll' )}
+              <Text
+                style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {moment( gift.timestamps.created ).format( 'lll' )}
               </Text>
             </View>
-            <View style={{
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: hp( 1 )
-            }}>
-              <View style={{
+            <View
+              style={{
                 flexDirection: 'row',
-              }}>
-                {avatar && walletName && contactDetails ?
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: hp( 1 ),
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                }}
+              >
+                {avatar && walletName && contactDetails ? (
                   <View style={styles.avatarContainer}>
-                    <RecipientAvatar recipient={contactDetails} contentContainerStyle={styles.avatarImage} />
+                    <RecipientAvatar
+                      recipient={contactDetails}
+                      contentContainerStyle={styles.avatarImage}
+                    />
                   </View>
-                  :
+                ) : (
                   <CheckingAcc />
-                }
-                <View style={{
-                  marginLeft: wp( 1 ),
-                  alignSelf: 'center'
-                }}>
-                  <Text style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue( 11 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontWeight: '600'
-                  }}>
+                )}
+                <View
+                  style={{
+                    marginLeft: wp( 1 ),
+                    alignSelf: 'center',
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue( 11 ),
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontWeight: '600',
+                    }}
+                  >
                     {walletName ? walletName : 'Checking Account'}
                   </Text>
                   {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
                   </Text> */}
                 </View>
-
               </View>
-              <View style={{
-                flexDirection: 'row', alignItems: 'center'
-              }}>
-
-
-                <Text style={{
-                  color: Colors.black,
-                  fontSize: RFValue( 18 ),
-                  fontFamily: Fonts.FiraSansRegular, marginHorizontal: wp( 2 )
-                }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.black,
+                    fontSize: RFValue( 18 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginHorizontal: wp( 2 ),
+                  }}
+                >
                   {numberWithCommas( gift.amount )}
-                  <Text style={{
-                    color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular
-                  }}> sats
+                  <Text
+                    style={{
+                      color: Colors.lightTextColor,
+                      fontSize: RFValue( 10 ),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                  >
+                    {' '}
+                    sats
                   </Text>
                 </Text>
-                {gift.status !== GiftStatus.CREATED ?
-                  isOpen ? <ArrowUp /> : <ArrowDown /> : null}
+                {gift.status !== GiftStatus.CREATED ? (
+                  isOpen ? (
+                    <ArrowUp />
+                  ) : (
+                    <ArrowDown />
+                  )
+                ) : null}
               </View>
             </View>
           </View>
-          {isOpen && gift.status !== GiftStatus.CREATED && gift.type === GiftType.SENT && gift?.deepLinkConfig?.encryptionType === 'OTP' &&
-            <View style={{
-              marginHorizontal: wp( 1 )
-            }}>
-              <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-                fontWeight: '600',
-              }}>
-                Share OTP with contact
-              </Text>
-              <View style={{
-                flexDirection: 'row', marginLeft: wp( 3 ), marginVertical: hp( 2 )
-              }}>
-                {gift?.deepLinkConfig?.encryptionKey.split( '' ).map( ( num, index ) => {
-                  return (
-                    <View
-                      key={index}
-                      style={{
-
-                        alignItems: 'center', backgroundColor: Colors.backgroundColor, marginHorizontal: wp( 1 ), borderRadius: wp( 2 )
-                      }}>
-                      <Text style={{
-                        marginHorizontal: wp( 4 ), marginVertical: wp( 3 )
-                      }}>{num}</Text>
-                    </View>
-                  )
-                } )}
-              </View>
-            </View>
-          }
-          {isOpen && gift.status !== GiftStatus.CREATED && gift.type === GiftType.SENT &&  gift.note !== '' &&
-            <View style={{
-              marginHorizontal: wp( 1 ),
-            }}>
-              <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-                fontWeight: '600'
-              }}>
-                Message to recipient
+          {isOpen &&
+            gift.status !== GiftStatus.CREATED &&
+            gift.type === GiftType.SENT &&
+            gift?.deepLinkConfig?.encryptionType === 'OTP' && (
+            <View
+              style={{
+                marginHorizontal: wp( 1 ),
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontWeight: '600',
+                }}
+              >
+                  Share OTP with contact
               </Text>
               <View
                 style={{
-                  marginLeft: wp( 3 ), marginVertical: hp( 2 ),
-                  alignItems: 'center', backgroundColor: Colors.backgroundColor, marginHorizontal: wp( 2 ), borderRadius: wp( 2 ), marginRight: wp( 9 )
-                }}>
-                <Text style={{
-                  marginHorizontal: wp( 3 ), marginVertical: wp( 2 ), color: Colors.textColorGrey,
-                  fontSize: RFValue( 10 ),
-                  letterSpacing: 0.5,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}>{gift.note}</Text>
-              </View>
-
-            </View>
-          }
-        </TouchableOpacity>
-        <View style={{
-          marginVertical: hp( 2 )
-        }}>
-          {Object.entries( gift.timestamps ?? {
-          } ).reverse().map( ( item, index ) => {
-
-            if ( gift.type === GiftType.RECEIVED && ( item[ 0 ] == 'created' || item[ 0 ] == 'sent' || item[ 0 ] == 'reclaimed' ) ) {
-              return null
-            }
-            return(
-              <View key={index} style={styles.timeInfo}>
-                <View style={{
                   flexDirection: 'row',
-                }}>
-                  <View style={styles.dot} />
-                  <Text style={{
-                    color: Colors.lightTextColor,
+                  marginLeft: wp( 3 ),
+                  marginVertical: hp( 2 ),
+                }}
+              >
+                {gift?.deepLinkConfig?.encryptionKey
+                  .split( '' )
+                  .map( ( num, index ) => {
+                    return (
+                      <View
+                        key={index}
+                        style={{
+                          alignItems: 'center',
+                          backgroundColor: Colors.backgroundColor,
+                          marginHorizontal: wp( 1 ),
+                          borderRadius: wp( 2 ),
+                        }}
+                      >
+                        <Text
+                          style={{
+                            marginHorizontal: wp( 4 ),
+                            marginVertical: wp( 3 ),
+                          }}
+                        >
+                          {num}
+                        </Text>
+                      </View>
+                    )
+                  } )}
+              </View>
+            </View>
+          )}
+          {isOpen &&
+            gift.status !== GiftStatus.CREATED &&
+            gift.type === GiftType.SENT &&
+            gift.note !== '' && (
+            <View
+              style={{
+                marginHorizontal: wp( 1 ),
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontWeight: '600',
+                }}
+              >
+                  Message to recipient
+              </Text>
+              <View
+                style={{
+                  marginLeft: wp( 3 ),
+                  marginVertical: hp( 2 ),
+                  alignItems: 'center',
+                  backgroundColor: Colors.backgroundColor,
+                  marginHorizontal: wp( 2 ),
+                  borderRadius: wp( 2 ),
+                  marginRight: wp( 9 ),
+                }}
+              >
+                <Text
+                  style={{
+                    marginHorizontal: wp( 3 ),
+                    marginVertical: wp( 2 ),
+                    color: Colors.textColorGrey,
                     fontSize: RFValue( 10 ),
+                    letterSpacing: 0.5,
                     fontFamily: Fonts.FiraSansRegular,
-                    fontWeight: '600'
-                  }}>
-
-                    {moment( item[ 1 ] ).format( 'lll' )}
-                  </Text>
-                </View>
-                <View style={{
-                  flexDirection: 'row', alignItems: 'flex-start'
-                }}>
-                  <View style={styles.line} />
-                  <View style={[ styles.normalStyle, {
-                    width: wp( '80%' ), borderRadius: wp( 2 ), paddingVertical: hp( 1 ), marginTop: hp( 1 )
-                  } ]}>
-                    <Text style={[ styles.modalInfoText, {
-                      marginBottom: hp( 1 )
-                    } ]}>
-                      Gift Card {item[ 0 ]}
+                  }}
+                >
+                  {gift.note}
+                </Text>
+              </View>
+            </View>
+          )}
+        </TouchableOpacity>
+        <View
+          style={{
+            marginVertical: hp( 2 ),
+          }}
+        >
+          {Object.entries( gift.timestamps ?? {
+          } )
+            .reverse()
+            .map( ( item, index ) => {
+              if (
+                gift.type === GiftType.RECEIVED &&
+                ( item[ 0 ] == 'created' ||
+                  item[ 0 ] == 'sent' ||
+                  item[ 0 ] == 'reclaimed' )
+              ) {
+                return null
+              }
+              return (
+                <View key={index} style={styles.timeInfo}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                    }}
+                  >
+                    <View style={styles.dot} />
+                    <Text
+                      style={{
+                        color: Colors.lightTextColor,
+                        fontSize: RFValue( 10 ),
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontWeight: '600',
+                      }}
+                    >
+                      {moment( item[ 1 ] ).format( 'lll' )}
                     </Text>
-                    {/* <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text> */}
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <View style={styles.line} />
+                    <View
+                      style={[
+                        {
+                          width: wp( '80%' ),
+                          borderRadius: wp( 2 ),
+                          paddingVertical: hp( 1.5 ),
+                          marginTop: hp( 1 ),
+                          marginBottom: hp( 1 ),
+                          backgroundColor: Colors.gray7,
+                          paddingHorizontal: hp( 1.5 ),
+                        },
+                      ]}
+                    >
+                      <Text style={styles.modalInfoText}>
+                        Gift Card {item[ 0 ]}
+                      </Text>
+                      {/* <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text> */}
+                    </View>
                   </View>
                 </View>
-
-
-              </View>
-            )
-          } )}
-
+              )
+            } )}
         </View>
       </SafeAreaView>
-
-      {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ?
-        (
-          <View style={{
-            ...styles.keeperViewStyle
-          }}><TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-              }}
-              onPress={() => {
-                dispatch( reclaimGift( gift.id ) )
-                navigation.goBack()
-              }}
-            >
-              <Text style={[ styles.buttonText, {
-              } ]}>Reclaim Gift Card</Text>
-              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-              }}
-              onPress={() => {
-              }}
-            >
-              <Text style={[ styles.buttonText, {
-              } ]}>Send Reminder</Text>
-              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
-            </TouchableOpacity>
-          </View>
+      <View style={{
+        marginBottom: wp( '3%' ), marginTop: wp( '3%' ), flexDirection: 'row',
+        justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ),
+        paddingVertical: wp( '2%' ),
+      }}>
+        {/* Reclaim */}
+        {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ? (
+          bottomButton( () => {
+            dispatch( reclaimGift( gift.id ) )
+            navigation.goBack()
+          }, 'Reclaim' )
         ) : null}
-      {gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ?
-        (
-          <View style={{
-            ...styles.keeperViewStyle
-          }}><TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-              }}
-              onPress={() => {
-              // dispatch( reclaimGift( gift.id ) )
-                navigation.navigate( 'EnterGiftDetails', {
-                  giftId: ( gift as Gift ).id,
-                } )
-              }}
-            >
-              <Text style={[ styles.buttonText, {
-              } ]}>Send Gift Card</Text>
-              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-              }}
-              onPress={() => {
-              }}
-            >
-              <Text style={[ styles.buttonText, {
-              } ]}>Expire Gift Card</Text>
-              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
-            </TouchableOpacity>
-          </View>
+        {/* Resend */}
+        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
+          navigation.navigate( 'EnterGiftDetails', {
+            giftId: ( gift as Gift ).id,
+          } )
+        }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift Card' ) ) : null}
+        {/* Expire */}
+        {/* {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
+          alert( 'Expire' )
+        }, 'Expire' )
+        ) : null} */}
+        {/* Add To Account */}
+        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.REJECTED ) && !gift.receiver.accountId ? (
+          bottomButton( () => {
+            setAcceptGiftModal( true )
+          }, 'Add To Account' )
         ) : null}
-      {gift.status === GiftStatus.ACCEPTED && !gift.receiver.accountId ?
-        (
-          <View style={{
-            backgroundColor: Colors.backgroundColor, width: '100%',
-          }}>
-            <TouchableOpacity
-              style={{
-                ...styles.bottomButton, marginBottom: hp( 3 )
-              }}
-              onPress={() => {setAcceptGiftModal( true )
-              }}
-            >
-              <Text style={[ styles.buttonText, {
-              } ]}>Add To Account</Text>
-              {/* <Text style={styles.buttonSubText}>Lorem ipsum dolor sit amet</Text> */}
-            </TouchableOpacity>
-          </View>
-        ) : null}
-      <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
+      </View>
+      <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
         <View style={styles.modalContentContainer}>
           <AddGiftToAccount
             getTheme={getTheme}
             navigation={navigation}
             giftAmount={gift.amount}
             giftId={( gift as Gift ).id}
-            onCancel={() =>{ setAcceptGiftModal( false ) }}
+            onCancel={() => setAcceptGiftModal( false )}
+            closeModal={()=>setAcceptGiftModal( false )}
           />
         </View>
       </ModalContainer>
@@ -438,7 +541,8 @@ const styles = StyleSheet.create( {
     shadowColor: '#6C6C6C1A',
     shadowOpacity: 1,
     shadowOffset: {
-      width: 10, height: 10
+      width: 10,
+      height: 10
     },
     shadowRadius: 10,
     elevation: 6,
@@ -458,14 +562,16 @@ const styles = StyleSheet.create( {
   },
   bottomButton: {
     backgroundColor: Colors.lightBlue,
-    height: wp( '18%' ),
-    width: wp( '45%' ),
+    height: wp( '13%' ),
+    width: 'auto',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0.5,
     borderColor: Colors.borderColor,
     alignSelf: 'center',
+    paddingLeft: wp( '5%' ),
+    paddingRight: wp( '5%' )
   },
   buttonSubText: {
     marginTop: hp( 0.4 ),
@@ -474,7 +580,7 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.5,
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
-    width: wp( '46%' )
+    width: wp( '46%' ),
   },
   buttonText: {
     color: Colors.backgroundColor1,
@@ -485,15 +591,15 @@ const styles = StyleSheet.create( {
     // marginRight: 10,
     marginLeft: 0,
     marginRight: 0,
-    width: wp( '46%' ),
+    // width: wp( '46%' ),
     textAlign: 'center'
   },
   keeperViewStyle: {
     flexDirection: 'row',
     backgroundColor: Colors.backgroundColor,
-    paddingHorizontal:wp( '4%' ),
+    paddingHorizontal: wp( '2%' ),
+    paddingVertical: wp( '2%' ),
     justifyContent: 'space-between',
-    height: wp( '30' ),
   },
   modalTitleText: {
     color: Colors.blue,
@@ -504,7 +610,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginRight: wp( 10 )
+    marginRight: wp( 10 ),
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor,
@@ -524,10 +630,11 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15
+      width: 15,
+      height: 15,
     },
     backgroundColor: Colors.blue,
-    marginLeft: wp( 2 )
+    marginLeft: wp( 2 ),
   },
   disabledButtonView: {
     height: wp( '12%' ),
@@ -538,10 +645,11 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15
+      width: 15,
+      height: 15,
     },
     backgroundColor: Colors.lightBlue,
-    marginLeft: wp( 2 )
+    marginLeft: wp( 2 ),
   },
   imageView: {
     width: 18,
@@ -553,7 +661,8 @@ const styles = StyleSheet.create( {
     elevation: 10,
     shadowOpacity: 0.1,
     shadowOffset: {
-      width: 1, height: 1
+      width: 1,
+      height: 1,
     },
   },
   modalInputBox: {
@@ -580,12 +689,13 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 10, height: 10
+      width: 10,
+      height: 10,
     },
     backgroundColor: Colors.white,
   },
   accImage: {
-    marginRight: wp( 4 )
+    marginRight: wp( 4 ),
   },
   availableToSpendText: {
     color: Colors.blue,
@@ -601,7 +711,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.FiraSansMedium,
   },
   selectedContactsView: {
     flexDirection: 'row',
@@ -610,7 +720,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     borderRadius: wp( 2 ),
     height: hp( 4 ),
-    paddingHorizontal: wp( 2 )
+    paddingHorizontal: wp( 2 ),
   },
   contactText: {
     fontSize: RFValue( 13 ),

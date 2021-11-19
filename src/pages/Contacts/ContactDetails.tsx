@@ -1034,7 +1034,9 @@ class ContactDetails extends PureComponent<
         </View>
 
         {showContactDetails &&
-          <ModalContainer visible={showContactDetails} closeBottomSheet={() => {
+          <ModalContainer onBackground={()=>this.setState( {
+            showContactDetails:false
+          } )} visible={showContactDetails} closeBottomSheet={() => {
             this.setState( {
               showContactDetails: false
             } )
@@ -1325,13 +1327,19 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderSendViaLinkContents}
           renderHeader={this.renderSendViaLinkHeader}
         />
-        <ModalContainer visible={sendViaQRModel} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>this.setState( {
+          sendViaQRModel: false
+        } )} visible={sendViaQRModel} closeBottomSheet={() => { }}>
           {this.renderSendViaQRContents()}
         </ModalContainer>
-        <ModalContainer visible={exitKeyModel} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>this.setState( {
+          exitKeyModel: false
+        } )} visible={exitKeyModel} closeBottomSheet={() => { }}>
           {this.renderExitKeyQRContents()}
         </ModalContainer>
-        <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          edit: false
+        } )} visible={edit} closeBottomSheet={() => this.setState( {
           edit: false
         } )}>
           <EditContactScreen contact={this.contact} closeModal={( name ) => {
@@ -1344,7 +1352,9 @@ class ContactDetails extends PureComponent<
             } )
           }} />
         </ModalContainer>
-        <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          reshareModal: false
+        } )} visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
         } )}>
           <ErrorModalContents
@@ -1396,12 +1406,16 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderErrorModalContent}
           renderHeader={this.renderErrorModalHeader}
         />
-        <ModalContainer visible={this.state.showQRCode} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          showQRCode: false
+        } )} visible={this.state.showQRCode} closeBottomSheet={() => this.setState( {
           showQRCode: false
         } )}>
           {this.SendShareModalFunction}
         </ModalContainer>
-        <ModalContainer visible={this.state.showQRScanner} closeBottomSheet={() => this.setState( {
+        <ModalContainer onBackground={()=>this.setState( {
+          showQRScanner: false
+        } )} visible={this.state.showQRScanner} closeBottomSheet={() => this.setState( {
           showQRScanner: false, showQRClicked: false
         } )}>
           <QRModal

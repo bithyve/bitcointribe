@@ -148,6 +148,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const createGuardian = useCallback(
     async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      setIsChange( isChangeKeeper )
       const isReshareTemp = payload && payload.isReshare ? payload.isReshare : undefined
       if( ( keeperQR || isReshare ) && !isChangeKeeper && !isReshareTemp ) return
       setIsGuardianCreationClicked( true )
@@ -561,12 +562,17 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 && isPrimaryKeeper ) && ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           isVersionMismatch={isVersionMismatch}
-          onPressChange={() => { setKeeperTypeModal( true ) }}
+          onPressChange={isPrimaryKeeper ? () => { setTimeout( () => {
+            setIsChange( true )
+            setKeeperQR( '' )
+            setIsReshare( false )
+          }, 2 )
+          setChangeModal( true ) } : setKeeperTypeModal( true )}
         />
       </View>
-      <ModalContainer visible={showQr} closeBottomSheet={() => setShowQr( false )} >
+      <ModalContainer onBackground={()=>setShowQr( false )} visible={showQr} closeBottomSheet={() => setShowQr( false )} >
         {renderSecondaryDeviceContents()}
       </ModalContainer>
       {/* <BottomSheet
@@ -593,16 +599,16 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         renderContent={renderSecondaryDeviceContents}
         renderHeader={renderSecondaryDeviceHeader}
       /> */}
-      <ModalContainer visible={SecondaryDeviceMessageModal} closeBottomSheet={()=>setSecondaryDeviceMessageModal( false )} >
+      <ModalContainer onBackground={()=>setSecondaryDeviceMessageModal( false )} visible={SecondaryDeviceMessageModal} closeBottomSheet={()=>setSecondaryDeviceMessageModal( false )} >
         {renderSecondaryDeviceMessageContents()}
       </ModalContainer>
-      <ModalContainer visible={ErrorModal} closeBottomSheet={()=>setErrorModal( false )} >
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={ErrorModal} closeBottomSheet={()=>setErrorModal( false )} >
         {renderErrorModalContent()}
       </ModalContainer>
-      <ModalContainer visible={HelpModal} closeBottomSheet={()=>{setHelpModal( false )}} >
+      <ModalContainer onBackground={()=>setHelpModal( false )} visible={HelpModal} closeBottomSheet={()=>{setHelpModal( false )}} >
         {renderHelpContent()}
       </ModalContainer>
-      <ModalContainer visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
+      <ModalContainer onBackground={()=>setReshareModal( false )} visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
         <ErrorModalContents
           title={strings.Resharewithsamedevice}
           info={

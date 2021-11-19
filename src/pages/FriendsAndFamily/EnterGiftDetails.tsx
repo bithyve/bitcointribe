@@ -51,15 +51,10 @@ const GiftDetails = ( { navigation } ) => {
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
-    title: 'Bitcoin',
-    subText: 'Lorem ipsum dolor',
+    title: 'Gift sats',
+    subText: 'Here\'s some sats for your stack',
     avatar: <GiftCard />,
     color: Colors.darkBlue
-    // id: '',
-    // title: '',
-    // subText: '',
-    // avatar: ImagePropTypes,
-    // color: ''
   } )
 
   useEffect( () => {
@@ -144,7 +139,7 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           <HeaderTitle
             firstLineTitle={'Enter gift details'}
-            secondLineTitle={'Who are we delighting today?'}
+            secondLineTitle= ''//{'Who are we delighting today?'}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
@@ -158,15 +153,16 @@ const GiftDetails = ( { navigation } ) => {
             style={{
               fontSize: RFValue( 14 ),
               color: Colors.black,
-              width: wp( '54%' ),
             }}
-          >You have recieved gift from
+          >You have received gift from{' '}
           </Text>
           <View
-            style={[ styles.inputBox ]}
+            style={styles.inputBox}
           >
             <TextInput
-              style={styles.modalInputBox}
+              style={name ? [ styles.modalInputBox ] : [ styles.modalInputBox, {
+                fontSize: RFValue( 15 ),
+              } ]}
               placeholder={'Enter name'}
               placeholderTextColor={Colors.gray1}
               value={name}
@@ -306,7 +302,7 @@ const GiftDetails = ( { navigation } ) => {
                           {value.title}
                         </Text>
                         <Text style={styles.subText}>
-                          { 'Lorem ipsum dolor'}
+                          {value.subText}
                         </Text>
                       </View>
                     </View>

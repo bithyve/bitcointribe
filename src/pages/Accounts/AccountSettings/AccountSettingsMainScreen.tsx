@@ -282,19 +282,19 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         keyExtractor={listItemKeyExtractor}
         renderItem={renderItem}
       />
-      <ModalContainer visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setShowAccountArchiveModal( false )} visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
         {showAccountArchiveBottomSheet()}
       </ModalContainer>
 
-      <ModalContainer visible={checkAccountModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
         {checkAccountBalance()}
       </ModalContainer>
 
-      {/* <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => {}}>
+      {/* <ModalContainer onBackground={()=>setShowRescanningPrompt( false )} visible={showRescanningPrompt} closeBottomSheet={() => {}}>
         {showRescanningPromptBottomSheet()}
       </ModalContainer>
 
-      <ModalContainer visible={showRescanning} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setShowRescanning( false )} visible={showRescanning} closeBottomSheet={() => {}}>
         {showRescanningBottomSheet()}
       </ModalContainer> */}
     </>
