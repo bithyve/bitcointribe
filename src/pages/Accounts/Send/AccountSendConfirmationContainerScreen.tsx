@@ -28,7 +28,7 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
-import { NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
+import { AccountType, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
@@ -101,6 +101,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
           requestAnimationFrame( () => {
             dispatch( refreshAccountShells( [ sourceAccountShell ], {
+              hardRefresh: true,
+              syncDonationAccount: account.type === AccountType.DONATION_ACCOUNT
             } ) )
           } )
           navigation.dispatch(
