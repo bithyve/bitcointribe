@@ -963,7 +963,8 @@ export enum GiftThemeId {
   ONE = 'ONE',
   TWO = 'TWO',
   THREE = 'THREE',
-  FOUR = 'FOUR'
+  FOUR = 'FOUR',
+  FIVE = 'FIVE'
 }
 
 export enum GiftType {
