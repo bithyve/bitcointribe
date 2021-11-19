@@ -16,7 +16,7 @@ import idx from 'idx'
 
 const { REQUEST_TIMEOUT } = config
 const accAxios: AxiosInstance = axios.create( {
-  timeout: REQUEST_TIMEOUT
+  timeout: REQUEST_TIMEOUT * 3
 } )
 
 export default class AccountUtilities {
