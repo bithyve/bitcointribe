@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkKind, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -388,7 +388,14 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
   if( generateShortLink ) {
     try {
       const url = deepLink.replace( /\s+/g, '' )
-      const domain = 'https://hexawallet.page.link'
+      let domain = ''
+      if( deepLinkKind === DeepLinkKind.CONTACT ) {
+        domain = ShortLinkDomain.CONTACT
+      } else if( deepLinkKind === DeepLinkKind.GIFT ||  deepLinkKind === DeepLinkKind.CONTACT_GIFT ) {
+        domain = ShortLinkDomain.GIFT
+      } else {
+        domain = ShortLinkDomain.DEFAULT
+      }
       shortLink = await dynamicLinks().buildShortLink( {
         link: url,
         domainUriPrefix: domain,
@@ -405,6 +412,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         }
       }, dynamicLinks.ShortLinkType.SHORT )
     } catch ( error ) {
+      console.log( error )
       shortLink = ''
     }
   }

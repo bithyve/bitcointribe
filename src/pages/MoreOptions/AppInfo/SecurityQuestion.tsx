@@ -50,22 +50,25 @@ function SecurityQuestion( props ) {
   const [ errorText, setErrorText ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const setConfirm = () => {
-    if ( answer.length > 0 && answer != securityAnswer ) {
-      if ( AnswerCounter < 2 ) {
-        AnswerCounter++
-        setAnswerCounter( AnswerCounter )
-      } else {
-        props.navigation.navigate( 'ReLogin', {
-          isPasscodeCheck: true
-        } )
-        props.onClose()
-        setShowAnswer( true )
-        setErrorText( '' )
-        return
-      }
-      setErrorText( login.Answerisincorrect )
+    if( props.isNeedAuthentication ){
+      if ( answer.length > 0 && answer != securityAnswer ) setErrorText( login.Answerisincorrect )
+      else setErrorText( '' )
     } else {
-      setErrorText( '' )
+      if ( answer.length > 0 && answer != securityAnswer ) {
+        if ( AnswerCounter < 2 ) {
+          AnswerCounter++
+          setAnswerCounter( AnswerCounter )
+        } else {
+          props.navigation.navigate( 'ReLogin', {
+            isPasscodeCheck: true,
+          } )
+          props.onClose()
+          setShowAnswer( true )
+          setErrorText( '' )
+          return
+        }
+        setErrorText( login.Answerisincorrect )
+      } else setErrorText( '' )
     }
   }
 

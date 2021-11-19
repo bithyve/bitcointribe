@@ -53,9 +53,9 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
         marginLeft: wp( 6 ), marginBottom: hp( 2 )
       }}>
         <Text style={styles.modalTitleText}>Gift Sats Added to Account</Text>
-        <Text style={{
+        {/* <Text style={{
           ...styles.modalInfoText,
-        }}>Lorem ipsum dolor Lorem dolor sit amet</Text>
+        }}>Lorem ipsum dolor Lorem dolor sit amet</Text> */}
 
       </View>
       <View
@@ -109,7 +109,7 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
       <BottomInfoBox
         containerStyle={{
         }}
-        infoText={'This may take a while to reflect on your account'}
+        infoText={'This may take a while to reflect in your account'}
       />
       <View style={{
         marginHorizontal: wp( 6 )

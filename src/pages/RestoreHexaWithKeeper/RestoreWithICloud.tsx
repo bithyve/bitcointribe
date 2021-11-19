@@ -1115,14 +1115,26 @@ class RestoreWithICloud extends Component<
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
 
-        <ModalContainer visible={restoreModal} closeBottomSheet={() => {
+        <ModalContainer onBackground={()=>{this.setState( {
+          restoreModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            restoreModal:true
+          } )
+        }, 200 )}} visible={restoreModal} closeBottomSheet={() => {
           this.setState( {
             restoreModal: false
           } )
         }} >
           {this.renderContent()}
         </ModalContainer>
-        <ModalContainer visible={contactListModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          contactListModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            contactListModal:true
+          } )
+        }, 200 )}} visible={contactListModal} closeBottomSheet={() => { }} >
           <ContactListForRestore
             title={strings[ 'SelectContact' ]}
             subText={
@@ -1146,7 +1158,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={this.state.restoreSuccess} closeBottomSheet={() => { this.setState( {
+        <ModalContainer onBackground={()=>{this.setState( {
+          restoreSuccess:false
+        } );setTimeout( () => {
+          this.setState( {
+            restoreSuccess:true
+          } )
+        }, 200 )}} visible={this.state.restoreSuccess} closeBottomSheet={() => { this.setState( {
           restoreSuccess: false
         } )}} >
           <RestoreSuccess
@@ -1165,7 +1183,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={backupModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          backupModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            backupModal:true
+          } )
+        }, 200 )}} visible={backupModal} closeBottomSheet={() => { }} >
           <ICloudBackupNotFound
             modalRef={this.BackupNotFound}
             onPressProceed={() => {
@@ -1183,7 +1207,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={restoreWallet} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          restoreWallet:false
+        } );setTimeout( () => {
+          this.setState( {
+            restoreWallet:true
+          } )
+        }, 200 )}} visible={restoreWallet} closeBottomSheet={() => { }} >
           <RestoreWallet
             modalRef={this.RestoreWallet}
             onPressProceed={() => {
@@ -1200,7 +1230,13 @@ class RestoreWithICloud extends Component<
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={loaderModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          loaderModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            loaderModal:true
+          } )
+        }, 200 )}} visible={loaderModal} closeBottomSheet={() => { }} >
           <LoaderModal
             headerText={this.state.loaderMessage.heading}
             messageText={this.state.loaderMessage.text}
@@ -1233,7 +1269,13 @@ class RestoreWithICloud extends Component<
             />
           )}
         /> */}
-        <ModalContainer visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
+        <ModalContainer onBackground={()=>{this.setState( {
+          securityQuestionModal:false
+        } );setTimeout( () => {
+          this.setState( {
+            securityQuestionModal:true
+          } )
+        }, 200 )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
           securityQuestionModal: false
         } ) }} >
           <SecurityQuestion
@@ -1270,7 +1312,9 @@ class RestoreWithICloud extends Component<
           /> )}
         /> */}
         </ModalContainer>
-        <ModalContainer visible={errorModal} closeBottomSheet={() => { }}>
+        <ModalContainer onBackground={()=>{this.setState( {
+          errorModal:false
+        } )}} visible={errorModal} closeBottomSheet={() => { }}>
           <ErrorModalContents
             modalRef={this.ErrorBottomSheet}
             title={this.state.errorModalTitle}
@@ -1289,7 +1333,9 @@ class RestoreWithICloud extends Component<
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />
         </ModalContainer>
-        <ModalContainer visible={sendViaLinkModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          sendViaLinkModal:false
+        } )}} visible={sendViaLinkModal} closeBottomSheet={() => { }} >
           {selectedContact.data && <SendViaLink
             headerText={strings[ 'SendRequest' ]}
             subHeaderText={strings[ 'Sendrecoveryrequestlink' ]}
@@ -1333,7 +1379,9 @@ class RestoreWithICloud extends Component<
             }}
           />}
         </ModalContainer>
-        <ModalContainer visible={shareOTPModal} closeBottomSheet={() => { }} >
+        <ModalContainer onBackground={()=>{this.setState( {
+          shareOTPModal:false
+        } )}} visible={shareOTPModal} closeBottomSheet={() => { }} >
           <ShareOtpWithTrustedContact
             renderTimer={renderTimer}
             onPressOk={() => {

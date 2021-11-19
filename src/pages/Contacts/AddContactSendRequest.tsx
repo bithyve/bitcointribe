@@ -67,7 +67,7 @@ export default function AddContactSendRequest( props ) {
   const [ renderTimer, setRenderTimer ] = useState( false )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const giftId = props.navigation.getParam( 'giftId' )
-  const giftToSend = accountsState.gifts[ giftId ]
+  const giftToSend = giftId? accountsState.gifts[ giftId ]: null
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
@@ -463,7 +463,7 @@ export default function AddContactSendRequest( props ) {
         </View>
         <RequestKeyFromContact
           isModal={false}
-          headerText={giftId ? 'Send gift' : null}
+          headerText={giftId ? 'Send Gift' : null}
           subHeaderText={ giftId ? 'You can send it to anyone using the QR or the link' : Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
           contactText={strings.adding}
           isGift={ giftId}
@@ -622,7 +622,7 @@ export default function AddContactSendRequest( props ) {
           renderContent={renderContactRequest}
           renderHeader={renderContactRequestHeader}
         /> */}
-        <ModalContainer visible={secure2FAModal} closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>setSecure2FAModal( false )} visible={secure2FAModal} closeBottomSheet={() => {}} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}
             onConfirm={( type ) => {
@@ -634,7 +634,7 @@ export default function AddContactSendRequest( props ) {
             Contact={contactInfo}
           />
         </ModalContainer>
-        <ModalContainer visible={changeSelection} closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>setChangeSelection( false )} visible={changeSelection} closeBottomSheet={() => {}} >
           <ChangeSelection
             closeBottomSheet={()=> setChangeSelection( false )}
             onConfirm={( index ) => {
@@ -648,10 +648,14 @@ export default function AddContactSendRequest( props ) {
             }}
           />
         </ModalContainer>
-        <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>{setTimerModal( false ); setTimeout( () => {
+          setTimerModal( true )
+        }, 200 )}} visible={timerModal }  closeBottomSheet={() => {}} >
           {renderTimerModalContents()}
         </ModalContainer>
-        <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>{setShareOtpWithTrustedContactModel( false ); setTimeout( () => {
+          setShareOtpWithTrustedContactModel( true )
+        }, 200 )}} visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
           {renderShareOtpWithTrustedContactContent()}
         </ModalContainer>
       </ScrollView>

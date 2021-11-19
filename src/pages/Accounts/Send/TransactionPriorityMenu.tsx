@@ -222,7 +222,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
           </View>
         </TouchableOpacity>
       </View>
-      <ModalContainer visible={customPriorityModel} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>showCustomPriorityModel( false )} visible={customPriorityModel} closeBottomSheet={() => {}} >
         {showCustomPriorityBottomSheet()}
       </ModalContainer>
     </View>

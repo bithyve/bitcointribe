@@ -99,6 +99,7 @@ import {
   LevelHealthInterface,
   notificationType,
   QRCodeTypes,
+  Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import {
@@ -121,6 +122,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -159,6 +162,7 @@ interface HomeStateTypes {
   notificationTitle: string | null;
   notificationInfo: string | null;
   notificationNote: string | null;
+  notificationType: string | null;
   notificationAdditionalInfo: any;
   notificationProceedText: string | null;
   notificationIgnoreText: string | null;
@@ -259,6 +263,7 @@ interface HomePropsTypes {
   availableKeepers: KeeperInfoInterface[]
   approvalContactData: ContactRecipientDescribing;
   rejectedExistingContactRequest: any;
+  trustedContacts: Trusted_Contacts;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -295,6 +300,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationTitle: null,
       notificationInfo: null,
       notificationNote: null,
+      notificationType: null,
       notificationAdditionalInfo: null,
       notificationProceedText: null,
       notificationIgnoreText:null,
@@ -464,14 +470,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.RESHARE_RESPONSE:
         case NotificationType.SM_UPLOADED_FOR_PK:
         case NotificationType.NEW_KEEPER_INFO:
+          console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
             notificationNote: '',
-            notificationAdditionalInfo: message.AdditionalInfo,
+            notificationAdditionalInfo: message.additionalInfo,
             notificationProceedText: 'Okay',
             notificationIgnoreText: '',
-            isIgnoreButton: false
+            isIgnoreButton: false,
+            notificationType: message.type
           }, () => {
             this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
           } )
@@ -481,10 +489,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             notificationTitle: message.title,
             notificationInfo: message.info,
             notificationNote: '',
-            notificationAdditionalInfo: message.AdditionalInfo,
+            notificationAdditionalInfo: message.additionalInfo,
             notificationProceedText: 'Go to Account',
             notificationIgnoreText: '',
-            isIgnoreButton: false
+            isIgnoreButton: false,
+            notificationType: message.type
           }, () => {
             this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
           } )
@@ -497,11 +506,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               notificationTitle: message.title,
               notificationInfo: message.info,
               notificationNote: 'For updating you will be taken to the ' + storeName,
-              notificationAdditionalInfo: message.AdditionalInfo,
+              notificationAdditionalInfo: message.additionalInfo,
               notificationProceedText: 'Upgrade',
               notificationIgnoreText: Number( current ) <= Number( mandatoryFor ) ? '' : 'Remind me later',
               isIgnoreButton: true,
               releaseNotes: Platform.OS === 'android' ?  message.additionalInfo.notes.android : message.additionalInfo.notes.ios,
+              notificationType: message.type
             }, () => {
               this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
             } )
@@ -1035,8 +1045,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async ( value ) => {
-    if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
-      this.handleNotificationBottomSheetSelection( value )
+    console.log( 'value', value )
+    // if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
+    // if( value.type !== NotificationType.FNF_KEEPER_REQUEST )
+    this.handleNotificationBottomSheetSelection( value )
   };
 
 
@@ -1293,6 +1305,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   }
 
+  moveToContactDetails = ( channelKey, type ) => {
+    const contactData = makeContactRecipientDescription(
+      channelKey,
+      this.props.trustedContacts[ channelKey ],
+      ContactTrustKind.OTHER,
+    )
+    this.props.navigation.navigate( 'ContactDetails', {
+      contact: contactData,
+      contactsType: type,
+      isFromApproval: true
+    } )
+  }
+
+  moveToAccount = ( txid ) => {
+    // this.props.navigation.navigate( 'AccountDetails', {
+    //   accountShellID: accountId,
+    //   swanDeepLinkContent: this.props.swanDeepLinkContent
+    // } )
+  }
 
   renderBottomSheetContent() {
     const { navigation } = this.props
@@ -1487,6 +1518,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 if( this.state.notificationProceedText === 'Upgrade' ) {
                   this.upgradeNow()
                 }
+                switch ( this.state.notificationType ) {
+                    case 'contact':
+                    case NotificationType.FNF_TRANSACTION:
+                      this.moveToAccount( notificationAdditionalInfo.txid )
+                      break
+
+                    case NotificationType.FNF_REQUEST_ACCEPTED:
+                      this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'Contact' )
+                      break
+
+                    case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
+                      this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'I am the Keeper of' )
+                      break
+                }
               }}
               onPressIgnore={()=> {
                 this.closeBottomSheet()
@@ -1542,6 +1587,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if ( !this.props.showContent ) {
       return (
         <ModalContainer
+          onBackground={()=>this.setState( {
+            currentBottomSheetKind: null
+          } )}
           visible={this.state.currentBottomSheetKind != null}
           closeBottomSheet={() => {}}
         >
@@ -1563,7 +1611,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // >
       <View
         style={{
-          height: heightPercentageToDP( '21.33%' ),
+          height: heightPercentageToDP( '21.9%' ),
           backgroundColor: Colors.blue,
           paddingTop:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch
@@ -1599,6 +1647,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // overallHealth={overallHealth}
           />
           <ModalContainer
+            onBackground={()=>this.setState( {
+              currentBottomSheetKind: null
+            } )}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
           >
@@ -1683,6 +1734,7 @@ const mapStateToProps = ( state ) => {
     openApproval: idx( state, ( _ ) => _.bhr.openApproval ),
     availableKeepers: idx( state, ( _ ) => _.bhr.availableKeepers ),
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
   }
 }
 
