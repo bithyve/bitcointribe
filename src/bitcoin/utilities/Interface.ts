@@ -945,6 +945,13 @@ export enum DeepLinkKind {
   CONTACT_GIFT = 'CONTACT_GIFT'
 }
 
+export enum ShortLinkDomain {
+  DEFAULT = 'https://app.hexawallet.io',
+  CONTACT = 'https://request.hexawallet.io',
+  GIFT = 'https://gift.hexawallet.io',
+  DONATION = 'https://donation.hexawallet.io',
+}
+
 export enum DeepLinkEncryptionType {
   DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
@@ -956,7 +963,8 @@ export enum GiftThemeId {
   ONE = 'ONE',
   TWO = 'TWO',
   THREE = 'THREE',
-  FOUR = 'FOUR'
+  FOUR = 'FOUR',
+  FIVE = 'FIVE'
 }
 
 export enum GiftType {
@@ -1027,12 +1035,3 @@ export interface cloudDataInterface {
   seed?: string;
 }
 
-export enum ShortLinkKind {
-  CONTACT = 'request',
-  KEEPER = 'keeper',
-  PRIMARY_KEEPER = 'keeper',
-  RECIPROCAL_KEEPER = 'keeper',
-  EXISTING_CONTACT = 'request',
-  GIFT = 'gift',
-  DONATION = 'donation'
-}
