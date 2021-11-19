@@ -18,7 +18,6 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import dynamicLinks from '@react-native-firebase/dynamic-links'
 import { ShortLinkDomain, } from '../../bitcoin/utilities/Interface'
-import DeviceInfo from 'react-native-device-info'
 
 export default function DonationWebPageBottomSheet( props ) {
   const [ link, setLink ] = useState( '' )
@@ -39,17 +38,6 @@ export default function DonationWebPageBottomSheet( props ) {
       const shortLink = await dynamicLinks().buildShortLink( {
         link: url,
         domainUriPrefix: domain,
-        android: {
-          packageName: DeviceInfo.getBundleId(),
-          fallbackUrl: url,
-        },
-        ios: {
-          fallbackUrl: url,
-          bundleId: DeviceInfo.getBundleId()
-        },
-        navigation: {
-          forcedRedirectEnabled: false
-        }
       }, dynamicLinks.ShortLinkType.SHORT )
       setLink ( shortLink )
     } catch ( error ) {
