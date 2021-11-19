@@ -48,6 +48,7 @@ import {
   updateGift,
   GENERATE_GIFTS,
   giftCreationSuccess,
+  updateAccountSettings,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -634,6 +635,13 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
           // skip test account auto-sync
+          // TODO: re-enable test account once test-wrapper is up
+            const settings = {
+              visibility: AccountVisibility.HIDDEN
+            }
+            yield put( updateAccountSettings( {
+              accountShell: shell, settings
+            } ) )
             break
 
           case AccountType.DONATION_ACCOUNT:
@@ -950,7 +958,9 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     updateAccounts: true,
     accountIds: accountIds
   } ) )
-  if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
+
+  // TODO: re-enable test-coins from test-faucet post test-wrapper resurrection
+  // if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
 export const addNewAccountShellsWatcher = createWatcher(
