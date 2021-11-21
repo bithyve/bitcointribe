@@ -257,7 +257,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               Linking.openURL( 'https://hexawallet.io/faq/' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
-                  alert( 'Make sure Telegram installed on your device' )
                 } )
             }}
             style={[ styles.otherCards, styles.extraHeight ]}

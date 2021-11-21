@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState, } from 'react'
+import React, { useMemo, useContext, useEffect, useState, } from 'react'
 import {
   View,
   StyleSheet,
@@ -38,6 +38,10 @@ import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -54,13 +58,22 @@ const ManageGifts = ( { navigation } ) => {
   )
   const trustedContactsArr = Object.values( trustedContacts ?? {
   } )
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
+  const currencyKind = useCurrencyKind()
+  const currencyCode = useCurrencyCode()
 
   const dispatch = useDispatch()
+
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   useEffect( () => {
     if ( timer ) {
@@ -177,6 +190,18 @@ const ManageGifts = ( { navigation } ) => {
     }
     if ( active === GiftType.RECEIVED ) {
       return 'Gifts you\'ve received would be visible below'
+    }
+  }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
     }
   }
 
@@ -424,12 +449,12 @@ const ManageGifts = ( { navigation } ) => {
                             fontSize: RFValue( 18 ),
                             fontFamily: Fonts.FiraSansRegular,
                           }}>
-                            {numberWithCommas( item.amount )}
+                            {getAmt( item.amount )}
                             <Text style={{
                               color: Colors.lightTextColor,
                               fontSize: RFValue( 10 ),
                               fontFamily: Fonts.FiraSansRegular
-                            }}> sats
+                            }}>{prefersBitcoin ? ' sats' : currencyCode}
                             </Text>
                           </Text>
                         </View>
