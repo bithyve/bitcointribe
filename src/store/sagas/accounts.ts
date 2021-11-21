@@ -138,6 +138,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
 export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
+    giftToSend.status = GiftStatus.SENT
     giftToSend.timestamps.sent = Date.now()
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
@@ -184,33 +185,6 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )
-  }
-}
-
-export async function changeGiftStatus( encryptionKey: string, giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string ) {
-  try{
-    console.log( 'giftToSend', giftToSend )
-    giftToSend.status = GiftStatus.SENT
-    giftToSend.timestamps.sent = Date.now()
-    giftToSend.note = note
-    giftToSend.themeId = themeId
-    giftToSend.sender.walletName = walletName
-
-    const giftMetaData: GiftMetaData = {
-      status: giftToSend.status,
-      notificationInfo: {
-        walletId: giftToSend.sender.walletId,
-        FCM: fcmToken,
-      }
-    }
-
-    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
-
-    return {
-      updatedGift: giftToSend
-    }
-  } catch( err ){
-    console.log( 'An error occured while upadting gift: ', err )
   }
 }
 
