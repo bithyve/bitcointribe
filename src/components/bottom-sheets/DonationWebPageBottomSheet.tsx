@@ -4,6 +4,7 @@ import {
   Image,
   Text,
   StyleSheet,
+  ActivityIndicator
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -111,9 +112,22 @@ export default function DonationWebPageBottomSheet( props ) {
             marginRight: 40,
           }}
         >
-          <CopyThisText
-            text={link}
-          />
+          {
+            link === '' ?
+              <ActivityIndicator
+                size="small"
+                style={{
+                  alignSelf: 'center',
+                  marginVertical: 30
+                }}
+                color={Colors.blue}
+              />
+              :
+              <CopyThisText
+                text={link}
+              />
+          }
+
         </View>
         <View style={styles.infoTextContainer}>
           <Text style={styles.titleTextStyle}>Embed Code</Text>

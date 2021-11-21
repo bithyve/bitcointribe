@@ -130,7 +130,7 @@ const GiftDetails = ( { navigation } ) => {
           }}
         >
           <HeaderTitle
-            firstLineTitle={'Gift Card Details'}
+            firstLineTitle={'Gift Details'}
             secondLineTitle={'Logs of Gift status appear here'}
             infoTextNormal={''}
             infoTextBold={''}
@@ -427,7 +427,7 @@ const GiftDetails = ( { navigation } ) => {
                       ]}
                     >
                       <Text style={styles.modalInfoText}>
-                        Gift Card {item[ 0 ]}
+                        Gift {item[ 0 ]}
                       </Text>
                       {/* <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text> */}
                     </View>
@@ -454,7 +454,7 @@ const GiftDetails = ( { navigation } ) => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
           } )
-        }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift Card' ) ) : null}
+        }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Expire */}
         {/* {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
           alert( 'Expire' )
