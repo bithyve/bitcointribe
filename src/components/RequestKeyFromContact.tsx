@@ -331,7 +331,7 @@ function RequestKeyFromContact( props ) {
           }}>
             {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
           </Text>
-          while accepting the gift card
+          while accepting the gift
         </Text>
       }
       {!props.isGift &&
