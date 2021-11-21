@@ -74,7 +74,7 @@ const GiftDetails = ( { navigation } ) => {
         onPress={()=>{
           if ( contact ) {
 
-            navigation.navigate( 'AddContactSendRequest', {
+            navigation.replace( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
               headerText: strings.addContact,
@@ -85,7 +85,7 @@ const GiftDetails = ( { navigation } ) => {
               senderName: name,
             } )
           } else {
-            navigation.navigate( 'SendGift', {
+            navigation.replace( 'SendGift', {
               fromScreen: 'Gift',
               giftId,
               note,
