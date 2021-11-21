@@ -690,6 +690,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           instanceNumber: account.instanceNum,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
+          visibility: account.accountVisibility,
         } )
         break
 
