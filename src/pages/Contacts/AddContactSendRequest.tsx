@@ -648,14 +648,23 @@ export default function AddContactSendRequest( props ) {
             }}
           />
         </ModalContainer>
-        <ModalContainer onBackground={()=>{setTimerModal( false ); setTimeout( () => {
-          setTimerModal( true )
-        }, 200 )}} visible={timerModal }  closeBottomSheet={() => {}} >
+        <ModalContainer
+          onBackground={()=>{
+            setTimerModal( false )
+            // setTimeout( () => {
+            //   setTimerModal( true )
+            // }, 200 )
+          }}
+          visible={timerModal }  closeBottomSheet={() => {}} >
           {renderTimerModalContents()}
         </ModalContainer>
-        <ModalContainer onBackground={()=>{setShareOtpWithTrustedContactModel( false ); setTimeout( () => {
-          setShareOtpWithTrustedContactModel( true )
-        }, 200 )}} visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>{
+          setShareOtpWithTrustedContactModel( false )
+          // setTimeout( () => {
+          //   setShareOtpWithTrustedContactModel( true )
+          // }, 200 )
+        }}
+        visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
           {renderShareOtpWithTrustedContactContent()}
         </ModalContainer>
       </ScrollView>

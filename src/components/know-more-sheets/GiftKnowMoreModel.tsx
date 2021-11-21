@@ -80,7 +80,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
               }}
             >
               {/* {strings.test2} */}
-              You can manage these Gifts from here. Send them when you want to and even retrive them back if not claimed. The recipient will only need a Hexa wallet to claim the Gift
+              You can manage these Gifts from here. Send them when you want to and even reclaim them if not accepted. The recipient will be directed to download Hexa if they don’t have one.
             </Text>
           </View>
         </ScrollView>
