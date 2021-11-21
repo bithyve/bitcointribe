@@ -546,7 +546,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             <Text style={styles.modalTitleText}>Accept Gift</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>{`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'OTP'}`}</Text>
+            }}>{`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'an email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'an OTP'}`}</Text>
           </View>
           <DashedLargeContainer
             titleText={'Gift Card'}
