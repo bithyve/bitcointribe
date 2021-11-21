@@ -68,7 +68,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     }, [] )
     const sortedShells: AccountShell[] = []
     let isChoosingEvenIndexedShells = true
-    let isFirstShell = false
+    let isFirstShell = true
 
     while ( evenIndexedShells.length > 0 || oddIndexedShells.length > 0 ) {
       if ( isFirstShell ) {
