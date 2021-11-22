@@ -28,6 +28,7 @@ import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ViewShot from 'react-native-view-shot'
 import ThemeList from './Theme'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 export default function SendViaLinkAndQR( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -241,7 +242,19 @@ export default function SendViaLinkAndQR( props ) {
         />
       </ViewShot>
 
-
+      <AppBottomSheetTouchableWrapper
+        onPress={() => {
+          props.navigation.goBack()
+        }}
+        style={{
+          ...styles.proceedButtonView,
+          elevation: 10,
+          backgroundColor:
+               Colors.blue
+        }}
+      >
+        <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
+      </AppBottomSheetTouchableWrapper>
       {/* <RequestKeyFromContact
         isModal={false}
         headerText={'Send Gift'}
@@ -287,5 +300,24 @@ const styles = StyleSheet.create( {
     marginRight: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  proceedButtonView: {
+    marginTop: hp( '2%' ),
+    marginBottom: hp( '4%' ),
+    height: wp( '13%' ),
+    width: wp( '40%' ),
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
   },
 } )

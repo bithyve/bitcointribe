@@ -557,20 +557,12 @@ export default class AccountOperations {
 
     // update primary utxo set and balance
     const updatedUTXOSet = []
-    let consumedBalance = 0
 
     account.confirmedUTXOs.forEach( confirmedUTXO => {
-      let include = true
-      if( consumedUTXOs[ confirmedUTXO.txId ] ) {
-        include = false
-        consumedBalance += consumedUTXOs[ confirmedUTXO.txId ].value
-      }
-      if( include ) updatedUTXOSet.push( confirmedUTXO )
+      if( !consumedUTXOs[ confirmedUTXO.txId ] ) updatedUTXOSet.push( confirmedUTXO )
     } )
 
-    account.balances.confirmed -= consumedBalance
     account.confirmedUTXOs = updatedUTXOSet
-
     // AccountOperations.updateQueryList( account, consumedUTXOs )
     AccountOperations.updateActiveAddresses( account, consumedUTXOs, txid, recipients )
   }
@@ -1049,7 +1041,15 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
+    console.log( {
+      acc: account.balances
+    } )
+    if( txid ){
+      AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
+      console.log( {
+        acc: account.balances
+      } )
+    }
     else throw new Error( 'Failed to broadcast transaction, txid missing' )
     return {
       txid
