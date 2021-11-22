@@ -461,7 +461,7 @@ const GiftDetails = ( { navigation } ) => {
         }, 'Expire' )
         ) : null} */}
         {/* Add To Account */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.REJECTED ) && !gift.receiver.accountId ? (
+        {( [ GiftStatus.CREATED, GiftStatus.REJECTED, GiftStatus.RECLAIMED ].includes( gift.status ) ) && !gift.receiver.accountId ? (
           bottomButton( () => {
             setAcceptGiftModal( true )
           }, 'Add To Account' )
