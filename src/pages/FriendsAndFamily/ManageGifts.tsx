@@ -187,7 +187,7 @@ const ManageGifts = ( { navigation } ) => {
       return 'All the gifts you have sent are shown here'
     }
     if ( active === GiftStatus.EXPIRED ) {
-      return 'All the gifts that were unclaimed or you expired are shown here'
+      return 'All the gifts that were not accepted or you expired are shown here'
     }
   }
 
