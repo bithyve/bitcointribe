@@ -241,7 +241,7 @@ const CreateGift = ( { navigation } ) => {
               backgroundColor: 'transparent',
               marginTop: hp( -1 )
             }}
-            infoText={'The Gift is ready to be sent to anyone you choose. If unclaimed, the sats would revert to your wallet.'}
+            infoText={'The Gift is ready to be sent to anyone you choose. If unaccepted, the sats would revert to your wallet.'}
           />
 
         </View>
