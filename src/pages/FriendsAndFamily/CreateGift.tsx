@@ -44,6 +44,7 @@ import ToggleContainer from '../../pages/Home/ToggleContainer'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../../components/MaterialCurrencyCodeIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
   getCurrencyImageByRegion, processRequestQR,
 } from '../../common/CommonFunctions/index'
@@ -258,7 +259,7 @@ const CreateGift = ( { navigation } ) => {
               backgroundColor: 'transparent',
               marginTop: hp( -1 )
             }}
-            infoText={'The Gift is ready to be sent to anyone you choose. If unclaimed, the sats would revert to your wallet.'}
+            infoText={'The Gift is ready to be sent to anyone you choose. If unaccepted, the sats would revert to your wallet.'}
           />
 
         </View>
@@ -365,7 +366,8 @@ const CreateGift = ( { navigation } ) => {
         {getAvatarForSubAccount( item.primarySubAccount, false, true )}
       </View>
       <View style={{
-        marginHorizontal: wp( 3 )
+        marginHorizontal: wp( 3 ),
+        flex: 1
       }}>
         <Text style={{
           color: Colors.gray4,
@@ -400,6 +402,14 @@ const CreateGift = ( { navigation } ) => {
           </Text>
         </Text>
       </View>
+      <MaterialCommunityIcons
+        name="dots-vertical"
+        size={24}
+        color="gray"
+        style={{
+          alignSelf: 'center'
+        }}
+      />
     </TouchableOpacity>
   }
 
@@ -712,7 +722,7 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={()=>setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
         {renderAccountList()}
       </ModalContainer>
-      {showLoader ? <Loader /> : null}
+      {showLoader ? <Loader isLoading indicatorColor={Colors.blue}/> : null}
     </ScrollView>
   )
 }
