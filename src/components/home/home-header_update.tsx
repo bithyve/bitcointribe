@@ -126,12 +126,12 @@ const HomeHeader = ( {
           />
         </View>
       }
-      {isFirstMessageBold ? <Text style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
+      {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
-        }}>{messageOne}</Text>{messageTwo}</Text> : <Text style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+        }}>{messageOne}</Text>{messageTwo}</Text> : <Text ellipsizeMode="middle" numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 )
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageTwo}</Text></Text>}
@@ -330,8 +330,8 @@ export default HomeHeader
 const styles = StyleSheet.create( {
   headerViewContainer: {
     marginTop: hp( '3.6%' ),
-    marginLeft: wp( 5 ),
-    marginRight: wp( 5 )
+    marginLeft: wp( 3 ),
+    marginRight: wp( 3 )
   },
   headerTitleText: {
     color: Colors.white,

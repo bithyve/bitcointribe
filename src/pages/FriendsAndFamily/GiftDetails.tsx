@@ -130,7 +130,7 @@ const GiftDetails = ( { navigation } ) => {
           }}
         >
           <HeaderTitle
-            firstLineTitle={'Gift Card Details'}
+            firstLineTitle={'Gift Details'}
             secondLineTitle={'Logs of Gift status appear here'}
             infoTextNormal={''}
             infoTextBold={''}
@@ -427,7 +427,7 @@ const GiftDetails = ( { navigation } ) => {
                       ]}
                     >
                       <Text style={styles.modalInfoText}>
-                        Gift Card {item[ 0 ]}
+                        Gift {item[ 0 ]}
                       </Text>
                       {/* <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text> */}
                     </View>
@@ -450,22 +450,18 @@ const GiftDetails = ( { navigation } ) => {
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
+        { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
           } )
-        }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift Card' ) ) : null}
-        {/* Expire */}
-        {/* {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
-          alert( 'Expire' )
-        }, 'Expire' )
-        ) : null} */}
+        }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Add To Account */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.REJECTED ) && !gift.receiver.accountId ? (
-          bottomButton( () => {
-            setAcceptGiftModal( true )
-          }, 'Add To Account' )
-        ) : null}
+        {( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.REJECTED, GiftStatus.RECLAIMED ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) )
+        && !gift.receiver.accountId ? (
+            bottomButton( () => {
+              setAcceptGiftModal( true )
+            }, 'Add To Account' )
+          ) : null}
       </View>
       <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
         <View style={styles.modalContentContainer}>

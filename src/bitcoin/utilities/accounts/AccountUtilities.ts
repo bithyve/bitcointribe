@@ -16,7 +16,7 @@ import idx from 'idx'
 
 const { REQUEST_TIMEOUT } = config
 const accAxios: AxiosInstance = axios.create( {
-  timeout: REQUEST_TIMEOUT
+  timeout: REQUEST_TIMEOUT * 3
 } )
 
 export default class AccountUtilities {
@@ -181,15 +181,16 @@ export default class AccountUtilities {
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
 
+    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
     const closingExtIndex = nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
     for ( let itr = 0; itr <= nextFreeAddressIndex + closingExtIndex; itr++ ) {
-      if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
+      if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network, purpose ) === address )
         return AccountUtilities.getPrivateKeyByIndex( xpriv, false, itr, network )
     }
 
     const closingIntIndex = nextFreeChangeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT_INTERNAL : config.GAP_LIMIT )
     for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
-      if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
+      if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network, purpose ) === address )
         return AccountUtilities.getPrivateKeyByIndex( xpriv, true, itr, network )
     }
 
@@ -357,6 +358,8 @@ export default class AccountUtilities {
       value: number;
     }>
   > => {
+
+    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
     for ( const output of outputs ) {
       if ( !output.address ) {
         let changeAddress: string
@@ -371,7 +374,8 @@ export default class AccountUtilities {
             account.xpub,
             true,
             nextFreeChangeAddressIndex,
-            network
+            network,
+            purpose
           )
 
         output.address = changeAddress
@@ -532,9 +536,9 @@ export default class AccountUtilities {
             for ( const utxo of addressSpecificUTXOs ) {
               const { value, Address, status, vout, txid } = utxo
               let include = true
-              UTXOs.forEach( ( utxo ) => {
-                if( utxo.txId === txid ) {
-                  if( status.confirmed && !utxo.status.confirmed ) utxo.status = status
+              UTXOs.forEach( ( cachedUTXO ) => {
+                if( cachedUTXO.txId === txid && cachedUTXO.address === Address ) {
+                  if( status.confirmed && !cachedUTXO.status.confirmed ) cachedUTXO.status = status
                   include = false
                 }
               } )

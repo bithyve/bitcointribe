@@ -21,7 +21,7 @@ import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import { Account, DeepLinkEncryptionType, Gift, GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
-import { changeGiftStatus, generateGiftLink } from '../../store/sagas/accounts'
+import { generateGiftLink } from '../../store/sagas/accounts'
 import DeviceInfo from 'react-native-device-info'
 import { updateGift } from '../../store/actions/accounts'
 import { updateWalletImageHealth } from '../../store/actions/BHR'
@@ -48,7 +48,6 @@ export default function SendGift( props ) {
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
   const [ giftThemeId, setGiftThemeId ] = useState( themeId?? GiftThemeId.ONE )
-  const [ updatedGiftObject, setUpdatedGiftObject ]: [Gift, any] = useState( )
   const [ encryptionKey, setEncryptionKey ]: [string, any] = useState( '' )
   const account: Account = giftToSend && giftToSend.sender.accountId ? accountsState.accounts[ giftToSend.sender.accountId ] : null
   const dispatch = useDispatch()
@@ -66,7 +65,6 @@ export default function SendGift( props ) {
     giftToSend.sender.contactId = null
 
     const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink )
-    setUpdatedGiftObject( updatedGift )
     setEncryptionKey( encryptionKey )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
@@ -89,19 +87,6 @@ export default function SendGift( props ) {
       version: DeviceInfo.getVersion(),
     } ) )
     setEncryptionOTP( deepLinkEncryptionOTP )
-  }
-
-  const updateStatusToSent = async() =>{
-    const senderName = wallet.userName? wallet.userName: wallet.walletName
-    const { updatedGift } = await changeGiftStatus( encryptionKey, updatedGiftObject, senderName, fcmToken, giftThemeId, note )
-    setUpdatedGiftObject( updatedGift )
-    setEncryptionKey( encryptionKey )
-    dispatch( updateGift( updatedGift ) )
-    dbManager.createGift( updatedGift  )
-    dispatch( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: [ updatedGift.id ]
-    } ) )
   }
 
   useEffect( () => {
@@ -160,8 +145,8 @@ export default function SendGift( props ) {
           // openTimer()
         }}
         amt={numberWithCommas( giftToSend.amount )}
-        onPressShare={() => updateStatusToSent()}
-        accountName={account.accountName}
+        onPressShare={() => {}}
+        accountName={account?.accountName}
       />
     </ScrollView>
   )

@@ -7,6 +7,7 @@ import {
   Image,
   StatusBar,
   Text,
+  Linking,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -101,6 +102,19 @@ const WalletInitializationScreen = props => {
             />
           </View>
         </TouchableOpacity>
+        <View style={{
+          marginLeft: wp( '3%' ), marginRight: wp( '3%' )
+        }}>
+          <Text
+            onPress={()=>  Linking.openURL( 'https://hexawallet.io/faq/' )
+              .then( ( _data ) => { } )
+              .catch( ( _error ) => {
+              } )}
+            style={styles.headerInfoText}>{strings.restoreNoteV1}<Text style={{
+              color: Colors.blue
+              , textDecorationLine:'underline'
+            }}>{'\nhttps://hexawallet.io/faq/'}</Text></Text>
+        </View>
         {/* <TouchableOpacity
           onPress={async () => {
             // props.navigation.navigate( 'RestoreWithICloud' )
