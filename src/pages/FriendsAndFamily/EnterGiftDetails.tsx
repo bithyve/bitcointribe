@@ -193,7 +193,7 @@ const GiftDetails = ( { navigation } ) => {
             marginHorizontal: wp( 5 ),
             lineHeight: wp( 7 )
           }}
-        >{`Scan the QR or click the link to claim your gift. The gift would be valid for 30 days and the sats would revert to ${name} if unclaimed`}
+        >{'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
