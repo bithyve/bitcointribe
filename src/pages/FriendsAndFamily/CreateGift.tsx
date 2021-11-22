@@ -662,7 +662,7 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={()=>setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
         {renderAccountList()}
       </ModalContainer>
-      {showLoader ? <Loader /> : null}
+      {showLoader ? <Loader isLoading indicatorColor={Colors.blue}/> : null}
     </ScrollView>
   )
 }
