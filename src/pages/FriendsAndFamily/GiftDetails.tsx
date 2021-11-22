@@ -61,10 +61,10 @@ const GiftDetails = ( { navigation } ) => {
   } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
-  const accountShells: AccountShell[] = useSelector( ( state ) =>
-    idx( state, ( _ ) => _.accounts.accountShells )
-  )
-  //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+
+  useEffect( ()=> {
+    if( gift.status === GiftStatus.SENT ) setIsOpen( true )
+  }, [ gift ] )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
