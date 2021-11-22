@@ -85,7 +85,6 @@ const ManageGifts = ( { navigation } ) => {
 
   useEffect( () => {
     const availableGifts = []
-    const receivedArr = []
     const sentAndClaimed = []
     const expiredArr = []
     const sortedGifts = Object.values( gifts ?? {
@@ -94,19 +93,19 @@ const ManageGifts = ( { navigation } ) => {
     } )
 
     sortedGifts.forEach( ( gift: Gift ) => {
-      if ( gift.type === GiftType.RECEIVED ) {
-        receivedArr.push( gift )
-      } else {
+      if ( gift.type === GiftType.SENT ) {
         if ( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ) availableGifts.push( gift )
         if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
+      } else if( gift.type === GiftType.RECEIVED ) {
+        if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
+        else availableGifts.push( gift )
       }
     } )
     const obj = {
     }
     obj[ `${GiftStatus.CREATED}` ] = availableGifts
     obj[ `${GiftStatus.SENT}` ] = sentAndClaimed
-    obj[ `${GiftType.RECEIVED}` ] = receivedArr
     obj[ `${GiftStatus.EXPIRED}` ] = expiredArr
 
     setGiftsArr( obj )
@@ -133,17 +132,18 @@ const ManageGifts = ( { navigation } ) => {
 
   const processGift = ( selectedGift: Gift, title, walletName ) => {
 
-    switch ( selectedGift.status ) {
-        case GiftStatus.CREATED:
-        case GiftStatus.RECLAIMED:
-          navigation.navigate( 'GiftDetails', {
-            title, walletName, gift: selectedGift, avatar: false
-          } )
-          // navigation.navigate( 'AddContact', {
-          //   fromScreen: 'ManageGift',
-          //   giftId: selectedGift.id
-          // } )
-          break
+    if( selectedGift.type === GiftType.SENT ){
+      if( selectedGift.status === GiftStatus.CREATED || selectedGift.status === GiftStatus.RECLAIMED ){
+        navigation.navigate( 'GiftDetails', {
+          title, walletName, gift: selectedGift, avatar: false
+        } )
+      }
+    } else if ( selectedGift.type === GiftType.RECEIVED ) {
+      if( selectedGift.status === GiftStatus.ACCEPTED ){
+        navigation.navigate( 'GiftDetails', {
+          title, walletName, gift: selectedGift, avatar: false
+        } )
+      }
     }
   }
   // const renderGiftDetailsModel = useCallback( () => {
@@ -178,18 +178,16 @@ const ManageGifts = ( { navigation } ) => {
     setActive( type )
   }
 
-  const getText = () => {
+  const getSectionDescription = () => {
     if ( active === GiftStatus.CREATED ) {
-      return 'Gifts that you create, ready to be sent, would be visible below'
+      if( giftsArr?.[ `${active}` ].length === 0 ) return 'All the gifts you create and receive would be visible below'
+      else return 'All the gifts you have created and not sent, plus gifts you have received are shown here'
     }
     if ( active === GiftStatus.SENT ) {
-      return 'Gifts you\'ve sent would be visible below'
+      return 'All the gifts you have sent are shown here'
     }
     if ( active === GiftStatus.EXPIRED ) {
-      return 'Gifts that were unclaimed and thus expired would be visible below'
-    }
-    if ( active === GiftType.RECEIVED ) {
-      return 'Gifts you\'ve received would be visible below'
+      return 'All the gifts that were not accepted or you expired are shown here'
     }
   }
 
@@ -303,7 +301,6 @@ const ManageGifts = ( { navigation } ) => {
                     {item === GiftStatus.CREATED && 'Available'}
                     {item === GiftStatus.EXPIRED && 'Expired'}
                     {item === GiftStatus.SENT && 'Sent'}
-                    {item === GiftType.RECEIVED && 'Received'}
                   </Text>
                 </TouchableOpacity>
               )
@@ -314,20 +311,19 @@ const ManageGifts = ( { navigation } ) => {
           height: 'auto'
         }}> */}
         {Object.values( gifts ?? {
-        } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
+        } ).length > 0 &&
           <BottomInfoBox
             // backgroundColor={Colors.white}
             // title={'Note'}
-            infoText={getText()}
+            infoText={getSectionDescription()}
           />
         }
-        {Object.values( gifts ?? {
-        } ).length > 0 && active === GiftStatus.CREATED &&
+        { active === GiftStatus.CREATED &&
         <TouchableOpacity
           onPress={() => navigation.navigate( 'CreateGift' )}
           style={{
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
-            marginVertical: hp( 2 )
+            marginVertical: hp( 1 )
           }}>
           <IconAddLight />
           <Text style={styles.createGiftText}>
@@ -344,11 +340,24 @@ const ManageGifts = ( { navigation } ) => {
           contentInset={{
             right: 0, top: 0, left: 0, bottom: hp( 9 )
           }}
+          contentContainerStyle={{
+            paddingBottom: 150
+          }}
           showsVerticalScrollIndicator={false}
           data={giftsArr?.[ `${active}` ]}
           keyExtractor={listItemKeyExtractor}
-          renderItem={( { item, index } ) => {
-            const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
+          renderItem={( { item, index }: {item:Gift, index: Number} ) => {
+            let title: string
+            if( item.type === GiftType.SENT ){
+              if( item.status === GiftStatus.CREATED || item.status === GiftStatus.RECLAIMED ) title = 'Available Gift'
+              else if( item.status === GiftStatus.SENT ) title = 'Sent to recipient'
+              else if( item.status === GiftStatus.ACCEPTED ) title = 'Accepted by recipient'
+              else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
+            } else if ( item.type === GiftType.RECEIVED ){
+              if( item.status === GiftStatus.ACCEPTED ) title = 'Received Gift'
+              else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
+            }
+
             let walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
             // let image
             let contactDetails : RecipientDescribing
@@ -467,108 +476,9 @@ const ManageGifts = ( { navigation } ) => {
                   </View>
                 }
               </>
-
             )
-
           }}
         />
-        {/* </View> */}
-
-
-        {Object.values( gifts ?? {
-        } ).length === 0 &&
-          <View style={{
-            // marginTop: hp( '45%' )
-          }}>
-            <View style={{
-              height: hp( '12%' ),
-              padding: 20,
-              marginLeft: 12,
-              marginRight: 20,
-              justifyContent:'center',
-            }}>
-              <Text style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
-                letterSpacing: 0.6,
-                lineHeight: 18,
-              }}>{getText()}</Text>
-            </View>
-            <View style={styles.centeredView}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate( 'CreateGift' )}
-                style={{
-                  flexDirection: 'row', alignItems: 'center'
-                }}>
-                <IconAdd />
-                <Text style={styles.createGiftText}>
-                  Create New Gift
-                </Text>
-              </TouchableOpacity>
-              {/* <ScrollView style={{
-              flex: 1
-            }}> */}
-              {/* {timer && [ 1, 2, 3 ].map( ( value, index ) => {
-                return (
-                  <View key={index} style={styles.scrollViewContainer}>
-
-                    <View>
-                      <View style={styles.roundedView} />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '22%' ),
-                          borderRadius: 10,
-                        }}
-                      />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '34%' ),
-                          borderRadius: 10,
-                          marginTop: hp( 1 ),
-                        }}
-                      />
-
-                    </View>
-                    <View>
-
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '35%' ),
-                          borderRadius: 10,
-                          marginTop: hp( 0.5 ),
-                          alignSelf: 'flex-end'
-                        }}
-                      />
-                      <View style={{
-                        flexDirection: 'row', marginTop: hp( 5 ), flex: 1, alignItems: 'flex-end'
-                      }}>
-                        <View
-                          style={{
-                            backgroundColor: Colors.backgroundColor,
-                            height: wp( '8%' ),
-                            width: wp( '32%' ),
-                            borderRadius: 20,
-
-                          }}
-                        />
-                        <View style={styles.roundedViewSmall} />
-                      </View>
-                    </View>
-                  </View>
-                )
-              } )} */}
-              {/* </ScrollView> */}
-            </View>
-
-          </View>
-        }
       </View>
     </View>
   )

@@ -19,10 +19,13 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../components/BottomInfoBox'
 import openLink from '../utils/OpenLink'
 import { LocalizationContext } from '../common/content/LocContext'
+import { useDispatch } from 'react-redux'
+import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
+  const dispatch = useDispatch()
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -78,6 +81,8 @@ const WalletInitializationScreen = props => {
         </View>
         <TouchableOpacity
           onPress={async () => {
+            dispatch( setCloudDataRecovery( null ) )
+            dispatch( setIsFileReading( false ) )
             props.navigation.navigate( 'RestoreWithICloud' )
           }}
           style={{

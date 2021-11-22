@@ -536,9 +536,9 @@ export default class AccountUtilities {
             for ( const utxo of addressSpecificUTXOs ) {
               const { value, Address, status, vout, txid } = utxo
               let include = true
-              UTXOs.forEach( ( utxo ) => {
-                if( utxo.txId === txid ) {
-                  if( status.confirmed && !utxo.status.confirmed ) utxo.status = status
+              UTXOs.forEach( ( cachedUTXO ) => {
+                if( cachedUTXO.txId === txid && cachedUTXO.address === Address ) {
+                  if( status.confirmed && !cachedUTXO.status.confirmed ) cachedUTXO.status = status
                   include = false
                 }
               } )

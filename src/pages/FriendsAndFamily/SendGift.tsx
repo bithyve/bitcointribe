@@ -146,7 +146,7 @@ export default function SendGift( props ) {
         }}
         amt={numberWithCommas( giftToSend.amount )}
         onPressShare={() => {}}
-        accountName={account.accountName}
+        accountName={account?.accountName}
       />
     </ScrollView>
   )
