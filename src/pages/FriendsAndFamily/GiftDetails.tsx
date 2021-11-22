@@ -450,17 +450,18 @@ const GiftDetails = ( { navigation } ) => {
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
-        { [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT, GiftStatus.ACCEPTED ].includes( gift.status ) ? ( bottomButton( () => {
+        { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Add To Account */}
-        {( [ GiftStatus.CREATED, GiftStatus.REJECTED, GiftStatus.RECLAIMED, GiftStatus.ACCEPTED ].includes( gift.status ) ) && !gift.receiver.accountId ? (
-          bottomButton( () => {
-            setAcceptGiftModal( true )
-          }, 'Add To Account' )
-        ) : null}
+        {( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.REJECTED, GiftStatus.RECLAIMED ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) )
+        && !gift.receiver.accountId ? (
+            bottomButton( () => {
+              setAcceptGiftModal( true )
+            }, 'Add To Account' )
+          ) : null}
       </View>
       <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
         <View style={styles.modalContentContainer}>

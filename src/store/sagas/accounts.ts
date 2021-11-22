@@ -141,7 +141,13 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
   try{
     giftToSend.status = GiftStatus.SENT
     giftToSend.type = GiftType.SENT
+
+    // set timestamps
     giftToSend.timestamps.sent = Date.now()
+    // remove successive timestamps(if exist)
+    delete giftToSend.timestamps.accepted
+    delete giftToSend.timestamps.reclaimed
+
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
     giftToSend.themeId = themeId

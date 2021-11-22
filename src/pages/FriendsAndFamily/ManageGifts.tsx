@@ -178,7 +178,7 @@ const ManageGifts = ( { navigation } ) => {
     setActive( type )
   }
 
-  const getText = () => {
+  const getSectionDescription = () => {
     if ( active === GiftStatus.CREATED ) {
       if( giftsArr?.[ `${active}` ].length === 0 ) return 'All the gifts you create and receive would be visible below'
       else return 'All the gifts you have created and not sent, plus gifts you have received are shown here'
@@ -315,7 +315,7 @@ const ManageGifts = ( { navigation } ) => {
           <BottomInfoBox
             // backgroundColor={Colors.white}
             // title={'Note'}
-            infoText={getText()}
+            infoText={getSectionDescription()}
           />
         }
         {Object.values( gifts ?? {
@@ -344,8 +344,18 @@ const ManageGifts = ( { navigation } ) => {
           showsVerticalScrollIndicator={false}
           data={giftsArr?.[ `${active}` ]}
           keyExtractor={listItemKeyExtractor}
-          renderItem={( { item, index } ) => {
-            const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
+          renderItem={( { item, index }: {item:Gift, index: Number} ) => {
+            let title: string
+            if( item.type === GiftType.SENT ){
+              if( item.status === GiftStatus.CREATED || item.status === GiftStatus.RECLAIMED ) title = 'Available Gift'
+              else if( item.status === GiftStatus.SENT ) title = 'Sent to recipient'
+              else if( item.status === GiftStatus.ACCEPTED ) title = 'Accepted by recipient'
+              else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
+            } else if ( item.type === GiftType.RECEIVED ){
+              if( item.status === GiftStatus.ACCEPTED ) title = 'Received Gift'
+              else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
+            }
+
             let walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
             // let image
             let contactDetails : RecipientDescribing
@@ -464,49 +474,9 @@ const ManageGifts = ( { navigation } ) => {
                   </View>
                 }
               </>
-
             )
-
           }}
         />
-        {/* </View> */}
-
-
-        {Object.values( gifts ?? {
-        } ).length === 0 &&
-          <View style={{
-            // marginTop: hp( '45%' )
-          }}>
-            <View style={{
-              height: hp( '12%' ),
-              padding: 20,
-              marginLeft: 12,
-              marginRight: 20,
-              justifyContent:'center',
-            }}>
-              <Text style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
-                letterSpacing: 0.6,
-                lineHeight: 18,
-              }}>{getText()}</Text>
-            </View>
-            <View style={styles.centeredView}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate( 'CreateGift' )}
-                style={{
-                  flexDirection: 'row', alignItems: 'center'
-                }}>
-                <IconAdd />
-                <Text style={styles.createGiftText}>
-                  Create New Gift
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-          </View>
-        }
       </View>
     </View>
   )
