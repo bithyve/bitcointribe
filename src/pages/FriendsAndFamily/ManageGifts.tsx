@@ -318,7 +318,7 @@ const ManageGifts = ( { navigation } ) => {
             infoText={getSectionDescription()}
           />
         }
-        {active === GiftStatus.CREATED &&
+        { active === GiftStatus.CREATED &&
         <TouchableOpacity
           onPress={() => navigation.navigate( 'CreateGift' )}
           style={{
