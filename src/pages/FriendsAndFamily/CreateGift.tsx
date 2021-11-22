@@ -9,7 +9,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
-  Image
+  Image,
+  TouchableWithoutFeedback
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -43,6 +44,7 @@ import ToggleContainer from '../../pages/Home/ToggleContainer'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../../components/MaterialCurrencyCodeIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
   getCurrencyImageByRegion, processRequestQR,
 } from '../../common/CommonFunctions/index'
@@ -73,6 +75,9 @@ const CreateGift = ( { navigation } ) => {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
+  const [ giftsNumber, setGiftsNumber ] = useState( false )
+  const [ amountKeyBoard, setAmountKeyBoard ] = useState( false )
+  const [ numbersOfGift, setNumbersOfGift ] = useState( '5' )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -180,15 +185,28 @@ const CreateGift = ( { navigation } ) => {
   }
 
   function onPressNumber( text ) {
-    let tmpPasscode = amount
-
-    if ( text != 'x' ) {
-      tmpPasscode += text
-      setAmount( tmpPasscode )
-    }
-
-    if ( amount && text == 'x' ) {
-      setAmount( amount.slice( 0, -1 ) )
+    if( amountKeyBoard ) {
+      let tmpPasscode = amount
+      if ( amount.length < 4 ) {
+        if ( text != 'x' ) {
+          tmpPasscode += text
+          if( amountKeyBoard ) setAmount( tmpPasscode )
+        }
+      }
+      if ( amount && text == 'x' ) {
+        setAmount( amount.slice( 0, -1 ) )
+      }
+    } else if( giftsNumber ) {
+      let tmpPasscode = numbersOfGift
+      if ( numbersOfGift.length < 4 ) {
+        if ( text != 'x' ) {
+          tmpPasscode += text
+          setNumbersOfGift( tmpPasscode )
+        }
+      }
+      if ( numbersOfGift && text == 'x' ) {
+        setNumbersOfGift( numbersOfGift.slice( 0, -1 ) )
+      }
     }
   }
 
@@ -241,7 +259,7 @@ const CreateGift = ( { navigation } ) => {
               backgroundColor: 'transparent',
               marginTop: hp( -1 )
             }}
-            infoText={'The Gift is ready to be sent to anyone you choose. If unclaimed, the sats would revert to your wallet.'}
+            infoText={'The Gift is ready to be sent to anyone you choose. If unaccepted, the sats would revert to your wallet.'}
           />
 
         </View>
@@ -348,7 +366,8 @@ const CreateGift = ( { navigation } ) => {
         {getAvatarForSubAccount( item.primarySubAccount, false, true )}
       </View>
       <View style={{
-        marginHorizontal: wp( 3 )
+        marginHorizontal: wp( 3 ),
+        flex: 1
       }}>
         <Text style={{
           color: Colors.gray4,
@@ -383,6 +402,14 @@ const CreateGift = ( { navigation } ) => {
           </Text>
         </Text>
       </View>
+      <MaterialCommunityIcons
+        name="dots-vertical"
+        size={24}
+        color="gray"
+        style={{
+          alignSelf: 'center'
+        }}
+      />
     </TouchableOpacity>
   }
 
@@ -432,44 +459,87 @@ const CreateGift = ( { navigation } ) => {
           />
         </View>
         {accountElement( selectedAccount, ()=> setAccountListModal( !accountListModal ) )}
-        <KeyboardAvoidingView
-          style={{
-            ...inputStyle,
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderColor: Colors.white,
-            marginTop: 10,
-            backgroundColor: Colors.white,
-            paddingHorizontal: wp( 3 ),
-            height: 50,
-          }}
-        >
-          <BalanceCurrencyIcon />
-          <View style={{
-            width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
-          }} />
-          <Text style={[ styles.modalInputBox, {
-            color: amount !== '' ? Colors.textColorGrey : Colors.gray1
-          } ]} onPress={() => setKeyboard( true )}>{amount}
-            {!showKeyboard &&
-          <Text style={{
-            fontSize: RFValue( 12 ),
-          }}>
-            {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
-          </Text>
-            }
-            {( showKeyboard ) && <Text style={{
-              color: Colors.lightBlue, fontSize: RFValue( 18 ),
-            }}>|</Text>}
-          </Text>
-          {isAmountInvalid && (
+        <View style={{
+          flexDirection: 'row'
+        }}>
+          <View
+            style={{
+              ...styles.inputBox,
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderColor: Colors.white,
+              marginTop: 10,
+              backgroundColor: Colors.white,
+              paddingHorizontal: wp( 3 ),
+              height: 50,
+              flex: 2,
+              marginRight: wp( '2%' )
+            }}
+          >
+            <BalanceCurrencyIcon />
             <View style={{
-              marginLeft: 'auto'
+              width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
+            }} />
+            <Text style={[ styles.modalInputBox, {
+              color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
+            } ]} onPress={() => {setKeyboard( true ); setAmountKeyBoard( true ); setGiftsNumber( false )}}>{amount}
+              {!showKeyboard && !amountKeyBoard &&
+              <Text style={{
+                fontSize: RFValue( 12 ),
+              }}>
+                {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
+              </Text>
+              }
+              {( showKeyboard && amountKeyBoard ) && <Text style={{
+                color: Colors.lightBlue, fontSize: RFValue( 18 ),
+              }}>|</Text>}
+            </Text>
+            {isAmountInvalid && (
+              <View style={{
+                marginLeft: 'auto'
+              }}>
+                <Text style={FormStyles.errorText}>{strings.Insufficient}</Text>
+              </View>
+            )}
+          </View>
+          <TouchableWithoutFeedback
+            onPress={() => {setKeyboard( true ); setGiftsNumber( true ); setAmountKeyBoard( false )}}
+          >
+            <View style={{
+              ...styles.inputBox,
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderColor: Colors.white,
+              marginTop: 10,
+              backgroundColor: Colors.white,
+              paddingHorizontal: wp( 3 ),
+              height: 50,
+              marginLeft: 0,
+              flex: 1
             }}>
-              <Text style={FormStyles.errorText}>{strings.Insufficient}</Text>
+              <Text style={[ {
+                fontSize: RFValue( 15 ),
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                backgroundColor: Colors.white,
+                alignSelf: 'center',
+                flex: 1,
+              }, {
+                color: numbersOfGift !== '' ? Colors.textColorGrey : Colors.gray1,
+              } ]} onPress={() => {setKeyboard( true ); setGiftsNumber( true );setAmountKeyBoard( false )}}>
+                <Text style={{
+                  color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
+                }}>x   </Text>{numbersOfGift}
+                {( showKeyboard && giftsNumber ) && <Text style={{
+                  color: Colors.lightBlue, fontSize: RFValue( 18 ),
+                }}>|</Text>}
+              </Text>
+              <Text style={{
+                color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),  marginLeft: 'auto', marginTop: hp( '0.5%' )
+              }}>gifts</Text>
             </View>
-          )}
-        </KeyboardAvoidingView>
+          </TouchableWithoutFeedback>
+        </View>
         <View style={{
           marginVertical: hp( 5 ),
           marginHorizontal: wp( 7 ),
@@ -652,7 +722,7 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={()=>setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
         {renderAccountList()}
       </ModalContainer>
-      {showLoader ? <Loader /> : null}
+      {showLoader ? <Loader isLoading indicatorColor={Colors.blue}/> : null}
     </ScrollView>
   )
 }
@@ -768,15 +838,15 @@ const styles = StyleSheet.create( {
   inputBox: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
     backgroundColor: Colors.white,
   },
   inputBoxFocused: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,

@@ -139,6 +139,7 @@ interface RestoreWithICloudStateTypes {
   errorModalInfo: string,
   strings: object;
   common: object;
+  restoreStarted: boolean
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -252,6 +253,7 @@ class RestoreWithICloud extends Component<
       errorModalInfo: '',
       strings: translations [ 'bhr' ],
       common: translations [ 'common' ],
+      restoreStarted: false
     }
     this.bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
     this.subPoints = [
@@ -804,7 +806,8 @@ class RestoreWithICloud extends Component<
   showLoaderModal = () => {
     // this.loaderBottomSheet.current.snapTo( 1 )
     this.setState( {
-      loaderModal: true
+      loaderModal: true,
+      restoreStarted: true
     } )
     // this.setLoaderMessages()
   }
@@ -1117,11 +1120,7 @@ class RestoreWithICloud extends Component<
 
         <ModalContainer onBackground={()=>{this.setState( {
           restoreModal:false
-        } );setTimeout( () => {
-          this.setState( {
-            restoreModal:true
-          } )
-        }, 200 )}} visible={restoreModal} closeBottomSheet={() => {
+        } )}} visible={restoreModal} closeBottomSheet={() => {
           this.setState( {
             restoreModal: false
           } )
@@ -1130,11 +1129,7 @@ class RestoreWithICloud extends Component<
         </ModalContainer>
         <ModalContainer onBackground={()=>{this.setState( {
           contactListModal:false
-        } );setTimeout( () => {
-          this.setState( {
-            contactListModal:true
-          } )
-        }, 200 )}} visible={contactListModal} closeBottomSheet={() => { }} >
+        } )}} visible={contactListModal} closeBottomSheet={() => { }} >
           <ContactListForRestore
             title={strings[ 'SelectContact' ]}
             subText={
@@ -1160,11 +1155,7 @@ class RestoreWithICloud extends Component<
         </ModalContainer>
         <ModalContainer onBackground={()=>{this.setState( {
           restoreSuccess:false
-        } );setTimeout( () => {
-          this.setState( {
-            restoreSuccess:true
-          } )
-        }, 200 )}} visible={this.state.restoreSuccess} closeBottomSheet={() => { this.setState( {
+        } )}} visible={this.state.restoreSuccess} closeBottomSheet={() => { this.setState( {
           restoreSuccess: false
         } )}} >
           <RestoreSuccess
@@ -1185,11 +1176,7 @@ class RestoreWithICloud extends Component<
         </ModalContainer>
         <ModalContainer onBackground={()=>{this.setState( {
           backupModal:false
-        } );setTimeout( () => {
-          this.setState( {
-            backupModal:true
-          } )
-        }, 200 )}} visible={backupModal} closeBottomSheet={() => { }} >
+        } )}} visible={backupModal} closeBottomSheet={() => { }} >
           <ICloudBackupNotFound
             modalRef={this.BackupNotFound}
             onPressProceed={() => {
@@ -1209,11 +1196,7 @@ class RestoreWithICloud extends Component<
         </ModalContainer>
         <ModalContainer onBackground={()=>{this.setState( {
           restoreWallet:false
-        } );setTimeout( () => {
-          this.setState( {
-            restoreWallet:true
-          } )
-        }, 200 )}} visible={restoreWallet} closeBottomSheet={() => { }} >
+        } )}} visible={restoreWallet} closeBottomSheet={() => { }} >
           <RestoreWallet
             modalRef={this.RestoreWallet}
             onPressProceed={() => {
@@ -1232,9 +1215,9 @@ class RestoreWithICloud extends Component<
         </ModalContainer>
         <ModalContainer onBackground={()=>{this.setState( {
           loaderModal:false
-        } );setTimeout( () => {
+        } );if( this.state.restoreStarted )setTimeout( () => {
           this.setState( {
-            loaderModal:true
+            loaderModal: true
           } )
         }, 200 )}} visible={loaderModal} closeBottomSheet={() => { }} >
           <LoaderModal
@@ -1243,39 +1226,9 @@ class RestoreWithICloud extends Component<
             subPoints={this.subPoints}
             bottomText={this.bottomTextMessage} />
         </ModalContainer>
-        {/* <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={this.loaderBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '100%' )
-              : hp( '100%' ),
-          ]}
-          renderContent={() => (
-          )}
-          renderHeader={() => (
-            <View
-              style={{
-                marginTop: 'auto',
-                flex: 1,
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                height: hp( '75%' ),
-                zIndex: 9999,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            />
-          )}
-        /> */}
         <ModalContainer onBackground={()=>{this.setState( {
           securityQuestionModal:false
-        } );setTimeout( () => {
-          this.setState( {
-            securityQuestionModal:true
-          } )
-        }, 200 )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
+        } )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
           securityQuestionModal: false
         } ) }} >
           <SecurityQuestion
@@ -1321,10 +1274,8 @@ class RestoreWithICloud extends Component<
             info={this.state.errorModalInfo}
             proceedButtonText={this.state.common[ 'tryAgain' ]}
             onPressProceed={() => {
-              // ( this.ErrorBottomSheet as any ).current.snapTo( 0 )
-              if( this.state.errorModalTitle === this.state.strings[ 'CloudRestorefailed' ] ) {
-                this.cloudData()
-              }
+              if( this.props.cloudData )this.getData( this.props.cloudData )
+              else this.cloudData()
               this.setState( {
                 errorModal: false
               } )
