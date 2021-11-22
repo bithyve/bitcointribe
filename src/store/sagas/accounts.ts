@@ -67,6 +67,7 @@ import {
   GiftMetaData,
   GiftStatus,
   GiftThemeId,
+  GiftType,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -139,6 +140,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
+    giftToSend.type = GiftType.SENT
     giftToSend.timestamps.sent = Date.now()
     giftToSend.note = note
     giftToSend.sender.walletName = walletName

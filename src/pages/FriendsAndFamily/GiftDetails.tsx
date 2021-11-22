@@ -450,18 +450,13 @@ const GiftDetails = ( { navigation } ) => {
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
+        { [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT, GiftStatus.ACCEPTED ].includes( gift.status ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
-        {/* Expire */}
-        {/* {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
-          alert( 'Expire' )
-        }, 'Expire' )
-        ) : null} */}
         {/* Add To Account */}
-        {( [ GiftStatus.CREATED, GiftStatus.REJECTED, GiftStatus.RECLAIMED ].includes( gift.status ) ) && !gift.receiver.accountId ? (
+        {( [ GiftStatus.CREATED, GiftStatus.REJECTED, GiftStatus.RECLAIMED, GiftStatus.ACCEPTED ].includes( gift.status ) ) && !gift.receiver.accountId ? (
           bottomButton( () => {
             setAcceptGiftModal( true )
           }, 'Add To Account' )

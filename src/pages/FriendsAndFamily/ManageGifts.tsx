@@ -85,7 +85,6 @@ const ManageGifts = ( { navigation } ) => {
 
   useEffect( () => {
     const availableGifts = []
-    const receivedArr = []
     const sentAndClaimed = []
     const expiredArr = []
     const sortedGifts = Object.values( gifts ?? {
@@ -94,19 +93,19 @@ const ManageGifts = ( { navigation } ) => {
     } )
 
     sortedGifts.forEach( ( gift: Gift ) => {
-      if ( gift.type === GiftType.RECEIVED ) {
-        receivedArr.push( gift )
-      } else {
+      if ( gift.type === GiftType.SENT ) {
         if ( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ) availableGifts.push( gift )
         if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
+      } else if( gift.type === GiftType.RECEIVED ) {
+        if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
+        else availableGifts.push( gift )
       }
     } )
     const obj = {
     }
     obj[ `${GiftStatus.CREATED}` ] = availableGifts
     obj[ `${GiftStatus.SENT}` ] = sentAndClaimed
-    obj[ `${GiftType.RECEIVED}` ] = receivedArr
     obj[ `${GiftStatus.EXPIRED}` ] = expiredArr
 
     setGiftsArr( obj )
@@ -133,17 +132,18 @@ const ManageGifts = ( { navigation } ) => {
 
   const processGift = ( selectedGift: Gift, title, walletName ) => {
 
-    switch ( selectedGift.status ) {
-        case GiftStatus.CREATED:
-        case GiftStatus.RECLAIMED:
-          navigation.navigate( 'GiftDetails', {
-            title, walletName, gift: selectedGift, avatar: false
-          } )
-          // navigation.navigate( 'AddContact', {
-          //   fromScreen: 'ManageGift',
-          //   giftId: selectedGift.id
-          // } )
-          break
+    if( selectedGift.type === GiftType.SENT ){
+      if( selectedGift.status === GiftStatus.CREATED || selectedGift.status === GiftStatus.RECLAIMED ){
+        navigation.navigate( 'GiftDetails', {
+          title, walletName, gift: selectedGift, avatar: false
+        } )
+      }
+    } else if ( selectedGift.type === GiftType.RECEIVED ) {
+      if( selectedGift.status === GiftStatus.ACCEPTED ){
+        navigation.navigate( 'GiftDetails', {
+          title, walletName, gift: selectedGift, avatar: false
+        } )
+      }
     }
   }
   // const renderGiftDetailsModel = useCallback( () => {
@@ -187,9 +187,6 @@ const ManageGifts = ( { navigation } ) => {
     }
     if ( active === GiftStatus.EXPIRED ) {
       return 'Gifts that were unclaimed and thus expired would be visible below'
-    }
-    if ( active === GiftType.RECEIVED ) {
-      return 'Gifts you\'ve received would be visible below'
     }
   }
 
@@ -303,7 +300,6 @@ const ManageGifts = ( { navigation } ) => {
                     {item === GiftStatus.CREATED && 'Available'}
                     {item === GiftStatus.EXPIRED && 'Expired'}
                     {item === GiftStatus.SENT && 'Sent'}
-                    {item === GiftType.RECEIVED && 'Received'}
                   </Text>
                 </TouchableOpacity>
               )
