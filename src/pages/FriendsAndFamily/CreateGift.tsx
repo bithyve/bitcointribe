@@ -43,6 +43,7 @@ import ToggleContainer from '../../pages/Home/ToggleContainer'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../../components/MaterialCurrencyCodeIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
   getCurrencyImageByRegion, processRequestQR,
 } from '../../common/CommonFunctions/index'
@@ -348,7 +349,8 @@ const CreateGift = ( { navigation } ) => {
         {getAvatarForSubAccount( item.primarySubAccount, false, true )}
       </View>
       <View style={{
-        marginHorizontal: wp( 3 )
+        marginHorizontal: wp( 3 ),
+        flex: 1
       }}>
         <Text style={{
           color: Colors.gray4,
@@ -383,6 +385,14 @@ const CreateGift = ( { navigation } ) => {
           </Text>
         </Text>
       </View>
+      <MaterialCommunityIcons
+        name="dots-vertical"
+        size={24}
+        color="gray"
+        style={{
+          alignSelf: 'center'
+        }}
+      />
     </TouchableOpacity>
   }
 
