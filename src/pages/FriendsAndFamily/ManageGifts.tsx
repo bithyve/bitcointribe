@@ -180,13 +180,14 @@ const ManageGifts = ( { navigation } ) => {
 
   const getText = () => {
     if ( active === GiftStatus.CREATED ) {
-      return 'Gifts that you create, ready to be sent, would be visible below'
+      if( giftsArr?.[ `${active}` ].length === 0 ) return 'All the gifts you create and receive would be visible below'
+      else return 'All the gifts you have created and not sent, plus gifts you have received are shown here'
     }
     if ( active === GiftStatus.SENT ) {
-      return 'Gifts you\'ve sent would be visible below'
+      return 'All the gifts you have sent are shown here'
     }
     if ( active === GiftStatus.EXPIRED ) {
-      return 'Gifts that were unclaimed and thus expired would be visible below'
+      return 'All the gifts that were unclaimed or you expired are shown here'
     }
   }
 
@@ -310,7 +311,7 @@ const ManageGifts = ( { navigation } ) => {
           height: 'auto'
         }}> */}
         {Object.values( gifts ?? {
-        } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
+        } ).length > 0 &&
           <BottomInfoBox
             // backgroundColor={Colors.white}
             // title={'Note'}
@@ -323,7 +324,7 @@ const ManageGifts = ( { navigation } ) => {
           onPress={() => navigation.navigate( 'CreateGift' )}
           style={{
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
-            marginVertical: hp( 2 )
+            marginVertical: hp( 1 )
           }}>
           <IconAddLight />
           <Text style={styles.createGiftText}>
@@ -502,65 +503,6 @@ const ManageGifts = ( { navigation } ) => {
                   Create New Gift
                 </Text>
               </TouchableOpacity>
-              {/* <ScrollView style={{
-              flex: 1
-            }}> */}
-              {/* {timer && [ 1, 2, 3 ].map( ( value, index ) => {
-                return (
-                  <View key={index} style={styles.scrollViewContainer}>
-
-                    <View>
-                      <View style={styles.roundedView} />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '22%' ),
-                          borderRadius: 10,
-                        }}
-                      />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '34%' ),
-                          borderRadius: 10,
-                          marginTop: hp( 1 ),
-                        }}
-                      />
-
-                    </View>
-                    <View>
-
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '35%' ),
-                          borderRadius: 10,
-                          marginTop: hp( 0.5 ),
-                          alignSelf: 'flex-end'
-                        }}
-                      />
-                      <View style={{
-                        flexDirection: 'row', marginTop: hp( 5 ), flex: 1, alignItems: 'flex-end'
-                      }}>
-                        <View
-                          style={{
-                            backgroundColor: Colors.backgroundColor,
-                            height: wp( '8%' ),
-                            width: wp( '32%' ),
-                            borderRadius: 20,
-
-                          }}
-                        />
-                        <View style={styles.roundedViewSmall} />
-                      </View>
-                    </View>
-                  </View>
-                )
-              } )} */}
-              {/* </ScrollView> */}
             </View>
 
           </View>
