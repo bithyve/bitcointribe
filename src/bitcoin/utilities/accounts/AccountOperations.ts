@@ -1041,14 +1041,8 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    console.log( {
-      acc: account.balances
-    } )
     if( txid ){
       AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
-      console.log( {
-        acc: account.balances
-      } )
     }
     else throw new Error( 'Failed to broadcast transaction, txid missing' )
     return {
