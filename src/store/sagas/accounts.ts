@@ -1224,6 +1224,13 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       giftIds.push( gifts[ giftId ].id )
       yield put( updateGift( gifts[ giftId ] ) )
     }
+    yield put( giftCreationSuccess( true ) )
+
+    yield call( dbManager.createGifts, gifts )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: giftIds
+    } ) )
 
     // refersh the account
     let shellToSync: AccountShell
@@ -1232,12 +1239,6 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     }
     yield put( refreshAccountShells( [ shellToSync ], {
     } ) )
-    yield call( dbManager.createGifts, gifts )
-    yield put( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: giftIds
-    } ) )
-    yield put( giftCreationSuccess( true ) )
   } else {
     console.log( 'Gifts generation failed' )
     yield put( giftCreationSuccess( false ) )
