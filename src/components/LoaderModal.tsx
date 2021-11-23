@@ -21,7 +21,7 @@ export default function LoaderModal( props ) {
       }}>
         <Image source={require( '../assets/images/loader.gif' )} style={{
           width: wp( '30%' ), height: wp( '35%' ), marginLeft: 'auto', resizeMode: 'stretch',
-        }} />
+        }}/>
       </View>
       {
         // Removed the showGif condition from here as we are not using the animated gif loader anymore
