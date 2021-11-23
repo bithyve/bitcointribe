@@ -77,7 +77,7 @@ const CreateGift = ( { navigation } ) => {
   const [ showKeyboard, setKeyboard ] = useState( false )
   const [ giftsNumber, setGiftsNumber ] = useState( false )
   const [ amountKeyBoard, setAmountKeyBoard ] = useState( false )
-  const [ numbersOfGift, setNumbersOfGift ] = useState( '5' )
+  const [ numbersOfGift, setNumbersOfGift ] = useState( '1' )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -147,13 +147,23 @@ const CreateGift = ( { navigation } ) => {
         onPress={()=>{
           switch( condn ){
               case 'Create Gift':
-                dispatch( generateGifts( {
-                  amounts: [ Number( amount ) ],
-                  accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
-                  includeFee: includeFees
-                } ) )
-                setInitGiftCreation( true )
-                setShowLoader( true )
+                // creating multiple gift instances(based on giftInstances) of the same amount
+                const giftInstances = Number( numbersOfGift )
+                const giftAmount = Number( amount )
+                const giftAmounts = []
+                for( let int = 0; int < giftInstances; int++ ){
+                  giftAmounts.push( giftAmount )
+                }
+
+                if( giftAmounts.length ){
+                  dispatch( generateGifts( {
+                    amounts: giftAmounts,
+                    accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
+                    includeFee: includeFees
+                  } ) )
+                  setInitGiftCreation( true )
+                  setShowLoader( true )
+                }
                 break
 
               case 'Add F&F and Send':
