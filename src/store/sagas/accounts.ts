@@ -616,14 +616,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
-          // skip test account auto-sync
-          // TODO: re-enable test account once test-wrapper is up
-            const settings = {
-              visibility: AccountVisibility.HIDDEN
-            }
-            yield put( updateAccountSettings( {
-              accountShell: shell, settings
-            } ) )
             break
 
           case AccountType.DONATION_ACCOUNT:
