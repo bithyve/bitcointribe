@@ -102,7 +102,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginRight: wp( 9 )
             }}>
-              {'You have received gift from '}
+              {'You have received a gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),
@@ -110,15 +110,7 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\nThe gift would be valid for 30 days and the sats would revert to '}
-              <Text style={{
-                color: Colors.blue,
-                fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansItalic,
-              }}>
-                {props.subText}
-              </Text>
-              {' if unclaimed'}
+              {'\nYou can choose to add the sats to any of your accounts, or forward the gift to any of your friends and family (at no extra fees!)'}
             </Text>
           </View>
           {props.date &&

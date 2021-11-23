@@ -57,8 +57,14 @@ export default function Login( props ) {
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
   const getRandomMessage = () => {
-    const randomIndex = Math.floor( Math.random() * 5 )
-    return strings.loaderMessages[ randomIndex ]
+    //const randomIndex = Math.floor( Math.random() * 5 )
+    //return strings.loaderMessages[ randomIndex ]
+    // added static message for 2.0.5 #4833
+    return {
+      heading: 'Gift Sats',
+      text: 'Send sats as gifts to your friends and family. Gift sats that you receive can be added to your account or gifted further without any extra fees.',
+      subText: ''
+    }
   }
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )

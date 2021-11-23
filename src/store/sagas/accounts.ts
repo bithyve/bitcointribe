@@ -616,14 +616,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
-          // skip test account auto-sync
-          // TODO: re-enable test account once test-wrapper is up
-            const settings = {
-              visibility: AccountVisibility.HIDDEN
-            }
-            yield put( updateAccountSettings( {
-              accountShell: shell, settings
-            } ) )
             break
 
           case AccountType.DONATION_ACCOUNT:
@@ -1232,6 +1224,13 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       giftIds.push( gifts[ giftId ].id )
       yield put( updateGift( gifts[ giftId ] ) )
     }
+    yield put( giftCreationSuccess( true ) )
+
+    yield call( dbManager.createGifts, gifts )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: giftIds
+    } ) )
 
     // refersh the account
     let shellToSync: AccountShell
@@ -1240,12 +1239,6 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     }
     yield put( refreshAccountShells( [ shellToSync ], {
     } ) )
-    yield call( dbManager.createGifts, gifts )
-    yield put( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: giftIds
-    } ) )
-    yield put( giftCreationSuccess( true ) )
   } else {
     console.log( 'Gifts generation failed' )
     yield put( giftCreationSuccess( false ) )
