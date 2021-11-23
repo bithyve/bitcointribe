@@ -61,6 +61,7 @@ import { updateUserName } from '../../store/actions/storage'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import Loader from '../../components/loader'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import LoaderModal from '../../components/LoaderModal'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -397,7 +398,8 @@ const CreateGift = ( { navigation } ) => {
       }}/>
       <View style={{
         marginLeft: wp( '4%' ),
-        flex: 1
+        flex: 1,
+        marginRight: wp( '2%' )
       }}>
         <Text style={{
           color: Colors.blue, fontSize: RFValue( 13 ), fontFamily: Fonts.FiraSansRegular
@@ -427,7 +429,8 @@ const CreateGift = ( { navigation } ) => {
               stateToUpdate == 'timeLock' ?
                 timeLock :
                 limitedValidity
-            }</Text></View>
+            }</Text>
+        </View>
         <TouchableOpacity onPress={()=>plus()} style={{
           width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginLeft: wp( '4%' )
         }}>
@@ -461,17 +464,17 @@ const CreateGift = ( { navigation } ) => {
         <Text style={{
           color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular
         }}>Create Gift sats</Text>
-        <Text style={{
+        {/* <Text style={{
           color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-        }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+        }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text> */}
       </View>
       <AdvanceGiftOptions
         title={'No. of Gifts'}
-        infoText={'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit'}
+        infoText={'Gift sats created will be of the same amount and can be sent separately'}
         stateToUpdate={'gift'}
         imageToShow={require( '../../assets/images/icons/gift.png' )}
       />
-      <View>
+      {/* <View>
         <Text style={{
           color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular
         }}>Customize Gift</Text>
@@ -490,7 +493,7 @@ const CreateGift = ( { navigation } ) => {
         infoText={'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit'}
         stateToUpdate={'limitedValidity'}
         imageToShow={require( '../../assets/images/icons/validity.png' )}
-      />
+      /> */}
     </View>
   }
 
@@ -888,7 +891,14 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={()=>setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
         {renderAdvanceModal()}
       </ModalContainer>
-      {showLoader ? <Loader isLoading indicatorColor={Colors.blue}/> : null}
+      <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
+        <LoaderModal
+          headerText={'Creating Gift'}
+          messageText={'Packing your gift'}
+          messageText2={''}
+          showGif={false}
+        />
+      </ModalContainer>
     </ScrollView>
   )
 }
