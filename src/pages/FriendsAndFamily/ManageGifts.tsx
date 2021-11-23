@@ -341,7 +341,7 @@ const ManageGifts = ( { navigation } ) => {
             right: 0, top: 0, left: 0, bottom: hp( 9 )
           }}
           contentContainerStyle={{
-            paddingBottom: 150
+            paddingBottom: 300
           }}
           showsVerticalScrollIndicator={false}
           data={giftsArr?.[ `${active}` ]}
