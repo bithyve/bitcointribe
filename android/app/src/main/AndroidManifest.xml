@@ -44,14 +44,70 @@
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-      <intent-filter android:label="Hexa" android:autoVerify="true">
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <!-- Accepts URIs that begin with "https://hexawallet.io/-->
-        <data android:scheme="https" android:host="hexawallet.io" />
-      </intent-filter>
-      <intent-filter android:label="Hexa">
+<!--      <intent-filter android:label="Hexa" android:autoVerify="true">-->
+<!--        <action android:name="android.intent.action.VIEW" />-->
+<!--        <category android:name="android.intent.category.DEFAULT" />-->
+<!--        <category android:name="android.intent.category.BROWSABLE" />-->
+<!--        &lt;!&ndash; Accepts URIs that begin with "https://hexawallet.io/&ndash;&gt;-->
+<!--        <data android:scheme="https" android:host="hexawallet.io" />-->
+<!--      </intent-filter>-->
+        <intent-filter android:label="@string/view_contact_request">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/contactPrefix" />
+        </intent-filter>
+        <intent-filter android:label="@string/view_keeper_request">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/keeperPrefix" />
+        </intent-filter>
+        <intent-filter android:label="@string/view_keeper_request">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/primaryKeeperPrefix" />
+        </intent-filter>
+        <intent-filter android:label="@string/view_keeper_request">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/reciprocalKeeperPrefix" />
+        </intent-filter>
+        <intent-filter android:label="@string/view_contact_request">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/existingKeeperPrefix" />
+        </intent-filter>
+        <intent-filter android:label="@string/view_gift">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/giftPrefix" />
+        </intent-filter>
+        <intent-filter android:label="@string/view_gift">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/contactGiftKeeperPrefix" />
+        </intent-filter>
+        <intent-filter android:label="Hexa">
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />

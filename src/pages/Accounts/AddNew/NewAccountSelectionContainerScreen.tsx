@@ -281,10 +281,10 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         ></SectionList>
         {<ListFooter />}
       </View>
-      <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {setSecureAccountAlert( false )}} >
+      <ModalContainer onBackground={()=>setSecureAccountAlert( false )} visible={secureAccountAlert} closeBottomSheet={() => {setSecureAccountAlert( false )}} >
         {renderSecureAccountAlertContent()}
       </ModalContainer>
-      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {setSecureAccountKnowMore( false )}} >
+      <ModalContainer onBackground={()=>setSecureAccountKnowMore( false )} visible={secureAccountKnowMore} closeBottomSheet={() => {setSecureAccountKnowMore( false )}} >
         {renderSecureAccountKnowMoreContent()}
       </ModalContainer>
     </SafeAreaView>

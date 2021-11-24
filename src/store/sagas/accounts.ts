@@ -48,6 +48,7 @@ import {
   updateGift,
   GENERATE_GIFTS,
   giftCreationSuccess,
+  updateAccountSettings,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -66,6 +67,7 @@ import {
   GiftMetaData,
   GiftStatus,
   GiftThemeId,
+  GiftType,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -137,7 +139,15 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
 export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
+    giftToSend.status = GiftStatus.SENT
+    giftToSend.type = GiftType.SENT
+
+    // set timestamps
     giftToSend.timestamps.sent = Date.now()
+    // remove successive timestamps(if exist)
+    delete giftToSend.timestamps.accepted
+    delete giftToSend.timestamps.reclaimed
+
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
     giftToSend.themeId = themeId
@@ -183,33 +193,6 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )
-  }
-}
-
-export async function changeGiftStatus( encryptionKey: string, giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string ) {
-  try{
-    console.log( 'giftToSend', giftToSend )
-    giftToSend.status = GiftStatus.SENT
-    giftToSend.timestamps.sent = Date.now()
-    giftToSend.note = note
-    giftToSend.themeId = themeId
-    giftToSend.sender.walletName = walletName
-
-    const giftMetaData: GiftMetaData = {
-      status: giftToSend.status,
-      notificationInfo: {
-        walletId: giftToSend.sender.walletId,
-        FCM: fcmToken,
-      }
-    }
-
-    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
-
-    return {
-      updatedGift: giftToSend
-    }
-  } catch( err ){
-    console.log( 'An error occured while upadting gift: ', err )
   }
 }
 
@@ -633,7 +616,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
-          // skip test account auto-sync
             break
 
           case AccountType.DONATION_ACCOUNT:
@@ -708,6 +690,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           instanceNumber: account.instanceNum,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
+          visibility: account.accountVisibility,
         } )
         break
 
@@ -950,7 +933,9 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     updateAccounts: true,
     accountIds: accountIds
   } ) )
-  if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
+
+  // TODO: re-enable test-coins from test-faucet post test-wrapper resurrection
+  // if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
 export const addNewAccountShellsWatcher = createWatcher(
@@ -1239,6 +1224,13 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       giftIds.push( gifts[ giftId ].id )
       yield put( updateGift( gifts[ giftId ] ) )
     }
+    yield put( giftCreationSuccess( true ) )
+
+    yield call( dbManager.createGifts, gifts )
+    yield put( updateWalletImageHealth( {
+      updateGifts: true,
+      giftIds: giftIds
+    } ) )
 
     // refersh the account
     let shellToSync: AccountShell
@@ -1247,12 +1239,6 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     }
     yield put( refreshAccountShells( [ shellToSync ], {
     } ) )
-    yield call( dbManager.createGifts, gifts )
-    yield put( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: giftIds
-    } ) )
-    yield put( giftCreationSuccess( true ) )
   } else {
     console.log( 'Gifts generation failed' )
     yield put( giftCreationSuccess( false ) )

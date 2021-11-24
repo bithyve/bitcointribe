@@ -9,7 +9,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
-  Image
+  Image,
+  TouchableWithoutFeedback
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -20,6 +21,7 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
@@ -43,6 +45,7 @@ import ToggleContainer from '../../pages/Home/ToggleContainer'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../../components/MaterialCurrencyCodeIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
   getCurrencyImageByRegion, processRequestQR,
 } from '../../common/CommonFunctions/index'
@@ -55,12 +58,15 @@ import { translations } from '../../common/content/LocContext'
 import FormStyles from '../../common/Styles/FormStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { updateUserName } from '../../store/actions/storage'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import Loader from '../../components/loader'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import LoaderModal from '../../components/LoaderModal'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
+  const activeAccounts = useActiveAccountShells()
   const currencyKind: CurrencyKind = useCurrencyKind()
-
   const strings  = translations[ 'accounts' ]
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
@@ -71,6 +77,11 @@ const CreateGift = ( { navigation } ) => {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
+  const [ giftsNumber, setGiftsNumber ] = useState( false )
+  const [ amountKeyBoard, setAmountKeyBoard ] = useState( false )
+  const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
+  const [ timeLock, setTimeLock ] = useState( 1 )
+  const [ limitedValidity, setLimitedValidity ] = useState( 1 )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -79,34 +90,25 @@ const CreateGift = ( { navigation } ) => {
   const accountState: AccountsState = useSelector( ( state ) => idx( state, ( _ ) => _.accounts ) )
   const giftCreationStatus = useSelector( state => state.accounts.giftCreationStatus )
   const accountShells: AccountShell[] = accountState.accountShells
-  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
-  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
-  const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
-  const account: Account = accountState.accounts[ sourcePrimarySubAccount.id ]
-  const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ showLoader, setShowLoader ] = useState( false )
+  const [ accountListModal, setAccountListModal ] = useState( false )
+  const [ advanceModal, setAdvanceModal ] = useState( false )
+  const defaultGiftAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+  const [ selectedAccount, setSelectedAccount ]: [AccountShell, any] = useState( defaultGiftAccount )
+  const spendableBalance = useSpendableBalanceForAccountShell( selectedAccount )
+  const account: Account = accountState.accounts[ selectedAccount.primarySubAccount.id ]
+  const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
   }, [ amount ] )
 
+
   const isAmountInvalid = useMemo( () => {
-    if( includeFees ) if( currentSatsAmountFormValue <= averageLowTxFee ) return true
-
-    return currentSatsAmountFormValue > spendableBalance
-  }, [ currentSatsAmountFormValue, spendableBalance, includeFees, averageLowTxFee ] )
-
-  const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
-  } )
-
-  const sourceAccountHeadlineText = useMemo( () => {
-    const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
-
-    return `${title}`
-    // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
-
-  }, [ sourcePrimarySubAccount ] )
+    let giftAmount = currentSatsAmountFormValue
+    if( averageLowTxFee ) giftAmount += averageLowTxFee
+    return giftAmount > spendableBalance
+  }, [ currentSatsAmountFormValue, averageLowTxFee, spendableBalance, includeFees ] )
 
   useEffect( () => {
     if( accountsState.selectedGiftId && initGiftCreation && giftCreationStatus ) {
@@ -138,23 +140,35 @@ const CreateGift = ( { navigation } ) => {
   }
 
   const renderButton = ( text, condn ) => {
-    const actualAmount = ( ( spendableBalance / SATOSHIS_IN_BTC ) *
+    const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
+    const actualAmount = ( ( availableToSpend / SATOSHIS_IN_BTC ) *
     accountsState.exchangeRates[ currencyCode ].last
     ).toFixed( 2 )
 
-    const isDisabled = spendableBalance <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > spendableBalance || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
+    const isDisabled = availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
     return(
       <TouchableOpacity
         disabled={isDisabled}
         onPress={()=>{
           switch( condn ){
               case 'Create Gift':
-                dispatch( generateGifts( {
-                  amounts: [ Number( amount ) ],
-                  includeFee: includeFees
-                } ) )
-                setInitGiftCreation( true )
-                setShowLoader( true )
+                // creating multiple gift instances(based on giftInstances) of the same amount
+                const giftInstances = Number( numbersOfGift )
+                const giftAmount = Number( amount )
+                const giftAmounts = []
+                for( let int = 0; int < giftInstances; int++ ){
+                  giftAmounts.push( giftAmount )
+                }
+
+                if( giftAmounts.length ){
+                  dispatch( generateGifts( {
+                    amounts: giftAmounts,
+                    accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
+                    includeFee: includeFees
+                  } ) )
+                  setInitGiftCreation( true )
+                  setShowLoader( true )
+                }
                 break
 
               case 'Add F&F and Send':
@@ -186,15 +200,28 @@ const CreateGift = ( { navigation } ) => {
   }
 
   function onPressNumber( text ) {
-    let tmpPasscode = amount
-    if ( amount.length < 4 ) {
-      if ( text != 'x' ) {
-        tmpPasscode += text
-        setAmount( tmpPasscode )
+    if( amountKeyBoard ) {
+      let tmpPasscode = amount
+      if ( amount.length < 4 ) {
+        if ( text != 'x' ) {
+          tmpPasscode += text
+          if( amountKeyBoard ) setAmount( tmpPasscode )
+        }
       }
-    }
-    if ( amount && text == 'x' ) {
-      setAmount( amount.slice( 0, -1 ) )
+      if ( amount && text == 'x' ) {
+        setAmount( amount.slice( 0, -1 ) )
+      }
+    } else if( giftsNumber ) {
+      let tmpPasscode = numbersOfGift
+      if ( numbersOfGift.length < 4 ) {
+        if ( text != 'x' ) {
+          tmpPasscode += text
+          setNumbersOfGift( tmpPasscode )
+        }
+      }
+      if ( numbersOfGift && text == 'x' ) {
+        setNumbersOfGift( numbersOfGift.slice( 0, -1 ) )
+      }
     }
   }
 
@@ -247,7 +274,7 @@ const CreateGift = ( { navigation } ) => {
               backgroundColor: 'transparent',
               marginTop: hp( -1 )
             }}
-            infoText={'The Gift is ready to be sent to anyone you choose. If unclaimed, the sats would revert to your wallet.'}
+            infoText={'The Gift is ready to be sent to anyone you choose. If unaccepted, the sats would revert to your wallet.'}
           />
 
         </View>
@@ -277,7 +304,7 @@ const CreateGift = ( { navigation } ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginHorizontal: wp( 3 )
             }}>
-          Add to Friends & Family
+          Add recipient to Friends and Family
             </Text>
           </TouchableOpacity>
         </View>
@@ -323,18 +350,226 @@ const CreateGift = ( { navigation } ) => {
     }
   }
 
+  const renderAccountList = () =>{
+    return <ScrollView style={{
+      height: 'auto'
+    }}>
+      { activeAccounts.map( ( item, index ) => {
+        if ( item.primarySubAccount.type === AccountType.SWAN_ACCOUNT || !item.primarySubAccount.isUsable ) return
+        return(
+          <View key={index} style={{
+            backgroundColor: Colors.white
+          }}>
+            {accountElement( item, ()=>{ setSelectedAccount( item )
+              setAccountListModal( false )} )}
+          </View>
+        )
+      } )}
+    </ScrollView>
+  }
+
+  const AdvanceGiftOptions = ( { title, infoText, stateToUpdate, imageToShow } ) => {
+    const plus = () =>{
+      if( stateToUpdate == 'gift' ){
+        setNumbersOfGift( numbersOfGift + 1 )
+      } else if( stateToUpdate == 'timeLock' ){
+        setTimeLock( timeLock + 1 )
+      } else if( stateToUpdate == 'limitedValidity' ){
+        setLimitedValidity( limitedValidity + 1 )
+      }
+    }
+
+    const minus = () =>{
+      if( stateToUpdate == 'gift' ){
+        if( numbersOfGift > 1 )setNumbersOfGift( numbersOfGift - 1 )
+      } else if( stateToUpdate == 'timeLock' ){
+        if( timeLock > 1 ) setTimeLock( timeLock - 1 )
+      } else if( stateToUpdate == 'limitedValidity' ){
+        if( limitedValidity > 1 ) setLimitedValidity( limitedValidity - 1 )
+      }
+    }
+
+    return ( <View style={{
+      flexDirection: 'row',
+      marginTop: wp( '5%' ), marginBottom: wp( '5%' ), justifyContent:'center',
+    }}>
+      <Image source={imageToShow} style={{
+        width: wp( '10%' ), height: wp( '6%' ), resizeMode: 'contain', alignSelf:'center',
+      }}/>
+      <View style={{
+        marginLeft: wp( '4%' ),
+        flex: 1,
+        marginRight: wp( '2%' )
+      }}>
+        <Text style={{
+          color: Colors.blue, fontSize: RFValue( 13 ), fontFamily: Fonts.FiraSansRegular
+        }}>{title}</Text>
+        <Text style={{
+          color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
+        }}>{infoText}</Text>
+      </View>
+      <View style={{
+        flexDirection:'row', alignItems: 'center',
+      }}>
+        <TouchableOpacity onPress={()=>minus()} style={{
+          width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginRight: wp( '4%' )
+        }}>
+          <AntDesign name="minus"
+            size={ 12}
+            color={Colors.white}/>
+        </TouchableOpacity>
+        <View style={{
+          height: wp( '12%' ), width: wp( '12%' ), borderRadius: 10, backgroundColor: Colors.white, justifyContent: 'center', alignItems:'center', shadowColor: Colors.borderColor, shadowOpacity: 0.6, shadowOffset: {
+            width: 7, height: 7
+          }, shadowRadius: 5, elevation: 5
+        }}><Text style={{
+            color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
+          }}>{stateToUpdate == 'gift'
+              ? numbersOfGift :
+              stateToUpdate == 'timeLock' ?
+                timeLock :
+                limitedValidity
+            }</Text>
+        </View>
+        <TouchableOpacity onPress={()=>plus()} style={{
+          width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginLeft: wp( '4%' )
+        }}>
+          <AntDesign name="plus"
+            size={ 12}
+            color={Colors.white}/>
+        </TouchableOpacity>
+      </View>
+    </View> )
+  }
+
+  const renderAdvanceModal = () =>{
+    return <View style={{
+      backgroundColor: Colors.bgColor, padding: wp( '5%' ),
+    }}>
+      <View style={{
+        flexDirection:'row',
+      }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={()=>setAdvanceModal( false )}
+          style={styles.modalCrossButton}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19}/>
+        </TouchableOpacity>
+      </View>
+
+      <View style={{
+        flexDirection:'column'
+      }}>
+        <Text style={{
+          color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular
+        }}>Create Gift sats</Text>
+        {/* <Text style={{
+          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+        }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text> */}
+      </View>
+      <AdvanceGiftOptions
+        title={'No. of Gifts'}
+        infoText={'Gift sats created will be of the same amount and can be sent separately'}
+        stateToUpdate={'gift'}
+        imageToShow={require( '../../assets/images/icons/gift.png' )}
+      />
+      {/* <View>
+        <Text style={{
+          color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular
+        }}>Customize Gift</Text>
+        <Text style={{
+          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+        }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+      </View>
+      <AdvanceGiftOptions
+        title={'Time Lock'}
+        infoText={'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit'}
+        stateToUpdate={'timeLock'}
+        imageToShow={require( '../../assets/images/icons/time.png' )}
+      />
+      <AdvanceGiftOptions
+        title={'Limited Validity'}
+        infoText={'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit'}
+        stateToUpdate={'limitedValidity'}
+        imageToShow={require( '../../assets/images/icons/validity.png' )}
+      /> */}
+    </View>
+  }
+
+  const accountElement = ( item, onPressCallBack ) =>{
+    return <TouchableOpacity
+      style={styles.accountSelectionView}
+      onPress={()=>onPressCallBack()}
+    >
+      <View style={{
+        width: wp( 13 ),
+        height: wp( 13 ),
+        marginTop: hp( 0.5 ),
+      }} >
+        {getAvatarForSubAccount( item.primarySubAccount, false, true )}
+      </View>
+      <View style={{
+        marginHorizontal: wp( 3 ),
+        flex: 1
+      }}>
+        <Text style={{
+          color: Colors.gray4,
+          fontSize: RFValue( 10 ),
+          fontFamily: Fonts.FiraSansRegular,
+        }}>
+            Sats would be deducted from
+        </Text>
+        <Text
+          style={{
+            color: Colors.black,
+            fontSize: RFValue( 14 ),
+            fontFamily: Fonts.FiraSansRegular,
+          }}
+        >
+          {item.primarySubAccount.customDisplayName ?? item.primarySubAccount.defaultTitle}
+        </Text>
+        <Text style={styles.availableToSpendText}>
+          {'Available to spend: '}
+          <Text style={styles.balanceText}>
+            {prefersBitcoin
+              ? UsNumberFormat( item.primarySubAccount?.balances?.confirmed )
+              : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
+                ? (
+                  ( item.primarySubAccount?.balances?.confirmed / SATOSHIS_IN_BTC ) *
+                      accountsState.exchangeRates[ currencyCode ].last
+                ).toFixed( 2 )
+                : 0}
+          </Text>
+          <Text>
+            {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
+          </Text>
+        </Text>
+      </View>
+      <MaterialCommunityIcons
+        name="dots-vertical"
+        size={24}
+        color="gray"
+        style={{
+          alignSelf: 'center'
+        }}
+      />
+    </TouchableOpacity>
+  }
+
   return (
-    <ScrollView contentContainerStyle={{
-      flexGrow: 1
-    }}
-    keyboardShouldPersistTaps='handled'
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1
+      }}
+      keyboardShouldPersistTaps='handled'
     >
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
         {giftModal &&
-      <ModalContainer visible={giftModal} closeBottomSheet={() => {}} >
-        {renderCreateGiftModal()}
-      </ModalContainer>
+          <ModalContainer onBackground={()=>setGiftModal( false )} visible={giftModal} closeBottomSheet={() => {}} >
+            {renderCreateGiftModal()}
+          </ModalContainer>
         }
         <View style={[ CommonStyles.headerContainer, {
           backgroundColor: Colors.backgroundColor,
@@ -357,77 +592,84 @@ const CreateGift = ( { navigation } ) => {
           <ToggleContainer />
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginRight: wp( 4 )
+          flexDirection: 'row', alignItems: 'center',
         }}>
-          <HeaderTitle
-            firstLineTitle={'Create Gift'}
-            secondLineTitle={'You can choose to send it to anyone using the QR or the link'}
-            infoTextNormal={''}
-            infoTextBold={''}
-            infoTextNormal1={''}
-            step={''}
-          />
-        </View>
-        <TouchableOpacity
-          style={{
-            width: '90%',
-            // height: '54%',
-            backgroundColor: Colors.gray7,
-            shadowOpacity: 0.06,
-            shadowOffset: {
-              width: 10, height: 10
-            },
-            shadowRadius: 10,
-            elevation: 2,
-            alignSelf: 'center',
-            borderRadius: wp( 2 ),
-            marginTop: hp( 3 ),
-            marginBottom: hp( 1 ),
-            paddingVertical: hp( 2 ),
-            paddingHorizontal: wp( 2 ),
-            flexDirection: 'row'
-          }}>
-          <CheckingAccount />
           <View style={{
-            marginHorizontal: wp( 3 )
+            flex: 1
           }}>
-            <Text style={{
-              color: Colors.gray4,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+            <View style={{
+              flexDirection: 'row', alignItems: 'center',
             }}>
-                Sats would be deducted from
-            </Text>
-            <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue( 14 ),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              {sourceAccountHeadlineText}
-            </Text>
-            <Text style={styles.availableToSpendText}>
-              {'Available to spend: '}
-              <Text style={styles.balanceText}>
-                {prefersBitcoin
-                  ? UsNumberFormat( spendableBalance )
-                  : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
-                    ? (
-                      ( spendableBalance / SATOSHIS_IN_BTC ) *
-                      accountsState.exchangeRates[ currencyCode ].last
-                    ).toFixed( 2 )
-                    : 0}
+              <Text style={{
+                color: Colors.blue,
+                fontSize: RFValue( 24 ),
+                letterSpacing: 0.01,
+                marginLeft: 20,
+                fontFamily: Fonts.FiraSansRegular
+              }} >
+                {'Create Gift'}
               </Text>
-              <Text>
-                {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
+              <TouchableOpacity style={{
+                marginLeft:'auto',
+              }} onPress={()=>setAdvanceModal( true )}>
+                <Image style={{
+                  width: wp( '5%' ), height: wp( '5%' ), resizeMode: 'contain',  marginRight: wp( '5%' )
+                }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
+              </TouchableOpacity>
+            </View>
+            <View style={{
+              flexDirection: 'row', alignItems: 'center',
+            }}>
+              <Text style={[ CommonStyles.subHeaderTitles, {
+                fontWeight: 'normal'
+              } ]} >
+                {'View and manage created Gifts'}
               </Text>
+            </View>
+
+
+          </View>
+        </View>
+        {accountElement( selectedAccount, ()=> setAccountListModal( !accountListModal ) )}
+        <View style={{
+          flexDirection: 'row'
+        }}>
+          <View
+            style={{
+              ...styles.inputBox,
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderColor: Colors.white,
+              marginTop: 10,
+              backgroundColor: Colors.white,
+              paddingHorizontal: wp( 3 ),
+              height: 50,
+              flex: 2,
+              marginRight: numbersOfGift == 1 ? wp( '5%' ) : wp( '2%' )
+            }}
+          >
+            <BalanceCurrencyIcon />
+            <View style={{
+              width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
+            }} />
+            <Text style={[ styles.modalInputBox, {
+              color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
+            } ]} onPress={() => {setKeyboard( true ); setAmountKeyBoard( true ); setGiftsNumber( false )}}>{amount}
+              {!showKeyboard && !amountKeyBoard &&
+              <Text style={{
+                fontSize: RFValue( 12 ),
+              }}>
+                {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
+              </Text>
+              }
+              {( showKeyboard && amountKeyBoard ) && <Text style={{
+                color: Colors.lightBlue, fontSize: RFValue( 18 ),
+              }}>|</Text>}
             </Text>
           </View>
-        </TouchableOpacity>
-        <KeyboardAvoidingView
-          style={{
-            ...inputStyle,
+
+          {numbersOfGift > 1 ? <View style={{
+            ...styles.inputBox,
             flexDirection: 'row',
             alignItems: 'center',
             borderColor: Colors.white,
@@ -435,35 +677,34 @@ const CreateGift = ( { navigation } ) => {
             backgroundColor: Colors.white,
             paddingHorizontal: wp( 3 ),
             height: 50,
-          }}
-        >
-          <BalanceCurrencyIcon />
-
-          <View style={{
-            width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
-          }} />
-          <Text style={[ styles.modalInputBox, {
-            color: amount !== '' ? Colors.textColorGrey : Colors.gray1
-          } ]} onPress={() => setKeyboard( true )}>{amount}
-            {!showKeyboard &&
-          <Text style={{
-            fontSize: RFValue( 12 ),
+            marginLeft: 0,
+            flex: 1
           }}>
-            {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
-          </Text>
-            }
-            {( showKeyboard ) && <Text style={{
-              color: Colors.lightBlue, fontSize: RFValue( 18 ),
-            }}>|</Text>}
-          </Text>
-          {isAmountInvalid && (
-            <View style={{
-              marginLeft: 'auto'
-            }}>
-              <Text style={FormStyles.errorText}>{strings.Insufficient}</Text>
-            </View>
-          )}
-        </KeyboardAvoidingView>
+            <Text style={[ {
+              fontSize: RFValue( 15 ),
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              backgroundColor: Colors.white,
+              alignSelf: 'center',
+              flex: 1,
+            }, {
+              color: Colors.textColorGrey
+            } ]} >
+              <Text style={{
+                color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
+              }}>x   </Text>{numbersOfGift}
+            </Text>
+            <Text style={{
+              color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),  marginLeft: 'auto', marginTop: hp( '0.5%' )
+            }}>gifts</Text>
+          </View> : null }
+        </View>
+        <View style={{
+          marginLeft: wp( '5%' ),
+          marginTop: wp( '3%' )
+        }}>
+          <Text style={FormStyles.errorText}>{isAmountInvalid ? strings.Insufficient : ''}</Text>
+        </View>
         <View style={{
           marginVertical: hp( 5 ),
           marginHorizontal: wp( 7 ),
@@ -497,14 +738,12 @@ const CreateGift = ( { navigation } ) => {
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )
         }}>
-
-
           {renderButton( 'Create Gift',  'Create Gift' )}
         </View>
         {showKeyboard &&
         <View style={{
+          marginTop:'auto'
         }}>
-
           <View style={styles.keyPadRow}>
             <TouchableOpacity
               onPress={() => onPressNumber( '1' )}
@@ -646,7 +885,20 @@ const CreateGift = ( { navigation } ) => {
         </View>
         }
       </SafeAreaView>
-      {showLoader ? <Loader /> : null}
+      <ModalContainer onBackground={()=>setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
+        {renderAccountList()}
+      </ModalContainer>
+      <ModalContainer onBackground={()=>setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
+        {renderAdvanceModal()}
+      </ModalContainer>
+      <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
+        <LoaderModal
+          headerText={'Creating Gift'}
+          messageText={'Packing your gift'}
+          messageText2={''}
+          showGif={false}
+        />
+      </ModalContainer>
     </ScrollView>
   )
 }
@@ -762,15 +1014,15 @@ const styles = StyleSheet.create( {
   inputBox: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
     backgroundColor: Colors.white,
   },
   inputBoxFocused: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
@@ -812,6 +1064,32 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
+  accountSelectionView: {
+    width: '90%',
+    backgroundColor: Colors.gray7,
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 2,
+    alignSelf: 'center',
+    borderRadius: wp( 2 ),
+    marginTop: hp( 3 ),
+    marginBottom: hp( 1 ),
+    paddingVertical: hp( 2 ),
+    paddingHorizontal: wp( 2 ),
+    flexDirection: 'row'
+  },
+  modalCrossButton: {
+    width: wp( 7 ),
+    height: wp( 7 ),
+    borderRadius: wp( 7/2 ),
+    backgroundColor: Colors.lightBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft:'auto'
+  }
 } )
 
 export default CreateGift

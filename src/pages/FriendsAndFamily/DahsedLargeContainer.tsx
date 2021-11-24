@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import {
   View,
   Text,
@@ -13,10 +13,39 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { LocalizationContext } from '../../common/content/LocContext'
+import {  useSelector } from 'react-redux'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
+  const currencyKind = useCurrencyKind()
+  const currencyCode = useCurrencyCode()
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
+    }
+  }
 
   return(
     <TouchableOpacity
@@ -73,7 +102,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginRight: wp( 9 )
             }}>
-              {'You have received gift from '}
+              {'You have received a gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),
@@ -81,15 +110,7 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\nThe gift would be valid for 30 days and the sats would revert to '}
-              <Text style={{
-                color: Colors.blue,
-                fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansItalic,
-              }}>
-                {props.subText}
-              </Text>
-              {' if unclaimed'}
+              {'\nYou can choose to add the sats to any of your accounts, or forward the gift to any of your friends and family (at no extra fees!)'}
             </Text>
           </View>
           {props.date &&
@@ -126,12 +147,12 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginVertical: hp( 1 )
             }}>
-              {props.amt}
+              {getAmt( props.amt )}
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansRegular
-              }}> sats
+              }}> {prefersBitcoin ? ' sats' : currencyCode}
               </Text>
             </Text>
           </View>

@@ -186,7 +186,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   return (
     <View style={styles.rootContainer}>
-      <ModalContainer visible={sendFailureModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
         {showSendFailureBottomSheet()}
       </ModalContainer>
       <View style={styles.headerSection}>

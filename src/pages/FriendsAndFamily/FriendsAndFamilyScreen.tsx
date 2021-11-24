@@ -520,7 +520,9 @@ class FriendsAndFamilyScreen extends React.Component<
         {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
-            <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
+            <ModalContainer onBackground={()=>this.setState( {
+              showIndicator: false
+            } )} visible={showIndicator} closeBottomSheet={() => {}}>
               <ActivityIndicator color={Colors.white} size='large'/>
             </ModalContainer>
           }
@@ -594,6 +596,54 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }}
           >
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
+              style={{
+                width: '90%',
+                // height: '54%',
+                backgroundColor: Colors.gray7,
+                shadowOpacity: 0.06,
+                shadowOffset: {
+                  width: 10, height: 10
+                },
+                shadowRadius: 10,
+                elevation: 2,
+                alignSelf: 'center',
+                borderRadius: wp( 2 ),
+                marginTop: hp( 3 ),
+                marginBottom: hp( 1 ),
+                paddingVertical: hp( 4 ),
+                paddingHorizontal: wp( 4.5 )
+              }}>
+              <View style={[ styles.subInfo, {
+                // marginBottom: hp( 3 )
+              } ]}>
+                <Gift />
+                <View style={{
+                  flex: 1, marginHorizontal: wp( 2 )
+                }}>
+                  <Text style={[ styles.pageTitle, {
+                    fontSize: RFValue( 11 ),
+                    marginHorizontal: wp ( 0 ),
+                  } ]}>
+                    {this.strings[
+                      'giftsats'
+                    ]}
+                  </Text>
+                  <Text style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: 3,
+                    width: '85%',
+                  }}>
+                    {this.strings[ 'giftSubText' ]}
+                  </Text>
+
+                </View>
+                <RightArrow />
+              </View>
+            </TouchableOpacity>
             <View style={{
               marginTop: wp( '5%' )
             }}>
@@ -653,32 +703,6 @@ class FriendsAndFamilyScreen extends React.Component<
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
-        {/* <ModalContainer visible={showModal} closeBottomSheet={() => this.setState( {
-          showModal: false,
-        } )} >
-          <AddContactAddressBook
-            isLoadContacts={isLoadContacts}
-            proceedButtonText={'Confirm & Proceed'}
-          />
-        </ModalContainer> */}
-        {/* <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.helpBottomSheetRef}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '87%' )
-              : hp( '89%' ),
-          ]}
-          renderContent={this.renderHelpContent}
-          renderHeader={this.renderHelpHeader}
-          onCloseEnd={() => {
-            this.setState( {
-              isShowingKnowMoreSheet: false
-            } )
-          }}
-        /> */}
       </View>
     /* feature/2.0 */
     )

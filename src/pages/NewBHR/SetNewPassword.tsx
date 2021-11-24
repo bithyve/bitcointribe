@@ -1087,13 +1087,13 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
       {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
       </ModalContainer> */}
-      <ModalContainer visible={securityQue} closeBottomSheet={() => {showSecurityQue( false ) }} >
+      <ModalContainer onBackground={()=>showSecurityQue( false )} visible={securityQue} closeBottomSheet={() => {showSecurityQue( false ) }} >
         {renderSecurityQuestion()}
       </ModalContainer>
-      <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {showEncryptionPswd( false ) }} >
+      <ModalContainer onBackground={()=>showEncryptionPswd( false )} visible={encryptionPswd} closeBottomSheet={() => {showEncryptionPswd( false ) }} >
         {renderEncryptionPswd()}
       </ModalContainer>
-      <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
+      <ModalContainer onBackground={()=>setLoaderModal( false )} visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
         {renderLoaderModalContent()}
       </ModalContainer>
 

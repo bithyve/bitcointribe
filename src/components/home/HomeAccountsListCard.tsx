@@ -54,9 +54,9 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
           <View style={styles.dot}/>
         )
       }
-      {( primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && AllowSecureAccount ) &&
+      {/* {( primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && AllowSecureAccount ) &&
       <View style={styles.dot}/>
-      }
+      } */}
       <View style={styles.headerBadgeContainer}>
 
         {/*

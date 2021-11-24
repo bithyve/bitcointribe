@@ -61,10 +61,10 @@ const GiftDetails = ( { navigation } ) => {
   } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
-  const accountShells: AccountShell[] = useSelector( ( state ) =>
-    idx( state, ( _ ) => _.accounts.accountShells )
-  )
-  //   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
+
+  useEffect( ()=> {
+    if( gift.status === GiftStatus.SENT ) setIsOpen( true )
+  }, [ gift ] )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
@@ -130,7 +130,7 @@ const GiftDetails = ( { navigation } ) => {
           }}
         >
           <HeaderTitle
-            firstLineTitle={'Gift Card Details'}
+            firstLineTitle={'Gift Details'}
             secondLineTitle={'Logs of Gift status appear here'}
             infoTextNormal={''}
             infoTextBold={''}
@@ -427,7 +427,7 @@ const GiftDetails = ( { navigation } ) => {
                       ]}
                     >
                       <Text style={styles.modalInfoText}>
-                        Gift Card {item[ 0 ]}
+                        Gift {item[ 0 ]}
                       </Text>
                       {/* <Text style={styles.subText}>Lorem ipsum dolor sit amet</Text> */}
                     </View>
@@ -439,7 +439,7 @@ const GiftDetails = ( { navigation } ) => {
       </SafeAreaView>
       <View style={{
         marginBottom: wp( '3%' ), marginTop: wp( '3%' ), flexDirection: 'row',
-        justifyContent: 'space-between', paddingHorizontal: wp( '2%' ),
+        justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ),
         paddingVertical: wp( '2%' ),
       }}>
         {/* Reclaim */}
@@ -450,33 +450,28 @@ const GiftDetails = ( { navigation } ) => {
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
+        { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
           } )
-        }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift Card' ) ) : null}
-        {/* Expire */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.SENT ) ? ( bottomButton( () => {
-          alert( 'Expire' )
-        }, 'Expire' )
-        ) : null}
+        }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Add To Account */}
-        {( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.REJECTED ) && !gift.receiver.accountId ? (
-          bottomButton( () => {
-            setAcceptGiftModal( true )
-          }, 'Add To Account' )
-        ) : null}
+        {( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.REJECTED, GiftStatus.RECLAIMED ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) )
+        && !gift.receiver.accountId ? (
+            bottomButton( () => {
+              setAcceptGiftModal( true )
+            }, 'Add To Account' )
+          ) : null}
       </View>
-      <ModalContainer visible={acceptGift} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
         <View style={styles.modalContentContainer}>
           <AddGiftToAccount
             getTheme={getTheme}
             navigation={navigation}
             giftAmount={gift.amount}
             giftId={( gift as Gift ).id}
-            onCancel={() => {
-              setAcceptGiftModal( false )
-            }}
+            onCancel={() => setAcceptGiftModal( false )}
+            closeModal={()=>setAcceptGiftModal( false )}
           />
         </View>
       </ModalContainer>

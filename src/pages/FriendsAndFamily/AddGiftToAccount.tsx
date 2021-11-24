@@ -21,7 +21,7 @@ import { associateGift } from '../../store/actions/trustedContacts'
 import { resetStackToAccountDetails,  } from '../../navigation/actions/NavigationActions'
 import AccountSelected from './AccountSelected'
 import GiftAddedModal from './GiftAddedModal'
-import { giftAccepted } from '../../store/actions/accounts'
+import { giftAccepted, refreshAccountShells } from '../../store/actions/accounts'
 
 
 export type Props = {
@@ -78,7 +78,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             setConfirmAccount( false )
             setGiftAddedModel( true )
             dispatch( associateGift( giftId, accId ) )
-          } else {
+          } else if( text === 'View Account' ) {
             setGiftAddedModel( false )
             dispatch( giftAccepted( '' ) )
             closeModal()
@@ -87,6 +87,9 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
                 accountShellID: sourcePrimarySubAccount.accountShellID,
               } )
             )
+            dispatch( refreshAccountShells( [ sendingAccount ], {
+              hardRefresh: true
+            } ) )
           }
         }}
         style={{

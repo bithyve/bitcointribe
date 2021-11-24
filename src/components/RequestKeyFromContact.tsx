@@ -270,7 +270,7 @@ function RequestKeyFromContact( props ) {
                       fontSize: RFValue( 11 ),
                       fontFamily: Fonts.FiraSansMediumItalic,
                     }}>
-                    Checking Account
+                      {props.accountName}
                     </Text>
                   </Text>
                   <Text style={{
@@ -280,7 +280,7 @@ function RequestKeyFromContact( props ) {
                     marginTop: hp( 0.3 ),
                     lineHeight: 12
                   }}>
-                    {moment().format( 'lll' )}
+                    {moment( ).format( 'lll' )}
                   </Text>
                 </>
               }
@@ -303,7 +303,7 @@ function RequestKeyFromContact( props ) {
               }}> sats
               </Text>
             </Text> */}
-              <More />
+              {!props.isGift &&<More />}
             </View>
 
           </TouchableOpacity>
@@ -331,7 +331,7 @@ function RequestKeyFromContact( props ) {
           }}>
             {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
           </Text>
-          while accepting the gift card
+          while accepting the gift
         </Text>
       }
       {!props.isGift &&
@@ -389,10 +389,10 @@ function RequestKeyFromContact( props ) {
       </TouchableOpacity> */}
       {props.isGift &&
         <DashedLargeContainer
-          titleText={'Gift Card'}
+          titleText={'Gift sats'}
           titleTextColor={Colors.black}
           subText={props.senderName}
-          extraText={'This is to get you started!\nWelcome to Bitcoin'}
+          extraText={props.giftNote? props.giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( props.amt )}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}

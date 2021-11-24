@@ -13,7 +13,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 export default function LoaderModal( props ) {
   return ( <View style={{
-    maxHeight: hp( '72%' ), backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    maxHeight: 'auto', backgroundColor: 'rgba(0, 0, 0, 0.3)'
   }}>
     <View style={styles.modalContentContainer}>
       <View style={{
@@ -21,7 +21,7 @@ export default function LoaderModal( props ) {
       }}>
         <Image source={require( '../assets/images/loader.gif' )} style={{
           width: wp( '30%' ), height: wp( '35%' ), marginLeft: 'auto', resizeMode: 'stretch',
-        }} />
+        }}/>
       </View>
       {
         // Removed the showGif condition from here as we are not using the animated gif loader anymore

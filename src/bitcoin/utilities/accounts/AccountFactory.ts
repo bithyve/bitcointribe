@@ -43,7 +43,7 @@ export function generateAccount(
     xpriv,
     accountName,
     accountDescription,
-    accountVisibility: AccountVisibility.DEFAULT,
+    accountVisibility: type === AccountType.TEST_ACCOUNT? AccountVisibility.HIDDEN: AccountVisibility.DEFAULT, // TODO: re-enable post test-wrapper resurrection
     activeAddresses: {
       external: {
       },
@@ -72,7 +72,7 @@ export function generateAccount(
     transactionsNote: {
     },
     importedAddresses: {
-    }
+    },
   }
 
   return account

@@ -710,16 +710,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
           changeButtonText={'Change'}
         />
       </View>
-      <ModalContainer visible={SecondaryDeviceMessageModal} closeBottomSheet={()=>setSecondaryDeviceMessageModal( false )} >
+      <ModalContainer onBackground={()=>setSecondaryDeviceMessageModal( false )} visible={SecondaryDeviceMessageModal} closeBottomSheet={()=>setSecondaryDeviceMessageModal( false )} >
         {renderSecondaryDeviceMessageContents()}
       </ModalContainer>
-      <ModalContainer visible={shareOtpWithTrustedContactModal} closeBottomSheet={() => setShareOtpWithTrustedContactModal( false )}>
+      <ModalContainer onBackground={()=>setShareOtpWithTrustedContactModal( false )} visible={shareOtpWithTrustedContactModal} closeBottomSheet={() => setShareOtpWithTrustedContactModal( false )}>
         {renderShareOtpWithTrustedContactContent()}
       </ModalContainer>
-      <ModalContainer visible={ChangeModal} closeBottomSheet={() => setChangeModal( false )}>
+      <ModalContainer onBackground={()=>setChangeModal( false )} visible={ChangeModal} closeBottomSheet={() => setChangeModal( false )}>
         {renderChangeContent()}
       </ModalContainer>
-      <ModalContainer visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
+      <ModalContainer onBackground={()=>setReshareModal( false )} visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
         <ErrorModalContents
           modalRef={ReshareBottomSheet}
           title={'Reshare with the same contact?'}
@@ -738,10 +738,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
           isBottomImage={false}
         />
       </ModalContainer>
-      <ModalContainer visible={ConfirmModal} closeBottomSheet={() => setConfirmModal( false )}>
+      <ModalContainer onBackground={()=>setConfirmModal( false )} visible={ConfirmModal} closeBottomSheet={() => setConfirmModal( false )}>
         {renderConfirmContent()}
       </ModalContainer>
-      <ModalContainer visible={ErrorModal} closeBottomSheet={() => setErrorModal( false )}>
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={ErrorModal} closeBottomSheet={() => setErrorModal( false )}>
         {renderErrorModalContent()}
       </ModalContainer>
       {/* <ModalContainer visible={showQrCode} closeBottomSheet={() => setShowQrCode( false )}>
@@ -786,7 +786,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
         />
       </ModalContainer> */}
-      <ModalContainer visible={showFNFList} closeBottomSheet={() => setShowFNFList( false )}>
+      <ModalContainer onBackground={()=>setShowFNFList( false )} visible={showFNFList} closeBottomSheet={() => setShowFNFList( false )}>
         <View
           style={{
             height: '100%',
@@ -839,12 +839,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
         </View>
       </ModalContainer>
 
-      <ModalContainer visible={HelpModal} closeBottomSheet={() => {setHelpModal( false )}} >
+      <ModalContainer onBackground={()=>setHelpModal( false )} visible={HelpModal} closeBottomSheet={() => {setHelpModal( false )}} >
         <FriendsAndFamilyHelpContents
           titleClicked={() => setHelpModal( false )}
         />
       </ModalContainer>
-      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
+      <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}

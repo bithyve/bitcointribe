@@ -556,7 +556,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asda","channelId":"dc9986c392da183bcbe1811aa6232a8d8f2fe7f1f4a21ee4852505a591d5cd5e","streamId":"07a7d807c","channelKey":"N7KUMNsPZSmvZGPczYmO1c6L","secondaryChannelKey":"VBK1kByohkx5C5386NQ2UO1G","version":"2.0.1","walletId":"1c2e8a04d13056c6eb5cdb6d7b16b16c90a2e8c3158ad50fc7fdeba5f903d719","encryptedKey":"92817fe2b172943568b5f304ac954434e66c98a01b5e76d93782757fa89e285f18797ec689369b6bc2d570d85d73bf826eea44620277640995e936da076e5e42b70b060a118ace9e8ab36fb14ad6e41b"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asda","channelId":"dff8eb3978c08ad72dc515ec5b71d145e5e6d9c1884f6f58739dd08d26f31b4b","streamId":"646625378","channelKey":"OewqnyQaNretrYLeUDvIGmNj","secondaryChannelKey":"3QcSSriLtO95lgYvZs1VvVkM","version":"2.0.1","walletId":"c08a0692304a8aadaef62f00796778b646f2a3190c524d78507d14b6a68c4d1e","encryptedKey":"c217fd0163cac758b8ae585653d3bdf328de633f9b4dc5f42efd7a12e786bff2ecfd1aace2b8d07add7d42d4004bac08bda0fa8c307541b7d17f200d426333a3a81ce98ec7a6d91561afd216c67f015f"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
@@ -630,17 +630,17 @@ const PersonalCopyHistory = ( props ) => {
           }}
         />
       </View>
-      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => setPersonalCopyShareModal( false )} >
+      <ModalContainer onBackground={()=>setPersonalCopyShareModal( false )} visible={personalCopyShareModal} closeBottomSheet={() => setPersonalCopyShareModal( false )} >
         {renderPersonalCopyShareModalContent()}
       </ModalContainer>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => setErrorModal( false )} >
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => setErrorModal( false )} >
         {renderErrorModalContent()}
       </ModalContainer>
 
-      <ModalContainer visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
+      <ModalContainer onBackground={()=>setHelpModal( false )} visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
         {renderHelpContent()}
       </ModalContainer>
-      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )} >
+      <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )} >
         <KeeperTypeModalContents
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
@@ -653,10 +653,10 @@ const PersonalCopyHistory = ( props ) => {
           keeper={selectedKeeper}
         />
       </ModalContainer>
-      <ModalContainer visible={qrModal} closeBottomSheet={() => setQRModal( false )} >
+      <ModalContainer onBackground={()=>setQRModal( false )} visible={qrModal} closeBottomSheet={() => setQRModal( false )} >
         {renderQrContent()}
       </ModalContainer>
-      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=> setStoragePermissionModal( false )} >
+      <ModalContainer onBackground={()=>setStoragePermissionModal( false )} visible={storagePermissionModal} closeBottomSheet={()=> setStoragePermissionModal( false )} >
         {renderStoragePermissionModalContent()}
       </ModalContainer>
     </View>

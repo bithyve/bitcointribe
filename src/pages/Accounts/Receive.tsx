@@ -291,14 +291,14 @@ export default function Receive( props ) {
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
 
-      <ModalContainer visible={receiveHelper} closeBottomSheet={() => {showReceiveHelper( false )}} >
+      <ModalContainer onBackground={()=>showReceiveHelper( false )} visible={receiveHelper} closeBottomSheet={() => {showReceiveHelper( false )}} >
         <ReceiveHelpContents
           titleClicked={() => {
             showReceiveHelper( false )
           }}
         />
       </ModalContainer>
-      <ModalContainer visible={receiveModal} closeBottomSheet={() => {setReceiveModal( false )} } >
+      <ModalContainer onBackground={()=>setReceiveModal( false )} visible={receiveModal} closeBottomSheet={() => {setReceiveModal( false )} } >
         {showReceiveAmountBottomSheet()}
       </ModalContainer>
       <BottomSheet

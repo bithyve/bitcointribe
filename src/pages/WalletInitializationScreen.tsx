@@ -7,6 +7,7 @@ import {
   Image,
   StatusBar,
   Text,
+  Linking,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -18,10 +19,13 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../components/BottomInfoBox'
 import openLink from '../utils/OpenLink'
 import { LocalizationContext } from '../common/content/LocContext'
+import { useDispatch } from 'react-redux'
+import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
+  const dispatch = useDispatch()
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -77,6 +81,8 @@ const WalletInitializationScreen = props => {
         </View>
         <TouchableOpacity
           onPress={async () => {
+            dispatch( setCloudDataRecovery( null ) )
+            dispatch( setIsFileReading( false ) )
             props.navigation.navigate( 'RestoreWithICloud' )
           }}
           style={{
@@ -101,6 +107,19 @@ const WalletInitializationScreen = props => {
             />
           </View>
         </TouchableOpacity>
+        <View style={{
+          marginLeft: wp( '3%' ), marginRight: wp( '3%' )
+        }}>
+          <Text
+            onPress={()=>  Linking.openURL( 'https://hexawallet.io/faq/' )
+              .then( ( _data ) => { } )
+              .catch( ( _error ) => {
+              } )}
+            style={styles.headerInfoText}>{strings.restoreNoteV1}<Text style={{
+              color: Colors.blue
+              , textDecorationLine:'underline'
+            }}>{'\nhttps://hexawallet.io/faq/'}</Text></Text>
+        </View>
         {/* <TouchableOpacity
           onPress={async () => {
             // props.navigation.navigate( 'RestoreWithICloud' )

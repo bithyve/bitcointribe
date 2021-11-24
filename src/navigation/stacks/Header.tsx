@@ -1619,6 +1619,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if ( !this.props.showContent ) {
       return (
         <ModalContainer
+          onBackground={()=>this.setState( {
+            currentBottomSheetKind: null
+          } )}
           visible={this.state.currentBottomSheetKind != null}
           closeBottomSheet={() => {}}
         >
@@ -1640,7 +1643,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // >
       <View
         style={{
-          height: heightPercentageToDP( '21.33%' ),
+          height: heightPercentageToDP( '21.9%' ),
           backgroundColor: Colors.blue,
           paddingTop:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch
@@ -1676,6 +1679,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // overallHealth={overallHealth}
           />
           <ModalContainer
+            onBackground={()=>this.setState( {
+              currentBottomSheetKind: null
+            } )}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
           >

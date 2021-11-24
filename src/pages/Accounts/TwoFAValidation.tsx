@@ -355,7 +355,7 @@ export default function TwoFAValidation( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <ModalContainer visible={unsuccessModal} closeBottomSheet={() => {}} >
+        <ModalContainer onBackground={()=>setUnsuccessModal( false )} visible={unsuccessModal} closeBottomSheet={() => {}} >
           {renderSendUnSuccessContents()}
         </ModalContainer>
         {/* <BottomSheet
