@@ -196,6 +196,7 @@ const GiftDetails = ( { navigation } ) => {
         >{'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
+          disabled
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
           style={[ styles.dashedContainer, {
             borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
@@ -230,9 +231,9 @@ const GiftDetails = ( { navigation } ) => {
                   </Text>
                 </View>
               </View>
-              {
+              {/* {
                 dropdownBoxOpenClose ? <ArrowUp />  : <ArrowDown />
-              }
+              } */}
             </View>
           </View>
         </TouchableOpacity>
