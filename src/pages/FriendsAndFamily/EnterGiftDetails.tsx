@@ -51,8 +51,8 @@ const GiftDetails = ( { navigation } ) => {
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
-    title: 'Gift sats',
-    subText: 'Here\'s some sats for your stack',
+    title: 'Gift Sats',
+    subText: 'A gift that keeps giving',
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
