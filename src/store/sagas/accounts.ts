@@ -1217,30 +1217,35 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     walletName: wallet.walletName
   }
 
-  const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
-  if( txid ) {
-    const giftIds = []
-    for( const giftId in gifts ){
-      giftIds.push( gifts[ giftId ].id )
-      yield put( updateGift( gifts[ giftId ] ) )
-    }
-    yield put( giftCreationSuccess( true ) )
+  try{
+    const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
+    if( txid ) {
+      const giftIds = []
+      for( const giftId in gifts ){
+        giftIds.push( gifts[ giftId ].id )
+        yield put( updateGift( gifts[ giftId ] ) )
+      }
+      yield put( giftCreationSuccess( true ) )
 
-    yield call( dbManager.createGifts, gifts )
-    yield put( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: giftIds
-    } ) )
+      yield call( dbManager.createGifts, gifts )
+      yield put( updateWalletImageHealth( {
+        updateGifts: true,
+        giftIds: giftIds
+      } ) )
 
-    // refersh the account
-    let shellToSync: AccountShell
-    for( const accountShell of accountsState.accountShells ){
-      if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
+      // refersh the account
+      let shellToSync: AccountShell
+      for( const accountShell of accountsState.accountShells ){
+        if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
+      }
+      yield put( refreshAccountShells( [ shellToSync ], {
+      } ) )
+    } else {
+      console.log( 'Gifts generation failed' )
+      yield put( giftCreationSuccess( false ) )
     }
-    yield put( refreshAccountShells( [ shellToSync ], {
-    } ) )
-  } else {
-    console.log( 'Gifts generation failed' )
+
+  } catch( err ){
     yield put( giftCreationSuccess( false ) )
   }
 }
