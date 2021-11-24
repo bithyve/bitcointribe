@@ -586,7 +586,7 @@ const CreateGift = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-          <ToggleContainer />
+          {/* <ToggleContainer /> */}
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center',
