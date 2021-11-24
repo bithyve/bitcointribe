@@ -68,15 +68,11 @@ export default function EditWalletName( props ) {
       >
         <TouchableOpacity
           disabled={!(
-            answer.trim() === confirmAnswer.trim() &&
-              confirmAnswer.trim() &&
               answer.trim() && answerError.length === 0
           )}
           onPress={()=>props.onPressConfirm( answer )}
           style={{
             ...styles.buttonView, backgroundColor: !(
-              answer.trim() === confirmAnswer.trim() &&
-                  confirmAnswer.trim() &&
                   answer.trim() && answerError.length === 0
             ) ? Colors.lightBlue : Colors.blue, elevation: Elevation
           }}
@@ -152,6 +148,7 @@ export default function EditWalletName( props ) {
           }}
         >
           <TextInput
+            maxLength={24}
             style={styles.modalInputBox}
             placeholder={strings.Enternewwalletname}
             placeholderTextColor={Colors.borderColor}
@@ -171,6 +168,7 @@ export default function EditWalletName( props ) {
                 : 'visible-password'
             }
             onChangeText={( text ) => {
+              text = text.replace( /[^A-Za-z]/g, '' )
               setAnswer( text )
             }}
             onFocus={() => {
