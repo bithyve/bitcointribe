@@ -140,7 +140,8 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
     }
   } )
   gift.receiver.accountId = associationAccount.id
-  gift.status = GiftStatus.EXPIRED
+  gift.status = GiftStatus.ASSOCIATED
+  gift.timestamps.associated = Date.now()
   yield put( updateGift( gift ) )
   yield call( dbManager.createGift, gift )
   yield put( updateAccountShells( {
@@ -362,7 +363,7 @@ function* syncGiftsStatusWorker() {
   }
   for( const giftId in storedGifts ){
     const gift = storedGifts[ giftId ]
-    if( gift.status === GiftStatus.EXPIRED ) continue
+    if( gift.status === GiftStatus.ASSOCIATED ) continue
 
     if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
       if( gift.status !== GiftStatus.ACCEPTED && gift.status !== GiftStatus.REJECTED ){

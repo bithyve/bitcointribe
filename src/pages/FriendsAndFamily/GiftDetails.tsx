@@ -383,7 +383,8 @@ const GiftDetails = ( { navigation } ) => {
                 gift.type === GiftType.RECEIVED &&
                 ( item[ 0 ] == 'created' ||
                   item[ 0 ] == 'sent' ||
-                  item[ 0 ] == 'reclaimed' )
+                  item[ 0 ] == 'reclaimed' ||
+                  item[ 0 ] == 'associated' )
               ) {
                 return null
               }
