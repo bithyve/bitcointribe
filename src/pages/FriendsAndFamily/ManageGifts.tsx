@@ -119,6 +119,10 @@ const ManageGifts = ( { navigation } ) => {
     getIsVisited()
   }, [] )
 
+  function performRefreshOnPullDown() {
+    dispatch( syncGiftsStatus() )
+  }
+
   const getIsVisited = async () => {
     const isVisited = await AsyncStorage.getItem( 'GiftVisited' )
     if ( !isVisited ) {
