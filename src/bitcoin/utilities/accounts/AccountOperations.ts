@@ -1041,6 +1041,8 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
+    if( txid.includes( 'sendrawtransaction RPC error' ) ) throw new Error( txid )
+
     if( txid ){
       AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
     }
