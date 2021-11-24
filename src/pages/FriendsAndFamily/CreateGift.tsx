@@ -77,8 +77,6 @@ const CreateGift = ( { navigation } ) => {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
-  const [ giftsNumber, setGiftsNumber ] = useState( false )
-  const [ amountKeyBoard, setAmountKeyBoard ] = useState( false )
   const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
   const [ timeLock, setTimeLock ] = useState( 1 )
   const [ limitedValidity, setLimitedValidity ] = useState( 1 )
@@ -200,28 +198,13 @@ const CreateGift = ( { navigation } ) => {
   }
 
   function onPressNumber( text ) {
-    if( amountKeyBoard ) {
-      let tmpPasscode = amount
-      if ( amount.length < 4 ) {
-        if ( text != 'x' ) {
-          tmpPasscode += text
-          if( amountKeyBoard ) setAmount( tmpPasscode )
-        }
-      }
-      if ( amount && text == 'x' ) {
-        setAmount( amount.slice( 0, -1 ) )
-      }
-    } else if( giftsNumber ) {
-      let tmpPasscode = numbersOfGift
-      if ( numbersOfGift.length < 4 ) {
-        if ( text != 'x' ) {
-          tmpPasscode += text
-          setNumbersOfGift( tmpPasscode )
-        }
-      }
-      if ( numbersOfGift && text == 'x' ) {
-        setNumbersOfGift( numbersOfGift.slice( 0, -1 ) )
-      }
+    let tmpPasscode = amount
+    if ( text != 'x' ) {
+      tmpPasscode += text
+      setAmount( tmpPasscode )
+    }
+    if ( amount && text == 'x' ) {
+      setAmount( amount.slice( 0, -1 ) )
     }
   }
 
@@ -654,15 +637,15 @@ const CreateGift = ( { navigation } ) => {
             }} />
             <Text style={[ styles.modalInputBox, {
               color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
-            } ]} onPress={() => {setKeyboard( true ); setAmountKeyBoard( true ); setGiftsNumber( false )}}>{amount}
-              {!showKeyboard && !amountKeyBoard &&
+            } ]} onPress={() => setKeyboard( true )}>{UsNumberFormat( amount )}
+              {!showKeyboard &&
               <Text style={{
                 fontSize: RFValue( 12 ),
               }}>
                 {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
               </Text>
               }
-              {( showKeyboard && amountKeyBoard ) && <Text style={{
+              {( showKeyboard ) && <Text style={{
                 color: Colors.lightBlue, fontSize: RFValue( 18 ),
               }}>|</Text>}
             </Text>
