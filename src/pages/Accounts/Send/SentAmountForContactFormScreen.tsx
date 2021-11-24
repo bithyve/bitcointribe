@@ -36,6 +36,7 @@ import ModalContainer from '../../../components/home/ModalContainer'
 import { translations } from '../../../common/content/LocContext'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import { NetworkType } from '../../../bitcoin/utilities/Interface'
+import Toast from '../../../components/Toast'
 
 export type NavigationParams = {
 };
@@ -131,6 +132,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   }
 
   function handleSendMaxPress( ) {
+    Toast( 'Selecting Send Max sets default priority to Low. You can change how fast sats get transferred using Custom Priority')
     dispatch( calculateSendMaxFee( {
       numberOfRecipients: selectedRecipients.length,
       accountShell: sourceAccountShell,
@@ -207,7 +209,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         <Text style={{
           marginRight: RFValue( 4 )
         }}>
-          {`${strings.SendingFrom}:`}
+          {`${strings.SendingFrom}:`} 
         </Text>
 
         <Text style={{
