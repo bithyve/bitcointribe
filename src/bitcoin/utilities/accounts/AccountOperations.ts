@@ -1041,14 +1041,10 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    console.log( {
-      acc: account.balances
-    } )
+    if( txid.includes( 'sendrawtransaction RPC error' ) ) throw new Error( txid )
+
     if( txid ){
       AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
-      console.log( {
-        acc: account.balances
-      } )
     }
     else throw new Error( 'Failed to broadcast transaction, txid missing' )
     return {

@@ -389,10 +389,10 @@ function RequestKeyFromContact( props ) {
       </TouchableOpacity> */}
       {props.isGift &&
         <DashedLargeContainer
-          titleText={'Gift Card'}
+          titleText={'Gift sats'}
           titleTextColor={Colors.black}
           subText={props.senderName}
-          extraText={'This is to get you started!\nWelcome to Bitcoin'}
+          extraText={props.giftNote? props.giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( props.amt )}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}

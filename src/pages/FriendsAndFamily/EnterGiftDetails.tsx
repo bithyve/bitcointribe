@@ -51,8 +51,8 @@ const GiftDetails = ( { navigation } ) => {
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
-    title: 'Gift sats',
-    subText: 'Here\'s some sats for your stack',
+    title: 'Gift Sats',
+    subText: 'A gift that keeps giving',
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
@@ -193,9 +193,10 @@ const GiftDetails = ( { navigation } ) => {
             marginHorizontal: wp( 5 ),
             lineHeight: wp( 7 )
           }}
-        >{`Scan the QR or click the link to claim your gift. The gift would be valid for 30 days and the sats would revert to ${name} if unclaimed`}
+        >{'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
+          disabled
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
           style={[ styles.dashedContainer, {
             borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
@@ -230,9 +231,9 @@ const GiftDetails = ( { navigation } ) => {
                   </Text>
                 </View>
               </View>
-              {
+              {/* {
                 dropdownBoxOpenClose ? <ArrowUp />  : <ArrowDown />
-              }
+              } */}
             </View>
           </View>
         </TouchableOpacity>
