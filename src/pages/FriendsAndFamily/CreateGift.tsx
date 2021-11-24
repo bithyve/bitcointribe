@@ -143,7 +143,7 @@ const CreateGift = ( { navigation } ) => {
     accountsState.exchangeRates[ currencyCode ].last
     ).toFixed( 2 )
 
-    const isDisabled = availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
+    const isDisabled = currentSatsAmountFormValue < 1000 || availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
     return(
       <TouchableOpacity
         disabled={isDisabled}
