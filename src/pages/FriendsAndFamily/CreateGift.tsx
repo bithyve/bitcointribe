@@ -143,7 +143,7 @@ const CreateGift = ( { navigation } ) => {
     accountsState.exchangeRates[ currencyCode ].last
     ).toFixed( 2 )
 
-    const isDisabled = availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
+    const isDisabled = currentSatsAmountFormValue < 1000 || availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
     return(
       <TouchableOpacity
         disabled={isDisabled}
@@ -600,7 +600,7 @@ const CreateGift = ( { navigation } ) => {
                 }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
               </TouchableOpacity>
             </View>
-            <View style={{
+            {/* <View style={{
               flexDirection: 'row', alignItems: 'center',
             }}>
               <Text style={[ CommonStyles.subHeaderTitles, {
@@ -608,7 +608,7 @@ const CreateGift = ( { navigation } ) => {
               } ]} >
                 {'View and manage created Gifts'}
               </Text>
-            </View>
+            </View> */}
 
 
           </View>
@@ -722,6 +722,17 @@ const CreateGift = ( { navigation } ) => {
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )
         }}>
           {renderButton( 'Create Gift',  'Create Gift' )}
+        </View>
+        <View style={{
+          marginLeft: wp( '5%' ),
+          marginTop: wp( '3%' )
+        }}>
+          <Text style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp( 3 )
+          }}>Note: Minimum gift value: 1000 sats</Text>
         </View>
         {showKeyboard &&
         <View style={{
