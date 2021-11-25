@@ -338,7 +338,7 @@ const CreateGift = ( { navigation } ) => {
       height: 'auto'
     }}>
       { activeAccounts.map( ( item, index ) => {
-        if ( item.primarySubAccount.type === AccountType.SWAN_ACCOUNT || !item.primarySubAccount.isUsable ) return
+        if ( [ AccountType.SWAN_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( item.primarySubAccount.type ) || !item.primarySubAccount.isUsable ) return
         return(
           <View key={index} style={{
             backgroundColor: Colors.white
