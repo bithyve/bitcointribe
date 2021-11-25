@@ -33,6 +33,9 @@ import { DeepLinkEncryptionType } from '../bitcoin/utilities/Interface'
 import ModalContainer from './home/ModalContainer'
 import NoticeModalContents from './../components/NoticeModalContents'
 import BottomSheet from 'reanimated-bottom-sheet'
+import Toast from '../components/Toast'
+import Clipboard from '@react-native-community/clipboard';
+
 
 function RequestKeyFromContact(props) {
   const [shareLink, setShareLink] = useState('')
@@ -124,14 +127,18 @@ function RequestKeyFromContact(props) {
         modalRef={noticeBottomSheet}
         title={'Please Share OTP with your contact'}
         info={OTP_MESSAGE}
-        proceedButtonText={'Ok'}
+        proceedButtonText={'Copy OTP'}
         onPressProceed={() => {
           // ErrorBottomSheet.current.snapTo( 0 )
+          Clipboard.setString(`${OTP}`);
+          Toast( 'code copied to clipboard' )
           setNoticeModal(false)
+
         }}
         isBottomImage={true}
         bottomImage={require('../assets/images/icons/errorImage.png')}
         type={'small'}
+        
       />
     )
   }, [props.isGift])
