@@ -5,7 +5,7 @@ import Colors from '../common/Colors'
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index'
 import { AppBottomSheetTouchableWrapper as TouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from './MaterialCurrencyCodeIcon'
-
+import { LinearGradient } from 'react-native-linear-gradient';
 
 export type Props = {
   isOn: boolean;
@@ -34,10 +34,10 @@ export type Props = {
 };
 
 
-const CurrencyCodeIcon = ( {
+const CurrencyCodeIcon = ({
   currencyCode,
   color,
-} ) => {
+}) => {
   return (
     <MaterialCurrencyCodeIcon
       currencyCode={currencyCode}
@@ -47,7 +47,7 @@ const CurrencyCodeIcon = ( {
   )
 }
 
-const CurrencyKindToggleSwitch: React.FC<Props> = ( {
+const CurrencyKindToggleSwitch: React.FC<Props> = ({
   isOn,
   fiatCurrencyCode,
   thumbColor,
@@ -62,8 +62,9 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
   changeSettingToggle,
   disabled,
   onpress,
-}: Props ) => {
+}: Props) => {
   return (
+
     <TouchableWrapper
       activeOpacity={1}
       onPress={onpress}
@@ -71,9 +72,9 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
       style={{
         flexDirection: isVertical ? 'column' : 'row',
         backgroundColor: trackColor || '#1E82C2',
-        height: isVertical ? wp( '17%' ) : changeSettingToggle ? wp( '8%' ) : wp( '10%' ),
-        width: isVertical ? wp( '10%' ) : changeSettingToggle ? wp( '14%' ) : wp( '17%' ),
-        borderRadius: wp( '10%' ) / 2,
+        height: isVertical ? wp('17%') : changeSettingToggle ? wp('8%') : wp('10%'),
+        width: isVertical ? wp('10%') : changeSettingToggle ? wp('14%') : wp('17%'),
+        borderRadius: wp('10%') / 2,
         alignItems: 'center',
         paddingLeft: isVertical ? 4 : 2,
         paddingRight: 2,
@@ -86,14 +87,14 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
 
           <View
             style={{
-              height: thumbSize || wp( '8%' ),
-              width: thumbSize || wp( '8%' ),
+              height: thumbSize || wp('8%'),
+              width: thumbSize || wp('8%'),
               justifyContent: 'center',
               alignItems: 'center',
             }}
           >
             {inactiveOffImage || (
-              ( !isNotImage && materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) && (
+              (!isNotImage && materialIconCurrencyCodes.includes(fiatCurrencyCode)) && (
                 <CurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
                   color={Colors.currencyGray}
@@ -102,23 +103,23 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
               || (
                 <Image
                   source={
-                    inactiveOffImage || getCurrencyImageByRegion( fiatCurrencyCode, 'light' )
+                    inactiveOffImage || getCurrencyImageByRegion(fiatCurrencyCode, 'light')
                   }
                   style={{
-                    width: wp( '3.5%' ),
-                    height: wp( '3.5%' ),
+                    width: wp('3.5%'),
+                    height: wp('3.5%'),
                     resizeMode: 'contain',
                   }}
                 />
-              ) )}
+              ))}
           </View>
 
           <View
             style={{
               backgroundColor: thumbColor || Colors.white,
-              height: thumbSize || wp( '8%' ),
-              width: thumbSize || wp( '8%' ),
-              borderRadius: thumbSize || wp( '8%' ) / 2,
+              height: thumbSize || wp('8%'),
+              width: thumbSize || wp('8%'),
+              borderRadius: thumbSize || wp('8%') / 2,
               marginLeft: isOn ? 'auto' : 0,
               justifyContent: 'center',
               alignItems: 'center',
@@ -128,11 +129,11 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
             {!isNotImage && (
               <Image
                 source={
-                  activeOnImage || require( '../assets/images/icons/icon_bitcoin_dark.png' )
+                  activeOnImage || require('../assets/images/icons/icon_bitcoin_dark.png')
                 }
                 style={{
-                  width: wp( '3.5%' ),
-                  height: wp( '3.5%' ),
+                  width: wp('3.5%'),
+                  height: wp('3.5%'),
                   resizeMode: 'contain',
                 }}
               />
@@ -148,9 +149,9 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
               backgroundColor: thumbColor
                 ? thumbColor
                 : Colors.white,
-              height: thumbSize || wp( '8%' ),
-              width: thumbSize || wp( '8%' ),
-              borderRadius: thumbSize || wp( '8%' ) / 2,
+              height: thumbSize || wp('8%'),
+              width: thumbSize || wp('8%'),
+              borderRadius: thumbSize || wp('8%') / 2,
               alignItems: 'center',
               justifyContent: 'center',
               marginLeft: 2,
@@ -159,30 +160,30 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
             }}
           >
             {activeOffImage || (
-              ( !isNotImage && materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) && (
+              (!isNotImage && materialIconCurrencyCodes.includes(fiatCurrencyCode)) && (
                 <CurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
                   color={Colors.blue}
                 />
               )
-                || (
-                  <Image
-                    source={
-                      activeOffImage || getCurrencyImageByRegion( fiatCurrencyCode, 'light' )
-                    }
-                    style={{
-                      width: wp( '3.5%' ),
-                      height: wp( '3.5%' ),
-                      resizeMode: 'contain',
-                    }}
-                  />
-                ) )}
+              || (
+                <Image
+                  source={
+                    activeOffImage || getCurrencyImageByRegion(fiatCurrencyCode, 'light')
+                  }
+                  style={{
+                    width: wp('3.5%'),
+                    height: wp('3.5%'),
+                    resizeMode: 'contain',
+                  }}
+                />
+              ))}
           </View>
 
           <View
             style={{
-              height: thumbSize || wp( '8%' ),
-              width: thumbSize || wp( '8%' ),
+              height: thumbSize || wp('8%'),
+              width: thumbSize || wp('8%'),
               justifyContent: 'center',
               alignItems: 'center',
               marginLeft: isOn ? 'auto' : isVertical ? 2 : 0,
@@ -193,11 +194,11 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
             {!isNotImage && (
               <Image
                 source={
-                  inactiveOnImage || require( '../assets/images/icons/icon_bitcoin_gray.png' )
+                  inactiveOnImage || require('../assets/images/icons/icon_bitcoin_gray.png')
                 }
                 style={{
-                  width: wp( '3.5%' ),
-                  height: wp( '3.5%' ),
+                  width: wp('3.5%'),
+                  height: wp('3.5%'),
                   resizeMode: 'contain',
                 }}
               />
@@ -205,7 +206,10 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
           </View>
         </View>
       )}
+
     </TouchableWrapper>
+
+
   )
 }
 

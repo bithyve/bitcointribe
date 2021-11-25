@@ -21,33 +21,33 @@ import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
 import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
 import { LocalizationContext } from '../../common/content/LocContext'
 
-function setCurrencyCodeToImage( currencyName, currencyColor ) {
+function setCurrencyCodeToImage(currencyName, currencyColor) {
   return (
     <View
       style={{
         marginRight: 5,
-        marginBottom: wp( '0.7%' ),
+        marginBottom: wp('0.7%'),
       }}
     >
       <MaterialCommunityIcons
         name={currencyName}
         color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
-        size={wp( '3.5%' )}
+        size={wp('3.5%')}
       />
     </View>
   )
 }
 export enum BottomSheetKind {
-    TAB_BAR_BUY_MENU,
-    TRUSTED_CONTACT_REQUEST,
-    ADD_CONTACT_FROM_ADDRESS_BOOK,
-    NOTIFICATIONS_LIST,
-    SWAN_STATUS_INFO,
-    WYRE_STATUS_INFO,
-    RAMP_STATUS_INFO,
-    ERROR,
-    CLOUD_ERROR,
-  }
+  TAB_BAR_BUY_MENU,
+  TRUSTED_CONTACT_REQUEST,
+  ADD_CONTACT_FROM_ADDRESS_BOOK,
+  NOTIFICATIONS_LIST,
+  SWAN_STATUS_INFO,
+  WYRE_STATUS_INFO,
+  RAMP_STATUS_INFO,
+  ERROR,
+  CLOUD_ERROR,
+}
 
 export const materialIconCurrencyCodes = [
   'BRL',
@@ -68,7 +68,7 @@ export const materialIconCurrencyCodes = [
   'USD',
 ]
 
-const HomeBuyCard = ( {
+const HomeBuyCard = ({
   cardContainer,
   amount,
   incramount,
@@ -79,14 +79,14 @@ const HomeBuyCard = ( {
   //   getCurrencyImageByRegion,
   //   exchangeRates,
   currencyCode,
-} ) => {
-//   const currencyKind: CurrencyKind = useCurrencyKind()
+}) => {
+  //   const currencyKind: CurrencyKind = useCurrencyKind()
   const fiatCurrencyCode = useCurrencyCode()
   //   const prefersBitcoin = useMemo( () => {
   //     return currencyKind === CurrencyKind.BITCOIN
   //   }, [ currencyKind ] )
-  const { translations, formatString } = useContext( LocalizationContext )
-  const strings = translations[ 'home' ]
+  const { translations, formatString } = useContext(LocalizationContext)
+  const strings = translations['home']
   return (
     <View
       style={cardContainer}
@@ -94,38 +94,49 @@ const HomeBuyCard = ( {
       <View>
         <Text style={{
           color: Colors.blue,
-          fontSize: RFValue( 10 ),
+          fontSize: RFValue(11),
           // marginLeft: 2,
           fontFamily: Fonts.FiraSansRegular,
           alignSelf: 'flex-start',
-          letterSpacing: 0.33
+          letterSpacing: 0.33,
+          lineHeight: RFValue(13),
+          fontWeight: '500'
+
         }}>
-          {formatString( strings.btcTo, fiatCurrencyCode )}
+          {formatString(strings.btcTo, fiatCurrencyCode)}
         </Text>
         <View style={{
-          flexDirection: 'row', marginTop: hp( '1' ), alignItems: 'center'
+          flexDirection: 'row', marginTop: hp('1'), alignItems: 'center'
         }}>
-          {materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
-          // setCurrencyCodeToImage(
-          //   getCurrencyImageName( CurrencyCode ),
-          //   'light'
-          // )
+          {materialIconCurrencyCodes.includes(fiatCurrencyCode) ? (
+            // setCurrencyCodeToImage(
+            //   getCurrencyImageName( CurrencyCode ),
+            //   'light'
+            // )
             <MaterialCurrencyCodeIcon
               currencyCode={fiatCurrencyCode}
               color={Colors.blue}
-              size={wp( '3.5%' )}
+              size={wp('3.5%')}
               style={{
-                width: wp( 4 )
+                width: wp(4)
               }}
             />
-          ) : currencyCode.includes( currencyCode ) && (
+          ) : currencyCode.includes(currencyCode) && (
             <Text style={{
-              marginTop: hp( 0.5 )
+              marginTop: hp(0.5)
             }}>
-              {setCurrencyCodeToImage( getCurrencyImageName( currencyCode ), Colors.blue )}
+              {setCurrencyCodeToImage(getCurrencyImageName(currencyCode), Colors.blue)}
             </Text>
           )}
-          <Text>{amount ? amount : '--'}</Text>
+          <Text
+            style={{
+              fontSize: RFValue(17), 
+              fontFamily: Fonts.FiraSansRegular, 
+              letterSpacing: 0.85,
+              lineHeight: RFValue(23),
+              fontWeight: '600'
+            }}
+          >{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>
       </View>
@@ -141,19 +152,19 @@ const HomeBuyCard = ( {
         //   />
         // }
         style={{
-          borderRadius: wp( 2 ),
-          paddingVertical: wp( 2.7 ),
-          paddingHorizontal: wp( 4 ),
+          borderRadius: wp(2),
+          paddingVertical: wp(2.7),
+          paddingHorizontal: wp(4),
           backgroundColor: Colors.blue,
           shadowColor: Colors.shadowBlue,
           shadowOpacity: 1,
           shadowOffset: {
             width: 15, height: 15
           },
-          elevation: 15
+          elevation: 12
         }}
         onPress={() =>
-          openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+          openBottomSheet(BottomSheetKind.TAB_BAR_BUY_MENU)
         }
       >
         <Text style={{

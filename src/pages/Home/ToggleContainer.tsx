@@ -8,8 +8,7 @@ import {
 } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import Fonts from './../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-// import CurrencyKindToggleSwitch from '../CurrencyKindToggleSwitch'
+import { RFValue } from 'react-native-responsive-fontsize' 
 const currencyCode = [ 'BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR', 'EUR' ]
 import { useDispatch } from 'react-redux'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
@@ -77,6 +76,6 @@ const styles = StyleSheet.create( {
   headerToggleSwitchContainer: {
     flex: 3,
     alignItems: 'flex-end',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between', 
   },
 } )

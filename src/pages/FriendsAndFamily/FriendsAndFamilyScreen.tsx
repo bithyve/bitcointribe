@@ -92,13 +92,13 @@ class FriendsAndFamilyScreen extends React.Component<
   focusListener: any;
   strings: object;
 
-  constructor( props, context ) {
-    super( props, context )
+  constructor(props, context) {
+    super(props, context)
 
     this.focusListener = null
     this.addContactAddressBookBottomSheetRef = React.createRef<BottomSheet>()
     this.helpBottomSheetRef = React.createRef<BottomSheet>()
-    this.strings = this.context.translations[ 'f&f' ]
+    this.strings = this.context.translations['f&f']
     this.state = {
       onRefresh: false,
       isLoadContacts: false,
@@ -115,54 +115,54 @@ class FriendsAndFamilyScreen extends React.Component<
     }
   }
 
-  componentDidMount = async() => {
-    requestAnimationFrame( () => {
+  componentDidMount = async () => {
+    requestAnimationFrame(() => {
       this.updateAddressBook()
-      this.props.syncPermanentChannels( {
+      this.props.syncPermanentChannels({
         permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
         metaSync: true,
-      } )
-    } )
+      })
+    })
   }
 
-  componentDidUpdate( prevProps, prevState ) {
-    requestAnimationFrame( () => {
+  componentDidUpdate(prevProps, prevState) {
+    requestAnimationFrame(() => {
       if (
         prevProps.trustedContacts != this.props.trustedContacts
       ) {
         this.updateAddressBook()
       }
-    } )
+    })
   }
 
   componentWillUnmount() {
-    ( this.focusListener )?.remove()
+    (this.focusListener)?.remove()
   }
 
-  setUpFocusListener = ( ) => {
-    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+  setUpFocusListener = () => {
+    this.focusListener = this.props.navigation.addListener('didFocus', () => {
 
-      this.setState( {
+      this.setState({
         showIndicator: true
-      } )
-    } )
-    this.props.navigation.setParams( {
+      })
+    })
+    this.props.navigation.setParams({
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
-    } )
+    })
   };
 
   toggleKnowMoreSheet = () => {
     const shouldShow = !this.state.isShowingKnowMoreSheet
 
-    this.setState( {
+    this.setState({
       isShowingKnowMoreSheet: shouldShow
     }, () => {
-      if ( shouldShow ) {
+      if (shouldShow) {
         // this.helpBottomSheetRef.current?.snapTo( 1 )
       } else {
-        this.helpBottomSheetRef.current?.snapTo( 0 )
+        this.helpBottomSheetRef.current?.snapTo(0)
       }
-    } )
+    })
   };
 
   updateAddressBook = async () => {
@@ -172,34 +172,34 @@ class FriendsAndFamilyScreen extends React.Component<
     const keeping = []
     const otherContacts = []
 
-    for( const channelKey of Object.keys( trustedContacts ) ){
-      const contact = trustedContacts[ channelKey ]
+    for (const channelKey of Object.keys(trustedContacts)) {
+      const contact = trustedContacts[channelKey]
 
-      const isGuardian =[ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD, TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( contact.relationType )
-      const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
-      if( contact.isActive ){
-        if( isGuardian || isWard ){
-          if( isGuardian && ( keeperInfo.findIndex( value=> value.channelKey == channelKey && ( value.type == 'device' || value.type == 'primaryKeeper' || value.type == 'pdf' ) ) === -1 && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) ) keepers.push(  makeContactRecipientDescription(
+      const isGuardian = [TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD, TrustedContactRelationTypes.PRIMARY_KEEPER].includes(contact.relationType)
+      const isWard = [TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD].includes(contact.relationType)
+      if (contact.isActive) {
+        if (isGuardian || isWard) {
+          if (isGuardian && (keeperInfo.findIndex(value => value.channelKey == channelKey && (value.type == 'device' || value.type == 'primaryKeeper' || value.type == 'pdf')) === -1 && (contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3'))) keepers.push(makeContactRecipientDescription(
             channelKey,
             contact,
             ContactTrustKind.KEEPER_OF_USER,
-          ) )
-          if( isWard ) keeping.push( makeContactRecipientDescription(
+          ))
+          if (isWard) keeping.push(makeContactRecipientDescription(
             channelKey,
             contact,
             ContactTrustKind.USER_IS_KEEPING,
-          ) )
-        } else otherContacts.push( makeContactRecipientDescription(
+          ))
+        } else otherContacts.push(makeContactRecipientDescription(
           channelKey,
           contact,
           ContactTrustKind.OTHER,
-        ) )
+        ))
       } else {
         // TODO: inject in expired contacts list
       }
     }
 
-    this.setState( {
+    this.setState({
       keepers,
       keeping,
       otherContacts,
@@ -215,7 +215,7 @@ class FriendsAndFamilyScreen extends React.Component<
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          this.helpBottomSheetRef.current?.snapTo( 0 )
+          this.helpBottomSheetRef.current?.snapTo(0)
         }}
       />
     )
@@ -225,7 +225,7 @@ class FriendsAndFamilyScreen extends React.Component<
     return (
       <AddressBookHelpContents
         titleClicked={() => {
-          this.helpBottomSheetRef.current?.snapTo( 0 )
+          this.helpBottomSheetRef.current?.snapTo(0)
         }}
       />
     )
@@ -236,15 +236,15 @@ class FriendsAndFamilyScreen extends React.Component<
     index: number,
     contactType: string,
   ) {
-    this.props.navigation.navigate( 'ContactDetails', {
+    this.props.navigation.navigate('ContactDetails', {
       contact: contactDescription,
       index,
       contactsType: contactType,
-    } )
+    })
   }
 
 
-  renderContactItem = ( {
+  renderContactItem = ({
     contactDescription,
     index,
     contactsType,
@@ -252,22 +252,22 @@ class FriendsAndFamilyScreen extends React.Component<
     contactDescription: ContactRecipientDescribing;
     index: number;
     contactsType: string;
-  } ) => {
+  }) => {
     return (
       <TouchableOpacity style={{
         alignItems: 'center',
         flex: 1
       }}
-      key={index}
+        key={index}
       >
         <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
         <Text style={{
-          textAlign: 'center', marginTop: hp ( 0.5 )
-        }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
+          textAlign: 'center', marginTop: hp(0.5)
+        }}>{contactDescription.displayedName.split(' ')[0] + ' '} </Text>
       </TouchableOpacity>
     )
   };
-  renderContactListItem = ( {
+  renderContactListItem = ({
     contactDescription,
     index,
     contactsType,
@@ -275,16 +275,16 @@ class FriendsAndFamilyScreen extends React.Component<
     contactDescription: ContactRecipientDescribing;
     index: number;
     contactsType: string;
-  } ) => {
+  }) => {
     return (
       <ListItem
-        key={String( index )}
+        key={String(index)}
         onPress={() =>
-          this.handleContactSelection( contactDescription, index, contactsType )
+          this.handleContactSelection(contactDescription, index, contactsType)
         }
         containerStyle={{
           backgroundColor: Colors.backgroundColor1,
-          paddingHorizontal: wp( 3 )
+          paddingHorizontal: wp(3)
         }}
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} index={index} />
@@ -297,15 +297,17 @@ class FriendsAndFamilyScreen extends React.Component<
   };
   renderAddFnFModal = () => {
     const { activeIndex } = this.state
-    return(
+    return (
       <View style={{
         ...styles.modalContentContainer,
       }}>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {this.setState( {
-            addFnF: false
-          } )}}
+          onPress={() => {
+            this.setState({
+              addFnF: false
+            })
+          }}
           style={styles.closeButton}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
@@ -315,12 +317,12 @@ class FriendsAndFamilyScreen extends React.Component<
         <Text style={styles.title}>Add Friends & Family</Text>
         <Text style={styles.subTitle}>Add a new contact, or invite a ward Lorem ipsum dolor sit amet, consectetur adipiscing elit</Text>
         <TouchableOpacity
-          onPress={() => this.setState( {
+          onPress={() => this.setState({
             activeIndex: 0
-          } )}
-          style={[ styles.cardView, {
-            backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1
-          } ]}>
+          })}
+          style={[styles.cardView, {
+            backgroundColor: activeIndex === 0 ? Colors.lightBlue : Colors.backgroundColor1
+          }]}>
           <View style={styles.cardSubView}>
             <View style={{
               width: 18,
@@ -339,23 +341,23 @@ class FriendsAndFamilyScreen extends React.Component<
               },
             }}>
               {activeIndex === 0 &&
-                    <Image
-                      style={{
-                        width: '100%', height: '100%'
-                      }}
-                      source={require( '../../assets/images/icons/checkmark.png' )}
-                    />
+                <Image
+                  style={{
+                    width: '100%', height: '100%'
+                  }}
+                  source={require('../../assets/images/icons/checkmark.png')}
+                />
               }
             </View>
             {activeIndex === 0 ?
               <Image
                 style={styles.icon}
-                source={require( '../../assets/images/icons/phone-bookFnF.png' )}
+                source={require('../../assets/images/icons/phone-bookFnF.png')}
               />
               :
               <Image
                 style={styles.icon}
-                source={require( '../../assets/images/icons/phone-book_white.png' )}
+                source={require('../../assets/images/icons/phone-book_white.png')}
               />
             }
 
@@ -364,14 +366,14 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }} >
               <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.black
+                fontSize: RFValue(13), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.black
               }}>
-                   Add Contacts
+                Add Contacts
               </Text>
-              <Text style={[ styles.cardSubText, {
+              <Text style={[styles.cardSubText, {
                 color: activeIndex === 0 ? Colors.white : Colors.textColorGrey,
-              } ]}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+              }]}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
               </Text>
             </View>
           </View>
@@ -381,27 +383,27 @@ class FriendsAndFamilyScreen extends React.Component<
           {/* )} */}
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => this.setState( {
+          onPress={() => this.setState({
             activeIndex: 1
-          } )}
-          style={[ styles.cardView, {
-            backgroundColor: activeIndex === 1 ?  Colors.lightBlue: Colors.backgroundColor1,
+          })}
+          style={[styles.cardView, {
+            backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.backgroundColor1,
             marginTop: 0
-          } ]}>
+          }]}>
           <View style={styles.cardSubView}>
             <View style={styles.imageView}>
               {activeIndex === 1 &&
-                    <Image
-                      style={{
-                        width: '100%', height: '100%'
-                      }}
-                      source={require( '../../assets/images/icons/checkmark.png' )}
-                    />
+                <Image
+                  style={{
+                    width: '100%', height: '100%'
+                  }}
+                  source={require('../../assets/images/icons/checkmark.png')}
+                />
               }
             </View>
             <Image
               style={styles.icon}
-              source={require( '../../assets/images/icons/icon_f&F_white.png' )}
+              source={require('../../assets/images/icons/icon_f&F_white.png')}
             />
             <View style={{
               // width: '70%',
@@ -409,54 +411,54 @@ class FriendsAndFamilyScreen extends React.Component<
             }} >
 
               <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.black
+                fontSize: RFValue(13), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.black
               }}>
-                    Add a Ward
+                Add a Ward
               </Text>
-              <Text style={[ styles.cardSubText, {
+              <Text style={[styles.cardSubText, {
                 color: activeIndex === 1 ? Colors.white : Colors.textColorGrey,
-              } ]}>
-                    Need text to be replaced
+              }]}>
+                Need text to be replaced
               </Text>
             </View>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => this.setState( {
+          onPress={() => this.setState({
             activeIndex: 2
-          } )}
+          })}
           style={{
-            marginTop: hp( 3 ),
-            width: '95%',  height: hp( '12%' ),
+            marginTop: hp(3),
+            width: '95%', height: hp('12%'),
             alignSelf: 'center', justifyContent: 'center',
-            borderRadius: wp( '4' ),
+            borderRadius: wp('4'),
             // marginVertical: hp( '3%' )
           }}>
           <View style={{
-            flexDirection:'row',
+            flexDirection: 'row',
             // alignItems: 'center',
             alignItems: 'center',
             justifyContent: 'center',
-            marginHorizontal: wp( '5%' ),
+            marginHorizontal: wp('5%'),
           }}>
             <View style={styles.imageView}>
               {activeIndex === 2 &&
-                    <Image
-                      style={{
-                        width: '100%', height: '100%'
-                      }}
-                      source={require( '../../assets/images/icons/checkmark.png' )}
-                    />
+                <Image
+                  style={{
+                    width: '100%', height: '100%'
+                  }}
+                  source={require('../../assets/images/icons/checkmark.png')}
+                />
               }
             </View>
 
             <Text style={{
-              fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
-              marginHorizontal: wp( 3 ),
+              fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
+              marginHorizontal: wp(3),
               width: '95%', flex: 1
             }}>
-                    Gift Sats when sending invite Gift Sats when sending invite Gift Sats when sending invite
+              Gift Sats when sending invite Gift Sats when sending invite Gift Sats when sending invite
             </Text>
           </View>
           {/* {isSelected && ( */}
@@ -473,13 +475,13 @@ class FriendsAndFamilyScreen extends React.Component<
     return (
       <TouchableOpacity
         onPress={async () => {
-          if ( this.state.activeIndex === 0 ) {
-            this.setState( {
+          if (this.state.activeIndex === 0) {
+            this.setState({
               isLoadContacts: true,
               addFnF: false
             }, () => {
-              this.props.navigation.navigate( 'AddContact' )
-            } )
+              this.props.navigation.navigate('AddContact')
+            })
           } else {
             // showEncryptionPswd( false )
           }
@@ -520,10 +522,10 @@ class FriendsAndFamilyScreen extends React.Component<
         {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
-            <ModalContainer onBackground={()=>this.setState( {
+            <ModalContainer onBackground={() => this.setState({
               showIndicator: false
-            } )} visible={showIndicator} closeBottomSheet={() => {}}>
-              <ActivityIndicator color={Colors.white} size='large'/>
+            })} visible={showIndicator} closeBottomSheet={() => { }}>
+              <ActivityIndicator color={Colors.white} size='large' />
             </ModalContainer>
           }
 
@@ -546,37 +548,37 @@ class FriendsAndFamilyScreen extends React.Component<
               <ToggleContainer />
             </View> */}
           <View style={{
-            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp( 3.5 ), marginRight: wp( 6 )
+            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp(3.5), marginRight: wp(6)
           }}>
             <Text
-              style={[ styles.pageTitle, {
+              style={[styles.pageTitle, {
 
-              } ]}
+              }]}
             >
-              {this.strings[ 'f&f' ]}
+              {this.strings['f&f']}
             </Text>
             <TouchableOpacity
               onPress={() => {
-                this.setState( {
+                this.setState({
                   isLoadContacts: true,
-                // addFnF: true
+                  // addFnF: true
                 }, () => {
-                  navigation.navigate( 'AddContact' )
+                  navigation.navigate('AddContact')
 
-                } )
+                })
               }}
               style={{
                 ...styles.selectedContactsView,
               }}
             >
-              <Text style={[ styles.contactText, {
-                fontSize: RFValue( 24 ),
-              } ]}>+</Text>
+              <Text style={[styles.contactText, {
+                fontSize: RFValue(24),
+              }]}>+</Text>
               {/* <Image
                     style={styles.addGrayImage}
                     source={require( '../../assets/images/icons/icon_add_grey.png' )}
                   /> */}
-              <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
+              <Text style={styles.contactText}>{this.strings['AddNew']}</Text>
 
             </TouchableOpacity>
           </View>
@@ -585,10 +587,10 @@ class FriendsAndFamilyScreen extends React.Component<
               <RefreshControl
                 refreshing={showLoader}
                 onRefresh={() => {
-                  syncPermanentChannels( {
+                  syncPermanentChannels({
                     permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
                     metaSync: true
-                  } )
+                  })
                 }}
               />
             }
@@ -597,7 +599,7 @@ class FriendsAndFamilyScreen extends React.Component<
             }}
           >
             <TouchableOpacity
-              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
+              onPress={() => this.props.navigation.navigate('ManageGifts')}
               style={{
                 width: '90%',
                 // height: '54%',
@@ -609,35 +611,35 @@ class FriendsAndFamilyScreen extends React.Component<
                 shadowRadius: 10,
                 elevation: 2,
                 alignSelf: 'center',
-                borderRadius: wp( 2 ),
-                marginTop: hp( 3 ),
-                marginBottom: hp( 1 ),
-                paddingVertical: hp( 4 ),
-                paddingHorizontal: wp( 4.5 )
+                borderRadius: wp(2),
+                marginTop: hp(3),
+                marginBottom: hp(1),
+                paddingVertical: hp(4),
+                paddingHorizontal: wp(4.5)
               }}>
-              <View style={[ styles.subInfo, {
+              <View style={[styles.subInfo, {
                 // marginBottom: hp( 3 )
-              } ]}>
+              }]}>
                 <Gift />
                 <View style={{
-                  flex: 1, marginHorizontal: wp( 2 )
+                  flex: 1, marginHorizontal: wp(2)
                 }}>
-                  <Text style={[ styles.pageTitle, {
-                    fontSize: RFValue( 11 ),
-                    marginHorizontal: wp ( 0 ),
-                  } ]}>
+                  <Text style={[styles.pageTitle, {
+                    fontSize: RFValue(11),
+                    marginHorizontal: wp(0),
+                  }]}>
                     {this.strings[
                       'giftsats'
                     ]}
                   </Text>
                   <Text style={{
                     color: Colors.textColorGrey,
-                    fontSize: RFValue( 10 ),
+                    fontSize: RFValue(10),
                     fontFamily: Fonts.FiraSansRegular,
                     marginTop: 3,
                     width: '85%',
                   }}>
-                    {this.strings[ 'giftSubText' ]}
+                    {this.strings['giftSubText']}
                   </Text>
 
                 </View>
@@ -645,56 +647,56 @@ class FriendsAndFamilyScreen extends React.Component<
               </View>
             </TouchableOpacity>
             <View style={{
-              marginTop: wp( '5%' )
+              marginTop: wp('5%')
             }}>
               <View style={{
                 marginBottom: 15
               }}>
                 {keepers.length > 0 &&
                   <>
-                    {keepers.length && keepers.map( ( item, index ) => {
-                      return this.renderContactListItem( {
+                    {keepers.length && keepers.map((item, index) => {
+                      return this.renderContactListItem({
                         contactDescription: item,
                         index,
                         contactsType: 'Keeper',
-                      } )
-                    } ) }
+                      })
+                    })}
                   </>
                 }
                 {keeping.length > 0 &&
                   <>
-                    {keeping.length && keeping.map( ( item, index ) => {
-                      return this.renderContactListItem( {
+                    {keeping.length && keeping.map((item, index) => {
+                      return this.renderContactListItem({
                         contactDescription: item,
                         index,
                         contactsType: 'I am the Keeper of',
-                      } )
-                    } ) }
+                      })
+                    })}
                   </>
                 }
                 {otherContacts.length > 0 &&
                   <>
-                    {otherContacts.length && otherContacts.map( ( item, index ) => {
-                      return this.renderContactListItem( {
+                    {otherContacts.length && otherContacts.map((item, index) => {
+                      return this.renderContactListItem({
                         contactDescription: item,
                         index,
                         contactsType: 'Contact',
-                      } )
-                    } ) }
+                      })
+                    })}
                   </>
                 }
               </View>
             </View>
             {
               keepers.length == 0 &&
-            keeping.length == 0 &&
-            otherContacts.length == 0 && (
+              keeping.length == 0 &&
+              otherContacts.length == 0 && (
                 // feature/2.0
                 <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={'Note'}
                   infoText={
-                    this.strings[ 'appear' ]
+                    this.strings['appear']
                   }
                 />
               )}
@@ -704,33 +706,33 @@ class FriendsAndFamilyScreen extends React.Component<
         </View>
         {showLoader ? <Loader /> : null}
       </View>
-    /* feature/2.0 */
+      /* feature/2.0 */
     )
   }
 }
 
-const mapStateToProps = ( state ) => {
+const mapStateToProps = (state) => {
   return {
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
+    trustedContacts: idx(state, (_) => _.trustedContacts.contacts),
     existingPermanentChannelsSynching: idx(
       state,
-      ( _ ) => _.trustedContacts.loading.existingPermanentChannelsSynching,
+      (_) => _.trustedContacts.loading.existingPermanentChannelsSynching,
     ),
-    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo )
+    keeperInfo: idx(state, (_) => _.bhr.keeperInfo)
   }
 }
 
-export default connect( mapStateToProps, {
+export default connect(mapStateToProps, {
   syncPermanentChannels,
-} )( FriendsAndFamilyScreen )
+})(FriendsAndFamilyScreen)
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   cardSubText: {
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
   },
-  icon:{
-    width: 27, height: 27, resizeMode: 'contain', marginHorizontal: wp( 3 )
+  icon: {
+    width: 27, height: 27, resizeMode: 'contain', marginHorizontal: wp(3)
   },
   imageView: {
     width: 18,
@@ -749,27 +751,27 @@ const styles = StyleSheet.create( {
     },
   },
   cardSubView: {
-    flexDirection:'row',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: wp( '4%' )
+    marginHorizontal: wp('4%')
   },
   cardView: {
-    width: '95%', height: hp( '12%' ),
+    width: '95%', height: hp('12%'),
     alignSelf: 'center', justifyContent: 'center',
-    borderRadius: wp( '4' ),
-    marginVertical: hp( '1%' ),
-    marginTop: hp( 5 )
+    borderRadius: wp('4'),
+    marginVertical: hp('1%'),
+    marginTop: hp(5)
   },
   closeButton: {
-    width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+    width: wp(7), height: wp(7), borderRadius: wp(7 / 2),
     alignSelf: 'flex-end',
     backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-    marginTop: wp( 3 ), marginRight: wp( 3 )
+    marginTop: wp(3), marginRight: wp(3)
   },
   buttonView: {
-    height: wp( '13%' ),
-    width: wp( '35%' ),
+    height: wp('13%'),
+    width: wp('35%'),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -779,25 +781,25 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
-    margin: wp( 7 )
+    margin: wp(7)
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
   title: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 18 ),
-    marginHorizontal: wp( 7 ),
+    fontSize: RFValue(18),
+    marginHorizontal: wp(7),
     color: Colors.blue,
-    marginVertical: hp( 1 )
+    marginVertical: hp(1)
   },
   subTitle: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 12 ),
-    marginHorizontal: wp( 7 ),
-    marginRight: wp( 9 ),
+    fontSize: RFValue(12),
+    marginHorizontal: wp(7),
+    marginRight: wp(9),
     color: Colors.textColorGrey,
     letterSpacing: 0.6
   },
@@ -815,11 +817,11 @@ const styles = StyleSheet.create( {
   },
   avatarImage: {
     ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 12 )/2,
-    marginHorizontal: wp ( 1 )
+    borderRadius: wp(12) / 2,
+    marginHorizontal: wp(1)
   },
   accountCardsSectionContainer: {
-    height: hp( '71.46%' ),
+    height: hp('71.46%'),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     opacity: 1,
@@ -836,7 +838,7 @@ const styles = StyleSheet.create( {
   contactText: {
     // marginLeft: 10,
     // marginHorizontal: wp ( 1 ),
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
     // padding: wp( 2 )
@@ -844,7 +846,7 @@ const styles = StyleSheet.create( {
   phoneText: {
     marginTop: 3,
     marginLeft: 10,
-    fontSize: RFValue( 10 ),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
@@ -860,58 +862,58 @@ const styles = StyleSheet.create( {
     // borderBottomWidth: 1,
     // borderColor: Colors.borderColor,
     backgroundColor: Colors.blue,
-    borderRadius: wp ( 2 ),
+    borderRadius: wp(2),
     // width: wp( 22 )
     // padding: wp( 1 ),
     //width: wp( 24 ),
-    height: hp( 4 ),
-    paddingHorizontal: wp( 2 )
+    height: hp(4),
+    paddingHorizontal: wp(2)
   },
   pageTitle: {
     color: Colors.blue,
-    fontSize: RFValue( 18 ),
+    fontSize: RFValue(18),
     letterSpacing: 0.54,
     // fontFamily: Fonts.FiraSansRegular,
     fontFamily: Fonts.FiraSansMedium,
     alignItems: 'center',
-    marginHorizontal: wp ( 4 ),
+    marginHorizontal: wp(4),
   },
   subInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginRight: wp ( 3 ),
+    marginRight: wp(3),
     flex: 1,
     marginBottom: 2
   },
   cardTitle: {
     color: Colors.blue,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     // fontFamily: Fonts.FiraSansRegular,
     fontFamily: Fonts.FiraSansMedium,
-    marginVertical: wp( 2 ),
-    marginHorizontal: wp( 4 )
+    marginVertical: wp(2),
+    marginHorizontal: wp(4)
   },
   pageInfoText: {
     marginLeft: 30,
     color: Colors.textColorGrey,
-    fontSize: RFValue( 10 ),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
   },
   imageIconStyle: {
-    width: wp( '12%' ),
-    height: wp( '12%' ),
-    borderRadius: wp( '12%' ) / 2,
+    width: wp('12%'),
+    height: wp('12%'),
+    borderRadius: wp('12%') / 2,
     resizeMode: 'contain',
   },
   imageIconViewStyle: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.shadowBlue,
-    width: wp( '12%' ),
-    height: wp( '12%' ),
-    borderRadius: wp( '12%' ) / 2,
+    width: wp('12%'),
+    height: wp('12%'),
+    borderRadius: wp('12%') / 2,
   },
   imageIconText: {
     textAlign: 'center',
@@ -932,18 +934,18 @@ const styles = StyleSheet.create( {
     marginRight: 10,
   },
   addGrayImage: {
-    width: wp( 3 ),
-    height: wp( 4 ),
+    width: wp(3),
+    height: wp(4),
     marginLeft: 5,
     color: Colors.white
   },
   moreImage: {
-    width: wp( '10%' ),
-    height: wp( '10%' ),
+    width: wp('10%'),
+    height: wp('10%'),
   }
-} )
+})
 
-function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> {
+function makeNavigationOptions({ navigation, }): NavigationScreenConfig<NavigationStackOptions, any> {
   return {
     ...defaultStackScreenNavigationOptions,
 
@@ -951,7 +953,7 @@ function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<Naviga
 
     headerRight: () => {
       return (
-        <KnowMoreButton onpress={navigation.getParam( 'toggleKnowMoreSheet' )} />
+        <KnowMoreButton onpress={navigation.getParam('toggleKnowMoreSheet')} />
       )
     },
   }

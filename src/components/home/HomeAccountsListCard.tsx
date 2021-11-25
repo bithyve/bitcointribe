@@ -100,14 +100,15 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
   const getText = ( text ) => {
     if ( text.includes( 'Register' ) ) {
       return(
-        <Text style={styles.subtitleText} numberOfLines={3}>
-          <Text style={styles.boldItalicText}>
+        <Text style={[styles.subtitleText, {}]} numberOfLines={3}>
+          <Text style={[styles.boldItalicText, {}]}>
             {`${strings.Register}`}
           </Text>
           {strings.andclaim}
         </Text>
       )
     }
+
     if ( !AllowSecureAccount && text.includes( 'MultiSig Wallet' ) ) {
       return(
         <Text style={styles.subtitleText} numberOfLines={3}>

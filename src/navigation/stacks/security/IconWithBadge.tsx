@@ -80,7 +80,7 @@ const IconWithBadge = ( {
   const { isError } = getLevel()
   return (
     <View style={{
-      // marginVertical: hp( '2%' )
+      marginTop: hp( '2%' )
     }}>
 
       {focused ?

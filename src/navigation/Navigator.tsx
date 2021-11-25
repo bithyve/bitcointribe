@@ -127,7 +127,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
-              // marginVertical: hp( '2%' )
+              marginTop: hp( '2%' )
             }}>
               {focused ?
                 <HomeSVG/>
@@ -156,7 +156,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
-              // marginVertical: hp( '2%' )
+              marginTop: hp( '2%' )
             }}>
               {focused ?
                 <FnF /> : <FnFInactive />
@@ -254,6 +254,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
+              marginTop: hp( '2%' )
             }}>
               {focused ?
                 <Settings />

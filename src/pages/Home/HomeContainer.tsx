@@ -6,6 +6,7 @@ import {
   ViewStyle,
   StyleProp,
   Image,
+  Dimensions
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -112,20 +113,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          marginTop: hp( 3 ),
-          marginLeft: wp( 4 ),
+          marginVertical: hp( 3 ),
+          marginLeft: wp( 5 ),
           marginRight: wp( 6 ),
           // alignItems: 'center',
           // backgroundColor: 'red'
         }}>
           <Text style={{
             color: Colors.blue,
-            fontSize: RFValue( 18 ),
+            fontSize: RFValue( 17, Dimensions.get('window').height),
             marginTop: hp( 1 ),
             fontFamily: Fonts.FiraSansMedium,
             letterSpacing: 0.54
           }}>
-            {this.state.strings.myaccounts}
+            {this.state.strings.myaccounts} 
           </Text>
           <ToggleContainer />
         </View>
