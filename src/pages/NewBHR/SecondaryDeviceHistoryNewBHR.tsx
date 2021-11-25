@@ -562,14 +562,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 && isPrimaryKeeper ) && ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ) && ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           isVersionMismatch={isVersionMismatch}
-          onPressChange={isPrimaryKeeper ? () => { setTimeout( () => {
-            setIsChange( true )
-            setKeeperQR( '' )
-            setIsReshare( false )
-          }, 2 )
-          setChangeModal( true ) } : setKeeperTypeModal( true )}
+          onPressChange={() => {
+            if( isPrimaryKeeper ){
+              setTimeout( () => {
+                setIsChange( true )
+                setKeeperQR( '' )
+                setIsReshare( false )
+              }, 2 )
+              setChangeModal( true )
+            } else setKeeperTypeModal( true )
+          }}
         />
       </View>
       <ModalContainer onBackground={()=>setShowQr( false )} visible={showQr} closeBottomSheet={() => setShowQr( false )} >

@@ -244,7 +244,7 @@ export default function SendViaLinkAndQR( props ) {
 
       <AppBottomSheetTouchableWrapper
         onPress={() => {
-          props.navigation.goBack()
+          props.navigation.pop( 3 )
         }}
         style={{
           ...styles.proceedButtonView,
