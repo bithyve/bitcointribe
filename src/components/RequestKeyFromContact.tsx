@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator, Platform, TouchableOpacity, Image } from 'react-native'
+import React, { useState, useEffect, useCallback } from 'react'
+import { View, Text, StyleSheet, ActivityIndicator, Platform, TouchableOpacity, Image, Pressable } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -30,56 +30,66 @@ import ThemeList from '../pages/FriendsAndFamily/Theme'
 import { withNavigation } from 'react-navigation'
 import { nameToInitials } from '../common/CommonFunctions'
 import { DeepLinkEncryptionType } from '../bitcoin/utilities/Interface'
+import ModalContainer from './home/ModalContainer'
+import NoticeModalContents from './../components/NoticeModalContents'
+import BottomSheet from 'reanimated-bottom-sheet'
 
-function RequestKeyFromContact( props ) {
-  const [ shareLink, setShareLink ] = useState( '' )
-  const strings = translations[ 'f&f' ]
-  const common = translations[ 'common' ]
+function RequestKeyFromContact(props) {
+  const [shareLink, setShareLink] = useState('')
+  const strings = translations['f&f']
+  const common = translations['common']
   const contact = props.contact
-  const [ serviceType, setServiceType ] = useState(
+  const [serviceType, setServiceType] = useState(
     props.serviceType ? props.serviceType : '',
   )
-  const [ Contact, setContact ] = useState( props.contact ? props.contact : {
-  } )
+  const [noticeModal, setNoticeModal] = useState(true);
+  const [Contact, setContact] = useState(props.contact ? props.contact : {
+  })
 
-  useEffect( () => {
-    setShareLink( props.link.replace( /\s+/g, '' ) )
-  }, [ props.link ] )
+  const OTP =  props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey}`
+  const OTP_MESSAGE = `Your friend will be prompted to enter ${OTP}  while accepting the gift`
+  const [noticeBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  )
 
-  useEffect( () => {
-    if ( contact ) {
-      setContact( props.contact )
+  useEffect(() => {
+    setShareLink(props.link.replace(/\s+/g, ''))
+  }, [props.link])
+
+  useEffect(() => {
+    if (contact) {
+      setContact(props.contact)
     }
-  }, [ contact ] )
+  }, [contact])
 
-  useEffect( () => {
-    if ( props.serviceType ) {
-      setServiceType( props.serviceType )
+  useEffect(() => {
+    if (props.serviceType) {
+      setServiceType(props.serviceType)
     }
-  }, [ props.serviceType ] )
+  }, [props.serviceType])
 
   const shareOption = async () => {
     try {
       // const url = 'https://awesome.contents.com/';
       const title = 'Request'
 
-      const options = Platform.select( {
+      const options = Platform.select({
         default: {
           title,
           message: `${shareLink}`,
         },
-      } )
+      })
 
 
-      Share.open( options )
-        .then( ( res ) => {
+      Share.open(options)
+        .then((res) => {
           // if (res.success) {
           props.onPressShare()
           // }
-        } )
-        .catch( ( err ) => {
-        } )
-    } catch ( error ) {
+        })
+        .catch((err) => {
+        })
+    } catch (error) {
       // console.log(error);
 
     }
@@ -87,29 +97,51 @@ function RequestKeyFromContact( props ) {
 
   const getTheme = () => {
     // props.themeId
-    const filteredArr = ThemeList.filter( ( item => item.id === props.themeId ) )
-    return filteredArr[ 0 ]
+    const filteredArr = ThemeList.filter((item => item.id === props.themeId))
+    return filteredArr[0]
   }
 
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  const numberWithCommas = (x) => {
+    return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''
   }
 
-  const shareViaLinkOrQR = ( type ) => {
+  const shareViaLinkOrQR = (type) => {
     props.onPressShare()
-    props.navigation.navigate( 'SendViaLinkAndQR', {
+    props.navigation.navigate('SendViaLinkAndQR', {
       type, qrCode: props.QR, link: shareLink, ...props
-    } )
+    })
   }
   const setPhoneNumber = () => {
-    const phoneNumber = Contact.phoneNumbers[ 0 ].number
-    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-    number = number.slice( number.length - 10 ) // last 10 digits only
+    const phoneNumber = Contact.phoneNumbers[0].number
+    let number = phoneNumber.replace(/[^0-9]/g, '') // removing non-numeric characters
+    number = number.slice(number.length - 10) // last 10 digits only
     return number
   }
 
+  const renderNoticeModalContent = useCallback(() => {
+    return (
+      <NoticeModalContents
+        modalRef={noticeBottomSheet}
+        title={'Please Share OTP with your contact'}
+        info={OTP_MESSAGE}
+        proceedButtonText={'Ok'}
+        onPressProceed={() => {
+          // ErrorBottomSheet.current.snapTo( 0 )
+          setNoticeModal(false)
+        }}
+        isBottomImage={true}
+        bottomImage={require('../assets/images/icons/errorImage.png')}
+        type={'small'}
+      />
+    )
+  }, [props.isGift])
+
+
   return (
     <View style={styles.modalContainer}>
+      <ModalContainer onBackground={() => setNoticeModal(false)} visible={noticeModal} closeBottomSheet={() => setNoticeModal(false)}>
+        {renderNoticeModalContent()}
+      </ModalContainer>
       <HeaderTitle
         firstLineTitle={props.headerText ? props.headerText : strings.scanQR}
         secondLineTitle={props.subHeaderText ? props.subHeaderText : strings.withHexa}
@@ -121,7 +153,7 @@ function RequestKeyFromContact( props ) {
       {props.isGift &&
         <>
           <TouchableOpacity
-            onPress={() => props.onSelectionChange && props.onSelectionChange( true )}
+            onPress={() => props.onSelectionChange && props.onSelectionChange(true)}
             style={{
               width: '90%',
               backgroundColor: Colors.gray7,
@@ -132,20 +164,20 @@ function RequestKeyFromContact( props ) {
               shadowRadius: 10,
               elevation: 2,
               alignSelf: 'center',
-              borderTopRightRadius: wp( 2 ),
-              borderBottomRightRadius: wp( 2 ),
-              borderTopLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 90/2  ),
-              borderBottomLeftRadius: contact && Object.keys( contact ).length !== 0 ? wp( 90/2 ) : wp( 90/2  ),
-              marginTop: hp( 1 ),
-              marginBottom: hp( 1 ),
-              paddingVertical: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : hp( 0 ),
-              paddingRight: wp( 3 ),
+              borderTopRightRadius: wp(2),
+              borderBottomRightRadius: wp(2),
+              borderTopLeftRadius: contact && Object.keys(contact).length !== 0 ? wp(90 / 2) : wp(90 / 2),
+              borderBottomLeftRadius: contact && Object.keys(contact).length !== 0 ? wp(90 / 2) : wp(90 / 2),
+              marginTop: hp(1),
+              marginBottom: hp(1),
+              paddingVertical: contact && Object.keys(contact).length !== 0 ? hp(0) : hp(0),
+              paddingRight: wp(3),
               flexDirection: 'row',
               alignItems: 'center',
-              paddingHorizontal: contact && Object.keys( contact ).length !== 0 ? hp( 0 ) : wp( 0 )
+              paddingHorizontal: contact && Object.keys(contact).length !== 0 ? hp(0) : wp(0)
             }}>
             <View style={styles.contactProfileImageContainer}>
-              {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
+              {contact ? Object.keys(contact).length !== 0 ? contact.imageAvailable ?
 
                 <Image
                   source={contact.image}
@@ -174,8 +206,8 @@ function RequestKeyFromContact( props ) {
                     <Text
                       style={{
                         textAlign: 'center',
-                        fontSize: RFValue( 20 ),
-                        lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
+                        fontSize: RFValue(20),
+                        lineHeight: RFValue(20), //... One for top and one for bottom alignment
                       }}
                     >
                       {nameToInitials(
@@ -190,69 +222,69 @@ function RequestKeyFromContact( props ) {
                     </Text>
                   </View>
                 )
-                : <GiftCard /> :  <GiftCard />
+                : <GiftCard /> : <GiftCard />
               }
             </View>
 
             <View style={{
-              marginHorizontal: wp( 3 )
+              marginHorizontal: wp(3)
             }}>
-              {Object.keys( contact ).length !== 0 &&
-              <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-                marginTop: hp( 0.3 ),
-                lineHeight: 12
-              }}>
-              Friends & Family
-              </Text>
+              {Object.keys(contact).length !== 0 &&
+                <Text style={{
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginTop: hp(0.3),
+                  lineHeight: 12
+                }}>
+                  Friends & Family
+                </Text>
               }
               {Contact &&
-                  Contact.phoneNumbers &&
-                  Contact.phoneNumbers.length && props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? (
-                  <Text style={{
-                    color: Colors.blue,
-                    fontSize: RFValue( 14 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginTop: hp( 0.01 ),
-                    letterSpacing: 5,
-                    lineHeight: 30,
-                    width: wp( '54%' )
-                  }}>
+                Contact.phoneNumbers &&
+                Contact.phoneNumbers.length && props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? (
+                <Text style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(14),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginTop: hp(0.01),
+                  letterSpacing: 5,
+                  lineHeight: 30,
+                  width: wp('54%')
+                }}>
 
-                    {setPhoneNumber()}
-                  </Text>
-                ) : Contact && Contact.emails && Contact.emails.length && props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? (
-                  <Text style={{
-                    color: Colors.blue,
-                    fontSize: RFValue( 14 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginTop: hp( 0.01 ),
-                    lineHeight: 30, width: wp( '54%' )
-                  }}>
-                    {Contact && Contact.emails[ 0 ].email}
-                  </Text>
+                  {setPhoneNumber()}
+                </Text>
+              ) : Contact && Contact.emails && Contact.emails.length && props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? (
+                <Text style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(14),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginTop: hp(0.01),
+                  lineHeight: 30, width: wp('54%')
+                }}>
+                  {Contact && Contact.emails[0].email}
+                </Text>
 
-                ): Object.keys( contact ).length !== 0 && props.encryptLinkWith === DeepLinkEncryptionType.OTP ?
-                  <Text style={{
-                    color: Colors.blue,
-                    fontSize: RFValue( 14 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginTop: hp( 0.01 ),
-                    letterSpacing: 5,
-                    lineHeight: 30,
-                    width: wp( '54%' )
-                  }}>
-                    {props.encryptionKey}
-                  </Text>
-                  :
-                  null}
+              ) : Object.keys(contact).length !== 0 && props.encryptLinkWith === DeepLinkEncryptionType.OTP ?
+                <Text style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(14),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginTop: hp(0.01),
+                  letterSpacing: 5,
+                  lineHeight: 30,
+                  width: wp('54%')
+                }}>
+                  {props.encryptionKey}
+                </Text>
+                :
+                null}
 
               {contact && contact.name ?
                 <Text style={{
                   color: Colors.textColorGrey,
-                  fontSize: RFValue( 11 ),
+                  fontSize: RFValue(11),
                   fontFamily: Fonts.FiraSansMediumItalic,
                 }}>
                   {contact.name}
@@ -261,13 +293,13 @@ function RequestKeyFromContact( props ) {
                 <>
                   <Text style={{
                     color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
+                    fontSize: RFValue(10),
                     fontFamily: Fonts.FiraSansRegular,
                     lineHeight: 27
                   }}>
-                  from <Text style={{
+                    from <Text style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue( 11 ),
+                      fontSize: RFValue(11),
                       fontFamily: Fonts.FiraSansMediumItalic,
                     }}>
                       {props.accountName}
@@ -275,12 +307,12 @@ function RequestKeyFromContact( props ) {
                   </Text>
                   <Text style={{
                     color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
+                    fontSize: RFValue(10),
                     fontFamily: Fonts.FiraSansRegular,
-                    marginTop: hp( 0.3 ),
+                    marginTop: hp(0.3),
                     lineHeight: 12
                   }}>
-                    {moment( ).format( 'lll' )}
+                    {moment().format('lll')}
                   </Text>
                 </>
               }
@@ -303,55 +335,54 @@ function RequestKeyFromContact( props ) {
               }}> sats
               </Text>
             </Text> */}
-              {!props.isGift &&<More />}
+              {!props.isGift && <More />}
             </View>
 
           </TouchableOpacity>
         </>
       }
+
       {props.isGift &&
         // <BottomInfoBox
         //   infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
         // />
-        <Text style={{
-          color: Colors.textColorGrey,
-          fontSize: RFValue( 12 ),
-          letterSpacing: 0.6,
-          // marginBottom: 2,
-          // fontFamily: Fonts.FiraSansRegular,
-          marginHorizontal: wp( 6 ),
-          marginRight: wp( 10 ),
-          lineHeight: 18,
-          marginVertical: hp( 2 ),
-          marginBottom: hp( 6 )
-        }}>
-          {'Your friend will be prompted to enter '}
+        <Pressable onPress={()=> setNoticeModal(true)}>
           <Text style={{
-            fontWeight: '600'
+            color: Colors.textColorGrey,
+            fontSize: RFValue(12),
+            letterSpacing: 0.6,
+            // marginBottom: 2,
+            // fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp(6),
+            marginRight: wp(10),
+            lineHeight: 18,
+            marginVertical: hp(2),
+            marginBottom: hp(6)
           }}>
-            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
-          </Text>
-          while accepting the gift
-        </Text>
+            Please share this OTP with your contact.
+           </Text>
+        </Pressable>
+
       }
+
       {!props.isGift &&
         <View
-          style={[ styles.mainContainer,
-            {
-              marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-              marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-            } ]}
+          style={[styles.mainContainer,
+          {
+            marginTop: !props.isModal ? hp('2%') : hp('1.7%'),
+            marginBottom: !props.isModal ? hp('2%') : hp('1.7%'),
+          }]}
         >
-          <View style={[ styles.qrContainer, {
-            marginVertical: hp( '4%' )
-          } ]}>
+          <View style={[styles.qrContainer, {
+            marginVertical: hp('4%')
+          }]}>
             {!props.QR ? (
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
               <QRCode
                 title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
                 value={props.QR}
-                size={hp( '27%' )} />
+                size={hp('27%')} />
             )}
           </View>
           {props.OR ? <CopyThisText
@@ -392,20 +423,20 @@ function RequestKeyFromContact( props ) {
           titleText={'Gift sats'}
           titleTextColor={Colors.black}
           subText={props.senderName}
-          extraText={props.giftNote? props.giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
-          amt={numberWithCommas( props.amt )}
+          extraText={props.giftNote ? props.giftNote : 'This is to get you started!\nWelcome to Bitcoin'}
+          amt={numberWithCommas(props.amt)}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
         />
       }
       {props.isGift &&
         <View style={{
-          flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
+          flexDirection: 'row', alignItems: 'center', margin: wp(6)
         }}>
           <ButtonGroupWithIcon
             buttonOneIcon={<Link />}
             buttonOneText={'Share Link'}
-            onButtonPress={( type ) => shareViaLinkOrQR( type )}
+            onButtonPress={(type) => shareViaLinkOrQR(type)}
             buttonTwoIcon={<Link />}
             buttonTwoText={'Share QR'}
           />
@@ -420,7 +451,7 @@ function RequestKeyFromContact( props ) {
     </View>
   )
 }
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   contactProfileImage: {
     width: 81,
     height: 81,
@@ -440,9 +471,9 @@ const styles = StyleSheet.create( {
   },
   dashedStyle: {
     backgroundColor: Colors.gray7,
-    borderRadius: wp( 2 ),
-    paddingVertical: hp( 1 ),
-    paddingHorizontal: wp( 4 ),
+    borderRadius: wp(2),
+    paddingVertical: hp(1),
+    paddingHorizontal: wp(4),
     borderColor: Colors.lightBlue,
     borderWidth: 1,
     borderStyle: 'dashed',
@@ -462,11 +493,11 @@ const styles = StyleSheet.create( {
     // shadowRadius: 10,
     // elevation: 2,
     alignSelf: 'center',
-    borderRadius: wp( 2 ),
-    marginTop: hp( 1 ),
-    marginBottom: hp( 1 ),
-    paddingVertical: wp( 1 ),
-    paddingHorizontal: wp( 1 ),
+    borderRadius: wp(2),
+    marginTop: hp(1),
+    marginBottom: hp(1),
+    paddingVertical: wp(1),
+    paddingHorizontal: wp(1),
     borderColor: Colors.lightBlue,
     borderWidth: 1,
   },
@@ -495,7 +526,7 @@ const styles = StyleSheet.create( {
     marginTop: 10,
     borderColor: Colors.white,
     backgroundColor: Colors.white,
-    width: wp( 90 )
+    width: wp(90)
   },
   inputBox: {
     borderWidth: 0.5,
@@ -519,7 +550,7 @@ const styles = StyleSheet.create( {
   modalInputBox: {
     flex: 1,
     height: 50,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
@@ -527,24 +558,24 @@ const styles = StyleSheet.create( {
 
   },
   modalInfoText: {
-    width: wp( 90 ),
+    width: wp(90),
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
     lineHeight: 18,
-    marginLeft: wp( 5 ),
-    paddingVertical: wp( 1 )
+    marginLeft: wp(5),
+    paddingVertical: wp(1)
   },
   titleStyle: {
     color: Colors.black,
-    fontSize: RFValue( 20 ),
+    fontSize: RFValue(20),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 18 ),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
@@ -553,7 +584,7 @@ const styles = StyleSheet.create( {
     width: '100%',
   },
   qrContainer: {
-    height: hp( '27%' ),
+    height: hp('27%'),
     justifyContent: 'center',
     marginLeft: 20,
     marginRight: 20,
@@ -588,7 +619,7 @@ const styles = StyleSheet.create( {
   },
   subHeaderText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     paddingTop: 5,
   },
@@ -596,11 +627,11 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     flexDirection: 'row',
     paddingRight: 10,
-    paddingBottom: hp( '1.5%' ),
-    paddingTop: hp( '1%' ),
+    paddingBottom: hp('1.5%'),
+    paddingTop: hp('1%'),
     marginLeft: 10,
     marginRight: 10,
-    marginBottom: hp( '1.5%' ),
+    marginBottom: hp('1.5%'),
   },
   backButton: {
     height: 30,
@@ -612,6 +643,6 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignItems: 'flex-start'
   }
-} )
+})
 
-export default withNavigation( RequestKeyFromContact )
+export default withNavigation(RequestKeyFromContact)
