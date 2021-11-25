@@ -562,7 +562,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ) && ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).status != 'notSetup' && ( ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 && isPrimaryKeeper ) || ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 && !isPrimaryKeeper ) ) ? true : false}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => {
             if( isPrimaryKeeper ){
