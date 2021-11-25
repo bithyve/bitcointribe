@@ -978,6 +978,7 @@ export enum GiftStatus {
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
   RECLAIMED = 'RECLAIMED',
+  ASSOCIATED = 'ASSOCIATED',
   EXPIRED = 'EXPIRED',
 }
 export interface Gift {
@@ -994,6 +995,7 @@ export interface Gift {
     sent?: number,
     accepted?: number,
     reclaimed?: number,
+    associated?: number,
   }
   sender: {
     walletId: string,
