@@ -245,6 +245,13 @@ export default function SendViaLinkAndQR( props ) {
       <AppBottomSheetTouchableWrapper
         onPress={() => {
           props.navigation.pop( 3 )
+          try {
+            if( props.navigation.state.params.setActiveTab ) {
+              props.navigation.state.params.setActiveTab( 'SENT' )
+            }
+          } catch ( error ) {
+            //
+          }
         }}
         style={{
           ...styles.proceedButtonView,

@@ -139,11 +139,14 @@ const CreateGift = ( { navigation } ) => {
 
   const renderButton = ( text, condn ) => {
     const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
-    const actualAmount = ( ( availableToSpend / SATOSHIS_IN_BTC ) *
-    accountsState.exchangeRates[ currencyCode ].last
-    ).toFixed( 2 )
+    // const actualAmount = ( ( availableToSpend / SATOSHIS_IN_BTC ) *
+    // accountsState.exchangeRates[ currencyCode ].last
+    // ).toFixed( 2 )
 
-    const isDisabled = currentSatsAmountFormValue < 1000 || availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
+    const isDisabled = currentSatsAmountFormValue < 1000 || availableToSpend <= 0
+    || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend
+    //|| ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) )
+    )
     return(
       <TouchableOpacity
         disabled={isDisabled}
@@ -637,7 +640,7 @@ const CreateGift = ( { navigation } ) => {
             }} />
             <Text style={[ styles.modalInputBox, {
               color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
-            } ]} onPress={() => setKeyboard( true )}>{UsNumberFormat( amount )}
+            } ]} onPress={() => setKeyboard( true )}>{UsNumberFormat( amount ) === '0' ? '' :UsNumberFormat( amount ) }
               {!showKeyboard &&
               <Text style={{
                 fontSize: RFValue( 12 ),
@@ -732,7 +735,7 @@ const CreateGift = ( { navigation } ) => {
             fontSize: RFValue( 13 ),
             fontFamily: Fonts.FiraSansRegular,
             marginHorizontal: wp( 3 )
-          }}>Note: Minimum gift value: 1000 sats</Text>
+          }}>{`Note: ${includeFees ? `Minimum gift value:  ${averageLowTxFee+ 1000} sats`: 'Minimum gift value: 1000 sats'}`}</Text>
         </View>
         {showKeyboard &&
         <View style={{

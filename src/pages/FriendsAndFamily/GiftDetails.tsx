@@ -453,6 +453,7 @@ const GiftDetails = ( { navigation } ) => {
         { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
+            setActiveTab: navigation.state.params.setActiveTab
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Add To Account */}
