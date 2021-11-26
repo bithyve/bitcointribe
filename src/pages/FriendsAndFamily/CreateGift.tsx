@@ -732,7 +732,7 @@ const CreateGift = ( { navigation } ) => {
             fontSize: RFValue( 13 ),
             fontFamily: Fonts.FiraSansRegular,
             marginHorizontal: wp( 3 )
-          }}>Note: Minimum gift value: 1000 sats</Text>
+          }}>{`Note: ${includeFees ? `Minimum gift value:  ${averageLowTxFee+ 1000} sats`: 'Minimum gift value: 1000 sats'}`}</Text>
         </View>
         {showKeyboard &&
         <View style={{
