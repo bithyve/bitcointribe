@@ -72,7 +72,8 @@ const ManageGifts = ( { navigation } ) => {
   const dispatch = useDispatch()
 
   const prefersBitcoin = useMemo( () => {
-    return currencyKind === CurrencyKind.BITCOIN
+    //return currencyKind === CurrencyKind.BITCOIN
+    return true
   }, [ currencyKind ] )
 
   useEffect( () => {

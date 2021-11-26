@@ -139,11 +139,14 @@ const CreateGift = ( { navigation } ) => {
 
   const renderButton = ( text, condn ) => {
     const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
-    const actualAmount = ( ( availableToSpend / SATOSHIS_IN_BTC ) *
-    accountsState.exchangeRates[ currencyCode ].last
-    ).toFixed( 2 )
+    // const actualAmount = ( ( availableToSpend / SATOSHIS_IN_BTC ) *
+    // accountsState.exchangeRates[ currencyCode ].last
+    // ).toFixed( 2 )
 
-    const isDisabled = currentSatsAmountFormValue < 1000 || availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
+    const isDisabled = currentSatsAmountFormValue < 1000 || availableToSpend <= 0
+    || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend
+    //|| ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) )
+    )
     return(
       <TouchableOpacity
         disabled={isDisabled}
