@@ -41,6 +41,7 @@ import Relay from '../bitcoin/utilities/Relay'
 import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { setCloudBackupStatus } from '../store/actions/cloud'
+import { setOpenToApproval } from '../store/actions/BHR'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -118,6 +119,7 @@ export default function Login( props ) {
 
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    dispatch( setOpenToApproval( false, [], null ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
