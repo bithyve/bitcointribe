@@ -136,13 +136,13 @@ const ManageGifts = ( { navigation } ) => {
     if( selectedGift.type === GiftType.SENT ){
       if( selectedGift.status === GiftStatus.CREATED || selectedGift.status === GiftStatus.RECLAIMED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     } else if ( selectedGift.type === GiftType.RECEIVED ) {
       if( selectedGift.status === GiftStatus.ACCEPTED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     }
@@ -321,7 +321,9 @@ const ManageGifts = ( { navigation } ) => {
         }
         { active === GiftStatus.CREATED &&
         <TouchableOpacity
-          onPress={() => navigation.navigate( 'CreateGift' )}
+          onPress={() => navigation.navigate( 'CreateGift', {
+            setActiveTab: buttonPress
+          } )}
           style={{
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
             marginVertical: hp( 1 )
@@ -403,7 +405,7 @@ const ManageGifts = ( { navigation } ) => {
                       key={index}
                       onPress={() => {
                         navigation.navigate( 'GiftDetails', {
-                          title, walletName, gift: item, avatar: true, contactDetails
+                          title, walletName, gift: item, avatar: true, contactDetails, setActiveTab: buttonPress
                         } )
                       }
                       }

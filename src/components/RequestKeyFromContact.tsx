@@ -98,7 +98,8 @@ function RequestKeyFromContact( props ) {
   const shareViaLinkOrQR = ( type ) => {
     props.onPressShare()
     props.navigation.navigate( 'SendViaLinkAndQR', {
-      type, qrCode: props.QR, link: shareLink, ...props
+      type, qrCode: props.QR, link: shareLink, ...props,
+      setActiveTab: props.navigation.state.params.setActiveTab
     } )
   }
   const setPhoneNumber = () => {

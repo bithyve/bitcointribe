@@ -83,6 +83,7 @@ const GiftDetails = ( { navigation } ) => {
               showDone:true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
             navigation.replace( 'SendGift', {
@@ -91,7 +92,8 @@ const GiftDetails = ( { navigation } ) => {
               note,
               contact,
               senderName: name,
-              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           }
 
