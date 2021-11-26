@@ -1286,6 +1286,7 @@ function* autoShareLevel2KeepersWorker( ) {
             channelKey: contactInfo.channelKey,
             streamId: streamUpdates.streamId,
             contactDetails: Contacts[ channelKey ].contactDetails,
+            contact: Contacts[ channelKey ],
             unEncryptedOutstreamUpdates: streamUpdates,
           } ]
         )
