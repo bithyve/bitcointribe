@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import ButtonBlue from '../../../components/ButtonBlue'
@@ -41,6 +42,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const strings = translations[ 'accManagement' ]
   const originalAccountShells = useActiveAccountShells()
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
+  const accountShells = useSelector( ( state ) => state.accounts.accountShells )
   // const [ tempValue, setTempValue ] = useState( false )
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const [ orderedAccountShells, setOrderedAccountShells ] = useState( originalAccountShells )
@@ -84,7 +86,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const getHiddenAccountShell = useMemo( () => {
     const newHiddenAccountShell = []
     if( showAllAccount === true ){
-      originalAccountShells.map( ( value, index ) =>{
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
           newHiddenAccountShell.push( value )
         }
@@ -382,7 +384,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
               height: 'auto'
             }}>
               {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
-                return renderItem( accountShell )
+                if( accountShell.primarySubAccount.type !== AccountType.TEST_ACCOUNT )
+                  return renderItem( accountShell )
               } )
               }
             </View>

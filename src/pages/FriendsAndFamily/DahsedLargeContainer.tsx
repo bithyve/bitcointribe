@@ -28,7 +28,8 @@ const DashedLargeContainer = ( props ) => {
     ( state ) => state.accounts.exchangeRates
   )
   const prefersBitcoin = useMemo( () => {
-    return currencyKind === CurrencyKind.BITCOIN
+    //return currencyKind === CurrencyKind.BITCOIN
+    return true
   }, [ currencyKind ] )
 
   const numberWithCommas = ( x ) => {
