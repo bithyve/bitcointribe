@@ -1933,7 +1933,8 @@ function* updateKeeperInfoToChannelWorker( ) {
       channelKey: string,
       streamId: string,
       unEncryptedOutstreamUpdates?: UnecryptedStreamData,
-      contactDetails?: ContactDetails
+      contactDetails?: ContactDetails,
+      contact?: TrustedContact
     }[] = []
     if( levelHealth[ 0 ] ) {
       for ( let i = 2; i < levelHealth[ 0 ].levelInfo.length; i++ ) {
@@ -1970,6 +1971,7 @@ function* updateKeeperInfoToChannelWorker( ) {
           streamId: streamUpdates.streamId,
           unEncryptedOutstreamUpdates: streamUpdates,
           contactDetails: contacts[ channelKey ].contactDetails,
+          contact: contacts[ channelKey ]
         } )
       }
     }
@@ -2589,6 +2591,7 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
         streamId: streamUpdates.streamId,
         contactDetails: contacts[ channelKey ].contactDetails,
         unEncryptedOutstreamUpdates: streamUpdates,
+        contact: contacts[ channelKey ]
       } ]
     )
 

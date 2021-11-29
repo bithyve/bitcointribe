@@ -888,7 +888,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       <ModalContainer visible={approvalErrorModal} closeBottomSheet={()=>{setApprovalErrorModal( false )}} >
         <ErrorModalContents
           title={'Need Approval'}
-          note={'Make sure your keeper has approved request by scanning qr from other keeper'}
+          note={'Scan the Approval Key stored on Personal Device 1 in: Security and Privacy> I am the Keeper of > Contact'}
           proceedButtonText={strings.ok}
           onPressProceed={() => setApprovalErrorModal( false )}
           isBottomImage={false}
