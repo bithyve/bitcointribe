@@ -77,8 +77,8 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
     const newAccountInfo: newAccountsInfo = {
       accountType: AccountType.DONATION_ACCOUNT,
       accountDetails: {
-        name: 'Donation Account',
-        description: accountName,
+        name: accountName,
+        description: accountDescription,
         is2FAEnabled: isTFAEnabled,
         doneeName: doneeName
       }
