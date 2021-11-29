@@ -116,7 +116,7 @@ const CreateGift = ( { navigation } ) => {
         setGiftModal( true )
         setInitGiftCreation( false )
         setShowLoader( false )
-        dispatch( giftCreationSuccess( false ) )
+        dispatch( giftCreationSuccess( null ) )
       }
     }
   }, [ accountsState.selectedGiftId, initGiftCreation, giftCreationStatus ] )
@@ -125,7 +125,11 @@ const CreateGift = ( { navigation } ) => {
     setInitGiftCreation( false )
     setShowLoader( false )
     if( giftCreationStatus ){
-      dispatch( giftCreationSuccess( false ) )
+      dispatch( giftCreationSuccess( null ) )
+    } else if( giftCreationStatus === false ){
+      // failed to create gift
+      setShowLoader( false )
+      dispatch( giftCreationSuccess( null ) )
     }
   }, [ giftCreationStatus ] )
 
@@ -141,7 +145,7 @@ const CreateGift = ( { navigation } ) => {
     const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
     const lowestGiftValue = includeFees? averageLowTxFee + 1000: 1000
 
-    const isDisabled = currentSatsAmountFormValue < lowestGiftValue || availableToSpend <= 0
+    const isDisabled = currentSatsAmountFormValue < 10 || availableToSpend <= 0
     || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend
     //|| ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) )
     )

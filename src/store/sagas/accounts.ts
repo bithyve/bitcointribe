@@ -105,6 +105,7 @@ import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
+import Toast from '../../components/Toast'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -1246,6 +1247,7 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
 
   } catch( err ){
     yield put( giftCreationSuccess( false ) )
+    Toast( 'Transaction failed due to dust limit. Please increase the gift amount and try' )
   }
 }
 

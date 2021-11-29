@@ -118,7 +118,7 @@ const initialState: AccountsState = {
   gifts: {
   },
   selectedGiftId: null,
-  giftCreationStatus: false,
+  giftCreationStatus: null,
   acceptedGiftId: '',
   addedGift: '',
   isGeneratingNewAccountShell: false,
@@ -552,7 +552,8 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case GENERATE_GIFTS:
         return {
           ...state,
-          selectedGiftId: null
+          selectedGiftId: null,
+          giftCreationStatus: null
         }
 
       case GIFT_CREATION_STATUS:
