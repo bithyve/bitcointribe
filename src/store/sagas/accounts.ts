@@ -934,8 +934,7 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     accountIds: accountIds
   } ) )
 
-  // TODO: re-enable test-coins from test-faucet post test-wrapper resurrection
-  // if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
+  if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
 export const addNewAccountShellsWatcher = createWatcher(
