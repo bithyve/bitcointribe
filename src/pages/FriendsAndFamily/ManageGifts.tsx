@@ -42,6 +42,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import ToggleContainer from './CurrencyToggle'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -229,7 +230,8 @@ const ManageGifts = ( { navigation } ) => {
       </ModalContainer>
         } */}
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between'
+          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between',
+          marginRight: 10,
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -245,11 +247,12 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-
+          <ToggleContainer />
         </View>
 
         <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+          marginRight: 10, marginTop: 10,
         }}>
           <HeaderTitle
             firstLineTitle={'Manage Gifts'}
@@ -594,7 +597,6 @@ const styles = StyleSheet.create( {
     height: hp( 3.6 ),
     paddingHorizontal: wp( 2 ),
     marginTop: wp( 2.7 ),
-    marginRight: wp( 4 ),
     alignSelf: 'flex-start'
   },
   createView: {
