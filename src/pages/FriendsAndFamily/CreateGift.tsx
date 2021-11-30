@@ -178,7 +178,8 @@ const CreateGift = ( { navigation } ) => {
                 setGiftModal( false )
                 navigation.navigate( 'AddContact', {
                   fromScreen: 'Gift',
-                  giftId: ( createdGift as Gift ).id
+                  giftId: ( createdGift as Gift ).id,
+                  setActiveTab: navigation.state.params.setActiveTab
                 } )
                 break
 
@@ -186,6 +187,7 @@ const CreateGift = ( { navigation } ) => {
                 setGiftModal( false )
                 navigation.navigate( 'EnterGiftDetails', {
                   giftId: ( createdGift as Gift ).id,
+                  setActiveTab: navigation.state.params.setActiveTab
                 } )
                 break
           }
