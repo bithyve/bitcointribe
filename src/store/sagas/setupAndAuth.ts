@@ -136,9 +136,6 @@ function* credentialsAuthWorker( { payload } ) {
     const wallet: Wallet = yield select( state => state.storage.wallet )
     const storedVersion = wallet.version
     const currentVersion = DeviceInfo.getVersion()
-    console.log( {
-      storedVersion, wallet
-    } )
     if( currentVersion !== storedVersion ) yield put( updateApplication( currentVersion, storedVersion ) )
 
     // initialize configuration file
