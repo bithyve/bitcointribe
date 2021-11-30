@@ -164,13 +164,13 @@ const CreateGift = ( { navigation } ) => {
                 }
 
                 if( giftAmounts.length ){
+                  setInitGiftCreation( true )
+                  setShowLoader( true )
                   dispatch( generateGifts( {
                     amounts: giftAmounts,
                     accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
                     includeFee: includeFees
                   } ) )
-                  setInitGiftCreation( true )
-                  setShowLoader( true )
                 }
                 break
 
@@ -892,8 +892,8 @@ const CreateGift = ( { navigation } ) => {
       </ModalContainer>
       <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
         <LoaderModal
-          headerText={'Creating Gift'}
-          messageText={'Packing your gift'}
+          headerText={'Creating Gift-Sats'}
+          messageText={'Please wait while your gift is being wrapped. Once created, you can choose to send it or keep it in your Available Gifts section for sending later.'}
           messageText2={''}
           showGif={false}
         />
