@@ -158,7 +158,7 @@ const CreateGift = ( { navigation } ) => {
           switch( condn ){
               case 'Create Gift':
                 // creating multiple gift instances(based on giftInstances) of the same amount
-                const giftInstances = Number( numbersOfGift )
+                const giftInstances = Number( numbersOfGift === '' ? 1 : Number( numbersOfGift ) )
                 const giftAmount = Number( amount )
                 const giftAmounts = []
                 for( let int = 0; int < giftInstances; int++ ){
