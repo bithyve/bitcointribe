@@ -12,10 +12,9 @@ import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouc
 export default function ErrorModalContents( props ) {
   return (
     <View style={{
-      ...styles.modalContentContainer, height: '100%'
+      ...styles.modalContentContainer,
     }}>
       <View style={{
-        height: '100%'
       }}>
         <View style={styles.successModalHeaderView}>
           <Text
@@ -41,6 +40,10 @@ export default function ErrorModalContents( props ) {
               {props.info}
             </Text>
           ) : null}
+
+          {
+            props.renderMore ? props.renderMore(): null
+          }
         </View>
         <View style={styles.successModalAmountView}>
           {props.note ? (
@@ -142,7 +145,6 @@ export default function ErrorModalContents( props ) {
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
@@ -152,7 +154,7 @@ const styles = StyleSheet.create( {
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   successModalAmountView: {
