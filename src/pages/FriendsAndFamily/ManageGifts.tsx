@@ -272,7 +272,10 @@ const ManageGifts = ( { navigation } ) => {
         </View>
         <ScrollView
           style={{
-            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 )
+            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 ),
+          }}
+          contentContainerStyle={{
+            justifyContent: 'space-evenly', width: '100%'
           }}
           horizontal>
           {
@@ -281,6 +284,7 @@ const ManageGifts = ( { navigation } ) => {
               return (
                 <TouchableOpacity
                   key={item}
+                  activeOpacity={0.6}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
                     shadowColor: active === item ? '#77B9EB96' : Colors.white,
@@ -533,7 +537,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium
   },
   buttonNavigator: {
-    width: wp( '20%' ),
+    //width: wp( '20%' ),
     height: 64,
     marginRight: wp( 2 ),
     marginLeft: wp( 1 ),
@@ -541,6 +545,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     backgroundColor: Colors.borderColor,
     borderRadius: wp( 3 ),
+    flex: 1,
   },
   modalTitleText: {
     color: Colors.blue,

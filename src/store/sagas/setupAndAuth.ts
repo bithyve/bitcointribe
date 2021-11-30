@@ -136,9 +136,6 @@ function* credentialsAuthWorker( { payload } ) {
     const wallet: Wallet = yield select( state => state.storage.wallet )
     const storedVersion = wallet.version
     const currentVersion = DeviceInfo.getVersion()
-    console.log( {
-      storedVersion, wallet
-    } )
     if( currentVersion !== storedVersion ) yield put( updateApplication( currentVersion, storedVersion ) )
 
     // initialize configuration file
@@ -192,25 +189,6 @@ export const changeAuthCredWatcher = createWatcher(
 
 function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, previousVersion: string }} ) {
   const { newVersion } = payload
-
-  if( semver.gte( newVersion, '2.0.5' ) ){
-    // TODO: re-enable test account once test-wrapper is up
-    const accountShells: AccountShell[] = yield select(
-      ( state ) => state.accounts.accountShells
-    )
-
-    let testAccountShell
-    accountShells.forEach( shell => {
-      if( shell.primarySubAccount.type === AccountType.TEST_ACCOUNT ) testAccountShell = shell
-    } )
-
-    const settings = {
-      visibility: AccountVisibility.HIDDEN
-    }
-    yield put( updateAccountSettings( {
-      accountShell: testAccountShell, settings
-    } ) )
-  }
 
   // update wallet version
   const wallet: Wallet = yield select( state => state.storage.wallet )
