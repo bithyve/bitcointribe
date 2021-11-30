@@ -622,6 +622,7 @@ export const ALLOW_SECURE_ACCOUNT = 'ALLOW_SECURE_ACCOUNT'
 export const UPDATE_SECONDARY_SHARD = 'UPDATE_SECONDARY_SHARD'
 export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
 export const GET_APPROVAL_FROM_KEEPER = 'GET_APPROVAL_FROM_KEEPER'
+export const CHANGE_QUESTION_ANSWER = 'CHANGE_QUESTION_ANSWER'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -707,6 +708,14 @@ export const rejectedExistingContactRequest = ( channelKey ) => {
   return {
     type: REJECTED_EC_REQUEST, payload: {
       channelKey
+    }
+  }
+}
+
+export const changeQuestionAnswer = ( questionId, question, answer ) => {
+  return {
+    type: CHANGE_QUESTION_ANSWER, payload: {
+      questionId, question, answer
     }
   }
 }

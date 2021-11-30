@@ -785,7 +785,7 @@ export default class BHROperations {
     }
   };
 
-  public static getMnemonics = ( secretsArray: string[], answer: string, isPrimary?: boolean ) => {
+  public static getMnemonics = ( secretsArray: string[], answer?: string, isPrimary?: boolean ) => {
     const shareArr = isPrimary ? [] : secretsArray
     if( isPrimary ){
       const { decryptedSecrets } = BHROperations.decryptSecrets( secretsArray, answer )
@@ -830,6 +830,42 @@ export default class BHROperations {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch Wallet Image',
+      }
+    }
+  };
+
+  public static encryptMetaSharesWithNewAnswer = async ( metaShares, oldMetaShares, oldAnswer, newAnswer ) => {
+    try {
+      const updatedMetaShares: MetaShare[] = [ ...metaShares ]
+      const updatedOldMetaShares: MetaShare[] = [ ...oldMetaShares ]
+      for ( let i = 0; i < updatedMetaShares.length; i++ ) {
+        const element = updatedMetaShares[ i ]
+        const decryptedData = BHROperations.decryptWithAnswer( element.encryptedShare.pmShare, oldAnswer )
+        const encryptedData = BHROperations.encryptWithAnswer( decryptedData.decryptedData, newAnswer )
+        updatedMetaShares[ i ] = {
+          ...updatedMetaShares[ i ],
+          encryptedShare: {
+            pmShare: encryptedData.encryptedData
+          }
+        }
+      }
+      for ( let i = 0; i < updatedOldMetaShares.length; i++ ) {
+        const element = updatedOldMetaShares[ i ]
+        const decryptedData = BHROperations.decryptWithAnswer( element.encryptedShare.pmShare, oldAnswer )
+        const encryptedData = BHROperations.encryptWithAnswer( decryptedData.decryptedData, newAnswer )
+        updatedOldMetaShares[ i ] = {
+          ...updatedOldMetaShares[ i ],
+          encryptedShare: {
+            pmShare: encryptedData.encryptedData
+          }
+        }
+      }
+      return {
+        updatedMetaShares, updatedOldMetaShares
+      }
+    } catch ( err ) {
+      return {
+        updatedMetaShares:metaShares, updatedOldMetaShares: oldMetaShares
       }
     }
   };
