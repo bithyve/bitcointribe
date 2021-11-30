@@ -58,8 +58,8 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
   const [ disableSave, setDisableSave ] = useState( true )
   const [ doneeName, setDoneeName ] = useState( donationAccount.donee )
-  const [ description, setDescription ] = useState( donationAccount.accountDescription )
-  const [ cause, setCause ] = useState( donationAccount.accountName )
+  const [ description, setDescription ] = useState( donationAccount.donationDescription )
+  const [ cause, setCause ] = useState( donationAccount.donationName )
 
   const [ isDonationPause, setIsDonationPause ] = useState(
     donationAccount.disableAccount ? donationAccount.disableAccount : false,
@@ -102,13 +102,13 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.accountDescription ) ||
-      ( cause && cause !== donationAccount.accountName )
+      ( description && description !== donationAccount.donationDescription ) ||
+      ( cause && cause !== donationAccount.donationName )
     ) {
       const accountDetails = {
         donee: doneeName ? doneeName : donationAccount.donee,
-        subject: cause ? cause : donationAccount.accountName,
-        description: description ? description : donationAccount.accountDescription,
+        subject: cause ? cause : donationAccount.donationName,
+        description: description ? description : donationAccount.donationDescription,
       }
       preferences = preferences
         ? {
@@ -131,8 +131,8 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
   useEffect( () => {
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.accountDescription ) ||
-      ( cause && cause !== donationAccount.accountName ) ||
+      ( description && description !== donationAccount.donationDescription ) ||
+      ( cause && cause !== donationAccount.donationName ) ||
       isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
       isIncomingTxnEnabled !== donationAccount.configuration.displayIncomingTxs ||
       isOutgoingTxnEnabled !== donationAccount.configuration.displayOutgoingTxs ||
