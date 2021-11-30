@@ -902,6 +902,8 @@ export interface MultiSigAccount extends Account {
 
 export interface DonationAccount extends Account {
   donee: string;
+  donationName: string;
+  donationDescription: string;
   configuration: {
     displayBalance: boolean;
     displayIncomingTxs: boolean;
@@ -915,7 +917,7 @@ export interface DonationAccount extends Account {
   }
   xprivs?: {                            // additional xpirvs for multi-sig
     secondary?: string,
-  }
+  },
 }
 
 export enum AccountType {
