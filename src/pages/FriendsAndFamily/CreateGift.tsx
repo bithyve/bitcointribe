@@ -41,7 +41,7 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import AccountShell from '../../common/data/models/AccountShell'
-import ToggleContainer from '../../pages/Home/ToggleContainer'
+import ToggleContainer from './CurrencyToggle'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../../components/MaterialCurrencyCodeIcon'
@@ -66,7 +66,7 @@ import LoaderModal from '../../components/LoaderModal'
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells()
-  const currencyKind: CurrencyKind = useCurrencyKind()
+  const currencyKind: CurrencyKind = useSelector( state => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN )
   const strings  = translations[ 'accounts' ]
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
@@ -579,7 +579,7 @@ const CreateGift = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-          {/* <ToggleContainer /> */}
+          <ToggleContainer />
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center',
