@@ -69,8 +69,12 @@ import Toast from '../../components/Toast'
 import Loader from '../../components/loader'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import Relay from '../../bitcoin/utilities/Relay'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { translations } from '../../common/content/LocContext'
 
 const TrustedContactHistoryKeeper = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+  const common  = translations[ 'common' ]
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
@@ -132,6 +136,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const index = props.navigation.getParam( 'index' )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const dispatch = useDispatch()
+  const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
 
   useEffect( () => {
     setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
@@ -198,7 +203,30 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setErrorModal( true )
       }
     }
-  }, [] )
+    approvalCheck()
+  }, [ ] )
+
+  const approvalCheck = async() => {
+    console.log( 'selectedKeeper',  props.navigation.getParam( 'selectedKeeper' ) )
+    if( props.navigation.getParam( 'selectedKeeper' ).channelKey ){
+      const instream = useStreamFromContact( trustedContacts[ props.navigation.getParam( 'selectedKeeper' ).channelKey ], wallet.walletId, true )
+      console.log( 'approvalCheck instream', instream )
+      const flag = await TrustedContactsOperations.checkSecondaryUpdated(
+        {
+          walletId: wallet.walletId,
+          options:{
+            retrieveSecondaryData: true
+          },
+          channelKey: props.navigation.getParam( 'selectedKeeper' ).channelKey,
+          StreamId: instream.streamId
+        }
+      )
+      console.log( 'approvalCheck flag', flag )
+      if( !flag ){
+        setApprovalErrorModal( true )
+      }
+    }
+  }
 
   const getContacts = useCallback(
     ( selectedContacts ) => {
@@ -855,6 +883,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}
+        />
+      </ModalContainer>
+      <ModalContainer visible={approvalErrorModal} closeBottomSheet={()=>{setApprovalErrorModal( false )}} >
+        <ErrorModalContents
+          title={'Need Approval'}
+          note={'Scan the Approval Key stored on Personal Device 1 in: Security and Privacy> I am the Keeper of > Contact'}
+          proceedButtonText={strings.ok}
+          onPressProceed={() => setApprovalErrorModal( false )}
+          isBottomImage={false}
         />
       </ModalContainer>
       {showLoader ? <Loader /> : null}

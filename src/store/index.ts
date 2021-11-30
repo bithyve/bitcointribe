@@ -144,6 +144,7 @@ import {
   updateSecondaryShardWatcher,
   getApprovalFromKeeperWatcher,
   rejectedExistingContactRequestWatcher,
+  changeQuestionAnswerWatcher,
 } from './sagas/BHR'
 
 import {
@@ -271,6 +272,7 @@ const rootSaga = function* () {
     updateSecondaryShardWatcher,
     getApprovalFromKeeperWatcher,
     rejectedExistingContactRequestWatcher,
+    changeQuestionAnswerWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

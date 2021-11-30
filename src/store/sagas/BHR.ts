@@ -67,7 +67,8 @@ import {
   setOpenToApproval,
   getApprovalFromKeepers,
   REJECTED_EC_REQUEST,
-  setSecondaryDataInfoStatus
+  setSecondaryDataInfoStatus,
+  CHANGE_QUESTION_ANSWER
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -132,6 +133,7 @@ import { setVersionHistory } from '../actions/versionHistory'
 import Toast from '../../components/Toast'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import { updateCloudData } from '../actions/cloud'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -1286,6 +1288,7 @@ function* autoShareLevel2KeepersWorker( ) {
             channelKey: contactInfo.channelKey,
             streamId: streamUpdates.streamId,
             contactDetails: Contacts[ channelKey ].contactDetails,
+            contact: Contacts[ channelKey ],
             unEncryptedOutstreamUpdates: streamUpdates,
           } ]
         )
@@ -1932,7 +1935,8 @@ function* updateKeeperInfoToChannelWorker( ) {
       channelKey: string,
       streamId: string,
       unEncryptedOutstreamUpdates?: UnecryptedStreamData,
-      contactDetails?: ContactDetails
+      contactDetails?: ContactDetails,
+      contact?: TrustedContact
     }[] = []
     if( levelHealth[ 0 ] ) {
       for ( let i = 2; i < levelHealth[ 0 ].levelInfo.length; i++ ) {
@@ -1969,6 +1973,7 @@ function* updateKeeperInfoToChannelWorker( ) {
           streamId: streamUpdates.streamId,
           unEncryptedOutstreamUpdates: streamUpdates,
           contactDetails: contacts[ channelKey ].contactDetails,
+          contact: contacts[ channelKey ]
         } )
       }
     }
@@ -2588,6 +2593,7 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
         streamId: streamUpdates.streamId,
         contactDetails: contacts[ channelKey ].contactDetails,
         unEncryptedOutstreamUpdates: streamUpdates,
+        contact: contacts[ channelKey ]
       } ]
     )
 
@@ -2621,4 +2627,106 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
 export const rejectedExistingContactRequestWatcher = createWatcher(
   rejectedExistingContactRequestWorker,
   REJECTED_EC_REQUEST,
+)
+
+function* changeQuestionAnswerWorker( { payload } ) {
+  yield put( switchS3LoaderKeeper( 'changeAnswerStatus' ) )
+  try {
+    const { questionId, question, answer } = payload
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const contacts: Trusted_Contacts = yield select(
+      ( state ) => state.trustedContacts.contacts
+    )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const s3 = yield call( dbManager.getBHR )
+    const oldMetaSharesKeeper: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
+    const encryptedSecretsKeeper: string[] = [ ...s3.encryptedSecretsKeeper ]
+
+    const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+    const updatedWallet: Wallet = {
+      ...wallet,
+      security: {
+        questionId, question, answer
+      },
+    }
+    yield put( updateWallet( updatedWallet ) )
+    yield call( dbManager.updateWallet, {
+      security: {
+        questionId, question, answer
+      }
+    } )
+    yield put( updateCloudData() )
+    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer )
+    yield call( dbManager.updateBHR, {
+      encryptedSecretsKeeper,
+      metaSharesKeeper: updatedMetaShares,
+      encryptedSMSecretsKeeper: [],
+      oldMetaSharesKeeper: updatedOldMetaShares
+    } )
+    if( contacts ){
+      const channelUpdates = []
+      for( const ck of Object.keys( contacts ) ){
+        const channelKey = ck
+        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER ){
+          const res = yield call( TrustedContactsOperations.retrieveFromStream, {
+            walletId: wallet.walletId, channelKey: ck, options: {
+              retrieveBackupData: true,
+            }
+          } )
+          if( res.backupData && res.backupData.primaryMnemonicShard ){
+            const metaShareData: MetaShare = res.backupData.primaryMnemonicShard
+
+            const primaryData: PrimaryStreamData = {
+              contactDetails: contacts[ channelKey ].contactDetails,
+              walletID: wallet.walletId,
+              walletName: wallet.walletName,
+            }
+            const backupData: BackupStreamData = {
+              primaryMnemonicShard: updatedMetaShares.find( value=>value.shareId==metaShareData.shareId ),
+              keeperInfo
+            }
+            const streamUpdates: UnecryptedStreamData = {
+              streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+              primaryData,
+              backupData,
+              metaData: {
+                flags:{
+                  active: true,
+                  newData: true,
+                  lastSeen: Date.now(),
+                },
+                version: DeviceInfo.getVersion()
+              }
+            }
+            // initiate permanent channel
+            channelUpdates.push( {
+              channelKey,
+              streamId: streamUpdates.streamId,
+              contactDetails: contacts[ channelKey ].contactDetails,
+              contact: contacts[ channelKey ],
+              unEncryptedOutstreamUpdates: streamUpdates,
+            } )
+          }
+        }
+      }
+
+
+      const { updated, updatedContacts }: {
+      updated: boolean;
+      updatedContacts: Trusted_Contacts
+      } = yield call(
+        TrustedContactsOperations.syncPermanentChannels,
+        channelUpdates
+      )
+    }
+    yield put( switchS3LoaderKeeper( 'changeAnswerStatus' ) )
+  } catch ( error ) {
+    console.log( 'CHANGE_QUESTION_ANSWER Error', error )
+    yield put( switchS3LoaderKeeper( 'changeAnswerStatus' ) )
+  }
+}
+
+export const changeQuestionAnswerWatcher = createWatcher(
+  changeQuestionAnswerWorker,
+  CHANGE_QUESTION_ANSWER,
 )

@@ -142,7 +142,8 @@ export enum BottomSheetKind {
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
-  GIFT_REQUEST
+  GIFT_REQUEST,
+  APPROVAL_MODAL
 }
 
 interface HomeStateTypes {
@@ -869,11 +870,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     if( prevProps.openApproval != this.props.openApproval ){
       if( this.props.openApproval ){
-        this.props.navigation.navigate( 'ContactDetails', {
-          contact: this.props.approvalContactData,
-          contactsType: 'I am the Keeper of',
-          isFromApproval: true
-        } )
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.APPROVAL_MODAL,
+          1
+        )
       }
     }
 
@@ -1568,6 +1568,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isContactAssociated={giftRequest.isAssociated}
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
+            />
+          )
+
+        case BottomSheetKind.APPROVAL_MODAL:
+          return (
+            <ErrorModalContents
+              title={'Approve Request'}
+              info={'You have been successfully added as a Keeper. Now Please Approve keeper by scanning QR from Primary Keeper'}
+              onPressProceed={()=>{
+                if( this.props.approvalContactData ){
+                  this.closeBottomSheet()
+                  this.props.navigation.navigate( 'ContactDetails', {
+                    contact: this.props.approvalContactData,
+                    contactsType: 'I am the Keeper of',
+                    isFromApproval: true
+                  } )
+                }
+              }}
+              proceedButtonText={'Proceed'}
+              isIgnoreButton={false}
+              isBottomImage={false}
             />
           )
 

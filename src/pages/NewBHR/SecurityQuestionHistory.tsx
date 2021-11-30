@@ -244,14 +244,18 @@ const SecurityQuestionHistory = ( props ) => {
           confirmButtonText={strings.ConfirmPassword}
           reshareButtonText={strings.ConfirmPassword}
           // changeButtonText={'Change Question'}
-          disableChange={true}
+          disableChange={false}
           onPressReshare={() => {
             // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
             showQuestionModal( true )
           }}
           onPressChange={() => {
-            props.navigation.navigate( 'NewOwnQuestions' )
+            props.navigation.navigate( 'SetNewPassword', {
+              isChange: true
+            } )
           }}
+          changeButtonText={'Change'}
+          isChangeKeeperAllow={true}
         />
       </View>
       <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >

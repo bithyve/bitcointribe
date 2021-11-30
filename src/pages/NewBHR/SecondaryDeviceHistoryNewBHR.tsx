@@ -44,6 +44,8 @@ import dbManager from '../../storage/realm/dbManager'
 import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import { translations } from '../../common/content/LocContext'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -99,7 +101,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   const index = props.navigation.getParam( 'index' )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
-
+  const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
   const next = props.navigation.getParam( 'next' )
 
   useEffect( () => {
@@ -115,6 +117,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     setOldChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   }, [ props.navigation.state.params ] )
 
+  //DidMount
   useEffect( ()=>{
     const firstName = 'Personal'
     let lastName = 'Device'
@@ -127,7 +130,30 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       name: `${firstName} ${lastName ? lastName : ''}`
     }
     setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+    approvalCheck()
   }, [ ] )
+
+  const approvalCheck = async() => {
+    console.log( 'selectedKeeper',  props.navigation.getParam( 'selectedKeeper' ) )
+    if( props.navigation.getParam( 'selectedKeeper' ).channelKey ){
+      const instream = useStreamFromContact( trustedContacts[ props.navigation.getParam( 'selectedKeeper' ).channelKey ], wallet.walletId, true )
+      console.log( 'approvalCheck instream', instream )
+      const flag = await TrustedContactsOperations.checkSecondaryUpdated(
+        {
+          walletId: wallet.walletId,
+          options:{
+            retrieveSecondaryData: true
+          },
+          channelKey: props.navigation.getParam( 'selectedKeeper' ).channelKey,
+          StreamId: instream.streamId
+        }
+      )
+      console.log( 'approvalCheck flag', flag )
+      if( !flag ){
+        setApprovalErrorModal( true )
+      }
+    }
+  }
 
   const saveInTransitHistory = async () => {
     const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
@@ -562,7 +588,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ) && ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).status != 'notSetup' && ( ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 && isPrimaryKeeper ) || ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 && !isPrimaryKeeper ) ) ? true : false}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => {
             if( isPrimaryKeeper ){
@@ -646,6 +672,16 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           onPressBack={() => setKeeperTypeModal( false )}
         />
       </ModalContainer>
+      <ModalContainer visible={approvalErrorModal} closeBottomSheet={()=>{setApprovalErrorModal( false )}} >
+        <ErrorModalContents
+          title={'Need Approval'}
+          note={'Scan the Approval Key stored on Personal Device 1 in: Security and Privacy> I am the Keeper of > Contact'}
+          proceedButtonText={strings.ok}
+          onPressProceed={() => setApprovalErrorModal( false )}
+          isBottomImage={false}
+        />
+      </ModalContainer>
+
     </View>
   )
 }
