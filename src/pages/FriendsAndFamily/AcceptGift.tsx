@@ -552,7 +552,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             titleText={'Gift Card'}
             titleTextColor={Colors.black}
             subText={walletName}
-            extraText={'This is to get you started!\nWelcome to Bitcoin'}
+            extraText={note? note: ''}
             amt={giftAmount}
             image={<GiftCard height={60} width={60} />}
             theme={getTheme()}
