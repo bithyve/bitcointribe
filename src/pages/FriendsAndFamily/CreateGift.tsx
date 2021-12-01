@@ -1034,8 +1034,8 @@ const CreateGift = ( { navigation } ) => {
       </ModalContainer>
       <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
         <LoaderModal
-          headerText={'Creating Gift-Sats'}
-          messageText={'Please wait while your gift is being wrapped. Once created, you can choose to send it or keep it in your Available Gifts section for sending later.'}
+          headerText={'Packing Your Gift'}
+          messageText={'• You can reclaim sent gift sats\n• Gift sats that you receive can be added to an account or gifted further without any extra fees'}
           messageText2={''}
           showGif={false}
         />
