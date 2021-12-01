@@ -147,10 +147,9 @@ const CreateGift = ( { navigation } ) => {
     const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
     const lowestGiftValue = includeFees? averageLowTxFee + 1000: 1000
 
-    const isDisabled = currentSatsAmountFormValue < 10 || availableToSpend <= 0
-    || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend
+    const isDisabled =  currentSatsAmountFormValue < lowestGiftValue || availableToSpend <= 0 ||  ( currentSatsAmountFormValue * Number( numbersOfGift ) ) > availableToSpend
     //|| ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) )
-    )
+
     return(
       <TouchableOpacity
         disabled={isDisabled}

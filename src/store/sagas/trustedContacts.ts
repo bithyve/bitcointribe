@@ -210,7 +210,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
   }
 
   if( exclusiveGiftCodes && exclusiveGiftCodes[ giftMetaData.exclusiveGiftCode ] ){
-    Toast( 'Exclusive gifts can only be accepted once' )
+    Toast( 'This gift is part of an exclusive giveaway. Cannot be claimed more than once' )
     return
   }
 
