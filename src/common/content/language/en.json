@@ -570,6 +570,8 @@
       "HealthCheckConfirmPassword": "Health Check Confirm Password",
       "Specifythepassword": "Specify the password as you did at the time of setting up the wallet",
       "Hint": "Hint",
+      "Backupwithcloud": "Backup with cloud",
+      "BackupwithcloudSub": "Backup the Recovery Key on cloud",
       "Backupwithcontact": "Backup with contact",
       "BackupwithcontactSub": "Backup the Recovery Key with a friend or family member",
       "Backuponadevice": "Backup on a device",

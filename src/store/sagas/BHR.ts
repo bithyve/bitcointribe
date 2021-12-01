@@ -1441,14 +1441,13 @@ function* createChannelAssetsWorker( { payload } ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
       const secondaryShareDownloadedVar = yield select( ( state ) => state.bhr.secondaryShareDownloaded )
-      const wallet: Wallet = yield select(
-        ( state ) => state.storage.wallet
-      )
+      const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+      const share = MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ) : OldMetaShares.length && OldMetaShares.find( value=>value.shareId==shareId ) ? OldMetaShares.find( value=>value.shareId==shareId ) : null
       const primaryMnemonicShardTemp = {
-        shareId: MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ).shareId : OldMetaShares.length ? OldMetaShares.find( value=>value.shareId==shareId ).shareId : '',
-        meta: MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ).meta : OldMetaShares.length ? OldMetaShares.find( value=>value.shareId==shareId ).meta : {
+        shareId: share ? share.shareId : '',
+        meta: share ? share.meta : {
         },
-        encryptedShare: MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ).encryptedShare : OldMetaShares.length ? OldMetaShares.find( value=>value.shareId==shareId ).encryptedShare : ''
+        encryptedShare: share ? share.encryptedShare : ''
       }
       const channelAssets: ChannelAssets = {
         primaryMnemonicShard: primaryMnemonicShardTemp,

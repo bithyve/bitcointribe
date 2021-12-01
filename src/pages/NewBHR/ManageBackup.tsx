@@ -300,7 +300,7 @@ export default function ManageBackup( props ) {
   }, [ status ] )
 
   useEffect( ()=>{
-    if( navigationObj.selectedKeeper && onKeeperButtonClick ){
+    if( navigationObj.selectedKeeper && onKeeperButtonClick ) {
       setSelectedKeeper( navigationObj.selectedKeeper )
       setSelectedLevelId( navigationObj.id )
       if( navigationObj.selectedKeeper.shareType && navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
@@ -459,32 +459,8 @@ export default function ManageBackup( props ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return
     }
-    if( value.id == 1 && keeperNumber == 2 ) {
-      if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-        props.navigation.navigate(
-          'CloudBackupHistory',
-          {
-            selectedTime: value.keeper2.updatedAt
-              ? getTime( value.keeper2.updatedAt )
-              : 'Never',
-          }
-        )
-      }
-    } else if( value.id == 1 && keeperNumber == 1 ) {
-      props.navigation.navigate(
-        'SecurityQuestionHistoryNewBHR',
-        {
-          selectedTime: value.keeper1.updatedAt
-            ? getTime( value.keeper1.updatedAt )
-            : 'Never',
-        }
-      )
-    } else {
-      // setShowLoader( true )
-      setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
-      onPressKeeperButton( value, keeperNumber )
-    }
-    // } )
+    setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
+    onPressKeeperButton( value, keeperNumber )
   }
 
   let onPressKeeperButton = ( value, number ) => {
@@ -549,6 +525,27 @@ export default function ManageBackup( props ) {
         'PersonalCopyHistoryNewBHR', {
           ...navigationParams,
           isChangeKeeperAllow
+        }
+      )
+    } else if( selectedKeeper.shareType == 'securityQuestion' ){
+      props.navigation.navigate(
+        'SecurityQuestionHistoryNewBHR',
+        {
+          selectedTime: selectedKeeper.updatedAt
+            ? getTime( selectedKeeper.updatedAt )
+            : 'Never',
+        }
+      )
+    }
+    else if( selectedKeeper.shareType == 'cloud' ){
+      props.navigation.navigate(
+        'CloudBackupHistory',
+        {
+          selectedTime: selectedKeeper.updatedAt
+            ? getTime( selectedKeeper.updatedAt )
+            : 'Never',
+          SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
+          selectedKeeper
         }
       )
     }
