@@ -105,14 +105,18 @@ const CreateGift = ( { navigation } ) => {
   }, [ amount ] )
 
   useEffect( () => {
-    let minimumGiftVal = minimumGiftValue
+    let minimumGiftVal = 1000
     if( includeFees ) minimumGiftVal += averageLowTxFee
     setMinimumGiftValue( minimumGiftVal )
   }, [ includeFees ] )
 
+  useEffect( () => {
+    if( numbersOfGift ) setFees( false )
+  }, [ numbersOfGift ] )
+
   function convertFiatToSats( fiatAmount: number ) {
     return accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
-      ? (
+      ? Math.trunc(
         ( fiatAmount / accountsState.exchangeRates[ currencyCode ].last ) * SATOSHIS_IN_BTC
       )
       : 0
@@ -121,14 +125,22 @@ const CreateGift = ( { navigation } ) => {
   function convertSatsToFiat( sats ) {
     return accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
       ? ( ( sats / SATOSHIS_IN_BTC ) * accountsState.exchangeRates[ currencyCode ].last ).toFixed( 2 )
-      : 0
+      : '0'
   }
 
   const isAmountInvalid = useMemo( () => {
     let giftAmount = currentSatsAmountFormValue
-    if( averageLowTxFee ) giftAmount += averageLowTxFee
-    return giftAmount > spendableBalance
-  }, [ currentSatsAmountFormValue, averageLowTxFee, spendableBalance, includeFees ] )
+    const numberOfGifts = numbersOfGift? Number( numbersOfGift ): 1
+    if( prefersBitcoin ){
+      if( averageLowTxFee ) giftAmount += averageLowTxFee
+      return giftAmount * numberOfGifts > spendableBalance
+    } else {
+      const giftAmountInFiat = giftAmount
+      const spendableBalanceInFiat = parseFloat( convertSatsToFiat( spendableBalance ) )
+      return giftAmountInFiat * numberOfGifts > spendableBalanceInFiat
+    }
+
+  }, [ currentSatsAmountFormValue, averageLowTxFee, spendableBalance, includeFees, prefersBitcoin, numbersOfGift ] )
 
   useEffect( () => {
     if( accountsState.selectedGiftId && initGiftCreation && giftCreationStatus ) {
@@ -165,10 +177,15 @@ const CreateGift = ( { navigation } ) => {
 
   const renderButton = ( text, condn ) => {
     const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
-    const lowestGiftValue = includeFees? averageLowTxFee + 1000: 1000
 
-    const isDisabled =  currentSatsAmountFormValue < lowestGiftValue || availableToSpend <= 0 ||  ( currentSatsAmountFormValue * Number( numbersOfGift ) ) > availableToSpend
-    //|| ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) )
+    let isDisabled = isAmountInvalid
+    if( !isDisabled ){
+      if( prefersBitcoin ){
+        isDisabled = currentSatsAmountFormValue < minimumGiftValue
+      } else {
+        isDisabled = currentSatsAmountFormValue < parseFloat( convertSatsToFiat( minimumGiftValue ) )
+      }
+    }
 
     return(
       <TouchableOpacity
@@ -178,17 +195,18 @@ const CreateGift = ( { navigation } ) => {
               case 'Create Gift':
                 // creating multiple gift instances(based on giftInstances) of the same amount
                 const giftInstances = Number( numbersOfGift === '' ? 1 : Number( numbersOfGift ) )
-                const giftAmount = Number( amount )
-                const giftAmounts = []
+                const giftAmountInSats = prefersBitcoin? Number( amount ): convertFiatToSats( parseFloat( amount ) )
+
+                const giftAmountsInSats = []
                 for( let int = 0; int < giftInstances; int++ ){
-                  giftAmounts.push( giftAmount )
+                  giftAmountsInSats.push( giftAmountInSats )
                 }
 
-                if( giftAmounts.length ){
+                if( giftAmountsInSats.length ){
                   setInitGiftCreation( true )
                   setShowLoader( true )
                   dispatch( generateGifts( {
-                    amounts: giftAmounts,
+                    amounts: giftAmountsInSats,
                     accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
                     includeFee: includeFees,
                     exclusiveGifts: isExclusive,
@@ -287,9 +305,10 @@ const CreateGift = ( { navigation } ) => {
           <DashedContainer
             titleText={'Available Gift'}
             subText={'Someone\'s about to feel extra special'}
-            amt={numberWithCommas( createdGift.amount )}
+            amt={prefersBitcoin? numberWithCommas( createdGift.amount ): convertSatsToFiat( createdGift.amount )}
             date={new Date()}
             image={<GiftCard />}
+            currencyCode={prefersBitcoin? '': currencyCode}
           />
 
 
@@ -862,6 +881,7 @@ const CreateGift = ( { navigation } ) => {
         }}>
           <TouchableOpacity
             onPress={() => setFees( !includeFees )}
+            disabled={numbersOfGift? Number( numbersOfGift )> 1: false}
             style={{
               flexDirection: 'row'
             }}
