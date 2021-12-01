@@ -42,6 +42,7 @@ const Colors = {
   bgColor: '#F8F8F8',
   shadowColor: '#8686860D',
   darkGray: '#00000065',
+  whiteGray:'#e5e5e5',
   // Grayscale
   gray1: '#d0d0d0',
   gray2: '#A3A3A3',

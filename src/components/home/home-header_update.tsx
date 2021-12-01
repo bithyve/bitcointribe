@@ -265,7 +265,7 @@ const HomeHeader = ( {
           style={{
             height: wp( '9%' ),
             width: wp( '10%' ),
-            justifyContent: 'center',
+            // justifyContent: 'center',
             marginLeft: 'auto',
           }}
         >
@@ -294,9 +294,9 @@ const HomeHeader = ( {
           style={{
             height: wp( '9%' ),
             width: wp( '10%' ),
-            justifyContent: 'center',
+            // justifyContent: 'center',
             marginLeft: 'auto',
-            // marginTop: hp( 1 )
+            marginTop: hp( 0.6 )
           }}
         >
           <ImageBackground

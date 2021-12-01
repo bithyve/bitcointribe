@@ -22,7 +22,7 @@ const miniNavButtonText = {
 const actionButton = {
   borderRadius: 10,
   minHeight: 50,
-  minWidth: 144,
+  minWidth: 130,
   justifyContent: 'center',
   alignItems: 'center',
   paddingHorizontal: 20,
