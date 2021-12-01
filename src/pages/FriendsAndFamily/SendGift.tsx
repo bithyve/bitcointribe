@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useState, useEffect, useMemo, useContext } from 'react'
 import {
   View,
   StyleSheet,
@@ -29,6 +29,9 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import dbManager from '../../storage/realm/dbManager'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -51,9 +54,32 @@ export default function SendGift( props ) {
   const [ encryptionKey, setEncryptionKey ]: [string, any] = useState( '' )
   const account: Account = giftToSend && giftToSend.sender.accountId ? accountsState.accounts[ giftToSend.sender.accountId ] : null
   const dispatch = useDispatch()
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
+  const currencyCode = useCurrencyCode()
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
+    }
   }
 
   const sendGift  = async () => {
@@ -144,7 +170,7 @@ export default function SendGift( props ) {
         onPressDone={() => {
           // openTimer()
         }}
-        amt={numberWithCommas( giftToSend.amount )}
+        amt={giftToSend.amount}
         giftNote={giftToSend.note}
         onPressShare={() => {}}
         accountName={account?.accountName}
