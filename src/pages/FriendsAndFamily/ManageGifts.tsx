@@ -67,14 +67,15 @@ const ManageGifts = ( { navigation } ) => {
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
-  const currencyKind = useCurrencyKind()
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
   const currencyCode = useCurrencyCode()
 
   const dispatch = useDispatch()
 
   const prefersBitcoin = useMemo( () => {
-    //return currencyKind === CurrencyKind.BITCOIN
-    return true
+    return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
 
   useEffect( () => {
@@ -394,8 +395,8 @@ const ManageGifts = ( { navigation } ) => {
                 {active === GiftStatus.CREATED ?
                   <ManageGiftsList
                     titleText={'Available Gift'}
-                    // subText={'Lorem ipsum dolor sit amet'}
-                    amt={numberWithCommas( item.amount )}
+                    currency={prefersBitcoin ? ' sats' : currencyCode}
+                    amt={getAmt( item.amount )}
                     date={item.timestamps?.created}
                     image={<GiftCard />}
                     onPress={() => processGift( item, title, walletName )}
