@@ -62,7 +62,7 @@ export default function Login( props ) {
     // added static message for 2.0.5 #4833
     return {
       heading: 'Gift Sats',
-      text: 'Send sats as gifts to your friends and family. Gift sats that you receive can be added to your account or gifted further without any extra fees.',
+      text: 'Send sats as gifts to your friends and family.',
       subText: ''
     }
   }
