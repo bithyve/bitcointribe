@@ -98,11 +98,31 @@ const CreateGift = ( { navigation } ) => {
   const account: Account = accountState.accounts[ selectedAccount.primarySubAccount.id ]
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ isExclusive, setIsExclusive ] = useState( true )
+  const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
   }, [ amount ] )
 
+  useEffect( () => {
+    let minimumGiftVal = minimumGiftValue
+    if( includeFees ) minimumGiftVal += averageLowTxFee
+    setMinimumGiftValue( minimumGiftVal )
+  }, [ includeFees ] )
+
+  function convertFiatToSats( fiatAmount: number ) {
+    return accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
+      ? (
+        ( fiatAmount / accountsState.exchangeRates[ currencyCode ].last ) * SATOSHIS_IN_BTC
+      )
+      : 0
+  }
+
+  function convertSatsToFiat( sats ) {
+    return accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
+      ? ( ( sats / SATOSHIS_IN_BTC ) * accountsState.exchangeRates[ currencyCode ].last ).toFixed( 2 )
+      : 0
+  }
 
   const isAmountInvalid = useMemo( () => {
     let giftAmount = currentSatsAmountFormValue
@@ -879,7 +899,7 @@ const CreateGift = ( { navigation } ) => {
             fontSize: RFValue( 13 ),
             fontFamily: Fonts.FiraSansRegular,
             marginHorizontal: wp( 3 )
-          }}>{`Note: ${includeFees ? `Minimum gift value:  ${averageLowTxFee+ 1000} sats`: 'Minimum gift value: 1000 sats'}`}</Text>
+          }}>{`Note: Minimum gift value: ${prefersBitcoin? minimumGiftValue: convertSatsToFiat( minimumGiftValue )} ${prefersBitcoin? 'sats': currencyCode}`}</Text>
         </View>
         {showKeyboard &&
         <View style={{
