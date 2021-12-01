@@ -165,7 +165,10 @@ export const associateGiftWatcher = createWatcher(
 )
 
 function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
-  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+  const storedGifts: {[id: string]: Gift} = accountsState.gifts
+  const exclusiveGiftCodes: {[exclusiveGiftCode: string]: boolean} = accountsState.exclusiveGiftCodes
+
   const { channelAddress } = payload
   const wallet: Wallet = yield select( state => state.storage.wallet )
   for( const giftId in storedGifts ){
@@ -203,6 +206,11 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     }
   } catch( err ){
     Toast( 'Gift expired/unavailable' )
+    return
+  }
+
+  if( exclusiveGiftCodes && exclusiveGiftCodes[ giftMetaData.exclusiveGiftCode ] ){
+    Toast( 'This gift is part of an exclusive giveaway. Cannot be claimed more than once' )
     return
   }
 

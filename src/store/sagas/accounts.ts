@@ -156,6 +156,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
 
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
+      exclusiveGiftCode: giftToSend.exclusiveGiftCode,
       notificationInfo: {
         walletId: giftToSend.sender.walletId,
         FCM: fcmToken,
@@ -1196,7 +1197,7 @@ export const restoreAccountShellsWatcher = createWatcher(
   RESTORE_ACCOUNT_SHELLS,
 )
 
-export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean }} ) {
+export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean, exclusiveGifts?: boolean }} ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -1220,7 +1221,7 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
   }
 
   try{
-    const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
+    const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee, payload.exclusiveGifts )
     if( txid ) {
       const giftIds = []
       for( const giftId in gifts ){
