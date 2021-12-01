@@ -1011,14 +1011,16 @@ export interface Gift {
     contactId?: string // permanentAddress of the contact
   },
   note?: string,
+  exclusiveGiftCode?: string,
   deepLinkConfig?: {
     encryptionType: string,
     encryptionKey: string,
-  }
+  },
 }
 
 export interface GiftMetaData {
   status: GiftStatus,
+  exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,
     FCM: string,

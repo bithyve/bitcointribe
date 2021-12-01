@@ -39,6 +39,7 @@ export default function SendViaLinkAndQR( props ) {
   const amt = props.navigation.getParam( 'amt' )
   const senderName = props.navigation.getParam( 'senderName' )
   const themeId = props.navigation.getParam( 'themeId' )
+  const giftNote = props.navigation.getParam( 'giftNote' )
 
   const viewRef = useRef( null )
 
@@ -166,7 +167,7 @@ export default function SendViaLinkAndQR( props ) {
           titleText={'Gift Card'}
           titleTextColor={Colors.black}
           subText={senderName}
-          extraText={'This is to get you started!\nWelcome to Bitcoin'}
+          extraText={giftNote? giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
           amt={numberWithCommas( amt )}
           onPress={onPress}
           image={<GiftCard height={60} width={60} />}
