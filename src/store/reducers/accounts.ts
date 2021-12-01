@@ -68,7 +68,10 @@ export type AccountsState = {
   };
   gifts : {
     [id: string]: Gift
-  }
+  },
+  exclusiveGiftCodes: {
+    [exclusiveGiftCode: string]: boolean
+  },
   selectedGiftId: string,
   giftCreationStatus: boolean,
   acceptedGiftId: string,
@@ -116,6 +119,8 @@ const initialState: AccountsState = {
     twoFAResetted: null,
   },
   gifts: {
+  },
+  exclusiveGiftCodes: {
   },
   selectedGiftId: null,
   giftCreationStatus: null,
@@ -564,29 +569,40 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
 
       case UPDATE_GIFT:
         const gift: Gift = action.payload.gift
+        const exclusiveGiftCodes = state.exclusiveGiftCodes? {
+          ...state.exclusiveGiftCodes
+        }: {
+        }
+        if( gift.exclusiveGiftCode ) exclusiveGiftCodes[ gift.exclusiveGiftCode ] = true
+
         return {
           ...state,
           gifts: {
             ...state.gifts,
             [ gift.id ]: gift
           },
+          exclusiveGiftCodes,
           selectedGiftId: gift.id
         }
+
       case GIFT_ACCEPTED:
         return{
           ...state,
           acceptedGiftId: action.payload
         }
+
       case GIFT_ADDED:
         return{
           ...state,
           addedGift: action.payload
         }
+
       case SET_GIFTS:
         return {
           ...state,
           gifts: action.payload.gifts,
         }
+
       default:
         return state
   }

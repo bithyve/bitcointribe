@@ -43,6 +43,9 @@ import AccountSelection from './AccountSelection'
 import ModalContainer from '../../components/home/ModalContainer'
 import AddGiftToAccount from './AddGiftToAccount'
 import ThemeList from './Theme'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -61,6 +64,16 @@ const GiftDetails = ( { navigation } ) => {
   } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
+  const currencyCode = useCurrencyCode()
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   useEffect( ()=> {
     if( gift.status === GiftStatus.SENT ) setIsOpen( true )
@@ -83,6 +96,18 @@ const GiftDetails = ( { navigation } ) => {
     >
       <Text style={styles.buttonText}>{text}</Text>
     </TouchableOpacity>
+  }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
+    }
   }
 
   return (
@@ -249,7 +274,7 @@ const GiftDetails = ( { navigation } ) => {
                     marginHorizontal: wp( 2 ),
                   }}
                 >
-                  {numberWithCommas( gift.amount )}
+                  {getAmt( gift.amount )}
                   <Text
                     style={{
                       color: Colors.lightTextColor,
@@ -257,8 +282,7 @@ const GiftDetails = ( { navigation } ) => {
                       fontFamily: Fonts.FiraSansRegular,
                     }}
                   >
-                    {' '}
-                    sats
+                    {prefersBitcoin ? ' sats' : ` ${currencyCode}`}
                   </Text>
                 </Text>
                 {gift.status !== GiftStatus.CREATED ? (

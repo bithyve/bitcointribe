@@ -48,7 +48,7 @@ export type Props = {
   hint: string;
   note: string,
   themeId: string
-  giftId: string;
+  giftId: string; //NOTE: here gift id stands for channelAddress of the gift(we should use more consistent naming to avoid confusion)
   isGiftWithFnF: boolean;
   isContactAssociated: boolean;
 };
@@ -72,10 +72,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
   const [ addGiftToAccountFlow, setAddGiftToAccountFlow ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
-  const acceptedGifts = useSelector( ( state ) => state.accounts.acceptedGiftId )
+  const acceptedGiftId = useSelector( ( state ) => state.accounts.acceptedGiftId )
   const gifts = useSelector( ( state ) => state.accounts.gifts )
-
-  const addedGift = useSelector( ( state ) => state.accounts.addedGift )
+  const [ acceptedGift, setAcceptedGift ] = useState( null )
+  const addedGiftId = useSelector( ( state ) => state.accounts.addedGift )
   const activeAccounts = useActiveAccountShells()
   // console.log( 'activeAccounts >>>>>>', activeAccounts )
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
@@ -102,13 +102,20 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
 
   }, [ sourcePrimarySubAccount ] )
 
+  useEffect( ()=> {
+    Object.values( gifts ).forEach( ( gift: Gift ) => {
+      if( gift.channelAddress === acceptedGiftId )
+        setAcceptedGift( gift )
+    } )
+  }, [ acceptedGiftId ] )
+
   useEffect( () => {
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ inputType ] )
 
   useEffect( () => {
-    if ( giftId === acceptedGifts ) {
+    if ( giftId === acceptedGiftId ) {
       setAcceptGiftModal( false )
       const filterGift = Object.values( gifts ?? {
       } ).find( ( item ) =>  giftId === item.channelAddress )
@@ -117,15 +124,15 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setIsDisabled( false )
     }
 
-  }, [ acceptedGifts ] )
+  }, [ acceptedGiftId ] )
 
   useEffect( () => {
-    if ( giftId === addedGift ) {
+    if ( giftId === addedGiftId ) {
       setConfirmAccount( false )
       setGiftAddedModel( true )
       setIsDisabled( false )
     }
-  }, [ addedGift ] )
+  }, [ addedGiftId ] )
 
   const getStyle = ( i ) => {
     if ( i == 0 ) {
@@ -431,8 +438,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           titleText={'Gift Card'}
           titleTextColor={Colors.black}
           subText={walletName}
-          extraText={'This is to get you started!\nWelcome to Bitcoin'}
-          amt={numberWithCommas( giftAmount )}
+          extraText={acceptedGift?.note? acceptedGift.note: 'This is to get you started!\nWelcome to Bitcoin'}
+          amt={giftAmount}
           image={<GiftCard />}
           theme={getTheme()}
         />
@@ -552,7 +559,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             titleText={'Gift Card'}
             titleTextColor={Colors.black}
             subText={walletName}
-            extraText={'This is to get you started!\nWelcome to Bitcoin'}
+            extraText={note? note: ''}
             amt={giftAmount}
             image={<GiftCard height={60} width={60} />}
             theme={getTheme()}

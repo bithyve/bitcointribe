@@ -8,7 +8,7 @@ import { Input } from 'react-native-elements'
 import { useDispatch, useSelector } from 'react-redux'
 import { addNewAccountShells } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
-import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
+import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions'
 import {
   DonationSubAccountDescribing,
 } from '../../../../common/data/models/SubAccountInfo/Interfaces'
@@ -26,6 +26,7 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import { newAccountsInfo } from '../../../../store/sagas/accounts'
 import { AccountType, Wallet } from '../../../../bitcoin/utilities/Interface'
 import Toast from '../../../../components/Toast'
+import useAccountsState from '../../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 
 export type Props = {
   navigation: any;
@@ -41,6 +42,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   const wallet: Wallet = useSelector(
     ( state ) => state.storage.wallet
   )
+  const { accountShells } = useAccountsState()
   const [ accountName, setAccountName ] = useState( '' )
   const [ doneeName, setDoneeName ] = useState( currentSubAccount.doneeName )
   const [ accountDescription, setAccountDescription ] = useState( '' )
@@ -61,7 +63,12 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   }, [] )
 
   useAccountShellCreationCompletionEffect( () => {
-    navigation.dispatch( resetToHomeAction() )
+    const shellId = accountShells[ accountShells.length - 1 ].id
+    navigation.dispatch(
+      resetStackToAccountDetails( {
+        accountShellID: shellId
+      } )
+    )
   } )
 
   function handleProceedButtonPress() {

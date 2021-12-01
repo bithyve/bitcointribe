@@ -42,6 +42,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import ToggleContainer from './CurrencyToggle'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -66,14 +67,15 @@ const ManageGifts = ( { navigation } ) => {
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
-  const currencyKind = useCurrencyKind()
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
   const currencyCode = useCurrencyCode()
 
   const dispatch = useDispatch()
 
   const prefersBitcoin = useMemo( () => {
-    //return currencyKind === CurrencyKind.BITCOIN
-    return true
+    return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
 
   useEffect( () => {
@@ -229,7 +231,8 @@ const ManageGifts = ( { navigation } ) => {
       </ModalContainer>
         } */}
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between'
+          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between',
+          marginRight: 10,
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -245,11 +248,12 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-
+          <ToggleContainer />
         </View>
 
         <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+          marginRight: 10, marginTop: 10,
         }}>
           <HeaderTitle
             firstLineTitle={'Manage Gifts'}
@@ -273,9 +277,6 @@ const ManageGifts = ( { navigation } ) => {
         <ScrollView
           style={{
             paddingHorizontal: wp( 3 ), paddingTop: hp( 2 ),
-          }}
-          contentContainerStyle={{
-            justifyContent: 'space-evenly', width: '100%'
           }}
           horizontal>
           {
@@ -394,8 +395,8 @@ const ManageGifts = ( { navigation } ) => {
                 {active === GiftStatus.CREATED ?
                   <ManageGiftsList
                     titleText={'Available Gift'}
-                    // subText={'Lorem ipsum dolor sit amet'}
-                    amt={numberWithCommas( item.amount )}
+                    currency={prefersBitcoin ? ' sats' : currencyCode}
+                    amt={getAmt( item.amount )}
                     date={item.timestamps?.created}
                     image={<GiftCard />}
                     onPress={() => processGift( item, title, walletName )}
@@ -537,7 +538,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium
   },
   buttonNavigator: {
-    //width: wp( '20%' ),
+    width: wp( '20%' ),
     height: 64,
     marginRight: wp( 2 ),
     marginLeft: wp( 1 ),
@@ -545,7 +546,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     backgroundColor: Colors.borderColor,
     borderRadius: wp( 3 ),
-    flex: 1,
   },
   modalTitleText: {
     color: Colors.blue,
@@ -594,7 +594,6 @@ const styles = StyleSheet.create( {
     height: hp( 3.6 ),
     paddingHorizontal: wp( 2 ),
     marginTop: wp( 2.7 ),
-    marginRight: wp( 4 ),
     alignSelf: 'flex-start'
   },
   createView: {

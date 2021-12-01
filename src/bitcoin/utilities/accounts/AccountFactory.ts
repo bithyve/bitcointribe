@@ -188,6 +188,8 @@ export function generateDonationAccount(
     instanceNum,
     accountName,
     accountDescription,
+    donationName,
+    donationDescription,
     donee,
     primarySeed,
     derivationPath,
@@ -201,6 +203,8 @@ export function generateDonationAccount(
     instanceNum: number,
     accountName: string,
     accountDescription: string,
+    donationName: string,
+    donationDescription: string,
     donee: string,
     primarySeed: string,
     derivationPath: string,
@@ -241,6 +245,8 @@ export function generateDonationAccount(
 
   const donationAccount: DonationAccount = {
     ...baseAccount,
+    donationName,
+    donationDescription,
     donee,
     configuration: {
       displayBalance: true,
