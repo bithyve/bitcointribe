@@ -834,27 +834,50 @@ export default class BHROperations {
     }
   };
 
-  public static encryptMetaSharesWithNewAnswer = async ( metaShares, oldMetaShares, oldAnswer, newAnswer ) => {
+  public static encryptMetaSharesWithNewAnswer = async ( metaShares, oldMetaShares, oldAnswer, newAnswer, security ) => {
     try {
-      const updatedMetaShares: MetaShare[] = [ ...metaShares ]
-      const updatedOldMetaShares: MetaShare[] = [ ...oldMetaShares ]
-      for ( let i = 0; i < updatedMetaShares.length; i++ ) {
-        const element = updatedMetaShares[ i ]
+      const { questionId, question, answer } = security
+      const updatedMetaShares: MetaShare[] = [ ]
+      const updatedOldMetaShares: MetaShare[] = [ ]
+      for ( let i = 0; i < metaShares.length; i++ ) {
+        const element: MetaShare = metaShares[ i ]
         const decryptedData = BHROperations.decryptWithAnswer( element.encryptedShare.pmShare, oldAnswer )
         const encryptedData = BHROperations.encryptWithAnswer( decryptedData.decryptedData, newAnswer )
         updatedMetaShares[ i ] = {
-          ...updatedMetaShares[ i ],
+          shareId: element.shareId,
+          meta: {
+            ...element.meta,
+            questionId,
+            question,
+            index: i,
+            reshareVersion: element.meta.reshareVersion,
+            scheme: element.meta.scheme,
+            timestamp: element.meta.timestamp,
+            validator: element.meta.validator,
+            version: element.meta.version,
+          },
           encryptedShare: {
             pmShare: encryptedData.encryptedData
           }
         }
       }
-      for ( let i = 0; i < updatedOldMetaShares.length; i++ ) {
-        const element = updatedOldMetaShares[ i ]
+      for ( let i = 0; i < oldMetaShares.length; i++ ) {
+        const element = oldMetaShares[ i ]
         const decryptedData = BHROperations.decryptWithAnswer( element.encryptedShare.pmShare, oldAnswer )
         const encryptedData = BHROperations.encryptWithAnswer( decryptedData.decryptedData, newAnswer )
         updatedOldMetaShares[ i ] = {
-          ...updatedOldMetaShares[ i ],
+          shareId: element.shareId,
+          meta: {
+            ...element.meta,
+            questionId,
+            question,
+            index: i,
+            reshareVersion: element.meta.reshareVersion,
+            scheme: element.meta.scheme,
+            timestamp: element.meta.timestamp,
+            validator: element.meta.validator,
+            version: element.meta.version,
+          },
           encryptedShare: {
             pmShare: encryptedData.encryptedData
           }

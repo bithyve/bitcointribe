@@ -2656,7 +2656,7 @@ function* changeQuestionAnswerWorker( { payload } ) {
       }
     } )
     yield put( updateCloudData() )
-    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer )
+    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer, payload )
     yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper,
       metaSharesKeeper: updatedMetaShares,
