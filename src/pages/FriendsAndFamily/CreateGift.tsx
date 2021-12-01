@@ -171,7 +171,8 @@ const CreateGift = ( { navigation } ) => {
                   dispatch( generateGifts( {
                     amounts: giftAmounts,
                     accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
-                    includeFee: includeFees
+                    includeFee: includeFees,
+                    exclusiveGifts: isExclusive,
                   } ) )
                 }
                 break
