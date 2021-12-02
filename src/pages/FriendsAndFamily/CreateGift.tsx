@@ -78,7 +78,7 @@ const CreateGift = ( { navigation } ) => {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
-  const [ numbersOfGift, setNumbersOfGift ] = useState( '' )
+  const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
   const [ timeLock, setTimeLock ] = useState( 1 )
   const [ limitedValidity, setLimitedValidity ] = useState( 1 )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
@@ -194,7 +194,7 @@ const CreateGift = ( { navigation } ) => {
           switch( condn ){
               case 'Create Gift':
                 // creating multiple gift instances(based on giftInstances) of the same amount
-                const giftInstances = Number( numbersOfGift === '' ? 1 : Number( numbersOfGift ) )
+                const giftInstances = Number( numbersOfGift )
                 const giftAmountInSats = prefersBitcoin? Number( amount ): convertFiatToSats( parseFloat( amount ) )
 
                 const giftAmountsInSats = []
@@ -255,18 +255,6 @@ const CreateGift = ( { navigation } ) => {
     }
   }
 
-  function onPressGiftNumber( text ) {
-    let tmpPasscode = numbersOfGift
-    if ( text != 'x' ) {
-      tmpPasscode += text
-      if( Number( tmpPasscode ) <= 100 ) {
-        setNumbersOfGift( tmpPasscode )
-      }
-    }
-    if ( numbersOfGift && text == 'x' ) {
-      setNumbersOfGift( numbersOfGift.slice( 0, -1 ) )
-    }
-  }
 
   const renderCreateGiftModal =()=>{
     return(
@@ -413,40 +401,84 @@ const CreateGift = ( { navigation } ) => {
   }
 
   const AdvanceGiftOptions = ( { title, infoText, stateToUpdate, imageToShow } ) => {
+    const plus = () =>{
+      if( stateToUpdate == 'gift' ){
+        setNumbersOfGift( numbersOfGift + 1 )
+      } else if( stateToUpdate == 'timeLock' ){
+        setTimeLock( timeLock + 1 )
+      } else if( stateToUpdate == 'limitedValidity' ){
+        setLimitedValidity( limitedValidity + 1 )
+      }
+    }
+
+    const minus = () =>{
+      if( stateToUpdate == 'gift' ){
+        if( numbersOfGift > 1 )setNumbersOfGift( numbersOfGift - 1 )
+      } else if( stateToUpdate == 'timeLock' ){
+        if( timeLock > 1 ) setTimeLock( timeLock - 1 )
+      } else if( stateToUpdate == 'limitedValidity' ){
+        if( limitedValidity > 1 ) setLimitedValidity( limitedValidity - 1 )
+      }
+    }
 
     return (
       <View>
-        <Text style={{
-          color: Colors.gray3, fontSize: RFValue( 14 ), fontFamily: Fonts.FiraSansRegular,
-          marginVertical: 4,
-        }}>{infoText}</Text>
         <View style={{
-          height: wp( '12%' ), borderRadius: 10, backgroundColor: Colors.white, justifyContent: 'space-between',
-          shadowColor: Colors.borderColor, paddingHorizontal: 5, shadowOpacity: 0.6, shadowOffset: {
-            width: 7, height: 7,
-          }, shadowRadius: 5, elevation: 5, marginVertical: 10, flexDirection: 'row',
-          alignItems: 'center'
-        }}><Text style={{
-            color: Colors.gray3, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
-          }}>{stateToUpdate == 'gift'
-              ? numbersOfGift === '' ? 'Enter number of gifts' :  numbersOfGift:
-              stateToUpdate == 'timeLock' ?
-                timeLock :
-                limitedValidity
-            }</Text>
-          <Text style={{
-            fontSize: RFValue( 12 ),
-            fontFamily: Fonts.FiraSansRegular,
-            color: Colors.gray3,
-            fontStyle: 'italic'
-          }}>Max 100</Text>
+          flexDirection: 'row',
+          marginTop: wp( '5%' ), marginBottom: wp( '5%' ), justifyContent:'center',
+        }}>
+          <Image source={imageToShow} style={{
+            width: wp( '10%' ), height: wp( '6%' ), resizeMode: 'contain', alignSelf:'center',
+          }}/>
+          <View style={{
+            marginLeft: wp( '4%' ),
+            flex: 1,
+            marginRight: wp( '2%' )
+          }}>
+            <Text style={{
+              color: Colors.blue, fontSize: RFValue( 13 ), fontFamily: Fonts.FiraSansRegular
+            }}>{title}</Text>
+            <Text style={{
+              color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
+            }}>{infoText}</Text>
+          </View>
+          <View style={{
+            flexDirection:'row', alignItems: 'center',
+          }}>
+            <TouchableOpacity onPress={()=>minus()} style={{
+              width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginRight: wp( '4%' )
+            }}>
+              <AntDesign name="minus"
+                size={ 12}
+                color={Colors.white}/>
+            </TouchableOpacity>
+            <View style={{
+              height: wp( '12%' ), width: wp( '12%' ), borderRadius: 10, backgroundColor: Colors.white, justifyContent: 'center', alignItems:'center', shadowColor: Colors.borderColor, shadowOpacity: 0.6, shadowOffset: {
+                width: 7, height: 7
+              }, shadowRadius: 5, elevation: 5
+            }}><Text style={{
+                color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
+              }}>{stateToUpdate == 'gift'
+                  ? numbersOfGift :
+                  stateToUpdate == 'timeLock' ?
+                    timeLock :
+                    limitedValidity
+                }</Text>
+            </View>
+            <TouchableOpacity onPress={()=>plus()} style={{
+              width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginLeft: wp( '4%' )
+            }}>
+              <AntDesign name="plus"
+                size={ 12}
+                color={Colors.white}/>
+            </TouchableOpacity>
+          </View>
         </View>
-
         <TouchableOpacity
           onPress={() => setIsExclusive( !isExclusive )}
           style={{
             flexDirection: 'row',
-            marginVertical: 15,
+            marginVertical: 7,
           }}
         >
 
@@ -460,153 +492,21 @@ const CreateGift = ( { navigation } ) => {
           </View>
           <Text style={{
             color: Colors.textColorGrey,
-            fontSize: RFValue( 14 ),
+            fontSize: RFValue( 13 ),
             fontFamily: Fonts.FiraSansRegular,
             marginHorizontal: wp( 3 )
           }}>
-            {'Make each gift exclusive\nRestricts the gift to one gift per Hexa app'}
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.keyPadRow}>
-
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '1' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '1' )}
-            >
-              1
+            <Text>
+              {'Make each gift exclusive\n'}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '2' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '2' )}
-            >
-              2
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '3' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '3' )}
-            >
-              3
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.keyPadRow}>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '4' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '4' )}
-            >
-              4
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '5' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '5' )}
-            >
-              5
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '6' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '6' )}
-            >
-              6
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.keyPadRow}>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '7' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '7' )}
-            >
-              7
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '8' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '8' )}
-            >
-              8
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '9' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '9' )}
-            >
-              9
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.keyPadRow}>
-          <View style={styles.keyPadElementTouchable}>
             <Text style={{
-              flex: 1, padding: 15
-            }}></Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( '0' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( '0' )}
-            >
-              0
+              fontSize: RFValue( 11 ),
+            }}>
+            (Restricts the gift to one per user/ Hexa app)
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onPressGiftNumber( 'x' )}
-            style={styles.keyPadElementTouchable}
-          >
-            <Text
-              style={styles.keyPadElementText}
-              onPress={() => onPressGiftNumber( 'x' )}
-            >
-              <Ionicons
-                name="ios-backspace"
-                size={30}
-                color={Colors.blue}
-              />
-            </Text>
-          </TouchableOpacity>
-        </View>
+          </Text>
+
+        </TouchableOpacity>
       </View>
     )
   }
@@ -632,14 +532,14 @@ const CreateGift = ( { navigation } ) => {
       }}>
         <Text style={{
           color: Colors.blue, fontSize: RFValue( 20 ), fontFamily: Fonts.FiraSansRegular
-        }}>Create Multiple Gift sats</Text>
+        }}>Create Multiple Gift Sats</Text>
         {/* <Text style={{
           color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
         }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text> */}
       </View>
       <AdvanceGiftOptions
         title={'No. of Gifts'}
-        infoText={'Gift sats created will be of the same amount and can be sent separately'}
+        infoText={'Gift Sats created will be of the same amount and can be sent separately'}
         stateToUpdate={'gift'}
         imageToShow={require( '../../assets/images/icons/gift.png' )}
       />
@@ -890,37 +790,40 @@ const CreateGift = ( { navigation } ) => {
         }}>
           <Text style={FormStyles.errorText}>{isAmountInvalid ? strings.Insufficient : ''}</Text>
         </View>
-        <View style={{
-          marginVertical: hp( 5 ),
-          marginHorizontal: wp( 7 ),
-          flexDirection: 'row'
-        }}>
-          <TouchableOpacity
-            onPress={() => setFees( !includeFees )}
-            disabled={numbersOfGift? Number( numbersOfGift )> 1: false}
-            style={{
+        {
+          ( Number( numbersOfGift ) === 1 ) && (
+            <View style={{
+              marginVertical: hp( 5 ),
+              marginHorizontal: wp( 7 ),
               flexDirection: 'row'
-            }}
-          >
-
-            <View style={styles.imageView}>
-              {includeFees &&
-              <CheckMark style={{
-                marginLeft: 6,
-                marginTop: 6
-              }}/>
-              }
-            </View>
-            <Text style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue( 12 ),
-              fontFamily: Fonts.FiraSansRegular,
-              marginHorizontal: wp( 3 )
             }}>
-          Include fee in amount
-            </Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity
+                onPress={() => setFees( !includeFees )}
+                disabled={numbersOfGift? Number( numbersOfGift )> 1: false}
+                style={{
+                  flexDirection: 'row'
+                }}
+              >
+                <View style={styles.imageView}>
+                  {includeFees &&
+                  <CheckMark style={{
+                    marginLeft: 6,
+                    marginTop: 6
+                  }}/>
+                  }
+                </View>
+                <Text style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue( 12 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginHorizontal: wp( 3 )
+                }}>
+              Include fee in amount
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )
+        }
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )
         }}>
@@ -1080,7 +983,7 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
         <LoaderModal
           headerText={'Packing Your Gift'}
-          messageText={'Once created, you can send the Gift Sats right away or keep them for later.\nIf not accepted, you can reclaim your Gift Sats'}
+          messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
           messageText2={''}
           source={require( '../../assets/images/gift.gif' )}
         />
