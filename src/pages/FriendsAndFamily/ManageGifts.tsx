@@ -288,7 +288,7 @@ const ManageGifts = ( { navigation } ) => {
                   activeOpacity={0.6}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
-                    shadowColor: active === item ? '#77B9EB96' : Colors.white,
+                    shadowColor: active === item ? '#77B9EB96' : Colors.backgroundColor,
                     shadowOpacity: 0.9,
                     shadowOffset: {
                       width: 5, height: 6

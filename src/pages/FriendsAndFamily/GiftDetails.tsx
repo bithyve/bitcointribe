@@ -35,9 +35,10 @@ import {
   reclaimGift,
 } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
-import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import AccountSelection from './AccountSelection'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -138,11 +139,12 @@ const GiftDetails = ( { navigation } ) => {
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
+              {/* <FontAwesome
                 name="long-arrow-left"
                 color={Colors.blue}
                 size={17}
-              />
+              /> */}
+              <LeftArrow/>
             </View>
           </TouchableOpacity>
         </View>
@@ -253,7 +255,7 @@ const GiftDetails = ( { navigation } ) => {
                       fontWeight: '600',
                     }}
                   >
-                    {walletName ? walletName : 'Checking Account'}
+                    {walletName ? walletName : 'From Checking Account'}
                   </Text>
                   {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
@@ -371,7 +373,6 @@ const GiftDetails = ( { navigation } ) => {
                 style={{
                   marginLeft: wp( 3 ),
                   marginVertical: hp( 2 ),
-                  alignItems: 'center',
                   backgroundColor: Colors.backgroundColor,
                   marginHorizontal: wp( 2 ),
                   borderRadius: wp( 2 ),
@@ -385,7 +386,7 @@ const GiftDetails = ( { navigation } ) => {
                     color: Colors.textColorGrey,
                     fontSize: RFValue( 10 ),
                     letterSpacing: 0.5,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.FiraSansRegular,               
                   }}
                 >
                   {gift.note}
@@ -462,8 +463,8 @@ const GiftDetails = ( { navigation } ) => {
         </View>
       </SafeAreaView>
       <View style={{
-        marginBottom: wp( '3%' ), marginTop: wp( '3%' ), flexDirection: 'row',
-        justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ),
+        marginBottom: wp( '3%' ), flexDirection: 'row',
+        justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ), backgroundColor:'#F5F5F5',
         paddingVertical: wp( '2%' ),
       }}>
         {/* Reclaim */}
@@ -520,8 +521,8 @@ const styles = StyleSheet.create( {
   },
   line: {
     height: hp( 7.2 ),
-    width: wp( 0.07 ),
-    backgroundColor: Colors.lightTextColor,
+    width: wp( 0.05 ),
+    backgroundColor: Colors.currencyGray,
     marginHorizontal: wp( 3 ),
   },
   subText: {
@@ -584,7 +585,7 @@ const styles = StyleSheet.create( {
   bottomButton: {
     backgroundColor: Colors.lightBlue,
     height: wp( '13%' ),
-    width: 'auto',
+    width: '40%',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
