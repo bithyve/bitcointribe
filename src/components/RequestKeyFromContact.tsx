@@ -311,7 +311,7 @@ function RequestKeyFromContact( props ) {
           </TouchableOpacity>
         </>
       }
-      {props.isGift &&
+      {props.isGift && props.encryptLinkWith !== DeepLinkEncryptionType.DEFAULT &&
         // <BottomInfoBox
         //   infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
         // />
