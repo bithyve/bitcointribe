@@ -1080,9 +1080,9 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
         <LoaderModal
           headerText={'Packing Your Gift'}
-          messageText={'• You can reclaim sent gift sats\n• Gift sats that you receive can be added to an account or gifted further without any extra fees'}
+          messageText={'Once created, you can send the Gift Sats right away or keep them for later.\nIf not accepted, you can reclaim your Gift Sats'}
           messageText2={''}
-          showGif={false}
+          source={require( '../../assets/images/gift.gif' )}
         />
       </ModalContainer>
     </ScrollView>
