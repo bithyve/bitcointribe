@@ -769,8 +769,8 @@ const CreateGift = ( { navigation } ) => {
           </View> : null }
         </View>
         <View style={{
-          marginLeft: wp( '5%' ),
-          marginTop: wp( '3%' )
+          marginLeft: wp( '3%' ),
+          marginTop: wp( '1.5%' )
         }}>
           <Text style={{
             color: Colors.textColorGrey,
@@ -793,7 +793,7 @@ const CreateGift = ( { navigation } ) => {
         {
           ( Number( numbersOfGift ) === 1 ) && (
             <View style={{
-              marginVertical: hp( 5 ),
+              marginVertical: hp( 2 ),
               marginHorizontal: wp( 7 ),
               flexDirection: 'row'
             }}>
@@ -824,6 +824,34 @@ const CreateGift = ( { navigation } ) => {
             </View>
           )
         }
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), justifyContent: 'space-between', marginVertical: hp( 2 )
+        }}>
+          <Text style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue( 14 ),
+            fontFamily: Fonts.FiraSansMedium,
+          }}>Total Amount</Text>
+          <Text>
+            <Text style={{
+              color: Colors.black,
+              fontSize: RFValue( 20 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}>
+              {
+                prefersBitcoin? Number( amount )  * numbersOfGift:
+                  Number( amount ) * numbersOfGift
+              }
+            </Text>
+            <Text style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue( 11 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}>{prefersBitcoin? ' sats': ` ${currencyCode}`}</Text>
+
+          </Text>
+
+        </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )
         }}>
