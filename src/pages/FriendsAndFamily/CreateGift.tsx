@@ -209,7 +209,7 @@ const CreateGift = ( { navigation } ) => {
                     amounts: giftAmountsInSats,
                     accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
                     includeFee: includeFees,
-                    exclusiveGifts: isExclusive,
+                    exclusiveGifts: giftAmountsInSats.length === 1? false: isExclusive,
                   } ) )
                 }
                 break
