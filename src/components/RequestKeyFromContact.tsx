@@ -122,6 +122,7 @@ function RequestKeyFromContact( props ) {
       {props.isGift &&
         <>
           <TouchableOpacity
+            disabled
             onPress={() => props.onSelectionChange && props.onSelectionChange( true )}
             style={{
               width: '90%',
