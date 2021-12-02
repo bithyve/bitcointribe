@@ -73,6 +73,7 @@ export const initializeTrustedContact = (
     contactsSecondaryChannelKey,
     shareId,
     giftId,
+    giftNote,
   }:{
       contact: any,
       flowKind: InitTrustedContactFlowKind,
@@ -82,6 +83,7 @@ export const initializeTrustedContact = (
       contactsSecondaryChannelKey?: string,
       shareId?: string,
       giftId?: string,
+      giftNote?: string,
     },
 ) => {
   return {
@@ -94,7 +96,8 @@ export const initializeTrustedContact = (
       channelKey,
       contactsSecondaryChannelKey,
       shareId,
-      giftId
+      giftId,
+      giftNote
     },
   }
 }

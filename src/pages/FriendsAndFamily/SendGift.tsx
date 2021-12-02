@@ -46,7 +46,7 @@ export default function SendGift( props ) {
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
   const giftToSend = accountsState.gifts[ giftId ]
-  const [ encryptWithOTP, setEncryptWithOTP ] = useState( true )
+  const [ encryptWithOTP, setEncryptWithOTP ] = useState( false )
   const [ encryptionOTP, setEncryptionOTP ] = useState( '' )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
@@ -155,7 +155,7 @@ export default function SendGift( props ) {
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
-        encryptLinkWith={DeepLinkEncryptionType.OTP}
+        encryptLinkWith={encryptionOTP? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT}
         encryptionKey={encryptionOTP}
         themeId={themeId}
         senderName={senderEditedName}

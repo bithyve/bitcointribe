@@ -77,6 +77,7 @@ const GiftDetails = ( { navigation } ) => {
             navigation.replace( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
+              note,
               headerText: strings.addContact,
               subHeaderText:strings.send,
               contactText:strings.adding,
