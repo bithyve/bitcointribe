@@ -872,6 +872,22 @@ const CreateGift = ( { navigation } ) => {
           marginLeft: wp( '5%' ),
           marginTop: wp( '3%' )
         }}>
+          <Text style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue( 11 ),
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp( 3 ),
+          }}>
+            <Text>{'Minimum gift value '}</Text>
+            <Text style={{
+              fontWeight: 'bold'
+            }}>{prefersBitcoin? minimumGiftValue: convertSatsToFiat( minimumGiftValue )} {prefersBitcoin? 'sats': currencyCode}</Text>
+          </Text>
+        </View>
+        <View style={{
+          marginLeft: wp( '5%' ),
+          marginTop: wp( '3%' )
+        }}>
           <Text style={FormStyles.errorText}>{isAmountInvalid ? strings.Insufficient : ''}</Text>
         </View>
         <View style={{
@@ -909,17 +925,6 @@ const CreateGift = ( { navigation } ) => {
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )
         }}>
           {renderButton( 'Create Gift',  'Create Gift' )}
-        </View>
-        <View style={{
-          marginLeft: wp( '5%' ),
-          marginTop: wp( '3%' )
-        }}>
-          <Text style={{
-            color: Colors.textColorGrey,
-            fontSize: RFValue( 13 ),
-            fontFamily: Fonts.FiraSansRegular,
-            marginHorizontal: wp( 3 )
-          }}>{`Note: Minimum gift value: ${prefersBitcoin? minimumGiftValue: convertSatsToFiat( minimumGiftValue )} ${prefersBitcoin? 'sats': currencyCode}`}</Text>
         </View>
         {showKeyboard &&
         <View style={{
