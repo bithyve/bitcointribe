@@ -64,7 +64,7 @@ const ManageGifts = ( { navigation } ) => {
   )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
-  const [ knowMore, setKnowMore ] = useState( false )
+  const [ knowMore, setKnowMore ] = useState( true )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
   const currencyKind = useSelector(
@@ -288,7 +288,7 @@ const ManageGifts = ( { navigation } ) => {
                   activeOpacity={0.6}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
-                    shadowColor: active === item ? '#77B9EB96' : Colors.backgroundColor,
+                    shadowColor: active === item ? '#77B9EB66' : Colors.backgroundColor,
                     shadowOpacity: 0.9,
                     shadowOffset: {
                       width: 5, height: 6
@@ -523,7 +523,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
   },
   createGiftText: {
-    color: Colors.blueText,
+    color: Colors.moreBlueText,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.3,
     fontFamily: Fonts.FiraSansMedium,
