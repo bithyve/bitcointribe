@@ -839,8 +839,7 @@ const CreateGift = ( { navigation } ) => {
               fontFamily: Fonts.FiraSansRegular,
             }}>
               {
-                prefersBitcoin? Number( amount )  * numbersOfGift:
-                  Number( amount ) * numbersOfGift
+                Number( amount ) * numbersOfGift
               }
             </Text>
             <Text style={{
