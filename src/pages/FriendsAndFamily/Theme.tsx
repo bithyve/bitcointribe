@@ -8,10 +8,10 @@ import { GiftThemeId } from '../../bitcoin/utilities/Interface'
 
 const ThemeList = [
   {
-    'id': GiftThemeId.ONE, 'title': 'Gift sats', 'subText': 'Something that appreciates with time', 'avatar': <GiftCard />, color: Colors.darkBlue
+    'id': GiftThemeId.ONE, 'title': 'Gift Sats', 'subText': 'Something that appreciates with time', 'avatar': <GiftCard />, color: Colors.darkBlue
   },
   {
-    'id': GiftThemeId.THREE, 'title': 'Birthday', 'subText': 'The only better birthday gift is time.', 'avatar': <Birthday />, color: Colors.pink
+    'id': GiftThemeId.THREE, 'title': 'Birthday', 'subText': 'The only better birthday gift is time', 'avatar': <Birthday />, color: Colors.pink
   },
   {
     'id': GiftThemeId.FIVE, 'title': 'Christmas', 'subText': 'This Christmas be the Santa who gifts sats', 'avatar': <Christmas />, color: Colors.pink
