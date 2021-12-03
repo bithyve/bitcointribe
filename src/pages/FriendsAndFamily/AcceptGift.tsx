@@ -550,7 +550,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           <View style={{
             marginLeft: wp( 6 ),
           }}>
-            <Text style={styles.modalTitleText}>Accept Gift</Text>
+            <Text style={styles.modalTitleText}>Accept Gift Sats</Text>
             {inputType !== DeepLinkEncryptionType.DEFAULT?
               <Text style={{
                 ...styles.modalInfoText,
@@ -714,7 +714,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
           marginTop: hp( 5 )
         }}>
-          {renderButton( 'Accept Gift', true )}
+          {renderButton( 'Accept', true )}
           <TouchableOpacity
             onPress={() => {
               if ( isGiftWithFnF ) {
@@ -738,7 +738,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 color: Colors.blue
               }}
             >
-              {'Deny Gift'}
+              {'Deny'}
             </Text>
           </TouchableOpacity>
         </View>
