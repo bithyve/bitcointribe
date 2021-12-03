@@ -19,7 +19,7 @@ export default function LoaderModal( props ) {
       <View style={{
         marginTop: 'auto', right: 0, bottom: 0, position: 'absolute'
       }}>
-        <Image source={require( '../assets/images/loader.gif' )} style={{
+        <Image source={props.source ? props.source :require( '../assets/images/loader.gif' )} style={{
           width: wp( '30%' ), height: wp( '35%' ), marginLeft: 'auto', resizeMode: 'stretch',
         }}/>
       </View>

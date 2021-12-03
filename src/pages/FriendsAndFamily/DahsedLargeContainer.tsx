@@ -22,7 +22,9 @@ import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
-  const currencyKind = useCurrencyKind()
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
   const currencyCode = useCurrencyCode()
   const exchangeRates = useSelector(
     ( state ) => state.accounts.exchangeRates

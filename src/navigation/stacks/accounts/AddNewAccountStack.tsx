@@ -10,6 +10,7 @@ import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAcco
 import NewSwanAccountDetailsScreen from '../../../pages/Accounts/AddNew/SwanAccount/NewSwanAccountDetailsScreen'
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import { translations } from '../../../common/content/LocContext'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -33,6 +34,14 @@ const AddNewAccountStack = createStackNavigator(
       navigationOptions: {
         title: 'Setup Wyre Account'
       }
+    },
+
+    AccountDetails: {
+      screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
     },
 
     NewRampAccountDetails: {
