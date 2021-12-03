@@ -44,7 +44,7 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( '' )
+  const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
@@ -320,7 +320,9 @@ const GiftDetails = ( { navigation } ) => {
           style={[ styles.inputBoxLong, styles.inputField ]}
         >
           <TextInput
-            style={styles.modalInputBox}
+            style={[ styles.modalInputBox, {
+              fontFamily: Fonts.FiraSansItalic
+            } ]}
             placeholder={`Add a personal note (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
@@ -334,6 +336,8 @@ const GiftDetails = ( { navigation } ) => {
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
+            numberOfLines={2}
+            multiline
             onChangeText={( text ) => {
               setNote( text )
             }}
