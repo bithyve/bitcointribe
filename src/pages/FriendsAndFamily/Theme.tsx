@@ -8,16 +8,16 @@ import { GiftThemeId } from '../../bitcoin/utilities/Interface'
 
 const ThemeList = [
   {
-    'id': GiftThemeId.ONE, 'title': 'Gift sats', 'subText': 'Here\'s some sats for your stack', 'avatar': <GiftCard />, color: Colors.darkBlue
+    'id': GiftThemeId.ONE, 'title': 'Gift Sats', 'subText': 'Something that appreciates with time', 'avatar': <GiftCard />, color: Colors.darkBlue
   },
   {
-    'id': GiftThemeId.THREE, 'title': 'Happy Birthday!', 'subText': 'Have an amazing year ahead', 'avatar': <Birthday />, color: Colors.pink
+    'id': GiftThemeId.THREE, 'title': 'Birthday', 'subText': 'The only better birthday gift is time', 'avatar': <Birthday />, color: Colors.pink
   },
   {
-    'id': GiftThemeId.FIVE, 'title': 'Merry Christmas', 'subText': 'Yuletide cheers to you and yours', 'avatar': <Christmas />, color: Colors.pink
+    'id': GiftThemeId.FIVE, 'title': 'Christmas', 'subText': 'This Christmas be the Santa who gifts sats', 'avatar': <Christmas />, color: Colors.pink
   },
   {
-    'id': GiftThemeId.SIX, 'title': 'Wedding best wishes!', 'subText': 'A special gift for a special couple', 'avatar': <Wedding />, color: Colors.pink
+    'id': GiftThemeId.SIX, 'title': 'Wedding', 'subText': 'Give a gift fit to be an heirloom', 'avatar': <Wedding />, color: Colors.pink
   },
 ]
 export default ThemeList

@@ -122,6 +122,7 @@ function RequestKeyFromContact( props ) {
       {props.isGift &&
         <>
           <TouchableOpacity
+            disabled
             onPress={() => props.onSelectionChange && props.onSelectionChange( true )}
             style={{
               width: '90%',
@@ -310,7 +311,7 @@ function RequestKeyFromContact( props ) {
           </TouchableOpacity>
         </>
       }
-      {props.isGift &&
+      {props.isGift && props.encryptLinkWith !== DeepLinkEncryptionType.DEFAULT &&
         // <BottomInfoBox
         //   infoText={'Your friend will be prompted to enter their OTP while accepting the gift card'}
         // />
@@ -394,7 +395,7 @@ function RequestKeyFromContact( props ) {
           titleTextColor={Colors.black}
           subText={props.senderName}
           extraText={props.giftNote? props.giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
-          amt={numberWithCommas( props.amt )}
+          amt={props.amt}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
         />

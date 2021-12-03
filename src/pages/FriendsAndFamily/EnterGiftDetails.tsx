@@ -52,7 +52,7 @@ const GiftDetails = ( { navigation } ) => {
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
     title: 'Gift Sats',
-    subText: 'A gift that keeps giving',
+    subText: 'Something that appreciates with time',
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
@@ -77,6 +77,7 @@ const GiftDetails = ( { navigation } ) => {
             navigation.replace( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
+              note,
               headerText: strings.addContact,
               subHeaderText:strings.send,
               contactText:strings.adding,

@@ -384,8 +384,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
               height: 'auto'
             }}>
               {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
-                if( accountShell.primarySubAccount.type !== AccountType.TEST_ACCOUNT )
-                  return renderItem( accountShell )
+                return renderItem( accountShell )
               } )
               }
             </View>

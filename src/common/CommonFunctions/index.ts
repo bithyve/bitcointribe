@@ -410,7 +410,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         navigation: {
           forcedRedirectEnabled: false
         }
-      }, dynamicLinks.ShortLinkType.SHORT )
+      }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
       console.log( error )
       shortLink = ''

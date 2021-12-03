@@ -902,6 +902,8 @@ export interface MultiSigAccount extends Account {
 
 export interface DonationAccount extends Account {
   donee: string;
+  donationName: string;
+  donationDescription: string;
   configuration: {
     displayBalance: boolean;
     displayIncomingTxs: boolean;
@@ -915,7 +917,7 @@ export interface DonationAccount extends Account {
   }
   xprivs?: {                            // additional xpirvs for multi-sig
     secondary?: string,
-  }
+  },
 }
 
 export enum AccountType {
@@ -1009,14 +1011,16 @@ export interface Gift {
     contactId?: string // permanentAddress of the contact
   },
   note?: string,
+  exclusiveGiftCode?: string,
   deepLinkConfig?: {
     encryptionType: string,
     encryptionKey: string,
-  }
+  },
 }
 
 export interface GiftMetaData {
   status: GiftStatus,
+  exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,
     FCM: string,

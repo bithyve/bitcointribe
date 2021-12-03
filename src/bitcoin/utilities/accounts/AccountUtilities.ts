@@ -1049,8 +1049,8 @@ export default class AccountUtilities {
         walletID: account.walletId,
         details: {
           donee: account.donee,
-          subject: account.accountName,
-          description: account.accountDescription,
+          subject: account.donationName,
+          description: account.donationDescription,
           xpubId: account.id,
           xpubs,
           configuration: account.configuration,
@@ -1106,8 +1106,9 @@ export default class AccountUtilities {
         account.configuration = preferences.configuration
 
       if( preferences.accountDetails ){
-        account.accountName = preferences.accountDetails.subject
-        account.accountDescription = preferences.accountDetails.description
+        account.donationName = preferences.accountDetails.subject
+        account.accountDescription = preferences.accountDetails.subject
+        account.donationDescription = preferences.accountDetails.description
         account.donee = preferences.accountDetails.donee
       }
     }
