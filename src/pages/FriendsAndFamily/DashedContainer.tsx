@@ -97,7 +97,7 @@ const DashedContainer = ( props ) => {
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular
-            }}> sats
+            }}> {props.currencyCode? props.currencyCode: 'sats'}
             </Text>
           </Text>
           {props.image}

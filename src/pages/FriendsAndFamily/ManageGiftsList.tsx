@@ -103,7 +103,7 @@ const ManageGiftsList = ( props ) => {
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansRegular
-              }}> sats
+              }}> {props.currency? props.currency: 'sats'}
               </Text>
             </Text>
             <Image source={require( '../../assets/images/icons/icon_arrow.png' )}

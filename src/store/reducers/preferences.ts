@@ -1,6 +1,7 @@
 import {
   CURRENCY_CODE,
   CURRENCY_KIND_SET,
+  GIFT_CURRENCY_KIND_SET,
   FCM_TOKEN_VALUE,
   SECONDARY_DEVICE_ADDRESS_VALUE,
   RELEASE_CASES_VALUE,
@@ -25,6 +26,7 @@ const initialState = ip.freeze( {
   hasShownNoInternetWarning: false,
   currencyCode: RNLocalize.getCurrencies()[ 0 ] || 'USD',
   currencyKind: CurrencyKind.BITCOIN,
+  giftCurrencyKind: CurrencyKind.BITCOIN,
   fcmTokenValue: '',
   secondaryDeviceAddressValue: '',
   releaseCasesValue: null,
@@ -60,6 +62,12 @@ export default ( state = initialState, { type, payload } ) => {
         return {
           ...state,
           currencyKind: payload,
+        }
+
+      case GIFT_CURRENCY_KIND_SET:
+        return {
+          ...state,
+          giftCurrencyKind: payload,
         }
 
       case FCM_TOKEN_VALUE:
