@@ -78,8 +78,10 @@ export default function SendViaLinkAndQR( props ) {
   }
 
   function onPress() {
-    if( type === 'QR'  && qrCode ) {
-      capture()
+    if( type === 'QR'  && qrCode  ) {
+      if( Platform.OS === 'android' ){
+        capture()
+      }
     } else {
       shareOption()
     }
