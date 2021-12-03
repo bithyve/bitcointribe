@@ -67,6 +67,7 @@ export default function AddContactSendRequest( props ) {
   const [ renderTimer, setRenderTimer ] = useState( false )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const giftId = props.navigation.getParam( 'giftId' )
+  const note = props.navigation.getParam( 'note' )
   const giftToSend = giftId? accountsState.gifts[ giftId ]: null
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
@@ -140,7 +141,8 @@ export default function AddContactSendRequest( props ) {
     dispatch( initializeTrustedContact( {
       contact: Contact,
       flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-      giftId
+      giftId,
+      giftNote: note,
     } ) )
   }, [ Contact, giftId ] )
 
@@ -233,7 +235,7 @@ export default function AddContactSendRequest( props ) {
     const extraData = giftToSend?  {
       channelAddress: giftToSend.channelAddress,
       amount: giftToSend.amount,
-      note: giftToSend.note,
+      note: note,
       themeId: giftToSend.themeId
     }: null
 
@@ -467,6 +469,7 @@ export default function AddContactSendRequest( props ) {
           subHeaderText={ giftId ? 'You can send it to anyone using the QR or the link' : Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addContact}
           contactText={strings.adding}
           isGift={ giftId}
+          giftNote={note}
           themeId={themeId}
           encryptLinkWith={encryptLinkWith}
           encryptionKey={encryptionKey}

@@ -41,6 +41,10 @@
 	<array>
 		<string>whatsapp</string>
 		<string>mailto</string>
+		<string>instagram</string>
+		<string>instagram-stories</string>
+		<string>fb</string>
+		<string>facebook-stories</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
