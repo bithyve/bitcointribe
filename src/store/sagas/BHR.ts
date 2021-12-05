@@ -155,7 +155,7 @@ function* initHealthWorker() {
       name: security && security.answer ? 'Encryption Password' : 'Set Password',
     },
     {
-      shareType: 'cloud',
+      shareType: '',
       updatedAt: 0,
       status: 'notSetup',
       shareId: randomIdForCloud,
@@ -413,7 +413,7 @@ function* updateHealthLevel2Worker( { payload } ) {
     }
     const levelInfo = []
     levelInfo[ 1 ] = {
-      shareType: 'cloud',
+      shareType: '',
       updatedAt: 0,
       status: 'notSetup',
       shareId: metaShares[ 0 ].shareId,
@@ -1440,10 +1440,15 @@ function* createChannelAssetsWorker( { payload } ) {
     if( MetaShares && MetaShares.length && shareId ){
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+      const currentLevel: number = yield select( ( state ) => state.bhr.currentLevel )
       const secondaryShareDownloadedVar = yield select( ( state ) => state.bhr.secondaryShareDownloaded )
       const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
       const share = MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ) : OldMetaShares.length && OldMetaShares.find( value=>value.shareId==shareId ) ? OldMetaShares.find( value=>value.shareId==shareId ) : null
-      const primaryMnemonicShardTemp = {
+      let primaryMnemonicShardTemp
+      if( currentLevel == 0 ){
+        primaryMnemonicShardTemp = wallet.primaryMnemonic
+      }
+      primaryMnemonicShardTemp = {
         shareId: share ? share.shareId : '',
         meta: share ? share.meta : {
         },
@@ -1817,12 +1822,12 @@ function* setupHealthWorker( { payload } ) {
         name: security && security.answer ? 'Encryption Password' : 'Set Password',
       },
       {
-        shareType: 'cloud',
+        shareType: keeperInfo[ 1 ] && keeperInfo[ 1 ].type ? keeperInfo[ 1 ].type : '',
         updatedAt: moment( new Date() ).valueOf(),
         status: 'accessible',
-        shareId: keeperInfo.find( value=>value.type == 'cloud' ) ? keeperInfo.find( value=>value.type == 'cloud' ).shareId : randomIdForCloud,
+        shareId: keeperInfo[ 1 ] && keeperInfo[ 1 ].shareId ? keeperInfo[ 1 ].shareId : randomIdForCloud,
         reshareVersion: 0,
-        name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
+        name: keeperInfo[ 1 ] && keeperInfo[ 1 ].name ? keeperInfo[ 1 ].name : '',
       },
     ]
     yield put( updateHealth( [ {
@@ -1855,12 +1860,12 @@ function* setupHealthWorker( { payload } ) {
           name: security && security.answer ? 'Encryption Password' : 'Set Password',
         },
         {
-          shareType: 'cloud',
+          shareType: keeperInfo.find( value=>value.shareId == metaShares[ 0 ].shareId ) ? keeperInfo.find( value=>value.shareId == metaShares[ 0 ].shareId ).type : '',
           updatedAt: moment( new Date() ).valueOf(),
           status: downloadedBackupData.find( value=>value.backupData.primaryMnemonicShard.shareId == metaShares[ 0 ].shareId ) ? 'accessible': 'notAccessible',
           shareId: metaShares[ 0 ].shareId,
           reshareVersion: 0,
-          name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
+          name: keeperInfo.find( value=>value.shareId == metaShares[ 0 ].shareId ) ? keeperInfo.find( value=>value.shareId == metaShares[ 0 ].shareId ).name : '',
         },
       ]
 
@@ -2176,12 +2181,12 @@ function* setupLevelHealthWorker( { payload } ) {
           name: 'Encryption Password',
         },
         {
-          shareType: 'cloud',
+          shareType: keeperInfo[ 1 ] && keeperInfo[ 1 ].type ? keeperInfo[ 1 ].type : '',
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
-          shareId: keeperInfo.find( value=>value.type == 'cloud' && value.scheme == scheme ) ? keeperInfo.find( value=>value.type == 'cloud' && value.scheme == scheme ).shareId : randomIdForCloud,
+          shareId: keeperInfo[ 1 ] && keeperInfo[ 1 ].shareId ? keeperInfo[ 1 ].shareId : randomIdForCloud,
           reshareVersion: 0,
-          name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
+          name: keeperInfo[ 1 ] && keeperInfo[ 1 ].name ? keeperInfo[ 1 ].name : '',
         },
       ]
       console.log( 'SETUP_LEVEL_HEALTH levelInfo', levelInfo )
@@ -2201,12 +2206,12 @@ function* setupLevelHealthWorker( { payload } ) {
             name: 'Encryption Password',
           },
           {
-            shareType: 'cloud',
+            shareType: keeperInfo[ 1 ] && keeperInfo[ 1 ].type ? keeperInfo[ 1 ].type : '',
             updatedAt: moment( new Date() ).valueOf(),
             status: 'accessible',
-            shareId: keeperInfo.find( value=>value.type == 'cloud' && value.scheme == scheme ) ? keeperInfo.find( value=>value.type == 'cloud' && value.scheme == scheme ).shareId : '',
+            shareId: keeperInfo[ 1 ] && keeperInfo[ 1 ].shareId ? keeperInfo[ 1 ].shareId : randomIdForCloud,
             reshareVersion: 0,
-            name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
+            name: keeperInfo[ 1 ] && keeperInfo[ 1 ].name ? keeperInfo[ 1 ].name : '',
           },
         ]
 

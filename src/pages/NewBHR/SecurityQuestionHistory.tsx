@@ -32,9 +32,11 @@ import HistoryHeaderComponent from './HistoryHeaderComponent'
 import ModalContainer from '../../components/home/ModalContainer'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { translations } from '../../common/content/LocContext'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 const SecurityQuestionHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
 
   const [ securityQuestionsHistory, setSecuirtyQuestionHistory ] = useState( [
     {
@@ -85,12 +87,14 @@ const SecurityQuestionHistory = ( props ) => {
       name?: string;
     }[];
   }[] = useSelector( ( state ) => state.bhr.levelHealth )
-  const currentLevel: Number = useSelector(
-    ( state ) => state.bhr.currentLevel,
-  )
+
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const next = props.navigation.getParam( 'next' )
   const dispatch = useDispatch()
+
+  useEffect( () => {
+    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
+  }, [ props.navigation.state.params ] )
 
   const renderSecurityQuestionContent = useCallback( () => {
     return (
@@ -223,7 +227,9 @@ const SecurityQuestionHistory = ( props ) => {
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={strings.EncryptionPassword}
-        selectedTime={props.navigation.state.params.selectedTime}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'Never'}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_password.png' )}
       />

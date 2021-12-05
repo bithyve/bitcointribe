@@ -100,7 +100,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const dispatch = useDispatch()
 
   const index = props.navigation.getParam( 'index' )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
   const next = props.navigation.getParam( 'next' )
 
@@ -186,10 +185,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         shareId: selectedKeeper.shareId,
         name: contactDetails && contactDetails.name ? contactDetails.name : contactDetails.displayedName ? contactDetails.displayedName : '',
         type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : currentLevel == 0 ? '1of1' : '2of3',
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
+        sharePosition: currentLevel == 0 ? -1 : MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
           MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
           OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
             OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :

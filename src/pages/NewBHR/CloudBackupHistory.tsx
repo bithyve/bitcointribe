@@ -29,6 +29,7 @@ import { translations } from '../../common/content/LocContext'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getIndex } from '../../common/utilities'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -163,40 +164,21 @@ const CloudBackupHistory = ( props ) => {
       title={strings.AutomatedCloudBackup}
       info={strings.Thisisthefirstlevel}
       note={''}
-      onPressProceed={( flag )=>{
-        // if ( ( bottomSheetRef as any ).current )
-        //   ( bottomSheetRef as any ).current.snapTo( 0 )
+      onPressProceed={( flag )=> {
         setConfirmationModal( false )
-        console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
         dispatch( updateCloudData() )
       }}
       onPressIgnore={( flag )=> {
-        // if ( ( bottomSheetRef as any ).current )
-        //   ( bottomSheetRef as any ).current.snapTo( 0 )
         setConfirmationModal( false )
-        console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
       }}
       autoClose={()=>{
-        // if ( ( bottomSheetRef as any ).current )
-        //   ( bottomSheetRef as any ).current.snapTo( 0 )
         setConfirmationModal( false )
-        console.log( 'updateCloudPermission', true )
         dispatch( updateCloudPermission( true ) )
       }}
       bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
     /> )
-  }, [] )
-
-  const renderCloudPermissionHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
   }, [] )
 
   const renderHealthCheckSuccessModalContent = useCallback( () => {
@@ -279,7 +261,9 @@ const CloudBackupHistory = ( props ) => {
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={Platform.OS == 'ios' ? 'iCloud backup' : 'Google Drive backup'}
-        selectedTime={props.navigation.state.params.selectedTime}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'Never'}
         moreInfo={''}
         tintColor={Colors.deepBlue}
         headerImage={require( '../../assets/images/icons/ico_cloud_backup.png' )}

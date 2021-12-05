@@ -1487,7 +1487,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               // }
               // ]}
               onPressProceed={()=>{
-                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.cloudPermissionGranted ){
                   this.props.setCloudData()
                 }
                 this.closeBottomSheet()
