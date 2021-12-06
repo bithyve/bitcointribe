@@ -622,8 +622,9 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
-    width: '90%'
+    paddingHorizontal: 15,
+    width: '90%',
+    paddingVertical: 7,
   },
   inputBox: {
     borderRadius: 10,
