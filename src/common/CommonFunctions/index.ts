@@ -373,10 +373,9 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 
   const appType = config.APP_STAGE
   const appVersion = DeviceInfo.getVersion()
-
   let deepLink: string
   if( extraData?.note ) {
-    extraData.note=  extraData.note.replaceAll( ' ', '%20' )
+    extraData.note=  extraData.note.replace( / /g, '%20' )
   }
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
