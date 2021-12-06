@@ -366,7 +366,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             // navigation.navigate( 'AccountDetails', {
             //   accountShellID: sourcePrimarySubAccount.accountShellID,
             // } )
-          } else if( text === 'Accept Gift' ) {
+          } else if( text === 'Accept' ) {
             setIsDisabled( true )
             if ( isGiftWithFnF ) {
               const key =
