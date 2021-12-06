@@ -43,8 +43,14 @@ export default function SendViaLinkAndQR( props ) {
   const viewRef = useRef( null )
 
   useEffect( () => {
-    onPress()
+    init()
   }, [ qrCode ] )
+
+  function init() {
+    setTimeout( () => {
+      onPress()
+    }, 1000 )
+  }
 
   // useEffect( () => {
   //   setShareLink( props.link.replace( /\s+/g, '' ) )
