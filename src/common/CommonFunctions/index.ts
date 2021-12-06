@@ -350,7 +350,7 @@ export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: Tr
   return deepLinkKind
 }
 
-export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any } ) => {
+export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData, currentLevel }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any, currentLevel?: string } ) => {
 
   let encryptedChannelKeys: string
   let encryptionHint: string
@@ -383,7 +383,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+currentLevel: ''}`
   }
 
   let shortLink = ''
@@ -541,6 +541,7 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -553,7 +554,8 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: true
+            isExistingContact: true,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -566,7 +568,8 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: false
+            isExistingContact: false,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 

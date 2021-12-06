@@ -134,7 +134,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const index = props.navigation.getParam( 'index' )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const dispatch = useDispatch()
   const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
 

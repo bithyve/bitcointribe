@@ -576,6 +576,8 @@
     "HealthCheckConfirmPassword": "હેલ્થ ચેક પાસવર્ડની પુષ્ટિ કરો",
     "Specifythepassword": "પાસવર્ડ સ્પષ્ટ કરો જેમ તમે વletલેટ સેટ કરતી વખતે કર્યું હતું",
     "Hint": "ઈશારો",
+    "Backupwithcloud": "મેઘ સાથે બેકઅપ",
+    "BackupwithcloudSub": "ક્લાઉડ પર પુનઃપ્રાપ્તિ કીનો બેકઅપ લો",
     "Backupwithcontact": "સંપર્ક સાથે બેકઅપ",
     "BackupwithcontactSub": "મિત્ર અથવા કુટુંબના સભ્ય સાથે પુનoveryપ્રાપ્તિ કીનો બેકઅપ લો",
     "Backuponadevice": "ઉપકરણ પર બેકઅપ",

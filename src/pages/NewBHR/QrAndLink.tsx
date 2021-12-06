@@ -193,6 +193,7 @@ export default function QrAndLink( props ) {
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
       keysToEncrypt,
+      currentLevel
     } )
     setTrustedLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
@@ -204,6 +205,7 @@ export default function QrAndLink( props ) {
         encryptionHint,
         walletName: wallet.walletName,
         version: appVersion,
+        currentLevel
       } )
     )
 

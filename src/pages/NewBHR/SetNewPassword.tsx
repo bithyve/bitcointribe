@@ -166,7 +166,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
   const setPassword = ( security ) =>{
     requestAnimationFrame( () => {
-      dispatch( updateCloudPermission( true ) )
+      // dispatch( updateCloudPermission( true ) )
       dispatch( setupPassword( security ) )
       const current = Date.now()
       AsyncStorage.setItem(
@@ -183,12 +183,12 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     } )
   }
 
-  useEffect( ()=>{
-    if( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true && !isSkipClicked && ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) ) ){
-      dispatch( setCloudData() )
-    }
-  }, [ cloudPermissionGranted, levelHealth ] )
+  // useEffect( ()=>{
+  //   if( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+  //     cloudPermissionGranted === true && !isSkipClicked && ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) ) ){
+  //     dispatch( setCloudData() )
+  //   }
+  // }, [ cloudPermissionGranted, levelHealth ] )
 
   const changeAnswer = ( security ) =>{
     dispatch( changeQuestionAnswer( security.questionId, security.question, security.answer ) )
@@ -319,7 +319,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   }, [ message, subTextMessage ] )
 
   const confirmAction = () => {
-    dispatch( updateCloudPermission( true ) )
+    // dispatch( updateCloudPermission( true ) )
     if ( activeIndex === 0 ) {
       showSecurityQue( true )
       setAnswer( '' )

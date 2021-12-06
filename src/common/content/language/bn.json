@@ -576,6 +576,8 @@
     "HealthCheckConfirmPassword": "স্বাস্থ্য পরীক্ষা পাসওয়ার্ড নিশ্চিত করুন",
     "Specifythepassword": "মানিব্যাগ সেট আপ করার সময় পাসওয়ার্ডটি নির্দিষ্ট করুন",
     "Hint": "ইঙ্গিত",
+    "Backupwithcloud": "ক্লাউড দিয়ে ব্যাকআপ",
+    "BackupwithcloudSub": "ক্লাউডে রিকভারি কী ব্যাকআপ করুন",
     "Backupwithcontact": "যোগাযোগের সাথে ব্যাকআপ",
     "BackupwithcontactSub": "কোনো বন্ধু বা পরিবারের সদস্যের সঙ্গে রিকভারি কী ব্যাকআপ করুন",
     "Backuponadevice": "একটি ডিভাইসে ব্যাকআপ",

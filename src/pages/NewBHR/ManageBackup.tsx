@@ -236,10 +236,9 @@ export default function ManageBackup( props ) {
   useEffect( ()=>{
     if ( metaSharesKeeper.length == 3 && onKeeperButtonClick ) {
       const obj = {
-        id: 2,
         selectedKeeper: {
           shareType: 'primaryKeeper',
-          name: 'Personal Device 1',
+          name: selectedKeeperName,
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
@@ -247,7 +246,6 @@ export default function ManageBackup( props ) {
           data: {
           },
         },
-        isSetup: true,
       }
       setSelectedKeeper( obj.selectedKeeper )
       setShowLoader( false )
@@ -260,7 +258,6 @@ export default function ManageBackup( props ) {
   useEffect( ()=>{
     if ( metaSharesKeeper.length == 5 && onKeeperButtonClick ) {
       const obj = {
-        id: 2,
         selectedKeeper: {
           shareType: selectedKeeperType,
           name: selectedKeeperName,
@@ -271,7 +268,6 @@ export default function ManageBackup( props ) {
           data: {
           },
         },
-        isSetup: true,
       }
       setSelectedKeeper( obj.selectedKeeper )
       dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
@@ -300,7 +296,7 @@ export default function ManageBackup( props ) {
   }, [ status ] )
 
   useEffect( ()=>{
-    if( navigationObj.selectedKeeper && onKeeperButtonClick ){
+    if( navigationObj.selectedKeeper && onKeeperButtonClick ) {
       setSelectedKeeper( navigationObj.selectedKeeper )
       setSelectedLevelId( navigationObj.id )
       if( navigationObj.selectedKeeper.shareType && navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
@@ -329,12 +325,10 @@ export default function ManageBackup( props ) {
     if( approvalStatus && isLevel3Started ) {
       setShowLoader( false )
       const obj = {
-        id: selectedLevelId,
         selectedKeeper: {
           ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
           shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? metaSharesKeeper[ 1 ] ? metaSharesKeeper[ 1 ].shareId: '' : metaSharesKeeper[ 4 ] ? metaSharesKeeper[ 4 ].shareId : ''
         },
-        isSetup: true,
       }
       goToHistory( obj, 'approvalStatus' )
     }
@@ -453,53 +447,26 @@ export default function ManageBackup( props ) {
   }
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
-    setSelectedRecoveryKeyNumber( keeperNumber )
-    // requestAnimationFrame( () => {
+
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return
     }
-    if( value.id == 1 && keeperNumber == 2 ) {
-      if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-        props.navigation.navigate(
-          'CloudBackupHistory',
-          {
-            selectedTime: value.keeper2.updatedAt
-              ? getTime( value.keeper2.updatedAt )
-              : 'Never',
-          }
-        )
-      }
-    } else if( value.id == 1 && keeperNumber == 1 ) {
-      props.navigation.navigate(
-        'SecurityQuestionHistoryNewBHR',
-        {
-          selectedTime: value.keeper1.updatedAt
-            ? getTime( value.keeper1.updatedAt )
-            : 'Never',
-        }
-      )
-    } else {
-      // setShowLoader( true )
-      setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
-      onPressKeeperButton( value, keeperNumber )
-    }
-    // } )
-  }
-
-  let onPressKeeperButton = ( value, number ) => {
+    setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
+    dispatch( onPressKeeper( value, keeperNumber ) )
+    setSelectedRecoveryKeyNumber( keeperNumber )
     setSelectedLevelId( value.id )
     setOnKeeperButtonClick( true )
-    dispatch( onPressKeeper( value, number ) )
   }
 
   const goToHistory = ( value, test ) => {
-    const { id, selectedKeeper, isSetup, isChangeKeeperAllow } = value
+    const { selectedKeeper } = value
     setShowLoader( false )
     const navigationParams = {
       selectedTitle: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName,
       SelectedRecoveryKeyNumber,
       selectedKeeper,
+      selectedLevelId
     }
     let index = 1
     let count = 0
@@ -511,23 +478,22 @@ export default function ManageBackup( props ) {
           if ( element.keeper2.shareType == 'contact' || element.keeper2.shareType == 'existingContact' ) count++
         }
         if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
-          if ( element.keeper1.shareType == 'device' || element.keeper1.shareType == 'primaryKeeper' ) count++
+          if ( element.keeper1.shareType == 'device' || ( currentLevel>0 && element.keeper1.shareType == 'primaryKeeper' ) ) count++
           if ( element.keeper2.shareType == 'device' ) count++
         }
       }
       if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
-        if ( count == 1 && isSetup ) index = 2
-        else if ( count == 0 && isSetup ) index = 1
+        if ( count == 1 ) index = 2
+        else if ( count == 0 ) index = 1
         else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
       }
       if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
         if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ) index = selectedKeeper.data.index
-        else if ( count == 0 && isSetup ) index = 0
-        else if ( count == 1 && isSetup ) index = 3
-        else if ( count == 2 && isSetup ) index = 4
+        else if ( count == 0 ) index = 0
+        else if ( count == 1 ) index = 3
+        else if ( count == 2 ) index = 4
         else index = 0
       }
-      if( selectedKeeper.shareType == 'primaryKeeper' ) index = 0
     }
     setSelectedKeeper( defaultKeeperObj )
     setKeeperTypeModal( false )
@@ -535,23 +501,16 @@ export default function ManageBackup( props ) {
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
         isPrimaryKeeper: selectedKeeper.shareType == 'primaryKeeper' ? true : false,
-        isChangeKeeperAllow,
         index: index > -1 ? index : 0,
       } )
     } else if ( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         index,
-        isChangeKeeperAllow
       } )
-    } else if ( selectedKeeper.shareType == 'pdf' ) {
-      props.navigation.navigate(
-        'PersonalCopyHistoryNewBHR', {
-          ...navigationParams,
-          isChangeKeeperAllow
-        }
-      )
-    }
+    } else if ( selectedKeeper.shareType == 'pdf' ) props.navigation.navigate( 'PersonalCopyHistoryNewBHR', navigationParams )
+    else if( selectedKeeper.shareType == 'securityQuestion' ) props.navigation.navigate( 'SecurityQuestionHistoryNewBHR', navigationParams )
+    else if( selectedKeeper.shareType == 'cloud' ) props.navigation.navigate( 'CloudBackupHistory', navigationParams )
     setOnKeeperButtonClick( false )
   }
 
@@ -688,7 +647,6 @@ export default function ManageBackup( props ) {
                   dispatch( generateMetaShare( selectedLevelId ) )
                 } else {
                   const obj = {
-                    id: selectedLevelId,
                     selectedKeeper: {
                       shareType: type,
                       name: name,
@@ -699,11 +657,9 @@ export default function ManageBackup( props ) {
                       data: {
                       },
                     },
-                    isSetup: true,
                   }
                   setSelectedKeeper( obj.selectedKeeper )
                   setShowLoader( false )
-                  setSelectedLevelId( 2 )
                   goToHistory( obj, 'TYPE' )
                 }
               } catch( err ){
