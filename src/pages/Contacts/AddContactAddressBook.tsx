@@ -297,10 +297,11 @@ export default function AddContactAddressBook( props ) {
           contact: selectedContacts[ 0 ],
         } )
       } else if ( props.navigation.state.params?.fromScreen === 'Gift' )  {
-        props.navigation.navigate( 'EnterGiftDetails', {
+        props.navigation.replace( 'EnterGiftDetails', {
           fromScreen: 'Gift',
           giftId: props.navigation.state.params?.giftId,
           contact: selectedContacts,
+          setActiveTab: props.navigation.state.params.setActiveTab
         } )
 
       } else {

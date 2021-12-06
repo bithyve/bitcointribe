@@ -6,6 +6,7 @@ import { Action } from 'redux'
 export const CARD_DATA = 'CARD_DATA'
 export const CURRENCY_CODE = 'CURRENCY_CODE'
 export const CURRENCY_KIND_SET = 'CURRENCY_KIND_SET'
+export const GIFT_CURRENCY_KIND_SET = 'GIFT_CURRENCY_KIND_SET'
 export const FCM_TOKEN_VALUE = 'FCM_TOKEN_VALUE'
 export const SECONDARY_DEVICE_ADDRESS_VALUE = 'SECONDARY_DEVICE_ADDRESS_VALUE'
 export const RELEASE_CASES_VALUE = 'RELEASE_CASES_VALUE'
@@ -39,6 +40,13 @@ export interface CurrencyKindSetAction extends Action {
 export const currencyKindSet = ( kind: CurrencyKind ) => {
   return {
     type: CURRENCY_KIND_SET,
+    payload: kind,
+  }
+}
+
+export const giftCurrencyKindSet = ( kind: CurrencyKind ) => {
+  return {
+    type: GIFT_CURRENCY_KIND_SET,
     payload: kind,
   }
 }

@@ -42,6 +42,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import ToggleContainer from './CurrencyToggle'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -66,7 +67,9 @@ const ManageGifts = ( { navigation } ) => {
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
-  const currencyKind = useCurrencyKind()
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
   const currencyCode = useCurrencyCode()
 
   const dispatch = useDispatch()
@@ -139,13 +142,13 @@ const ManageGifts = ( { navigation } ) => {
     if( selectedGift.type === GiftType.SENT ){
       if( selectedGift.status === GiftStatus.CREATED || selectedGift.status === GiftStatus.RECLAIMED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     } else if ( selectedGift.type === GiftType.RECEIVED ) {
       if( selectedGift.status === GiftStatus.ACCEPTED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     }
@@ -232,7 +235,8 @@ const ManageGifts = ( { navigation } ) => {
       </ModalContainer>
         } */}
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between'
+          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between',
+          marginRight: 10,
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -248,11 +252,12 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-
+          <ToggleContainer />
         </View>
 
         <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+          marginRight: 10, marginTop: 10,
         }}>
           <HeaderTitle
             firstLineTitle={'Manage Gifts'}
@@ -275,7 +280,7 @@ const ManageGifts = ( { navigation } ) => {
         </View>
         <ScrollView
           style={{
-            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 )
+            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 ),
           }}
           horizontal>
           {
@@ -284,6 +289,7 @@ const ManageGifts = ( { navigation } ) => {
               return (
                 <TouchableOpacity
                   key={item}
+                  activeOpacity={0.6}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
                     shadowColor: active === item ? '#77B9EB96' : Colors.white,
@@ -324,7 +330,9 @@ const ManageGifts = ( { navigation } ) => {
         }
         { active === GiftStatus.CREATED &&
         <TouchableOpacity
-          onPress={() => navigation.navigate( 'CreateGift' )}
+          onPress={() => navigation.navigate( 'CreateGift', {
+            setActiveTab: buttonPress
+          } )}
           style={{
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
             marginVertical: hp( 1 )
@@ -391,8 +399,8 @@ const ManageGifts = ( { navigation } ) => {
                 {active === GiftStatus.CREATED ?
                   <ManageGiftsList
                     titleText={'Available Gift'}
-                    // subText={'Lorem ipsum dolor sit amet'}
-                    amt={numberWithCommas( item.amount )}
+                    currency={prefersBitcoin ? ' sats' : currencyCode}
+                    amt={getAmt( item.amount )}
                     date={item.timestamps?.created}
                     image={<GiftCard />}
                     onPress={() => processGift( item, title, walletName )}
@@ -406,7 +414,7 @@ const ManageGifts = ( { navigation } ) => {
                       key={index}
                       onPress={() => {
                         navigation.navigate( 'GiftDetails', {
-                          title, walletName, gift: item, avatar: true, contactDetails
+                          title, walletName, gift: item, avatar: true, contactDetails, setActiveTab: buttonPress
                         } )
                       }
                       }
@@ -590,7 +598,6 @@ const styles = StyleSheet.create( {
     height: hp( 3.6 ),
     paddingHorizontal: wp( 2 ),
     marginTop: wp( 2.7 ),
-    marginRight: wp( 4 ),
     alignSelf: 'flex-start'
   },
   createView: {

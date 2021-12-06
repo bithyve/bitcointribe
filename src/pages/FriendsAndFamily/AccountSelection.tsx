@@ -75,7 +75,7 @@ export default function AccountSelection( { onClose, onChangeType } ) {
           height: hp( '36%' )
         }}>
           {activeAccounts.map( ( item, index ) => {
-            if ( [ AccountType.SWAN_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( item.primarySubAccount.type ) || !item.primarySubAccount.isUsable || item.primarySubAccount.isTFAEnabled ) return
+            if ( [ AccountType.TEST_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( item.primarySubAccount.type ) || !item.primarySubAccount.isUsable || item.primarySubAccount.isTFAEnabled ) return
             return(
               <View key={index}>
                 <CardWithRadioBtn

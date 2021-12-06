@@ -44,7 +44,7 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( '' )
+  const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
@@ -52,7 +52,7 @@ const GiftDetails = ( { navigation } ) => {
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
     title: 'Gift Sats',
-    subText: 'A gift that keeps giving',
+    subText: 'Something that appreciates with time',
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
@@ -77,12 +77,14 @@ const GiftDetails = ( { navigation } ) => {
             navigation.replace( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
+              note,
               headerText: strings.addContact,
               subHeaderText:strings.send,
               contactText:strings.adding,
               showDone:true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
             navigation.replace( 'SendGift', {
@@ -91,7 +93,8 @@ const GiftDetails = ( { navigation } ) => {
               note,
               contact,
               senderName: name,
-              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           }
 
@@ -196,7 +199,6 @@ const GiftDetails = ( { navigation } ) => {
         >{'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
-          disabled
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
           style={[ styles.dashedContainer, {
             borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
@@ -231,9 +233,9 @@ const GiftDetails = ( { navigation } ) => {
                   </Text>
                 </View>
               </View>
-              {/* {
+              {
                 dropdownBoxOpenClose ? <ArrowUp />  : <ArrowDown />
-              } */}
+              }
             </View>
           </View>
         </TouchableOpacity>
@@ -318,7 +320,9 @@ const GiftDetails = ( { navigation } ) => {
           style={[ styles.inputBoxLong, styles.inputField ]}
         >
           <TextInput
-            style={styles.modalInputBox}
+            style={[ styles.modalInputBox, {
+              fontFamily: Fonts.FiraSansItalic
+            } ]}
             placeholder={`Add a personal note (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
@@ -332,6 +336,8 @@ const GiftDetails = ( { navigation } ) => {
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
+            numberOfLines={2}
+            multiline
             onChangeText={( text ) => {
               setNote( text )
             }}

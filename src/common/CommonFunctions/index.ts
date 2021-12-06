@@ -375,7 +375,9 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
   const appVersion = DeviceInfo.getVersion()
 
   let deepLink: string
-
+  if( extraData?.note ) {
+    extraData.note=  extraData.note.replaceAll( ' ', '%20' )
+  }
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
@@ -410,7 +412,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         navigation: {
           forcedRedirectEnabled: false
         }
-      }, dynamicLinks.ShortLinkType.SHORT )
+      }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
       console.log( error )
       shortLink = ''

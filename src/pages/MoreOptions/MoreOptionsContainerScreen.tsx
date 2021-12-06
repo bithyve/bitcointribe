@@ -129,18 +129,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const findImage = ( name ) => {
     switch ( name ){
-        case 'Account Management':
+        case strings.accountManagement:
           return ( <AccManagement /> )
-        case 'Node Settings':
+        case strings.node:
           return ( <Node /> )
-        case 'Wallet Settings':
+        case strings.walletSettings:
           return ( <Wallet /> )
-        case 'App Info':
+        case strings.AppInfo:
           return ( <AppInfo /> )
         default:
-          return null //You might want to return something else here//
+          return null
     }
   }
+
   return (
     <View style={{
       backgroundColor: Colors.blue

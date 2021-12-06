@@ -166,7 +166,10 @@ export const associateGiftWatcher = createWatcher(
 )
 
 function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
-  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+  const storedGifts: {[id: string]: Gift} = accountsState.gifts
+  const exclusiveGiftCodes: {[exclusiveGiftCode: string]: boolean} = accountsState.exclusiveGiftCodes
+
   const { channelAddress } = payload
   const wallet: Wallet = yield select( state => state.storage.wallet )
   for( const giftId in storedGifts ){
@@ -204,6 +207,11 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     }
   } catch( err ){
     Toast( 'Gift expired/unavailable' )
+    return
+  }
+
+  if( exclusiveGiftCodes && exclusiveGiftCodes[ giftMetaData.exclusiveGiftCode ] ){
+    Toast( 'This gift is part of an exclusive giveaway. Cannot be claimed more than once' )
     return
   }
 
@@ -790,8 +798,8 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string, isCurrentLevel0?: boolean }} ) {
-  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId, isCurrentLevel0 } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string, giftNote?: string, isCurrentLevel0?: boolean }} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId, giftNote, isCurrentLevel0 } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -871,7 +879,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       .digest( 'hex' )
     giftToSend.sender.contactId = permanentChannelAddress
     giftToSend.receiver.contactId = permanentChannelAddress
-    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, GiftThemeId.ONE, '' )
+    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, GiftThemeId.ONE, giftNote )
     yield put( updateGift( updatedGift ) )
     yield call( dbManager.createGift, updatedGift )
     yield put( updateWalletImageHealth( {
