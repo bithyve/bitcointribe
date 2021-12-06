@@ -632,7 +632,7 @@
       "4": "You are not logged-in into your Google Drive account. Please log in from your Phone Settings.",
       "15": "Request timed out. Please try again.",
       "30": "Please check authentication with your google account in settings and try again.",
-      "errorinuploadingdata": "Error in uploading data. Please re-try again.",
+      "errorinuploadingdata": "Error in uploading data. Please try again later.",
       "12501": "We recommend signing in as it easily allows you to backup your wallet on your personal cloud.",
       "default": "We encountered a non-standard error. Please try again after sometime or contact us"
     }

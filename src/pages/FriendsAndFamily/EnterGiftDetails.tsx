@@ -154,7 +154,7 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           <Text
             style={{
-              fontSize: RFValue( 14 ),
+              fontSize: RFValue( 15 ),
               color: Colors.black,
             }}
           >You have received gift from{' '}
@@ -191,7 +191,7 @@ const GiftDetails = ( { navigation } ) => {
         </View>
         <Text
           style={{
-            fontSize: RFValue( 14 ),
+            fontSize: RFValue( 15 ),
             color: Colors.black,
             marginHorizontal: wp( 5 ),
             lineHeight: wp( 7 )
