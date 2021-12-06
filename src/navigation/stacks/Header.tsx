@@ -157,6 +157,7 @@ interface HomeStateTypes {
   currencyCode: string;
   notificationDataChange: boolean;
   trustedContactRequest: any;
+  isCurrentLevel0: boolean;
   giftRequest: any;
   recoveryRequest: any;
   isLoadContacts: boolean;
@@ -294,6 +295,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currencyCode: 'USD',
       notificationDataChange: false,
       trustedContactRequest: null,
+      isCurrentLevel0: false,
       giftRequest: null,
       recoveryRequest: null,
       isLoadContacts: false,
@@ -332,6 +334,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         const { trustedContactRequest, giftRequest } = processRequestQR( qrData )
         if( trustedContactRequest ){
           this.setState( {
+            isCurrentLevel0: JSON.parse( qrData ).currentLevel == 0 ? true : false,
             trustedContactRequest
           },
           () => {
@@ -1056,7 +1059,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       this.closeBottomSheet()
       const { navigation } = this.props
-      const { trustedContactRequest } = this.state
+      const { trustedContactRequest, isCurrentLevel0 } = this.state
 
       let channelKeys: string[]
       try{
@@ -1081,7 +1084,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
 
       if( trustedContactRequest.isExistingContact ){
-        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
+        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey, isCurrentLevel0 )
       } else {
         navigation.navigate( 'ContactsListForAssociateContact', {
           postAssociation: ( contact ) => {
@@ -1091,7 +1094,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               channelKey: trustedContactRequest.channelKey,
               contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
               isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
-              isKeeper: trustedContactRequest.isKeeper
+              isKeeper: trustedContactRequest.isKeeper,
+              isCurrentLevel0
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )

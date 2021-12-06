@@ -238,7 +238,7 @@ export default function ManageBackup( props ) {
       const obj = {
         selectedKeeper: {
           shareType: 'primaryKeeper',
-          name: 'Personal Device 1',
+          name: selectedKeeperName,
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
@@ -494,7 +494,6 @@ export default function ManageBackup( props ) {
         else if ( count == 2 ) index = 4
         else index = 0
       }
-      if( selectedKeeper.shareType == 'primaryKeeper' ) index = 0
     }
     setSelectedKeeper( defaultKeeperObj )
     setKeeperTypeModal( false )

@@ -239,6 +239,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           encryptionKey: encryption_key,
           walletName: wallet.walletName,
           keysToEncrypt,
+          currentLevel
         } )
         const QRData = JSON.stringify( {
           type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
@@ -247,6 +248,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           encryptionHint,
           walletName: wallet.walletName,
           version: appVersion,
+          currentLevel
         } )
         setKeeperQR( QRData )
       }
