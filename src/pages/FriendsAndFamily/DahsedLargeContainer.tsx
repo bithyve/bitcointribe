@@ -141,7 +141,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansItalic,
               width: wp( '63%' )
             }}>
-              {props.extraText.replaceAll( '%20', ' ' )}
+              {props.extraText ? props.extraText.replace( /%20/g, ' ' ) : ''}
             </Text>
             <Text style={{
               color: Colors.blue,
