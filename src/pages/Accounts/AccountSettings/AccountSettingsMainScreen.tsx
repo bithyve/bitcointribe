@@ -226,7 +226,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ primarySubAccount ] )
 
   function showArchiveModal() {
-    if ( primarySubAccount.balances.confirmed === 0 ) {
+    if ( primarySubAccount.balances.confirmed + primarySubAccount.balances.unconfirmed === 0 ) {
       setShowAccountArchiveModal( true )
     } else {
       // checkAccountBalance()
