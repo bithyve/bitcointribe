@@ -117,6 +117,7 @@ interface ContactDetailsPropTypes {
   updateSecondaryShardStatus: boolean;
   getSecondaryDataInfoStatus: boolean;
   setSecondaryDataInfoStatus: any;
+  IsCurrentLevel0: boolean;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -1224,45 +1225,40 @@ class ContactDetails extends PureComponent<
             )}
           </View>
         )}
-        {this.contactsType == 'I am the Keeper of' && this.props.openApproval != null && this.props.availableKeepers.length == 0 && (
+        {this.contactsType == 'I am the Keeper of' && (
           <View style={styles.keeperViewStyle}>
-            {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
+            <TouchableOpacity
               disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING )}
               style={{
                 ...styles.bottomButton,
                 opacity: this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING ? 1 : 0.5,
               }}
-              onPress={() => {
-                this.generateQR( 'recovery' )
-              }
-              }
+              onPress={() => this.generateQR( 'recovery' )}
             >
-              {/* <Image
-                source={require( '../../assets/images/icons/icon_restore.png' )}
-                style={styles.buttonImage}
-              /> */}
               <Text style={styles.buttonText}>Show Recovery Key</Text>
               <Text style={styles.buttonSubText}>During wallet recovery process</Text>
-            </TouchableOpacity>}
-            {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-                // justifyContent: 'space-around',
+            </TouchableOpacity>
+            {this.props.openApproval && this.props.openApproval != null && this.props.availableKeepers.length && !this.props.IsCurrentLevel0 ? <TouchableOpacity
+              style={styles.bottomButton}
+              onPress={() => {
+                this.setState( {
+                  showQRClicked: true
+                } )
+                this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
               }}
+            >
+              <Text style={styles.buttonText}>Scan Approval Key</Text>
+              <Text style={styles.buttonSubText}>Get Approval from other Keepers</Text>
+            </TouchableOpacity>: <TouchableOpacity
+              style={styles.bottomButton}
               onPress={() => {
                 this.generateQR( 'approval' )
               }}
             >
-              {/* <Image
-                source={require( '../../assets/images/icons/icon_restore.png' )}
-                style={styles.buttonImage}
-              /> */}
-              <Text style={[ styles.buttonText, {
-
-              } ]}>Show Approval Key</Text>
+              <Text style={styles.buttonText}>Show Approval Key</Text>
               <Text style={styles.buttonSubText}>Approve changes for the contact</Text>
             </TouchableOpacity> }
-            {encryptedExitKey ? (
+            {!this.props.openApproval && this.props.openApproval != null && encryptedExitKey ? (
               <TouchableOpacity
                 style={{
                   ...styles.bottomButton,
@@ -1277,10 +1273,6 @@ class ContactDetails extends PureComponent<
                   }
                 }}
               >
-                {/* <Image
-                  source={require( '../../assets/images/icons/icon_request.png' )}
-                  style={styles.buttonImage}
-                /> */}
                 <View>
                   <Text style={styles.buttonText} numberOfLines={1}>
                     {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
@@ -1295,24 +1287,6 @@ class ContactDetails extends PureComponent<
             ) : null}
           </View>
         )}
-        {this.props.openApproval && this.props.openApproval != null && this.props.availableKeepers.length && <View style={{
-          ...styles.keeperViewStyle, justifyContent: 'flex-start', paddingLeft: wp( 5 )
-        }}><TouchableOpacity
-            style={{
-              ...styles.bottomButton,
-            }}
-            onPress={() => {
-              this.setState( {
-                showQRClicked: true
-              } )
-              this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
-            }}
-          >
-            <Text style={[ styles.buttonText, {
-            } ]}>Scan Approval Key</Text>
-            <Text style={styles.buttonSubText}>Get Approval from other Keepers</Text>
-          </TouchableOpacity></View> }
-
         {/* </View> */}
         <BottomSheet
           enabledInnerScrolling={true}
@@ -1419,7 +1393,7 @@ class ContactDetails extends PureComponent<
           showQRScanner: false, showQRClicked: false
         } )}>
           <QRModal
-            isFromKeeperDeviceHistory={false}
+            isFromKeeperDeviceHistory={true}
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
@@ -1435,7 +1409,7 @@ class ContactDetails extends PureComponent<
               } )
             }}
             onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Test","channelId":"b6fda5fccdcd52d4bf7791f629d5de30d9f559ad6733ff9a0e7d2429745f4ccc","streamId":"765087d33","secondaryChannelKey":"TGfS9qqRHcaQOzOQ6WR1Plhc","version":"2.0.0","walletId":"5999171c4129eca5a12a0221712a708c66a8507ff81c139a33812f3383982766"}'
+              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Sada","channelId":"9efb4d94fdeb93b464cb8f72e424b8a4794202ea9a0af51d7cd081ab5a181ae0","streamId":"4625ca458","secondaryChannelKey":"g9HWZIxWOj8tYX8OxhJ88E3E","version":"2.0.5","walletId":"9a1e60930db75fbb51d67d71ae552d3d2e2d9eaeae126c4a23000070afa6c23a"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />
@@ -1485,6 +1459,7 @@ const mapStateToProps = ( state ) => {
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
     updateSecondaryShardStatus: idx( state, ( _ ) => _.bhr.loading.updateSecondaryShardStatus ),
     getSecondaryDataInfoStatus: idx( state, ( _ ) => _.bhr.loading.getSecondaryDataInfoStatus ),
+    IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
   }
 }
 export default connect( mapStateToProps, {

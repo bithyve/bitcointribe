@@ -549,7 +549,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
         type: shareType,
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
-        currentLevel: currentLevel,
+        currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
           MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :

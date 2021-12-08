@@ -266,6 +266,7 @@ interface HomePropsTypes {
   approvalContactData: ContactRecipientDescribing;
   rejectedExistingContactRequest: any;
   trustedContacts: Trusted_Contacts;
+  IsCurrentLevel0: boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -871,7 +872,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       this.updateBadgeCounter()
     }
-    if( prevProps.openApproval != this.props.openApproval ){
+    if( prevProps.openApproval != this.props.openApproval && !this.props.IsCurrentLevel0 ){
       if( this.props.openApproval ){
         this.openBottomSheetOnLaunch(
           BottomSheetKind.APPROVAL_MODAL,
@@ -1760,6 +1761,7 @@ const mapStateToProps = ( state ) => {
     availableKeepers: idx( state, ( _ ) => _.bhr.availableKeepers ),
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
+    IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
   }
 }
 

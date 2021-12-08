@@ -47,7 +47,7 @@ function* cloudWorker( { payload } ) {
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
-        type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
+        type: share ? share.shareType : 'cloud',
         scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : '1of1',
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
