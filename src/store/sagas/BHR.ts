@@ -225,9 +225,7 @@ function* generateLevel1SharesWorker( { payload } ){
     // } )
     yield put( updateMetaSharesKeeper( metaShares ) )
     yield call( dbManager.updateBHR, {
-      encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
-      encryptedSMSecretsKeeper: [],
       oldMetaSharesKeeper: []
     } )
     if ( level == 2 ) {
@@ -261,9 +259,7 @@ function* generateLevel2SharesWorker( { payload } ){
   if ( metaShares ) {
     yield put( updateMetaSharesKeeper( metaShares ) )
     yield call( dbManager.updateBHR, {
-      encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
-      encryptedSMSecretsKeeper: [],
       oldMetaSharesKeeper: existingMetaShares
     } )
     if ( level == 3 ) {
@@ -2350,9 +2346,7 @@ function* retrieveMetaSharesWorker( { payload } ) {
 
     yield put( updateMetaSharesKeeper( metaShares ) )
     dbManager.updateBHR( {
-      encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
-      encryptedSMSecretsKeeper: [],
       oldMetaSharesKeeper: []
     } )
 
@@ -2653,7 +2647,6 @@ function* changeQuestionAnswerWorker( { payload } ) {
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const s3 = yield call( dbManager.getBHR )
     const oldMetaSharesKeeper: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
-    const encryptedSecretsKeeper: string[] = [ ...s3.encryptedSecretsKeeper ]
 
     const metaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
     const updatedWallet: Wallet = {
@@ -2672,9 +2665,7 @@ function* changeQuestionAnswerWorker( { payload } ) {
     const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer, payload )
     yield put( updateMetaSharesKeeper( updatedMetaShares ) )
     yield call( dbManager.updateBHR, {
-      encryptedSecretsKeeper,
       metaSharesKeeper: updatedMetaShares,
-      encryptedSMSecretsKeeper: [],
       oldMetaSharesKeeper: updatedOldMetaShares
     } )
     if( contacts ){

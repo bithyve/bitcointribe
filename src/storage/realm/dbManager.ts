@@ -285,8 +285,6 @@ const updateBHR = async ( data ) => {
     const dbRef = db.objects( schema.BHR )
     if( dbRef && dbRef.length ){
       db.write( () => {
-        dbRef[ 0 ][ 'encryptedSMSecretsKeeper' ] = data.encryptedSMSecretsKeeper
-        dbRef[ 0 ][ 'encryptedSecretsKeeper' ] = data.encryptedSecretsKeeper
         dbRef[ 0 ][ 'metaSharesKeeper' ] = data.metaSharesKeeper
         dbRef[ 0 ][ 'oldMetaSharesKeeper' ] = data.oldMetaSharesKeeper
       } )
@@ -357,9 +355,7 @@ const getBHR = () => {
       return bhr[ 0 ]
     } else {
       return {
-        encryptedSecretsKeeper: [],
         metaSharesKeeper: [],
-        encryptedSMSecretsKeeper: [],
         oldMetaSharesKeeper:[],
       }
     }
