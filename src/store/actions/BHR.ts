@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-import { BackupStreamData, cloudDataInterface, LevelHealthInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, cloudDataInterface, LevelHealthInterface, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -12,6 +12,8 @@ export const UPDATE_HEALTH = 'UPDATE_HEALTH'
 export const ERROR_SENDING = 'ERROR_SENDING'
 export const UPDATE_SHARES_HEALTH = 'UPDATE_SHARES_HEALTH'
 export const GENERATE_META_SHARE = 'GENERATE_META_SHARE'
+export const UPDATE_META_SHARES_KEEPER= 'UPDATE_META_SHARES_KEEPER'
+
 export const MSHARES = 'MSHARES'
 export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE'
 export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE'
@@ -193,6 +195,15 @@ export const generateMetaShare = ( level, isUpgrade? ) => {
   return {
     type: GENERATE_META_SHARE, payload: {
       level, isUpgrade
+    }
+  }
+}
+
+export const updateMetaSharesKeeper = ( metaSharesKeeper: MetaShare[] ) => {
+  return {
+    type: UPDATE_META_SHARES_KEEPER,
+    payload: {
+      metaSharesKeeper
     }
   }
 }

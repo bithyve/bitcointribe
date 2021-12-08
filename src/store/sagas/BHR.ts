@@ -68,7 +68,8 @@ import {
   getApprovalFromKeepers,
   REJECTED_EC_REQUEST,
   setSecondaryDataInfoStatus,
-  CHANGE_QUESTION_ANSWER
+  CHANGE_QUESTION_ANSWER,
+  updateMetaSharesKeeper
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -222,6 +223,7 @@ function* generateLevel1SharesWorker( { payload } ){
     // dbManager.updateWallet( {
     //   smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
     // } )
+    yield put( updateMetaSharesKeeper( metaShares ) )
     yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -257,6 +259,7 @@ function* generateLevel2SharesWorker( { payload } ){
   const { encryptedPrimarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
   const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, existingMetaShares, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
+    yield put( updateMetaSharesKeeper( metaShares ) )
     yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -2344,6 +2347,8 @@ function* retrieveMetaSharesWorker( { payload } ) {
         }
       }
     }
+
+    yield put( updateMetaSharesKeeper( metaShares ) )
     dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -2665,6 +2670,7 @@ function* changeQuestionAnswerWorker( { payload } ) {
     } )
     yield put( updateCloudData() )
     const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer, payload )
+    yield put( updateMetaSharesKeeper( updatedMetaShares ) )
     yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper,
       metaSharesKeeper: updatedMetaShares,

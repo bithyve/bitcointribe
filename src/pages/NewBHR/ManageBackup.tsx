@@ -124,7 +124,8 @@ export default function ManageBackup( props ) {
 
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ knowMoreModal, setKnowMoreModal ] = useState( false )
-  const [ metaSharesKeeper, setMetaSharesKeeper ]: [ MetaShare[], any ] = useState( [ ...s3.metaSharesKeeper ] )
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper ) || []
+  // const [ metaSharesKeeper, setMetaSharesKeeper ]: [ MetaShare[], any ] = useState( [ ...s3.metaSharesKeeper ] )
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
@@ -133,11 +134,11 @@ export default function ManageBackup( props ) {
   useEffect( ()=>{
 
     InteractionManager.runAfterInteractions( async() => {
-      realm.objects( schema.BHR ).addListener( obj => {
-        if( obj.length > 0 ) {
-          setMetaSharesKeeper( obj[ 0 ].metaSharesKeeper )
-        }
-      } )
+      // realm.objects( schema.BHR ).addListener( obj => {
+      //   if( obj.length > 0 ) {
+      //     setMetaSharesKeeper( obj[ 0 ].metaSharesKeeper )
+      //   }
+      // } )
       // onPressKeeperButton= debounce( onPressKeeperButton.bind( this ), 1500 )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
@@ -234,7 +235,7 @@ export default function ManageBackup( props ) {
   }, [ levelHealth ] )
 
   useEffect( ()=>{
-    if ( metaSharesKeeper.length == 3 && onKeeperButtonClick ) {
+    if ( metaSharesKeeper?.length == 3 && onKeeperButtonClick ) {
       const obj = {
         selectedKeeper: {
           shareType: 'primaryKeeper',
@@ -256,7 +257,7 @@ export default function ManageBackup( props ) {
   }, [ metaSharesKeeper ] )
 
   useEffect( ()=>{
-    if ( metaSharesKeeper.length == 5 && onKeeperButtonClick ) {
+    if ( metaSharesKeeper?.length == 5 && onKeeperButtonClick ) {
       const obj = {
         selectedKeeper: {
           shareType: selectedKeeperType,

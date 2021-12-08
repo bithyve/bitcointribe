@@ -40,7 +40,8 @@ import {
   TYPE_BOTTOMSHEET_OPEN,
   ALLOW_SECURE_ACCOUNT,
   OPEN_CLOSE_APPROVAL,
-  SET_SECONDARY_DATA_INFO_STATUS
+  SET_SECONDARY_DATA_INFO_STATUS,
+  UPDATE_META_SHARES_KEEPER
 } from '../actions/BHR'
 
 const initialState: {
@@ -82,7 +83,7 @@ const initialState: {
   }[];
   keeperInfo: KeeperInfoInterface[];
   shares: any;
-  metaShare: MetaShare;
+  metaSharesKeeper: MetaShare[];
   errorReceiving: Boolean;
   secondaryShareDownloaded: any;
   pdfInfo: {
@@ -154,7 +155,7 @@ const initialState: {
   errorSending: false,
   shares: null,
   keeperInfo: [],
-  metaShare: null,
+  metaSharesKeeper: null,
   errorReceiving: false,
   secondaryShareDownloaded: null,
   pdfInfo: {
@@ -214,6 +215,12 @@ export default ( state = initialState, action ) => {
           ...state,
           levelHealth: action.payload.health,
           currentLevel: action.payload.currentLevel,
+        }
+
+      case UPDATE_META_SHARES_KEEPER:
+        return {
+          ...state,
+          metaSharesKeeper: action.payload.metaSharesKeeper
         }
 
       case ERROR_SENDING:
