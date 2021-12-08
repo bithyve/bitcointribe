@@ -69,7 +69,8 @@ import {
   REJECTED_EC_REQUEST,
   setSecondaryDataInfoStatus,
   CHANGE_QUESTION_ANSWER,
-  updateMetaSharesKeeper
+  updateMetaSharesKeeper,
+  updateOldMetaSharesKeeper
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -258,6 +259,7 @@ function* generateLevel2SharesWorker( { payload } ){
   const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, existingMetaShares, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
     yield put( updateMetaSharesKeeper( metaShares ) )
+    yield put( updateOldMetaSharesKeeper( existingMetaShares ) )
     yield call( dbManager.updateBHR, {
       metaSharesKeeper: metaShares,
       oldMetaSharesKeeper: existingMetaShares
@@ -2664,6 +2666,7 @@ function* changeQuestionAnswerWorker( { payload } ) {
     yield put( updateCloudData() )
     const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer, payload )
     yield put( updateMetaSharesKeeper( updatedMetaShares ) )
+    yield put( updateOldMetaSharesKeeper( updatedOldMetaShares ) )
     yield call( dbManager.updateBHR, {
       metaSharesKeeper: updatedMetaShares,
       oldMetaSharesKeeper: updatedOldMetaShares

@@ -13,7 +13,7 @@ export const ERROR_SENDING = 'ERROR_SENDING'
 export const UPDATE_SHARES_HEALTH = 'UPDATE_SHARES_HEALTH'
 export const GENERATE_META_SHARE = 'GENERATE_META_SHARE'
 export const UPDATE_META_SHARES_KEEPER= 'UPDATE_META_SHARES_KEEPER'
-
+export const UPDATE_OLD_META_SHARES_KEEPER= 'UPDATE_OLD_META_SHARES_KEEPER'
 export const MSHARES = 'MSHARES'
 export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE'
 export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE'
@@ -204,6 +204,15 @@ export const updateMetaSharesKeeper = ( metaSharesKeeper: MetaShare[] ) => {
     type: UPDATE_META_SHARES_KEEPER,
     payload: {
       metaSharesKeeper
+    }
+  }
+}
+
+export const updateOldMetaSharesKeeper = ( oldMetaSharesKeeper: MetaShare[] ) => {
+  return {
+    type: UPDATE_OLD_META_SHARES_KEEPER,
+    payload: {
+      oldMetaSharesKeeper
     }
   }
 }

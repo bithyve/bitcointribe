@@ -41,7 +41,8 @@ import {
   ALLOW_SECURE_ACCOUNT,
   OPEN_CLOSE_APPROVAL,
   SET_SECONDARY_DATA_INFO_STATUS,
-  UPDATE_META_SHARES_KEEPER
+  UPDATE_META_SHARES_KEEPER,
+  UPDATE_OLD_META_SHARES_KEEPER
 } from '../actions/BHR'
 
 const initialState: {
@@ -84,6 +85,7 @@ const initialState: {
   keeperInfo: KeeperInfoInterface[];
   shares: any;
   metaSharesKeeper: MetaShare[];
+  oldMetaSharesKeeper: MetaShare[];
   errorReceiving: Boolean;
   secondaryShareDownloaded: any;
   pdfInfo: {
@@ -155,7 +157,8 @@ const initialState: {
   errorSending: false,
   shares: null,
   keeperInfo: [],
-  metaSharesKeeper: null,
+  metaSharesKeeper: [],
+  oldMetaSharesKeeper: [],
   errorReceiving: false,
   secondaryShareDownloaded: null,
   pdfInfo: {
@@ -221,6 +224,12 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           metaSharesKeeper: action.payload.metaSharesKeeper
+        }
+
+      case UPDATE_OLD_META_SHARES_KEEPER:
+        return {
+          ...state,
+          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
         }
 
       case ERROR_SENDING:
