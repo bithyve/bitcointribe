@@ -500,10 +500,10 @@ function* recoverWalletWithoutIcloudWorker( { payload } ) {
     }
     const primaryMnemonic = backupData.primaryMnemonicShard.encryptedShare.pmShare
     const secondaryMnemonics = ''
-    const image: NewWalletImage = yield call( BHROperations.fetchWalletImage, backupData.primaryMnemonicShard.meta.walletId )
+    const image = yield call( BHROperations.fetchWalletImage, backupData.primaryMnemonicShard.meta.walletId )
     yield call( recoverWalletWorker, {
       payload: {
-        level: selectedBackup.levelStatus, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics
+        level: selectedBackup.levelStatus, answer, selectedBackup, image: image.data.walletImage, primaryMnemonic, secondaryMnemonics, isWithoutCloud: true
       }
     } )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
@@ -525,13 +525,13 @@ export const recoverWalletWithoutIcloudWatcher = createWatcher(
 
 function* recoverWalletWorker( { payload } ) {
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-  let { level, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics, shares }: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
+  let { level, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics, shares, isWithoutCloud }: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
     primaryData?: PrimaryStreamData;
     backupData?: BackupStreamData;
     secondaryData?: SecondaryStreamData;
-  }[] } = payload
+  }[], isWithoutCloud?: boolean } = payload
   try {
-    if( shares ){
+    if( shares && !isWithoutCloud ){
       const pmShares = []
       const smShares = []
       for ( let i = 0; i < shares.length; i++ ) {
@@ -542,11 +542,11 @@ function* recoverWalletWorker( { payload } ) {
       secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
       primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
     }
-
-    const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
-    console.log( 'getWI', getWI )
-    if( getWI.status == 200 ) {
-      image = getWI.data.walletImage
+    if( !isWithoutCloud ) {
+      const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+      if( getWI.status == 200 ) {
+        image = getWI.data.walletImage
+      }
     }
     const accounts = image.accounts
     const acc = []
@@ -1505,7 +1505,9 @@ function* createChannelAssetsWorker( { payload } ) {
             question: wallet.security.question,
             scheme: '1of1',
           },
-          encryptedShare: wallet.primaryMnemonic
+          encryptedShare: {
+            pmShare: wallet.primaryMnemonic
+          }
         }
       } else {
         primaryMnemonicShardTemp = {

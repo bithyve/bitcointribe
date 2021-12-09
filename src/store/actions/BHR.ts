@@ -270,7 +270,7 @@ export const recoverWallet = ( payload: { level: number, answer: string, selecte
   primaryData?: PrimaryStreamData;
   backupData?: BackupStreamData;
   secondaryData?: SecondaryStreamData;
-}[] } ) => {
+}[], isWithoutCloud?: boolean } ) => {
   return {
     type: RECOVER_WALLET_HEALTH, payload: payload
   }
