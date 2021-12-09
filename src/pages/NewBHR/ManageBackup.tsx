@@ -138,13 +138,11 @@ export default function ManageBackup( props ) {
           setMetaSharesKeeper( obj[ 0 ].metaSharesKeeper )
         }
       } )
-      // onPressKeeperButton= debounce( onPressKeeperButton.bind( this ), 1500 )
+      await onRefresh()
+      dispatch( modifyLevelData() )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
           dispatch( setLevelToNotSetupStatus() )
-          dispatch( modifyLevelData() )
-        } else {
-          await onRefresh()
           dispatch( modifyLevelData() )
         }
       } )
