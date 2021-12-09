@@ -35,14 +35,18 @@ import {
   reclaimGift,
 } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
-import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import AccountSelection from './AccountSelection'
 import ModalContainer from '../../components/home/ModalContainer'
 import AddGiftToAccount from './AddGiftToAccount'
 import ThemeList from './Theme'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -61,6 +65,16 @@ const GiftDetails = ( { navigation } ) => {
   } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
+  const currencyCode = useCurrencyCode()
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   useEffect( ()=> {
     if( gift.status === GiftStatus.SENT ) setIsOpen( true )
@@ -83,6 +97,18 @@ const GiftDetails = ( { navigation } ) => {
     >
       <Text style={styles.buttonText}>{text}</Text>
     </TouchableOpacity>
+  }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
+    }
   }
 
   return (
@@ -113,11 +139,12 @@ const GiftDetails = ( { navigation } ) => {
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
+              {/* <FontAwesome
                 name="long-arrow-left"
                 color={Colors.blue}
                 size={17}
-              />
+              /> */}
+              <LeftArrow />
             </View>
           </TouchableOpacity>
         </View>
@@ -228,7 +255,7 @@ const GiftDetails = ( { navigation } ) => {
                       fontWeight: '600',
                     }}
                   >
-                    {walletName ? walletName : 'Checking Account'}
+                    {walletName ? walletName : 'From Checking Account'}
                   </Text>
                   {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
@@ -249,7 +276,7 @@ const GiftDetails = ( { navigation } ) => {
                     marginHorizontal: wp( 2 ),
                   }}
                 >
-                  {numberWithCommas( gift.amount )}
+                  {getAmt( gift.amount )}
                   <Text
                     style={{
                       color: Colors.lightTextColor,
@@ -257,8 +284,7 @@ const GiftDetails = ( { navigation } ) => {
                       fontFamily: Fonts.FiraSansRegular,
                     }}
                   >
-                    {' '}
-                    sats
+                    {prefersBitcoin ? ' sats' : ` ${currencyCode}`}
                   </Text>
                 </Text>
                 {gift.status !== GiftStatus.CREATED ? (
@@ -383,7 +409,8 @@ const GiftDetails = ( { navigation } ) => {
                 gift.type === GiftType.RECEIVED &&
                 ( item[ 0 ] == 'created' ||
                   item[ 0 ] == 'sent' ||
-                  item[ 0 ] == 'reclaimed' )
+                  item[ 0 ] == 'reclaimed' ||
+                  item[ 0 ] == 'associated' )
               ) {
                 return null
               }
@@ -438,9 +465,9 @@ const GiftDetails = ( { navigation } ) => {
         </View>
       </SafeAreaView>
       <View style={{
-        marginBottom: wp( '3%' ), marginTop: wp( '3%' ), flexDirection: 'row',
+        marginBottom: wp( '3%' ), flexDirection: 'row',
         justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ),
-        paddingVertical: wp( '2%' ),
+        paddingVertical: wp( '2%' ), backgroundColor:'#F5F5F5',
       }}>
         {/* Reclaim */}
         {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ? (
@@ -453,6 +480,7 @@ const GiftDetails = ( { navigation } ) => {
         { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
+            setActiveTab: navigation.state.params.setActiveTab
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Add To Account */}
@@ -495,8 +523,8 @@ const styles = StyleSheet.create( {
   },
   line: {
     height: hp( 7.2 ),
-    width: wp( 0.07 ),
-    backgroundColor: Colors.lightTextColor,
+    width: wp( 0.05 ),
+    backgroundColor: Colors.currencyGray,
     marginHorizontal: wp( 3 ),
   },
   subText: {
@@ -559,7 +587,7 @@ const styles = StyleSheet.create( {
   bottomButton: {
     backgroundColor: Colors.lightBlue,
     height: wp( '13%' ),
-    width: 'auto',
+    width: '40%',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

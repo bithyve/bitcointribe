@@ -32,7 +32,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
-import { setupPassword } from '../../store/actions/BHR'
+import { changeQuestionAnswer, setupPassword } from '../../store/actions/BHR'
 import {  setCloudData } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -64,7 +64,7 @@ function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
-export default function SetNewPassword( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName?: any } ) => void, goBack: () => any; } } ) {
+export default function SetNewPassword( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { isChange?: any } ) => void, goBack: () => any; } } ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
@@ -125,9 +125,11 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const [ activeIndex, setActiveIndex ] = useState( 0 )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const setupPasswordStatus = useSelector( ( state ) => state.bhr.loading.setupPasswordStatus )
+  const changeAnswerStatus = useSelector( ( state ) => state.bhr.loading.changeAnswerStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.bhr.cloudPermissionGranted )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
+  const isChange = props.navigation.getParam( 'isChange' )
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -149,15 +151,22 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   }, [] )
 
   useEffect( () =>{
-    if( !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !=='notSetup' ){
+    if( !isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !=='notSetup' ){
       setLoaderModal( false )
       props.navigation.goBack()
     }
   }, [ setupPasswordStatus, levelHealth ] )
 
+  useEffect( ()=>{
+    if( isChange && !changeAnswerStatus && loaderModal ){
+      setLoaderModal( false )
+      props.navigation.goBack()
+    }
+  }, [ changeAnswerStatus ] )
+
   const setPassword = ( security ) =>{
     requestAnimationFrame( () => {
-      dispatch( updateCloudPermission( true ) )
+      // dispatch( updateCloudPermission( true ) )
       dispatch( setupPassword( security ) )
       const current = Date.now()
       AsyncStorage.setItem(
@@ -174,12 +183,16 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     } )
   }
 
-  useEffect( ()=>{
-    if( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true && !isSkipClicked && ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) ) ){
-      dispatch( setCloudData() )
-    }
-  }, [ cloudPermissionGranted, levelHealth ] )
+  // useEffect( ()=>{
+  //   if( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+  //     cloudPermissionGranted === true && !isSkipClicked && ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) ) ){
+  //     dispatch( setCloudData() )
+  //   }
+  // }, [ cloudPermissionGranted, levelHealth ] )
+
+  const changeAnswer = ( security ) =>{
+    dispatch( changeQuestionAnswer( security.questionId, security.question, security.answer ) )
+  }
 
   const showLoader = () => {
     setLoaderModal( true )
@@ -278,7 +291,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
       }
     }
     if( isSkip ) security = null
-    setPassword( security )
+    if( isChange )changeAnswer( security )
+    else setPassword( security )
     showSecurityQue( false )
     showEncryptionPswd( false )
   }
@@ -305,7 +319,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   }, [ message, subTextMessage ] )
 
   const confirmAction = () => {
-    dispatch( updateCloudPermission( true ) )
+    // dispatch( updateCloudPermission( true ) )
     if ( activeIndex === 0 ) {
       showSecurityQue( true )
       setAnswer( '' )

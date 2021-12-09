@@ -26,7 +26,8 @@ import { Gift, GiftThemeId, Wallet } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
+import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import More from '../../assets/images/svgs/icon_more_gray.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
@@ -44,7 +45,7 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( '' )
+  const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
@@ -52,7 +53,7 @@ const GiftDetails = ( { navigation } ) => {
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
     title: 'Gift Sats',
-    subText: 'A gift that keeps giving',
+    subText: 'Something that appreciates with time',
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
@@ -77,12 +78,14 @@ const GiftDetails = ( { navigation } ) => {
             navigation.replace( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
+              note,
               headerText: strings.addContact,
               subHeaderText:strings.send,
               contactText:strings.adding,
               showDone:true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
             navigation.replace( 'SendGift', {
@@ -91,7 +94,8 @@ const GiftDetails = ( { navigation } ) => {
               note,
               contact,
               senderName: name,
-              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           }
 
@@ -125,17 +129,18 @@ const GiftDetails = ( { navigation } ) => {
               navigation.goBack()
             }}
           >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
+            <View style={styles.headerLeftIconInnerContainer}>
+              {/* <FontAwesome
                 name="long-arrow-left"
                 color={Colors.blue}
                 size={17}
-              />
+              /> */}
+              <LeftArrow />
             </View>
           </TouchableOpacity>
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginRight: wp( 4 )
+          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginLeft: wp( 3 )
         }}>
           <HeaderTitle
             firstLineTitle={'Enter gift details'}
@@ -147,12 +152,13 @@ const GiftDetails = ( { navigation } ) => {
           />
         </View>
         <View style={{
-          flexDirection: 'row', marginHorizontal: wp( 5 ), alignItems: 'center',
+          flexDirection: 'row', marginHorizontal: wp( 8 ), alignItems: 'center',
         }}>
           <Text
             style={{
-              fontSize: RFValue( 14 ),
+              fontSize: RFValue( 15 ),
               color: Colors.black,
+              fontWeight:'400'
             }}
           >You have received gift from{' '}
           </Text>
@@ -188,15 +194,14 @@ const GiftDetails = ( { navigation } ) => {
         </View>
         <Text
           style={{
-            fontSize: RFValue( 14 ),
+            fontSize: RFValue( 15 ),
             color: Colors.black,
-            marginHorizontal: wp( 5 ),
+            marginHorizontal: wp( 8 ),
             lineHeight: wp( 7 )
           }}
         >{'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
-          disabled
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
           style={[ styles.dashedContainer, {
             borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
@@ -231,9 +236,9 @@ const GiftDetails = ( { navigation } ) => {
                   </Text>
                 </View>
               </View>
-              {/* {
+              {
                 dropdownBoxOpenClose ? <ArrowUp />  : <ArrowDown />
-              } */}
+              }
             </View>
           </View>
         </TouchableOpacity>
@@ -318,7 +323,9 @@ const GiftDetails = ( { navigation } ) => {
           style={[ styles.inputBoxLong, styles.inputField ]}
         >
           <TextInput
-            style={styles.modalInputBox}
+            style={[ styles.modalInputBox, {
+              fontFamily: Fonts.FiraSansItalic
+            } ]}
             placeholder={`Add a personal note (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
@@ -332,6 +339,8 @@ const GiftDetails = ( { navigation } ) => {
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
+            numberOfLines={2}
+            multiline
             onChangeText={( text ) => {
               setNote( text )
             }}
@@ -612,12 +621,13 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
+    //height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
-    width: '90%'
+    paddingHorizontal: 15,
+    width: '90%',
+    paddingVertical: 7,
   },
   inputBox: {
     borderRadius: 10,
@@ -679,6 +689,9 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
+  headerLeftIconInnerContainer:{
+    marginLeft: wp(8.7),
+  }
 } )
 
 export default GiftDetails

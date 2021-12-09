@@ -850,7 +850,8 @@ export interface Wallet {
   accounts: {
     [accountType: string]: string[] // array of accountIds
   },
-  version: string
+  version: string,
+  smShare?: string,
 }
 
 export interface Account {
@@ -902,6 +903,8 @@ export interface MultiSigAccount extends Account {
 
 export interface DonationAccount extends Account {
   donee: string;
+  donationName: string;
+  donationDescription: string;
   configuration: {
     displayBalance: boolean;
     displayIncomingTxs: boolean;
@@ -915,7 +918,7 @@ export interface DonationAccount extends Account {
   }
   xprivs?: {                            // additional xpirvs for multi-sig
     secondary?: string,
-  }
+  },
 }
 
 export enum AccountType {
@@ -964,7 +967,8 @@ export enum GiftThemeId {
   TWO = 'TWO',
   THREE = 'THREE',
   FOUR = 'FOUR',
-  FIVE = 'FIVE'
+  FIVE = 'FIVE',
+  SIX= 'SIX'
 }
 
 export enum GiftType {
@@ -978,6 +982,7 @@ export enum GiftStatus {
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
   RECLAIMED = 'RECLAIMED',
+  ASSOCIATED = 'ASSOCIATED',
   EXPIRED = 'EXPIRED',
 }
 export interface Gift {
@@ -994,6 +999,7 @@ export interface Gift {
     sent?: number,
     accepted?: number,
     reclaimed?: number,
+    associated?: number,
   }
   sender: {
     walletId: string,
@@ -1008,14 +1014,16 @@ export interface Gift {
     contactId?: string // permanentAddress of the contact
   },
   note?: string,
+  exclusiveGiftCode?: string,
   deepLinkConfig?: {
     encryptionType: string,
     encryptionKey: string,
-  }
+  },
 }
 
 export interface GiftMetaData {
   status: GiftStatus,
+  exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,
     FCM: string,
@@ -1023,12 +1031,12 @@ export interface GiftMetaData {
 }
 
 export interface cloudDataInterface {
-  levelStatus: number;
-  encryptedCloudDataJson: string;
-  walletName: string;
-  questionId: string;
-  question: string;
-  keeperData: string;
+  levelStatus?: number;
+  encryptedCloudDataJson?: string;
+  walletName?: string;
+  questionId?: string;
+  question?: string;
+  keeperData?: string;
   bhXpub?: string;
   shares?: any;
   secondaryShare?: string;

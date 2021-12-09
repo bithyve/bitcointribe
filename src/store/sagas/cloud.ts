@@ -7,7 +7,7 @@ import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_C
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
+import { Accounts, KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -35,19 +35,17 @@ function* cloudWorker( { payload } ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     if( levelHealth.length == 0 ) return
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) {
-
-      const s3 = yield call( dbManager.getBHR )
-      const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+      const metaSharesKeeper = yield select( ( state ) => state.bhr.metaSharesKeeper )
+      const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
       console.log( 'CLOUD CALL PAYLOAD', payload )
       const index: number = MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== null || MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== undefined ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
       const RK: MetaShare = index != null && MetaShares.length ? MetaShares[ index ] : null
-
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
-        type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
+        type: share ? share.shareType : 'cloud',
         scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : '1of1',
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
@@ -83,14 +81,16 @@ function* cloudWorker( { payload } ) {
       const shares = RK ? JSON.stringify( RK ) : ''
       let encryptedCloudDataJson
 
-      const walletDB = yield call( dbManager.getWallet )
-      const contacts = yield call( dbManager.getTrustedContacts )
-      const accounts = yield call( dbManager.getAccounts )
+      const trustedContacts: Trusted_Contacts = yield select(
+        ( state ) => state.trustedContacts.contacts,
+      )
+      const accounts: Accounts = yield select( state => state.accounts.accounts )
+
       const encKey = BHROperations.getDerivedKey(
-        bip39.mnemonicToSeedSync( walletDB.primaryMnemonic ).toString( 'hex' ),
+        bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' ),
       )
 
-      encryptedCloudDataJson = yield call( WIEncryption, accounts, encKey, contacts, walletDB,
+      encryptedCloudDataJson = yield call( WIEncryption, accounts, encKey, trustedContacts, wallet,
         wallet.security.answer, accountShells,
         activePersonalNode,
         versionHistory,
@@ -102,7 +102,7 @@ function* cloudWorker( { payload } ) {
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
-        secondaryShare: walletDB.smShare ? walletDB.smShare : '',
+        secondaryShare: wallet.smShare ? wallet.smShare : '',
         encryptedCloudDataJson: encryptedCloudDataJson,
         seed: shares ? '' : encryptedData,
         walletName: wallet.walletName,

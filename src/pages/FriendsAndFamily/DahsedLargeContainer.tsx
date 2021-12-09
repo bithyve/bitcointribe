@@ -22,7 +22,9 @@ import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
-  const currencyKind = useCurrencyKind()
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
   const currencyCode = useCurrencyCode()
   const exchangeRates = useSelector(
     ( state ) => state.accounts.exchangeRates
@@ -102,7 +104,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginRight: wp( 9 )
             }}>
-              {'You have received a gift from '}
+              {'You have received bitcoin gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),
@@ -110,7 +112,7 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\nYou can choose to add the sats to any of your accounts, or forward the gift to any of your friends and family (at no extra fees!)'}
+              {'\n\nAdd bitcoin to an account or keep the Gift Card to send to someone else'}
             </Text>
           </View>
           {props.date &&
@@ -136,10 +138,10 @@ const DashedLargeContainer = ( props ) => {
               fontSize: RFValue( 12 ),
               letterSpacing: 0.12,
               lineHeight: 18,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.FiraSansItalic,
               width: wp( '63%' )
             }}>
-              {props.extraText}
+              {props.extraText ? props.extraText.replace( /%20/g, ' ' ) : ''}
             </Text>
             <Text style={{
               color: Colors.blue,

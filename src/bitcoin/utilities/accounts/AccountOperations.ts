@@ -1061,6 +1061,7 @@ export default class AccountOperations {
     amounts: number[],
     averageTxFees: AverageTxFees,
     includeFee?: boolean,
+    exclusiveGifts?: boolean,
   ): Promise<{
     txid: string;
     gifts: Gift[];
@@ -1071,6 +1072,9 @@ export default class AccountOperations {
 
     const recipients = []
     const gifts: Gift[] = []
+    let exclusiveGiftCode
+    if( exclusiveGifts ) exclusiveGiftCode = walletDetails.walletId.slice( 0, 5 ) + '-' + Date.now()
+
     amounts.forEach( amount => {
       const keyPair = bitcoinJS.ECPair.makeRandom( {
         network: network
@@ -1106,7 +1110,8 @@ export default class AccountOperations {
           accountId: account.id,
         },
         receiver: {
-        }
+        },
+        exclusiveGiftCode,
       }
 
       gifts.push( createdGift )

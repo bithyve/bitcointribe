@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Accounts } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -169,13 +169,14 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   }
 }
 
-export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer, accountShells,
+export const WIEncryption = async ( accounts: Accounts, encKey, contacts: Trusted_Contacts, walletDB, answer, accountShells,
   activePersonalNode,
   versionHistory,
   restoreVersions, ) => {
   const acc = {
   }
-  accounts.forEach( account => {
+
+  Object.values( accounts ).forEach( account => {
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
@@ -201,7 +202,7 @@ export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer
     details2FA: walletDB.details2FA,
   }
   const channelIds = []
-  contacts.forEach( contact => {
+  Object.values( contacts ).forEach( contact => {
     channelIds.push( contact.channelKey )
   } )
   if( channelIds.length > 0 ) {
@@ -350,7 +351,7 @@ export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: Tr
   return deepLinkKind
 }
 
-export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any } ) => {
+export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData, currentLevel }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any, currentLevel?: string } ) => {
 
   let encryptedChannelKeys: string
   let encryptionHint: string
@@ -373,15 +374,16 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 
   const appType = config.APP_STAGE
   const appVersion = DeviceInfo.getVersion()
-
   let deepLink: string
-
+  if( extraData?.note ) {
+    extraData.note=  extraData.note.replace( / /g, '%20' )
+  }
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+currentLevel: ''}`
   }
 
   let shortLink = ''
@@ -410,7 +412,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         navigation: {
           forcedRedirectEnabled: false
         }
-      }, dynamicLinks.ShortLinkType.SHORT )
+      }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
       console.log( error )
       shortLink = ''
@@ -539,6 +541,7 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -551,7 +554,8 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: true
+            isExistingContact: true,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -564,7 +568,8 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: false
+            isExistingContact: false,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 

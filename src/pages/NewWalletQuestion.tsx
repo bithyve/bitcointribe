@@ -336,7 +336,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         answer: pswd,
       }
     }
-    if( isSkip ) security = null
+    if( isSkip ) {
+      security = null
+      dispatch( updateCloudPermission( false ) )
+    } else dispatch( updateCloudPermission( true ) )
     checkCloudLogin( security )
     showSecurityQue( false )
     showEncryptionPswd( false )
