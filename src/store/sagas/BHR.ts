@@ -459,9 +459,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
   try {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     const { icloudData, selectedBackup, answer }: { icloudData: NewWalletImage, selectedBackup: cloudDataInterface, answer: string } = payload
-    console.log( 'payload.icloudData', payload.icloudData )
-    console.log( 'payload.selectedBackup', payload.selectedBackup )
-    console.log( 'payload.answer', payload.answer )
     const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedData
     const secondaryMnemonics = selectedBackup.secondaryShare ? BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedData : ''
     const image: NewWalletImage = icloudData
@@ -491,9 +488,8 @@ function* recoverWalletWithoutIcloudWorker( { payload } ) {
   try {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     const { backupData, answer }: { backupData: BackupStreamData, answer: string } = payload
-
     const selectedBackup: cloudDataInterface = {
-      levelStatus: backupData.keeperInfo[ 0 ].currentLevel,
+      levelStatus: backupData.keeperInfo[ backupData.keeperInfo.length - 1 ].currentLevel,
       questionId: backupData.primaryMnemonicShard.meta.questionId,
       question: backupData.primaryMnemonicShard.meta.question,
       keeperData: JSON.stringify( backupData.keeperInfo ),
