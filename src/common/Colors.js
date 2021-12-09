@@ -31,6 +31,7 @@ const Colors = {
   seaBlue: '#CFE8F8',
   deepBlue: '#04578B',
   blueText: '#1582C4',
+  moreBlueText: '#006DB4',
   babyGray: '#BCB6B6',
   greyTextColor: '#656565',
   coral: '#D35400',

@@ -416,6 +416,7 @@ class RestoreWithICloud extends Component<
       const newArray = []
       try {
         arr = JSON.parse( result )
+        arr = arr.reverse()
       } catch ( error ) {
         //console.log('ERROR', error);
       }
