@@ -330,17 +330,6 @@ const updateGift = ( id, gift  ) => {
   }
 }
 
-const getGifts = ( ids ) => {
-  if( ids ) {
-    const idsQuery = ids.map( id => `id = "${id}"` ).join( ' OR ' )
-    const giftsRef = db.objects( schema.Gifts ).filtered( `(${idsQuery})` )
-    return giftsRef
-  } else {
-    const giftsRef = db.objects( schema.Gifts )
-    return giftsRef
-  }
-}
-
 const getAccounts = () => {
   try {
     const accountsRef = db.objects( schema.Account )
@@ -364,7 +353,6 @@ export default {
   markAccountChecked,
   updateTransaction,
   updateTransactions,
-  getGifts,
   createGifts,
   createGift,
   updateGift

@@ -105,7 +105,8 @@ import {
   cloudDataInterface,
   Accounts,
   AccountType,
-  ContactDetails
+  ContactDetails,
+  Gift
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -789,14 +790,15 @@ function* updateWalletImageWorker( { payload } ) {
     walletImage.versionHistory = BHROperations.encryptWithAnswer( JSON.stringify( STATE_DATA.versionHistory ), encryptionKey ).encryptedData
   }
   if( updateGifts ) {
-    const gitfsRef = yield call( dbManager.getGifts, giftIds )
-    const gitfs = gitfsRef.toJSON()
-    const data = {
+    const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+    const encryptedGifts = {
     }
-    gitfs.forEach( gitf => {
-      data[ gitf.id ] = BHROperations.encryptWithAnswer( JSON.stringify( gitf ), encryptionKey ).encryptedData
+    giftIds.forEach( id => {
+      const gift = storedGifts[ id ]
+      if( gift ) encryptedGifts[ gift.id ] = BHROperations.encryptWithAnswer( JSON.stringify( gift ), encryptionKey ).encryptedData
     } )
-    walletImage.gifts = data
+
+    walletImage.gifts = encryptedGifts
   }
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
