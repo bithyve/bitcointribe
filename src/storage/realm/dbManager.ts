@@ -347,23 +347,6 @@ const getWallet = () => {
   return wallets[ 0 ]
 }
 
-const getBHR = () => {
-  try {
-    const dbRef = db.objects( schema.BHR )
-    const bhr = Array.from( dbRef )
-    if( bhr && bhr.length > 0 ) {
-      return bhr[ 0 ]
-    } else {
-      return {
-        metaSharesKeeper: [],
-        oldMetaSharesKeeper:[],
-      }
-    }
-  } catch ( error ) {
-    console.log( error )
-  }
-}
-
 const getTrustedContacts = () => {
   const rrustedContactRef = db.objects( schema.TrustedContact )
   const contacts = Array.from( rrustedContactRef )
@@ -391,7 +374,6 @@ export default {
   updateContact,
   updateWallet,
   getTrustedContacts,
-  getBHR,
   updateBHR,
   markAccountChecked,
   updateTransaction,

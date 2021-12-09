@@ -35,9 +35,8 @@ function* cloudWorker( { payload } ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     if( levelHealth.length == 0 ) return
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) {
-
-      const s3 = yield call( dbManager.getBHR )
-      const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+      const metaSharesKeeper = yield select( ( state ) => state.bhr.metaSharesKeeper )
+      const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
       console.log( 'CLOUD CALL PAYLOAD', payload )

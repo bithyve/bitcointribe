@@ -50,7 +50,6 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
 export default function ManageBackup( props ) {
   const dispatch = useDispatch()
-  const s3 = dbManager.getBHR()
   const cloudBackupStatus: CloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
@@ -124,8 +123,7 @@ export default function ManageBackup( props ) {
 
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ knowMoreModal, setKnowMoreModal ] = useState( false )
-  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper ) || []
-  // const [ metaSharesKeeper, setMetaSharesKeeper ]: [ MetaShare[], any ] = useState( [ ...s3.metaSharesKeeper ] )
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )

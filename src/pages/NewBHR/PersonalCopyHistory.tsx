@@ -108,9 +108,11 @@ const PersonalCopyHistory = ( props ) => {
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.bhr.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
-  const s3 = dbManager.getBHR()
-  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
+  const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
+
+  const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useSelector(
     ( state ) => state.trustedContacts.contacts,
   )
