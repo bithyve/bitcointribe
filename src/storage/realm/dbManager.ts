@@ -330,20 +330,9 @@ const updateGift = ( id, gift  ) => {
   }
 }
 
-const getAccounts = () => {
-  try {
-    const accountsRef = db.objects( schema.Account )
-    const accounts = Array.from( accountsRef )
-    return accounts
-  } catch ( error ) {
-    console.log( error )
-  }
-}
-
 export default {
   initDb,
   createWallet,
-  getAccounts,
   createAccounts,
   createAccount,
   updateAccount,

@@ -736,14 +736,16 @@ function* updateWalletImageWorker( { payload } ) {
     walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify( details2FA ), encryptionKey ).encryptedData
   }
   if( updateAccounts && accountIds.length > 0 ) {
-    const accounts = yield call( dbManager.getAccounts )
+    const accounts: Accounts = yield select( state => state.accounts.accounts )
     const acc = {
     }
-    accounts.forEach( account => {
-      const data = account.toJSON()
-      const shouldUpdate = accountIds.includes( data.id )
+    Object.values( accounts ).forEach( account => {
+      const shouldUpdate = accountIds.includes( accounts.id )
       if( shouldUpdate )  {
         const txns = []
+        const accToEncrypt: any = {
+          ...account
+        }
         account.transactions.forEach( tx => {
           txns.push( {
             receivers: tx.receivers,
@@ -758,23 +760,24 @@ function* updateWalletImageWorker( { payload } ) {
             type: tx.type
           } )
         } )
-        data.transactions = []
-        data.transactionsMeta = txns
+        accToEncrypt.transactions = []
+        accToEncrypt.transactionsMeta = txns
         const transactionsNote = {
         }
-        if( data.transactionsNote.length > 0 ) {
-          data.transactionsNote.forEach( txNote => {
+        if( accToEncrypt.transactionsNote.length > 0 ) {
+          accToEncrypt.transactionsNote.forEach( txNote => {
             transactionsNote[ txNote.txId ] = txNote.note
           } )
         }
-        data.transactionsNote = transactionsNote
+        accToEncrypt.transactionsNote = transactionsNote
         acc[ account.id ] = {
-          encryptedData: BHROperations.encryptWithAnswer( JSON.stringify( data ), encryptionKey ).encryptedData
+          encryptedData: BHROperations.encryptWithAnswer( JSON.stringify( accToEncrypt ), encryptionKey ).encryptedData
         }
       }
     } )
     walletImage.accounts = acc
   }
+
   if( updateContacts ) {
     const trustedContacts: Trusted_Contacts = yield select(
       ( state ) => state.trustedContacts.contacts,
@@ -785,10 +788,12 @@ function* updateWalletImageWorker( { payload } ) {
     } )
     walletImage.contacts = BHROperations.encryptWithAnswer( JSON.stringify( channelIds ), encryptionKey ).encryptedData
   }
+
   if( updateVersion ) {
     const STATE_DATA = yield call( stateDataToBackup )
     walletImage.versionHistory = BHROperations.encryptWithAnswer( JSON.stringify( STATE_DATA.versionHistory ), encryptionKey ).encryptedData
   }
+
   if( updateGifts ) {
     const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
     const encryptedGifts = {
@@ -800,15 +805,13 @@ function* updateWalletImageWorker( { payload } ) {
 
     walletImage.gifts = encryptedGifts
   }
+
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
     if ( res.data ) console.log( 'Wallet Image updated', payload )
     yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
     //yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
-    console.log( {
-      err: res.err
-    } )
     yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
     throw new Error( 'Failed to update Wallet Image' )
   }

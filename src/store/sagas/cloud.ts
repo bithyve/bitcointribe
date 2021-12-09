@@ -7,7 +7,7 @@ import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_C
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { Accounts, KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -84,7 +84,8 @@ function* cloudWorker( { payload } ) {
       const trustedContacts: Trusted_Contacts = yield select(
         ( state ) => state.trustedContacts.contacts,
       )
-      const accounts = yield call( dbManager.getAccounts )
+      const accounts: Accounts = yield select( state => state.accounts.accounts )
+
       const encKey = BHROperations.getDerivedKey(
         bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' ),
       )
