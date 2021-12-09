@@ -26,7 +26,8 @@ import { Gift, GiftThemeId, Wallet } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
+import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import More from '../../assets/images/svgs/icon_more_gray.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
@@ -128,17 +129,18 @@ const GiftDetails = ( { navigation } ) => {
               navigation.goBack()
             }}
           >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
+            <View style={styles.headerLeftIconInnerContainer}>
+              {/* <FontAwesome
                 name="long-arrow-left"
                 color={Colors.blue}
                 size={17}
-              />
+              /> */}
+              <LeftArrow />
             </View>
           </TouchableOpacity>
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginRight: wp( 4 )
+          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginLeft: wp( 3 )
         }}>
           <HeaderTitle
             firstLineTitle={'Enter gift details'}
@@ -150,12 +152,13 @@ const GiftDetails = ( { navigation } ) => {
           />
         </View>
         <View style={{
-          flexDirection: 'row', marginHorizontal: wp( 5 ), alignItems: 'center',
+          flexDirection: 'row', marginHorizontal: wp( 8 ), alignItems: 'center',
         }}>
           <Text
             style={{
-              fontSize: RFValue( 14 ),
+              fontSize: RFValue( 15 ),
               color: Colors.black,
+              fontWeight:'400'
             }}
           >You have received gift from{' '}
           </Text>
@@ -191,9 +194,9 @@ const GiftDetails = ( { navigation } ) => {
         </View>
         <Text
           style={{
-            fontSize: RFValue( 14 ),
+            fontSize: RFValue( 15 ),
             color: Colors.black,
-            marginHorizontal: wp( 5 ),
+            marginHorizontal: wp( 8 ),
             lineHeight: wp( 7 )
           }}
         >{'Scan the QR or click the link to accept your gift.'}
@@ -618,12 +621,13 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
+    //height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
-    width: '90%'
+    paddingHorizontal: 15,
+    width: '90%',
+    paddingVertical: 7,
   },
   inputBox: {
     borderRadius: 10,
@@ -685,6 +689,9 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
+  headerLeftIconInnerContainer:{
+    marginLeft: wp(8.7),
+  }
 } )
 
 export default GiftDetails
