@@ -103,7 +103,6 @@ function* updateWalletWorker( { payload } ) {
   yield call( dbManager.updateWallet, {
     walletName,
   } )
-  yield call( dbManager.getWallet )
   yield put( updateWalletImageHealth( {
   } ) )
   yield put ( updateWalletNameToChannel() )
@@ -657,14 +656,16 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         const secondarySetupData = idx( instream, ( _ ) => _.primaryData.secondarySetupData )
         if( secondarySetupData ){
           const secondaryXpub = secondarySetupData.secondaryXpub
+          const smShare = secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
+          shouldUpdateSmShare = secondarySetupData.secondaryShardWI !== ''
+
           yield put( updateWallet(
             {
               ...wallet,
               secondaryXpub,
+              smShare
             }
           ) )
-          const smShare = secondarySetupData.secondaryShardWI ? secondarySetupData.secondaryShardWI : ''
-          shouldUpdateSmShare = secondarySetupData.secondaryShardWI !== ''
           yield call( dbManager.updateWallet, {
             secondaryXpub,
             smShare,

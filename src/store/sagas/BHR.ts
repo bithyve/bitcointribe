@@ -716,7 +716,8 @@ function* updateWalletImageWorker( { payload } ) {
     giftIds,
   } = payload
   yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
-  const wallet = yield call( dbManager.getWallet )
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+
   const walletImage : NewWalletImage = {
     name: wallet.walletName,
     walletId : wallet.walletId,
@@ -731,7 +732,7 @@ function* updateWalletImageWorker( { payload } ) {
       secondaryXpub: wallet.secondaryXpub,
       ...wallet.details2FA
     }
-    walletImage.details2FA = BHROperations.encryptWithAnswer( details2FA, encryptionKey ).encryptedData
+    walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify( details2FA ), encryptionKey ).encryptedData
   }
   if( updateAccounts && accountIds.length > 0 ) {
     const accounts = yield call( dbManager.getAccounts )
@@ -774,9 +775,11 @@ function* updateWalletImageWorker( { payload } ) {
     walletImage.accounts = acc
   }
   if( updateContacts ) {
-    const contacts = yield call( dbManager.getTrustedContacts )
+    const trustedContacts: Trusted_Contacts = yield select(
+      ( state ) => state.trustedContacts.contacts,
+    )
     const channelIds = []
-    contacts.forEach( contact => {
+    Object.values( trustedContacts ).forEach( contact => {
       channelIds.push( contact.channelKey )
     } )
     walletImage.contacts = BHROperations.encryptWithAnswer( JSON.stringify( channelIds ), encryptionKey ).encryptedData
@@ -1329,7 +1332,7 @@ function* setLevelToNotSetupStatusWorker( ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const { metaSharesKeeper } = yield select( ( state ) => state.bhr )
 
-    const wallet = yield call( dbManager.getWallet )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const metaShares: MetaShare[] = [ ...metaSharesKeeper ]
     let toDelete:LevelInfo[]
     const shareArray = []
@@ -1946,8 +1949,8 @@ function* updateKeeperInfoToChannelWorker( ) {
     const { metaSharesKeeper } = yield select( ( state ) => state.bhr )
 
     const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
-    const wallet = yield call( dbManager.getWallet )
-    const { walletName } = yield select( ( state ) => state.storage.wallet )
+
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const channelSyncUpdates: {
       channelKey: string,
       streamId: string,
@@ -1962,7 +1965,7 @@ function* updateKeeperInfoToChannelWorker( ) {
         const primaryData: PrimaryStreamData = {
           contactDetails: contacts[ channelKey ].contactDetails,
           walletID: wallet.walletId,
-          walletName,
+          walletName:  wallet.walletName,
           relationType: TrustedContactRelationTypes.KEEPER,
         }
 

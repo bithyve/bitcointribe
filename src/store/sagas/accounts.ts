@@ -1052,12 +1052,11 @@ export const mergeAccountShellsWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
     const { qrdata, QRModalHeader, accountShell } = payload
-    const walletDB = yield call( dbManager.getWallet )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const walletId = wallet.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     let secondaryMnemonic
-    const sharesArray = [ walletDB.smShare ]
+    const sharesArray = [ wallet.smShare ]
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
