@@ -230,7 +230,7 @@ export default function ManageBackup( props ) {
       const obj = {
         selectedKeeper: {
           shareType: 'primaryKeeper',
-          name: selectedKeeperName,
+          name: strings.Backuponadevice,
           reshareVersion: 0,
           status: 'notSetup',
           updatedAt: 0,
@@ -291,7 +291,7 @@ export default function ManageBackup( props ) {
     if( navigationObj.selectedKeeper && onKeeperButtonClick ) {
       setSelectedKeeper( navigationObj.selectedKeeper )
       setSelectedLevelId( navigationObj.id )
-      if( navigationObj.selectedKeeper.shareType && navigationObj.selectedKeeper.shareType == 'primaryKeeper' ){
+      if( selectedLevelId == 2 && SelectedRecoveryKeyNumber == 1 ){
         goToHistory( navigationObj, 'navigationObjIF' )
       } else if( navigationObj.selectedKeeper && navigationObj.selectedKeeper.shareId && navigationObj.selectedKeeper.status !== 'notSetup' ){
         goToHistory( navigationObj, 'navigationObjIF' )
