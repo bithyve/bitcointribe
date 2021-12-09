@@ -777,14 +777,8 @@ export const S3MetaShareSchema: ObjectSchema = {
 export const BHRSchemaSchema: ObjectSchema = {
   name: BHR,
   properties: {
-    encryptedSecretsKeeper: {
-      type: 'string?[]', optional: true
-    },
     metaSharesKeeper: {
       type: 'list', objectType: S3MetaShare, default: []
-    },
-    encryptedSMSecretsKeeper: {
-      type: 'string?[]', optional: true
     },
     oldMetaSharesKeeper:{
       type: 'list', objectType: S3MetaShare, default: []

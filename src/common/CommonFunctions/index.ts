@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Accounts } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -169,13 +169,14 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   }
 }
 
-export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer, accountShells,
+export const WIEncryption = async ( accounts: Accounts, encKey, contacts: Trusted_Contacts, walletDB, answer, accountShells,
   activePersonalNode,
   versionHistory,
   restoreVersions, ) => {
   const acc = {
   }
-  accounts.forEach( account => {
+
+  Object.values( accounts ).forEach( account => {
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
@@ -201,7 +202,7 @@ export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer
     details2FA: walletDB.details2FA,
   }
   const channelIds = []
-  contacts.forEach( contact => {
+  Object.values( contacts ).forEach( contact => {
     channelIds.push( contact.channelKey )
   } )
   if( channelIds.length > 0 ) {

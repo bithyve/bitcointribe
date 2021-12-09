@@ -71,9 +71,11 @@ export default function QrAndLink( props ) {
   const oldChannelKey = props.navigation.getParam( 'oldChannelKey' )
   const index = props.navigation.getParam( 'index' )
   const recreateChannel = props.navigation.getParam( 'recreateChannel' )
-  const s3 = dbManager.getBHR()
-  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
+  const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
+
+  const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 
