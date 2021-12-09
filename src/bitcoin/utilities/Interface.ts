@@ -850,7 +850,8 @@ export interface Wallet {
   accounts: {
     [accountType: string]: string[] // array of accountIds
   },
-  version: string
+  version: string,
+  smShare?: string,
 }
 
 export interface Account {

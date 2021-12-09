@@ -50,7 +50,6 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
 export default function ManageBackup( props ) {
   const dispatch = useDispatch()
-  const s3 = dbManager.getBHR()
   const cloudBackupStatus: CloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
@@ -124,7 +123,7 @@ export default function ManageBackup( props ) {
 
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ knowMoreModal, setKnowMoreModal ] = useState( false )
-  const [ metaSharesKeeper, setMetaSharesKeeper ]: [ MetaShare[], any ] = useState( [ ...s3.metaSharesKeeper ] )
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
@@ -133,18 +132,11 @@ export default function ManageBackup( props ) {
   useEffect( ()=>{
 
     InteractionManager.runAfterInteractions( async() => {
-      realm.objects( schema.BHR ).addListener( obj => {
-        if( obj.length > 0 ) {
-          setMetaSharesKeeper( obj[ 0 ].metaSharesKeeper )
-        }
-      } )
-      // onPressKeeperButton= debounce( onPressKeeperButton.bind( this ), 1500 )
+      await onRefresh()
+      dispatch( modifyLevelData() )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
           dispatch( setLevelToNotSetupStatus() )
-          dispatch( modifyLevelData() )
-        } else {
-          await onRefresh()
           dispatch( modifyLevelData() )
         }
       } )
@@ -234,7 +226,7 @@ export default function ManageBackup( props ) {
   }, [ levelHealth ] )
 
   useEffect( ()=>{
-    if ( metaSharesKeeper.length == 3 && onKeeperButtonClick ) {
+    if ( metaSharesKeeper?.length == 3 && onKeeperButtonClick ) {
       const obj = {
         selectedKeeper: {
           shareType: 'primaryKeeper',
@@ -256,7 +248,7 @@ export default function ManageBackup( props ) {
   }, [ metaSharesKeeper ] )
 
   useEffect( ()=>{
-    if ( metaSharesKeeper.length == 5 && onKeeperButtonClick ) {
+    if ( metaSharesKeeper?.length == 5 && onKeeperButtonClick ) {
       const obj = {
         selectedKeeper: {
           shareType: selectedKeeperType,
