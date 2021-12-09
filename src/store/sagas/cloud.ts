@@ -43,11 +43,10 @@ function* cloudWorker( { payload } ) {
       console.log( 'CLOUD CALL PAYLOAD', payload )
       const index: number = MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== null || MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== undefined ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
       const RK: MetaShare = index != null && MetaShares.length ? MetaShares[ index ] : null
-
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
-        type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
+        type: share ? share.shareType : 'cloud',
         scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : '1of1',
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
