@@ -42,7 +42,8 @@ import {
   OPEN_CLOSE_APPROVAL,
   SET_SECONDARY_DATA_INFO_STATUS,
   UPDATE_META_SHARES_KEEPER,
-  UPDATE_OLD_META_SHARES_KEEPER
+  UPDATE_OLD_META_SHARES_KEEPER,
+  SET_IS_CURRENT_LEVEL0
 } from '../actions/BHR'
 
 const initialState: {
@@ -115,12 +116,13 @@ const initialState: {
   navigationObj: any;
   errorTitle: string;
   errorInfo: string;
-  status: LevelStatus,
-  isTypeBottomSheetOpen: boolean,
+  status: LevelStatus;
+  isTypeBottomSheetOpen: boolean;
   AllowSecureAccount: boolean;
   openApproval: boolean;
-  availableKeepers: KeeperInfoInterface[]
-  approvalContactData: ContactRecipientDescribing
+  availableKeepers: KeeperInfoInterface[];
+  approvalContactData: ContactRecipientDescribing;
+  IsCurrentLevel0: boolean;
 } = {
   mnemonic: '',
   loading: {
@@ -190,7 +192,8 @@ const initialState: {
   AllowSecureAccount: false,
   openApproval: false,
   availableKeepers: [],
-  approvalContactData: null
+  approvalContactData: null,
+  IsCurrentLevel0: false
 }
 
 export default ( state = initialState, action ) => {
@@ -460,6 +463,12 @@ export default ( state = initialState, action ) => {
             ...state.loading,
             getSecondaryDataInfoStatus: action.payload.flag,
           },
+        }
+
+      case SET_IS_CURRENT_LEVEL0:
+        return {
+          ...state,
+          IsCurrentLevel0: action.payload.flag,
         }
 
   }

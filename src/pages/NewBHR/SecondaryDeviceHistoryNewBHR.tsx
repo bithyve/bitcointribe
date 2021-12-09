@@ -188,7 +188,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         name: contactDetails && contactDetails.name ? contactDetails.name : contactDetails.displayedName ? contactDetails.displayedName : '',
         type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : currentLevel == 0 ? '1of1' : '2of3',
-        currentLevel: currentLevel,
+        currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: currentLevel == 0 ? -1 : MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
           MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :

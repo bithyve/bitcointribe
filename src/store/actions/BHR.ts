@@ -74,6 +74,7 @@ export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
 export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
+export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -289,7 +290,7 @@ export const recoverWallet = ( payload: { level: number, answer: string, selecte
   primaryData?: PrimaryStreamData;
   backupData?: BackupStreamData;
   secondaryData?: SecondaryStreamData;
-}[] } ) => {
+}[], isWithoutCloud?: boolean } ) => {
   return {
     type: RECOVER_WALLET_HEALTH, payload: payload
   }
@@ -643,6 +644,7 @@ export const UPDATE_SECONDARY_SHARD = 'UPDATE_SECONDARY_SHARD'
 export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
 export const GET_APPROVAL_FROM_KEEPER = 'GET_APPROVAL_FROM_KEEPER'
 export const CHANGE_QUESTION_ANSWER = 'CHANGE_QUESTION_ANSWER'
+export const SET_IS_CURRENT_LEVEL0 = 'SET_IS_CURRENT_LEVEL0'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -736,6 +738,22 @@ export const changeQuestionAnswer = ( questionId, question, answer ) => {
   return {
     type: CHANGE_QUESTION_ANSWER, payload: {
       questionId, question, answer
+    }
+  }
+}
+
+export const setIsCurrentLevel0 = ( flag ) => {
+  return {
+    type: SET_IS_CURRENT_LEVEL0, payload: {
+      flag
+    }
+  }
+}
+
+export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
+  return {
+    type: RECOVER_WALLET_WITHOUT_ICLOUD, payload: {
+      backupData, answer
     }
   }
 }

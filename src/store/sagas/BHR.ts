@@ -70,7 +70,9 @@ import {
   setSecondaryDataInfoStatus,
   CHANGE_QUESTION_ANSWER,
   updateMetaSharesKeeper,
-  updateOldMetaSharesKeeper
+  updateOldMetaSharesKeeper,
+  setIsCurrentLevel0,
+  RECOVER_WALLET_WITHOUT_ICLOUD
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -488,15 +490,51 @@ export const recoverWalletFromIcloudWatcher = createWatcher(
   RECOVER_WALLET_USING_ICLOUD
 )
 
+function* recoverWalletWithoutIcloudWorker( { payload } ) {
+  try {
+    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    const { backupData, answer }: { backupData: BackupStreamData, answer: string } = payload
+
+    const selectedBackup: cloudDataInterface = {
+      levelStatus: backupData.keeperInfo[ 0 ].currentLevel,
+      questionId: backupData.primaryMnemonicShard.meta.questionId,
+      question: backupData.primaryMnemonicShard.meta.question,
+      keeperData: JSON.stringify( backupData.keeperInfo ),
+    }
+    const primaryMnemonic = backupData.primaryMnemonicShard.encryptedShare.pmShare
+    const secondaryMnemonics = ''
+    const image = yield call( BHROperations.fetchWalletImage, backupData.primaryMnemonicShard.meta.walletId )
+    yield call( recoverWalletWorker, {
+      payload: {
+        level: selectedBackup.levelStatus, answer, selectedBackup, image: image.data.walletImage, primaryMnemonic, secondaryMnemonics, isWithoutCloud: true
+      }
+    } )
+    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+  } catch ( err ) {
+    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    console.log( {
+      err: err.message
+    } )
+    yield put( walletRecoveryFailed( true ) )
+    // Alert.alert('Wallet recovery failed!', err.message);
+  }
+  yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+}
+
+export const recoverWalletWithoutIcloudWatcher = createWatcher(
+  recoverWalletWithoutIcloudWorker,
+  RECOVER_WALLET_WITHOUT_ICLOUD
+)
+
 function* recoverWalletWorker( { payload } ) {
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-  let { level, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics, shares }: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
+  let { level, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics, shares, isWithoutCloud }: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
     primaryData?: PrimaryStreamData;
     backupData?: BackupStreamData;
     secondaryData?: SecondaryStreamData;
-  }[] } = payload
+  }[], isWithoutCloud?: boolean } = payload
   try {
-    if( shares ){
+    if( shares && !isWithoutCloud ){
       const pmShares = []
       const smShares = []
       for ( let i = 0; i < shares.length; i++ ) {
@@ -507,11 +545,11 @@ function* recoverWalletWorker( { payload } ) {
       secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
       primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
     }
-
-    const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
-    console.log( 'getWI', getWI )
-    if( getWI.status == 200 ) {
-      image = getWI.data.walletImage
+    if( !isWithoutCloud ) {
+      const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+      if( getWI.status == 200 ) {
+        image = getWI.data.walletImage
+      }
     }
     const accounts = image.accounts
     const acc = []
@@ -1460,7 +1498,31 @@ function* createChannelAssetsWorker( { payload } ) {
       const share = MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ) : OldMetaShares.length && OldMetaShares.find( value=>value.shareId==shareId ) ? OldMetaShares.find( value=>value.shareId==shareId ) : null
       let primaryMnemonicShardTemp
       if( currentLevel == 0 ){
-        primaryMnemonicShardTemp = wallet.primaryMnemonic
+        const timestamp = new Date().toLocaleString( undefined, {
+          day: 'numeric',
+          month: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        } )
+        primaryMnemonicShardTemp = {
+          shareId: shareId,
+          meta: {
+            version: DeviceInfo.getVersion(),
+            validator: '',
+            index: -1,
+            walletId: wallet.walletId,
+            tag: wallet.walletName,
+            timestamp: timestamp,
+            reshareVersion: 0,
+            questionId: wallet.security.questionId,
+            question: wallet.security.question,
+            scheme: '1of1',
+          },
+          encryptedShare: {
+            pmShare: wallet.primaryMnemonic
+          }
+        }
       } else {
         primaryMnemonicShardTemp = {
           shareId: share ? share.shareId : '',
@@ -1708,8 +1770,8 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
   try {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     const levelHealthState: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
-    let currentLevelState: number = yield select( ( state ) => state.bhr.currentLevel )
-    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const currentLevelState: number = yield select( ( state ) => state.bhr.currentLevel )
+    const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
     let levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -1750,12 +1812,19 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     if ( levelData && levelData.length && levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }
+    let currentLevel
     if( levelHealthVar[ 0 ].levelInfo.findIndex( value=>value.updatedAt == 0 ) == -1 ) {
-      if( levelHealthVar[ 0 ].levelInfo.length == 6 ) currentLevelState = 3
-      else if( levelHealthVar[ 0 ].levelInfo.length == 4 ) currentLevelState = 2
-      else currentLevelState = 1
+      if( levelHealthVar[ 0 ].levelInfo.length == 6 ) currentLevel = 3
+      else if( levelHealthVar[ 0 ].levelInfo.length == 4 ) currentLevel = 2
+      else currentLevel = 1
     }
-    yield put( updateHealth( levelHealthVar, currentLevelState, 'modifyLevelDataWatcher' ) )
+    for ( let i = 0; i < keeperInfo.length; i++ ) {
+      if( keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      else if( keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      else if( keeperInfo[ i ].scheme == '3of5' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+    }
+    yield put( putKeeperInfo( keeperInfo ) )
+    yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
     const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState )
     yield put ( updateLevelData( levelDataUpdated, isError ) )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
@@ -2552,6 +2621,7 @@ function* getApprovalFromKeeperWorker( { payload } ) {
             contact,
             ContactTrustKind.KEEPER_OF_USER,
           )
+          yield put( setIsCurrentLevel0( response.backupData.keeperInfo.length == 2 ? true : false ) )
           yield put( setOpenToApproval( true, response.backupData.keeperInfo, contactData ) )
         }
       } else { yield put( setOpenToApproval( false, [], null ) ) }

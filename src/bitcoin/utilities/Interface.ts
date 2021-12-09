@@ -557,7 +557,7 @@ export interface SecondaryStreamData {
 }
 
 export interface BackupStreamData {
-  primaryMnemonicShard?: any,
+  primaryMnemonicShard?: MetaShare,
   keeperInfo?: KeeperInfoInterface[],
 }
 
@@ -1031,12 +1031,12 @@ export interface GiftMetaData {
 }
 
 export interface cloudDataInterface {
-  levelStatus: number;
-  encryptedCloudDataJson: string;
-  walletName: string;
-  questionId: string;
-  question: string;
-  keeperData: string;
+  levelStatus?: number;
+  encryptedCloudDataJson?: string;
+  walletName?: string;
+  questionId?: string;
+  question?: string;
+  keeperData?: string;
   bhXpub?: string;
   shares?: any;
   secondaryShare?: string;
