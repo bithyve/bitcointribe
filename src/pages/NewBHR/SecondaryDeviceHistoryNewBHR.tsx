@@ -716,6 +716,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       </ModalContainer>
       <ModalContainer visible={keeperTypeModal} closeBottomSheet={()=>{setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
+          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
           headerText={strings.Changebackupmethod}
           subHeader={strings.withanewcontact}
           onPressSetup={async ( type, name ) => {

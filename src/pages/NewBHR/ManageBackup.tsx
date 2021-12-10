@@ -40,7 +40,7 @@ import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBN
 import Loader from '../../components/loader'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel } from '../../store/actions/BHR'
+import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, downloadSMShare, setApprovalStatus } from '../../store/actions/BHR'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import { setCloudData, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
@@ -127,6 +127,7 @@ export default function ManageBackup( props ) {
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
+  const [ showQRModal, setShowQRModal ] = useState( false )
 
   // After Mount didMount
   useEffect( ()=>{
@@ -225,6 +226,12 @@ export default function ManageBackup( props ) {
     }
   }, [ levelHealth ] )
 
+  const sendApprovalRequestToPK = ( ) => {
+    setShowQRModal( true )
+    setIsLevel3Started( true )
+    setKeeperTypeModal( false )
+  }
+
   useEffect( ()=>{
     if ( metaSharesKeeper?.length == 3 && onKeeperButtonClick ) {
       const obj = {
@@ -239,11 +246,15 @@ export default function ManageBackup( props ) {
           },
         },
       }
-      setSelectedKeeper( obj.selectedKeeper )
-      setShowLoader( false )
-      setSelectedLevelId( 2 )
-      goToHistory( obj, 'metaSharesKeeper2' )
-      dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
+      if( selectedKeeperType == 'pdf' ){
+        sendApprovalRequestToPK( )
+      } else {
+        setSelectedKeeper( obj.selectedKeeper )
+        setShowLoader( false )
+        setSelectedLevelId( 2 )
+        goToHistory( obj, 'metaSharesKeeper2' )
+        dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
+      }
     }
   }, [ metaSharesKeeper ] )
 
@@ -316,6 +327,7 @@ export default function ManageBackup( props ) {
   useEffect( ()=>{
     if( approvalStatus && isLevel3Started ) {
       setShowLoader( false )
+      setShowQRModal( false )
       const obj = {
         selectedKeeper: {
           ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
@@ -454,6 +466,7 @@ export default function ManageBackup( props ) {
   const goToHistory = ( value, test ) => {
     const { selectedKeeper } = value
     setShowLoader( false )
+    setShowQRModal( false )
     const navigationParams = {
       selectedTitle: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName,
       SelectedRecoveryKeyNumber,
@@ -623,6 +636,7 @@ export default function ManageBackup( props ) {
 
         <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
           <KeeperTypeModalContents
+            selectedLevelId={selectedLevelId}
             headerText={'Backup Recovery Key'}
             subHeader={strings[ 'saveyourRecovery' ]}
             onPressSetup={async ( type, name ) => {
@@ -637,6 +651,8 @@ export default function ManageBackup( props ) {
                 metaSharesKeeper.length != 5
                 ) {
                   dispatch( generateMetaShare( selectedLevelId ) )
+                } else if( type == 'pdf' ){
+                  sendApprovalRequestToPK( )
                 } else {
                   const obj = {
                     selectedKeeper: {
@@ -716,6 +732,29 @@ export default function ManageBackup( props ) {
               marginBottom: hp( '-3%' ),
             }}
             bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+          />
+        </ModalContainer>
+        <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
+          <QRModal
+            isFromKeeperDeviceHistory={true}
+            QRModalHeader={'QR scanner'}
+            title={common[ 'note' ]}
+            infoText={strings[ 'Pleaseapprovethis' ]}
+            isOpenedFlag={showQRModal}
+            onQrScan={async( qrScannedData ) => {
+              setShowQRModal( true )
+              dispatch( setApprovalStatus( false ) )
+              dispatch( downloadSMShare( qrScannedData ) )
+              setShowQRModal( false )
+            }}
+            onBackPress={() => setShowQRModal( false ) }
+            onPressContinue={async() => {
+              setShowQRModal( true )
+              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Sa","channelId":"ad5402f9881ebf177fc7d17d799d05d3dfe8133b7a9899c969890f34d18c3239","streamId":"8b58b89d1","secondaryChannelKey":"DmqheKI3eNm4rx7RBIRGE29v","version":"2.0.7","walletId":"51050a044ef91ce8dbb089e785a0d7204dd1d781d5c20d7e13037e51b17ddc65"}'
+              dispatch( setApprovalStatus( false ) )
+              dispatch( downloadSMShare( qrScannedData ) )
+              setShowQRModal( false )
+            }}
           />
         </ModalContainer>
       </View>

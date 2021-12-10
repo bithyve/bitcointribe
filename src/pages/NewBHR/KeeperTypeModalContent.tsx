@@ -162,7 +162,7 @@ export default function KeeperTypeModalContents( props ) {
         }}
       >
         {keeperTypesData.map( ( value, index ) => {
-          if ( value.type === 'cloud' && props.isCloud ) return
+          if ( value.type === 'cloud' && props.selectedLevelId != 1 && currentLevel != 0 ) return
           if ( ( value.type === 'pdf' && completedKeeperType.findIndex( ( value ) => value == 'pdf' ) > -1 ) || ( value.type === 'pdf' && currentLevel == 0 ) ) return
           if ( value.type === 'contact' && completedKeeperType.findIndex( ( value ) => value == 'contact' ) > -1 ) return
           if ( value.type === 'device' && completedKeeperType.findIndex( ( value ) => value == 'device' ) > -1 ) return
