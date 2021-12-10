@@ -140,6 +140,7 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
     }
   } )
   gift.receiver.accountId = associationAccount.id
+  gift.status = GiftStatus.EXPIRED
   yield put( updateGift( gift ) )
   yield call( dbManager.createGift, gift )
   yield put( updateAccountShells( {
@@ -164,12 +165,16 @@ export const associateGiftWatcher = createWatcher(
 )
 
 function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
-  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
-  const { channelAddress } = payload
+  const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+  const storedGifts: {[id: string]: Gift} = accountsState.gifts
+  const exclusiveGiftCodes: {[exclusiveGiftCode: string]: boolean} = accountsState.exclusiveGiftCodes
 
+  const { channelAddress } = payload
+  const wallet: Wallet = yield select( state => state.storage.wallet )
   for( const giftId in storedGifts ){
     if( channelAddress === storedGifts[ giftId ].channelAddress ) {
-      Toast( 'Gift already added' )
+      if( storedGifts[ giftId ].sender.walletId == wallet.walletId ) Toast( 'You are the owner of this gift' )
+      else Toast( 'Gift already exists' )
       return
     }
   }
@@ -204,47 +209,54 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     return
   }
 
-  if( !storedGifts[ gift.id ] ){
-    gift.type = GiftType.RECEIVED
-    gift.status = GiftStatus.ACCEPTED
-    gift.timestamps.accepted = Date.now()
+  if( exclusiveGiftCodes && exclusiveGiftCodes[ giftMetaData.exclusiveGiftCode ] ){
+    Toast( 'This gift is part of an exclusive giveaway. Cannot be claimed more than once' )
+    return
+  }
 
-    yield put( updateGift( gift ) )
-    yield put( giftAccepted( gift.channelAddress ) )
-    yield call( dbManager.createGift, gift )
-    yield put( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: [ gift.id ]
-    } ) )
-    if( giftMetaData ){
-      giftMetaData.status = GiftStatus.ACCEPTED
+  if( storedGifts[ gift.id ] ){
+    // returning gift; remove stored gift
+    delete storedGifts[ gift.id ]
+  }
 
-      const giftChannelsToSync = {
-        [ gift.channelAddress ]: {
-          metaDataUpdates: giftMetaData
-        }
+  gift.type = GiftType.RECEIVED
+  gift.status = GiftStatus.ACCEPTED
+  gift.timestamps.accepted = Date.now()
+  yield put( updateGift( gift ) )
+  yield put( giftAccepted( gift.channelAddress ) )
+  yield call( dbManager.createGift, gift )
+  yield put( updateWalletImageHealth( {
+    updateGifts: true,
+    giftIds: [ gift.id ]
+  } ) )
+  if( giftMetaData ){
+    giftMetaData.status = GiftStatus.ACCEPTED
+
+    const giftChannelsToSync = {
+      [ gift.channelAddress ]: {
+        metaDataUpdates: giftMetaData
       }
-      yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
-
-      if( giftMetaData.notificationInfo.FCM ){
-        const wallet: Wallet = yield select( state => state.storage.wallet )
-        const notification: INotification = {
-          notificationType: notificationType.GIFT_ACCEPTED,
-          title: 'Gift notification',
-          body: `Gift accepted by ${wallet.walletName}`,
-          data: {
-          },
-          tag: notificationTag.IMP,
-        }
-
-        Relay.sendNotifications( [ {
-          walletId: giftMetaData.notificationInfo.walletId,
-          FCMs: [ giftMetaData.notificationInfo.FCM ],
-        } ], notification )
-      }
-    } else {
-      console.log( 'Meta data update failed for gift:', gift.id )
     }
+    yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
+
+    if( giftMetaData.notificationInfo.FCM ){
+      const wallet: Wallet = yield select( state => state.storage.wallet )
+      const notification: INotification = {
+        notificationType: notificationType.GIFT_ACCEPTED,
+        title: 'Gift notification',
+        body: `Gift accepted by ${wallet.walletName}`,
+        data: {
+        },
+        tag: notificationTag.IMP,
+      }
+
+      Relay.sendNotifications( [ {
+        walletId: giftMetaData.notificationInfo.walletId,
+        FCMs: [ giftMetaData.notificationInfo.FCM ],
+      } ], notification )
+    }
+  } else {
+    console.log( 'Meta data update failed for gift:', gift.id )
   }
 }
 
@@ -358,6 +370,8 @@ function* syncGiftsStatusWorker() {
   }
   for( const giftId in storedGifts ){
     const gift = storedGifts[ giftId ]
+    if( gift.status === GiftStatus.EXPIRED ) continue
+
     if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
       if( gift.status !== GiftStatus.ACCEPTED && gift.status !== GiftStatus.REJECTED ){
         giftChannelToGiftIdMap[ gift.channelAddress ] = giftId
@@ -690,6 +704,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
             title: notifTitle,
             body: notifBody,
             data: {
+              channelKey: contact.channelKey
             },
             tag: notificationTag.IMP,
           }
@@ -782,8 +797,8 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string }} ) {
-  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId } = payload
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string, giftNote?: string }} ) {
+  const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId, giftNote } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -863,7 +878,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       .digest( 'hex' )
     giftToSend.sender.contactId = permanentChannelAddress
     giftToSend.receiver.contactId = permanentChannelAddress
-    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, GiftThemeId.ONE, '' )
+    const { updatedGift, deepLink } = yield call( generateGiftLink, giftToSend, senderName, FCM, GiftThemeId.ONE, giftNote )
     yield put( updateGift( updatedGift ) )
     yield call( dbManager.createGift, updatedGift )
     yield put( updateWalletImageHealth( {

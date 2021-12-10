@@ -31,9 +31,12 @@ import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, Unecr
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
-import { newAccountShellCreationCompleted } from '../actions/accounts'
+import { newAccountShellCreationCompleted, updateAccountSettings } from '../actions/accounts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import AccountShell from '../../common/data/models/AccountShell'
+import semver from 'semver'
 
 
 

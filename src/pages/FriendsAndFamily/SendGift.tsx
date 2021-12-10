@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useState, useEffect, useMemo, useContext } from 'react'
 import {
   View,
   StyleSheet,
@@ -18,7 +18,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { DeepLinkEncryptionType, GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import { Account, DeepLinkEncryptionType, Gift, GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
@@ -29,6 +29,9 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import dbManager from '../../storage/realm/dbManager'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -43,15 +46,40 @@ export default function SendGift( props ) {
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
   const giftToSend = accountsState.gifts[ giftId ]
-  const [ encryptWithOTP, setEncryptWithOTP ] = useState( true )
+  const [ encryptWithOTP, setEncryptWithOTP ] = useState( false )
   const [ encryptionOTP, setEncryptionOTP ] = useState( '' )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
   const [ giftThemeId, setGiftThemeId ] = useState( themeId?? GiftThemeId.ONE )
+  const [ encryptionKey, setEncryptionKey ]: [string, any] = useState( '' )
+  const account: Account = giftToSend && giftToSend.sender.accountId ? accountsState.accounts[ giftToSend.sender.accountId ] : null
   const dispatch = useDispatch()
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
+  const currencyCode = useCurrencyCode()
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
+    }
   }
 
   const sendGift  = async () => {
@@ -62,7 +90,8 @@ export default function SendGift( props ) {
     }
     giftToSend.sender.contactId = null
 
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink )
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink )
+    setEncryptionKey( encryptionKey )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
     dispatch( updateWalletImageHealth( {
@@ -119,38 +148,14 @@ export default function SendGift( props ) {
             />
           </View>
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => props.navigation.pop( isContact ? 4 : 3 )}
-          style={{
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-            backgroundColor: Colors.lightBlue,
-            paddingHorizontal: wp( 4 ),
-            paddingVertical: wp( 1 ),
-            marginRight: wp( 5 ),
-            borderRadius: wp( 2 )
-          }}
-        >
-          <Text
-            style={{
-              ...{
-                color: Colors.backgroundColor1,
-                fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
-              }
-            }}
-          >
-            Done
-          </Text>
-        </TouchableOpacity> */}
       </View>
       <RequestKeyFromContact
         isModal={false}
-        headerText={'Send gift'}
+        headerText={'Send Gift'}
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
-        encryptLinkWith={DeepLinkEncryptionType.OTP}
+        encryptLinkWith={encryptionOTP? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT}
         encryptionKey={encryptionOTP}
         themeId={themeId}
         senderName={senderEditedName}
@@ -165,9 +170,10 @@ export default function SendGift( props ) {
         onPressDone={() => {
           // openTimer()
         }}
-        amt={numberWithCommas( giftToSend.amount )}
-        onPressShare={() => {
-        }}
+        amt={giftToSend.amount}
+        giftNote={giftToSend.note}
+        onPressShare={() => {}}
+        accountName={account?.accountName}
       />
     </ScrollView>
   )

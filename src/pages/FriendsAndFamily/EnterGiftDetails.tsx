@@ -44,22 +44,17 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( '' )
+  const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
-    title: 'Bitcoin',
-    subText: 'Lorem ipsum dolor',
+    title: 'Gift Sats',
+    subText: 'Something that appreciates with time',
     avatar: <GiftCard />,
     color: Colors.darkBlue
-    // id: '',
-    // title: '',
-    // subText: '',
-    // avatar: ImagePropTypes,
-    // color: ''
   } )
 
   useEffect( () => {
@@ -79,24 +74,27 @@ const GiftDetails = ( { navigation } ) => {
         onPress={()=>{
           if ( contact ) {
 
-            navigation.navigate( 'AddContactSendRequest', {
+            navigation.replace( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
+              note,
               headerText: strings.addContact,
               subHeaderText:strings.send,
               contactText:strings.adding,
               showDone:true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
-            navigation.navigate( 'SendGift', {
+            navigation.replace( 'SendGift', {
               fromScreen: 'Gift',
               giftId,
               note,
               contact,
               senderName: name,
-              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           }
 
@@ -144,7 +142,7 @@ const GiftDetails = ( { navigation } ) => {
         }}>
           <HeaderTitle
             firstLineTitle={'Enter gift details'}
-            secondLineTitle={'Who are we delighting today?'}
+            secondLineTitle= ''//{'Who are we delighting today?'}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
@@ -158,15 +156,16 @@ const GiftDetails = ( { navigation } ) => {
             style={{
               fontSize: RFValue( 14 ),
               color: Colors.black,
-              width: wp( '54%' ),
             }}
-          >You have recieved gift from
+          >You have received gift from{' '}
           </Text>
           <View
-            style={[ styles.inputBox ]}
+            style={styles.inputBox}
           >
             <TextInput
-              style={styles.modalInputBox}
+              style={name ? [ styles.modalInputBox ] : [ styles.modalInputBox, {
+                fontSize: RFValue( 15 ),
+              } ]}
               placeholder={'Enter name'}
               placeholderTextColor={Colors.gray1}
               value={name}
@@ -197,7 +196,7 @@ const GiftDetails = ( { navigation } ) => {
             marginHorizontal: wp( 5 ),
             lineHeight: wp( 7 )
           }}
-        >{`The gift would be valid for 30 days and the sats would revert to ${name} if unclaimed`}
+        >{'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
           onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
@@ -306,7 +305,7 @@ const GiftDetails = ( { navigation } ) => {
                           {value.title}
                         </Text>
                         <Text style={styles.subText}>
-                          { 'Lorem ipsum dolor'}
+                          {value.subText}
                         </Text>
                       </View>
                     </View>
@@ -321,7 +320,9 @@ const GiftDetails = ( { navigation } ) => {
           style={[ styles.inputBoxLong, styles.inputField ]}
         >
           <TextInput
-            style={styles.modalInputBox}
+            style={[ styles.modalInputBox, {
+              fontFamily: Fonts.FiraSansItalic
+            } ]}
             placeholder={`Add a personal note (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
@@ -335,6 +336,8 @@ const GiftDetails = ( { navigation } ) => {
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
+            numberOfLines={2}
+            multiline
             onChangeText={( text ) => {
               setNote( text )
             }}
@@ -615,12 +618,13 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
+    //height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
-    width: '90%'
+    paddingHorizontal: 15,
+    width: '90%',
+    paddingVertical: 7,
   },
   inputBox: {
     borderRadius: 10,

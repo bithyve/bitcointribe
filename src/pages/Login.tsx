@@ -57,8 +57,14 @@ export default function Login( props ) {
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
   const getRandomMessage = () => {
-    const randomIndex = Math.floor( Math.random() * 5 )
-    return strings.loaderMessages[ randomIndex ]
+    //const randomIndex = Math.floor( Math.random() * 5 )
+    //return strings.loaderMessages[ randomIndex ]
+    // added static message for 2.0.5 #4833
+    return {
+      heading: 'Gift Sats',
+      text: 'Send sats as gifts to your friends and family.',
+      subText: ''
+    }
   }
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
@@ -690,11 +696,22 @@ export default function Login( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'}>
+        <ModalContainer
+          visible={loaderModal}
+          closeBottomSheet={() => {}}
+          background={'rgba(42,42,42,0.4)'}
+          onBackground={()=>{
+            setloaderModal( false )
+            // setTimeout( () => {
+            //   setloaderModal( true )
+            // }, 200 )
+          }
+          }
+        >
           {renderLoaderModalContent()}
         </ModalContainer>
       </View>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => {}}>
         {renderErrorModalContent()}
       </ModalContainer>
       {/* <BottomSheet

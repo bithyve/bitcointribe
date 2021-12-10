@@ -46,7 +46,8 @@ import {
   GENERATE_GIFTS,
   SET_GIFTS,
   GIFT_ACCEPTED,
-  GIFT_ADDED
+  GIFT_ADDED,
+  GIFT_CREATION_STATUS
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -67,8 +68,12 @@ export type AccountsState = {
   };
   gifts : {
     [id: string]: Gift
-  }
+  },
+  exclusiveGiftCodes: {
+    [exclusiveGiftCode: string]: boolean
+  },
   selectedGiftId: string,
+  giftCreationStatus: boolean,
   acceptedGiftId: string,
   addedGift: string,
   isGeneratingNewAccountShell: boolean;
@@ -115,7 +120,10 @@ const initialState: AccountsState = {
   },
   gifts: {
   },
+  exclusiveGiftCodes: {
+  },
   selectedGiftId: null,
+  giftCreationStatus: null,
   acceptedGiftId: '',
   addedGift: '',
   isGeneratingNewAccountShell: false,
@@ -549,34 +557,52 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case GENERATE_GIFTS:
         return {
           ...state,
-          selectedGiftId: null
+          selectedGiftId: null,
+          giftCreationStatus: null
+        }
+
+      case GIFT_CREATION_STATUS:
+        return {
+          ...state,
+          giftCreationStatus: action.payload.flag,
         }
 
       case UPDATE_GIFT:
         const gift: Gift = action.payload.gift
+        const exclusiveGiftCodes = state.exclusiveGiftCodes? {
+          ...state.exclusiveGiftCodes
+        }: {
+        }
+        if( gift.exclusiveGiftCode ) exclusiveGiftCodes[ gift.exclusiveGiftCode ] = true
+
         return {
           ...state,
           gifts: {
             ...state.gifts,
             [ gift.id ]: gift
           },
+          exclusiveGiftCodes,
           selectedGiftId: gift.id
         }
+
       case GIFT_ACCEPTED:
         return{
           ...state,
           acceptedGiftId: action.payload
         }
+
       case GIFT_ADDED:
         return{
           ...state,
           addedGift: action.payload
         }
+
       case SET_GIFTS:
         return {
           ...state,
           gifts: action.payload.gifts,
         }
+
       default:
         return state
   }

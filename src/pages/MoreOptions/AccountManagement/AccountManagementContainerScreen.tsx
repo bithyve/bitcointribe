@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import ButtonBlue from '../../../components/ButtonBlue'
@@ -39,11 +40,11 @@ export type Props = {
 const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const strings = translations[ 'accManagement' ]
-  const originalAccountShells = useActiveAccountShells()
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
+  const accountShells = useSelector( ( state ) => state.accounts.accountShells )
   // const [ tempValue, setTempValue ] = useState( false )
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
-  const [ orderedAccountShells, setOrderedAccountShells ] = useState( originalAccountShells )
+  const [ orderedAccountShells, setOrderedAccountShells ] = useState( accountShells )
   const [ hiddenAccountShells, setHiddenAccountShells ] = useState( [] )
   const [ archivedAccountShells, setArchivedAccountShells ] = useState( [] )
   const [ accountVisibility, setAccountVisibility ] = useState( null )
@@ -57,8 +58,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
   const getnewDraggableOrderedAccountShell = useMemo( () => {
     const newDraggableOrderedAccountShell = []
-    if( originalAccountShells ){
-      originalAccountShells.map( ( value, index ) =>{
+    if( accountShells ){
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newDraggableOrderedAccountShell.push( value )
         }
@@ -66,12 +67,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setOrderedAccountShells( newDraggableOrderedAccountShell )
     }
     return newDraggableOrderedAccountShell
-  }, [ originalAccountShells ] )
+  }, [ accountShells ] )
 
   const getnewOrderedAccountShell = useMemo( () => {
     if( showAllAccount === true ){
       const newOrderedAccountShell = []
-      originalAccountShells.map( ( value, index ) =>{
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newOrderedAccountShell.push( value )
         }
@@ -79,12 +80,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setOrderedAccountShells( newOrderedAccountShell )
       return newOrderedAccountShell
     }
-  }, [ showAllAccount, originalAccountShells ] )
+  }, [ showAllAccount, accountShells ] )
 
   const getHiddenAccountShell = useMemo( () => {
     const newHiddenAccountShell = []
     if( showAllAccount === true ){
-      originalAccountShells.map( ( value, index ) =>{
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
           newHiddenAccountShell.push( value )
         }
@@ -92,12 +93,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setHiddenAccountShells( newHiddenAccountShell )
       return newHiddenAccountShell
     }
-  }, [ showAllAccount, originalAccountShells ] )
+  }, [ showAllAccount, accountShells ] )
 
   const getArchivedAccountShells = useMemo( () => {
     if( showAllAccount === true ){
       const newArchivedAccountShells = []
-      originalAccountShells.map( ( value, index ) =>{
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
           newArchivedAccountShells.push( value )
         }
@@ -105,7 +106,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setArchivedAccountShells( newArchivedAccountShells )
       return newArchivedAccountShells
     }
-  }, [ showAllAccount, originalAccountShells ] )
+  }, [ showAllAccount, accountShells ] )
 
   const canSaveOrder = useMemo( () => {
     return hasChangedOrder
@@ -133,7 +134,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [ navigation ] )
 
   const showUnHideArchiveAccountBottomSheet = useCallback( () => {
-
     return(
       <UnHideArchiveAccountBottomSheet
         onProceed={( accounShell )=>{
@@ -287,10 +287,10 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   return (
     <SafeAreaView style={styles.rootContainer}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <ModalContainer visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
+      <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
         {showUnHideArchiveAccountBottomSheet()}
       </ModalContainer>
-      <ModalContainer visible={successModel} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={()=>showSuccessModel( false )} visible={successModel} closeBottomSheet={() => {}} >
         {showSuccessAccountBottomSheet()}
       </ModalContainer>
       <ScrollView>

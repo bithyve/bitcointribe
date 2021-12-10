@@ -47,6 +47,8 @@ import {
   recomputeNetBalance,
   updateGift,
   GENERATE_GIFTS,
+  giftCreationSuccess,
+  updateAccountSettings,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -65,6 +67,7 @@ import {
   GiftMetaData,
   GiftStatus,
   GiftThemeId,
+  GiftType,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -102,6 +105,7 @@ import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
+import Toast from '../../components/Toast'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -137,7 +141,14 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
+    giftToSend.type = GiftType.SENT
+
+    // set timestamps
     giftToSend.timestamps.sent = Date.now()
+    // remove successive timestamps(if exist)
+    delete giftToSend.timestamps.accepted
+    delete giftToSend.timestamps.reclaimed
+
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
     giftToSend.themeId = themeId
@@ -145,6 +156,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
 
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
+      exclusiveGiftCode: giftToSend.exclusiveGiftCode,
       notificationInfo: {
         walletId: giftToSend.sender.walletId,
         FCM: fcmToken,
@@ -179,7 +191,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       }
     } )
     return {
-      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink
+      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )
@@ -606,7 +618,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
-          // skip test account auto-sync
             break
 
           case AccountType.DONATION_ACCOUNT:
@@ -681,6 +692,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           instanceNumber: account.instanceNum,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
+          visibility: account.accountVisibility,
         } )
         break
 
@@ -817,8 +829,10 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           walletId,
           type: accountType,
           instanceNum: donationInstanceCount,
-          accountName: accountName? accountName: 'Donation Account',
-          accountDescription: accountDescription? accountDescription: 'Receive Donations',
+          accountName: 'Donation Account',
+          accountDescription: accountName? accountName: 'Receive Donations',
+          donationName: accountName,
+          donationDescription: accountDescription,
           donee: doneeName? doneeName: wallet.walletName,
           primarySeed,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
@@ -923,6 +937,7 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     updateAccounts: true,
     accountIds: accountIds
   } ) )
+
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
@@ -1182,7 +1197,7 @@ export const restoreAccountShellsWatcher = createWatcher(
   RESTORE_ACCOUNT_SHELLS,
 )
 
-export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean }} ) {
+export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean, exclusiveGifts?: boolean }} ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -1205,28 +1220,37 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     walletName: wallet.walletName
   }
 
-  const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
-  if( txid ) {
-    const giftIds = []
-    for( const giftId in gifts ){
-      giftIds.push( gifts[ giftId ].id )
-      yield put( updateGift( gifts[ giftId ] ) )
+  try{
+    const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee, payload.exclusiveGifts )
+    if( txid ) {
+      const giftIds = []
+      for( const giftId in gifts ){
+        giftIds.push( gifts[ giftId ].id )
+        yield put( updateGift( gifts[ giftId ] ) )
+      }
+      yield put( giftCreationSuccess( true ) )
+
+      yield call( dbManager.createGifts, gifts )
+      yield put( updateWalletImageHealth( {
+        updateGifts: true,
+        giftIds: giftIds
+      } ) )
+
+      // refersh the account
+      let shellToSync: AccountShell
+      for( const accountShell of accountsState.accountShells ){
+        if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
+      }
+      yield put( refreshAccountShells( [ shellToSync ], {
+      } ) )
+    } else {
+      console.log( 'Gifts generation failed' )
+      yield put( giftCreationSuccess( false ) )
     }
 
-    // refersh the account
-    let shellToSync: AccountShell
-    for( const accountShell of accountsState.accountShells ){
-      if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
-    }
-    yield put( refreshAccountShells( [ shellToSync ], {
-    } ) )
-    yield call( dbManager.createGifts, gifts )
-    yield put( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: giftIds
-    } ) )
-  } else {
-    console.log( 'Gifts generation failed' )
+  } catch( err ){
+    yield put( giftCreationSuccess( false ) )
+    Toast( 'Transaction failed due to dust limit. Please increase the gift amount and try' )
   }
 }
 

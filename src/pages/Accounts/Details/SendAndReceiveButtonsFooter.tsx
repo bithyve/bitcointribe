@@ -16,6 +16,8 @@ import Fonts from '../../../common/Fonts'
 import useCurrencyCode from '../../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
 import { translations } from '../../../common/content/LocContext'
+import {  useSelector } from 'react-redux'
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 
 type FooterButtonProps = {
   style?: Record<string, unknown>;
@@ -69,6 +71,10 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
   network,
   isTestAccount
 } ) => {
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
+
   const currencyKind = useCurrencyKind()
   const currencyCode = useCurrencyCode()
   const common  = translations[ 'common' ]
@@ -79,6 +85,10 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
       return network == NetworkKind.MAINNET ? 'sat' : 't-sat'
     }
   }, [ network, currencyKind ] )
+
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   const transactionFeeUnitText = useMemo( () => {
     if ( currencyKind == CurrencyKind.FIAT ) {
@@ -103,7 +113,16 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
         onPress={onSendPressed}
         title={common.send}
         subtitle={`Tran Fee: ~${
-          averageTxFees ? averageTxFees[ network ].low.averageTxFee : 0
+          averageTxFees ?
+            prefersBitcoin?
+              averageTxFees[ network ].low.averageTxFee :
+              exchangeRates && exchangeRates[ currencyCode ]
+                ? (
+                  ( averageTxFees[ network ].low.averageTxFee / SATOSHIS_IN_BTC ) *
+                    exchangeRates[ currencyCode ].last
+                ).toFixed( 2 )
+                : ''
+            : 0
         } (${isTestAccount ? 't-sats' : transactionFeeUnitText})`}
         imageSource={require( '../../../assets/images/icons/icon_send_blue.png' )}
       />

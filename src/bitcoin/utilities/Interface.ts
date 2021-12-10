@@ -902,6 +902,8 @@ export interface MultiSigAccount extends Account {
 
 export interface DonationAccount extends Account {
   donee: string;
+  donationName: string;
+  donationDescription: string;
   configuration: {
     displayBalance: boolean;
     displayIncomingTxs: boolean;
@@ -915,7 +917,7 @@ export interface DonationAccount extends Account {
   }
   xprivs?: {                            // additional xpirvs for multi-sig
     secondary?: string,
-  }
+  },
 }
 
 export enum AccountType {
@@ -945,6 +947,13 @@ export enum DeepLinkKind {
   CONTACT_GIFT = 'CONTACT_GIFT'
 }
 
+export enum ShortLinkDomain {
+  DEFAULT = 'https://app.hexawallet.io',
+  CONTACT = 'https://request.hexawallet.io',
+  GIFT = 'https://gift.hexawallet.io',
+  DONATION = 'https://donation.hexawallet.io',
+}
+
 export enum DeepLinkEncryptionType {
   DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
@@ -956,7 +965,9 @@ export enum GiftThemeId {
   ONE = 'ONE',
   TWO = 'TWO',
   THREE = 'THREE',
-  FOUR = 'FOUR'
+  FOUR = 'FOUR',
+  FIVE = 'FIVE',
+  SIX= 'SIX'
 }
 
 export enum GiftType {
@@ -1000,14 +1011,16 @@ export interface Gift {
     contactId?: string // permanentAddress of the contact
   },
   note?: string,
+  exclusiveGiftCode?: string,
   deepLinkConfig?: {
     encryptionType: string,
     encryptionKey: string,
-  }
+  },
 }
 
 export interface GiftMetaData {
   status: GiftStatus,
+  exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,
     FCM: string,
@@ -1027,12 +1040,3 @@ export interface cloudDataInterface {
   seed?: string;
 }
 
-export enum ShortLinkKind {
-  CONTACT = 'request',
-  KEEPER = 'keeper',
-  PRIMARY_KEEPER = 'keeper',
-  RECIPROCAL_KEEPER = 'keeper',
-  EXISTING_CONTACT = 'request',
-  GIFT = 'gift',
-  DONATION = 'donation'
-}

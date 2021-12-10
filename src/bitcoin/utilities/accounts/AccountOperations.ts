@@ -557,20 +557,12 @@ export default class AccountOperations {
 
     // update primary utxo set and balance
     const updatedUTXOSet = []
-    let consumedBalance = 0
 
     account.confirmedUTXOs.forEach( confirmedUTXO => {
-      let include = true
-      if( consumedUTXOs[ confirmedUTXO.txId ] ) {
-        include = false
-        consumedBalance += consumedUTXOs[ confirmedUTXO.txId ].value
-      }
-      if( include ) updatedUTXOSet.push( confirmedUTXO )
+      if( !consumedUTXOs[ confirmedUTXO.txId ] ) updatedUTXOSet.push( confirmedUTXO )
     } )
 
-    account.balances.confirmed -= consumedBalance
     account.confirmedUTXOs = updatedUTXOSet
-
     // AccountOperations.updateQueryList( account, consumedUTXOs )
     AccountOperations.updateActiveAddresses( account, consumedUTXOs, txid, recipients )
   }
@@ -767,7 +759,22 @@ export default class AccountOperations {
       )
 
       for ( const input of inputs ) {
-        txb.addInput( input.txId, input.vout, nSequence )
+        if( account.type === AccountType.SWAN_ACCOUNT ){
+          // native segwit
+          const privateKey = AccountUtilities.addressToPrivateKey(
+            input.address,
+            account
+          )
+          const keyPair = AccountUtilities.getKeyPair(
+            privateKey,
+            network
+          )
+          const p2wpkh = bitcoinJS.payments.p2wpkh( {
+            pubkey: keyPair.publicKey,
+            network,
+          } )
+          txb.addInput( input.txId, input.vout, nSequence, p2wpkh.output )
+        } else txb.addInput( input.txId, input.vout, nSequence )
       }
 
       const sortedOuts = await AccountUtilities.sortOutputs(
@@ -841,14 +848,26 @@ export default class AccountOperations {
           redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
         }
 
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript,
-          null,
-          input.value,
-          witnessScript,
-        )
+        if( account.type === AccountType.SWAN_ACCOUNT ){
+          // native segwit
+          txb.sign(
+            vin,
+            keyPair,
+            null,
+            null,
+            input.value,
+          )
+        } else {
+          txb.sign(
+            vin,
+            keyPair,
+            redeemScript,
+            null,
+            input.value,
+            witnessScript,
+          )
+        }
+
         vin++
       }
 
@@ -1022,7 +1041,11 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
+    if( txid.includes( 'sendrawtransaction RPC error' ) ) throw new Error( txid )
+
+    if( txid ){
+      AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
+    }
     else throw new Error( 'Failed to broadcast transaction, txid missing' )
     return {
       txid
@@ -1038,6 +1061,7 @@ export default class AccountOperations {
     amounts: number[],
     averageTxFees: AverageTxFees,
     includeFee?: boolean,
+    exclusiveGifts?: boolean,
   ): Promise<{
     txid: string;
     gifts: Gift[];
@@ -1048,6 +1072,9 @@ export default class AccountOperations {
 
     const recipients = []
     const gifts: Gift[] = []
+    let exclusiveGiftCode
+    if( exclusiveGifts ) exclusiveGiftCode = walletDetails.walletId.slice( 0, 5 ) + '-' + Date.now()
+
     amounts.forEach( amount => {
       const keyPair = bitcoinJS.ECPair.makeRandom( {
         network: network
@@ -1083,7 +1110,8 @@ export default class AccountOperations {
           accountId: account.id,
         },
         receiver: {
-        }
+        },
+        exclusiveGiftCode,
       }
 
       gifts.push( createdGift )

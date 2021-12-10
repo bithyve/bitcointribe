@@ -226,7 +226,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ primarySubAccount ] )
 
   function showArchiveModal() {
-    if ( primarySubAccount.balances.confirmed === 0 ) {
+    if ( primarySubAccount.balances.confirmed + primarySubAccount.balances.unconfirmed === 0 ) {
       setShowAccountArchiveModal( true )
     } else {
       // checkAccountBalance()
@@ -282,19 +282,19 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         keyExtractor={listItemKeyExtractor}
         renderItem={renderItem}
       />
-      <ModalContainer visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setShowAccountArchiveModal( false )} visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
         {showAccountArchiveBottomSheet()}
       </ModalContainer>
 
-      <ModalContainer visible={checkAccountModal} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
         {checkAccountBalance()}
       </ModalContainer>
 
-      {/* <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => {}}>
+      {/* <ModalContainer onBackground={()=>setShowRescanningPrompt( false )} visible={showRescanningPrompt} closeBottomSheet={() => {}}>
         {showRescanningPromptBottomSheet()}
       </ModalContainer>
 
-      <ModalContainer visible={showRescanning} closeBottomSheet={() => {}}>
+      <ModalContainer onBackground={()=>setShowRescanning( false )} visible={showRescanning} closeBottomSheet={() => {}}>
         {showRescanningBottomSheet()}
       </ModalContainer> */}
     </>

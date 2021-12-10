@@ -553,11 +553,11 @@ export const accountShellOrderedToFront = (
   }
 }
 
-export const generateGifts = ( { amounts, accountId, includeFee }:{amounts: number[], accountId?: string, includeFee?: boolean } ) => {
+export const generateGifts = ( { amounts, accountId, includeFee, exclusiveGifts }:{amounts: number[], accountId?: string, includeFee?: boolean, exclusiveGifts?: boolean } ) => {
   return {
     type: GENERATE_GIFTS,
     payload: {
-      accountId, amounts, includeFee
+      accountId, amounts, includeFee, exclusiveGifts
     }
   }
 }
@@ -588,6 +588,7 @@ export const UPDATE_GIFT = 'UPDATE_GIFT'
 export const GIFT_ACCEPTED = 'GIFT_ACCEPTED'
 export const GIFT_ADDED = 'GIFT_ADDED'
 export const SET_GIFTS = 'SET_GIFTS'
+export const GIFT_CREATION_STATUS = 'GIFT_CREATION_STATUS'
 
 export const testcoinsReceived = ( ) => {
   return {
@@ -845,6 +846,15 @@ export const setGifts = ( gifts:{
     type: SET_GIFTS,
     payload: {
       gifts
+    }
+  }
+}
+
+export const giftCreationSuccess = ( flag ) =>{
+  return {
+    type: GIFT_CREATION_STATUS,
+    payload: {
+      flag
     }
   }
 }

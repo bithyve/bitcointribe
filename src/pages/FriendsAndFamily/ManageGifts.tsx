@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState, } from 'react'
+import React, { useMemo, useContext, useEffect, useState, } from 'react'
 import {
   View,
   StyleSheet,
@@ -38,6 +38,11 @@ import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import ToggleContainer from './CurrencyToggle'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -54,13 +59,24 @@ const ManageGifts = ( { navigation } ) => {
   )
   const trustedContactsArr = Object.values( trustedContacts ?? {
   } )
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
+  const currencyCode = useCurrencyCode()
 
   const dispatch = useDispatch()
+
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   useEffect( () => {
     if ( timer ) {
@@ -72,7 +88,6 @@ const ManageGifts = ( { navigation } ) => {
 
   useEffect( () => {
     const availableGifts = []
-    const receivedArr = []
     const sentAndClaimed = []
     const expiredArr = []
     const sortedGifts = Object.values( gifts ?? {
@@ -81,19 +96,19 @@ const ManageGifts = ( { navigation } ) => {
     } )
 
     sortedGifts.forEach( ( gift: Gift ) => {
-      if ( gift.type === GiftType.RECEIVED ) {
-        receivedArr.push( gift )
-      } else {
+      if ( gift.type === GiftType.SENT ) {
         if ( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ) availableGifts.push( gift )
         if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
+      } else if( gift.type === GiftType.RECEIVED ) {
+        if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
+        else availableGifts.push( gift )
       }
     } )
     const obj = {
     }
     obj[ `${GiftStatus.CREATED}` ] = availableGifts
     obj[ `${GiftStatus.SENT}` ] = sentAndClaimed
-    obj[ `${GiftType.RECEIVED}` ] = receivedArr
     obj[ `${GiftStatus.EXPIRED}` ] = expiredArr
 
     setGiftsArr( obj )
@@ -120,17 +135,18 @@ const ManageGifts = ( { navigation } ) => {
 
   const processGift = ( selectedGift: Gift, title, walletName ) => {
 
-    switch ( selectedGift.status ) {
-        case GiftStatus.CREATED:
-        case GiftStatus.RECLAIMED:
-          navigation.navigate( 'GiftDetails', {
-            title, walletName, gift: selectedGift, avatar: false
-          } )
-          // navigation.navigate( 'AddContact', {
-          //   fromScreen: 'ManageGift',
-          //   giftId: selectedGift.id
-          // } )
-          break
+    if( selectedGift.type === GiftType.SENT ){
+      if( selectedGift.status === GiftStatus.CREATED || selectedGift.status === GiftStatus.RECLAIMED ){
+        navigation.navigate( 'GiftDetails', {
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
+        } )
+      }
+    } else if ( selectedGift.type === GiftType.RECEIVED ) {
+      if( selectedGift.status === GiftStatus.ACCEPTED ){
+        navigation.navigate( 'GiftDetails', {
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
+        } )
+      }
     }
   }
   // const renderGiftDetailsModel = useCallback( () => {
@@ -165,18 +181,28 @@ const ManageGifts = ( { navigation } ) => {
     setActive( type )
   }
 
-  const getText = () => {
+  const getSectionDescription = () => {
     if ( active === GiftStatus.CREATED ) {
-      return 'Gifts that you have created and are ready to be sent are visible below'
+      if( giftsArr?.[ `${active}` ].length === 0 ) return 'All the gifts you create and receive would be visible below'
+      else return 'All the gifts you have created and not sent, plus gifts you have received are shown here'
     }
     if ( active === GiftStatus.SENT ) {
-      return 'Gifts you\'ve sent are visible below'
+      return 'All the gifts you have sent are shown here'
     }
     if ( active === GiftStatus.EXPIRED ) {
-      return 'Gifts that were unclaimed and thus expired are visible below'
+      return 'All the gifts that were not accepted or you expired are shown here'
     }
-    if ( active === GiftType.RECEIVED ) {
-      return 'Gifts you\'ve received are visible below'
+  }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
     }
   }
 
@@ -186,7 +212,7 @@ const ManageGifts = ( { navigation } ) => {
       flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
-      <ModalContainer visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
+      <ModalContainer onBackground={()=>setKnowMore( false )} visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
         <GiftKnowMore closeModal={() => setKnowMore( false )} />
       </ModalContainer>
       <View style={{
@@ -205,7 +231,8 @@ const ManageGifts = ( { navigation } ) => {
       </ModalContainer>
         } */}
         <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between'
+          backgroundColor: Colors.backgroundColor, flexDirection: 'row', justifyContent: 'space-between',
+          marginRight: 10,
         } ]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -221,11 +248,12 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-
+          <ToggleContainer />
         </View>
 
         <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 'auto'
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+          marginRight: 10, marginTop: 10,
         }}>
           <HeaderTitle
             firstLineTitle={'Manage Gifts'}
@@ -248,7 +276,7 @@ const ManageGifts = ( { navigation } ) => {
         </View>
         <ScrollView
           style={{
-            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 )
+            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 ),
           }}
           horizontal>
           {
@@ -257,6 +285,7 @@ const ManageGifts = ( { navigation } ) => {
               return (
                 <TouchableOpacity
                   key={item}
+                  activeOpacity={0.6}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
                     shadowColor: active === item ? '#77B9EB96' : Colors.white,
@@ -278,7 +307,6 @@ const ManageGifts = ( { navigation } ) => {
                     {item === GiftStatus.CREATED && 'Available'}
                     {item === GiftStatus.EXPIRED && 'Expired'}
                     {item === GiftStatus.SENT && 'Sent'}
-                    {item === GiftType.RECEIVED && 'Received'}
                   </Text>
                 </TouchableOpacity>
               )
@@ -289,20 +317,21 @@ const ManageGifts = ( { navigation } ) => {
           height: 'auto'
         }}> */}
         {Object.values( gifts ?? {
-        } ).length > 0 && giftsArr?.[ `${active}` ].length === 0 &&
+        } ).length > 0 &&
           <BottomInfoBox
             // backgroundColor={Colors.white}
             // title={'Note'}
-            infoText={getText()}
+            infoText={getSectionDescription()}
           />
         }
-        {Object.values( gifts ?? {
-        } ).length > 0 && active === GiftStatus.CREATED &&
+        { active === GiftStatus.CREATED &&
         <TouchableOpacity
-          onPress={() => navigation.navigate( 'CreateGift' )}
+          onPress={() => navigation.navigate( 'CreateGift', {
+            setActiveTab: buttonPress
+          } )}
           style={{
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
-            marginVertical: hp( 2 )
+            marginVertical: hp( 1 )
           }}>
           <IconAddLight />
           <Text style={styles.createGiftText}>
@@ -319,11 +348,24 @@ const ManageGifts = ( { navigation } ) => {
           contentInset={{
             right: 0, top: 0, left: 0, bottom: hp( 9 )
           }}
+          contentContainerStyle={{
+            paddingBottom: 300
+          }}
           showsVerticalScrollIndicator={false}
           data={giftsArr?.[ `${active}` ]}
           keyExtractor={listItemKeyExtractor}
-          renderItem={( { item, index } ) => {
-            const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
+          renderItem={( { item, index }: {item:Gift, index: Number} ) => {
+            let title: string
+            if( item.type === GiftType.SENT ){
+              if( item.status === GiftStatus.CREATED || item.status === GiftStatus.RECLAIMED ) title = 'Available Gift'
+              else if( item.status === GiftStatus.SENT ) title = 'Sent to recipient'
+              else if( item.status === GiftStatus.ACCEPTED ) title = 'Accepted by recipient'
+              else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
+            } else if ( item.type === GiftType.RECEIVED ){
+              if( item.status === GiftStatus.ACCEPTED ) title = 'Received Gift'
+              else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
+            }
+
             let walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
             // let image
             let contactDetails : RecipientDescribing
@@ -353,8 +395,8 @@ const ManageGifts = ( { navigation } ) => {
                 {active === GiftStatus.CREATED ?
                   <ManageGiftsList
                     titleText={'Available Gift'}
-                    // subText={'Lorem ipsum dolor sit amet'}
-                    amt={numberWithCommas( item.amount )}
+                    currency={prefersBitcoin ? ' sats' : currencyCode}
+                    amt={getAmt( item.amount )}
                     date={item.timestamps?.created}
                     image={<GiftCard />}
                     onPress={() => processGift( item, title, walletName )}
@@ -368,7 +410,7 @@ const ManageGifts = ( { navigation } ) => {
                       key={index}
                       onPress={() => {
                         navigation.navigate( 'GiftDetails', {
-                          title, walletName, gift: item, avatar: true, contactDetails
+                          title, walletName, gift: item, avatar: true, contactDetails, setActiveTab: buttonPress
                         } )
                       }
                       }
@@ -424,12 +466,12 @@ const ManageGifts = ( { navigation } ) => {
                             fontSize: RFValue( 18 ),
                             fontFamily: Fonts.FiraSansRegular,
                           }}>
-                            {numberWithCommas( item.amount )}
+                            {getAmt( item.amount )}
                             <Text style={{
                               color: Colors.lightTextColor,
                               fontSize: RFValue( 10 ),
                               fontFamily: Fonts.FiraSansRegular
-                            }}> sats
+                            }}>{prefersBitcoin ? ' sats' : currencyCode}
                             </Text>
                           </Text>
                         </View>
@@ -442,98 +484,9 @@ const ManageGifts = ( { navigation } ) => {
                   </View>
                 }
               </>
-
             )
-
           }}
         />
-        {/* </View> */}
-
-
-        {Object.values( gifts ?? {
-        } ).length === 0 &&
-          <View style={{
-            // marginTop: hp( '45%' )
-          }}>
-            <BottomInfoBox
-              // backgroundColor={Colors.white}
-              // title={'Note'}
-              infoText={getText()}
-            />
-            <View style={styles.centeredView}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate( 'CreateGift' )}
-                style={{
-                  flexDirection: 'row', alignItems: 'center'
-                }}>
-                <IconAdd />
-                <Text style={styles.createGiftText}>
-                  Create New Gift
-                </Text>
-              </TouchableOpacity>
-              {/* <ScrollView style={{
-              flex: 1
-            }}> */}
-              {/* {timer && [ 1, 2, 3 ].map( ( value, index ) => {
-                return (
-                  <View key={index} style={styles.scrollViewContainer}>
-
-                    <View>
-                      <View style={styles.roundedView} />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '22%' ),
-                          borderRadius: 10,
-                        }}
-                      />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '34%' ),
-                          borderRadius: 10,
-                          marginTop: hp( 1 ),
-                        }}
-                      />
-
-                    </View>
-                    <View>
-
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '35%' ),
-                          borderRadius: 10,
-                          marginTop: hp( 0.5 ),
-                          alignSelf: 'flex-end'
-                        }}
-                      />
-                      <View style={{
-                        flexDirection: 'row', marginTop: hp( 5 ), flex: 1, alignItems: 'flex-end'
-                      }}>
-                        <View
-                          style={{
-                            backgroundColor: Colors.backgroundColor,
-                            height: wp( '8%' ),
-                            width: wp( '32%' ),
-                            borderRadius: 20,
-
-                          }}
-                        />
-                        <View style={styles.roundedViewSmall} />
-                      </View>
-                    </View>
-                  </View>
-                )
-              } )} */}
-              {/* </ScrollView> */}
-            </View>
-
-          </View>
-        }
       </View>
     </View>
   )
@@ -641,7 +594,6 @@ const styles = StyleSheet.create( {
     height: hp( 3.6 ),
     paddingHorizontal: wp( 2 ),
     marginTop: wp( 2.7 ),
-    marginRight: wp( 4 ),
     alignSelf: 'flex-start'
   },
   createView: {

@@ -366,11 +366,16 @@ export const customSendMaxUpdated = (
 
 export interface SendTxNotificationAction extends Action {
   type: typeof SEND_TX_NOTIFICATION;
+  payload?: {
+    txid: string;
+   };
 }
 
-export const sendTxNotification = (): SendTxNotificationAction => {
+export const sendTxNotification = ( txid? ): SendTxNotificationAction => {
   return {
-    type: SEND_TX_NOTIFICATION,
+    type: SEND_TX_NOTIFICATION, payload:{
+      txid
+    }
   }
 }
 

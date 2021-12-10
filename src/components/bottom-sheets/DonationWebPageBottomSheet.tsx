@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Image,
   Text,
   StyleSheet,
+  ActivityIndicator
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -14,11 +15,37 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import config from '../../bitcoin/HexaConfig'
 import CopyThisText from '../CopyThisText'
-import { ScrollView } from 'react-native-gesture-handler'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import dynamicLinks from '@react-native-firebase/dynamic-links'
+import { ShortLinkDomain, } from '../../bitcoin/utilities/Interface'
 
 export default function DonationWebPageBottomSheet( props ) {
+  const [ link, setLink ] = useState( '' )
+
+  useEffect( () => {
+    getShortLink( `https://hexawallet.io/${config.APP_STAGE === APP_STAGE.PRODUCTION
+      ? 'donation'
+      : config.APP_STAGE === APP_STAGE.STAGING
+        ? 'donation-stage'
+        : 'donation-test'
+    }/?donationid=` + props.account.id.slice( 0, 15 ) )
+  }, [] )
+
+  async function getShortLink( longLink:string ) {
+    try {
+      const url = longLink.replace( /\s+/g, '' )
+      const domain =  ShortLinkDomain.DONATION
+      const shortLink = await dynamicLinks().buildShortLink( {
+        link: url,
+        domainUriPrefix: domain,
+      }, dynamicLinks.ShortLinkType.SHORT )
+      setLink ( shortLink )
+    } catch ( error ) {
+      setLink ( longLink )
+    }
+  }
+
   return (
     <View style={styles.modalContentContainer}>
       <View style={{
@@ -85,16 +112,22 @@ export default function DonationWebPageBottomSheet( props ) {
             marginRight: 40,
           }}
         >
-          <CopyThisText
-            text={
-              `https://hexawallet.io/${config.APP_STAGE === APP_STAGE.PRODUCTION
-                ? 'donation'
-                : config.APP_STAGE === APP_STAGE.STAGING
-                  ? 'donation-stage'
-                  : 'donation-test'
-              }/?donationid=` + props.account.id.slice( 0, 15 )
-            }
-          />
+          {
+            link === '' ?
+              <ActivityIndicator
+                size="small"
+                style={{
+                  alignSelf: 'center',
+                  marginVertical: 30
+                }}
+                color={Colors.blue}
+              />
+              :
+              <CopyThisText
+                text={link}
+              />
+          }
+
         </View>
         <View style={styles.infoTextContainer}>
           <Text style={styles.titleTextStyle}>Embed Code</Text>

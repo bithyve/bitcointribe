@@ -28,6 +28,7 @@ import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ViewShot from 'react-native-view-shot'
 import ThemeList from './Theme'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 export default function SendViaLinkAndQR( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -38,12 +39,18 @@ export default function SendViaLinkAndQR( props ) {
   const amt = props.navigation.getParam( 'amt' )
   const senderName = props.navigation.getParam( 'senderName' )
   const themeId = props.navigation.getParam( 'themeId' )
-
+  const giftNote = props.navigation.getParam( 'giftNote' )
   const viewRef = useRef( null )
 
   useEffect( () => {
-    onPress()
+    init()
   }, [ qrCode ] )
+
+  function init() {
+    setTimeout( () => {
+      onPress()
+    }, 1000 )
+  }
 
   // useEffect( () => {
   //   setShareLink( props.link.replace( /\s+/g, '' ) )
@@ -77,8 +84,10 @@ export default function SendViaLinkAndQR( props ) {
   }
 
   function onPress() {
-    if( type === 'QR'  && qrCode ) {
-      capture()
+    if( type === 'QR'  && qrCode  ) {
+      if( Platform.OS === 'android' ){
+        capture()
+      }
     } else {
       shareOption()
     }
@@ -165,8 +174,8 @@ export default function SendViaLinkAndQR( props ) {
           titleText={'Gift Card'}
           titleTextColor={Colors.black}
           subText={senderName}
-          extraText={'This is to get you started!\nWelcome to Bitcoin'}
-          amt={numberWithCommas( amt )}
+          extraText={giftNote? giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
+          amt={amt}
           onPress={onPress}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
@@ -241,10 +250,29 @@ export default function SendViaLinkAndQR( props ) {
         />
       </ViewShot>
 
-
+      <AppBottomSheetTouchableWrapper
+        onPress={() => {
+          props.navigation.pop( 3 )
+          try {
+            if( props.navigation.state.params.setActiveTab ) {
+              props.navigation.state.params.setActiveTab( 'SENT' )
+            }
+          } catch ( error ) {
+            //
+          }
+        }}
+        style={{
+          ...styles.proceedButtonView,
+          elevation: 10,
+          backgroundColor:
+               Colors.blue
+        }}
+      >
+        <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
+      </AppBottomSheetTouchableWrapper>
       {/* <RequestKeyFromContact
         isModal={false}
-        headerText={'Send gift'}
+        headerText={'Send Gift'}
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
@@ -287,5 +315,24 @@ const styles = StyleSheet.create( {
     marginRight: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  proceedButtonView: {
+    marginTop: hp( '2%' ),
+    marginBottom: hp( '4%' ),
+    height: wp( '13%' ),
+    width: wp( '40%' ),
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
   },
 } )
