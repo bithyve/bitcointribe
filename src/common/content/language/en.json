@@ -531,7 +531,7 @@
       "QuestionBackedUp": "Question Successfully Backed Up",
       "BackupHistory": "Cloud Backup",
       "historyofyourbackup": "The history of your backup will appear here",
-      "cloudBackupSuccessInfo":"Your have successfully backed up on the cloud. You don't have to do anything.",
+      "cloudBackupSuccessInfo":"You have successfully backed up on the cloud. You don't have to do anything.",
       "cloudBackupNotSetupInfo": "You can backup on the cloud and use the Recovery Key from the cloud when restoring.",
       "cloudBackupInAccessibleInfo": "You need to confirm your cloud connection, to ensure changes to your backup scheme.",
       "historyofyourRecovery": "The history of your Recovery Key will appear here",
