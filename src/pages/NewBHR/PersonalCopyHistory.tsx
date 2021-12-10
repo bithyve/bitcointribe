@@ -28,6 +28,8 @@ import {
   createChannelAssets,
   createOrChangeGuardian,
   setChannelAssets,
+  setApprovalStatus,
+  downloadSMShare
 } from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -150,6 +152,13 @@ const PersonalCopyHistory = ( props ) => {
     }
     setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
   }, [ ] )
+
+  const sendApprovalRequestToPK = ( ) => {
+    setQrBottomSheetsFlag( true )
+    setIsConfirm( false )
+    setQRModal( true )
+    setKeeperTypeModal( false )
+  }
 
   useEffect( ()=>  {
     if( Platform.OS === 'ios' ) {
@@ -286,7 +295,7 @@ const PersonalCopyHistory = ( props ) => {
               OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId )?
                 OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion: 0,
             shareType: 'pdf',
-            status: 'notAccessible',
+            status: selectedKeeper.updatedAt > 0 ? selectedKeeper.status : 'notAccessible',
             name: 'Personal Copy'
           }
           dispatch( updateMSharesHealth( shareObj, false ) )
@@ -549,6 +558,9 @@ const PersonalCopyHistory = ( props ) => {
               n: isChange ? 2 : 1
             } )
             props.navigation.dispatch( popAction )
+          } else {
+            dispatch( setApprovalStatus( false ) )
+            dispatch( downloadSMShare( qrScannedData ) )
           }
         }}
         onBackPress={() => {
@@ -558,18 +570,37 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asda","channelId":"dff8eb3978c08ad72dc515ec5b71d145e5e6d9c1884f6f58739dd08d26f31b4b","streamId":"646625378","channelKey":"OewqnyQaNretrYLeUDvIGmNj","secondaryChannelKey":"3QcSSriLtO95lgYvZs1VvVkM","version":"2.0.1","walletId":"c08a0692304a8aadaef62f00796778b646f2a3190c524d78507d14b6a68c4d1e","encryptedKey":"c217fd0163cac758b8ae585653d3bdf328de633f9b4dc5f42efd7a12e786bff2ecfd1aace2b8d07add7d42d4004bac08bda0fa8c307541b7d17f200d426333a3a81ce98ec7a6d91561afd216c67f015f"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sa","channelId":"8c6389cb2ba53a03c74800a73a439d0f826b3dd1c03d0730f8f51fef021db730","streamId":"8b58b89d1","channelKey":"2hGwaYfr2qgrnYfzhA2uOUvX","secondaryChannelKey":"keHUy1AO1ODvfzEdECzAJmkP","version":"2.0.7","walletId":"51050a044ef91ce8dbb089e785a0d7204dd1d781d5c20d7e13037e51b17ddc65","encryptedKey":"1a7a5c7792a00a0ff1eb8c493639816181709d7ff9efd616536ad7f88048efd37c06fa550c283652a8716be622540054fc3a65b6f0365115aa1fdcb227e29efae824c1336af15536f5d07653ae0a9080"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
               n: isChange ? 2 : 1
             } )
             props.navigation.dispatch( popAction )
+          } else {
+            setQRModal( false )
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
+            dispatch( setApprovalStatus( false ) )
+            dispatch( downloadSMShare( qrScannedData ) )
           }
         }}
       />
     )
   }
+
+  useEffect( ()=>{
+    if( approvalStatus && isChangeClicked ){
+      console.log( 'APPROVe' )
+      setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
+    }
+  }, [ approvalStatus ] )
+
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
 
   const deviceText = ( text ) => {
     switch ( text ) {
@@ -649,7 +680,8 @@ const PersonalCopyHistory = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            onPressChangeKeeperType( type, name )
+            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            else onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}
