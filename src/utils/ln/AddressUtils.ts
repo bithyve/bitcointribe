@@ -1,4 +1,4 @@
-import { satoshisPerBTC } from './../stores/UnitsStore'
+import { satoshisPerBTC } from './../../mobxstore/UnitsStore'
 const btcNonBech = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/
 const btcBech = /^(bc1|BC1|[13])[a-zA-HJ-NP-Z0-9]{25,87}$/
 

@@ -28,9 +28,9 @@ export default function BottomInfoBox( props ) {
         <Text
           style={{
             color: props.titleColor ? props.titleColor : Colors.blue,
-            fontSize: RFValue( 13 ),
+            fontSize: RFValue( 16 ),
             marginBottom: 2,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.FiraSansMedium,
           }}
         >
           {props.title}

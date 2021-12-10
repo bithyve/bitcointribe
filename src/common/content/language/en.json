@@ -495,7 +495,8 @@
       "swanautowithdrawal": "This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.",
       "Byproceeding": "By proceeding you understand that you will be taken to Swan Bitcoin to complete the process.\n\nPlease check the available payment methods along with Terms and Conditions for using Swan Bitcoin as per your jurisdiction.",
       "Onceyoucomplete": "Once you complete the registration process or login in to your Swan Bitcoin account, you can use this wallet",
-      "NotNow": "Not Now"
+      "NotNow": "Not Now",
+      "LightningaWallet": "Lightning Wallet"
     },
     "bhr": {
       "Pleaseapprovethis": "Please approve this request by scanning the Approval Key stored with any of the other backups",
@@ -636,5 +637,12 @@
       "errorinuploadingdata": "Error in uploading data. Please try again later.",
       "12501": "We recommend signing in as it easily allows you to backup your wallet on your personal cloud.",
       "default": "We encountered a non-standard error. Please try again after sometime or contact us"
+    },
+    "zeusLN": {
+      "Connectyournode": "Connect your node",
+      "SetupLightningAccount": "Set up Lightning Account",
+      "Entermanually": "Enter manually",
+      "NoLNDnode": "No LND node",
+      "NoLNDnodeSub": "Elit culpa consectetur elit ex consectetur quis culpa veniam est consequat."
     }
 }
