@@ -72,7 +72,9 @@ import {
   updateMetaSharesKeeper,
   updateOldMetaSharesKeeper,
   setIsCurrentLevel0,
-  RECOVER_WALLET_WITHOUT_ICLOUD
+  RECOVER_WALLET_WITHOUT_ICLOUD,
+  UPGRADE_PDF,
+  setPdfUpgrade
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -952,17 +954,11 @@ function* getPDFDataWorker( { payload } ) {
       )
       if( pdfPath ){
         yield put( pdfSuccessfullyCreated( true ) )
-
         yield put( setPDFInfo( {
           filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
         } ) )
       }
-      // yield put( setPDFInfo( {
-      //   filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
-      // } ) )
     }
-
-    //yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
@@ -2826,4 +2822,31 @@ function* changeQuestionAnswerWorker( { payload } ) {
 export const changeQuestionAnswerWatcher = createWatcher(
   changeQuestionAnswerWorker,
   CHANGE_QUESTION_ANSWER,
+)
+
+function* upgradePDFWorker( ) {
+  try {
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
+    if( levelData.find( value=>value.keeper1.shareType == 'pdf' || value.keeper2.shareType == 'pdf' ) ){
+      const keeper = levelData.find( value=>value.keeper1.shareType ) ? levelData.find( value=>value.keeper1.shareType ).keeper1 : levelData.find( value=>  value.keeper2.shareType == 'pdf' ) ? levelData.find( value=>  value.keeper2.shareType == 'pdf' ).keeper2 : null
+      yield put( setPdfUpgrade( true ) )
+      const shareObj = {
+        walletId: wallet.walletId,
+        shareId: keeper ? keeper.shareId : '',
+        reshareVersion: 0,
+        shareType: 'pdf',
+        status: 'notAccessible',
+        name: 'Personal Copy'
+      }
+      yield put( updateMSharesHealth( shareObj, false ) )
+    }
+  } catch ( error ) {
+    console.log( 'UPGRADE_PDF Error', error )
+  }
+}
+
+export const upgradePDFWorkerWatcher = createWatcher(
+  upgradePDFWorker,
+  UPGRADE_PDF,
 )
