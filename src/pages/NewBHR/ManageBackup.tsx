@@ -132,7 +132,6 @@ export default function ManageBackup( props ) {
   useEffect( ()=>{
 
     InteractionManager.runAfterInteractions( async() => {
-      await onRefresh()
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
           dispatch( setLevelToNotSetupStatus() )
@@ -147,6 +146,15 @@ export default function ManageBackup( props ) {
       focusListener.remove()
     }
   }, [] )
+
+  useEffect( () => {
+    init()
+  }, [] )
+
+  const init = async () => {
+    await onRefresh()
+    dispatch( modifyLevelData() )
+  }
 
   const updateAddressBook = async ( ) => {
     const keeping = []
