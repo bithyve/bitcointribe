@@ -133,7 +133,6 @@ export default function ManageBackup( props ) {
 
     InteractionManager.runAfterInteractions( async() => {
       await onRefresh()
-      dispatch( modifyLevelData() )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
           dispatch( setLevelToNotSetupStatus() )
