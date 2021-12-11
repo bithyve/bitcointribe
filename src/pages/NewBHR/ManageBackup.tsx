@@ -133,7 +133,6 @@ export default function ManageBackup( props ) {
 
     InteractionManager.runAfterInteractions( async() => {
       await onRefresh()
-      dispatch( modifyLevelData() )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
           dispatch( setLevelToNotSetupStatus() )
@@ -480,7 +479,8 @@ export default function ManageBackup( props ) {
         else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
       }
       if( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'primaryKeeper' ) {
-        if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ) index = selectedKeeper.data.index
+        if( selectedKeeper.shareType == 'primaryKeeper' ) index = 0
+        else if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ) index = selectedKeeper.data.index
         else if ( count == 0 ) index = 0
         else if ( count == 1 ) index = 3
         else if ( count == 2 ) index = 4

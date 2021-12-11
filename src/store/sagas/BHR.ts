@@ -2452,7 +2452,7 @@ export const retrieveMetaSharesWatcher = createWatcher(
 function* onPressKeeperChannelWorker( { payload } ) {
   try {
     const { value, number } = payload
-    console.log( 'value, number', value, number )
+
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const isLevelThreeMetaShareCreated = yield select( ( state ) => state.bhr.isLevelThreeMetaShareCreated )
@@ -2460,12 +2460,11 @@ function* onPressKeeperChannelWorker( { payload } ) {
     const isLevelTwoMetaShareCreated = yield select( ( state ) => state.bhr.isLevelTwoMetaShareCreated )
     const isLevel2Initialized = yield select( ( state ) => state.bhr.isLevel2Initialized )
     const { metaSharesKeeper } = yield select( ( state ) => state.bhr )
-    console.log( 'currentLevel', currentLevel )
 
     if( currentLevel === 0 && value.id === 1 && levelHealth[ 0 ].levelInfo[ 0 ].status=='notSetup' ){
       yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
       return
-    } else if( currentLevel === 1 && value.id === 2 && number == 2 && levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt==0 ){
+    } else if( currentLevel === 1 && value.id === 2 && number == 2 && levelHealth[ 1 ]?.levelInfo.length == 4 && levelHealth[ 1 ]?.levelInfo[ 2 ].updatedAt==0 ){
       yield put( setLevelCompletionError( 'Please backup Recovery Key 1 ', 'Please share Recovery Key 1 and ensure it is accepted on another device running Hexa before proceeding to backup Recovery Key 2', LevelStatus.FAILED ) )
       return
     }
