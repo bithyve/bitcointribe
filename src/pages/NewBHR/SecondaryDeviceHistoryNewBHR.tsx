@@ -234,9 +234,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       setChannelKey( channelKeyTemp )
       const contactDetails = payload && payload.chosenContactTmp ? payload.chosenContactTmp : Contact
       setContact( contactDetails )
+
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
-        name: contactDetails && contactDetails.name ? contactDetails.name : contactDetails.displayedName ? contactDetails.displayedName : '',
+        name: contactDetails ? ( contactDetails.name? contactDetails.name: contactDetails.displayedName ? contactDetails.displayedName: '' ): '',
         type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : currentLevel == 0 ? '1of1' : '2of3',
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
@@ -247,7 +248,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
             2,
         data: {
-          ...contactDetails, index
+          ...( contactDetails? contactDetails: {
+          } ),
+          index
         },
         channelKey: channelKeyTemp
       }
@@ -490,8 +493,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           // ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 );
           setShowQr( true )
           setChangeModal( false )
+
+          let name = 'Personal Device 1'
+          if( index === 3 ) name = 'Personal Device 2'
+          else if( index === 4 ) name = 'Personal Device 3'
+
+          const contact = {
+            id: uuid(),
+            name: name
+          }
+          setContact( contact )
           createGuardian( {
-            isChangeTemp: true
+            isChangeTemp: true, chosenContactTmp: contact
           } )
         }}
         onPressIgnore={() => setChangeModal( false )}

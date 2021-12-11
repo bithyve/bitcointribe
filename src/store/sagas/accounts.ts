@@ -1095,50 +1095,6 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-function parseAA( addresses ) {
-  try {
-    if( addresses.length > 0 ) {
-      const obj = {
-      }
-      addresses.forEach( aa => {
-        const tmp = {
-          index : aa.index
-        }
-        if( aa.assignee ) {
-          const assignee = {
-            ...aa.assignee
-          }
-          if( aa.assignee.recipientInfo ) {
-            const recipientInfo = {
-            }
-            aa.assignee.recipientInfo.forEach( info => {
-              recipientInfo[ info.txid ] = info.recipient
-            } )
-            assignee.recipientInfo = recipientInfo
-            tmp.assignee = assignee
-          }
-        }
-        obj[ aa.address ] = tmp
-      } )
-      return obj
-    } else {
-      return {
-      }
-    }
-  } catch ( error ) {
-    console.log( error )
-    return {
-    }
-  }
-}
-
-function getAA( activeAddresses:{external: [], internal: []} ) {
-  return {
-    external: parseAA( activeAddresses.external ),
-    internal: parseAA( activeAddresses.internal  )
-  }
-}
-
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
@@ -1147,8 +1103,6 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   for ( const account of restoredAccounts ){
     const accountShell: AccountShell = yield call( generateShellFromAccount, account )
     accountShell.primarySubAccount.visibility = account.accountVisibility
-    const aa = getAA( account.activeAddresses )
-    account.activeAddresses = aa
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
   }
