@@ -540,9 +540,7 @@ const PersonalCopyHistory = ( props ) => {
       } )
     }
     if ( type == 'pdf' ) {
-      setTimeout( () => {
-        setPersonalCopyShareModal( true )
-      }, 1000 )
+      createGuardian()
     }
   }
 
@@ -577,7 +575,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sa","channelId":"9a2a4b88edc575c1efecdf7bc01fcd525f44f7f21a46fe0ef67da9bedd41ce92","streamId":"8b58b89d1","channelKey":"VwjtMxx1ksuSlJHMYaUAkwec","secondaryChannelKey":"ZXbevmVd0xvfKE50ij7wRSAU","version":"2.0.8","walletId":"51050a044ef91ce8dbb089e785a0d7204dd1d781d5c20d7e13037e51b17ddc65","encryptedKey":"1a7a5c7792a00a0ff1eb8c493639816181709d7ff9efd616536ad7f88048efd37c06fa550c283652a8716be622540054fc3a65b6f0365115aa1fdcb227e29efae824c1336af15536f5d07653ae0a9080"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asa","channelId":"f1e2b75507eff77de91e56c5e431767eef3c6a6cee1e937fad41864e19892bcb","streamId":"84af9aa6d","channelKey":"ByZowa42G8j1vG6YnCMpDnCc","secondaryChannelKey":"vjzO0spKh4bYVUwYR7tKD5N1","version":"2.0.8","walletId":"30cd144365acc65dc809f5fac231643883d37f256bc9d9d0d09cec5f119b83d9","encryptedKey":"bae794c0051f2898c772b94a53fb465373264e5ef90ab8c0747a4f4bbe2af61d0897ade3ba342fb8e84cb53c86868ec5989451d20c3b2521a946d1aa6f470294402ea677800558403f58267b0b039964"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
@@ -586,7 +584,7 @@ const PersonalCopyHistory = ( props ) => {
             props.navigation.dispatch( popAction )
           } else {
             setQRModal( false )
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
+            const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Asa","channelId":"59554060913cddb8cca36888affd621fc9939e43f57365cc6e87a0b78d018cad","streamId":"84af9aa6d","secondaryChannelKey":"cjIzFMeQiCjzEtC8piv1qSow","version":"2.0.7","walletId":"30cd144365acc65dc809f5fac231643883d37f256bc9d9d0d09cec5f119b83d9"}'
             dispatch( setApprovalStatus( false ) )
             dispatch( downloadSMShare( qrScannedData ) )
           }
@@ -599,7 +597,7 @@ const PersonalCopyHistory = ( props ) => {
     if( approvalStatus && isChangeClicked ){
       console.log( 'APPROVe' )
       setQRModal( false )
-      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
+      onPressChangeKeeperType( 'pdf', selectedKeeperName )
     }
   }, [ approvalStatus ] )
 
@@ -626,8 +624,10 @@ const PersonalCopyHistory = ( props ) => {
         info={'You need to re-share your PDF as there seems to be some issue'}
         proceedButtonText={'Proceed'}
         onPressProceed={() => {
+          setIsChangeClicked( true )
           dispatch( pdfSuccessfullyCreated( false ) )
-          createGuardian( )
+          setQRModal( true )
+          // createGuardian( )
           setPdfUpgradeModal( false )
         }}
         isBottomImage={true}

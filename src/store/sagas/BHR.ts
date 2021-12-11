@@ -74,7 +74,8 @@ import {
   setIsCurrentLevel0,
   RECOVER_WALLET_WITHOUT_ICLOUD,
   UPGRADE_PDF,
-  setPdfUpgrade
+  setPdfUpgrade,
+  upgradePDF
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -1298,6 +1299,7 @@ function* autoShareLevel2KeepersWorker( ) {
           channelKey
         }
         yield put( updatedKeeperInfo( obj ) )
+        if( obj.type == 'pdf' ) yield put( upgradePDF() )
 
         const contactInfo = {
           channelKey: keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ i ].shareId ).channelKey,
@@ -1350,7 +1352,7 @@ function* autoShareLevel2KeepersWorker( ) {
             shareId: obj.shareId,
             reshareVersion: MetaShares.find( value=>value.shareId == obj.shareId ).meta.reshareVersion,
             updatedAt: moment( new Date() ).valueOf(),
-            status: 'accessible',
+            status: obj.type == 'pdf' ? 'notAccessible' : 'accessible',
             name: obj.name,
             shareType: obj.type
           }
