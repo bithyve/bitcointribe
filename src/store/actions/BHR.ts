@@ -647,6 +647,7 @@ export const GET_APPROVAL_FROM_KEEPER = 'GET_APPROVAL_FROM_KEEPER'
 export const CHANGE_QUESTION_ANSWER = 'CHANGE_QUESTION_ANSWER'
 export const SET_IS_CURRENT_LEVEL0 = 'SET_IS_CURRENT_LEVEL0'
 export const UPGRADE_PDF = 'UPGRADE_PDF'
+export const UPGRADE_LEVEL1_KEEPER = 'UPGRADE_LEVEL1_KEEPER'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -771,5 +772,11 @@ export const setPdfUpgrade = ( flag ) => {
 export const upgradePDF = ( ) => {
   return {
     type: UPGRADE_PDF
+  }
+}
+
+export const upgradeLevelOneKeeper = ( ) => {
+  return {
+    type: UPGRADE_LEVEL1_KEEPER
   }
 }

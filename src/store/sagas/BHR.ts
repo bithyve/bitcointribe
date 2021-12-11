@@ -75,7 +75,8 @@ import {
   RECOVER_WALLET_WITHOUT_ICLOUD,
   UPGRADE_PDF,
   setPdfUpgrade,
-  upgradePDF
+  upgradePDF,
+  UPGRADE_LEVEL1_KEEPER,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -2850,4 +2851,104 @@ function* upgradePDFWorker( ) {
 export const upgradePDFWorkerWatcher = createWatcher(
   upgradePDFWorker,
   UPGRADE_PDF,
+)
+
+function* upgradeLevelOneKeeperWorker( ) {
+  try {
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const Contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
+    const { metaSharesKeeper } = yield select( ( state ) => state.bhr )
+    if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
+      if( ( levelHealth[ 1 ].levelInfo.length == 6 &&
+        levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
+        levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 1 ].shareType != 'cloud' )||
+        ( levelHealth[ 1 ].levelInfo.length == 4 &&
+          levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
+          levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+          levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
+          levelHealth[ 1 ].levelInfo[ 1 ].shareType != 'cloud' ) ){
+        const channelKey = keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).channelKey
+        const obj: KeeperInfoInterface = {
+          shareId: levelHealth[ 1 ].levelInfo[ 1 ].shareId,
+          name: levelHealth[ 0 ].levelInfo[ 1 ].name,
+          type: levelHealth[ 0 ].levelInfo[ 1 ].shareType,
+          scheme: metaSharesKeeper.find( value=>value.shareId == levelHealth[ 1 ].levelInfo[ 1 ].shareId ).meta.scheme,
+          currentLevel: 3,
+          createdAt: moment( new Date() ).valueOf(),
+          sharePosition: metaSharesKeeper.findIndex( value=>value.shareId == levelHealth[ 1 ].levelInfo[ 1 ].shareId ),
+          data: keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).data,
+          channelKey
+        }
+        yield put( updatedKeeperInfo( obj ) )
+        if( obj.type == 'pdf' ) yield put( upgradePDF() )
+
+        const contactInfo = {
+          channelKey: keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).channelKey,
+        }
+
+        const primaryData: PrimaryStreamData = {
+          contactDetails: Contacts[ channelKey ].contactDetails,
+          walletID: wallet.walletId,
+          walletName: wallet.walletName,
+          relationType: TrustedContactRelationTypes.KEEPER,
+        }
+        const backupData: BackupStreamData = {
+          primaryMnemonicShard: metaSharesKeeper.find( value=>value.shareId == levelHealth[ 1 ].levelInfo[ 1 ].shareId ),
+          keeperInfo
+        }
+        const streamUpdates: UnecryptedStreamData = {
+          streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+          primaryData,
+          backupData,
+          metaData: {
+            flags:{
+              active: true,
+              newData: true,
+              lastSeen: Date.now(),
+            },
+            version: DeviceInfo.getVersion()
+          }
+        }
+        // initiate permanent channel
+        const { updated }: {
+          updated: boolean;
+          updatedContacts: Trusted_Contacts
+        } = yield call(
+          TrustedContactsOperations.syncPermanentChannels,
+          [ {
+            channelKey: contactInfo.channelKey,
+            streamId: streamUpdates.streamId,
+            contactDetails: Contacts[ channelKey ].contactDetails,
+            contact: Contacts[ channelKey ],
+            unEncryptedOutstreamUpdates: streamUpdates,
+          } ]
+        )
+        if ( updated ) {
+          const shareObj = {
+            walletId: wallet.walletId,
+            shareId: obj.shareId,
+            reshareVersion: metaSharesKeeper.find( value=>value.shareId == obj.shareId ).meta.reshareVersion,
+            updatedAt: moment( new Date() ).valueOf(),
+            status: 'notAccessible',
+            name: obj.name,
+            shareType: obj.type
+          }
+          yield put( updateMSharesHealth( shareObj, false ) )
+        }
+      }
+    }
+  } catch ( error ) {
+    console.log( 'UPGRADE_PDF Error', error )
+  }
+}
+
+export const upgradeLevelOneKeeperWatcher = createWatcher(
+  upgradeLevelOneKeeperWorker,
+  UPGRADE_LEVEL1_KEEPER,
 )

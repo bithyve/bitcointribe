@@ -40,7 +40,7 @@ import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBN
 import Loader from '../../components/loader'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, downloadSMShare, setApprovalStatus } from '../../store/actions/BHR'
+import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, downloadSMShare, setApprovalStatus, upgradeLevelOneKeeper } from '../../store/actions/BHR'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import { setCloudData, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
@@ -441,9 +441,13 @@ export default function ManageBackup( props ) {
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
-        dispatch( deletePrivateData() )
-        setLoaderModal( true )
-        dispatch( updateCloudData() )
+        if( levelHealth[ 1 ].levelInfo[ 1 ].shareType == 'cloud' ){
+          dispatch( deletePrivateData() )
+          setLoaderModal( true )
+          dispatch( updateCloudData() )
+        } else {
+          dispatch( upgradeLevelOneKeeper() )
+        }
       } else if( levelHealth[ 1 ].levelInfo.length == 6 &&
         levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
@@ -451,8 +455,12 @@ export default function ManageBackup( props ) {
         levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
-        dispatch( updateCloudData() )
-        setLoaderModal( true )
+        if( levelHealth[ 1 ].levelInfo[ 1 ].shareType == 'cloud' ){
+          dispatch( updateCloudData() )
+          setLoaderModal( true )
+        } else {
+          dispatch( upgradeLevelOneKeeper() )
+        }
       }
     }
   }
@@ -744,7 +752,7 @@ export default function ManageBackup( props ) {
         </ModalContainer>
         <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
           <QRModal
-            isFromKeeperDeviceHistory={true}
+            isFromKeeperDeviceHistory={false}
             QRModalHeader={'QR scanner'}
             title={common[ 'note' ]}
             infoText={strings[ 'Pleaseapprovethis' ]}
@@ -758,7 +766,7 @@ export default function ManageBackup( props ) {
             onBackPress={() => setShowQRModal( false ) }
             onPressContinue={async() => {
               setShowQRModal( true )
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Sa","channelId":"ad5402f9881ebf177fc7d17d799d05d3dfe8133b7a9899c969890f34d18c3239","streamId":"8b58b89d1","secondaryChannelKey":"DmqheKI3eNm4rx7RBIRGE29v","version":"2.0.7","walletId":"51050a044ef91ce8dbb089e785a0d7204dd1d781d5c20d7e13037e51b17ddc65"}'
+              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Asa","channelId":"59554060913cddb8cca36888affd621fc9939e43f57365cc6e87a0b78d018cad","streamId":"84af9aa6d","secondaryChannelKey":"cjIzFMeQiCjzEtC8piv1qSow","version":"2.0.7","walletId":"30cd144365acc65dc809f5fac231643883d37f256bc9d9d0d09cec5f119b83d9"}'
               dispatch( setApprovalStatus( false ) )
               dispatch( downloadSMShare( qrScannedData ) )
               setShowQRModal( false )

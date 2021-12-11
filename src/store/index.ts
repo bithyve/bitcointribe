@@ -147,6 +147,7 @@ import {
   rejectedExistingContactRequestWatcher,
   changeQuestionAnswerWatcher,
   upgradePDFWorkerWatcher,
+  upgradeLevelOneKeeperWatcher,
 } from './sagas/BHR'
 
 import {
@@ -277,6 +278,7 @@ const rootSaga = function* () {
     rejectedExistingContactRequestWatcher,
     changeQuestionAnswerWatcher,
     upgradePDFWorkerWatcher,
+    upgradeLevelOneKeeperWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

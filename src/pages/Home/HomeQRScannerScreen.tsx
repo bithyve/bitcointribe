@@ -216,7 +216,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             __DEV__ && (
               <TouchableOpacity onPress={() => {
                 const qrScannedData = {
-                  data: '{"type":"PRIMARY_KEEPER_REQUEST","encryptedChannelKeys":"xaK8GkkEDyjJGSQZqRCzIO8J-vPggEiXBKJHeVONcPQfi94Cg","encryptionType":"DEFAULT","encryptionHint":"","walletName":"Wes","version":"2.0.1"}'
+                  data: '{"type":"KEEPER_REQUEST","encryptedChannelKeys":"IGh6skcFCwLagxmD1jazFkfP-Rs7gOemfun91PiEtzpMCyu2w","encryptionType":"DEFAULT","encryptionHint":"","walletName":"Asa","version":"2.0.8","currentLevel":2}'
                 }
                 handleBarcodeRecognized( qrScannedData )
               }} >
