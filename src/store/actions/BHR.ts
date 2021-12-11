@@ -75,6 +75,7 @@ export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
 export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
+export const PDF_UPGRADE = 'PDF_UPGRADE'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -645,6 +646,8 @@ export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
 export const GET_APPROVAL_FROM_KEEPER = 'GET_APPROVAL_FROM_KEEPER'
 export const CHANGE_QUESTION_ANSWER = 'CHANGE_QUESTION_ANSWER'
 export const SET_IS_CURRENT_LEVEL0 = 'SET_IS_CURRENT_LEVEL0'
+export const UPGRADE_PDF = 'UPGRADE_PDF'
+export const UPGRADE_LEVEL1_KEEPER = 'UPGRADE_LEVEL1_KEEPER'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -755,5 +758,25 @@ export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
     type: RECOVER_WALLET_WITHOUT_ICLOUD, payload: {
       backupData, answer
     }
+  }
+}
+
+export const setPdfUpgrade = ( flag ) => {
+  return {
+    type: PDF_UPGRADE, payload: {
+      flag
+    }
+  }
+}
+
+export const upgradePDF = ( ) => {
+  return {
+    type: UPGRADE_PDF
+  }
+}
+
+export const upgradeLevelOneKeeper = ( ) => {
+  return {
+    type: UPGRADE_LEVEL1_KEEPER
   }
 }

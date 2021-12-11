@@ -1393,7 +1393,7 @@ class ContactDetails extends PureComponent<
           showQRScanner: false, showQRClicked: false
         } )}>
           <QRModal
-            isFromKeeperDeviceHistory={true}
+            isFromKeeperDeviceHistory={false}
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
@@ -1409,7 +1409,7 @@ class ContactDetails extends PureComponent<
               } )
             }}
             onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Sada","channelId":"9efb4d94fdeb93b464cb8f72e424b8a4794202ea9a0af51d7cd081ab5a181ae0","streamId":"4625ca458","secondaryChannelKey":"g9HWZIxWOj8tYX8OxhJ88E3E","version":"2.0.5","walletId":"9a1e60930db75fbb51d67d71ae552d3d2e2d9eaeae126c4a23000070afa6c23a"}'
+              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Asa","channelId":"59554060913cddb8cca36888affd621fc9939e43f57365cc6e87a0b78d018cad","streamId":"84af9aa6d","secondaryChannelKey":"cjIzFMeQiCjzEtC8piv1qSow","version":"2.0.7","walletId":"30cd144365acc65dc809f5fac231643883d37f256bc9d9d0d09cec5f119b83d9"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />

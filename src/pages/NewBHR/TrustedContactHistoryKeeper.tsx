@@ -31,13 +31,13 @@ import {
   setChannelAssets,
   createChannelAssets,
   createOrChangeGuardian,
-  switchS3LoaderKeeper,
+  setApprovalStatus,
+  downloadSMShare,
 } from '../../store/actions/BHR'
 import { useDispatch } from 'react-redux'
 import {
   KeeperInfoInterface,
   Keepers,
-  LevelHealthInterface,
   MetaShare,
   TrustedContact,
   Trusted_Contacts,
@@ -71,6 +71,7 @@ import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFr
 import Relay from '../../bitcoin/utilities/Relay'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { translations } from '../../common/content/LocContext'
+import QRModal from '../Accounts/QRModal'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -138,6 +139,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const index = props.navigation.getParam( 'index' )
   const dispatch = useDispatch()
   const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
+  const [ qrModal, setQRModal ] = useState( false )
+  const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
+  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
 
   useEffect( () => {
     setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
@@ -162,6 +166,53 @@ const TrustedContactHistoryKeeper = ( props ) => {
       setShowQrCode( true )
     }
   }, [ isChange ] )
+
+  const sendApprovalRequestToPK = ( ) => {
+    setQrBottomSheetsFlag( true )
+    setQRModal( true )
+    setKeeperTypeModal( false )
+  }
+
+  const renderQrContent = () => {
+    return (
+      <QRModal
+        isFromKeeperDeviceHistory={false}
+        QRModalHeader={'QR scanner'}
+        title={'Note'}
+        infoText={
+          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+        }
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={async( qrScannedData ) => {
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
+        }}
+        onBackPress={() => {
+          setQrBottomSheetsFlag( false )
+          setQRModal( false )
+        }}
+        onPressContinue={async() => {
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
+        }}
+      />
+    )
+  }
+
+  useEffect( ()=>{
+    if( approvalStatus && isChangeClicked ){
+      setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
+    }
+  }, [ approvalStatus ] )
+
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
+
 
   //didMount
   useEffect( () => {
@@ -875,12 +926,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
       </ModalContainer>
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
+          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            onPressChangeKeeperType( type, name )
+            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            else onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}
@@ -894,6 +947,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressProceed={() => setApprovalErrorModal( false )}
           isBottomImage={false}
         />
+      </ModalContainer>
+      <ModalContainer visible={qrModal} closeBottomSheet={() => {setQRModal( false )}} >
+        {renderQrContent()}
       </ModalContainer>
       {showLoader ? <Loader /> : null}
     </View>
