@@ -778,7 +778,7 @@ function* updateWalletImageWorker( { payload } ) {
     const acc = {
     }
     Object.values( accounts ).forEach( account => {
-      const shouldUpdate = accountIds.includes( accounts.id )
+      const shouldUpdate = accountIds.includes( account.id )
       if( shouldUpdate )  {
         const txns = []
         const accToEncrypt: any = {
