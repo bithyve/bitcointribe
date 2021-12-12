@@ -618,7 +618,7 @@ function* recoverWalletWorker( { payload } ) {
       yield put( retrieveMetaShares( shares ) )
       yield put( setAllowSecureAccount( true ) )
     }
-    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+
     // restore gifts
     if( image.gifts ) {
       const gifts = {
@@ -633,7 +633,7 @@ function* recoverWalletWorker( { payload } ) {
     }
 
     yield put( restoreAccountShells( acc ) )
-
+    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
     console.log( err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )

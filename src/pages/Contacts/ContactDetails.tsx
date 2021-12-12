@@ -1409,7 +1409,7 @@ class ContactDetails extends PureComponent<
               } )
             }}
             onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Asa","channelId":"59554060913cddb8cca36888affd621fc9939e43f57365cc6e87a0b78d018cad","streamId":"84af9aa6d","secondaryChannelKey":"cjIzFMeQiCjzEtC8piv1qSow","version":"2.0.7","walletId":"30cd144365acc65dc809f5fac231643883d37f256bc9d9d0d09cec5f119b83d9"}'
+              const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"ShivaniNew","channelId":"016eb4ac3b68d312ac8301e5cedeececdc4b8e42a56e49fd849048ff3642da86","streamId":"65bf22a7c","channelKey":"0BvnLFWTJfNP3hFy43qYk136","secondaryChannelKey":"upToEzzuNHJ75QYqyRz9Q6Lc","version":"2.0.7","walletId":"2ca1d6a049f75ec5c693d76a896745e12438941d97921dfabfa6c3a4a1ac258d"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />
