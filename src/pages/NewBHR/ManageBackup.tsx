@@ -428,6 +428,10 @@ export default function ManageBackup( props ) {
         channelUpdates: channelUpdates,
         metaSync: true
       } ) )
+      syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true
+      } )
     }
     dispatch( modifyLevelData() )
     dispatch( setHealthStatus() )
@@ -441,7 +445,7 @@ export default function ManageBackup( props ) {
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
-        if( levelHealth[ 1 ].levelInfo[ 1 ].shareType == 'cloud' ){
+        if( levelHealth[ 0 ].levelInfo[ 1 ].shareType == 'cloud' ){
           dispatch( deletePrivateData() )
           setLoaderModal( true )
           dispatch( updateCloudData() )
@@ -455,7 +459,7 @@ export default function ManageBackup( props ) {
         levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
-        if( levelHealth[ 1 ].levelInfo[ 1 ].shareType == 'cloud' ){
+        if( levelHealth[ 0 ].levelInfo[ 1 ].shareType == 'cloud' ){
           dispatch( updateCloudData() )
           setLoaderModal( true )
         } else {

@@ -1105,6 +1105,7 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
     accountShell.primarySubAccount.visibility = account.accountVisibility
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
+    accountShell.primarySubAccount.transactions = account.transactionsMeta
   }
 
   // update redux store & database

@@ -493,19 +493,16 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           // ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 );
           setShowQr( true )
           setChangeModal( false )
-
-          let name = 'Personal Device 1'
-          if( index === 3 ) name = 'Personal Device 2'
-          else if( index === 4 ) name = 'Personal Device 3'
-
-          const contact = {
-            id: uuid(),
-            name: name
-          }
-          setContact( contact )
-          createGuardian( {
-            isChangeTemp: true, chosenContactTmp: contact
+          props.navigation.navigate( 'ContactsListForAssociateContact', {
+            postAssociation: ( contact ) => {
+              setShowQr( true )
+              setContact( contact )
+              createGuardian( {
+                isChangeTemp: true, chosenContactTmp: contact
+              } )
+            }
           } )
+
         }}
         onPressIgnore={() => setChangeModal( false )}
         isBottomImage={false}
@@ -600,17 +597,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
     else {
       setReshareModal( false )
-      let name = 'Personal Device 1'
-      if( index === 3 ) name = 'Personal Device 2'
-      else if( index === 4 ) name = 'Personal Device 3'
 
-      const contact = {
-        id: uuid(),
-        name: name
-      }
-      setContact( contact )
-      createGuardian( {
-        isReshare: true, chosenContactTmp: contact
+      props.navigation.navigate( 'ContactsListForAssociateContact', {
+        postAssociation: ( contact ) => {
+          setShowQr( true )
+          setContact( contact )
+          createGuardian( {
+            isReshare: true, chosenContactTmp: contact
+          } )
+        }
       } )
       setShowQr( true )
     }
@@ -644,8 +639,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           confirmButtonText={isChange ? 'Share Now' : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressConfirm={() => {
             if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
-              setShowQr( true )
-              createGuardian()
+              props.navigation.navigate( 'ContactsListForAssociateContact', {
+                postAssociation: ( contact ) => {
+                  setShowQr( true )
+                  createGuardian( {
+                    chosenContactTmp: contact
+                  } )
+                }
+              } )
+
             } else {
               setSecondaryDeviceMessageModal( true )
             }
