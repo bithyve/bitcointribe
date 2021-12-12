@@ -360,10 +360,6 @@ class RestoreWithICloud extends Component<
       } else this.setKeeperInfoList( 0, this.props.downloadedBackupData[ 0 ].backupData.keeperInfo )
     }
 
-    // if( prevState.isWithoutCloud != this.state.isWithoutCloud ){
-    //   this.props.restoreWithoutUsingIcloud( this.props.downloadedBackupData[ 0 ].backupData, this.state.answer )
-    // }
-
     // if ( prevProps.s3Service != this.props.s3Service && this.props.s3Service.levelhealth ) {
     //   this.props.setupHealth( this.state.currentLevel )
     // }
@@ -390,8 +386,6 @@ class RestoreWithICloud extends Component<
           securityQuestionModal: true,
           question: downloadedBackupData[ 0 ].backupData.primaryMnemonicShard.meta.question
         } )
-      } else {
-        this.setKeeperInfoList( downloadedBackupData[ 0 ].backupData.keeperInfo[ 1 ].currentLevel, downloadedBackupData[ 0 ].backupData.keeperInfo )
       }
     }
     updatedListData = [ ...listData ]

@@ -614,7 +614,10 @@ function* recoverWalletWorker( { payload } ) {
     } )
 
     // restore Metashres
-    if( level > 1 ) yield put( retrieveMetaShares( shares ) )
+    if( level > 1 ) {
+      yield put( retrieveMetaShares( shares ) )
+      yield put( setAllowSecureAccount( true ) )
+    }
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     // restore gifts
     if( image.gifts ) {
