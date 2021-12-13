@@ -70,6 +70,7 @@ export default function AddContactSendRequest( props ) {
   const note = props.navigation.getParam( 'note' )
   const giftToSend = giftId? accountsState.gifts[ giftId ]: null
   const [ trustedLink, setTrustedLink ] = useState( '' )
+  const [ longLink, setLongLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.NUMBER: DeepLinkEncryptionType.DEFAULT )
@@ -250,6 +251,7 @@ export default function AddContactSendRequest( props ) {
     } )
     const link = shortLink !== '' ? shortLink: deepLink
     setTrustedLink( link )
+    setLongLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
 
     let qrType: string
@@ -478,6 +480,7 @@ export default function AddContactSendRequest( props ) {
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
+          longLink={longLink}
           contactEmail={''}
           onPressBack={() => {
             props.navigation.goBack()

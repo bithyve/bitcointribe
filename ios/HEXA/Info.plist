@@ -147,5 +147,13 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+  	<array>
+    	<string>https://app.hexawallet.io</string>
+    	<string>https://request.hexawallet.io</string>
+    	<string>https://gift.hexawallet.io</string>
+    	<string>https://donation.hexawallet.io</string>
+    	<string>https://f&f.hexawallet.io</string>
+  	</array>
 </dict>
 </plist>
