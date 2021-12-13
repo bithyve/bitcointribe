@@ -335,6 +335,7 @@ export default function AddContactAddressBook( props ) {
       subHeaderText:strings.send,
       contactText:strings.adding,
       showDone:true,
+      skipClicked: true,
     } )
   }
 

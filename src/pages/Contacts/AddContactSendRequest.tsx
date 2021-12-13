@@ -108,6 +108,10 @@ export default function AddContactSendRequest( props ) {
     ? props.navigation.getParam( 'existingContact' )
     : false
 
+    const skipClicked = props.navigation.getParam('skipClicked')
+    ? props.navigation.getParam('skipClicked')
+    : false
+
   const [ Contact ] = useState(
     SelectedContact ? SelectedContact[ 0 ] : {
     },
@@ -204,8 +208,7 @@ export default function AddContactSendRequest( props ) {
       switch( encryptLinkWith ){
           case DeepLinkEncryptionType.NUMBER:
             const phoneNumber = idx( contactInfo, ( _ ) => _.phoneNumbers[ 0 ].number )
-
-            if( phoneNumber ){
+            if( phoneNumber || skipClicked ){
               const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
               encryption_key = number.slice( number.length - 10 ) // last 10 digits only
               setEncryptKey( encryption_key )
