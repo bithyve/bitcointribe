@@ -24,6 +24,7 @@ import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import { Gift, GiftThemeId, Wallet } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
+import CheckMark from '../../assets/images/svgs/checkmark.svg'
 import AccountShell from '../../common/data/models/AccountShell'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
@@ -48,6 +49,7 @@ const GiftDetails = ( { navigation } ) => {
   const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
+  const [ addfNf, setAddfNf ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
@@ -66,7 +68,7 @@ const GiftDetails = ( { navigation } ) => {
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
 
-  const renderButton = ( text ) => {
+  const renderButton = ( text, condn ) => {
 
     const isDisabled = false
     return(
@@ -74,7 +76,6 @@ const GiftDetails = ( { navigation } ) => {
         disabled={isDisabled}
         onPress={()=>{
           if ( contact ) {
-
             navigation.replace( 'AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
@@ -85,6 +86,12 @@ const GiftDetails = ( { navigation } ) => {
               showDone:true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
+              setActiveTab: navigation.state.params.setActiveTab
+            } )
+          } else if (condn === 'Add F&F and Send') {
+            navigation.navigate( 'AddContact', {
+              fromScreen: 'GiftDetails',
+              giftId,
               setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
@@ -113,20 +120,27 @@ const GiftDetails = ( { navigation } ) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={{
-      flexGrow: 1, height: '100%'
-    }}
-    keyboardShouldPersistTaps='handled'
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        height: '100%',
+      }}
+      keyboardShouldPersistTaps="handled"
     >
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-        <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
-        } ]}>
+        <View
+          style={[
+            CommonStyles.headerContainer,
+            {
+              backgroundColor: Colors.backgroundColor,
+            },
+          ]}
+        >
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              navigation.goBack()
+              navigation.goBack();
             }}
           >
             <View style={styles.headerLeftIconInnerContainer}>
@@ -135,110 +149,127 @@ const GiftDetails = ( { navigation } ) => {
                 color={Colors.blue}
                 size={17}
               /> */}
-              <LeftArrow/>
+              <LeftArrow />
             </View>
           </TouchableOpacity>
         </View>
-        <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginLeft: wp( 3 )
-        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            marginLeft: wp(3),
+          }}
+        >
           <HeaderTitle
             firstLineTitle={'Enter gift details'}
-            secondLineTitle= ''//{'Who are we delighting today?'}
+            secondLineTitle="" //{'Who are we delighting today?'}
             infoTextNormal={''}
             infoTextBold={''}
             infoTextNormal1={''}
             step={''}
           />
         </View>
-        <View style={{
-          flexDirection: 'row', marginHorizontal: wp( 8 ), alignItems: 'center',
-        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}
+        >
           <Text
             style={{
-              fontSize: RFValue( 14 ),
+              fontSize: RFValue(14),
               color: Colors.black,
-              fontWeight:'400',
+              fontWeight: '400',
             }}
-          >You have received gift from{' '}
-          </Text>
-          <View
-            style={styles.inputBox}
           >
+            You have received gift from{' '}
+          </Text>
+          <View style={styles.inputBox}>
             <TextInput
-              style={name ? [ styles.modalInputBox ] : [ styles.modalInputBox, {
-                fontSize: RFValue( 15 ),
-              } ]}
+              style={
+                name
+                  ? [styles.modalInputBox]
+                  : [
+                      styles.modalInputBox,
+                      {
+                        fontSize: RFValue(15),
+                      },
+                    ]
+              }
               placeholder={'Enter name'}
               placeholderTextColor={Colors.gray1}
               value={name}
-              keyboardType={
-                Platform.OS == 'ios'
-                  ? 'ascii-capable'
-                  : 'visible-password'
-              }
+              keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
               returnKeyType="done"
               returnKeyLabel="Done"
               autoCompleteType="off"
               autoCorrect={false}
               autoCapitalize="none"
-              onChangeText={( txt ) => {
-                setName( txt )
+              onChangeText={(txt) => {
+                setName(txt);
               }}
               onBlur={() => {
-                dispatch( updateUserName( name ) )
+                dispatch(updateUserName(name));
               }}
             />
           </View>
-
         </View>
         <Text
           style={{
-            fontSize: RFValue( 14 ),
+            fontSize: RFValue(14),
             color: Colors.black,
             marginHorizontal: wp(8),
-            lineHeight: wp( 7 )
+            lineHeight: wp(7),
           }}
-        >{'Scan the QR or click the link to accept your gift.'}
+        >
+          {'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
-          onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
-          style={[ styles.dashedContainer, {
-            borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
-          } ]}>
-          <View style={[ styles.dashedStyle, {
-            borderColor: dropdownBoxValue?.color ?? Colors.lightBlue
-          } ]}>
-            <View style={{
-              flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-            }}>
-              <View style={{
-                flexDirection: 'row', alignItems: 'center'
-              }}>
-                <View style={{
-                  margin: wp( 1 )
-                }}>
-                  {dropdownBoxValue?.avatar
-                    ? dropdownBoxValue?.avatar
-                    : <GiftCard />}
+          onPress={() => setDropdownBoxOpenClose(!dropdownBoxOpenClose)}
+          style={[
+            styles.dashedContainer,
+            {
+              borderColor: dropdownBoxValue?.color ?? Colors.lightBlue,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.dashedStyle,
+              {
+                borderColor: dropdownBoxValue?.color ?? Colors.lightBlue,
+              },
+            ]}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <View
+                  style={{
+                    margin: wp(1),
+                  }}
+                >
+                  {dropdownBoxValue?.avatar ? dropdownBoxValue?.avatar : <GiftCard />}
                 </View>
 
                 <View>
-                  <Text style={styles.titleText}>
-                    {dropdownBoxValue?.title
-                      ? dropdownBoxValue?.title
-                      : 'Greeting Bitcoin'}
-                  </Text>
-                  <Text style={styles.subText}>
-                    {dropdownBoxValue?.subText
-                      ? dropdownBoxValue?.subText
-                      : 'Greeting Bitcoin'}
-                  </Text>
+                  <Text style={styles.titleText}>{dropdownBoxValue?.title ? dropdownBoxValue?.title : 'Greeting Bitcoin'}</Text>
+                  <Text style={styles.subText}>{dropdownBoxValue?.subText ? dropdownBoxValue?.subText : 'Greeting Bitcoin'}</Text>
                 </View>
               </View>
-              {
-                dropdownBoxOpenClose ? <ArrowUp />  : <ArrowDown />
-              }
+              {dropdownBoxOpenClose ? <ArrowUp /> : <ArrowDown />}
             </View>
           </View>
         </TouchableOpacity>
@@ -268,72 +299,71 @@ const GiftDetails = ( { navigation } ) => {
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
               style={{
-                height: hp( '40%' )
+                height: hp('40%'),
               }}
             >
-              {dropdownBoxList.map( ( value, index ) => (
+              {dropdownBoxList.map((value, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    setTimeout( () => {
-                      setDropdownBoxValue( value )
-                      setDropdownBoxOpenClose( false )
-                    }, 70 )
+                    setTimeout(() => {
+                      setDropdownBoxValue(value);
+                      setDropdownBoxOpenClose(false);
+                    }, 70);
                   }}
-                  style={[ styles.dashedStyle, {
-                    margin: wp( 1.5 ),
-                    borderColor: `${value.color?? Colors.lightBlue}`,
-                    backgroundColor: dropdownBoxValue
-                      ? dropdownBoxValue?.id == value.id
-                        ? Colors.skyBlue
-                        : Colors.white
-                      : Colors.white,
-
-                  } ]}
+                  style={[
+                    styles.dashedStyle,
+                    {
+                      margin: wp(1.5),
+                      borderColor: `${value.color ?? Colors.lightBlue}`,
+                      backgroundColor: dropdownBoxValue ? (dropdownBoxValue?.id == value.id ? Colors.skyBlue : Colors.white) : Colors.white,
+                    },
+                  ]}
                 >
-                  <View style={{
-                    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                  }}>
-                    <View style={{
-                      flexDirection: 'row', alignItems: 'center'
-                    }}>
-                      <View style={{
-                        margin: wp( 1 )
-                      }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <View
+                        style={{
+                          margin: wp(1),
+                        }}
+                      >
                         {value.avatar}
                       </View>
 
                       <View>
-                        <Text style={styles.titleText}>
-                          {value.title}
-                        </Text>
-                        <Text style={styles.subText}>
-                          {value.subText}
-                        </Text>
+                        <Text style={styles.titleText}>{value.title}</Text>
+                        <Text style={styles.subText}>{value.subText}</Text>
                       </View>
                     </View>
                   </View>
-
                 </TouchableOpacity>
-              ) )}
+              ))}
             </ScrollView>
           </View>
         ) : null}
-        <View
-          style={[ styles.inputBoxLong, styles.inputField ]}
-        >
+        <View style={[styles.inputBoxLong, styles.inputField]}>
           <TextInput
-            style={[ styles.modalInputBox, {
-              fontFamily: Fonts.FiraSansItalic
-            } ]}
+            style={[
+              styles.modalInputBox,
+              {
+                fontFamily: Fonts.FiraSansItalic,
+              },
+            ]}
             placeholder={`Add a personal note (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
-            keyboardType={
-              Platform.OS == 'ios'
-                ? 'ascii-capable'
-                : 'visible-password'
-            }
+            keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
             returnKeyType="done"
             returnKeyLabel="Done"
             autoCompleteType="off"
@@ -341,25 +371,65 @@ const GiftDetails = ( { navigation } ) => {
             autoCapitalize="none"
             numberOfLines={2}
             multiline
-            onChangeText={( text ) => {
-              setNote( text )
+            onChangeText={(text) => {
+              setNote(text);
             }}
           />
         </View>
-        <View style={{
-          flexDirection: 'row', alignItems: 'center', marginTop: hp( 2 ), marginLeft: wp( 2 )
-        }}>
-          {renderButton( 'Next' )}
+
+        <View
+          style={{
+            marginTop: hp(2),
+            marginBottom: hp(2),
+            marginHorizontal: wp(7),
+            flexDirection: 'row',
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setAddfNf( !addfNf )}
+            style={{
+              flexDirection: 'row',
+            }}
+          >
+            <View style={styles.imageView}>
+              {addfNf &&
+                <CheckMark
+                  style={{
+                    marginLeft: 6,
+                    marginTop: 6,
+                  }}
+                />
+              }
+            </View>
+            <Text style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue( 12 ),
+              fontFamily: Fonts.FiraSansRegular,
+              marginHorizontal: wp( 3 )
+            }}>
+          Add recipient to Friends and Family
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: hp(2),
+            marginLeft: wp(2),
+          }}
+        >
+        {renderButton( 'Next', addfNf ? 'Add F&F and Send' : 'Next' )}
           <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
             <View style={styles.statusIndicatorInactiveView} />
           </View>
         </View>
-
       </SafeAreaView>
     </ScrollView>
-  )
+  );
 }
 
 const styles = StyleSheet.create( {
@@ -368,6 +438,19 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     marginHorizontal: wp( 2 )
+  },
+  imageView: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    shadowOpacity: 0.1,
+    shadowOffset: {
+      width: 1, height: 1
+    },
   },
   dropdownBox: {
     flexDirection: 'row',
