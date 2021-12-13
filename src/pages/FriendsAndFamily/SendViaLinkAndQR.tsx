@@ -192,12 +192,12 @@ export default function SendViaLinkAndQR( props ) {
             >
               <View style={[ styles.qrContainer, {
               } ]}>
-                {!qrCode ? (
+                {!link ? (
                   <ActivityIndicator size="large" color={Colors.babyGray} />
                 ) : (
                   <QRCode
                     title={'Gift card'}
-                    value={qrCode}
+                    value={link}
                     size={hp( '24%' )} />
                 )}
               </View>
