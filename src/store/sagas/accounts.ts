@@ -51,6 +51,7 @@ import {
   updateAccountSettings,
 } from '../actions/accounts'
 import {
+  setAllowSecureAccount,
   updateWalletImageHealth
 } from '../actions/BHR'
 import {
@@ -1147,8 +1148,12 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account shells for respective accountss
   for ( const account of restoredAccounts ){
     const accountShell: AccountShell = yield call( generateShellFromAccount, account )
+
+    // turn on the UI-level usability flag if savings account is already usable(level 2 completed)
+    if( account.type === AccountType.SAVINGS_ACCOUNT && account.isUsable ) yield put( setAllowSecureAccount( true ) )
+
     accountShell.primarySubAccount.visibility = account.accountVisibility
-    const aa = getAA( account.activeAddresses )
+    const aa = getAA( account.activeAddresses )  // TODO: check whether active addresses are getting restored
     account.activeAddresses = aa
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
