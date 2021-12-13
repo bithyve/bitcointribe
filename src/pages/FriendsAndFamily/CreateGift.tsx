@@ -132,7 +132,7 @@ const CreateGift = ( { navigation } ) => {
     let giftAmount = currentSatsAmountFormValue
     const numberOfGifts = numbersOfGift? Number( numbersOfGift ): 1
     if( prefersBitcoin ){
-      if( averageLowTxFee ) giftAmount += averageLowTxFee
+      if( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
       return giftAmount * numberOfGifts > spendableBalance
     } else {
       const giftAmountInFiat = giftAmount
