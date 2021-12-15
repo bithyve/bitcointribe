@@ -94,6 +94,9 @@ const HomeHeader = ( {
     ( state ) => state.preferences.currencyCode
   )
 
+  const walletNameLength = walletName?.split('').length;
+  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
     return <View style={{
@@ -212,7 +215,7 @@ const HomeHeader = ( {
               alignItems: 'flex-start',
             }}
           >
-            <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+            <Text style={styles.headerTitleText}>{walletNameNew}</Text>
             <View
               style={{
                 flexDirection: 'row',
