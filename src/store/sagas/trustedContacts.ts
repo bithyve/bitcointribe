@@ -373,7 +373,7 @@ function* syncGiftsStatusWorker() {
     if( gift.status === GiftStatus.EXPIRED ) continue
 
     if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
-      if( gift.status !== GiftStatus.ACCEPTED && gift.status !== GiftStatus.REJECTED ){
+      if( gift.status !== GiftStatus.ACCEPTED ){
         giftChannelToGiftIdMap[ gift.channelAddress ] = giftId
         giftChannelsToSync[ gift.channelAddress ] = {
           creator: true
@@ -401,6 +401,7 @@ function* syncGiftsStatusWorker() {
       if( giftToUpdate.status !== giftMetaData.status ){
         giftToUpdate.status = giftMetaData.status
         if ( giftMetaData.status === GiftStatus.ACCEPTED ) giftToUpdate.timestamps.accepted = Date.now()
+        if ( giftMetaData.status === GiftStatus.REJECTED ) giftToUpdate.timestamps.rejected = Date.now()
 
         yield put( updateGift( giftToUpdate ) )
         yield call( dbManager.createGift, giftToUpdate )
