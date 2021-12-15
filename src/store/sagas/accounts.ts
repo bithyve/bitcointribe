@@ -1255,7 +1255,7 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
 
   } catch( err ){
     yield put( giftCreationSuccess( false ) )
-    Toast( 'Transaction failed due to dust limit. Please increase the gift amount and try' )
+    Toast( err.message )
   }
 }
 

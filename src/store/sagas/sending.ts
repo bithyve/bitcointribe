@@ -202,7 +202,7 @@ function* executeSendStage2( { payload }: {payload: {
   } catch( err ){
     yield put( sendStage2Executed( {
       successful: false,
-      err: 'Send failed: ' + err
+      err: 'Send failed: ' + err.message
     } ) )
   }
 }
