@@ -75,7 +75,7 @@ const DashedContainerSmall = ( props ) => {
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular
-            }}> sats
+            }}> {props.currency}
             </Text>
           </Text>
           {/* </View> */}
