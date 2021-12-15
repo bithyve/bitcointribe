@@ -53,6 +53,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
 
+  const orderedAccountShellsArranged = [orderedAccountShells[1],orderedAccountShells[2],orderedAccountShells[0],orderedAccountShells[3],]
+
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
   } )
 
@@ -334,7 +336,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         </View>
 
         {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
-          accountShells={orderedAccountShells}
+          accountShells={orderedAccountShellsArranged}
           onDragEnded={handleDragEnd}
         />}
 
@@ -349,17 +351,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
                 return renderItem( accountShell )
               } )
               }
-              {/* <FlatList
-              style={{
-              }}
-              contentContainerStyle={{
-                paddingHorizontal: 14
-              }}
-              extraData={orderedAccountShells}
-              data={orderedAccountShells}
-              keyExtractor={listItemKeyExtractor}
-              renderItem={renderItem}
-            /> */}
             </View>
           </View>
         </View>}
