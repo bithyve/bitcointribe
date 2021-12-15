@@ -488,7 +488,7 @@ export default function AddContactSendRequest( props ) {
           onPressDone={() => {
             // openTimer()
           }}
-          amt={numberWithCommas( giftToSend?.amount )}
+          amt={giftToSend?.amount}
           onPressShare={() => {
             setTimeout( () => {
               setRenderTimer( true )
