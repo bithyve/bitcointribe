@@ -11,7 +11,8 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
+
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
@@ -440,7 +441,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           subText={walletName}
           extraText={acceptedGift?.note? acceptedGift.note: 'This is to get you started!\nWelcome to Bitcoin'}
           amt={giftAmount}
-          image={<GiftCard />}
+          image={<CheckingAcc />}
           theme={getTheme()}
         />
         <BottomInfoBox
@@ -563,7 +564,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             subText={walletName}
             extraText={note? note: ''}
             amt={giftAmount}
-            image={<GiftCard height={60} width={60} />}
+            image={<CheckingAcc height={60} width={60} />}
             theme={getTheme()}
           />
           {/* <View

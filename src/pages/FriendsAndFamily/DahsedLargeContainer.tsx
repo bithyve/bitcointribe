@@ -83,9 +83,9 @@ const DashedLargeContainer = ( props ) => {
         padding: wp( 3 )
       }}>
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'
+          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between',
         }}>
-          <View>
+          <View style={{width: 370 }}>
             <Text style={{
               color: Colors.black,
               fontSize: RFValue( 14 ),
@@ -104,7 +104,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginRight: wp( 9 )
             }}>
-              {'You have received bitcoin gift from '}
+              {'You have received a bitcoin gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),
@@ -112,7 +112,8 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\n\nAdd bitcoin to an account or keep the Gift Card to send to someone else'}
+              {props.type  === 'QR' && '\n\nScan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet.'}
+              {props.type  === 'Link' && '\n\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet.'}
             </Text>
           </View>
           {props.date &&
@@ -139,7 +140,7 @@ const DashedLargeContainer = ( props ) => {
               letterSpacing: 0.12,
               lineHeight: 18,
               fontFamily: Fonts.FiraSansItalic,
-              width: wp( '63%' )
+              width: wp( '70%' )
             }}>
               {props.extraText ? props.extraText.replace( /%20/g, ' ' ) : ''}
             </Text>
