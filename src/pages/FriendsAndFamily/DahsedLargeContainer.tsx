@@ -49,6 +49,20 @@ const DashedLargeContainer = ( props ) => {
     }
   }
 
+  const getText = text => {
+    try {
+      if( props.version !== '2.0.5' ||  props.version !== '2.0.6'||  props.version !== '2.0.65' ){
+        return Buffer.from( text, 'base64' ).toString( 'utf-8' )
+      } else {
+        return text.replace( /%20/g, ' ' )
+      }
+
+    } catch ( error ) {
+      console.log( error )
+      return text.replace( /%20/g, ' ' )
+    }
+  }
+
   return(
     <TouchableOpacity
       activeOpacity={0.7}
@@ -85,7 +99,9 @@ const DashedLargeContainer = ( props ) => {
         <View style={{
           flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between',
         }}>
-          <View style={{width: 370 }}>
+          <View style={{
+            width: 370
+          }}>
             <Text style={{
               color: Colors.black,
               fontSize: RFValue( 14 ),
@@ -142,7 +158,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansItalic,
               width: wp( '70%' )
             }}>
-              {props.extraText ? props.extraText.replace( /%20/g, ' ' ) : ''}
+              {props.extraText ? props.isSend ? props.extraText.replace( /%20/g, ' ' ): getText( props.extraText ) : ''}
             </Text>
             <Text style={{
               color: Colors.blue,
