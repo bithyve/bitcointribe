@@ -391,7 +391,7 @@ function RequestKeyFromContact( props ) {
       </TouchableOpacity> */}
       {props.isGift &&
         <DashedLargeContainer
-          titleText={'Gift sats'}
+          titleText={'Gift Sats'}
           titleTextColor={Colors.black}
           subText={props.senderName}
           extraText={props.giftNote? props.giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
