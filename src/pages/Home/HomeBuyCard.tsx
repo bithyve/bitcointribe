@@ -94,7 +94,7 @@ const HomeBuyCard = ( {
       <View>
         <Text style={{
           color: Colors.blue,
-          fontSize: RFValue( 10 ),
+          fontSize: RFValue( 11 ),
           // marginLeft: 2,
           fontFamily: Fonts.FiraSansRegular,
           alignSelf: 'flex-start',
@@ -142,13 +142,13 @@ const HomeBuyCard = ( {
         // }
         style={{
           borderRadius: wp( 2 ),
-          paddingVertical: wp( 2.7 ),
+          paddingVertical: wp( 2.5 ),
           paddingHorizontal: wp( 4 ),
           backgroundColor: Colors.blue,
           shadowColor: Colors.shadowBlue,
           shadowOpacity: 1,
           shadowOffset: {
-            width: 15, height: 15
+            width: 11, height: 12
           },
           elevation: 15
         }}

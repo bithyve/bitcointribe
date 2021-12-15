@@ -71,7 +71,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
             paddingLeft: 30,
             paddingRight: 30
           }}
-        >
+         >
           <View style={styles.textBoxView}>
             <View style={styles.amountInputImage}>
               <Ionicons name={'hashtag'} size={20} color={'#C6C6C6'} />

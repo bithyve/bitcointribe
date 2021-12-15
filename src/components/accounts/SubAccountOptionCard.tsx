@@ -66,7 +66,8 @@ const SubAccountOptionCard: React.FC<Props> = ( {
   const subtitleTextStyle = useMemo( () => {
     return {
       ...styles.subtitleText,
-      color: isSelected ? Colors.offWhite : Colors.secondaryText,
+      color: isSelected ? Colors.offWhite : Colors.gray8,
+      fontFamily: Fonts.FiraSansRegular
     }
   }, [ isSelected ] )
 
