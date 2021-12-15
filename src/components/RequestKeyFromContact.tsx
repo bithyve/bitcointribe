@@ -398,6 +398,7 @@ function RequestKeyFromContact( props ) {
           amt={props.amt}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
+          isSend
         />
       }
       {props.isGift &&

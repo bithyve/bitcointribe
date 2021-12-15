@@ -180,6 +180,7 @@ export default function SendViaLinkAndQR( props ) {
           onPress={onPress}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
+          isSend
           renderQrOrLink={() => {
             return (
               <>

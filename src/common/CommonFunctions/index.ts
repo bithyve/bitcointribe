@@ -375,7 +375,8 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
   const appVersion = DeviceInfo.getVersion()
   let deepLink: string
   if( extraData?.note ) {
-    extraData.note=  extraData.note.replace( / /g, '%20' )
+    //extraData.note=  extraData.note.replace( / /g, '%20' )
+    extraData.note=`${Buffer.from( extraData.note ).toString( 'base64' )}`
   }
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
@@ -409,12 +410,12 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
           bundleId: DeviceInfo.getBundleId()
         },
         navigation: {
-          forcedRedirectEnabled:  deepLinkKind !== DeepLinkKind.CONTACT
+          forcedRedirectEnabled:  false
         },
         social: {
-          descriptionText: deepLinkKind === DeepLinkKind.CONTACT ? 'Est eu cillum sunt in magna qui. Ex esse irure consectetur excepteur commodo.' : '',
-          title: deepLinkKind === DeepLinkKind.CONTACT?'F&F request': '',
-          imageUrl:deepLinkKind === DeepLinkKind.CONTACT ? 'https://thumbs.dreamstime.com/b/friendship-vector-flat-illustration-happy-friends-hugging-together-young-people-have-fun-event-together-friendship-vector-flat-141041331.jpg': ''
+          descriptionText: '',
+          title: '',
+          //imageUrl:''
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {

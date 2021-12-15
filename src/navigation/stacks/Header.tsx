@@ -1568,6 +1568,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isContactAssociated={giftRequest.isAssociated}
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
+              version={giftRequest.version}
             />
           )
 

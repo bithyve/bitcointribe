@@ -52,10 +52,11 @@ export type Props = {
   giftId: string; //NOTE: here gift id stands for channelAddress of the gift(we should use more consistent naming to avoid confusion)
   isGiftWithFnF: boolean;
   isContactAssociated: boolean;
+  version?: string
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -439,10 +440,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           titleText={'Gift Card'}
           titleTextColor={Colors.black}
           subText={walletName}
-          extraText={acceptedGift?.note? acceptedGift.note: 'This is to get you started!\nWelcome to Bitcoin'}
+          extraText={acceptedGift?.note? acceptedGift.note: ''}
           amt={giftAmount}
           image={<CheckingAcc />}
           theme={getTheme()}
+          version={version}
         />
         <BottomInfoBox
           containerStyle={{
@@ -566,6 +568,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             amt={giftAmount}
             image={<CheckingAcc height={60} width={60} />}
             theme={getTheme()}
+            version={version}
           />
           {/* <View
             style={{
