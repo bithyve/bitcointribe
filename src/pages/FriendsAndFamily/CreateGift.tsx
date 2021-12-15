@@ -686,15 +686,6 @@ const CreateGift = ( { navigation } ) => {
                 }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
               </TouchableOpacity>
             </View>
-            {/* <View style={{
-              flexDirection: 'row', alignItems: 'center',
-            }}>
-              <Text style={[ CommonStyles.subHeaderTitles, {
-                fontWeight: 'normal'
-              } ]} >
-                {'View and manage created Gifts'}
-              </Text>
-            </View> */}
 
 
           </View>

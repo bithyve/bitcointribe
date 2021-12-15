@@ -293,9 +293,7 @@ const ManageGifts = ( { navigation } ) => {
                     shadowOffset: {
                       width: 5, height: 6
                     },
-                    // shadowRadius: 10,
                     elevation: active === item ? 10 : 0,
-                    // paddingVertical: hp( 2 )
                     marginBottom: hp( 2 ),
                     marginLeft: wp( 1 )
                   } ]}
