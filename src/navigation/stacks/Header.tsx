@@ -327,8 +327,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned:  ( qrData )=>{
-        const { trustedContactRequest, giftRequest } = processRequestQR( qrData )
+      onCodeScanned:  async ( qrData )=>{
+        const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
         if( trustedContactRequest ){
           this.setState( {
             trustedContactRequest

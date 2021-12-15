@@ -347,12 +347,12 @@ function RequestKeyFromContact( props ) {
           <View style={[ styles.qrContainer, {
             marginVertical: hp( '4%' )
           } ]}>
-            {!props.longLink ? (
+            {!props.link ? (
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
               <QRCode
                 title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
-                value={props.longLink}
+                value={props.link}
                 size={hp( '27%' )} />
             )}
           </View>
