@@ -168,25 +168,24 @@ const GiftDetails = ( { navigation } ) => {
         <TouchableOpacity
           onPress={() => setIsOpen( !isOpen )}
           style={
-            gift.status === GiftStatus.CREATED
+            gift.status === GiftStatus.SENT
               ? [
                 styles.dashedContainer,
-                {
-                  // position: isOpen ? 'absolute': 'relative'
-                },
               ]
-              : [
+              : 
+              [
                 styles.dashedContainer,
                 {
                   borderColor: Colors.white,
                   shadowOpacity: isOpen ? 1 : 0,
+                  borderWidth: 1
                 },
               ]
           }
         >
           <View
             style={
-              gift.status === GiftStatus.CREATED
+              gift.status === GiftStatus.SENT
                 ? styles.dashedStyle
                 : styles.normalStyle
             }
@@ -296,8 +295,7 @@ const GiftDetails = ( { navigation } ) => {
                 ) : null}
               </View>
             </View>
-          </View>
-          {isOpen &&
+            {isOpen &&
             gift.status !== GiftStatus.CREATED &&
             gift.type === GiftType.SENT &&
             gift?.deepLinkConfig?.encryptionType === 'OTP' && (
@@ -365,7 +363,7 @@ const GiftDetails = ( { navigation } ) => {
                   fontSize: RFValue( 10 ),
                   fontFamily: Fonts.FiraSansRegular,
                   fontWeight: '600',
-                }}
+                }}         
               >
                   Message to recipient
               </Text>
@@ -394,6 +392,7 @@ const GiftDetails = ( { navigation } ) => {
               </View>
             </View>
           )}
+          </View>
         </TouchableOpacity>
         <View
           style={{
