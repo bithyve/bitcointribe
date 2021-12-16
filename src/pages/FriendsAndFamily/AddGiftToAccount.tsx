@@ -136,7 +136,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             spendableBalance={spendableBalance}
             formattedUnitText={formattedUnitText}
             renderButton={renderButton}
-            giftAmount={numberWithCommas( giftAmount )}
+            giftAmount={giftAmount}
             onCancel={onCancel}
           />
         </View>

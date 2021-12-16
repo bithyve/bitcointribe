@@ -18,6 +18,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import semver from 'semver'
 
 const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -46,6 +47,20 @@ const DashedLargeContainer = ( props ) => {
       } else {
         return numberWithCommas( sats )
       }
+    }
+  }
+
+  const getText = text => {
+    try {
+      if( semver.gte( props.version, '2.0.66' ) ){
+        return Buffer.from( text, 'base64' ).toString( 'utf-8' )
+      } else {
+        return text.replace( /%20/g, ' ' )
+      }
+
+    } catch ( error ) {
+      console.log( error )
+      return text.replace( /%20/g, ' ' )
     }
   }
 
@@ -83,9 +98,11 @@ const DashedLargeContainer = ( props ) => {
         padding: wp( 3 )
       }}>
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'
+          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between',
         }}>
-          <View>
+          <View style={{
+            width: 370
+          }}>
             <Text style={{
               color: Colors.black,
               fontSize: RFValue( 14 ),
@@ -104,7 +121,7 @@ const DashedLargeContainer = ( props ) => {
               fontFamily: Fonts.FiraSansRegular,
               marginRight: wp( 9 )
             }}>
-              {'You have received bitcoin gift from '}
+              {'You have received a bitcoin gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),
@@ -112,7 +129,8 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\n\nAdd bitcoin to an account or keep the Gift Card to send to someone else'}
+              {props.type  === 'QR' && '\n\nScan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet.'}
+              {props.type  === 'Link' && '\n\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet.'}
             </Text>
           </View>
           {props.date &&
@@ -139,9 +157,8 @@ const DashedLargeContainer = ( props ) => {
               letterSpacing: 0.12,
               lineHeight: 18,
               fontFamily: Fonts.FiraSansItalic,
-              width: wp( '63%' )
             }}>
-              {props.extraText ? props.extraText.replace( /%20/g, ' ' ) : ''}
+              {props.extraText ? props.isSend ? props.extraText.replace( /%20/g, ' ' ): getText( props.extraText ) : ''}
             </Text>
             <Text style={{
               color: Colors.blue,

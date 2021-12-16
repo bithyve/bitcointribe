@@ -58,13 +58,12 @@ function SecurityQuestion( props ) {
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                Health Check{'\n'}Security Question
+                {`Health Check\n${props.encryptionType === 'password' ? 'Encryption Password' : 'Security Question'}`}
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
-                Specify the answer{'\n'}as you did at
-                the time of setting up the wallet
+                {`Specify the ${props.encryptionType === 'password' ? 'password' : 'answer'}\nas you did at the time of setting up the wallet`}
               </Text>
             </View>
           </View>
@@ -72,6 +71,10 @@ function SecurityQuestion( props ) {
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
           }}>
             <View style={styles.dropdownBox}>
+              {
+                props.encryptionType === 'password' && <Text style={styles.dropdownBoxText}>Hint</Text>
+              }
+
               <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
             </View>
             <View style={{
@@ -86,7 +89,7 @@ function SecurityQuestion( props ) {
                       ? Colors.red
                       : Colors.borderColor,
                 }}
-                placeholder={'Enter answer'}
+                placeholder={props.encryptionType === 'password' ? 'Enter password' : 'Enter answer'}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 textContentType="none"
@@ -211,9 +214,9 @@ const styles = StyleSheet.create( {
   dropdownBox: {
     marginTop: hp( '2%' ),
     height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    alignItems: 'center',
+    paddingLeft: 5,
+    paddingRight: 5,
+    //alignItems: 'center',
   },
   questionConfirmButton: {
     height: wp( '13%' ),

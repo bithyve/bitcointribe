@@ -30,8 +30,9 @@ const ListStyles = StyleSheet.create( {
   },
 
   reorderItemIconImage: {
-    width: 44,
-    height: 44,
+    width: 26,
+    height: 22,
+    marginRight: 30
   },
 
   circledAvatarContainer: {
