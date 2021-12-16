@@ -18,6 +18,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import semver from 'semver'
 
 const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -51,7 +52,7 @@ const DashedLargeContainer = ( props ) => {
 
   const getText = text => {
     try {
-      if( props.version !== '2.0.5' ||  props.version !== '2.0.6'||  props.version !== '2.0.65' ){
+      if( semver.gte( props.version, '2.0.66' ) ){
         return Buffer.from( text, 'base64' ).toString( 'utf-8' )
       } else {
         return text.replace( /%20/g, ' ' )
