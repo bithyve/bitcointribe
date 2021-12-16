@@ -194,7 +194,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
               break
 
             case GiftStatus.REJECTED:
-              Toast( 'Gift already rejected' )
+              Toast( 'Gift already Accepted' )
               break
 
             case GiftStatus.RECLAIMED:

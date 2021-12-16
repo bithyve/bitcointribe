@@ -398,9 +398,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     )
   }
 
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  }
+  // const numberWithCommas = ( x ) => {
+  //   return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  // }
 
   const renderGiftAcceptedtModal = () => {
     return (
