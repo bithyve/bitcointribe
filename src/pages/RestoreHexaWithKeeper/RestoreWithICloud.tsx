@@ -570,7 +570,7 @@ class RestoreWithICloud extends Component<
         this.setState( {
           errorModal: true,
           errorModalTitle: this.state.strings[ 'ErrorreceivingRecoveryKey' ],
-          errorModalInfo: 'Failed to decrypt. Please enter correct answer or encryption password',
+          errorModalInfo: 'The answer entered is incorrect. Please enter the correct answer or encryption password.',
         } )
       }
     }
