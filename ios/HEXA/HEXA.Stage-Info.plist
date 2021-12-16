@@ -35,6 +35,13 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://gift.hexawallet.io</string>
+		<string>https://request.hexawallet.io</string>
+		<string>https://app.hexawallet.io</string>
+		<string>https://donation.hexawallet.io</string>
+	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>

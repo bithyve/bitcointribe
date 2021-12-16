@@ -120,8 +120,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}>
           <Text style={{
             color: Colors.blue,
-            fontSize: RFValue( 18 ),
+            fontSize: RFValue( 19 ),
             marginTop: hp( 1 ),
+            marginLeft:wp(1),
             fontFamily: Fonts.FiraSansMedium,
             letterSpacing: 0.54
           }}>

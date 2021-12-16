@@ -64,7 +64,7 @@ const ManageGifts = ( { navigation } ) => {
   )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
-  const [ knowMore, setKnowMore ] = useState( false )
+  const [ knowMore, setKnowMore ] = useState( true )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
   const currencyKind = useSelector(
@@ -98,7 +98,7 @@ const ManageGifts = ( { navigation } ) => {
     sortedGifts.forEach( ( gift: Gift ) => {
       if ( gift.type === GiftType.SENT ) {
         if ( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ) availableGifts.push( gift )
-        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
+        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED || gift.status === GiftStatus.REJECTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
       } else if( gift.type === GiftType.RECEIVED ) {
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
@@ -288,14 +288,12 @@ const ManageGifts = ( { navigation } ) => {
                   activeOpacity={0.6}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
-                    shadowColor: active === item ? '#77B9EB96' : Colors.white,
+                    shadowColor: active === item ? '#77B9EB66' : Colors.backgroundColor,
                     shadowOpacity: 0.9,
                     shadowOffset: {
                       width: 5, height: 6
                     },
-                    // shadowRadius: 10,
                     elevation: active === item ? 10 : 0,
-                    // paddingVertical: hp( 2 )
                     marginBottom: hp( 2 ),
                     marginLeft: wp( 1 )
                   } ]}
@@ -360,6 +358,7 @@ const ManageGifts = ( { navigation } ) => {
               if( item.status === GiftStatus.CREATED || item.status === GiftStatus.RECLAIMED ) title = 'Available Gift'
               else if( item.status === GiftStatus.SENT ) title = 'Sent to recipient'
               else if( item.status === GiftStatus.ACCEPTED ) title = 'Accepted by recipient'
+              else if( item.status === GiftStatus.REJECTED ) title = 'Rejected by recipient'
               else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
             } else if ( item.type === GiftType.RECEIVED ){
               if( item.status === GiftStatus.ACCEPTED ) title = 'Received Gift'
@@ -523,7 +522,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
   },
   createGiftText: {
-    color: Colors.blueText,
+    color: Colors.moreBlueText,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.3,
     fontFamily: Fonts.FiraSansMedium,

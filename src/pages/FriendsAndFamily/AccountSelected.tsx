@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -9,12 +9,14 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import { ScrollView } from 'react-native-gesture-handler'
 import DashedContainerSmall from './DashedContainerSmall'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import {  useSelector } from 'react-redux'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
 
 export type Props = {
   sourcePrimarySubAccount: any;
@@ -30,11 +32,34 @@ export type Props = {
 
 
 export default function AccountSelected( { giftAmount, onAccountChange, sourcePrimarySubAccount, sourceAccountHeadlineText, spendableBalance, formattedUnitText, getTheme, renderButton, onCancel } ) {
+  const exchangeRates = useSelector(
+    ( state ) => state.accounts.exchangeRates
+  )
+  const currencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind,
+  )
+  const currencyCode = useCurrencyCode()
 
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
+
+  const getAmt = ( sats ) => {
+    if( prefersBitcoin ) {
+      return numberWithCommas( sats )
+    } else {
+      if( exchangeRates && exchangeRates[ currencyCode ] ) {
+        return ( exchangeRates[ currencyCode ].last /SATOSHIS_IN_BTC * sats ).toFixed( 2 )
+      } else {
+        return numberWithCommas( sats )
+      }
+    }
+  }
+
   return (
     <>
       <TouchableOpacity
@@ -61,7 +86,8 @@ export default function AccountSelected( { giftAmount, onAccountChange, sourcePr
       <DashedContainerSmall
         image={<GiftCard />}
         theme={getTheme()}
-        amt={numberWithCommas( giftAmount )}
+        amt={getAmt( giftAmount )}
+        currency={prefersBitcoin ? ' sats' : currencyCode}
       />
       <TouchableOpacity
         onPress={() => { onAccountChange()}}

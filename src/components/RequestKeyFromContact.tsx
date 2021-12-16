@@ -347,12 +347,12 @@ function RequestKeyFromContact( props ) {
           <View style={[ styles.qrContainer, {
             marginVertical: hp( '4%' )
           } ]}>
-            {!props.QR ? (
+            {!props.link ? (
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
               <QRCode
                 title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
-                value={props.QR}
+                value={props.link}
                 size={hp( '27%' )} />
             )}
           </View>
@@ -391,13 +391,14 @@ function RequestKeyFromContact( props ) {
       </TouchableOpacity> */}
       {props.isGift &&
         <DashedLargeContainer
-          titleText={'Gift sats'}
+          titleText={'Gift Sats'}
           titleTextColor={Colors.black}
           subText={props.senderName}
           extraText={props.giftNote? props.giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
           amt={props.amt}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
+          isSend
         />
       }
       {props.isGift &&

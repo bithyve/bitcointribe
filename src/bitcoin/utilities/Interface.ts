@@ -997,6 +997,7 @@ export interface Gift {
     sent?: number,
     accepted?: number,
     reclaimed?: number,
+    rejected?: number,
   }
   sender: {
     walletId: string,

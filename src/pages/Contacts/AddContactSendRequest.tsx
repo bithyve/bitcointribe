@@ -70,6 +70,7 @@ export default function AddContactSendRequest( props ) {
   const note = props.navigation.getParam( 'note' )
   const giftToSend = giftId? accountsState.gifts[ giftId ]: null
   const [ trustedLink, setTrustedLink ] = useState( '' )
+  const [ longLink, setLongLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.NUMBER: DeepLinkEncryptionType.DEFAULT )
@@ -106,6 +107,10 @@ export default function AddContactSendRequest( props ) {
 
   const existingContact = props.navigation.getParam( 'existingContact' )
     ? props.navigation.getParam( 'existingContact' )
+    : false
+
+    const skipClicked = props.navigation.getParam('skipClicked')
+    ? props.navigation.getParam('skipClicked')
     : false
 
   const [ Contact ] = useState(
@@ -204,8 +209,7 @@ export default function AddContactSendRequest( props ) {
       switch( encryptLinkWith ){
           case DeepLinkEncryptionType.NUMBER:
             const phoneNumber = idx( contactInfo, ( _ ) => _.phoneNumbers[ 0 ].number )
-
-            if( phoneNumber ){
+            if( phoneNumber || skipClicked ){
               const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
               encryption_key = number.slice( number.length - 10 ) // last 10 digits only
               setEncryptKey( encryption_key )
@@ -250,6 +254,7 @@ export default function AddContactSendRequest( props ) {
     } )
     const link = shortLink !== '' ? shortLink: deepLink
     setTrustedLink( link )
+    setLongLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
 
     let qrType: string
@@ -478,6 +483,7 @@ export default function AddContactSendRequest( props ) {
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
+          longLink={longLink}
           contactEmail={''}
           onPressBack={() => {
             props.navigation.goBack()
@@ -485,7 +491,7 @@ export default function AddContactSendRequest( props ) {
           onPressDone={() => {
             // openTimer()
           }}
-          amt={numberWithCommas( giftToSend?.amount )}
+          amt={giftToSend?.amount}
           onPressShare={() => {
             setTimeout( () => {
               setRenderTimer( true )
