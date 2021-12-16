@@ -157,7 +157,6 @@ const DashedLargeContainer = ( props ) => {
               letterSpacing: 0.12,
               lineHeight: 18,
               fontFamily: Fonts.FiraSansItalic,
-              width: wp( '70%' )
             }}>
               {props.extraText ? props.isSend ? props.extraText.replace( /%20/g, ' ' ): getText( props.extraText ) : ''}
             </Text>
