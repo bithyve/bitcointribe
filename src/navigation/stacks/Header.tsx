@@ -125,7 +125,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
-export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
   Closed,
   Open,

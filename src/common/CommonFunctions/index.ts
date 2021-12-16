@@ -636,12 +636,15 @@ export const processRequestQR =async ( qrData: string ) => {
     }
   } else {
     if( isUrl( qrData ) ) {
-      const { url } = await dynamicLinks().resolveLink( qrData )
-      if( url ) {
-        return processDeepLink( url )
-      } else {
-        return {
+      try {
+        const { url } = await dynamicLinks().resolveLink( qrData )
+        if( url ) {
+          return processDeepLink( url )
+        } else {
+          return processDeepLink( qrData )
         }
+      } catch ( error ) {
+        return processDeepLink( qrData )
       }
     } else {
       Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
