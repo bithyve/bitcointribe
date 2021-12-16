@@ -518,6 +518,9 @@ export const processDeepLink = ( deepLink: string ) => {
           return {
             trustedContactRequest: trustedContactGiftRequest
           }
+
+        default:
+          throw new Error() // no mechanism to process an otherwise valid link
     }
   }
   catch ( error ) {
@@ -624,6 +627,9 @@ export const processRequestQR =async ( qrData: string ) => {
             type: parsedData.type,
           }
           break
+
+        default:
+          throw new Error() // no mechanism to process an otherwise valid link
     }
     return {
       trustedContactRequest, giftRequest
