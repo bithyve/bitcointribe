@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DraggableFlatList from 'react-native-draggable-flatlist'
 import AccountShell from '../../../common/data/models/AccountShell'
 import ReorderAccountShellsDraggableListItem from './ReorderAccountShellsDraggableListItem'
@@ -39,10 +39,11 @@ const ReorderAccountShellsDraggableList: React.FC<Props> = ( {
   accountShells,
   onDragEnded,
 }: Props ) => {
+  const [ shell, setShell ] = useState( accountShells.filter( a => a !== undefined ) )
   return (
     <DraggableFlatList
       activationDistance={5}
-      data={accountShells}
+      data={shell}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       onDragEnd={( { data } ) => onDragEnded( data )}
