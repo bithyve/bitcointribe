@@ -187,7 +187,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           }}
           style={{
             height: 30, width: 30, justifyContent: 'center',
-            marginLeft: wp( '5%' )
+            marginLeft: wp( '5%' ),marginTop:hp('4%')
           }}
         >
           <FontAwesome
@@ -205,7 +205,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
               fontFamily: Fonts.FiraSansRegular,
               fontSize: RFValue( 25 ),
               marginLeft: wp( '5%' ),
-              marginTop: hp( '2%' ),
+              marginTop: hp( '3%' ),
               letterSpacing: 0.01
             }}
           >

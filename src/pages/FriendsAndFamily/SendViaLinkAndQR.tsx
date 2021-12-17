@@ -171,14 +171,16 @@ export default function SendViaLinkAndQR( props ) {
       }}>
 
         <DashedLargeContainer
-          titleText={'Gift Card'}
+          titleText={'Gift Sats'}
           titleTextColor={Colors.black}
           subText={senderName}
           extraText={giftNote? giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
           amt={amt}
+          type={type}
           onPress={onPress}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
+          isSend
           renderQrOrLink={() => {
             return (
               <>
@@ -192,12 +194,12 @@ export default function SendViaLinkAndQR( props ) {
             >
               <View style={[ styles.qrContainer, {
               } ]}>
-                {!qrCode ? (
+                {!link ? (
                   <ActivityIndicator size="large" color={Colors.babyGray} />
                 ) : (
                   <QRCode
                     title={'Gift card'}
-                    value={qrCode}
+                    value={link}
                     size={hp( '24%' )} />
                 )}
               </View>

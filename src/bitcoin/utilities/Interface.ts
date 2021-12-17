@@ -1012,6 +1012,7 @@ export interface Gift {
     accepted?: number,
     reclaimed?: number,
     associated?: number,
+    rejected?: number,
   }
   sender: {
     walletId: string,

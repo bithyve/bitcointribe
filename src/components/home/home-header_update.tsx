@@ -124,6 +124,9 @@ const HomeHeader = ( {
   }, [ cloudErrorMessage, cloudBackupStatus ] )
 
 
+  const walletNameLength = walletName?.split('').length;
+  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
     return <View style={{
@@ -242,7 +245,7 @@ const HomeHeader = ( {
               alignItems: 'flex-start',
             }}
           >
-            <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+            <Text style={styles.headerTitleText}>{walletNameNew}</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -295,7 +298,7 @@ const HomeHeader = ( {
           style={{
             height: wp( '9%' ),
             width: wp( '10%' ),
-            justifyContent: 'center',
+            // justifyContent: 'center',
             marginLeft: 'auto',
           }}
         >
@@ -324,9 +327,9 @@ const HomeHeader = ( {
           style={{
             height: wp( '9%' ),
             width: wp( '10%' ),
-            justifyContent: 'center',
+            // justifyContent: 'center',
             marginLeft: 'auto',
-            // marginTop: hp( 1 )
+            marginTop: hp( 0.6 )
           }}
         >
           <ImageBackground

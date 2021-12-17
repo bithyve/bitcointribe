@@ -98,7 +98,7 @@ const ManageGifts = ( { navigation } ) => {
     sortedGifts.forEach( ( gift: Gift ) => {
       if ( gift.type === GiftType.SENT ) {
         if ( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ) availableGifts.push( gift )
-        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
+        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED || gift.status === GiftStatus.REJECTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED || gift.status === GiftStatus.ASSOCIATED ) expiredArr.push( gift )
       } else if( gift.type === GiftType.RECEIVED ) {
         if ( gift.status === GiftStatus.EXPIRED || gift.status === GiftStatus.ASSOCIATED ) expiredArr.push( gift )
@@ -297,9 +297,7 @@ const ManageGifts = ( { navigation } ) => {
                     shadowOffset: {
                       width: 5, height: 6
                     },
-                    // shadowRadius: 10,
                     elevation: active === item ? 10 : 0,
-                    // paddingVertical: hp( 2 )
                     marginBottom: hp( 2 ),
                     marginLeft: wp( 1 )
                   } ]}
@@ -365,6 +363,7 @@ const ManageGifts = ( { navigation } ) => {
               else if( item.status === GiftStatus.SENT ) title = 'Sent to recipient'
               else if( item.status === GiftStatus.ACCEPTED ) title = 'Accepted by recipient'
               else if( item.status === GiftStatus.EXPIRED || item.status === GiftStatus.ASSOCIATED ) title = 'Gift expired'
+              else if( item.status === GiftStatus.REJECTED ) title = 'Rejected by recipient'
             } else if ( item.type === GiftType.RECEIVED ){
               if( item.status === GiftStatus.ACCEPTED ) title = 'Received Gift'
               else if( item.status === GiftStatus.EXPIRED || item.status === GiftStatus.ASSOCIATED ) title = 'Gift expired'

@@ -190,9 +190,31 @@ export const changeAuthCredWatcher = createWatcher(
 function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, previousVersion: string }} ) {
   const { newVersion, previousVersion } = payload
 
-  // update wallet version
   const wallet: Wallet = yield select( state => state.storage.wallet )
   const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
+  const storedVersion = wallet.version
+
+  if( semver.lt( storedVersion, '2.0.66' ) ){
+    const accountShells: AccountShell[] = yield select(
+      ( state ) => state.accounts.accountShells
+    )
+
+    let testAccountShell: AccountShell
+    accountShells.forEach( shell => {
+      if( shell.primarySubAccount.type === AccountType.TEST_ACCOUNT ) testAccountShell = shell
+    } )
+
+    if( testAccountShell.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
+      const settings = {
+        visibility: AccountVisibility.DEFAULT
+      }
+      yield put( updateAccountSettings( {
+        accountShell: testAccountShell, settings
+      } ) )
+    }
+  }
+
+  // update wallet version
   yield put( updateWallet( {
     ...wallet,
     version: newVersion

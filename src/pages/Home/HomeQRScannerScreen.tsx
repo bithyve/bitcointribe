@@ -58,7 +58,6 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const common = translations[ 'common' ]
   const strings = translations[ 'accounts' ]
   function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    console.log( 'scannedData', scannedData )
     const networkType: NetworkType = AccountUtilities.networkType( scannedData )
     if ( networkType ) {
       const network = AccountUtilities.getNetworkByType( networkType )
@@ -76,7 +75,11 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     }
 
     const onCodeScanned = navigation.getParam( 'onCodeScanned' )
-    if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
+    try {
+      if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
+    } catch ( error ) {
+      //
+    }
     navigation.goBack( null )
   }
 

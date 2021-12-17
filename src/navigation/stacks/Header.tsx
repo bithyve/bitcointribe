@@ -125,7 +125,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
-export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
   Closed,
   Open,
@@ -331,8 +331,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned:  ( qrData )=>{
-        const { trustedContactRequest, giftRequest } = processRequestQR( qrData )
+      onCodeScanned:  async ( qrData )=>{
+        const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
         if( trustedContactRequest ){
           this.setState( {
             isCurrentLevel0: JSON.parse( qrData ).currentLevel == 0 ? true : false,
@@ -1573,6 +1573,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isContactAssociated={giftRequest.isAssociated}
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
+              version={giftRequest.version}
             />
           )
 

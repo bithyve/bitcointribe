@@ -133,7 +133,7 @@ const CreateGift = ( { navigation } ) => {
     let giftAmount = currentSatsAmountFormValue
     const numberOfGifts = numbersOfGift? Number( numbersOfGift ): 1
     if( prefersBitcoin ){
-      if( averageLowTxFee ) giftAmount += averageLowTxFee
+      if( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
       return giftAmount * numberOfGifts > spendableBalance
     } else {
       const giftAmountInFiat = giftAmount
@@ -687,15 +687,6 @@ const CreateGift = ( { navigation } ) => {
                 }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
               </TouchableOpacity>
             </View>
-            {/* <View style={{
-              flexDirection: 'row', alignItems: 'center',
-            }}>
-              <Text style={[ CommonStyles.subHeaderTitles, {
-                fontWeight: 'normal'
-              } ]} >
-                {'View and manage created Gifts'}
-              </Text>
-            </View> */}
 
 
           </View>

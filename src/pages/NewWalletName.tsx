@@ -228,6 +228,12 @@ export default function NewWalletName( props ) {
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
+                {strings.WalletCreationNumbers}</Text>
+              <Text style={{
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                alignSelf: 'flex-end'
+              }}>
                 {strings.numbers}</Text>
             </View>
           </View>

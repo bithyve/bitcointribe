@@ -190,7 +190,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       if ( errorMessage ) {
         setError( errorMessage )
         setTimeout( () => {
-          // setFailure( true )
+          setFailure( true )
         }, 200 )
       }
     },

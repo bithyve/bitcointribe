@@ -51,6 +51,7 @@ import {
   updateAccountSettings,
 } from '../actions/accounts'
 import {
+  setAllowSecureAccount,
   updateWalletImageHealth
 } from '../actions/BHR'
 import {
@@ -1102,6 +1103,10 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account shells for respective accountss
   for ( const account of restoredAccounts ){
     const accountShell: AccountShell = yield call( generateShellFromAccount, account )
+
+    // turn on the UI-level usability flag if savings account is already usable(level 2 completed)
+    if( account.type === AccountType.SAVINGS_ACCOUNT && account.isUsable ) yield put( setAllowSecureAccount( true ) )
+
     accountShell.primarySubAccount.visibility = account.accountVisibility
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
@@ -1204,7 +1209,7 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
 
   } catch( err ){
     yield put( giftCreationSuccess( false ) )
-    Toast( 'Transaction failed due to dust limit. Please increase the gift amount and try' )
+    Toast( err.message )
   }
 }
 
