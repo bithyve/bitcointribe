@@ -65,6 +65,10 @@ const AppInfo = ( props ) => {
   const walletName = useSelector(
     ( state ) => state.storage.wallet?.walletName,
   )
+
+  const walletNameLength = walletName?.split('').length;
+  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+
   const walletId = useSelector(
     ( state ) => state.storage.wallet?.walletId,
   )
@@ -263,7 +267,7 @@ const AppInfo = ( props ) => {
                   }}
                 />
                 {menuOption.title === 'Wallet Name' &&
-                  <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+                  <Text style={styles.headerTitleText}>{walletNameNew}</Text>
                 }
                 { menuOption.title === 'Wallet ID' &&
                   <Text style={styles.headerTitleText}>{`${walletId.length > 22 ? walletId.substr( 0, 22 )+'...' : walletId}`}</Text>

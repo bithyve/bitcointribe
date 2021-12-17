@@ -35,7 +35,7 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
   coverImageSource = require( '../../assets/images/icons/iPhone-QR.png' ),
   onCodeScanned,
 }: Props ) => {
-  const [ isCameraOpen, setIsCameraOpen ] = useState( false )
+  const [ isCameraOpen, setIsCameraOpen ] = useState( true )
   const dispatch = useDispatch()
 
   const CameraCover: React.FC = () => {

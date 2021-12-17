@@ -8,7 +8,8 @@ import {
   PermissionsAndroid,
   Linking,
   SafeAreaView,
-  TouchableOpacity
+  TouchableOpacity,
+  StatusBar
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useSelector, useDispatch } from 'react-redux'
@@ -334,12 +335,14 @@ export default function AddContactAddressBook( props ) {
       subHeaderText:strings.send,
       contactText:strings.adding,
       showDone:true,
+      skipClicked: true,
     } )
   }
 
   return (
     <View style={styles.modalContentContainer}>
       <SafeAreaView />
+      <StatusBar barStyle="dark-content"/>
       {/* <View style={styles.modalHeaderTitleView}> */}
       <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor

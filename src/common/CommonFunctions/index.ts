@@ -375,7 +375,8 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
   const appVersion = DeviceInfo.getVersion()
   let deepLink: string
   if( extraData?.note ) {
-    extraData.note=  extraData.note.replace( / /g, '%20' )
+    //extraData.note=  extraData.note.replace( / /g, '%20' )
+    extraData.note=`${Buffer.from( extraData.note ).toString( 'base64' )}`
   }
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
@@ -409,7 +410,12 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
           bundleId: DeviceInfo.getBundleId()
         },
         navigation: {
-          forcedRedirectEnabled: false
+          forcedRedirectEnabled:  false
+        },
+        social: {
+          descriptionText: '',
+          title: '',
+          //imageUrl:''
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
@@ -426,7 +432,6 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 export const processDeepLink = ( deepLink: string ) => {
   try {
     const splits = deepLink.split( '/' )
-
     // swan link(external)
     if ( splits.includes( 'swan' ) )
       return {
@@ -513,17 +518,35 @@ export const processDeepLink = ( deepLink: string ) => {
           return {
             trustedContactRequest: trustedContactGiftRequest
           }
+
+        default:
+          throw new Error() // no mechanism to process an otherwise valid link
     }
   }
   catch ( error ) {
     Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
+    return {
+    }
   }
 }
 
-export const processRequestQR = ( qrData: string ) => {
-  try {
-    const parsedData = JSON.parse( qrData )
+const isUrl = string => {
+  try { return Boolean( new URL( string ) ) }
+  catch( e ){ return false }
+}
 
+const isJson = ( str ) => {
+  try {
+    JSON.parse( str )
+  } catch ( e ) {
+    return false
+  }
+  return true
+}
+
+export const processRequestQR =async ( qrData: string ) => {
+  if( isJson( qrData ) ) {
+    const parsedData = JSON.parse( qrData )
     let trustedContactRequest, giftRequest
     switch ( parsedData.type ) {
         case QRCodeTypes.CONTACT_REQUEST:
@@ -604,12 +627,30 @@ export const processRequestQR = ( qrData: string ) => {
             type: parsedData.type,
           }
           break
-    }
 
+        default:
+          throw new Error() // no mechanism to process an otherwise valid link
+    }
     return {
       trustedContactRequest, giftRequest
     }
-  } catch ( err ) {
-    Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
+  } else {
+    if( isUrl( qrData ) ) {
+      try {
+        const { url } = await dynamicLinks().resolveLink( qrData )
+        if( url ) {
+          return processDeepLink( url )
+        } else {
+          return processDeepLink( qrData )
+        }
+      } catch ( error ) {
+        return processDeepLink( qrData )
+      }
+    } else {
+      Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
+      return {
+      }
+    }
   }
+
 }

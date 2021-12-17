@@ -11,7 +11,8 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
+
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
@@ -51,10 +52,11 @@ export type Props = {
   giftId: string; //NOTE: here gift id stands for channelAddress of the gift(we should use more consistent naming to avoid confusion)
   isGiftWithFnF: boolean;
   isContactAssociated: boolean;
+  version?: string
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -396,9 +398,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     )
   }
 
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  }
+  // const numberWithCommas = ( x ) => {
+  //   return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  // }
 
   const renderGiftAcceptedtModal = () => {
     return (
@@ -438,10 +440,12 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           titleText={'Gift Card'}
           titleTextColor={Colors.black}
           subText={walletName}
-          extraText={acceptedGift?.note? acceptedGift.note: 'This is to get you started!\nWelcome to Bitcoin'}
+          extraText={acceptedGift?.note? acceptedGift.note: ''}
           amt={giftAmount}
-          image={<GiftCard />}
+          image={<CheckingAcc />}
           theme={getTheme()}
+          version={version}
+          isSend
         />
         <BottomInfoBox
           containerStyle={{
@@ -563,8 +567,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             subText={walletName}
             extraText={note? note: ''}
             amt={giftAmount}
-            image={<GiftCard height={60} width={60} />}
+            image={<CheckingAcc height={60} width={60} />}
             theme={getTheme()}
+            version={version}
           />
           {/* <View
             style={{
