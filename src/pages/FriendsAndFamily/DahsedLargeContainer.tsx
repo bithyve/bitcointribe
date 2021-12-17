@@ -150,7 +150,9 @@ const DashedLargeContainer = ( props ) => {
           flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: hp( 1 )
         }}>
 
-          <View>
+          <View style={{
+            flex: 1
+          }}>
             <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 12 ),
