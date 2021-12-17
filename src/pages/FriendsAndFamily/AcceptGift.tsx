@@ -445,6 +445,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           image={<CheckingAcc />}
           theme={getTheme()}
           version={version}
+          isSend
         />
         <BottomInfoBox
           containerStyle={{
