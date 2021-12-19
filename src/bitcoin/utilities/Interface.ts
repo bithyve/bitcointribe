@@ -1013,7 +1013,8 @@ export interface Gift {
     reclaimed?: number,
     associated?: number,
     rejected?: number,
-  }
+  },
+  validity?: number,
   sender: {
     walletId: string,
     accountId: string,
