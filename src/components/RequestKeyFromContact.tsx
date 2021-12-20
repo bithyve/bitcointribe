@@ -401,6 +401,14 @@ function RequestKeyFromContact( props ) {
           isSend
         />
       }
+      {
+        props.isGift &&
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
+        }}>
+          <Text style={styles.subHeaderText}>If the recipient does not accept in 7 days, the link/QR will expire and the gift will revert back to you</Text>
+        </View>
+      }
       {props.isGift &&
         <View style={{
           flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
