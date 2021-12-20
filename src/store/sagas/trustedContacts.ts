@@ -193,12 +193,12 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
               Toast( 'Gift already claimed' )
               break
 
-            case GiftStatus.REJECTED:
-              Toast( 'Gift already Accepted' )
-              break
-
             case GiftStatus.RECLAIMED:
               Toast( 'Gift already reclaimed' )
+              break
+
+            case GiftStatus.EXPIRED:
+              Toast( 'Gift already expired' )
               break
         }
         return

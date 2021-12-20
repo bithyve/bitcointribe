@@ -1115,7 +1115,7 @@ export default class AccountOperations {
         timestamps: {
           created: Date.now(),
         },
-        validity,
+        validitySpan: validity,
         sender: {
           walletId: walletDetails.walletId,
           walletName: walletDetails.walletName,

@@ -1014,7 +1014,7 @@ export interface Gift {
     associated?: number,
     rejected?: number,
   },
-  validity?: number,
+  validitySpan?: number,
   sender: {
     walletId: string,
     accountId: string,
@@ -1037,6 +1037,10 @@ export interface Gift {
 
 export interface GiftMetaData {
   status: GiftStatus,
+  validity?: {
+    createdAt: number,
+    validitySpan: number,
+  },
   exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,
