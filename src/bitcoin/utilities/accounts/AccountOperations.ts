@@ -1072,6 +1072,7 @@ export default class AccountOperations {
     averageTxFees: AverageTxFees,
     includeFee?: boolean,
     exclusiveGifts?: boolean,
+    validity: number = config.DEFAULT_GIFT_VALIDITY,
   ): Promise<{
     txid: string;
     gifts: Gift[];
@@ -1114,6 +1115,7 @@ export default class AccountOperations {
         timestamps: {
           created: Date.now(),
         },
+        validitySpan: validity,
         sender: {
           walletId: walletDetails.walletId,
           walletName: walletDetails.walletName,
