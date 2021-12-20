@@ -1038,7 +1038,7 @@ export interface Gift {
 export interface GiftMetaData {
   status: GiftStatus,
   validity?: {
-    createdAt: number,
+    sentAt: number,
     validitySpan: number,
   },
   exclusiveGiftCode?: string,

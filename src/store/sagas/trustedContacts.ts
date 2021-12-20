@@ -402,6 +402,7 @@ function* syncGiftsStatusWorker() {
         giftToUpdate.status = giftMetaData.status
         if ( giftMetaData.status === GiftStatus.ACCEPTED ) giftToUpdate.timestamps.accepted = Date.now()
         if ( giftMetaData.status === GiftStatus.REJECTED ) giftToUpdate.timestamps.rejected = Date.now()
+        if ( giftMetaData.status === GiftStatus.RECLAIMED ) giftToUpdate.timestamps.reclaimed = Date.now()
 
         yield put( updateGift( giftToUpdate ) )
         yield call( dbManager.createGift, giftToUpdate )

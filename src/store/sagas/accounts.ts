@@ -158,7 +158,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
       validity: giftToSend.validitySpan? {
-        createdAt: giftToSend.timestamps.created,
+        sentAt: giftToSend.timestamps.sent,
         validitySpan: giftToSend.validitySpan
       }: null,
       exclusiveGiftCode: giftToSend.exclusiveGiftCode,
