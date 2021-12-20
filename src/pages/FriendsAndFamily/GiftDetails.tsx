@@ -56,21 +56,26 @@ import Feather from 'react-native-vector-icons/Feather'
 const ADVANCEDSETTINGDATA = [
   {
     id: '1',
+    title: 'No Second Factor',
+    subtitle: 'Good for small gifts',
+  },
+  {
+    id: '2',
     title: 'F&F Identification',
     subtitle: 'Use a phone number or email ID stored in your contact details. The recipient needs to confirm their own details',
   },
   {
-    id: '2',
+    id: '3',
     title: 'Simple OTP',
     subtitle: 'A 6 digit OTP to be sent separately to the recipient. Good for reducing the chances of man-in-the-middle attack',
   },
   {
-    id: '3',
+    id: '4',
     title: 'Long OTP',
     subtitle: 'Unguessable long OTP to be sent tot he recipient separately. Improved security against server hacks and man-in-the-middle',
   },
   {
-    id: '4',
+    id: '5',
     title: 'Custom Secret Phrase',
     subtitle: 'Manually provide a passphrase with a hint that the recipient has to confirm',
   },
