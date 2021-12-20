@@ -64,7 +64,7 @@ export default function SendViaLinkAndQR( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `${link}`,
+          message: `You have received a bitcoin gift from ${senderName}. Click on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet\n\n${link}`,
         },
       } )
 
@@ -99,7 +99,7 @@ export default function SendViaLinkAndQR( props ) {
         Platform.select( {
           default: {
             title: 'Share Gift Card',
-            message: `${link}`,
+            message: 'Scan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet.',
             url: `file://${uri}`,
           },
           ios: {

@@ -21,6 +21,7 @@ import { translations } from '../common/content/LocContext'
 import GiftCard from '../assets/images/svgs/icon_gift.svg'
 import Link from '../assets/images/svgs/link.svg'
 import More from '../assets/images/svgs/icon_more_gray.svg'
+import { useSelector } from 'react-redux'
 
 import BottomInfoBox from './BottomInfoBox'
 import DashedContainer from '../pages/FriendsAndFamily/DashedContainer'
@@ -41,6 +42,7 @@ function RequestKeyFromContact( props ) {
   )
   const [ Contact, setContact ] = useState( props.contact ? props.contact : {
   } )
+  const walletName = useSelector( state => state.storage.wallet.walletName )
 
   useEffect( () => {
     setShareLink( props.link.replace( /\s+/g, '' ) )
@@ -66,7 +68,7 @@ function RequestKeyFromContact( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `${shareLink}`,
+          message: `You have a new Hexa app Friends and Family Request from ${walletName}\n\n${shareLink}`,
         },
       } )
 
