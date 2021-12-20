@@ -1013,7 +1013,8 @@ export interface Gift {
     reclaimed?: number,
     associated?: number,
     rejected?: number,
-  }
+  },
+  validitySpan?: number,
   sender: {
     walletId: string,
     accountId: string,
@@ -1036,6 +1037,10 @@ export interface Gift {
 
 export interface GiftMetaData {
   status: GiftStatus,
+  validity?: {
+    sentAt: number,
+    validitySpan: number,
+  },
   exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,
