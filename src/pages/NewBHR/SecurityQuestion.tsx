@@ -82,8 +82,10 @@ function SecurityQuestion( props ) {
   }
 
   useEffect( () => {
-    if ( answer.trim() == securityAnswer.trim() ) {
-      setErrorText( '' )
+    if( security.questionId ) {
+      if ( answer.trim() == securityAnswer.trim() ) {
+        setErrorText( '' )
+      }
     }
   }, [ answer ] )
 
@@ -177,8 +179,10 @@ function SecurityQuestion( props ) {
                   setAnswer( text )
                 }}
                 onBlur={() => {
-                  if ( validateAllowedCharacters( answer ) == false ) {
-                    setErrorText( stringsLogin.Answersmust )
+                  if( parseInt( security.questionId ) > 0  ) {
+                    if ( validateAllowedCharacters( answer ) == false ) {
+                      setErrorText( stringsLogin.Answersmust )
+                    }
                   }
                 }}
                 keyboardType={
@@ -241,8 +245,10 @@ function SecurityQuestion( props ) {
                 ).then( () => {
                   props.onPressConfirm()
                 } )
-              } else if ( validateAllowedCharacters( answer ) == false ) {
-                setErrorText( stringsLogin.Answersmust )
+              } else if( parseInt( security.questionId ) > 0  ) {
+                if ( validateAllowedCharacters( answer ) == false ) {
+                  setErrorText( stringsLogin.Answersmust )
+                }
               } else {
                 setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
               }

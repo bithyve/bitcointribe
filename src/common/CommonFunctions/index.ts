@@ -405,6 +405,8 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         domain = ShortLinkDomain.CONTACT
       } else if( deepLinkKind === DeepLinkKind.GIFT ||  deepLinkKind === DeepLinkKind.CONTACT_GIFT ) {
         domain = ShortLinkDomain.GIFT
+      } else if( deepLinkKind === DeepLinkKind.KEEPER || deepLinkKind === DeepLinkKind.PRIMARY_KEEPER || deepLinkKind === DeepLinkKind.RECIPROCAL_KEEPER ) {
+        domain = ShortLinkDomain.CONTACT
       } else {
         domain = ShortLinkDomain.DEFAULT
       }

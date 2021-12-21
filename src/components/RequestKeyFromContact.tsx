@@ -68,7 +68,7 @@ function RequestKeyFromContact( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `You have a new Hexa app Friends and Family Request from ${walletName}\n\n${shareLink}`,
+          message: `You have a new Hexa app ${props.isKeeper ? 'keeper' : 'Friends and Family'} request from ${walletName}\n\n${shareLink}`,
         },
       } )
 
@@ -353,7 +353,7 @@ function RequestKeyFromContact( props ) {
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
               <QRCode
-                title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
+                title={props.isGift ? 'Bitcoin Address' : props.isKeeper ? 'Keeper request' : 'F&F request'}
                 value={props.link}
                 size={hp( '27%' )} />
             )}

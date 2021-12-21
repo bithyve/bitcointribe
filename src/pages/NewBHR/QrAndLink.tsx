@@ -187,14 +187,15 @@ export default function QrAndLink( props ) {
       }
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
       deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
       encryptionType: encryptLinkWith,
       encryptionKey: encryption_key,
       walletName: wallet.walletName,
       keysToEncrypt,
+      generateShortLink: true
     } )
-    setTrustedLink( deepLink )
+    setTrustedLink( shortLink !== '' ? shortLink: deepLink )
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
       JSON.stringify( {
@@ -325,6 +326,7 @@ export default function QrAndLink( props ) {
           onPressBack={() => {
             props.navigation.goBack()
           }}
+          isKeeper={true}
           onPressDone={() => {
             // openTimer()
           }}

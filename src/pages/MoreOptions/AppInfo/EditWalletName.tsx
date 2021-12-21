@@ -68,12 +68,12 @@ export default function EditWalletName( props ) {
       >
         <TouchableOpacity
           disabled={!(
-              answer.trim() && answerError.length === 0
+            answer.trim() && answerError.length === 0
           )}
           onPress={()=>props.onPressConfirm( answer )}
           style={{
             ...styles.buttonView, backgroundColor: !(
-                  answer.trim() && answerError.length === 0
+              answer.trim() && answerError.length === 0
             ) ? Colors.lightBlue : Colors.blue, elevation: Elevation
           }}
         >
