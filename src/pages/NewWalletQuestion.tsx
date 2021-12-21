@@ -262,7 +262,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     //   validateAllowedCharacters( tempAns ) == false
     // ) {
     //   setAnswerError( strings.Answersmust )
-    // } 
+    // }
     else {
       setTimeout( () => {
         setAnswerError( '' )
@@ -296,8 +296,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
       if ( answer && confirmAnswer && confirmAnswer != answer ) {
         setAnswerError( strings.Answersdonotmatch )
-      } 
-      
+      }
+
       // else if (
       //   validateAllowedCharacters( answer ) == false ||
       //   validateAllowedCharacters( confirmAnswer ) == false
@@ -316,7 +316,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
         setPswdError( strings.Passworddonotmatch )
       }
-      } 
       // else if (
       //   validateAllowedCharacters( pswd ) == false ||
       //   validateAllowedCharacters( confirmPswd ) == false
