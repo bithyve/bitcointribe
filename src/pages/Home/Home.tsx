@@ -273,8 +273,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
-    if( this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.currentLevel == 0 ) {
-      this.props.setCloudData()
+    if( Platform.OS === 'ios' ) {
+      if( this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.currentLevel == 0 ) {
+        this.props.setCloudData()
+      }
     }
     requestAnimationFrame( () => {
       this.setUpFocusListener()
