@@ -9,7 +9,8 @@ import {
   StatusBar,
   ScrollView,
   Platform,
-  ImagePropTypes
+  FlatList,
+  TouchableWithoutFeedback
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -22,7 +23,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
-import { Gift, GiftThemeId, Wallet } from '../../bitcoin/utilities/Interface'
+import { Gift, GiftThemeId, Wallet, DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -39,7 +40,90 @@ import { updateUserName } from '../../store/actions/storage'
 
 import { translations } from '../../common/content/LocContext'
 
+import RadioButton from '../../components/RadioButton'
+import Feather from 'react-native-vector-icons/Feather'
+import ModalContainer from '../../components/home/ModalContainer'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+
+enum AdvancedSetting {
+  FNF_IDENTIFICATION = 'FNF_IDENTIFICATION',
+  SIMPLE_OTP = 'SIMPLE_OTP',
+  LONG_OTP = 'LONG_OTP',
+  CUSTOM_SECRET = 'CUSTOM_SECRET',
+  NO_2FA = 'NO_2FA'
+}
+
+const ADVANCEDSETTINGDATA = [
+  {
+    id: '1',
+    type: AdvancedSetting.FNF_IDENTIFICATION,
+    title: 'F&F Identification',
+    subtitle: 'Use contact\'s phone number or email ID',
+  },
+  {
+    id: '2',
+    type: AdvancedSetting.SIMPLE_OTP,
+    title: 'Simple OTP (6 digit)',
+    subtitle: 'Reduces the chances of man-in-the-middle attack',
+  },
+  {
+    id: '3',
+    type: AdvancedSetting.LONG_OTP,
+    title: 'Long OTP (Unguessable)',
+    subtitle: 'Improved secuirty against server access/hack',
+  },
+  {
+    id: '4',
+    type: AdvancedSetting.CUSTOM_SECRET,
+    title: 'Custom Secret Phrase',
+    subtitle: 'Manually enter a paraphrase with a hint',
+  },
+  {
+    id: '5',
+    type: AdvancedSetting.NO_2FA,
+    title: 'No Second Factor',
+    subtitle: 'Good for small gifts',
+  },
+]
+
+enum FNF_IDENTIFICATION_TYPE {
+  PHONE_NUMBER = 'PHONE_NUMBER',
+  EMAIL = 'EMAIL'
+}
+
+const FNFIDENTIFICATIONDATA = [
+  {
+    id: '1',
+    type: FNF_IDENTIFICATION_TYPE.PHONE_NUMBER,
+    title: 'Phone Number',
+    subtitle: 'Confirm with contact\'s phone number',
+  },
+  {
+    id: '2',
+    type: FNF_IDENTIFICATION_TYPE.EMAIL,
+    title: 'Email Address',
+    subtitle: 'Confirm with contact\'s email address',
+  },
+]
+
 const GiftDetails = ( { navigation } ) => {
+
+
+  const renderItem = ( { item } ) => {
+    if( addfNf ){
+      if( item.type === AdvancedSetting.FNF_IDENTIFICATION )
+        return<SettingCard type={item.type} title={item.title} subTitle={item.subtitle} />
+    } else {
+      if( item.type !== AdvancedSetting.FNF_IDENTIFICATION )
+        return<SettingCard type={item.type} title={item.title} subTitle={item.subtitle} />
+    }
+  }
+
+
+  const renderIdentificationItem = ( { item } ) => (
+    <IdentificationCard type={item.type} title={item.title} subtitle={item.subtitle} />
+  )
+
   const dispatch = useDispatch()
   const { giftId, contact } = navigation.state.params
   const wallet: Wallet = useSelector( state => state.storage.wallet )
@@ -51,7 +135,20 @@ const GiftDetails = ( { navigation } ) => {
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
-  const [ isDisabled, setIsDisabled ] = useState( false )
+  const [ advanceSettingsModal, setAdvanceSettingsModal ] = useState( false )
+  const [ selectedAdvancedOption, setSelectedAdvancedOption ] = useState( AdvancedSetting.NO_2FA )
+  const [ FnFIdentificationModal, setFnFIdentificationModal ] = useState( false )
+  const [ selectedFAndF, setSelectedFAndF ] = useState( FNF_IDENTIFICATION_TYPE.PHONE_NUMBER )
+
+  const [ customSecretIdentificationModal, setCustomSecretIdentificationModal ] = useState( false )
+
+  const [ secretPhrase, setSecretPhrase ] = useState( '' )
+  const [ secretPhraseVisibility, setSecretPhraseVisibility ] = useState( true )
+  const [ confirmSecretPhrase, setConfirmSecretPhrase ] = useState( '' )
+  const [ confirmSecretPhraseVisibility, setconfirmSecretPhraseVisibility ] = useState( true )
+  const [ secretPhraseHint, setSecretPhraseHint ] = useState( '' )
+  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
+
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
     title: 'Gift Sats',
@@ -66,6 +163,379 @@ const GiftDetails = ( { navigation } ) => {
   }, [] )
 
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
+
+
+  const IdentificationCard = ( { type, title, subtitle } ) => {
+    return (
+      <AppBottomSheetTouchableWrapper
+        onPress={() => {setSelectedFAndF( type )}}>
+
+        <View style={styles.cardContainer}>
+          <View style={styles.radioBtnContainer}>
+            <RadioButton
+              isChecked={type === selectedFAndF}
+              size={20}
+              color={Colors.lightBlue}
+              borderColor={Colors.borderColor}
+            />
+          </View>
+          <View>
+            <Text style={styles.identificationHeading}>{title}</Text>
+            <Text numberOfLines={2} style={styles.identificationDescription}>{subtitle}</Text>
+          </View>
+
+        </View>
+      </AppBottomSheetTouchableWrapper>
+    )
+  }
+
+  const selectAdvancedOption = ( type: AdvancedSetting ) => {
+    setSelectedAdvancedOption( type )
+    setAdvanceSettingsModal( false )
+
+    switch( type ){
+        case AdvancedSetting.NO_2FA:
+          setEncryptionType( DeepLinkEncryptionType.DEFAULT )
+          break
+
+        case AdvancedSetting.FNF_IDENTIFICATION:
+          setFnFIdentificationModal( true ) // selected F&F
+          break
+
+        case AdvancedSetting.SIMPLE_OTP:
+          setEncryptionType( DeepLinkEncryptionType.OTP )
+          break
+
+        case AdvancedSetting.LONG_OTP:
+          setEncryptionType( DeepLinkEncryptionType.LONG_OTP )
+          break
+
+        case AdvancedSetting.CUSTOM_SECRET:
+          setEncryptionType( DeepLinkEncryptionType.SECRET_PHRASE )
+          setCustomSecretIdentificationModal( true )
+          break
+
+        default:
+          setEncryptionType( DeepLinkEncryptionType.DEFAULT )
+    }
+  }
+
+  const SettingCard = ( { type, title, subTitle } ) => {
+    return (
+      <AppBottomSheetTouchableWrapper
+        onPress={() => {
+          selectAdvancedOption( type )
+        }}>
+        <View style={styles.cardContainer}>
+          <View style={styles.radioBtnContainer}>
+            <RadioButton
+              isChecked={type === selectedAdvancedOption }
+              size={20}
+              color={Colors.lightBlue}
+              borderColor={Colors.borderColor}
+              onpress={() => {selectAdvancedOption( type )}}
+            />
+          </View>
+          <View>
+            <Text style={styles.identificationHeading}>{title}</Text>
+            <Text numberOfLines={2} style={styles.identificationDescription}>{subTitle}</Text>
+          </View>
+        </View>
+      </AppBottomSheetTouchableWrapper>
+    )
+  }
+
+  const AdvancedSettingsModal = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setAdvanceSettingsModal( false )
+          }}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text style={{
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular
+            }}>Add Second Factor</Text>
+          </View>
+
+          <Text
+            style={{
+              ...styles.modalInfoText,
+              paddingTop: 8,
+              marginLeft: 30,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: 14,
+            }}
+          >
+            {'For confirming identity or improving security'}
+          </Text>
+
+          <FlatList data={ADVANCEDSETTINGDATA} renderItem={renderItem} keyExtractor={( item ) => item.id} />
+          <Text style={{
+            ...styles.modalInfoText,
+            paddingTop: 8,
+            marginLeft: 30,
+            fontFamily: Fonts.FiraSansRegular,
+            fontSize: 14,
+            marginTop: 40
+          }}>Use a different medium/app for sending the 2nd factor.(Not the same as the gift link/QR)</Text>
+        </View>
+      </View>
+    )
+  }
+
+
+  const FandFIndentificationModal = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setFnFIdentificationModal( false )
+          }}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text style={{
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey',
+            }}>Add Second Factor</Text>
+            <Text
+              style={{
+                ...styles.modalInfoText,
+                color: '#006DB4',
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: 18,
+              }}
+            >
+              {'F&F Identication'}
+            </Text>
+          </View>
+
+          <Text
+            style={{
+              ...styles.modalInfoText,
+              paddingTop: 8,
+              marginLeft: 30,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: 12,
+            }}
+          >
+            {'Use a phone number or email ID stored in your contact details. the recipient needs to confirm'}
+          </Text>
+
+          <FlatList data={FNFIDENTIFICATIONDATA} renderItem={renderIdentificationItem} keyExtractor={( item ) => item.id} />
+          <Text style={{
+            ...styles.modalInfoText,
+            paddingTop: 8,
+            marginLeft: 30,
+            fontFamily: Fonts.FiraSansRegular,
+            fontSize: 14,
+            marginTop: 50
+          }}>The option selected above will be used to encrypt your Gift Sats. Don't use the medium</Text>
+        </View>
+
+        <View style={{
+          flexDirection:'row', alignItems: 'center'
+        }}>
+          <TouchableOpacity
+            style={{
+              ...styles.btnContainer, marginTop: 30
+            }}
+            onPress={() => {
+              console.log( 'Proceed clicked' )
+            }}
+          >
+            <Text style={styles.btnText}>Proceed</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              marginTop: 30, marginLeft: 40
+            }}
+            onPress={() => {
+              console.log( 'Back clicked' )
+              // navigation.goback();
+            }}
+          >
+            <Text style={{
+              ...styles.btnText, color:'#006DB4'
+            }}>Back</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+
+
+  const SecretPhaseModal = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setCustomSecretIdentificationModal( false )
+          }}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text style={{
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey'
+            }}>Add Second Factor</Text>
+            <Text
+              style={{
+                ...styles.modalInfoText,
+                color: '#006DB4',
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: 18,
+              }}
+            >
+              {'Custom Secret Phrase'}
+            </Text>
+          </View>
+
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.textInput}
+              secureTextEntry={secretPhraseVisibility}
+              onChangeText={( text ) => {
+                setSecretPhrase( text )
+              }}/>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setSecretPhraseVisibility( !secretPhraseVisibility )
+              }}
+            >
+              <Feather
+                style={{
+                  marginLeft: 'auto',
+                }}
+                size={15}
+                color={Colors.blue}
+                name={secretPhraseVisibility ? 'eye-off' : 'eye'}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.textInput}
+              secureTextEntry={confirmSecretPhraseVisibility}
+              onChangeText={( text ) => {
+                setConfirmSecretPhrase( text )
+              }}
+            />
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setconfirmSecretPhraseVisibility( !confirmSecretPhraseVisibility )
+              }}
+            >
+              <Feather
+                style={{
+                  marginLeft: 'auto',
+                }}
+                size={15}
+                color={Colors.blue}
+                name={confirmSecretPhraseVisibility ? 'eye-off' : 'eye'}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.textInput}
+              placeholder="Add a hint"
+              onChangeText={( text ) => {
+                setSecretPhraseHint( text )
+              }}
+            />
+          </View>
+          <Text
+            style={{
+              margin: 10,
+              marginLeft: 35,
+              color: '#6C6C6C',
+              width:'85%'
+            }}
+          >
+              The recipient will be shown the hint and they will have to provide the passphrase to accept the gift
+          </Text>
+
+          <TouchableOpacity
+            style={{
+              ...styles.btnContainer, backgroundColor: ( secretPhrase && secretPhrase === confirmSecretPhrase )? Colors.blue: Colors.lightBlue
+            }}
+            disabled={!( secretPhrase && secretPhrase === confirmSecretPhrase )}
+            onPress={() => {
+              navigation.replace( 'SendGift', {
+                fromScreen: 'Gift',
+                giftId,
+                encryptionType,
+                note,
+                secretPhrase,
+                secretPhraseHint,
+                contact,
+                senderName: name,
+                themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+                setActiveTab: navigation.state.params.setActiveTab
+              } )
+            }}
+          >
+            <Text style={styles.btnText}>Proceed</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+
 
 
   const renderButton = ( text, condn ) => {
@@ -88,7 +558,7 @@ const GiftDetails = ( { navigation } ) => {
               senderName: name,
               setActiveTab: navigation.state.params.setActiveTab
             } )
-          } else if (condn === 'Add F&F and Send') {
+          } else if ( condn === 'Add F&F and Send' ) {
             navigation.navigate( 'AddContact', {
               fromScreen: 'GiftDetails',
               giftId,
@@ -98,6 +568,7 @@ const GiftDetails = ( { navigation } ) => {
             navigation.replace( 'SendGift', {
               fromScreen: 'Gift',
               giftId,
+              encryptionType,
               note,
               contact,
               senderName: name,
@@ -129,36 +600,80 @@ const GiftDetails = ( { navigation } ) => {
     >
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-        <View
-          style={[
-            CommonStyles.headerContainer,
-            {
-              backgroundColor: Colors.backgroundColor,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              navigation.goBack();
-            }}
+        <View style={styles.advancedButton}>
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.backgroundColor,
+              },
+            ]}
           >
-            <View style={styles.headerLeftIconInnerContainer}>
-              {/* <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              /> */}
-              <LeftArrow />
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.goBack()
+              }}
+            >
+              <View style={styles.headerLeftIconInnerContainer}>
+                <LeftArrow />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View>
+            <TouchableOpacity
+              onPress={() =>
+                setAdvanceSettingsModal( true )
+              }
+              style={{
+                height: 30,
+                width: 100,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 8,
+                backgroundColor: Colors.blue,
+              }}
+            >
+              <Text style={{
+                color: 'white'
+              }}>{'Advanced'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+        {advanceSettingsModal && <ModalContainer
+          closeBottomSheet={() => setAdvanceSettingsModal( false )}
+          visible={advanceSettingsModal}
+          onBackground={()=>setAdvanceSettingsModal( false )}
+        >
+          {AdvancedSettingsModal()}
+        </ModalContainer>}
+
+        {FnFIdentificationModal && <ModalContainer
+          closeBottomSheet={() => setFnFIdentificationModal( false )}
+          visible={FnFIdentificationModal}
+          onBackground={()=>setFnFIdentificationModal( false )}
+        >
+          {FandFIndentificationModal()}
+        </ModalContainer>}
+
+        {
+          customSecretIdentificationModal && <ModalContainer
+            closeBottomSheet={() => {
+              setCustomSecretIdentificationModal( false )
+            }}
+            visible={customSecretIdentificationModal}
+            onBackground={()=>{setCustomSecretIdentificationModal( false )}}
+          >
+            {SecretPhaseModal()}
+          </ModalContainer>}
+
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
-            marginLeft: wp(3),
+            marginLeft: wp( 3 ),
           }}
         >
           <HeaderTitle
@@ -173,13 +688,13 @@ const GiftDetails = ( { navigation } ) => {
         <View
           style={{
             flexDirection: 'row',
-            marginHorizontal: wp(8),
+            marginHorizontal: wp( 8 ),
             alignItems: 'center',
           }}
         >
           <Text
             style={{
-              fontSize: RFValue(14),
+              fontSize: RFValue( 14 ),
               color: Colors.black,
               fontWeight: '400',
             }}
@@ -190,13 +705,13 @@ const GiftDetails = ( { navigation } ) => {
             <TextInput
               style={
                 name
-                  ? [styles.modalInputBox]
+                  ? [ styles.modalInputBox ]
                   : [
-                      styles.modalInputBox,
-                      {
-                        fontSize: RFValue(15),
-                      },
-                    ]
+                    styles.modalInputBox,
+                    {
+                      fontSize: RFValue( 15 ),
+                    },
+                  ]
               }
               placeholder={'Enter name'}
               placeholderTextColor={Colors.gray1}
@@ -207,27 +722,27 @@ const GiftDetails = ( { navigation } ) => {
               autoCompleteType="off"
               autoCorrect={false}
               autoCapitalize="none"
-              onChangeText={(txt) => {
-                setName(txt);
+              onChangeText={( txt ) => {
+                setName( txt )
               }}
               onBlur={() => {
-                dispatch(updateUserName(name));
+                dispatch( updateUserName( name ) )
               }}
             />
           </View>
         </View>
         <Text
           style={{
-            fontSize: RFValue(14),
+            fontSize: RFValue( 14 ),
             color: Colors.black,
-            marginHorizontal: wp(8),
-            lineHeight: wp(7),
+            marginHorizontal: wp( 8 ),
+            lineHeight: wp( 7 ),
           }}
         >
           {'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
-          onPress={() => setDropdownBoxOpenClose(!dropdownBoxOpenClose)}
+          onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
           style={[
             styles.dashedContainer,
             {
@@ -258,7 +773,7 @@ const GiftDetails = ( { navigation } ) => {
               >
                 <View
                   style={{
-                    margin: wp(1),
+                    margin: wp( 1 ),
                   }}
                 >
                   {dropdownBoxValue?.avatar ? dropdownBoxValue?.avatar : <GiftCard />}
@@ -299,24 +814,24 @@ const GiftDetails = ( { navigation } ) => {
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
               style={{
-                height: hp('40%'),
+                height: hp( '40%' ),
               }}
             >
-              {dropdownBoxList.map((value, index) => (
+              {dropdownBoxList.map( ( value, index ) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    setTimeout(() => {
-                      setDropdownBoxValue(value);
-                      setDropdownBoxOpenClose(false);
-                    }, 70);
+                    setTimeout( () => {
+                      setDropdownBoxValue( value )
+                      setDropdownBoxOpenClose( false )
+                    }, 70 )
                   }}
                   style={[
                     styles.dashedStyle,
                     {
-                      margin: wp(1.5),
+                      margin: wp( 1.5 ),
                       borderColor: `${value.color ?? Colors.lightBlue}`,
-                      backgroundColor: dropdownBoxValue ? (dropdownBoxValue?.id == value.id ? Colors.skyBlue : Colors.white) : Colors.white,
+                      backgroundColor: dropdownBoxValue ? ( dropdownBoxValue?.id == value.id ? Colors.skyBlue : Colors.white ) : Colors.white,
                     },
                   ]}
                 >
@@ -335,7 +850,7 @@ const GiftDetails = ( { navigation } ) => {
                     >
                       <View
                         style={{
-                          margin: wp(1),
+                          margin: wp( 1 ),
                         }}
                       >
                         {value.avatar}
@@ -348,11 +863,11 @@ const GiftDetails = ( { navigation } ) => {
                     </View>
                   </View>
                 </TouchableOpacity>
-              ))}
+              ) )}
             </ScrollView>
           </View>
         ) : null}
-        <View style={[styles.inputBoxLong, styles.inputField]}>
+        <View style={[ styles.inputBoxLong, styles.inputField ]}>
           <TextInput
             style={[
               styles.modalInputBox,
@@ -371,17 +886,17 @@ const GiftDetails = ( { navigation } ) => {
             autoCapitalize="none"
             numberOfLines={2}
             multiline
-            onChangeText={(text) => {
-              setNote(text);
+            onChangeText={( text ) => {
+              setNote( text )
             }}
           />
         </View>
 
         <View
           style={{
-            marginTop: hp(2),
-            marginBottom: hp(2),
-            marginHorizontal: wp(7),
+            marginTop: hp( 2 ),
+            marginBottom: hp( 2 ),
+            marginHorizontal: wp( 7 ),
             flexDirection: 'row',
           }}
         >
@@ -416,11 +931,11 @@ const GiftDetails = ( { navigation } ) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: hp(2),
-            marginLeft: wp(2),
+            marginTop: hp( 2 ),
+            marginLeft: wp( 2 ),
           }}
         >
-        {renderButton( 'Next', addfNf ? 'Add F&F and Send' : 'Next' )}
+          {renderButton( 'Next', addfNf ? 'Add F&F and Send' : 'Next' )}
           <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
@@ -429,7 +944,7 @@ const GiftDetails = ( { navigation } ) => {
         </View>
       </SafeAreaView>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create( {
@@ -438,19 +953,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     marginHorizontal: wp( 2 )
-  },
-  imageView: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: Colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 6,
-    shadowOpacity: 0.1,
-    shadowOffset: {
-      width: 1, height: 1
-    },
   },
   dropdownBox: {
     flexDirection: 'row',
@@ -726,19 +1228,19 @@ const styles = StyleSheet.create( {
     marginRight: 20,
     backgroundColor: Colors.white,
   },
-  inputBoxFocused: {
-    borderWidth: 0.5,
-    borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 10, height: 10
-    },
-    backgroundColor: Colors.white,
-  },
+  // inputBoxFocused: {
+  //   borderWidth: 0.5,
+  //   borderRadius: 10,
+  //   marginLeft: 20,
+  //   marginRight: 20,
+  //   elevation: 10,
+  //   shadowColor: Colors.borderColor,
+  //   shadowOpacity: 10,
+  //   shadowOffset: {
+  //     width: 10, height: 10
+  //   },
+  //   backgroundColor: Colors.white,
+  // },
   accImage:{
     marginRight: wp( 4 )
   },
@@ -773,7 +1275,72 @@ const styles = StyleSheet.create( {
     color: Colors.white,
   },
   headerLeftIconInnerContainer:{
-    marginLeft: wp(8.7),
+    marginLeft: wp( 8.7 ),
+  },
+  cardContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    backgroundColor:'#fff',
+    width:'80%',
+    alignSelf:'center',
+    padding:13,
+    borderRadius:8,
+    paddingHorizontal:20,
+    marginVertical:10,
+  },
+  identificationHeading:{
+    color:'#006DB4',
+    fontSize:13,
+    fontWeight:'400',
+    fontFamily: Fonts.FiraSansRegular,
+
+  },
+  identificationDescription:{
+    color:'#6C6C6C',
+    fontSize:11,
+    fontWeight:'400',
+    width:225,
+    fontFamily: Fonts.FiraSansRegular,
+
+  },
+  radioBtnContainer:{
+    marginRight:10
+  },
+  advancedButton: {
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width: '94%'
+  },
+  textInputContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width:'85%',
+    alignSelf:'center',
+    marginTop:10,
+    backgroundColor:'#fff',
+    padding:14,
+    borderRadius:10
+  },
+  textInput:{
+    width:'92%'
+  },
+  btnContainer:{
+    marginTop:10,
+    backgroundColor:'#006DB4',
+    width:100,
+    padding:14,
+    borderRadius:6,
+    marginLeft: 30,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  btnText: {
+    color: '#fff',
+    fontWeight:'500',
+    fontSize:15,
+    fontFamily: Fonts.FiraSansRegular
   }
 } )
 
