@@ -2,6 +2,7 @@ import * as bitcoinJS from 'bitcoinjs-lib'
 import * as bip32 from 'bip32'
 import crypto from 'crypto'
 import coinselect from 'coinselect'
+import coinselectSplit from 'coinselect/split'
 import {
   Transaction,
   TransactionPrerequisite,
@@ -591,10 +592,9 @@ export default class AccountOperations {
           } ),
           network,
         } ).address,
-        value: Math.floor( confirmedBalance / numberOfRecipients ),
       } )
     }
-    const { fee } = coinselect(
+    const { fee } = coinselectSplit(
       inputUTXOs,
       outputUTXOs,
       feePerByte,
@@ -1072,6 +1072,7 @@ export default class AccountOperations {
     averageTxFees: AverageTxFees,
     includeFee?: boolean,
     exclusiveGifts?: boolean,
+    validity: number = config.DEFAULT_GIFT_VALIDITY,
   ): Promise<{
     txid: string;
     gifts: Gift[];
@@ -1114,6 +1115,7 @@ export default class AccountOperations {
         timestamps: {
           created: Date.now(),
         },
+        validitySpan: validity,
         sender: {
           walletId: walletDetails.walletId,
           walletName: walletDetails.walletName,
