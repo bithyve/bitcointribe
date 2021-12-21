@@ -45,59 +45,78 @@ import Feather from 'react-native-vector-icons/Feather'
 import ModalContainer from '../../components/home/ModalContainer'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
+enum AdvancedSetting {
+  FNF_IDENTIFICATION = 'FNF_IDENTIFICATION',
+  SIMPLE_OTP = 'SIMPLE_OTP',
+  LONG_OTP = 'LONG_OTP',
+  CUSTOM_SECRET = 'CUSTOM_SECRET',
+  NO_2FA = 'NO_2FA'
+}
+
 const ADVANCEDSETTINGDATA = [
   {
     id: '1',
+    type: AdvancedSetting.FNF_IDENTIFICATION,
     title: 'F&F Identification',
     subtitle: 'Use contact\'s phone number or email ID',
   },
   {
     id: '2',
+    type: AdvancedSetting.SIMPLE_OTP,
     title: 'Simple OTP (6 digit)',
     subtitle: 'Reduces the chances of man-in-the-middle attack',
   },
   {
     id: '3',
+    type: AdvancedSetting.LONG_OTP,
     title: 'Long OTP (Unguessable)',
     subtitle: 'Improved secuirty against server access/hack',
   },
   {
     id: '4',
+    type: AdvancedSetting.CUSTOM_SECRET,
     title: 'Custom Secret Phrase',
     subtitle: 'Manually enter a paraphrase with a hint',
   },
   {
     id: '5',
+    type: AdvancedSetting.NO_2FA,
     title: 'No Second Factor',
     subtitle: 'Good for small gifts',
   },
-];
+]
 
+enum FNF_IDENTIFICATION_TYPE {
+  PHONE_NUMBER = 'PHONE_NUMBER',
+  EMAIL = 'EMAIL'
+}
 
 const FNFIDENTIFICATIONDATA = [
   {
     id: '1',
+    type: FNF_IDENTIFICATION_TYPE.PHONE_NUMBER,
     title: 'Phone Number',
     subtitle: 'Confirm with contact\'s phone number',
   },
   {
     id: '2',
+    type: FNF_IDENTIFICATION_TYPE.EMAIL,
     title: 'Email Address',
     subtitle: 'Confirm with contact\'s email address',
   },
-];
+]
 
 const GiftDetails = ( { navigation } ) => {
 
 
   const renderItem = ( { item } ) => (
-    <SettingCard id={item.id} title={item.title} subTitle={item.subtitle} />
+    <SettingCard type={item.type} title={item.title} subTitle={item.subtitle} />
   )
 
 
-  const renderIdentificationItem = ({ item }) => (
-    <IdentificationCard id={item.id} title={item.title} subtitle={item.subtitle} />
-  );
+  const renderIdentificationItem = ( { item } ) => (
+    <IdentificationCard type={item.type} title={item.title} subtitle={item.subtitle} />
+  )
 
   const dispatch = useDispatch()
   const { giftId, contact } = navigation.state.params
@@ -111,15 +130,15 @@ const GiftDetails = ( { navigation } ) => {
   const [ addfNf, setAddfNf ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ advanceSettingsModal, setAdvanceSettingsModal ] = useState( false )
-  const [ selectedAdvancedOptionId, setSelectedAdvancedOptionId ] = useState( '1' )
+  const [ selectedAdvancedOption, setSelectedAdvancedOption ] = useState( AdvancedSetting.NO_2FA )
   const [ FnFIdentificationModal, setFnFIdentificationModal ] = useState( false )
-  const [ selectedFAndFId, setSelectedFAndFId ] = useState( '1' )
+  const [ selectedFAndF, setSelectedFAndF ] = useState( FNF_IDENTIFICATION_TYPE.PHONE_NUMBER )
 
   const [ customSecretIdentificationModal, setCustomSecretIdentificationModal ] = useState( false )
 
-  const [secretPhrase, setSecretPhrase] = useState(true)
-  const [confirmSecretPhrase, setconfirmSecretPhrase] = useState(true)
-  const [encryptionType, setEncryptionType] = useState( DeepLinkEncryptionType.DEFAULT)
+  const [ secretPhrase, setSecretPhrase ] = useState( true )
+  const [ confirmSecretPhrase, setconfirmSecretPhrase ] = useState( true )
+  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
 
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
@@ -137,15 +156,15 @@ const GiftDetails = ( { navigation } ) => {
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
 
-  const IdentificationCard = ( { id, title, subtitle } ) => {
+  const IdentificationCard = ( { type, title, subtitle } ) => {
     return (
       <AppBottomSheetTouchableWrapper
-        onPress={() => {setSelectedFAndFId( id )}}>
+        onPress={() => {setSelectedFAndF( type )}}>
 
         <View style={styles.cardContainer}>
           <View style={styles.radioBtnContainer}>
             <RadioButton
-              isChecked={id === selectedFAndFId}
+              isChecked={type === selectedFAndF}
               size={20}
               color={Colors.lightBlue}
               borderColor={Colors.borderColor}
@@ -161,28 +180,28 @@ const GiftDetails = ( { navigation } ) => {
     )
   }
 
-  const selectAdvancedOption = ( id: string ) => {
-    setSelectedAdvancedOptionId( id )
+  const selectAdvancedOption = ( type: AdvancedSetting ) => {
+    setSelectedAdvancedOption( type )
     setAdvanceSettingsModal( false )
 
-    switch( id ){
-        case '1':
+    switch( type ){
+        case AdvancedSetting.NO_2FA:
           setEncryptionType( DeepLinkEncryptionType.DEFAULT )
           break
 
-        case '2':
+        case AdvancedSetting.FNF_IDENTIFICATION:
           setFnFIdentificationModal( true ) // selected F&F
           break
 
-        case '3':
+        case AdvancedSetting.SIMPLE_OTP:
           setEncryptionType( DeepLinkEncryptionType.OTP )
           break
 
-        case '4':
+        case AdvancedSetting.LONG_OTP:
           setEncryptionType( DeepLinkEncryptionType.LONG_OTP )
           break
 
-        case '5':
+        case AdvancedSetting.CUSTOM_SECRET:
           setCustomSecretIdentificationModal( true )
           break
 
@@ -191,20 +210,20 @@ const GiftDetails = ( { navigation } ) => {
     }
   }
 
-  const SettingCard = ( { id, title, subTitle } ) => {
+  const SettingCard = ( { type, title, subTitle } ) => {
     return (
       <AppBottomSheetTouchableWrapper
         onPress={() => {
-          selectAdvancedOption( id )
+          selectAdvancedOption( type )
         }}>
         <View style={styles.cardContainer}>
           <View style={styles.radioBtnContainer}>
             <RadioButton
-              isChecked={id === selectedAdvancedOptionId }
+              isChecked={type === selectedAdvancedOption }
               size={20}
               color={Colors.lightBlue}
               borderColor={Colors.borderColor}
-              onpress={() => {selectAdvancedOption( id )}}
+              onpress={() => {selectAdvancedOption( type )}}
             />
           </View>
           <View>
@@ -216,254 +235,268 @@ const GiftDetails = ( { navigation } ) => {
     )
   }
 
-    const AdvancedSettingsModal = () => {
-      return (
-        <View style={styles.modalContentContainer}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              setAdvanceSettingsModal(false);
-            }}
+  const AdvancedSettingsModal = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setAdvanceSettingsModal( false )
+          }}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <View>
+          <View
             style={{
-              width: wp(7),
-              height: wp(7),
-              borderRadius: wp(7 / 2),
-              alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: wp(3),
-              marginRight: wp(3),
+              marginLeft: wp( 7 ),
             }}
           >
-            <FontAwesome name="close" color={Colors.white} size={19} />
-          </TouchableOpacity>
-          <View>
-            <View
-              style={{
-                marginLeft: wp(7),
-              }}
-            >
-              <Text style={{ ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular }}>Add Second Factor</Text>
-            </View>
-
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                paddingTop: 8,
-                marginLeft: 30,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: 14,
-              }}
-            >
-              {'For confirming identity or improving security'}
-            </Text>
-
-            <FlatList data={ADVANCEDSETTINGDATA} renderItem={renderItem} keyExtractor={(item) => item.id} />
             <Text style={{
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular
+            }}>Add Second Factor</Text>
+          </View>
+
+          <Text
+            style={{
               ...styles.modalInfoText,
               paddingTop: 8,
               marginLeft: 30,
               fontFamily: Fonts.FiraSansRegular,
               fontSize: 14,
-              marginTop: 40
-            }}>Use a different medium/app for sending the 2nd factor.(Not the same as the gift link/QR)</Text>
-          </View>
-        </View>
-      );
-    }
-
-
-    const FandFIndentificationModal = () => {
-      return (
-        <View style={styles.modalContentContainer}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              setFnFIdentificationModal(false);
-            }}
-            style={{
-              width: wp(7),
-              height: wp(7),
-              borderRadius: wp(7 / 2),
-              alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: wp(3),
-              marginRight: wp(3),
             }}
           >
-            <FontAwesome name="close" color={Colors.white} size={19} />
-          </TouchableOpacity>
-          <View>
-            <View
-              style={{
-                marginLeft: wp(7),
-              }}
-            >
-              <Text style={{ ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey', }}>Add Second Factor</Text>
-              <Text
-                style={{
-                  ...styles.modalInfoText,
-                  color: '#006DB4',
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: 18,
-                }}
-              >
-               {'F&F Identication'}
-              </Text>
-            </View>
+            {'For confirming identity or improving security'}
+          </Text>
 
+          <FlatList data={ADVANCEDSETTINGDATA} renderItem={renderItem} keyExtractor={( item ) => item.id} />
+          <Text style={{
+            ...styles.modalInfoText,
+            paddingTop: 8,
+            marginLeft: 30,
+            fontFamily: Fonts.FiraSansRegular,
+            fontSize: 14,
+            marginTop: 40
+          }}>Use a different medium/app for sending the 2nd factor.(Not the same as the gift link/QR)</Text>
+        </View>
+      </View>
+    )
+  }
+
+
+  const FandFIndentificationModal = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setFnFIdentificationModal( false )
+          }}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text style={{
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey',
+            }}>Add Second Factor</Text>
             <Text
               style={{
                 ...styles.modalInfoText,
-                paddingTop: 8,
-                marginLeft: 30,
+                color: '#006DB4',
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: 12,
+                fontSize: 18,
               }}
             >
-              {'Use a phone number or email ID stored in your contact details. the recipient needs to confirm'}
+              {'F&F Identication'}
             </Text>
+          </View>
 
-            <FlatList data={FNFIDENTIFICATIONDATA} renderItem={renderIdentificationItem} keyExtractor={(item) => item.id} />
-            <Text style={{
+          <Text
+            style={{
               ...styles.modalInfoText,
               paddingTop: 8,
               marginLeft: 30,
               fontFamily: Fonts.FiraSansRegular,
-              fontSize: 14,
-              marginTop: 50
-            }}>The option selected above will be used to encrypt your Gift Sats. Don't use the medium</Text>
-          </View>
-
-          <View style={{flexDirection:'row', alignItems: 'center'}}>
-          <TouchableOpacity
-              style={{...styles.btnContainer, marginTop: 30}}
-              onPress={() => {
-                console.log('Proceed clicked');
-              }}
-            >
-              <Text style={styles.btnText}>Proceed</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{ marginTop: 30, marginLeft: 40}}
-              onPress={() => {
-                console.log('Back clicked');
-                // navigation.goback();
-              }}
-            >
-              <Text style={{...styles.btnText, color:'#006DB4'}}>Back</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      );
-    }
-
-
-    const SecretPhaseModal = () => {
-      return (
-        <View style={styles.modalContentContainer}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              setCustomSecretIdentificationModal(false);
-            }}
-            style={{
-              width: wp(7),
-              height: wp(7),
-              borderRadius: wp(7 / 2),
-              alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: wp(3),
-              marginRight: wp(3),
+              fontSize: 12,
             }}
           >
-            <FontAwesome name="close" color={Colors.white} size={19} />
-          </TouchableOpacity>
-          <View>
-            <View
-              style={{
-                marginLeft: wp(7),
-              }}
-            >
-              <Text style={{ ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey' }}>Add Second Factor</Text>
-              <Text
-                style={{
-                  ...styles.modalInfoText,
-                  color: '#006DB4',
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: 18,
-                }}
-              >
-                {'Custom Secret Phrase'}
-              </Text>
-            </View>
+            {'Use a phone number or email ID stored in your contact details. the recipient needs to confirm'}
+          </Text>
 
-            <View style={styles.textInputContainer}>
-              <TextInput style={styles.textInput}  secureTextEntry={secretPhrase}/>
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setSecretPhrase(!secretPhrase);
-                }}
-              >
-                <Feather
-                  style={{
-                    marginLeft: 'auto',
-                  }}
-                  size={15}
-                  color={Colors.blue}
-                  name={secretPhrase ? 'eye-off' : 'eye'}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-            <View style={styles.textInputContainer}>
-              <TextInput style={styles.textInput}  secureTextEntry={confirmSecretPhrase}/>
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setconfirmSecretPhrase(!confirmSecretPhrase);
-                }}
-              >
-                <Feather
-                  style={{
-                    marginLeft: 'auto',
-                  }}
-                  size={15}
-                  color={Colors.blue}
-                  name={confirmSecretPhrase ? 'eye-off' : 'eye'}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-            <View style={styles.textInputContainer}>
-              <TextInput style={styles.textInput} placeholder="Add a hint" />
-            </View>
+          <FlatList data={FNFIDENTIFICATIONDATA} renderItem={renderIdentificationItem} keyExtractor={( item ) => item.id} />
+          <Text style={{
+            ...styles.modalInfoText,
+            paddingTop: 8,
+            marginLeft: 30,
+            fontFamily: Fonts.FiraSansRegular,
+            fontSize: 14,
+            marginTop: 50
+          }}>The option selected above will be used to encrypt your Gift Sats. Don't use the medium</Text>
+        </View>
+
+        <View style={{
+          flexDirection:'row', alignItems: 'center'
+        }}>
+          <TouchableOpacity
+            style={{
+              ...styles.btnContainer, marginTop: 30
+            }}
+            onPress={() => {
+              console.log( 'Proceed clicked' )
+            }}
+          >
+            <Text style={styles.btnText}>Proceed</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              marginTop: 30, marginLeft: 40
+            }}
+            onPress={() => {
+              console.log( 'Back clicked' )
+              // navigation.goback();
+            }}
+          >
+            <Text style={{
+              ...styles.btnText, color:'#006DB4'
+            }}>Back</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+
+
+  const SecretPhaseModal = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setCustomSecretIdentificationModal( false )
+          }}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text style={{
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey'
+            }}>Add Second Factor</Text>
             <Text
               style={{
-                margin: 10,
-                marginLeft: 35,
-                color: '#6C6C6C',
-                width:'85%'
+                ...styles.modalInfoText,
+                color: '#006DB4',
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: 18,
               }}
             >
+              {'Custom Secret Phrase'}
+            </Text>
+          </View>
+
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.textInput}  secureTextEntry={secretPhrase}/>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setSecretPhrase( !secretPhrase )
+              }}
+            >
+              <Feather
+                style={{
+                  marginLeft: 'auto',
+                }}
+                size={15}
+                color={Colors.blue}
+                name={secretPhrase ? 'eye-off' : 'eye'}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.textInput}  secureTextEntry={confirmSecretPhrase}/>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setconfirmSecretPhrase( !confirmSecretPhrase )
+              }}
+            >
+              <Feather
+                style={{
+                  marginLeft: 'auto',
+                }}
+                size={15}
+                color={Colors.blue}
+                name={confirmSecretPhrase ? 'eye-off' : 'eye'}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.textInput} placeholder="Add a hint" />
+          </View>
+          <Text
+            style={{
+              margin: 10,
+              marginLeft: 35,
+              color: '#6C6C6C',
+              width:'85%'
+            }}
+          >
               The recipient will be shown the hint and they will have to provide the passphrase to accept the gift
-            </Text>
+          </Text>
 
-            <TouchableOpacity
-              style={styles.btnContainer}
-              onPress={() => {
-                console.log('321');
-              }}
-            >
-              <Text style={styles.btnText}>Proceed</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.btnContainer}
+            onPress={() => {
+              console.log( '321' )
+            }}
+          >
+            <Text style={styles.btnText}>Proceed</Text>
+          </TouchableOpacity>
         </View>
-      );
-    }
+      </View>
+    )
+  }
 
 
 
@@ -530,27 +563,27 @@ const GiftDetails = ( { navigation } ) => {
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
         <View style={styles.advancedButton}>
-        <View
-          style={[
-            CommonStyles.headerContainer,
-            {
-              backgroundColor: Colors.backgroundColor,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              navigation.goBack()
-            }}
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.backgroundColor,
+              },
+            ]}
           >
-            <View style={styles.headerLeftIconInnerContainer}>
-              <LeftArrow />
-            </View>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.goBack()
+              }}
+            >
+              <View style={styles.headerLeftIconInnerContainer}>
+                <LeftArrow />
+              </View>
+            </TouchableOpacity>
+          </View>
 
-        <View>
+          <View>
             <TouchableOpacity
               onPress={() =>
                 setAdvanceSettingsModal( true )
