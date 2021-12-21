@@ -41,7 +41,7 @@ import { translations } from '../../common/content/LocContext'
 
 const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const { giftId, contact } = navigation.state.params
+  const { giftId, contact, encryptionType } = navigation.state.params
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
@@ -88,7 +88,7 @@ const GiftDetails = ( { navigation } ) => {
               senderName: name,
               setActiveTab: navigation.state.params.setActiveTab
             } )
-          } else if (condn === 'Add F&F and Send') {
+          } else if ( condn === 'Add F&F and Send' ) {
             navigation.navigate( 'AddContact', {
               fromScreen: 'GiftDetails',
               giftId,
@@ -98,6 +98,7 @@ const GiftDetails = ( { navigation } ) => {
             navigation.replace( 'SendGift', {
               fromScreen: 'Gift',
               giftId,
+              encryptionType,
               note,
               contact,
               senderName: name,
@@ -140,7 +141,7 @@ const GiftDetails = ( { navigation } ) => {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              navigation.goBack();
+              navigation.goBack()
             }}
           >
             <View style={styles.headerLeftIconInnerContainer}>
@@ -158,7 +159,7 @@ const GiftDetails = ( { navigation } ) => {
             flexDirection: 'row',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
-            marginLeft: wp(3),
+            marginLeft: wp( 3 ),
           }}
         >
           <HeaderTitle
@@ -173,13 +174,13 @@ const GiftDetails = ( { navigation } ) => {
         <View
           style={{
             flexDirection: 'row',
-            marginHorizontal: wp(8),
+            marginHorizontal: wp( 8 ),
             alignItems: 'center',
           }}
         >
           <Text
             style={{
-              fontSize: RFValue(14),
+              fontSize: RFValue( 14 ),
               color: Colors.black,
               fontWeight: '400',
             }}
@@ -190,13 +191,13 @@ const GiftDetails = ( { navigation } ) => {
             <TextInput
               style={
                 name
-                  ? [styles.modalInputBox]
+                  ? [ styles.modalInputBox ]
                   : [
-                      styles.modalInputBox,
-                      {
-                        fontSize: RFValue(15),
-                      },
-                    ]
+                    styles.modalInputBox,
+                    {
+                      fontSize: RFValue( 15 ),
+                    },
+                  ]
               }
               placeholder={'Enter name'}
               placeholderTextColor={Colors.gray1}
@@ -207,27 +208,27 @@ const GiftDetails = ( { navigation } ) => {
               autoCompleteType="off"
               autoCorrect={false}
               autoCapitalize="none"
-              onChangeText={(txt) => {
-                setName(txt);
+              onChangeText={( txt ) => {
+                setName( txt )
               }}
               onBlur={() => {
-                dispatch(updateUserName(name));
+                dispatch( updateUserName( name ) )
               }}
             />
           </View>
         </View>
         <Text
           style={{
-            fontSize: RFValue(14),
+            fontSize: RFValue( 14 ),
             color: Colors.black,
-            marginHorizontal: wp(8),
-            lineHeight: wp(7),
+            marginHorizontal: wp( 8 ),
+            lineHeight: wp( 7 ),
           }}
         >
           {'Scan the QR or click the link to accept your gift.'}
         </Text>
         <TouchableOpacity
-          onPress={() => setDropdownBoxOpenClose(!dropdownBoxOpenClose)}
+          onPress={() => setDropdownBoxOpenClose( !dropdownBoxOpenClose )}
           style={[
             styles.dashedContainer,
             {
@@ -258,7 +259,7 @@ const GiftDetails = ( { navigation } ) => {
               >
                 <View
                   style={{
-                    margin: wp(1),
+                    margin: wp( 1 ),
                   }}
                 >
                   {dropdownBoxValue?.avatar ? dropdownBoxValue?.avatar : <GiftCard />}
@@ -299,24 +300,24 @@ const GiftDetails = ( { navigation } ) => {
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
               style={{
-                height: hp('40%'),
+                height: hp( '40%' ),
               }}
             >
-              {dropdownBoxList.map((value, index) => (
+              {dropdownBoxList.map( ( value, index ) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    setTimeout(() => {
-                      setDropdownBoxValue(value);
-                      setDropdownBoxOpenClose(false);
-                    }, 70);
+                    setTimeout( () => {
+                      setDropdownBoxValue( value )
+                      setDropdownBoxOpenClose( false )
+                    }, 70 )
                   }}
                   style={[
                     styles.dashedStyle,
                     {
-                      margin: wp(1.5),
+                      margin: wp( 1.5 ),
                       borderColor: `${value.color ?? Colors.lightBlue}`,
-                      backgroundColor: dropdownBoxValue ? (dropdownBoxValue?.id == value.id ? Colors.skyBlue : Colors.white) : Colors.white,
+                      backgroundColor: dropdownBoxValue ? ( dropdownBoxValue?.id == value.id ? Colors.skyBlue : Colors.white ) : Colors.white,
                     },
                   ]}
                 >
@@ -335,7 +336,7 @@ const GiftDetails = ( { navigation } ) => {
                     >
                       <View
                         style={{
-                          margin: wp(1),
+                          margin: wp( 1 ),
                         }}
                       >
                         {value.avatar}
@@ -348,11 +349,11 @@ const GiftDetails = ( { navigation } ) => {
                     </View>
                   </View>
                 </TouchableOpacity>
-              ))}
+              ) )}
             </ScrollView>
           </View>
         ) : null}
-        <View style={[styles.inputBoxLong, styles.inputField]}>
+        <View style={[ styles.inputBoxLong, styles.inputField ]}>
           <TextInput
             style={[
               styles.modalInputBox,
@@ -371,17 +372,17 @@ const GiftDetails = ( { navigation } ) => {
             autoCapitalize="none"
             numberOfLines={2}
             multiline
-            onChangeText={(text) => {
-              setNote(text);
+            onChangeText={( text ) => {
+              setNote( text )
             }}
           />
         </View>
 
         <View
           style={{
-            marginTop: hp(2),
-            marginBottom: hp(2),
-            marginHorizontal: wp(7),
+            marginTop: hp( 2 ),
+            marginBottom: hp( 2 ),
+            marginHorizontal: wp( 7 ),
             flexDirection: 'row',
           }}
         >
@@ -416,11 +417,11 @@ const GiftDetails = ( { navigation } ) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: hp(2),
-            marginLeft: wp(2),
+            marginTop: hp( 2 ),
+            marginLeft: wp( 2 ),
           }}
         >
-        {renderButton( 'Next', addfNf ? 'Add F&F and Send' : 'Next' )}
+          {renderButton( 'Next', addfNf ? 'Add F&F and Send' : 'Next' )}
           <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
@@ -429,7 +430,7 @@ const GiftDetails = ( { navigation } ) => {
         </View>
       </SafeAreaView>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create( {
@@ -773,7 +774,7 @@ const styles = StyleSheet.create( {
     color: Colors.white,
   },
   headerLeftIconInnerContainer:{
-    marginLeft: wp(8.7),
+    marginLeft: wp( 8.7 ),
   }
 } )
 

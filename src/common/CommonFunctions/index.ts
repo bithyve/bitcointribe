@@ -363,6 +363,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
       case DeepLinkEncryptionType.NUMBER:
       case DeepLinkEncryptionType.EMAIL:
       case DeepLinkEncryptionType.OTP:
+      case DeepLinkEncryptionType.LONG_OTP:
         encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
         encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
           keysToEncrypt,

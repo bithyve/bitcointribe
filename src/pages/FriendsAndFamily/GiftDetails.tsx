@@ -26,6 +26,7 @@ import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import {
   AccountType,
+  DeepLinkEncryptionType,
   Gift,
   GiftStatus,
   GiftType,
@@ -130,7 +131,7 @@ const GiftDetails = ( { navigation } ) => {
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
   const [ secretPhrase, setSecretPhrase ] = useState( true )
   const [ confirmSecretPhrase, setconfirmSecretPhrase ] = useState( true )
-
+  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
 
   const currencyKind = useSelector(
     ( state ) => state.preferences.giftCurrencyKind,
@@ -207,13 +208,28 @@ const GiftDetails = ( { navigation } ) => {
     setAdvanceSettingsModal( false )
 
     switch( id ){
+        case '1':
+          setEncryptionType( DeepLinkEncryptionType.DEFAULT )
+          break
+
         case '2':
           setFnFIdentificationModal( true ) // selected F&F
+          break
+
+        case '3':
+          setEncryptionType( DeepLinkEncryptionType.OTP )
+          break
+
+        case '4':
+          setEncryptionType( DeepLinkEncryptionType.LONG_OTP )
           break
 
         case '5':
           setCustomSecretIdentificationModal( true )
           break
+
+        default:
+          setEncryptionType( DeepLinkEncryptionType.DEFAULT )
     }
   }
 
@@ -924,7 +940,8 @@ const GiftDetails = ( { navigation } ) => {
         { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT, GiftStatus.REJECTED ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
-            setActiveTab: navigation.state.params.setActiveTab
+            setActiveTab: navigation.state.params.setActiveTab,
+            encryptionType,
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Add To Account */}
