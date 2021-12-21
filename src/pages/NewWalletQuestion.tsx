@@ -273,7 +273,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
       setPswdError( strings.Passworddonotmatch )
-    } else if (
+    }
+    /* else if (
       validateAllowedCharacters( pswd ) == false ||
       validateAllowedCharacters( tempPswd ) == false
     ) {
@@ -282,7 +283,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       // setTimeout( () => {
       //   setPswdError( '' )
       // }, 2 )
-    }
+    }*/
   }
 
   useEffect( () => {
@@ -310,12 +311,13 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
         setPswdError( strings.Passworddonotmatch )
-      } else if (
+      }
+      /*else if (
         validateAllowedCharacters( pswd ) == false ||
         validateAllowedCharacters( confirmPswd ) == false
       ) {
         setPswdError( strings.Passwordmust )
-      }
+      }*/
     }
   }, [ confirmPswd ] )
 
@@ -478,7 +480,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text.toLowerCase() )
+                setPswd( text )
                 setPswdMasked( text )
                 // setPswdError( '' )
               }}
@@ -601,12 +603,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               </TouchableWithoutFeedback>
             ) : null}
           </View>
-          {pswdError.length == 0 && (
+          {/* {pswdError.length == 0 && (
             <Text style={styles.helpText}>
-              {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
               {strings.Numbersorspecial}
             </Text>
-          )}
+          )} */}
           <View
             style={{
               ...hintInputStyle,
