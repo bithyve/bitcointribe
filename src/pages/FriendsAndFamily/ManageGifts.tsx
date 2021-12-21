@@ -32,7 +32,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ManageGiftsList from './ManageGiftsList'
 import IconAdd from '../../assets/images/svgs/icon_add.svg'
-import IconAddLight from '../../assets/images/svgs/icon_add_light.svg'
+import IconAddLight from '../../assets/images/svgs/icon_add_dark.svg'
 import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
 import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -522,7 +522,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
   },
   createGiftText: {
-    color: Colors.moreBlueText,
+    color: Colors.blueTextNew,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.3,
     fontFamily: Fonts.FiraSansMedium,

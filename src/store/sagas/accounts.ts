@@ -138,7 +138,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
+export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, encryptionType?: DeepLinkEncryptionType, generateShortLink?: boolean, secretPhrase?: string, secretPhraseHint?: string ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
@@ -170,21 +170,44 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
 
     Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
 
-    let deepLinkEncryptionOTP
-    if( shouldEncrypt ) {
-      deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
-      giftToSend.deepLinkConfig = {
-        encryptionType: DeepLinkEncryptionType.OTP,
-        encryptionKey: deepLinkEncryptionOTP,
-      }
-    } else {
-      giftToSend.deepLinkConfig = null // removes previous link config(if any)
+    let deepLinkEncryptionKey
+    switch ( encryptionType ) {
+        case DeepLinkEncryptionType.DEFAULT:
+          giftToSend.deepLinkConfig = null // removes previous link config(if any)
+          break
+
+        case DeepLinkEncryptionType.OTP:
+          deepLinkEncryptionKey = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+          giftToSend.deepLinkConfig = {
+            encryptionType: DeepLinkEncryptionType.OTP,
+            encryptionKey: deepLinkEncryptionKey,
+          }
+          break
+
+        case DeepLinkEncryptionType.LONG_OTP:
+          deepLinkEncryptionKey = TrustedContactsOperations.generateKey( 15 ).toUpperCase()
+          giftToSend.deepLinkConfig = {
+            encryptionType: DeepLinkEncryptionType.LONG_OTP,
+            encryptionKey: deepLinkEncryptionKey,
+          }
+          break
+
+        case DeepLinkEncryptionType.SECRET_PHRASE:
+          deepLinkEncryptionKey = secretPhrase
+          giftToSend.deepLinkConfig = {
+            encryptionType: DeepLinkEncryptionType.SECRET_PHRASE,
+            encryptionKey: deepLinkEncryptionKey,
+          }
+
+        default:
+          giftToSend.deepLinkConfig = null // removes previous link config(if any)
+          break
     }
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, shortLink } = await generateDeepLink( {
       deepLinkKind: DeepLinkKind.GIFT,
-      encryptionType: shouldEncrypt? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT,
-      encryptionKey: deepLinkEncryptionOTP,
+      encryptionType: encryptionType? encryptionType: DeepLinkEncryptionType.DEFAULT,
+      encryptionKey: deepLinkEncryptionKey,
       walletName: walletName,
       keysToEncrypt: encryptionKey,
       generateShortLink,
@@ -192,11 +215,13 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
         note,
-        themeId: giftToSend.themeId
+        themeId: giftToSend.themeId,
+        giftHint: secretPhraseHint
       }
     } )
+
     return {
-      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
+      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, deepLinkEncryptionOTP: deepLinkEncryptionKey, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )

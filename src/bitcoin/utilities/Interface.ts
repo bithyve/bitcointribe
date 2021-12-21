@@ -958,7 +958,9 @@ export enum DeepLinkEncryptionType {
   DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
   EMAIL = 'EMAIL',
-  OTP = 'OTP'
+  OTP = 'OTP',
+  LONG_OTP = 'LONG_OTP',
+  SECRET_PHRASE = 'SECRET_PHRASE'
 }
 
 export enum GiftThemeId {
