@@ -40,7 +40,9 @@ export default function SendGift( props ) {
   const giftId = props.navigation.getParam( 'giftId' )
   const note = props.navigation.getParam( 'note' )
   const giftLinkEncryptionType: DeepLinkEncryptionType = props.navigation.getParam( 'encryptionType' )
-  const contact = props.navigation.getParam( 'contact' )
+
+  const secretPhrase = props.navigation.getParam( 'secretPhrase' )
+  const secretPhraseHint = props.navigation.getParam( 'secretPhraseHint' )
   const senderEditedName = props.navigation.getParam( 'senderName' )
   const themeId = props.navigation.getParam( 'themeId' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
@@ -90,7 +92,7 @@ export default function SendGift( props ) {
     }
     giftToSend.sender.contactId = null
 
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, giftLinkEncryptionType, generateShortLink )
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, giftLinkEncryptionType, generateShortLink, secretPhrase, secretPhraseHint )
     setEncryptionKey( encryptionKey )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )

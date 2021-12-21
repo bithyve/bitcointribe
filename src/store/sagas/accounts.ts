@@ -138,7 +138,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, encryptionType?: DeepLinkEncryptionType, generateShortLink?: boolean ) {
+export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, encryptionType?: DeepLinkEncryptionType, generateShortLink?: boolean, secretPhrase?: string, secretPhraseHint?: string ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
@@ -192,6 +192,13 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
           }
           break
 
+        case DeepLinkEncryptionType.SECRET_PHRASE:
+          deepLinkEncryptionKey = secretPhrase
+          giftToSend.deepLinkConfig = {
+            encryptionType: DeepLinkEncryptionType.SECRET_PHRASE,
+            encryptionKey: deepLinkEncryptionKey,
+          }
+
         default:
           giftToSend.deepLinkConfig = null // removes previous link config(if any)
           break
@@ -208,9 +215,11 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
         note,
-        themeId: giftToSend.themeId
+        themeId: giftToSend.themeId,
+        giftHint: secretPhraseHint
       }
     } )
+
     return {
       updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, deepLinkEncryptionOTP: deepLinkEncryptionKey, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
     }
