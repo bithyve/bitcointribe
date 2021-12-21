@@ -70,9 +70,9 @@ let messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
 
 
-// function validateAllowedCharacters( answer: string ): boolean {
-//   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
-// }
+function validateAllowedCharacters( answer: string ): boolean {
+  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+}
 
 export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
   const { translations } = useContext( LocalizationContext )
@@ -257,12 +257,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     if ( answer && confirmAnswer && confirmAnswer != answer ) {
       setAnswerError( strings.Answersdonotmatch )
     }
-    // } else if (
-    //   validateAllowedCharacters( answer ) == false ||
-    //   validateAllowedCharacters( tempAns ) == false
-    // ) {
-    //   setAnswerError( strings.Answersmust )
-    // }
+    if( securityQue ) {
+      if (
+        validateAllowedCharacters( answer ) == false ||
+       validateAllowedCharacters( tempAns ) == false
+      ) {
+        setAnswerError( strings.Answersmust )
+      }
+    }
+
     else {
       setTimeout( () => {
         setAnswerError( '' )
