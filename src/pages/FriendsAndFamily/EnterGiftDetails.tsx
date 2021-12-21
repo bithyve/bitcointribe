@@ -109,9 +109,15 @@ const FNFIDENTIFICATIONDATA = [
 const GiftDetails = ( { navigation } ) => {
 
 
-  const renderItem = ( { item } ) => (
-    <SettingCard type={item.type} title={item.title} subTitle={item.subtitle} />
-  )
+  const renderItem = ( { item } ) => {
+    if( addfNf ){
+      if( item.type === AdvancedSetting.FNF_IDENTIFICATION )
+        return<SettingCard type={item.type} title={item.title} subTitle={item.subtitle} />
+    } else {
+      if( item.type !== AdvancedSetting.FNF_IDENTIFICATION )
+        return<SettingCard type={item.type} title={item.title} subTitle={item.subtitle} />
+    }
+  }
 
 
   const renderIdentificationItem = ( { item } ) => (
@@ -136,8 +142,11 @@ const GiftDetails = ( { navigation } ) => {
 
   const [ customSecretIdentificationModal, setCustomSecretIdentificationModal ] = useState( false )
 
-  const [ secretPhrase, setSecretPhrase ] = useState( true )
-  const [ confirmSecretPhrase, setconfirmSecretPhrase ] = useState( true )
+  const [ secretPhrase, setSecretPhrase ] = useState( '' )
+  const [ secretPhraseVisibility, setSecretPhraseVisibility ] = useState( true )
+  const [ confirmSecretPhrase, setConfirmSecretPhrase ] = useState( '' )
+  const [ confirmSecretPhraseVisibility, setconfirmSecretPhraseVisibility ] = useState( true )
+  const [ secretPhraseHint, setSecretPhraseHint ] = useState( '' )
   const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
 
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
@@ -202,6 +211,7 @@ const GiftDetails = ( { navigation } ) => {
           break
 
         case AdvancedSetting.CUSTOM_SECRET:
+          setEncryptionType( DeepLinkEncryptionType.SECRET_PHRASE )
           setCustomSecretIdentificationModal( true )
           break
 
@@ -438,10 +448,14 @@ const GiftDetails = ( { navigation } ) => {
           </View>
 
           <View style={styles.textInputContainer}>
-            <TextInput style={styles.textInput}  secureTextEntry={secretPhrase}/>
+            <TextInput style={styles.textInput}
+              secureTextEntry={secretPhraseVisibility}
+              onChangeText={( text ) => {
+                setSecretPhrase( text )
+              }}/>
             <TouchableWithoutFeedback
               onPress={() => {
-                setSecretPhrase( !secretPhrase )
+                setSecretPhraseVisibility( !secretPhraseVisibility )
               }}
             >
               <Feather
@@ -450,15 +464,20 @@ const GiftDetails = ( { navigation } ) => {
                 }}
                 size={15}
                 color={Colors.blue}
-                name={secretPhrase ? 'eye-off' : 'eye'}
+                name={secretPhraseVisibility ? 'eye-off' : 'eye'}
               />
             </TouchableWithoutFeedback>
           </View>
           <View style={styles.textInputContainer}>
-            <TextInput style={styles.textInput}  secureTextEntry={confirmSecretPhrase}/>
+            <TextInput style={styles.textInput}
+              secureTextEntry={confirmSecretPhraseVisibility}
+              onChangeText={( text ) => {
+                setConfirmSecretPhrase( text )
+              }}
+            />
             <TouchableWithoutFeedback
               onPress={() => {
-                setconfirmSecretPhrase( !confirmSecretPhrase )
+                setconfirmSecretPhraseVisibility( !confirmSecretPhraseVisibility )
               }}
             >
               <Feather
@@ -467,12 +486,17 @@ const GiftDetails = ( { navigation } ) => {
                 }}
                 size={15}
                 color={Colors.blue}
-                name={confirmSecretPhrase ? 'eye-off' : 'eye'}
+                name={confirmSecretPhraseVisibility ? 'eye-off' : 'eye'}
               />
             </TouchableWithoutFeedback>
           </View>
           <View style={styles.textInputContainer}>
-            <TextInput style={styles.textInput} placeholder="Add a hint" />
+            <TextInput style={styles.textInput}
+              placeholder="Add a hint"
+              onChangeText={( text ) => {
+                setSecretPhraseHint( text )
+              }}
+            />
           </View>
           <Text
             style={{
@@ -486,9 +510,23 @@ const GiftDetails = ( { navigation } ) => {
           </Text>
 
           <TouchableOpacity
-            style={styles.btnContainer}
+            style={{
+              ...styles.btnContainer, backgroundColor: ( secretPhrase && secretPhrase === confirmSecretPhrase )? Colors.blue: Colors.lightBlue
+            }}
+            disabled={!( secretPhrase && secretPhrase === confirmSecretPhrase )}
             onPress={() => {
-              console.log( '321' )
+              navigation.replace( 'SendGift', {
+                fromScreen: 'Gift',
+                giftId,
+                encryptionType,
+                note,
+                secretPhrase,
+                secretPhraseHint,
+                contact,
+                senderName: name,
+                themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+                setActiveTab: navigation.state.params.setActiveTab
+              } )
             }}
           >
             <Text style={styles.btnText}>Proceed</Text>

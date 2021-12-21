@@ -170,25 +170,25 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
 
     Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
 
-    let deepLinkEncryptionOTP
+    let deepLinkEncryptionKey
     switch ( encryptionType ) {
         case DeepLinkEncryptionType.DEFAULT:
           giftToSend.deepLinkConfig = null // removes previous link config(if any)
           break
 
         case DeepLinkEncryptionType.OTP:
-          deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+          deepLinkEncryptionKey = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
           giftToSend.deepLinkConfig = {
             encryptionType: DeepLinkEncryptionType.OTP,
-            encryptionKey: deepLinkEncryptionOTP,
+            encryptionKey: deepLinkEncryptionKey,
           }
           break
 
         case DeepLinkEncryptionType.LONG_OTP:
-          deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 15 ).toUpperCase()
+          deepLinkEncryptionKey = TrustedContactsOperations.generateKey( 15 ).toUpperCase()
           giftToSend.deepLinkConfig = {
             encryptionType: DeepLinkEncryptionType.LONG_OTP,
-            encryptionKey: deepLinkEncryptionOTP,
+            encryptionKey: deepLinkEncryptionKey,
           }
           break
 
@@ -200,7 +200,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     const { deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, shortLink } = await generateDeepLink( {
       deepLinkKind: DeepLinkKind.GIFT,
       encryptionType: encryptionType? encryptionType: DeepLinkEncryptionType.DEFAULT,
-      encryptionKey: deepLinkEncryptionOTP,
+      encryptionKey: deepLinkEncryptionKey,
       walletName: walletName,
       keysToEncrypt: encryptionKey,
       generateShortLink,
@@ -212,7 +212,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       }
     } )
     return {
-      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
+      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, deepLinkEncryptionOTP: deepLinkEncryptionKey, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )

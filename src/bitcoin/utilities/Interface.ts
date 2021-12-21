@@ -960,6 +960,7 @@ export enum DeepLinkEncryptionType {
   EMAIL = 'EMAIL',
   OTP = 'OTP',
   LONG_OTP = 'LONG_OTP',
+  SECRET_PHRASE = 'SECRET_PHRASE'
 }
 
 export enum GiftThemeId {
