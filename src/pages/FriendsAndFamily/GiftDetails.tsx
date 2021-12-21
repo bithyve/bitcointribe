@@ -83,7 +83,7 @@ const ADVANCEDSETTINGDATA = [
 ]
 
 
-const IDENTIFICATIONDATA = [
+const FNFIDENTIFICATIONDATA = [
   {
     id: '1',
     title: 'Confirm with phone number',
@@ -104,7 +104,7 @@ const GiftDetails = ( { navigation } ) => {
 
 
   const renderIdentificationItem = ( { item } ) => (
-    <IdentificationCard title={item.title} subtitle={item.subtitle} />
+    <IdentificationCard id={item.id} title={item.title} subtitle={item.subtitle} />
   )
 
   const dispatch = useDispatch()
@@ -125,6 +125,8 @@ const GiftDetails = ( { navigation } ) => {
   const [ advanceSettingsModal, setAdvanceSettingsModal ] = useState( false )
   const [ selectedAdvancedOptionId, setSelectedAdvancedOptionId ] = useState( '1' )
   const [ IdentificationModal, setIdentificationModal ] = useState( false )
+  const [ selectedFAndFId, setSelectedFAndFId ] = useState( '1' )
+
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
   const [ secretPhrase, setSecretPhrase ] = useState( true )
   const [ confirmSecretPhrase, setconfirmSecretPhrase ] = useState( true )
@@ -176,32 +178,48 @@ const GiftDetails = ( { navigation } ) => {
     }
   }
 
-  const IdentificationCard = ( { title, subtitle } ) => {
+  const IdentificationCard = ( { id, title, subtitle } ) => {
     return (
-      <View style={styles.cardContainer}>
-        <View style={styles.radioBtnContainer}>
-          <RadioButton
-            isChecked={false}
-            size={20}
-            color={Colors.lightBlue}
-            borderColor={Colors.borderColor}
-          />
-        </View>
-        <View>
-          <Text style={styles.identificationHeading}>{title}</Text>
-          <Text numberOfLines={2} style={styles.identificationDescription}>{subtitle}</Text>
-        </View>
+      <AppBottomSheetTouchableWrapper
+        onPress={() => {setSelectedFAndFId( id )}}>
 
-      </View>
+        <View style={styles.cardContainer}>
+          <View style={styles.radioBtnContainer}>
+            <RadioButton
+              isChecked={id === selectedFAndFId}
+              size={20}
+              color={Colors.lightBlue}
+              borderColor={Colors.borderColor}
+            />
+          </View>
+          <View>
+            <Text style={styles.identificationHeading}>{title}</Text>
+            <Text numberOfLines={2} style={styles.identificationDescription}>{subtitle}</Text>
+          </View>
+
+        </View>
+      </AppBottomSheetTouchableWrapper>
     )
+  }
+
+  const selectAdvancedOption = ( id: string ) => {
+    setSelectedAdvancedOptionId( id )
+    setAdvanceSettingsModal( false )
+
+    switch( id ){
+        case '2':
+          setIdentificationModal( true ) // selected F&F
+          break
+
+        case '5':
+          break
+    }
   }
 
   const SettingCard = ( { id, title, subTitle } ) => {
     return (
       <AppBottomSheetTouchableWrapper
-        onPress={() => {
-          setSelectedAdvancedOptionId( id )
-        }}>
+        onPress={() => {selectAdvancedOption( id )}}>
         <View style={styles.cardContainer}>
           <View style={styles.radioBtnContainer}>
             <RadioButton
@@ -209,7 +227,7 @@ const GiftDetails = ( { navigation } ) => {
               size={20}
               color={Colors.lightBlue}
               borderColor={Colors.borderColor}
-              onpress={() => {setSelectedAdvancedOptionId( id )}}
+              onpress={() => {selectAdvancedOption( id )}}
             />
           </View>
           <View>
@@ -345,7 +363,7 @@ const GiftDetails = ( { navigation } ) => {
             {'Options depending on what details you have available for the contact'}
           </Text>
 
-          <FlatList data={IDENTIFICATIONDATA} renderItem={renderIdentificationItem} keyExtractor={( item ) => item.id} />
+          <FlatList data={FNFIDENTIFICATIONDATA} renderItem={renderIdentificationItem} keyExtractor={( item ) => item.id} />
           <Text style={{
             ...styles.modalInfoText,
             paddingTop: 8,
