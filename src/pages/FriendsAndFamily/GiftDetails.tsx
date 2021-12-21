@@ -7,7 +7,10 @@ import {
   Text,
   StatusBar,
   ScrollView,
-  Alert
+  Alert,
+  FlatList,
+  TextInput,
+  TouchableWithoutFeedback
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -23,6 +26,7 @@ import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import {
   AccountType,
+  DeepLinkEncryptionType,
   Gift,
   GiftStatus,
   GiftType,
@@ -47,8 +51,14 @@ import ThemeList from './Theme'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import RadioButton from '../../components/RadioButton'
+import Feather from 'react-native-vector-icons/Feather'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+
 
 const GiftDetails = ( { navigation } ) => {
+
+
   const dispatch = useDispatch()
   const {
     title,
@@ -65,6 +75,7 @@ const GiftDetails = ( { navigation } ) => {
   } = navigation.state.params
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
+
   const currencyKind = useSelector(
     ( state ) => state.preferences.giftCurrencyKind,
   )
@@ -111,6 +122,10 @@ const GiftDetails = ( { navigation } ) => {
     }
   }
 
+
+ 
+
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -124,29 +139,29 @@ const GiftDetails = ( { navigation } ) => {
           backgroundColor={Colors.backgroundColor}
           barStyle="dark-content"
         />
-        <View
-          style={[
-            CommonStyles.headerContainer,
-            {
-              backgroundColor: Colors.backgroundColor,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              navigation.goBack()
-            }}
+        <View style={styles.advancedButton}>
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.backgroundColor,
+              },
+            ]}
           >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              {/* <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              /> */}
-              <LeftArrow/>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.goBack()
+              }}
+            >
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <LeftArrow/>
+              </View>
+
+            </TouchableOpacity>
+
+          </View>
+         
         </View>
         <View
           style={{
@@ -697,24 +712,27 @@ const styles = StyleSheet.create( {
   inputBox: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    backgroundColor: Colors.white,
+    width: wp( '85%' ),
+    height: 50,
+    paddingLeft: 15,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
   },
-  inputBoxFocused: {
-    borderWidth: 0.5,
-    borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 10,
-      height: 10,
-    },
-    backgroundColor: Colors.white,
-  },
+  // inputBoxFocused: {
+  //   borderWidth: 0.5,
+  //   borderRadius: 10,
+  //   marginLeft: 20,
+  //   marginRight: 20,
+  //   elevation: 10,
+  //   shadowColor: Colors.borderColor,
+  //   shadowOpacity: 10,
+  //   shadowOffset: {
+  //     width: 10,
+  //     height: 10,
+  //   },
+  //   backgroundColor: Colors.white,
+  // },
   accImage: {
     marginRight: wp( 4 ),
   },
@@ -748,6 +766,71 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
+  cardContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    backgroundColor:'#fff',
+    width:'80%',
+    alignSelf:'center',
+    padding:13,
+    borderRadius:8,
+    paddingHorizontal:20,
+    marginVertical:10,
+  },
+  identificationHeading:{
+    color:'#006DB4',
+    fontSize:13,
+    fontWeight:'400',
+    fontFamily: Fonts.FiraSansRegular,
+
+  },
+  identificationDescription:{
+    color:'#6C6C6C',
+    fontSize:11,
+    fontWeight:'400',
+    width:225,
+    fontFamily: Fonts.FiraSansRegular,
+
+  },
+  radioBtnContainer:{
+    marginRight:10
+  },
+  advancedButton: {
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width: '94%'
+  },
+  textInputContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width:'85%',
+    alignSelf:'center',
+    marginTop:10,
+    backgroundColor:'#fff',
+    padding:14,
+    borderRadius:10
+  },
+  textInput:{
+    width:'92%'
+  },
+  btnContainer:{
+    marginTop:10,
+    backgroundColor:'#006DB4',
+    width:100,
+    padding:14,
+    borderRadius:6,
+    marginLeft: 30,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  btnText: {
+    color: '#fff',
+    fontWeight:'500',
+    fontSize:15,
+    fontFamily: Fonts.FiraSansRegular
+  }
 } )
 
 export default GiftDetails
