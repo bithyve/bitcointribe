@@ -124,9 +124,9 @@ const GiftDetails = ( { navigation } ) => {
   const [ isOpen, setIsOpen ] = useState( false )
   const [ advanceSettingsModal, setAdvanceSettingsModal ] = useState( false )
   const [ selectedAdvancedOptionId, setSelectedAdvancedOptionId ] = useState( '1' )
-  const [ IdentificationModal, setIdentificationModal ] = useState( false )
+  const [ FnFIdentificationModal, setFnFIdentificationModal ] = useState( false )
   const [ selectedFAndFId, setSelectedFAndFId ] = useState( '1' )
-
+  const [ customSecretIdentificationModal, setCustomSecretIdentificationModal ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
   const [ secretPhrase, setSecretPhrase ] = useState( true )
   const [ confirmSecretPhrase, setconfirmSecretPhrase ] = useState( true )
@@ -208,10 +208,11 @@ const GiftDetails = ( { navigation } ) => {
 
     switch( id ){
         case '2':
-          setIdentificationModal( true ) // selected F&F
+          setFnFIdentificationModal( true ) // selected F&F
           break
 
         case '5':
+          setCustomSecretIdentificationModal( true )
           break
     }
   }
@@ -314,7 +315,7 @@ const GiftDetails = ( { navigation } ) => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            setIdentificationModal( false )
+            setFnFIdentificationModal( false )
           }}
           style={{
             width: wp( 7 ),
@@ -413,7 +414,7 @@ const GiftDetails = ( { navigation } ) => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            setIdentificationModal( false )
+            setCustomSecretIdentificationModal( false )
           }}
           style={{
             width: wp( 7 ),
@@ -551,7 +552,6 @@ const GiftDetails = ( { navigation } ) => {
             <TouchableOpacity
               onPress={() =>
                 setAdvanceSettingsModal( true )
-                // setIdentificationModal( true )
               }
               style={{
                 height: 30,
@@ -570,28 +570,31 @@ const GiftDetails = ( { navigation } ) => {
         </View>
 
         {advanceSettingsModal && <ModalContainer
-          closeBottomSheet={() => {}}
+          closeBottomSheet={() => setAdvanceSettingsModal( false )}
           visible={advanceSettingsModal}
           onBackground={()=>setAdvanceSettingsModal( false )}
         >
           {AdvancedSettingsModal()}
         </ModalContainer>}
 
-        {IdentificationModal && <ModalContainer
-          closeBottomSheet={() => {}}
-          visible={IdentificationModal}
-          onBackground={()=>setIdentificationModal( false )}
+        {FnFIdentificationModal && <ModalContainer
+          closeBottomSheet={() => setFnFIdentificationModal( false )}
+          visible={FnFIdentificationModal}
+          onBackground={()=>setFnFIdentificationModal( false )}
         >
           {FandFIndentificationModal()}
         </ModalContainer>}
-        {/*
-      {IdentificationModal && <ModalContainer
-        closeBottomSheet={() => {}}
-        visible={IdentificationModal}
-        onBackground={()=>setIdentificationModal( false )}
-        >
-          {SecretPhaseModal()}
-        </ModalContainer>} */}
+
+        {
+          customSecretIdentificationModal && <ModalContainer
+            closeBottomSheet={() => {
+              setCustomSecretIdentificationModal( false )
+            }}
+            visible={customSecretIdentificationModal}
+            onBackground={()=>{setCustomSecretIdentificationModal( false )}}
+          >
+            {SecretPhaseModal()}
+          </ModalContainer>}
         <View
           style={{
             flexDirection: 'row',
