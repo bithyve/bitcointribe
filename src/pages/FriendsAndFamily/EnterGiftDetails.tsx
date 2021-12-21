@@ -49,22 +49,22 @@ const ADVANCEDSETTINGDATA = [
   {
     id: '1',
     title: 'F&F Identification',
-    subtitle: 'Use a phone number or email ID stored in your contact details. The recipient needs to confirm their own details',
+    subtitle: 'Use contact\'s phone number or email ID',
   },
   {
     id: '2',
-    title: 'Simple OTP',
-    subtitle: 'A 6 digit OTP to be sent separately to the recipient. Good for reducing the chances of man-in-the-middle attack',
+    title: 'Simple OTP (6 digit)',
+    subtitle: 'Reduces the chances of man-in-the-middle attack',
   },
   {
     id: '3',
-    title: 'Long OTP',
-    subtitle: 'Unguessable long OTP to be sent tot he recipient separately. Improved security against server hacks and man-in-the-middle',
+    title: 'Long OTP (Unguessable)',
+    subtitle: 'Improved secuirty against server access/hack',
   },
   {
     id: '4',
     title: 'Custom Secret Phrase',
-    subtitle: 'Manually provide a passphrase with a hint that the recipient has to confirm',
+    subtitle: 'Manually enter a paraphrase with a hint',
   },
   {
     id: '5',
@@ -77,13 +77,13 @@ const ADVANCEDSETTINGDATA = [
 const FNFIDENTIFICATIONDATA = [
   {
     id: '1',
-    title: 'Confirm with phone number',
-    subtitle: 'The recipient will have to confirm their phone number <phone number> to accept the gift',
+    title: 'Phone Number',
+    subtitle: 'Confirm with contact\'s phone number',
   },
   {
     id: '2',
-    title: 'Confirm with email address',
-    subtitle: 'The recipient will have to confirm their email address <email address> to accept the gift',
+    title: 'Email Address',
+    subtitle: 'Confirm with contact\'s email address',
   },
 ];
 
@@ -245,15 +245,6 @@ const GiftDetails = ( { navigation } ) => {
               }}
             >
               <Text style={{ ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular }}>Add Second Factor</Text>
-              <Text
-                style={{
-                  ...styles.modalInfoText,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: 14,
-                }}
-              >
-                {'Add a second factor to your Gift Sats that is generated on the App. For identity Confirmation or Improving security'}
-              </Text>
             </View>
 
             <Text
@@ -265,7 +256,7 @@ const GiftDetails = ( { navigation } ) => {
                 fontSize: 14,
               }}
             >
-              {'The gift can be accessed without providing any second factor. Good for small gifts'}
+              {'For confirming identity or improving security'}
             </Text>
 
             <FlatList data={ADVANCEDSETTINGDATA} renderItem={renderItem} keyExtractor={(item) => item.id} />
@@ -275,8 +266,8 @@ const GiftDetails = ( { navigation } ) => {
               marginLeft: 30,
               fontFamily: Fonts.FiraSansRegular,
               fontSize: 14,
-              marginTop: 50
-            }}>The option selected above will be used to encrypt your Gift Sats. Don't use the medium/ app for communicating the 2nd factor that you use to send the gift link/QR</Text>
+              marginTop: 40
+            }}>Use a different medium/app for sending the 2nd factor.(Not the same as the gift link/QR)</Text>
           </View>
         </View>
       );
@@ -330,10 +321,10 @@ const GiftDetails = ( { navigation } ) => {
                 paddingTop: 8,
                 marginLeft: 30,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: 14,
+                fontSize: 12,
               }}
             >
-              {'Options depending on what details you have available for the contact'}
+              {'Use a phone number or email ID stored in your contact details. the recipient needs to confirm'}
             </Text>
 
             <FlatList data={FNFIDENTIFICATIONDATA} renderItem={renderIdentificationItem} keyExtractor={(item) => item.id} />
@@ -344,7 +335,7 @@ const GiftDetails = ( { navigation } ) => {
               fontFamily: Fonts.FiraSansRegular,
               fontSize: 14,
               marginTop: 50
-            }}>The recipient will be shown some characters of their phone number/ email that they need to confirm</Text>
+            }}>The option selected above will be used to encrypt your Gift Sats. Don't use the medium</Text>
           </View>
 
           <View style={{flexDirection:'row', alignItems: 'center'}}>
