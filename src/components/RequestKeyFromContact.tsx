@@ -101,7 +101,8 @@ function RequestKeyFromContact( props ) {
     props.onPressShare()
     props.navigation.navigate( 'SendViaLinkAndQR', {
       type, qrCode: props.QR, link: shareLink, ...props,
-      setActiveTab: props.navigation.state.params.setActiveTab
+      setActiveTab: props.navigation.state.params.setActiveTab, 
+      OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith
     } )
   }
   const setPhoneNumber = () => {
@@ -333,7 +334,7 @@ function RequestKeyFromContact( props ) {
           <Text style={{
             fontWeight: '600'
           }}>
-            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE? `secret ${props.encryptionKey} ` : `OTP ${props.encryptionKey} `}
+            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE? `secret ${props.encryptionKey} ` : `OTP `}
           </Text>
           while accepting the gift
         </Text>
