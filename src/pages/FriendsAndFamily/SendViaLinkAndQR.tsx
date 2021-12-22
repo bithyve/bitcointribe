@@ -33,6 +33,9 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import ModalContainer from '../../components/home/ModalContainer'
 import Fonts from '../../common/Fonts'
 import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
+import Clipboard from '@react-native-clipboard/clipboard'
+import Toast from '../../components/Toast'
+
 
 export default function SendViaLinkAndQR( props ) {
 
@@ -40,6 +43,8 @@ export default function SendViaLinkAndQR( props ) {
 
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
+  const common  = translations[ 'common' ]
+
   const type = props.navigation.getParam( 'type' )
   const qrCode = props.navigation.getParam( 'qrCode' )
   const link = props.navigation.getParam( 'link' )
@@ -92,6 +97,12 @@ export default function SendViaLinkAndQR( props ) {
     }
   }
 
+  const writeToClipboard = () => {
+    setOTPmodal(false);
+    Clipboard.setString(OTP )
+    Toast(common.copied)
+  }
+
   const shareOTPModal = () => {
     return (
       <View style={styles.modalContentContainer}>
@@ -142,7 +153,7 @@ export default function SendViaLinkAndQR( props ) {
             {'Touch to copy'}
           </Text>
              {OTP.length == '6' &&
-                <View style={styles.otpContainer}>
+                <TouchableOpacity style={styles.otpContainer} onPress={writeToClipboard}>
                     <View style={styles.otpBoxContainer}>
                       <Text style={styles.otpBoxText}>{shortOTP[0]}</Text>
                     </View>
@@ -161,12 +172,12 @@ export default function SendViaLinkAndQR( props ) {
                     <View style={styles.otpBoxContainer}>
                       <Text style={styles.otpBoxText}>{shortOTP[5]}</Text>
                     </View>
-              </View>
+              </TouchableOpacity>
              }
            {OTP.length > 6 && 
-            <View style={styles.otpInputFieldContainer}>
+            <TouchableOpacity onPress={writeToClipboard} style={styles.otpInputFieldContainer}>
               <Text style={styles.otpInput}>{OTP}</Text>
-          </View>
+          </TouchableOpacity>
           }
           <View>
           <Text
