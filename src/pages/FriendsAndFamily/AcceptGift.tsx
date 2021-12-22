@@ -729,9 +729,23 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             letterSpacing: 0.6,
             fontFamily: Fonts.FiraSansRegular,
             marginHorizontal: wp( 5 ),
-            marginTop: wp( 2 ),
+            marginVertical: wp( 2 ),
           }}>
             {`Hint: ${Buffer.from( hint, 'hex' ).toString( 'utf-8' )}`}
+          </Text>
+        }
+        {( inputType === DeepLinkEncryptionType.LONG_OTP
+        || inputType === DeepLinkEncryptionType.OTP
+        ) &&
+          <Text style={{
+            color: Colors.gray4,
+            fontSize: RFValue( 13 ),
+            letterSpacing: 0.6,
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp( 5 ),
+            marginVertical: wp( 2 ),
+          }}>
+            Enter OTP to accept
           </Text>
         }
         {/* {props.inputNotRequired ? null: ( */}
