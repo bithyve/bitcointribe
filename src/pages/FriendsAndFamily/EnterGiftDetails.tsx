@@ -450,6 +450,7 @@ const GiftDetails = ( { navigation } ) => {
           <View style={styles.textInputContainer}>
             <TextInput style={styles.textInput}
               secureTextEntry={secretPhraseVisibility}
+              placeholder='Enter a Secret Phrase'
               onChangeText={( text ) => {
                 setSecretPhrase( text )
               }}/>
@@ -471,6 +472,8 @@ const GiftDetails = ( { navigation } ) => {
           <View style={styles.textInputContainer}>
             <TextInput style={styles.textInput}
               secureTextEntry={confirmSecretPhraseVisibility}
+              placeholder='Confirm the Secret Phrase'
+
               onChangeText={( text ) => {
                 setConfirmSecretPhrase( text )
               }}
