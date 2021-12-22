@@ -138,7 +138,8 @@ export default function SendViaLinkAndQR( props ) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Share OTP
+              {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'Share phone' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'Share Email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE ? `Secret Phrase ` : `Share OTP `}
+              
             </Text>
           </View>
           <Text
