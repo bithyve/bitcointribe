@@ -21,8 +21,12 @@ import { withNavigation } from 'react-navigation'
 
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 
-function validateAllowedCharacters( answer: string ): boolean {
-  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+function validateAllowedCharacters( answer: string, type: string ): boolean {
+  if( type === 'password' ) {
+    return answer !== ''
+  } else {
+    return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+  }
 }
 
 function SecurityQuestion( props ) {
@@ -41,7 +45,7 @@ function SecurityQuestion( props ) {
   }
 
   useEffect( () => {
-    if ( !errorText && answer && validateAllowedCharacters( answer ) ) setIsDisabled( false )
+    if ( !errorText && answer && validateAllowedCharacters( answer, props.encryptionType ) ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ answer, errorText ] )
 
@@ -107,12 +111,12 @@ function SecurityQuestion( props ) {
                 }
                 // onFocus={() => props.onFocus()}
                 onBlur={() => {
-                  if ( validateAllowedCharacters( answer ) == false ) {
+                  if ( validateAllowedCharacters( answer, props.encryptionType ) == false ) {
                     setErrorText( 'Answer must contain lowercase characters(a-z) and digits (0-9)' )
                   }
                 }}
               />
-              {errorText ? (
+              {( errorText && props.encryptionType !== 'password' ) ? (
                 <Text
                   style={{
                     marginLeft: 'auto',
@@ -166,7 +170,7 @@ function SecurityQuestion( props ) {
                 ).then( () => {
                   props.onPressConfirm( answer )
                 } )
-              } else if ( validateAllowedCharacters( answer ) == false ) {
+              } else if ( validateAllowedCharacters( answer, props.encryptionType ) == false ) {
                 setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
               } else {
                 setErrorText( 'Answer is incorrect' )
