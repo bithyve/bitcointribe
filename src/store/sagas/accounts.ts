@@ -153,6 +153,9 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
     giftToSend.themeId = themeId
+
+    let previousChannelAddress
+    if( giftToSend.channelAddress ) previousChannelAddress = giftToSend.channelAddress // gift is being resent
     giftToSend.channelAddress = giftToSend.id.slice( 0, 10 ) + Math.floor( Math.random() * 10e4 )
 
     const giftMetaData: GiftMetaData = {
@@ -168,7 +171,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       }
     }
 
-    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
+    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData, previousChannelAddress ) // non-awaited upload
 
     let deepLinkEncryptionKey
     switch ( encryptionType ) {
