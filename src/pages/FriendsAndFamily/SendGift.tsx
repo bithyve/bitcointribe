@@ -157,7 +157,7 @@ export default function SendGift( props ) {
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
-        encryptLinkWith={encryptionOTP? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT}
+        encryptLinkWith={giftLinkEncryptionType}
         encryptionKey={encryptionOTP}
         themeId={themeId}
         senderName={senderEditedName}

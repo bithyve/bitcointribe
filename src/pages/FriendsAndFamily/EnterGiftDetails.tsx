@@ -159,8 +159,11 @@ const GiftDetails = ( { navigation } ) => {
 
   useEffect( () => {
     setDropdownBoxList( ThemeList )
-    setName( wallet.walletName )
-  }, [] )
+    }, [] )
+    
+    useEffect( () => {
+    setName( wallet.userName? wallet.userName: wallet.walletName )
+    }, [ wallet.walletName, wallet.userName ] )
 
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
@@ -450,6 +453,7 @@ const GiftDetails = ( { navigation } ) => {
           <View style={styles.textInputContainer}>
             <TextInput style={styles.textInput}
               secureTextEntry={secretPhraseVisibility}
+              placeholder='Enter a Secret Phrase'
               onChangeText={( text ) => {
                 setSecretPhrase( text )
               }}/>
@@ -471,6 +475,8 @@ const GiftDetails = ( { navigation } ) => {
           <View style={styles.textInputContainer}>
             <TextInput style={styles.textInput}
               secureTextEntry={confirmSecretPhraseVisibility}
+              placeholder='Confirm the Secret Phrase'
+
               onChangeText={( text ) => {
                 setConfirmSecretPhrase( text )
               }}
@@ -626,13 +632,14 @@ const GiftDetails = ( { navigation } ) => {
               onPress={() =>
                 setAdvanceSettingsModal( true )
               }
+              disabled={addfNf}
               style={{
                 height: 30,
                 width: 100,
                 justifyContent: 'center',
                 alignItems: 'center',
                 borderRadius: 8,
-                backgroundColor: Colors.blue,
+                backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
               }}
             >
               <Text style={{

@@ -237,7 +237,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     } else if ( inputType === DeepLinkEncryptionType.OTP ){
       return (
         <View style={{
-          flexDirection: 'row', marginBottom: wp( '5%' )
+          flexDirection: 'row', marginBottom: wp( '5%' ), justifyContent: 'space-evenly'
         }}>
           {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
             return (
@@ -249,6 +249,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
+                placeholder="-"
                 ref={( input ) => {
                   if ( i == 0 ) this.textInput = input
                   if ( i == 1 ) this.textInput2 = input
@@ -348,8 +349,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               setPasscode( text )
               setIsDisabled( false ) // TODO: place validation and then enable accept button
             }}
+            placeholder={inputType === DeepLinkEncryptionType.LONG_OTP ? 'Enter OTP' : 'Enter answer'}
             style={{
-              flex: 1, fontSize: RFValue( 13 )
+              flex: 1, fontSize: RFValue( 14 )
             }}
             onFocus={() => {
               if ( Platform.OS === 'ios' ) {
@@ -723,22 +725,41 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         {inputType === DeepLinkEncryptionType.SECRET_PHRASE && hint &&
           <Text style={{
             color: Colors.gray4,
-            fontSize: RFValue( 12 ),
+            fontSize: RFValue( 13 ),
             letterSpacing: 0.6,
             fontFamily: Fonts.FiraSansRegular,
-            marginHorizontal: wp( 5 )
+            marginHorizontal: wp( 5 ),
+            marginVertical: wp( 2 ),
           }}>
-            {Buffer.from( hint, 'base64' ).toString( 'utf-8' )}
+            {`Hint: ${Buffer.from( hint, 'hex' ).toString( 'utf-8' )}`}
+          </Text>
+        }
+        {( inputType === DeepLinkEncryptionType.LONG_OTP
+        || inputType === DeepLinkEncryptionType.OTP
+        ) &&
+          <Text style={{
+            color: Colors.gray4,
+            fontSize: RFValue( 13 ),
+            letterSpacing: 0.6,
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp( 5 ),
+            marginVertical: wp( 2 ),
+          }}>
+            Enter OTP to accept
           </Text>
         }
         {/* {props.inputNotRequired ? null: ( */}
         <View style={{
-          marginLeft: wp( '8%' ), marginRight: wp( '8%' )
+          marginHorizontal: wp( 5 )
         }}>
           <View style={{
-            flexDirection: 'row'
+            flexDirection: 'row', backgroundColor: 'red'
           }}>
-            <Text style={styles.inputErrorText}>{WrongInputError}</Text>
+            {
+              WrongInputError !== '' && (
+                <Text style={styles.inputErrorText}>{WrongInputError}</Text>
+              )
+            }
           </View>
           {getInputBox()}
         </View>
@@ -904,13 +925,14 @@ const styles = StyleSheet.create( {
   },
   textboxView: {
     flexDirection: 'row',
-    paddingLeft: 15,
+    paddingLeft: 5,
     height: 50,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: Colors.borderColor,
     marginBottom: wp( '5%' ),
     alignItems: 'center',
+    marginTop: 10,
   },
   countryCodeText: {
     fontFamily: Fonts.FiraSansRegular,
