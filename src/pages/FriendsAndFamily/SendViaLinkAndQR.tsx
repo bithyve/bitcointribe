@@ -39,7 +39,7 @@ import Toast from '../../components/Toast'
 
 export default function SendViaLinkAndQR( props ) {
 
-  const [OTPmodal, setOTPmodal] = useState(false)
+  const [ OTPmodal, setOTPmodal ] = useState( false )
 
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
@@ -52,9 +52,9 @@ export default function SendViaLinkAndQR( props ) {
   const senderName = props.navigation.getParam( 'senderName' )
   const themeId = props.navigation.getParam( 'themeId' )
   const giftNote = props.navigation.getParam( 'giftNote' )
-  const OTP =  props.navigation.state.params.OTP;
-  const encryptLinkWith =  props.navigation.state.params.encryptLinkWith;
-  const shortOTP = OTP && OTP.split('');
+  const OTP =  props.navigation.state.params.OTP
+  const encryptLinkWith =  props.navigation.state.params.encryptLinkWith
+  const shortOTP = OTP && OTP.split( '' )
 
   const viewRef = useRef( null )
 
@@ -98,9 +98,9 @@ export default function SendViaLinkAndQR( props ) {
   }
 
   const writeToClipboard = () => {
-    setOTPmodal(false);
-    Clipboard.setString(OTP )
-    Toast(common.copied)
+    setOTPmodal( false )
+    Clipboard.setString( OTP )
+    Toast( common.copied )
   }
 
   const shareOTPModal = () => {
@@ -109,18 +109,18 @@ export default function SendViaLinkAndQR( props ) {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            setOTPmodal(false);
+            setOTPmodal( false )
           }}
           style={{
-            width: wp(7),
-            height: wp(7),
-            borderRadius: wp(7 / 2),
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.lightBlue,
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: wp(3),
-            marginRight: wp(3),
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19} />
@@ -128,7 +128,7 @@ export default function SendViaLinkAndQR( props ) {
         <View>
           <View
             style={{
-              marginLeft: wp(7),
+              marginLeft: wp( 7 ),
             }}
           >
             <Text
@@ -138,8 +138,8 @@ export default function SendViaLinkAndQR( props ) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'Share phone' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'Share Email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE ? `Secret Phrase ` : `Share OTP `}
-              
+              {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'Share phone' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'Share Email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE ? 'Secret Phrase ' : 'Share OTP '}
+
             </Text>
           </View>
           <Text
@@ -153,45 +153,45 @@ export default function SendViaLinkAndQR( props ) {
           >
             {'Touch to copy'}
           </Text>
-             {OTP.length == '6' &&
+          {OTP.length == '6' &&
                 <TouchableOpacity style={styles.otpContainer} onPress={writeToClipboard}>
-                    <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>{shortOTP[0]}</Text>
-                    </View>
-                    <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>{shortOTP[1]}</Text>
-                    </View>
-                    <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>{shortOTP[2]}</Text>
-                    </View>
-                    <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>{shortOTP[3]}</Text>
-                    </View>
-                    <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>{shortOTP[4]}</Text>
-                    </View>
-                    <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>{shortOTP[5]}</Text>
-                    </View>
-              </TouchableOpacity>
-             }
-           {OTP.length > 6 && 
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 0 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 1 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 2 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 3 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 4 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 5 ]}</Text>
+                  </View>
+                </TouchableOpacity>
+          }
+          {OTP.length > 6 &&
             <TouchableOpacity onPress={writeToClipboard} style={styles.otpInputFieldContainer}>
               <Text style={styles.otpInput}>{OTP}</Text>
-          </TouchableOpacity>
+            </TouchableOpacity>
           }
           <View>
-          <Text
-            style={{
-              margin: 10,
-              marginLeft: 35,
-              color: '#6C6C6C',
-              width:'85%',
-              fontFamily: Fonts.FiraSansRegular
-            }}
-          >
+            <Text
+              style={{
+                margin: 10,
+                marginLeft: 35,
+                color: '#6C6C6C',
+                width:'85%',
+                fontFamily: Fonts.FiraSansRegular
+              }}
+            >
               Use a medium/ app different to that used for sending the gift
-          </Text>
+            </Text>
 
           </View>
 
@@ -200,12 +200,12 @@ export default function SendViaLinkAndQR( props ) {
               ...styles.btnContainer,
             }}
             onPress={() => {
-              props.navigation.pop(3)
+              props.navigation.pop( 3 )
               try {
-                if (props.navigation.state.params.setActiveTab) {
-                  props.navigation.state.params.setActiveTab('SENT')
+                if ( props.navigation.state.params.setActiveTab ) {
+                  props.navigation.state.params.setActiveTab( 'SENT' )
                 }
-              } catch (error) {
+              } catch ( error ) {
                 //
               }
             }}
@@ -214,7 +214,7 @@ export default function SendViaLinkAndQR( props ) {
           </TouchableOpacity>
         </View>
       </View>
-    );
+    )
 
   }
 
@@ -386,10 +386,24 @@ export default function SendViaLinkAndQR( props ) {
         />
       </ViewShot>
 
+
+      <Text style={{
+        color: Colors.lightTextColor,
+        fontSize: RFValue( 14 ),
+        fontFamily: Fonts.FiraSansRegular,
+        // fontWeight: '700',
+        letterSpacing: 0.01,
+        lineHeight: 18,
+        marginHorizontal: wp( 8 ),
+        marginVertical: 10
+      }}>
+        Once you have shared the QR/link, you can view the OTP
+      </Text>
+
       <AppBottomSheetTouchableWrapper
         onPress={() => {
-          OTP && DeepLinkEncryptionType.SECRET_PHRASE !==  encryptLinkWith ? (setOTPmodal(true)) : 
-          props.navigation.pop( 3 )
+          OTP && DeepLinkEncryptionType.SECRET_PHRASE !==  encryptLinkWith ? ( setOTPmodal( true ) ) :
+            props.navigation.pop( 3 )
           try {
             if( props.navigation.state.params.setActiveTab ) {
               props.navigation.state.params.setActiveTab( 'SENT' )
@@ -405,13 +419,13 @@ export default function SendViaLinkAndQR( props ) {
                Colors.blue
         }}
       >
-        <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
+        <Text style={styles.proceedButtonText}>{OTP ? 'Show OTP' : 'Yes, I have shared'}</Text>
       </AppBottomSheetTouchableWrapper>
       {OTPmodal &&
       <ModalContainer
-      closeBottomSheet={() => setOTPmodal( false )}
-      visible={OTPmodal}
-      onBackground={()=>setOTPmodal( false )}
+        closeBottomSheet={() => setOTPmodal( false )}
+        visible={OTPmodal}
+        onBackground={()=>setOTPmodal( false )}
       >
         {shareOTPModal()}
       </ModalContainer>}
@@ -511,9 +525,9 @@ const styles = StyleSheet.create( {
     borderRadius:10
   },
   otpBoxText:{
-   fontSize:26,
-   color:'#000',
-   fontWeight:'400'
+    fontSize:26,
+    color:'#000',
+    fontWeight:'400'
   },
   otpInput:{
     letterSpacing:7,
