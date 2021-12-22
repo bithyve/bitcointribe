@@ -363,7 +363,16 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
       case DeepLinkEncryptionType.NUMBER:
       case DeepLinkEncryptionType.EMAIL:
       case DeepLinkEncryptionType.OTP:
+      case DeepLinkEncryptionType.LONG_OTP:
         encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
+        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+          keysToEncrypt,
+          encryptionKey
+        )
+        break
+
+      case DeepLinkEncryptionType.SECRET_PHRASE:
+        encryptionHint = `${Buffer.from( extraData.giftHint ).toString( 'hex' )}`
         encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
           keysToEncrypt,
           encryptionKey
@@ -376,8 +385,9 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
   let deepLink: string
   if( extraData?.note ) {
     //extraData.note=  extraData.note.replace( / /g, '%20' )
-    extraData.note=`${Buffer.from( extraData.note ).toString( 'base64' )}`
+    extraData.note=`${Buffer.from( extraData.note ).toString( 'hex' )}`
   }
+
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
@@ -395,6 +405,8 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         domain = ShortLinkDomain.CONTACT
       } else if( deepLinkKind === DeepLinkKind.GIFT ||  deepLinkKind === DeepLinkKind.CONTACT_GIFT ) {
         domain = ShortLinkDomain.GIFT
+      } else if( deepLinkKind === DeepLinkKind.KEEPER || deepLinkKind === DeepLinkKind.PRIMARY_KEEPER || deepLinkKind === DeepLinkKind.RECIPROCAL_KEEPER ) {
+        domain = ShortLinkDomain.CONTACT
       } else {
         domain = ShortLinkDomain.DEFAULT
       }

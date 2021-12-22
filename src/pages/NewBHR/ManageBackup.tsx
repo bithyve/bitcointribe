@@ -206,17 +206,19 @@ export default function ManageBackup( props ) {
 
   useEffect( ()=>{
     autoCloudUpload()
-    if (
-      levelHealth.length > 0 &&
-      levelHealth.length == 1 &&
-      cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true &&
-      levelHealth.length &&
-      levelHealth[ 0 ].levelInfo.length &&
-      levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' &&
-      levelHealth[ 0 ].levelInfo[ 1 ].updatedAt == 0
-    ) {
-      dispatch( setCloudData() )
+    if( Platform.OS === 'ios' ) {
+      if (
+        levelHealth.length > 0 &&
+        levelHealth.length == 1 &&
+        cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+        cloudPermissionGranted === true &&
+        levelHealth.length &&
+        levelHealth[ 0 ].levelInfo.length &&
+        levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' &&
+        levelHealth[ 0 ].levelInfo[ 1 ].updatedAt == 0
+      ) {
+        dispatch( setCloudData() )
+      }
     }
 
     if (
