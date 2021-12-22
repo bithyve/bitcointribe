@@ -1334,10 +1334,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       >
         {renderLoaderModalContent()}
       </ModalContainer>
-      <ModalContainer onBackground={()=>showSecurityQue( false )} visible={securityQue} closeBottomSheet={null} >
+      <ModalContainer onBackground={()=>showSecurityQue( false )} visible={securityQue} closeBottomSheet={()=>showSecurityQue( false )} >
         {renderSecurityQuestion()}
       </ModalContainer>
-      <ModalContainer onBackground={()=>{showEncryptionPswd( false )}} visible={encryptionPswd} closeBottomSheet={null} >
+      <ModalContainer onBackground={()=>{showEncryptionPswd( false )}} visible={encryptionPswd} closeBottomSheet={()=>{showEncryptionPswd( false )}} >
         {renderEncryptionPswd()}
       </ModalContainer>
     </View>

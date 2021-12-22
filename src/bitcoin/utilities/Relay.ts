@@ -358,7 +358,7 @@ export default class Relay {
     }
   };
 
-  public static updateGiftChannel = async ( encryptionKey: string, gift: Gift, metaData: GiftMetaData ): Promise<{
+  public static updateGiftChannel = async ( encryptionKey: string, gift: Gift, metaData: GiftMetaData, previousChannelAddress?: string ): Promise<{
     updated: boolean;
   }> => {
     try {
@@ -370,7 +370,8 @@ export default class Relay {
           HEXA_ID,
           channelAddress: gift.channelAddress,
           encryptedGift,
-          metaData
+          metaData,
+          previousChannelAddress,
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )

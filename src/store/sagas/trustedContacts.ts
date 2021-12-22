@@ -336,7 +336,10 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
   if( giftMetaData.status !== gift.status ){
     gift.status = giftMetaData.status
 
-    if( giftMetaData.status === GiftStatus.RECLAIMED ) gift.timestamps.reclaimed = Date.now()
+    if( giftMetaData.status === GiftStatus.RECLAIMED ) {
+      gift.timestamps.reclaimed = Date.now()
+      gift.channelAddress = null
+    }
     else if ( giftMetaData.status === GiftStatus.ACCEPTED ) gift.timestamps.accepted = Date.now()
 
     yield put( updateGift( gift ) )

@@ -332,7 +332,7 @@ const CreateGift = ( { navigation } ) => {
           />
 
         </View>
-        <View style={{
+        {/* <View style={{
           marginBottom: hp( 4 ),
           marginHorizontal: wp( 7 ),
           flexDirection: 'row'
@@ -361,7 +361,7 @@ const CreateGift = ( { navigation } ) => {
           Add recipient to Friends and Family
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={{
           marginLeft: wp( 4 ), flexDirection: 'row'
         }}>
