@@ -32,6 +32,7 @@ import ThemeList from './Theme'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ModalContainer from '../../components/home/ModalContainer'
 import Fonts from '../../common/Fonts'
+import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
 
 export default function SendViaLinkAndQR( props ) {
 
@@ -47,6 +48,9 @@ export default function SendViaLinkAndQR( props ) {
   const themeId = props.navigation.getParam( 'themeId' )
   const giftNote = props.navigation.getParam( 'giftNote' )
   const OTP =  props.navigation.state.params.OTP;
+  const encryptLinkWith =  props.navigation.state.params.encryptLinkWith;
+  const shortOTP = OTP && OTP.split('');
+
   const viewRef = useRef( null )
 
   useEffect( () => {
@@ -140,22 +144,22 @@ export default function SendViaLinkAndQR( props ) {
              {OTP.length == '6' &&
                 <View style={styles.otpContainer}>
                     <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>1</Text>
+                      <Text style={styles.otpBoxText}>{shortOTP[0]}</Text>
                     </View>
                     <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>1</Text>
+                      <Text style={styles.otpBoxText}>{shortOTP[1]}</Text>
                     </View>
                     <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>1</Text>
+                      <Text style={styles.otpBoxText}>{shortOTP[2]}</Text>
                     </View>
                     <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>1</Text>
+                      <Text style={styles.otpBoxText}>{shortOTP[3]}</Text>
                     </View>
                     <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>1</Text>
+                      <Text style={styles.otpBoxText}>{shortOTP[4]}</Text>
                     </View>
                     <View style={styles.otpBoxContainer}>
-                      <Text style={styles.otpBoxText}>1</Text>
+                      <Text style={styles.otpBoxText}>{shortOTP[5]}</Text>
                     </View>
               </View>
              }
@@ -184,7 +188,14 @@ export default function SendViaLinkAndQR( props ) {
               ...styles.btnContainer,
             }}
             onPress={() => {
-              console.log('123')
+              props.navigation.pop(3)
+              try {
+                if (props.navigation.state.params.setActiveTab) {
+                  props.navigation.state.params.setActiveTab('SENT')
+                }
+              } catch (error) {
+                //
+              }
             }}
           >
             <Text style={styles.btnText}>Proceed</Text>
@@ -232,9 +243,7 @@ export default function SendViaLinkAndQR( props ) {
     } )
   }
 
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  }
+
   const getTheme = () => {
     // props.themeId
     const filteredArr = ThemeList.filter( ( item => item.id === themeId ) )
@@ -367,15 +376,15 @@ export default function SendViaLinkAndQR( props ) {
 
       <AppBottomSheetTouchableWrapper
         onPress={() => {
-          setOTPmodal(true)
-          // props.navigation.pop( 3 )
-          // try {
-          //   if( props.navigation.state.params.setActiveTab ) {
-          //     props.navigation.state.params.setActiveTab( 'SENT' )
-          //   }
-          // } catch ( error ) {
-          //   //
-          // }
+          OTP && DeepLinkEncryptionType.SECRET_PHRASE !==  encryptLinkWith ? (setOTPmodal(true)) : 
+          props.navigation.pop( 3 )
+          try {
+            if( props.navigation.state.params.setActiveTab ) {
+              props.navigation.state.params.setActiveTab( 'SENT' )
+            }
+          } catch ( error ) {
+            //
+          }
         }}
         style={{
           ...styles.proceedButtonView,
@@ -386,14 +395,14 @@ export default function SendViaLinkAndQR( props ) {
       >
         <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
       </AppBottomSheetTouchableWrapper>
-      {OTPmodal && <ModalContainer
+      {OTPmodal &&
+      <ModalContainer
       closeBottomSheet={() => setOTPmodal( false )}
       visible={OTPmodal}
       onBackground={()=>setOTPmodal( false )}
       >
         {shareOTPModal()}
-      </ModalContainer>
-      }
+      </ModalContainer>}
       {/* <RequestKeyFromContact
         isModal={false}
         headerText={'Send Gift'}

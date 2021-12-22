@@ -102,7 +102,7 @@ function RequestKeyFromContact( props ) {
     props.navigation.navigate( 'SendViaLinkAndQR', {
       type, qrCode: props.QR, link: shareLink, ...props,
       setActiveTab: props.navigation.state.params.setActiveTab, 
-      OTP: props.encryptionKey,
+      OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith
     } )
   }
   const setPhoneNumber = () => {
