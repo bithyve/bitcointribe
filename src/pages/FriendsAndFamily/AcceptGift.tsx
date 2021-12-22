@@ -745,9 +745,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             marginHorizontal: wp( 5 ),
             marginVertical: wp( 2 ),
           }}>
-            {
-
-            }
             Enter OTP to accept
           </Text>
         }
