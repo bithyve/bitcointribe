@@ -626,13 +626,14 @@ const GiftDetails = ( { navigation } ) => {
               onPress={() =>
                 setAdvanceSettingsModal( true )
               }
+              disabled={addfNf}
               style={{
                 height: 30,
                 width: 100,
                 justifyContent: 'center',
                 alignItems: 'center',
                 borderRadius: 8,
-                backgroundColor: Colors.blue,
+                backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
               }}
             >
               <Text style={{
