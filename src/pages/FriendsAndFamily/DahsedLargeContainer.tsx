@@ -100,9 +100,7 @@ const DashedLargeContainer = ( props ) => {
         <View style={{
           flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between',
         }}>
-          <View style={{
-            width: 370
-          }}>
+          <View>
             <Text style={{
               color: Colors.black,
               fontSize: RFValue( 14 ),
