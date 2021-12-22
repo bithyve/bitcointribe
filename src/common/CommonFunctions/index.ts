@@ -372,7 +372,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         break
 
       case DeepLinkEncryptionType.SECRET_PHRASE:
-        encryptionHint = `${Buffer.from( extraData.giftHint ).toString( 'base64' )}`
+        encryptionHint = `${Buffer.from( extraData.giftHint ).toString( 'hex' )}`
         encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
           keysToEncrypt,
           encryptionKey
@@ -385,7 +385,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
   let deepLink: string
   if( extraData?.note ) {
     //extraData.note=  extraData.note.replace( / /g, '%20' )
-    extraData.note=`${Buffer.from( extraData.note ).toString( 'base64' )}`
+    extraData.note=`${Buffer.from( extraData.note ).toString( 'hex' )}`
   }
 
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){

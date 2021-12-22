@@ -53,7 +53,7 @@ const DashedLargeContainer = ( props ) => {
   const getText = text => {
     try {
       if( semver.gte( props.version, '2.0.66' ) ){
-        return Buffer.from( text, 'base64' ).toString( 'utf-8' )
+        return Buffer.from( text, 'hex' ).toString( 'utf-8' )
       } else {
         return text.replace( /%20/g, ' ' )
       }

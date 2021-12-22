@@ -731,7 +731,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             marginHorizontal: wp( 5 ),
             marginTop: wp( 2 ),
           }}>
-            {`Hint: ${Buffer.from( hint, 'base64' ).toString( 'utf-8' )}`}
+            {`Hint: ${Buffer.from( hint, 'hex' ).toString( 'utf-8' )}`}
           </Text>
         }
         {/* {props.inputNotRequired ? null: ( */}

@@ -333,7 +333,7 @@ function RequestKeyFromContact( props ) {
           <Text style={{
             fontWeight: '600'
           }}>
-            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
+            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE? `secret ${props.encryptionKey} ` : `OTP ${props.encryptionKey} `}
           </Text>
           while accepting the gift
         </Text>
