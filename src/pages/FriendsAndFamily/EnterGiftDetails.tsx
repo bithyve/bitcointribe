@@ -159,8 +159,11 @@ const GiftDetails = ( { navigation } ) => {
 
   useEffect( () => {
     setDropdownBoxList( ThemeList )
-    setName( wallet.walletName )
-  }, [] )
+    }, [] )
+    
+    useEffect( () => {
+    setName( wallet.userName? wallet.userName: wallet.walletName )
+    }, [ wallet.walletName, wallet.userName ] )
 
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
