@@ -30,6 +30,7 @@ import {
   Gift,
   GiftStatus,
   GiftType,
+  TrustedContact,
 } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -62,17 +63,20 @@ const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
   const {
     title,
-    walletName,
+    contactName,
+    contact,
     gift,
     avatar,
     contactDetails,
   }: {
     title: string;
-    walletName: string;
+    contactName: string;
+    contact: TrustedContact,
     gift: Gift;
     avatar: boolean;
     contactDetails: any;
   } = navigation.state.params
+
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
 
@@ -86,6 +90,8 @@ const GiftDetails = ( { navigation } ) => {
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
+
+  const deepLinkConfig = contact? contact.deepLinkConfig: gift.deepLinkConfig ? gift.deepLinkConfig: null
 
   useEffect( ()=> {
     if( gift.status === GiftStatus.SENT ) setIsOpen( true )
@@ -123,9 +129,6 @@ const GiftDetails = ( { navigation } ) => {
   }
 
 
- 
-
-
   return (
     <ScrollView
       contentContainerStyle={{
@@ -161,7 +164,7 @@ const GiftDetails = ( { navigation } ) => {
             </TouchableOpacity>
 
           </View>
-         
+
         </View>
         <View
           style={{
@@ -245,7 +248,7 @@ const GiftDetails = ( { navigation } ) => {
                   flexDirection: 'row',
                 }}
               >
-                {avatar && walletName && contactDetails ? (
+                {avatar && contactName && contactDetails ? (
                   <View style={styles.avatarContainer}>
                     <RecipientAvatar
                       recipient={contactDetails}
@@ -269,7 +272,7 @@ const GiftDetails = ( { navigation } ) => {
                       fontWeight: '600',
                     }}
                   >
-                    {walletName ? walletName : 'From Checking Account'}
+                    {contactName ? contactName : 'From Checking Account'}
                   </Text>
                   {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
@@ -310,10 +313,10 @@ const GiftDetails = ( { navigation } ) => {
                 ) : null}
               </View>
             </View>
-            {isOpen &&
+            {/* {isOpen &&
             gift.status !== GiftStatus.CREATED &&
             gift.type === GiftType.SENT &&
-            gift?.deepLinkConfig?.encryptionType === 'OTP' && (
+            deepLinkConfig?.encryptionType === DeepLinkEncryptionType.OTP && (
               <View
                 style={{
                   marginHorizontal: wp( 1 ),
@@ -336,7 +339,7 @@ const GiftDetails = ( { navigation } ) => {
                     marginVertical: hp( 2 ),
                   }}
                 >
-                  {gift?.deepLinkConfig?.encryptionKey
+                  {deepLinkConfig?.encryptionKey
                     .split( '' )
                     .map( ( num, index ) => {
                       return (
@@ -362,10 +365,10 @@ const GiftDetails = ( { navigation } ) => {
                     } )}
                 </View>
               </View>
-            )}
+            )} */}
             {isOpen &&
             gift.status !== GiftStatus.CREATED &&
-            gift.type === GiftType.SENT &&
+            gift.type === GiftType.SENT && gift.note &&
             gift.note !== '' && (
               <View
                 style={{
@@ -409,6 +412,37 @@ const GiftDetails = ( { navigation } ) => {
             )}
           </View>
         </TouchableOpacity>
+
+        <View style={{
+          backgroundColor: Colors.backgroundColor,
+          paddingBottom: hp( 4 ),
+          marginTop: 10
+        }}>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text
+              style={{
+                ...styles.modalTitleText,
+                fontSize: 14,
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Second Factor used for encryption
+            </Text>
+          </View>
+          <View
+            style={styles.deepLinkEncryptionTextContainer}
+            >
+              <Text style={styles.deepLinkEncryptionText}>
+                {deepLinkConfig?.encryptionKey}
+              </Text>
+          </View>
+        </View>
+      </View>
         <View
           style={{
             marginVertical: hp( 2 ),
@@ -830,6 +864,24 @@ const styles = StyleSheet.create( {
     fontWeight:'500',
     fontSize:15,
     fontFamily: Fonts.FiraSansRegular
+  },
+  deepLinkEncryptionText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: wp( 10 ),
+    justifyContent:'center',
+    textAlign: 'center',
+    letterSpacing: 8
+  },
+  deepLinkEncryptionTextContainer: {
+    width: wp( '80%' ),
+    borderRadius: wp( 2 ),
+    paddingVertical: hp( 1.5 ),
+    marginTop: hp( 1 ),
+    marginLeft: 40,
+    backgroundColor: Colors.gray7,
+    paddingHorizontal: hp( 1.5 ),
   }
 } )
 
