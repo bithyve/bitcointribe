@@ -201,6 +201,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
             encryptionType: DeepLinkEncryptionType.SECRET_PHRASE,
             encryptionKey: deepLinkEncryptionKey,
           }
+          break
 
         default:
           giftToSend.deepLinkConfig = null // removes previous link config(if any)
