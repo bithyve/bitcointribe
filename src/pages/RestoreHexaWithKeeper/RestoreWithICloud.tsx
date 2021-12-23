@@ -460,13 +460,13 @@ class RestoreWithICloud extends Component<
   };
 
   getSecurityQuestion = ( questionId, question1 ) =>{
-    if( questionId > 0 ){
+    if( Number( questionId ) > 0 ){
       const question = this.getQuestion( questionId )
       console.log( 'Question', question )
       this.setState( {
         question : question[ 0 ].question
       } )
-    } else if( questionId === 0 ){
+    } else if( questionId === '0' ){
       this.setState( {
         question: question1
       } )
