@@ -30,6 +30,7 @@ import {
   Gift,
   GiftStatus,
   GiftType,
+  TrustedContact,
 } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -62,17 +63,20 @@ const GiftDetails = ( { navigation } ) => {
   const dispatch = useDispatch()
   const {
     title,
-    walletName,
+    contactName,
+    contact,
     gift,
     avatar,
     contactDetails,
   }: {
     title: string;
-    walletName: string;
+    contactName: string;
+    contact: TrustedContact,
     gift: Gift;
     avatar: boolean;
     contactDetails: any;
   } = navigation.state.params
+
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
 
@@ -86,6 +90,8 @@ const GiftDetails = ( { navigation } ) => {
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
+
+  const deepLinkConfig = contact? contact.deepLinkConfig: gift.deepLinkConfig ? gift.deepLinkConfig: null
 
   useEffect( ()=> {
     if( gift.status === GiftStatus.SENT ) setIsOpen( true )
@@ -123,9 +129,6 @@ const GiftDetails = ( { navigation } ) => {
   }
 
 
- 
-
-
   return (
     <ScrollView
       contentContainerStyle={{
@@ -161,7 +164,7 @@ const GiftDetails = ( { navigation } ) => {
             </TouchableOpacity>
 
           </View>
-         
+
         </View>
         <View
           style={{
@@ -245,7 +248,7 @@ const GiftDetails = ( { navigation } ) => {
                   flexDirection: 'row',
                 }}
               >
-                {avatar && walletName && contactDetails ? (
+                {avatar && contactName && contactDetails ? (
                   <View style={styles.avatarContainer}>
                     <RecipientAvatar
                       recipient={contactDetails}
@@ -269,7 +272,7 @@ const GiftDetails = ( { navigation } ) => {
                       fontWeight: '600',
                     }}
                   >
-                    {walletName ? walletName : 'From Checking Account'}
+                    {contactName ? contactName : 'From Checking Account'}
                   </Text>
                   {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
@@ -313,7 +316,7 @@ const GiftDetails = ( { navigation } ) => {
             {isOpen &&
             gift.status !== GiftStatus.CREATED &&
             gift.type === GiftType.SENT &&
-            gift?.deepLinkConfig?.encryptionType === 'OTP' && (
+            deepLinkConfig?.encryptionType === DeepLinkEncryptionType.OTP && (
               <View
                 style={{
                   marginHorizontal: wp( 1 ),
@@ -336,7 +339,7 @@ const GiftDetails = ( { navigation } ) => {
                     marginVertical: hp( 2 ),
                   }}
                 >
-                  {gift?.deepLinkConfig?.encryptionKey
+                  {deepLinkConfig?.encryptionKey
                     .split( '' )
                     .map( ( num, index ) => {
                       return (
@@ -365,7 +368,7 @@ const GiftDetails = ( { navigation } ) => {
             )}
             {isOpen &&
             gift.status !== GiftStatus.CREATED &&
-            gift.type === GiftType.SENT &&
+            gift.type === GiftType.SENT && gift.note &&
             gift.note !== '' && (
               <View
                 style={{

@@ -25,7 +25,7 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import idx from 'idx'
-import { Gift, GiftStatus, GiftType } from '../../bitcoin/utilities/Interface'
+import { Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
 import { syncGiftsStatus } from '../../store/actions/trustedContacts'
 import BottomInfoBox from '../../components/BottomInfoBox'
@@ -57,8 +57,7 @@ const ManageGifts = ( { navigation } ) => {
   const trustedContacts: Trusted_Contacts = useSelector(
     ( state ) => state.trustedContacts.contacts,
   )
-  const trustedContactsArr = Object.values( trustedContacts ?? {
-  } )
+
   const exchangeRates = useSelector(
     ( state ) => state.accounts.exchangeRates
   )
@@ -133,18 +132,18 @@ const ManageGifts = ( { navigation } ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-  const processGift = ( selectedGift: Gift, title, walletName ) => {
+  const processGift = ( selectedGift: Gift, title, contactName, contact?: TrustedContact ) => {
 
     if( selectedGift.type === GiftType.SENT ){
       if( selectedGift.status === GiftStatus.CREATED || selectedGift.status === GiftStatus.RECLAIMED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
+          title, contactName, contact, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     } else if ( selectedGift.type === GiftType.RECEIVED ) {
       if( selectedGift.status === GiftStatus.ACCEPTED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
+          title, contactName, contact, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     }
@@ -365,30 +364,25 @@ const ManageGifts = ( { navigation } ) => {
               else if( item.status === GiftStatus.EXPIRED ) title = 'Gift expired'
             }
 
-            let walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
-            // let image
-            let contactDetails : RecipientDescribing
-            if ( item.type === GiftType.SENT && item.receiver?.contactId ) {
-              const arr =trustedContactsArr.filter( value => {
-                return item.permanentChannelAddress === value.receiver?.contactId
-              } )
-              contactDetails = arr[ 0 ]?.contactDetails
-              walletName = arr[ 0 ]?.contactDetails?.contactName
-              // image = arr[ 0 ]?.contactDetails?.image?.uri
-            }
-            if ( item.type === GiftType.RECEIVED && item.sender?.contactId ) {
-              const arr =trustedContactsArr.filter( value => {
-                console.log( value.permanentChannelAddress, value.sender?.contactId )
+            let contactName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
+            const contactId = item.type === GiftType.SENT? item.receiver?.contactId: item.sender?.contactId //permanent channel address of the contact
 
-                return item.permanentChannelAddress === value.sender?.contactId
-              } )
-              contactDetails = arr[ 0 ]?.contactDetails
-              walletName = arr[ 0 ]?.contactDetails?.contactName
-              // image = arr[ 0 ]?.contactDetails?.image?.uri
+            let associatedContact: TrustedContact
+            if( contactId ){ // gift sent to a contact (gift + F&F)
+              for( const contact of  Object.values( trustedContacts ) ){
+                if( contactId === contact.permanentChannelAddress ) {
+                  associatedContact = contact
+                  break
+                }
+              }
             }
+
+            const contactDetails = associatedContact?.contactDetails? associatedContact.contactDetails: null
             if( contactDetails ) {
-              contactDetails.displayedName = walletName
+              contactName = contactDetails.contactName
+              contactDetails.displayedName = contactDetails.contactName
             }
+
             return (
               <>
                 {active === GiftStatus.CREATED ?
@@ -398,7 +392,7 @@ const ManageGifts = ( { navigation } ) => {
                     amt={getAmt( item.amount )}
                     date={item.timestamps?.created}
                     image={<GiftCard />}
-                    onPress={() => processGift( item, title, walletName )}
+                    onPress={() => processGift( item, title, contactName, associatedContact )}
                   />
                   :
                   <View
@@ -409,7 +403,7 @@ const ManageGifts = ( { navigation } ) => {
                       key={index}
                       onPress={() => {
                         navigation.navigate( 'GiftDetails', {
-                          title, walletName, gift: item, avatar: true, contactDetails, setActiveTab: buttonPress
+                          title, contactName, contact: associatedContact, gift: item, avatar: true, contactDetails, setActiveTab: buttonPress
                         } )
                       }
                       }
@@ -423,7 +417,7 @@ const ManageGifts = ( { navigation } ) => {
                         ...styles.listItem
                       }}
                       >
-                        {walletName && contactDetails ?
+                        {contactName && contactDetails ?
                           <View style={styles.avatarContainer}>
                             <RecipientAvatar recipient={contactDetails} contentContainerStyle={styles.avatarImage} />
                           </View>
@@ -445,7 +439,7 @@ const ManageGifts = ( { navigation } ) => {
                           <Text style={{
                             fontSize: RFValue( 12 ), textAlign: 'center', color: Colors.textColorGrey
                           }}>
-                            {walletName ? walletName : 'Checking Account'}
+                            {contactName ? contactName : 'Checking Account'}
                           </Text>
                           <Text style={{
                             color: Colors.lightTextColor,
