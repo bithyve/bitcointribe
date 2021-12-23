@@ -313,7 +313,7 @@ const GiftDetails = ( { navigation } ) => {
                 ) : null}
               </View>
             </View>
-            {isOpen &&
+            {/* {isOpen &&
             gift.status !== GiftStatus.CREATED &&
             gift.type === GiftType.SENT &&
             deepLinkConfig?.encryptionType === DeepLinkEncryptionType.OTP && (
@@ -365,7 +365,7 @@ const GiftDetails = ( { navigation } ) => {
                     } )}
                 </View>
               </View>
-            )}
+            )} */}
             {isOpen &&
             gift.status !== GiftStatus.CREATED &&
             gift.type === GiftType.SENT && gift.note &&
@@ -412,6 +412,37 @@ const GiftDetails = ( { navigation } ) => {
             )}
           </View>
         </TouchableOpacity>
+
+        <View style={{
+          backgroundColor: Colors.backgroundColor,
+          paddingBottom: hp( 4 ),
+          marginTop: 10
+        }}>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text
+              style={{
+                ...styles.modalTitleText,
+                fontSize: 14,
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Second Factor used for encryption
+            </Text>
+          </View>
+          <View
+            style={styles.deepLinkEncryptionTextContainer}
+            >
+              <Text style={styles.deepLinkEncryptionText}>
+                {deepLinkConfig?.encryptionKey}
+              </Text>
+          </View>
+        </View>
+      </View>
         <View
           style={{
             marginVertical: hp( 2 ),
@@ -833,6 +864,24 @@ const styles = StyleSheet.create( {
     fontWeight:'500',
     fontSize:15,
     fontFamily: Fonts.FiraSansRegular
+  },
+  deepLinkEncryptionText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: wp( 10 ),
+    justifyContent:'center',
+    textAlign: 'center',
+    letterSpacing: 8
+  },
+  deepLinkEncryptionTextContainer: {
+    width: wp( '80%' ),
+    borderRadius: wp( 2 ),
+    paddingVertical: hp( 1.5 ),
+    marginTop: hp( 1 ),
+    marginLeft: 40,
+    backgroundColor: Colors.gray7,
+    paddingHorizontal: hp( 1.5 ),
   }
 } )
 
