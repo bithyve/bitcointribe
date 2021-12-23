@@ -64,7 +64,7 @@ const ManageGifts = ( { navigation } ) => {
   )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
-  const [ knowMore, setKnowMore ] = useState( true )
+  const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
   const currencyKind = useSelector(
