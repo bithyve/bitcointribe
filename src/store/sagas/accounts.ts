@@ -1086,12 +1086,11 @@ export const mergeAccountShellsWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
     const { qrdata, QRModalHeader, accountShell } = payload
-    const walletDB = yield call( dbManager.getWallet )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const walletId = wallet.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     let secondaryMnemonic
-    const sharesArray = [ walletDB.smShare ]
+    const sharesArray = [ wallet.smShare ]
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
@@ -1112,7 +1111,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const shard: string = res.secondaryData.secondaryMnemonicShard
     sharesArray.push( shard )
     if( sharesArray.length>1 ){
-      secondaryMnemonic = BHROperations.getMnemonics( sharesArray, wallet.security.answer )
+      secondaryMnemonic = BHROperations.getMnemonics( sharesArray )
     }
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
@@ -1130,50 +1129,6 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-function parseAA( addresses ) {
-  try {
-    if( addresses.length > 0 ) {
-      const obj = {
-      }
-      addresses.forEach( aa => {
-        const tmp = {
-          index : aa.index
-        }
-        if( aa.assignee ) {
-          const assignee = {
-            ...aa.assignee
-          }
-          if( aa.assignee.recipientInfo ) {
-            const recipientInfo = {
-            }
-            aa.assignee.recipientInfo.forEach( info => {
-              recipientInfo[ info.txid ] = info.recipient
-            } )
-            assignee.recipientInfo = recipientInfo
-            tmp.assignee = assignee
-          }
-        }
-        obj[ aa.address ] = tmp
-      } )
-      return obj
-    } else {
-      return {
-      }
-    }
-  } catch ( error ) {
-    console.log( error )
-    return {
-    }
-  }
-}
-
-function getAA( activeAddresses:{external: [], internal: []} ) {
-  return {
-    external: parseAA( activeAddresses.external ),
-    internal: parseAA( activeAddresses.internal  )
-  }
-}
-
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
@@ -1186,10 +1141,9 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
     if( account.type === AccountType.SAVINGS_ACCOUNT && account.isUsable ) yield put( setAllowSecureAccount( true ) )
 
     accountShell.primarySubAccount.visibility = account.accountVisibility
-    const aa = getAA( account.activeAddresses )  // TODO: check whether active addresses are getting restored
-    account.activeAddresses = aa
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
+    accountShell.primarySubAccount.transactions = account.transactionsMeta
   }
 
   // update redux store & database

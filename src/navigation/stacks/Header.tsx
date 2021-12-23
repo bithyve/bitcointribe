@@ -142,7 +142,8 @@ export enum BottomSheetKind {
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
-  GIFT_REQUEST
+  GIFT_REQUEST,
+  APPROVAL_MODAL
 }
 
 interface HomeStateTypes {
@@ -156,6 +157,7 @@ interface HomeStateTypes {
   currencyCode: string;
   notificationDataChange: boolean;
   trustedContactRequest: any;
+  isCurrentLevel0: boolean;
   giftRequest: any;
   recoveryRequest: any;
   isLoadContacts: boolean;
@@ -264,6 +266,7 @@ interface HomePropsTypes {
   approvalContactData: ContactRecipientDescribing;
   rejectedExistingContactRequest: any;
   trustedContacts: Trusted_Contacts;
+  IsCurrentLevel0: boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -293,6 +296,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currencyCode: 'USD',
       notificationDataChange: false,
       trustedContactRequest: null,
+      isCurrentLevel0: false,
       giftRequest: null,
       recoveryRequest: null,
       isLoadContacts: false,
@@ -331,6 +335,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
         if( trustedContactRequest ){
           this.setState( {
+            isCurrentLevel0: JSON.parse( qrData ).currentLevel == 0 ? true : false,
             trustedContactRequest
           },
           () => {
@@ -867,13 +872,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       this.updateBadgeCounter()
     }
-    if( prevProps.openApproval != this.props.openApproval ){
+    if( prevProps.openApproval != this.props.openApproval && !this.props.IsCurrentLevel0 ){
       if( this.props.openApproval ){
-        this.props.navigation.navigate( 'ContactDetails', {
-          contact: this.props.approvalContactData,
-          contactsType: 'I am the Keeper of',
-          isFromApproval: true
-        } )
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.APPROVAL_MODAL,
+          1
+        )
       }
     }
 
@@ -1056,7 +1060,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       this.closeBottomSheet()
       const { navigation } = this.props
-      const { trustedContactRequest } = this.state
+      const { trustedContactRequest, isCurrentLevel0 } = this.state
 
       let channelKeys: string[]
       try{
@@ -1081,7 +1085,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
 
       if( trustedContactRequest.isExistingContact ){
-        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
+        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey, isCurrentLevel0 )
       } else {
         navigation.navigate( 'ContactsListForAssociateContact', {
           postAssociation: ( contact ) => {
@@ -1091,7 +1095,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               channelKey: trustedContactRequest.channelKey,
               contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
               isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
-              isKeeper: trustedContactRequest.isKeeper
+              isKeeper: trustedContactRequest.isKeeper,
+              isCurrentLevel0
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
@@ -1489,7 +1494,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               // }
               // ]}
               onPressProceed={()=>{
-                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.cloudPermissionGranted ){
                   this.props.setCloudData()
                 }
                 this.closeBottomSheet()
@@ -1571,6 +1576,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
               version={giftRequest.version}
+            />
+          )
+
+        case BottomSheetKind.APPROVAL_MODAL:
+          return (
+            <ErrorModalContents
+              title={'Approve Request'}
+              info={'You have been successfully added as a Keeper. Now Please Approve keeper by scanning QR from Primary Keeper'}
+              onPressProceed={()=>{
+                if( this.props.approvalContactData ){
+                  this.closeBottomSheet()
+                  this.props.navigation.navigate( 'ContactDetails', {
+                    contact: this.props.approvalContactData,
+                    contactsType: 'I am the Keeper of',
+                    isFromApproval: true
+                  } )
+                }
+              }}
+              proceedButtonText={'Proceed'}
+              isIgnoreButton={false}
+              isBottomImage={false}
             />
           )
 
@@ -1738,6 +1764,7 @@ const mapStateToProps = ( state ) => {
     availableKeepers: idx( state, ( _ ) => _.bhr.availableKeepers ),
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
+    IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
   }
 }
 

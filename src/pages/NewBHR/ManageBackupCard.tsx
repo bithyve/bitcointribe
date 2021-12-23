@@ -298,7 +298,7 @@ const styles = StyleSheet.create( {
   manageButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 'auto',
+    marginLeft: 5,
     marginTop: 'auto',
   },
   manageButtonText: {

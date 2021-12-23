@@ -73,6 +73,7 @@ export const initializeTrustedContact = (
     contactsSecondaryChannelKey,
     shareId,
     giftId,
+    isCurrentLevel0,
     giftNote,
   }:{
       contact: any,
@@ -83,6 +84,7 @@ export const initializeTrustedContact = (
       contactsSecondaryChannelKey?: string,
       shareId?: string,
       giftId?: string,
+      isCurrentLevel0?: boolean,
       giftNote?: string,
     },
 ) => {
@@ -97,6 +99,7 @@ export const initializeTrustedContact = (
       contactsSecondaryChannelKey,
       shareId,
       giftId,
+      isCurrentLevel0,
       giftNote
     },
   }

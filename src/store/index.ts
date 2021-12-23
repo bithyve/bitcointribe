@@ -115,6 +115,7 @@ import {
   generateMetaSharesWatcher,
   updateHealthLevel2Watcher,
   recoverWalletFromIcloudWatcher,
+  recoverWalletWithoutIcloudWatcher,
   recoverWalletHealthWatcher,
   cloudMetaShareHealthWatcher,
   recoverMnemonicHealthWatcher,
@@ -144,6 +145,9 @@ import {
   updateSecondaryShardWatcher,
   getApprovalFromKeeperWatcher,
   rejectedExistingContactRequestWatcher,
+  changeQuestionAnswerWatcher,
+  upgradePDFWorkerWatcher,
+  upgradeLevelOneKeeperWatcher,
 } from './sagas/BHR'
 
 import {
@@ -241,6 +245,7 @@ const rootSaga = function* () {
     generateMetaSharesWatcher,
     updateHealthLevel2Watcher,
     recoverWalletFromIcloudWatcher,
+    recoverWalletWithoutIcloudWatcher,
     recoverWalletHealthWatcher,
     cloudMetaShareHealthWatcher,
     updateWalletImageHealthWatcher,
@@ -271,6 +276,9 @@ const rootSaga = function* () {
     updateSecondaryShardWatcher,
     getApprovalFromKeeperWatcher,
     rejectedExistingContactRequestWatcher,
+    changeQuestionAnswerWatcher,
+    upgradePDFWorkerWatcher,
+    upgradeLevelOneKeeperWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

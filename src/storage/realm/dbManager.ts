@@ -271,7 +271,7 @@ const updateContact = async ( contact ) => {
       unencryptedPermanentChannel.push( value )
     }
     data.permanentChannel = permanentChannel
-    data.unencryptedPermanentChannel = permanentChannel
+    data.unencryptedPermanentChannel = unencryptedPermanentChannel
     db.create( schema.TrustedContact, data, true )
     return true
   } catch ( error ) {
@@ -285,8 +285,6 @@ const updateBHR = async ( data ) => {
     const dbRef = db.objects( schema.BHR )
     if( dbRef && dbRef.length ){
       db.write( () => {
-        dbRef[ 0 ][ 'encryptedSMSecretsKeeper' ] = data.encryptedSMSecretsKeeper
-        dbRef[ 0 ][ 'encryptedSecretsKeeper' ] = data.encryptedSecretsKeeper
         dbRef[ 0 ][ 'metaSharesKeeper' ] = data.metaSharesKeeper
         dbRef[ 0 ][ 'oldMetaSharesKeeper' ] = data.oldMetaSharesKeeper
       } )
@@ -332,75 +330,18 @@ const updateGift = ( id, gift  ) => {
   }
 }
 
-const getGifts = ( ids ) => {
-  if( ids ) {
-    const idsQuery = ids.map( id => `id = "${id}"` ).join( ' OR ' )
-    const giftsRef = db.objects( schema.Gifts ).filtered( `(${idsQuery})` )
-    return giftsRef
-  } else {
-    const giftsRef = db.objects( schema.Gifts )
-    return giftsRef
-  }
-}
-
-const getWallet = () => {
-  const walletsRef = db.objects( schema.Wallet )
-  const wallets = Array.from( walletsRef )
-  return wallets[ 0 ]
-}
-
-const getBHR = () => {
-  try {
-    const dbRef = db.objects( schema.BHR )
-    const bhr = Array.from( dbRef )
-    if( bhr && bhr.length > 0 ) {
-      return bhr[ 0 ]
-    } else {
-      return {
-        encryptedSecretsKeeper: [],
-        metaSharesKeeper: [],
-        encryptedSMSecretsKeeper: [],
-        oldMetaSharesKeeper:[],
-      }
-    }
-  } catch ( error ) {
-    console.log( error )
-  }
-}
-
-const getTrustedContacts = () => {
-  const rrustedContactRef = db.objects( schema.TrustedContact )
-  const contacts = Array.from( rrustedContactRef )
-  return contacts
-}
-
-const getAccounts = () => {
-  try {
-    const accountsRef = db.objects( schema.Account )
-    const accounts = Array.from( accountsRef )
-    return accounts
-  } catch ( error ) {
-    console.log( error )
-  }
-}
-
 export default {
   initDb,
   createWallet,
-  getWallet,
-  getAccounts,
   createAccounts,
   createAccount,
   updateAccount,
   updateContact,
   updateWallet,
-  getTrustedContacts,
-  getBHR,
   updateBHR,
   markAccountChecked,
   updateTransaction,
   updateTransactions,
-  getGifts,
   createGifts,
   createGift,
   updateGift
