@@ -21,6 +21,7 @@ import { translations } from '../common/content/LocContext'
 import GiftCard from '../assets/images/svgs/icon_gift.svg'
 import Link from '../assets/images/svgs/link.svg'
 import More from '../assets/images/svgs/icon_more_gray.svg'
+import { useSelector } from 'react-redux'
 
 import BottomInfoBox from './BottomInfoBox'
 import DashedContainer from '../pages/FriendsAndFamily/DashedContainer'
@@ -41,6 +42,7 @@ function RequestKeyFromContact( props ) {
   )
   const [ Contact, setContact ] = useState( props.contact ? props.contact : {
   } )
+  const walletName = useSelector( state => state.storage.wallet.walletName )
 
   useEffect( () => {
     setShareLink( props.link.replace( /\s+/g, '' ) )
@@ -66,7 +68,7 @@ function RequestKeyFromContact( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `${shareLink}`,
+          message: `You have a new Hexa app ${props.isKeeper ? 'keeper' : 'Friends and Family'} request from ${walletName}\n\n${shareLink}`,
         },
       } )
 
@@ -99,7 +101,8 @@ function RequestKeyFromContact( props ) {
     props.onPressShare()
     props.navigation.navigate( 'SendViaLinkAndQR', {
       type, qrCode: props.QR, link: shareLink, ...props,
-      setActiveTab: props.navigation.state.params.setActiveTab
+      setActiveTab: props.navigation.state.params.setActiveTab,
+      OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith
     } )
   }
   const setPhoneNumber = () => {
@@ -331,7 +334,7 @@ function RequestKeyFromContact( props ) {
           <Text style={{
             fontWeight: '600'
           }}>
-            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : `OTP ${props.encryptionKey} `}
+            {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'phone number ' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE? 'secret phrase ' : 'OTP '}
           </Text>
           while accepting the gift
         </Text>
@@ -351,7 +354,7 @@ function RequestKeyFromContact( props ) {
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
               <QRCode
-                title={props.isGift ? 'Bitcoin Address' : 'F&F request'}
+                title={props.isGift ? 'Bitcoin Address' : props.isKeeper ? 'Keeper request' : 'F&F request'}
                 value={props.link}
                 size={hp( '27%' )} />
             )}
@@ -400,6 +403,14 @@ function RequestKeyFromContact( props ) {
           theme={getTheme()}
           isSend
         />
+      }
+      {
+        props.isGift &&
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
+        }}>
+          <Text style={styles.subHeaderText}>If the recipient does not accept in 7 days, the link/QR will expire and the gift will revert back to you</Text>
+        </View>
       }
       {props.isGift &&
         <View style={{

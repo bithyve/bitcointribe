@@ -1451,7 +1451,7 @@ function* setHealthStatusWorker( ) {
           if( element2.updatedAt > 0 ) {
             const delta = Math.abs( Date.now() - element2.updatedAt )
             const minutes = Math.round( delta / ( 60 * 1000 ) )
-            if ( minutes > TIME_SLOTS.SHARE_SLOT2 ) {
+            if ( minutes > TIME_SLOTS.SHARE_SLOT1 ) {
               levelHealth[ j ].levelInfo[ i ].status = 'notAccessible'
               shareArray =  {
                 walletId: wallet.walletId,

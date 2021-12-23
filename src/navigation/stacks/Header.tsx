@@ -1164,6 +1164,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               break
 
             case DeepLinkEncryptionType.OTP:
+            case DeepLinkEncryptionType.LONG_OTP:
+            case DeepLinkEncryptionType.SECRET_PHRASE:
               decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, key )
               break
         }
