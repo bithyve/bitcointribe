@@ -138,7 +138,8 @@ export default function SendViaLinkAndQR( props ) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'Share phone' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'Share Email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE ? 'Secret Phrase ' : 'Share OTP '}
+              Show Second Factor
+              {/* {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'Share phone' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'Share Email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE ? 'Secret Phrase ' : 'Share OTP '} */}
 
             </Text>
           </View>
@@ -294,7 +295,7 @@ export default function SendViaLinkAndQR( props ) {
       </View>
       <HeaderTitle
         firstLineTitle={`Share via ${type === 'Link' ? 'link' : 'QR'}`}
-        secondLineTitle={type === 'Link' ? 'Send the link to your contact from any app below' : ''}
+        secondLineTitle={type === 'Link' ? 'Once you have shared the QR/ link, you can view the Second Factor set (if any)' : ''}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -403,7 +404,7 @@ export default function SendViaLinkAndQR( props ) {
       <AppBottomSheetTouchableWrapper
         onPress={() => {
           OTP && DeepLinkEncryptionType.SECRET_PHRASE !==  encryptLinkWith ? ( setOTPmodal( true ) ) :
-            props.navigation.pop( 3 )
+            props.navigation.pop( 1 )
           try {
             if( props.navigation.state.params.setActiveTab ) {
               props.navigation.state.params.setActiveTab( 'SENT' )
@@ -419,7 +420,7 @@ export default function SendViaLinkAndQR( props ) {
                Colors.blue
         }}
       >
-        <Text style={styles.proceedButtonText}>{OTP ? 'Show OTP' : 'Yes, I have shared'}</Text>
+        <Text style={styles.proceedButtonText}>{OTP ? 'Show 2nd Factor' : 'Yes, I have shared'}</Text>
       </AppBottomSheetTouchableWrapper>
       {OTPmodal &&
       <ModalContainer
