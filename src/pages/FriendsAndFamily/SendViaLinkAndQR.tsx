@@ -195,7 +195,7 @@ export default function SendViaLinkAndQR( props ) {
 
           </View>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               ...styles.btnContainer,
             }}
@@ -211,7 +211,7 @@ export default function SendViaLinkAndQR( props ) {
             }}
           >
             <Text style={styles.btnText}>Proceed</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     )
