@@ -193,12 +193,12 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
               Toast( 'Gift already claimed' )
               break
 
-            case GiftStatus.REJECTED:
-              Toast( 'Gift already rejected' )
-              break
-
             case GiftStatus.RECLAIMED:
               Toast( 'Gift already reclaimed' )
+              break
+
+            case GiftStatus.EXPIRED:
+              Toast( 'Gift already expired' )
               break
         }
         return
@@ -336,7 +336,10 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
   if( giftMetaData.status !== gift.status ){
     gift.status = giftMetaData.status
 
-    if( giftMetaData.status === GiftStatus.RECLAIMED ) gift.timestamps.reclaimed = Date.now()
+    if( giftMetaData.status === GiftStatus.RECLAIMED ) {
+      gift.timestamps.reclaimed = Date.now()
+      gift.channelAddress = null
+    }
     else if ( giftMetaData.status === GiftStatus.ACCEPTED ) gift.timestamps.accepted = Date.now()
 
     yield put( updateGift( gift ) )
@@ -373,7 +376,7 @@ function* syncGiftsStatusWorker() {
     if( gift.status === GiftStatus.ASSOCIATED ) continue
 
     if( gift.type === GiftType.SENT &&  gift.channelAddress ) {
-      if( gift.status !== GiftStatus.ACCEPTED && gift.status !== GiftStatus.REJECTED ){
+      if( gift.status !== GiftStatus.ACCEPTED ){
         giftChannelToGiftIdMap[ gift.channelAddress ] = giftId
         giftChannelsToSync[ gift.channelAddress ] = {
           creator: true
@@ -401,6 +404,8 @@ function* syncGiftsStatusWorker() {
       if( giftToUpdate.status !== giftMetaData.status ){
         giftToUpdate.status = giftMetaData.status
         if ( giftMetaData.status === GiftStatus.ACCEPTED ) giftToUpdate.timestamps.accepted = Date.now()
+        if ( giftMetaData.status === GiftStatus.REJECTED ) giftToUpdate.timestamps.rejected = Date.now()
+        if ( giftMetaData.status === GiftStatus.RECLAIMED ) giftToUpdate.timestamps.reclaimed = Date.now()
 
         yield put( updateGift( giftToUpdate ) )
         yield call( dbManager.createGift, giftToUpdate )

@@ -24,10 +24,10 @@ import {
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
+import { initializeHealthSetup, updateWalletImageHealth, upgradePDF } from '../actions/BHR'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
@@ -37,7 +37,7 @@ import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/tru
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
-
+import semverLte from 'semver/functions/lte'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -188,10 +188,33 @@ export const changeAuthCredWatcher = createWatcher(
 
 
 function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, previousVersion: string }} ) {
-  const { newVersion } = payload
+  const { newVersion, previousVersion } = payload
+
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
+  const storedVersion = wallet.version
+
+  if( semver.lt( storedVersion, '2.0.66' ) ){
+    const accountShells: AccountShell[] = yield select(
+      ( state ) => state.accounts.accountShells
+    )
+
+    let testAccountShell: AccountShell
+    accountShells.forEach( shell => {
+      if( shell.primarySubAccount.type === AccountType.TEST_ACCOUNT ) testAccountShell = shell
+    } )
+
+    if( testAccountShell.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
+      const settings = {
+        visibility: AccountVisibility.DEFAULT
+      }
+      yield put( updateAccountSettings( {
+        accountShell: testAccountShell, settings
+      } ) )
+    }
+  }
 
   // update wallet version
-  const wallet: Wallet = yield select( state => state.storage.wallet )
   yield put( updateWallet( {
     ...wallet,
     version: newVersion
@@ -228,6 +251,11 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   yield put( updateWalletImageHealth( {
     updateVersion: true
   } ) )
+  if( semverLte( previousVersion, '2.0.6' ) ){
+    if( levelData.find( value=>value.keeper1.shareType == 'pdf' || value.keeper2.shareType == 'pdf' ) ){
+      yield put( upgradePDF() )
+    }
+  }
 }
 
 export const applicationUpdateWatcher = createWatcher(

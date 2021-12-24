@@ -39,14 +39,16 @@ export default function SendGift( props ) {
 
   const giftId = props.navigation.getParam( 'giftId' )
   const note = props.navigation.getParam( 'note' )
-  const contact = props.navigation.getParam( 'contact' )
+  const giftLinkEncryptionType: DeepLinkEncryptionType = props.navigation.getParam( 'encryptionType' )
+
+  const secretPhrase = props.navigation.getParam( 'secretPhrase' )
+  const secretPhraseHint = props.navigation.getParam( 'secretPhraseHint' )
   const senderEditedName = props.navigation.getParam( 'senderName' )
   const themeId = props.navigation.getParam( 'themeId' )
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
   const giftToSend = accountsState.gifts[ giftId ]
-  const [ encryptWithOTP, setEncryptWithOTP ] = useState( false )
   const [ encryptionOTP, setEncryptionOTP ] = useState( '' )
   const [ giftDeepLink, setGiftDeepLink ] = useState( '' )
   const [ giftQR, setGiftQR ] = useState( '' )
@@ -90,7 +92,7 @@ export default function SendGift( props ) {
     }
     giftToSend.sender.contactId = null
 
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, encryptWithOTP, generateShortLink )
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, giftLinkEncryptionType, generateShortLink, secretPhrase, secretPhraseHint )
     setEncryptionKey( encryptionKey )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
@@ -155,7 +157,7 @@ export default function SendGift( props ) {
         subHeaderText={'You can send it to anyone using the QR or the link'}
         contactText={strings.adding}
         isGift={true}
-        encryptLinkWith={encryptionOTP? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT}
+        encryptLinkWith={giftLinkEncryptionType}
         encryptionKey={encryptionOTP}
         themeId={themeId}
         senderName={senderEditedName}

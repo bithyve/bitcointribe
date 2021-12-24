@@ -40,12 +40,11 @@ export type Props = {
 const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const strings = translations[ 'accManagement' ]
-  const originalAccountShells = useActiveAccountShells()
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
   const accountShells = useSelector( ( state ) => state.accounts.accountShells )
   // const [ tempValue, setTempValue ] = useState( false )
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
-  const [ orderedAccountShells, setOrderedAccountShells ] = useState( originalAccountShells )
+  const [ orderedAccountShells, setOrderedAccountShells ] = useState( accountShells )
   const [ hiddenAccountShells, setHiddenAccountShells ] = useState( [] )
   const [ archivedAccountShells, setArchivedAccountShells ] = useState( [] )
   const [ accountVisibility, setAccountVisibility ] = useState( null )
@@ -59,8 +58,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
   const getnewDraggableOrderedAccountShell = useMemo( () => {
     const newDraggableOrderedAccountShell = []
-    if( originalAccountShells ){
-      originalAccountShells.map( ( value, index ) =>{
+    if( accountShells ){
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newDraggableOrderedAccountShell.push( value )
         }
@@ -68,12 +67,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setOrderedAccountShells( newDraggableOrderedAccountShell )
     }
     return newDraggableOrderedAccountShell
-  }, [ originalAccountShells ] )
+  }, [ accountShells ] )
 
   const getnewOrderedAccountShell = useMemo( () => {
     if( showAllAccount === true ){
       const newOrderedAccountShell = []
-      originalAccountShells.map( ( value, index ) =>{
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newOrderedAccountShell.push( value )
         }
@@ -81,7 +80,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setOrderedAccountShells( newOrderedAccountShell )
       return newOrderedAccountShell
     }
-  }, [ showAllAccount, originalAccountShells ] )
+  }, [ showAllAccount, accountShells ] )
 
   const getHiddenAccountShell = useMemo( () => {
     const newHiddenAccountShell = []
@@ -94,12 +93,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setHiddenAccountShells( newHiddenAccountShell )
       return newHiddenAccountShell
     }
-  }, [ showAllAccount, originalAccountShells ] )
+  }, [ showAllAccount, accountShells ] )
 
   const getArchivedAccountShells = useMemo( () => {
     if( showAllAccount === true ){
       const newArchivedAccountShells = []
-      originalAccountShells.map( ( value, index ) =>{
+      accountShells.map( ( value, index ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
           newArchivedAccountShells.push( value )
         }
@@ -107,7 +106,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setArchivedAccountShells( newArchivedAccountShells )
       return newArchivedAccountShells
     }
-  }, [ showAllAccount, originalAccountShells ] )
+  }, [ showAllAccount, accountShells ] )
 
   const canSaveOrder = useMemo( () => {
     return hasChangedOrder
@@ -135,7 +134,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [ navigation ] )
 
   const showUnHideArchiveAccountBottomSheet = useCallback( () => {
-
     return(
       <UnHideArchiveAccountBottomSheet
         onProceed={( accounShell )=>{
@@ -351,17 +349,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
                 return renderItem( accountShell )
               } )
               }
-              {/* <FlatList
-              style={{
-              }}
-              contentContainerStyle={{
-                paddingHorizontal: 14
-              }}
-              extraData={orderedAccountShells}
-              data={orderedAccountShells}
-              keyExtractor={listItemKeyExtractor}
-              renderItem={renderItem}
-            /> */}
             </View>
           </View>
         </View>}

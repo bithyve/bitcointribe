@@ -37,23 +37,23 @@ export enum TransactionType {
 }
 export interface Transaction {
   txid: string;
-  status: string;
-  confirmations: number;
+  status?: string;
+  confirmations?: number;
 
   /**
    * Sats per byte
    */
-  fee: string;
+  fee?: string;
 
   /**
    * UTC string
    */
-  date: string;
+  date?: string;
 
   /**
    * Inbound(Received)/Outbound(Sent) transaction
    */
-  transactionType: TransactionType;
+  transactionType?: TransactionType;
 
   /**
    * Amount in Satoshis.
@@ -888,7 +888,19 @@ export interface Account {
       address: string,
       privateKey: string
     }
-  }
+  },
+  transactionsMeta?: {
+    receivers: {name: string, amount: number}[];
+    sender: string;
+    txid: string;
+    notes: string;
+    tags: string[]
+    amount: number;
+    accountType: string;
+    address: string;
+    isNew: boolean
+    type: string;
+  }[]
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -960,7 +972,9 @@ export enum DeepLinkEncryptionType {
   DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
   EMAIL = 'EMAIL',
-  OTP = 'OTP'
+  OTP = 'OTP',
+  LONG_OTP = 'LONG_OTP',
+  SECRET_PHRASE = 'SECRET_PHRASE'
 }
 
 export enum GiftThemeId {
@@ -1001,7 +1015,9 @@ export interface Gift {
     accepted?: number,
     reclaimed?: number,
     associated?: number,
-  }
+    rejected?: number,
+  },
+  validitySpan?: number,
   sender: {
     walletId: string,
     accountId: string,
@@ -1024,6 +1040,10 @@ export interface Gift {
 
 export interface GiftMetaData {
   status: GiftStatus,
+  validity?: {
+    sentAt: number,
+    validitySpan: number,
+  },
   exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,

@@ -11,7 +11,8 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
+
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
@@ -51,10 +52,11 @@ export type Props = {
   giftId: string; //NOTE: here gift id stands for channelAddress of the gift(we should use more consistent naming to avoid confusion)
   isGiftWithFnF: boolean;
   isContactAssociated: boolean;
+  version?: string
 };
 
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject }: Props ) {
+export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -76,25 +78,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const gifts = useSelector( ( state ) => state.accounts.gifts )
   const [ acceptedGift, setAcceptedGift ] = useState( null )
   const addedGiftId = useSelector( ( state ) => state.accounts.addedGift )
-  const activeAccounts = useActiveAccountShells()
-  // console.log( 'activeAccounts >>>>>>', activeAccounts )
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
-  // console.log( 'sendingAccount', sendingAccount )
-
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
-  const spendableBalance = useSpendableBalanceForAccountShell( sendingAccount )
-
-  const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
-  } )
-
-  const sourceAccountHeadlineText = useMemo( () => {
-    const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
-
-    return `${title}`
-    // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
-
-  }, [ sourcePrimarySubAccount ] )
 
   useEffect( () => {
     setAccId( sourcePrimarySubAccount.id )
@@ -252,7 +237,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     } else if ( inputType === DeepLinkEncryptionType.OTP ){
       return (
         <View style={{
-          flexDirection: 'row', marginBottom: wp( '5%' )
+          flexDirection: 'row', marginBottom: wp( '5%' ), justifyContent: 'space-evenly'
         }}>
           {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
             return (
@@ -264,6 +249,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
+                placeholder="-"
                 ref={( input ) => {
                   if ( i == 0 ) this.textInput = input
                   if ( i == 1 ) this.textInput2 = input
@@ -350,6 +336,37 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           } )}
         </View>
       )
+    } else if ( inputType == DeepLinkEncryptionType.LONG_OTP || inputType == DeepLinkEncryptionType.SECRET_PHRASE ) {
+      return (
+        <View style={styles.textboxView}>
+          <TextInput
+            autoCapitalize={'none'}
+            returnKeyLabel="Done"
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            placeholderTextColor={Colors.borderColor}
+            onChangeText={( text ) => {
+              setPasscode( text )
+              setIsDisabled( false ) // TODO: place validation and then enable accept button
+            }}
+            placeholder={inputType === DeepLinkEncryptionType.LONG_OTP ? 'Enter OTP' : 'Enter answer'}
+            style={{
+              flex: 1, fontSize: RFValue( 14 )
+            }}
+            onFocus={() => {
+              if ( Platform.OS === 'ios' ) {
+                setOnBlurFocus( true )
+              }
+            }}
+            onBlur={() => {
+              setOnBlurFocus( false )
+            }}
+            value={passcode}
+            autoCorrect={false}
+            autoCompleteType="off"
+          />
+        </View>
+      )
     }
   }
 
@@ -369,12 +386,26 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           } else if( text === 'Accept' ) {
             setIsDisabled( true )
             if ( isGiftWithFnF ) {
-              const key =
-                  inputType === DeepLinkEncryptionType.NUMBER
-                    ? PhoneNumber
-                    : inputType === DeepLinkEncryptionType.EMAIL
-                      ? EmailId
-                      : passcode.toUpperCase()
+              let key
+              switch ( inputType ) {
+                  case DeepLinkEncryptionType.NUMBER:
+                    key = PhoneNumber
+                    break
+
+                  case DeepLinkEncryptionType.EMAIL:
+                    key = EmailId
+                    break
+
+                  case DeepLinkEncryptionType.OTP:
+                  case DeepLinkEncryptionType.LONG_OTP:
+                  case DeepLinkEncryptionType.SECRET_PHRASE:
+                    key = passcode
+                    break
+
+                  default:
+                    break
+              }
+
               setTimeout( () => {
                 setPhoneNumber( '' )
               }, 2 )
@@ -396,9 +427,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     )
   }
 
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  }
+  // const numberWithCommas = ( x ) => {
+  //   return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  // }
 
   const renderGiftAcceptedtModal = () => {
     return (
@@ -438,10 +469,12 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           titleText={'Gift Card'}
           titleTextColor={Colors.black}
           subText={walletName}
-          extraText={acceptedGift?.note? acceptedGift.note: 'This is to get you started!\nWelcome to Bitcoin'}
+          extraText={acceptedGift?.note? acceptedGift.note: ''}
           amt={giftAmount}
-          image={<GiftCard />}
+          image={<CheckingAcc />}
           theme={getTheme()}
+          version={version}
+          isSend
         />
         <BottomInfoBox
           containerStyle={{
@@ -563,8 +596,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             subText={walletName}
             extraText={note? note: ''}
             amt={giftAmount}
-            image={<GiftCard height={60} width={60} />}
+            image={<CheckingAcc height={60} width={60} />}
             theme={getTheme()}
+            version={version}
           />
           {/* <View
             style={{
@@ -688,23 +722,44 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           </TouchableOpacity> */}
 
         </View>
-        {/* <Text style={{
-          color: Colors.gray4,
-          fontSize: RFValue( 12 ),
-          letterSpacing: 0.6,
-          fontFamily: Fonts.FiraSansRegular,
-          marginHorizontal: wp( 5 )
-        }}>
-          {`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'OTP'}`}
-        </Text> */}
+        {inputType === DeepLinkEncryptionType.SECRET_PHRASE && hint &&
+          <Text style={{
+            color: Colors.gray4,
+            fontSize: RFValue( 13 ),
+            letterSpacing: 0.6,
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp( 5 ),
+            marginVertical: wp( 2 ),
+          }}>
+            {`Hint: ${Buffer.from( hint, 'hex' ).toString( 'utf-8' )}`}
+          </Text>
+        }
+        {( inputType === DeepLinkEncryptionType.LONG_OTP
+        || inputType === DeepLinkEncryptionType.OTP
+        ) &&
+          <Text style={{
+            color: Colors.gray4,
+            fontSize: RFValue( 13 ),
+            letterSpacing: 0.6,
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp( 5 ),
+            marginVertical: wp( 2 ),
+          }}>
+            Enter OTP to accept
+          </Text>
+        }
         {/* {props.inputNotRequired ? null: ( */}
         <View style={{
-          marginLeft: wp( '8%' ), marginRight: wp( '8%' )
+          marginHorizontal: wp( 5 )
         }}>
           <View style={{
-            flexDirection: 'row'
+            flexDirection: 'row', backgroundColor: 'red'
           }}>
-            <Text style={styles.inputErrorText}>{WrongInputError}</Text>
+            {
+              WrongInputError !== '' && (
+                <Text style={styles.inputErrorText}>{WrongInputError}</Text>
+              )
+            }
           </View>
           {getInputBox()}
         </View>
@@ -870,13 +925,14 @@ const styles = StyleSheet.create( {
   },
   textboxView: {
     flexDirection: 'row',
-    paddingLeft: 15,
+    paddingLeft: 5,
     height: 50,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: Colors.borderColor,
     marginBottom: wp( '5%' ),
     alignItems: 'center',
+    marginTop: 10,
   },
   countryCodeText: {
     fontFamily: Fonts.FiraSansRegular,

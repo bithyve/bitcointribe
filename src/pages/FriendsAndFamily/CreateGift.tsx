@@ -63,6 +63,8 @@ import Loader from '../../components/loader'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
+import { calculateSendMaxFee } from '../../store/actions/sending'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -89,6 +91,8 @@ const CreateGift = ( { navigation } ) => {
   const [ createdGift, setCreatedGift ] = useState( null )
   const accountState: AccountsState = useSelector( ( state ) => idx( state, ( _ ) => _.accounts ) )
   const giftCreationStatus = useSelector( state => state.accounts.giftCreationStatus )
+  const sendMaxFee = useSelector( ( state ) => idx( state, ( _ ) => _.sending.sendMaxFee ) )
+  const [ isSendMax, setIsSendMax ] = useState( false )
   const accountShells: AccountShell[] = accountState.accountShells
   const [ showLoader, setShowLoader ] = useState( false )
   const [ accountListModal, setAccountListModal ] = useState( false )
@@ -133,7 +137,7 @@ const CreateGift = ( { navigation } ) => {
     let giftAmount = currentSatsAmountFormValue
     const numberOfGifts = numbersOfGift? Number( numbersOfGift ): 1
     if( prefersBitcoin ){
-      if( averageLowTxFee ) giftAmount += averageLowTxFee
+      if( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
       return giftAmount * numberOfGifts > spendableBalance
     } else {
       const giftAmountInFiat = giftAmount
@@ -169,11 +173,29 @@ const CreateGift = ( { navigation } ) => {
   }, [ giftCreationStatus ] )
 
   useEffect( () => {
-    if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
-  }, [ account, accountState.averageTxFees ] )
+    if( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
+    else if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
+  }, [ account, accountState.averageTxFees, isSendMax, sendMaxFee ] )
+
+  useEffect( () => {
+    if( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
+    else if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
+  }, [ account, accountState.averageTxFees, isSendMax, sendMaxFee ] )
 
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
+
+  useEffect( () => {
+    if( isSendMax ) setAmount( `${spendableBalance - sendMaxFee}` )
+  }, [ sendMaxFee, isSendMax ] )
+
+  function handleSendMaxPress( ) {
+    dispatch( calculateSendMaxFee( {
+      numberOfRecipients: Number( numbersOfGift ),
+      accountShell: selectedAccount,
+    } ) )
+    setIsSendMax( true )
   }
 
   const renderButton = ( text, condn ) => {
@@ -254,6 +276,7 @@ const CreateGift = ( { navigation } ) => {
     if ( amount && text == 'x' ) {
       setAmount( amount.slice( 0, -1 ) )
     }
+    if( isSendMax ) setIsSendMax( false )
   }
 
 
@@ -311,7 +334,7 @@ const CreateGift = ( { navigation } ) => {
           />
 
         </View>
-        <View style={{
+        {/* <View style={{
           marginBottom: hp( 4 ),
           marginHorizontal: wp( 7 ),
           flexDirection: 'row'
@@ -340,7 +363,7 @@ const CreateGift = ( { navigation } ) => {
           Add recipient to Friends and Family
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={{
           marginLeft: wp( 4 ), flexDirection: 'row'
         }}>
@@ -687,15 +710,6 @@ const CreateGift = ( { navigation } ) => {
                 }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
               </TouchableOpacity>
             </View>
-            {/* <View style={{
-              flexDirection: 'row', alignItems: 'center',
-            }}>
-              <Text style={[ CommonStyles.subHeaderTitles, {
-                fontWeight: 'normal'
-              } ]} >
-                {'View and manage created Gifts'}
-              </Text>
-            </View> */}
 
 
           </View>
@@ -725,7 +739,7 @@ const CreateGift = ( { navigation } ) => {
             <Text style={[ styles.modalInputBox, {
               color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
             } ]} onPress={() => setKeyboard( true )}>{UsNumberFormat( amount ) === '0' ? '' :UsNumberFormat( amount ) }
-              {!showKeyboard &&
+              {( !showKeyboard && !amount ) &&
               <Text style={{
                 fontSize: RFValue( 12 ),
               }}>
@@ -736,6 +750,25 @@ const CreateGift = ( { navigation } ) => {
                 color: Colors.lightBlue, fontSize: RFValue( 18 ),
               }}>|</Text>}
             </Text>
+            <AppBottomSheetTouchableWrapper
+              onPress={handleSendMaxPress}
+              style={{
+                padding: 16,
+              }}
+              disabled={spendableBalance <= 0}
+            >
+              <Text
+                style={{
+                  color: Colors.blue,
+                  textAlign: 'center',
+                  // paddingHorizontal: 10,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansItalic,
+                }}
+              >
+                {strings.SendMax}
+              </Text>
+            </AppBottomSheetTouchableWrapper>
           </View>
 
           {numbersOfGift > 1 ? <View style={{
@@ -845,7 +878,7 @@ const CreateGift = ( { navigation } ) => {
           <Text style={FormStyles.errorText}>{isAmountInvalid ? strings.Insufficient : ''}</Text>
         </View>
         {
-          ( Number( numbersOfGift ) === 1 ) && (
+          ( Number( numbersOfGift ) === 1 ) && !isSendMax && (
             <View style={{
               marginVertical: hp( 2 ),
               marginHorizontal: wp( 7 ),

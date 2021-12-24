@@ -1393,7 +1393,7 @@ class ContactDetails extends PureComponent<
           showQRScanner: false, showQRClicked: false
         } )}>
           <QRModal
-            isFromKeeperDeviceHistory={true}
+            isFromKeeperDeviceHistory={false}
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
@@ -1409,7 +1409,7 @@ class ContactDetails extends PureComponent<
               } )
             }}
             onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Sada","channelId":"9efb4d94fdeb93b464cb8f72e424b8a4794202ea9a0af51d7cd081ab5a181ae0","streamId":"4625ca458","secondaryChannelKey":"g9HWZIxWOj8tYX8OxhJ88E3E","version":"2.0.5","walletId":"9a1e60930db75fbb51d67d71ae552d3d2e2d9eaeae126c4a23000070afa6c23a"}'
+              const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"ShivaniNew","channelId":"016eb4ac3b68d312ac8301e5cedeececdc4b8e42a56e49fd849048ff3642da86","streamId":"65bf22a7c","channelKey":"0BvnLFWTJfNP3hFy43qYk136","secondaryChannelKey":"upToEzzuNHJ75QYqyRz9Q6Lc","version":"2.0.7","walletId":"2ca1d6a049f75ec5c693d76a896745e12438941d97921dfabfa6c3a4a1ac258d"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />

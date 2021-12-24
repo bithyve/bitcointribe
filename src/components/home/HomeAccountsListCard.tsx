@@ -257,10 +257,10 @@ const styles = StyleSheet.create( {
   },
 
   subtitleText: {
-    marginTop: widthPercentageToDP( 0.5 ),
+    marginTop: widthPercentageToDP( 1 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 10 ),
   },
 
   balanceRow: {

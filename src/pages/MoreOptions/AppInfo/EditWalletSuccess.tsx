@@ -22,8 +22,8 @@ export default function EditWalletSuccess( props ) {
   const walletName = useSelector(
     ( state ) => state.storage.wallet.walletName,
   )
-  const walletNameLength = walletName?.split('').length;
-    const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+  const walletNameLength = walletName?.split( '' ).length
+  const walletNameNew = walletName.split( '' )[ walletNameLength - 1 ].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`
 
   return (
     <SafeAreaView style={{
@@ -71,7 +71,10 @@ export default function EditWalletSuccess( props ) {
           marginHorizontal: 10, flexDirection: 'row', alignItems: 'center'
         }}>
           <Wallet />
-          <Text style={styles.headerTitleText}>{walletNameNew}</Text>
+          <Text style={styles.headerTitleText}>
+            {/* {`${walletName}’s Wallet`} */}
+            {walletNameNew}
+          </Text>
         </View>
 
       </View>

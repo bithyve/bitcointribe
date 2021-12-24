@@ -31,7 +31,8 @@ const Colors = {
   seaBlue: '#CFE8F8',
   deepBlue: '#04578B',
   blueText: '#1582C4',
-  moreBlueText: '#006DB4',
+  moreBlueText: '#055e99',
+  blueTextNew:'#024978',
   babyGray: '#BCB6B6',
   greyTextColor: '#656565',
   coral: '#D35400',
@@ -42,6 +43,7 @@ const Colors = {
   bgColor: '#F8F8F8',
   shadowColor: '#8686860D',
   darkGray: '#00000065',
+  whiteGray:'#e5e5e5',
   // Grayscale
   gray1: '#d0d0d0',
   gray2: '#A3A3A3',

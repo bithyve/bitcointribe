@@ -256,12 +256,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
     if ( answer && confirmAnswer && confirmAnswer != answer ) {
       setAnswerError( strings.Answersdonotmatch )
-    } else if (
-      validateAllowedCharacters( answer ) == false ||
-      validateAllowedCharacters( tempAns ) == false
-    ) {
-      setAnswerError( strings.Answersmust )
-    } else {
+    }
+    if( securityQue ) {
+      if (
+        validateAllowedCharacters( answer ) == false ||
+       validateAllowedCharacters( tempAns ) == false
+      ) {
+        setAnswerError( strings.Answersmust )
+      }
+    }
+
+    else {
       setTimeout( () => {
         setAnswerError( '' )
       }, 2 )
@@ -273,16 +278,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
       setPswdError( strings.Passworddonotmatch )
-    } else if (
-      validateAllowedCharacters( pswd ) == false ||
-      validateAllowedCharacters( tempPswd ) == false
-    ) {
-      setPswdError( strings.Passwordmust )
-    } else {
-      // setTimeout( () => {
-      //   setPswdError( '' )
-      // }, 2 )
     }
+    // else if (
+    //   validateAllowedCharacters( pswd ) == false ||
+    //   validateAllowedCharacters( tempPswd ) == false
+    // ) {
+    //   setPswdError( strings.Passwordmust )
+    // } else {
+    //   // setTimeout( () => {
+    //   //   setPswdError( '' )
+    //   // }, 2 )
+    // }
   }
 
   useEffect( () => {
@@ -293,12 +299,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
       if ( answer && confirmAnswer && confirmAnswer != answer ) {
         setAnswerError( strings.Answersdonotmatch )
-      } else if (
-        validateAllowedCharacters( answer ) == false ||
-        validateAllowedCharacters( confirmAnswer ) == false
-      ) {
-        setAnswerError( strings.Answersmust )
       }
+
+      // else if (
+      //   validateAllowedCharacters( answer ) == false ||
+      //   validateAllowedCharacters( confirmAnswer ) == false
+      // ) {
+      //   setAnswerError( strings.Answersmust )
+      // }
     }
   }, [ confirmAnswer ] )
 
@@ -310,12 +318,13 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
         setPswdError( strings.Passworddonotmatch )
-      } else if (
-        validateAllowedCharacters( pswd ) == false ||
-        validateAllowedCharacters( confirmPswd ) == false
-      ) {
-        setPswdError( strings.Passwordmust )
       }
+      // else if (
+      //   validateAllowedCharacters( pswd ) == false ||
+      //   validateAllowedCharacters( confirmPswd ) == false
+      // ) {
+      //   setPswdError( strings.Passwordmust )
+      // }
     }
   }, [ confirmPswd ] )
 
@@ -481,7 +490,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text.toLowerCase() )
+                setPswd( text )
                 setPswdMasked( text )
                 // setPswdError( '' )
               }}
@@ -604,12 +613,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               </TouchableWithoutFeedback>
             ) : null}
           </View>
-          {pswdError.length == 0 && (
+          {/* {pswdError.length == 0 && (
             <Text style={styles.helpText}>
-              {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
               {strings.Numbersorspecial}
             </Text>
-          )}
+          )} */}
           <View
             style={{
               ...hintInputStyle,
@@ -1329,10 +1337,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       >
         {renderLoaderModalContent()}
       </ModalContainer>
-      <ModalContainer onBackground={()=>showSecurityQue( false )} visible={securityQue} closeBottomSheet={null} >
+      <ModalContainer onBackground={()=>showSecurityQue( false )} visible={securityQue} closeBottomSheet={()=>showSecurityQue( false )} >
         {renderSecurityQuestion()}
       </ModalContainer>
-      <ModalContainer onBackground={()=>{showEncryptionPswd( false )}} visible={encryptionPswd} closeBottomSheet={null} >
+      <ModalContainer onBackground={()=>{showEncryptionPswd( false )}} visible={encryptionPswd} closeBottomSheet={()=>{showEncryptionPswd( false )}} >
         {renderEncryptionPswd()}
       </ModalContainer>
     </View>

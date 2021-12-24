@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useContext } from 'react'
+import React, { useMemo, useEffect, useContext, useState } from 'react'
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
+  Platform,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -19,6 +20,10 @@ import { UsNumberFormat } from '../../common/utilities'
 import { useDispatch, useSelector } from 'react-redux'
 import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
 import { LocalizationContext } from '../../common/content/LocContext'
+import ModalContainer from '../../components/home/ModalContainer'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import { setCloudBackupStatus, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
+import CloudStatus from '../../common/data/enums/CloudBackupStatus'
 
 const currencyCode = [
   'BRL',
@@ -93,6 +98,34 @@ const HomeHeader = ( {
   const CurrencyCode = useSelector(
     ( state ) => state.preferences.currencyCode
   )
+  const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
+  const stringsBhr  = translations[ 'bhr' ]
+  const common  = translations[ 'common' ]
+  const iCloudErrors  = translations[ 'iCloudErrors' ]
+  const driveErrors  = translations[ 'driveErrors' ]
+  const dispatch = useDispatch()
+
+  const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
+  const [ errorMsg, setErrorMsg ] = useState( '' )
+
+  useEffect( ()=>{
+    if( cloudErrorMessage != '' ){
+      const message = Platform.select( {
+        ios: iCloudErrors[ cloudErrorMessage ],
+        android: driveErrors[ cloudErrorMessage ],
+      } )
+      setErrorMsg( message )
+      setCloudErrorModal( true )
+      //setErrorMsg( cloudErrorMessage )
+      dispatch( setCloudErrorMessage( '' ) )
+    } else if( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.IN_PROGRESS ){
+      setCloudErrorModal( false )
+    }
+  }, [ cloudErrorMessage, cloudBackupStatus ] )
+
+
+  const walletNameLength = walletName?.split('').length;
+  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
@@ -212,7 +245,7 @@ const HomeHeader = ( {
               alignItems: 'flex-start',
             }}
           >
-            <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+            <Text style={styles.headerTitleText}>{walletNameNew}</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -265,7 +298,7 @@ const HomeHeader = ( {
           style={{
             height: wp( '9%' ),
             width: wp( '10%' ),
-            justifyContent: 'center',
+            // justifyContent: 'center',
             marginLeft: 'auto',
           }}
         >
@@ -294,9 +327,9 @@ const HomeHeader = ( {
           style={{
             height: wp( '9%' ),
             width: wp( '10%' ),
-            justifyContent: 'center',
+            // justifyContent: 'center',
             marginLeft: 'auto',
-            // marginTop: hp( 1 )
+            marginTop: hp( 0.6 )
           }}
         >
           <ImageBackground
@@ -321,6 +354,32 @@ const HomeHeader = ( {
         </TouchableOpacity>
       </View>
       {getMessage()}
+
+      <ModalContainer onBackground={()=>setCloudErrorModal( false )} visible={cloudErrorModal} closeBottomSheet={() => setCloudErrorModal( false ) }>
+        <ErrorModalContents
+          title={stringsBhr[ 'CloudBackupError' ]}
+          //info={cloudErrorMessage}
+          note={errorMsg}
+          onPressProceed={()=>{
+            setCloudErrorModal( false )
+            dispatch( updateCloudData() )
+            //dispatch( setCloudBackupStatus( CloudStatus.IN_PROGRESS ) )
+          }}
+          onPressIgnore={()=> setTimeout( ()=>{setCloudErrorModal( false )}, 500 )}
+          proceedButtonText={common.tryAgain}
+          cancelButtonText={common.ok}
+          isIgnoreButton={true}
+          isBottomImage={true}
+          isBottomImageStyle={{
+            width: wp( '27%' ),
+            height: wp( '27%' ),
+            marginLeft: 'auto',
+            resizeMode: 'stretch',
+            marginBottom: hp( '-3%' ),
+          }}
+          bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

@@ -2,6 +2,7 @@ import * as bitcoinJS from 'bitcoinjs-lib'
 import * as bip32 from 'bip32'
 import crypto from 'crypto'
 import coinselect from 'coinselect'
+import coinselectSplit from 'coinselect/split'
 import {
   Transaction,
   TransactionPrerequisite,
@@ -591,10 +592,9 @@ export default class AccountOperations {
           } ),
           network,
         } ).address,
-        value: Math.floor( confirmedBalance / numberOfRecipients ),
       } )
     }
-    const { fee } = coinselect(
+    const { fee } = coinselectSplit(
       inputUTXOs,
       outputUTXOs,
       feePerByte,
@@ -1041,7 +1041,17 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    if( txid.includes( 'sendrawtransaction RPC error' ) ) throw new Error( txid )
+    if( txid.includes( 'sendrawtransaction RPC error' ) ){
+      let err
+      try{
+        err = ( txid.split( ':' )[ 3 ] ).split( '"' )[ 1 ]
+      } catch( err ){
+        console.log( {
+          err
+        } )
+      }
+      throw new Error( err )
+    }
 
     if( txid ){
       AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
@@ -1062,6 +1072,7 @@ export default class AccountOperations {
     averageTxFees: AverageTxFees,
     includeFee?: boolean,
     exclusiveGifts?: boolean,
+    validity: number = config.DEFAULT_GIFT_VALIDITY,
   ): Promise<{
     txid: string;
     gifts: Gift[];
@@ -1104,6 +1115,7 @@ export default class AccountOperations {
         timestamps: {
           created: Date.now(),
         },
+        validitySpan: validity,
         sender: {
           walletId: walletDetails.walletId,
           walletName: walletDetails.walletName,
