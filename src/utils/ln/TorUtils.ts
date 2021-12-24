@@ -1,13 +1,13 @@
-import Tor, { RequestMethod } from 'react-native-tor'
-const tor = Tor()
-const doTorRequest = async <T extends RequestMethod>(
+// import Tor, { RequestMethod } from 'react-native-tor'
+// const tor = Tor()
+const doTorRequest = async(
   url: string,
   method: T,
   data?: string,
   headers?: any,
   trustSSL = true
 ) => {
-  await tor.startIfNotStarted()
+  /*await tor.startIfNotStarted()
   switch ( method.toLowerCase() ) {
       case RequestMethod.GET:
         const getResult = await tor.get( url, headers, trustSSL )
@@ -30,12 +30,12 @@ const doTorRequest = async <T extends RequestMethod>(
           return deleteResult.json
         }
         break
-  }
+  }*/
 }
 
 const restartTor = async () => {
-  await tor.stopIfRunning()
-  await tor.startIfNotStarted()
+  // await tor.stopIfRunning()
+  // await tor.startIfNotStarted()
 }
 
-export { doTorRequest, restartTor, RequestMethod }
+export { doTorRequest, restartTor }

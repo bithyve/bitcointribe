@@ -4,7 +4,7 @@ import stores from '../../../mobxstore'
 import TransactionRequest from '../../../models/TransactionRequest'
 import OpenChannelRequest from '../../../models/OpenChannelRequest'
 import Base64Utils from '../Base64Utils'
-import { doTorRequest, RequestMethod } from '../TorUtils'
+//import { doTorRequest, RequestMethod } from '../TorUtils'
 
 // keep track of all active calls so we can cancel when appropriate
 const calls: any = {
@@ -33,12 +33,12 @@ export default class Eclair {
       const body = querystring.stringify( params )
 
       if ( enableTor === true ) {
-        calls[ id ] = doTorRequest(
-          url + method,
-          RequestMethod.POST,
-          body,
-          headers
-        )
+        // calls[ id ] = doTorRequest(
+        //   url + method,
+        //   RequestMethod.POST,
+        //   body,
+        //   headers
+        // )
       } else {
         calls[ id ] = RNFetchBlob.config( {
           trusty: !certVerification

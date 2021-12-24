@@ -2,7 +2,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import stores from '../../../mobxstore'
 import OpenChannelRequest from '../../../models/OpenChannelRequest'
 import VersionUtils from '../VersionUtils'
-import { doTorRequest, RequestMethod } from '../TorUtils'
+//import { doTorRequest, RequestMethod } from '../TorUtils'
 
 interface Headers {
     macaroon?: string;
@@ -33,15 +33,15 @@ export default class LND {
       // API is a bit of a mess but
       // If tor enabled in setting, start up the daemon here
       if ( useTor === true ) {
-        calls[ id ] = doTorRequest(
-          url,
-                method as RequestMethod,
-                JSON.stringify( data ),
-                headers
-        ).then( ( response: any ) => {
-          delete calls[ id ]
-          return response
-        } )
+        // calls[ id ] = doTorRequest(
+        //   url,
+        //         method as RequestMethod,
+        //         JSON.stringify( data ),
+        //         headers
+        // ).then( ( response: any ) => {
+        //   delete calls[ id ]
+        //   return response
+        // } )
       } else {
         calls[ id ] = RNFetchBlob.config( {
           trusty: !certVerification
