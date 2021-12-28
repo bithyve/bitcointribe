@@ -52,8 +52,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const common  = translations[ 'common' ]
   const [ isSendingMax, setIsSendingMax ] = useState( false )
   const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
-  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String(  currentAmount ? currentAmount : 0 ) )
-  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ) )
+  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String(  currentAmount ? currentAmount : '' ) )
+  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ?  convertSatsToFiat( Number( currentSatsAmountTextValue ) ) : '' ) )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( currentSatsAmountTextValue )
@@ -124,13 +124,13 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
       ? (
         ( fiatAmount / exchangeRates[ currencyCode ].last ) * SATOSHIS_IN_BTC
       )
-      : 0
+      : ''
   }
 
   function convertSatsToFiat( amount: Satoshis ) {
     return exchangeRates && exchangeRates[ currencyCode ]
       ? ( amount / SATOSHIS_IN_BTC ) * exchangeRates[ currencyCode ].last
-      : 0
+      : ''
   }
 
   return (
