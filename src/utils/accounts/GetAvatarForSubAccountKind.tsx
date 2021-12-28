@@ -63,6 +63,8 @@ const getAvatarForSubAccount = (
         return <Watch />
       case SubAccountKind.FULLY_IMPORTED_WALLET:
         return <Wallet />
+      case SubAccountKind.LIGHTNING_ACCOUNT:
+        return <Wallet />
       case SubAccountKind.SERVICE:
         return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:

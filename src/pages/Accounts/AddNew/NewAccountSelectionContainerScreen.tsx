@@ -90,7 +90,6 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   }
 
   function handleProceedButtonPress() {
-    console.log(selectedChoice.kind, "signature")
     switch ( selectedChoice.kind ) {
         case SubAccountKind.TEST_ACCOUNT:
 
@@ -196,7 +195,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           }}
           style={{
             height: 30, width: 30, justifyContent: 'center',
-            marginLeft: wp( '5%' ),marginTop:hp('4%')
+            marginLeft: wp( '5%' ), marginTop:hp( '4%' )
           }}
         >
           <FontAwesome

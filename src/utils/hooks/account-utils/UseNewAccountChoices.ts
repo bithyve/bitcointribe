@@ -108,7 +108,7 @@ export default function useNewAccountChoices() {
       new LightningSubAccountInfo ( {
         defaultTitle: 'Lightning Account',
         defaultDescription: 'User Lightning Account',
-        visibility: isEnabled( AccountType.LIGHTNING_ACCOUNT, wallet )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN,
+        visibility: AccountVisibility.DEFAULT,
       } ),
     ]
 

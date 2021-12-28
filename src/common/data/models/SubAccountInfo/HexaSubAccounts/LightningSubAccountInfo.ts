@@ -47,8 +47,8 @@ implements HexaSubAccountDescribing {
     isUsable,
     accountShellID = null,
     instanceNumber = null,
-    defaultTitle = 'Checking Account',
-    defaultSubTitle= 'SingleSig on-chain bitcoin wallet',
+    defaultTitle = 'Lightning Account',
+    defaultSubTitle= 'Lightning account',
     balances = {
       confirmed: 0, unconfirmed: 0
     },
