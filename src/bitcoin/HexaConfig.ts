@@ -147,6 +147,10 @@ class HexaConfig {
       series: 40,
       upperBound: 10,
     },
+    [ AccountType.LIGHTNING_ACCOUNT ]: {
+      series: 40,
+      upperBound: 10,
+    },
   }
 
   public BITHYVE_ESPLORA_API_ENDPOINTS = {
