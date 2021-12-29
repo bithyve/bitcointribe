@@ -520,92 +520,94 @@ render() {
   }
 
   const NodeInterface = () => (
-    <>
-      <View>
-        <Menu
-          onPress={()=> {
-            this.setState( prevState =>{
-              return{
-                ...prevState,
-                showNodeTypePicker : !prevState.showNodeTypePicker
-              }
-            } )
 
-          }}
-          arrow={this.state.showNodeTypePicker}
-          label={'Type'}
-          value={nodeTypes.find( node => node.value === implementation ).name}
-        />
-        <View style={{
-          position: 'relative',
-        }}>
-          {this.state.showNodeTypePicker && (
-            <View
-              style={{
-                marginTop: wp( '1%' ),
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: Colors.borderColor,
-                overflow: 'hidden',
-              }}
-            >
-              <ScrollView>
-                {nodeTypes.map( ( item ) => {
-                  return (
-                    <TouchableOpacity
-                      onPress={() => {
+    <View style={{
+      marginHorizontal: 10
+    }}>
+      <Menu
+        onPress={()=> {
+          this.setState( prevState =>{
+            return{
+              ...prevState,
+              showNodeTypePicker : !prevState.showNodeTypePicker
+            }
+          } )
+
+        }}
+        arrow={this.state.showNodeTypePicker}
+        label={'Type'}
+        value={nodeTypes.find( node => node.value === implementation ).name}
+      />
+      <View style={{
+        position: 'relative', marginBottom: 20
+      }}>
+        {this.state.showNodeTypePicker && (
+          <View
+            style={{
+              marginTop: wp( '1%' ),
+              borderRadius: 10,
+              borderWidth: 1,
+              borderColor: Colors.borderColor,
+              overflow: 'hidden',
+            }}
+          >
+            <ScrollView>
+              {nodeTypes.map( ( item ) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState( {
+                        showNodeTypePicker: false
+                      } )
+                      if ( item.value === 'lndhub' ) {
                         this.setState( {
-                          showNodeTypePicker: false
+                          implementation: item.value,
+                          saved: false,
+                          certVerification: true
                         } )
-                        if ( item.value === 'lndhub' ) {
-                          this.setState( {
-                            implementation: item.value,
-                            saved: false,
-                            certVerification: true
-                          } )
-                        } else {
-                          this.setState( {
-                            implementation: item.value,
-                            saved: false,
-                            certVerification: false
-                          } )
-                        }
-                      }}
+                      } else {
+                        this.setState( {
+                          implementation: item.value,
+                          saved: false,
+                          certVerification: false
+                        } )
+                      }
+                    }}
+                    style={{
+                      flexDirection: 'row', height: wp( '13%' )
+                    }}
+                  >
+                    <View
                       style={{
-                        flexDirection: 'row', height: wp( '13%' )
+                        flex: 1,
+                        justifyContent: 'center',
+                        height: wp( '13%' ),
+                        borderBottomWidth: 1,
+                        borderBottomColor: Colors.borderColor,
+                        backgroundColor: Colors.white,
+
                       }}
                     >
-                      <View
+                      <Text
                         style={{
-                          flex: 1,
-                          justifyContent: 'center',
-                          height: wp( '13%' ),
-                          borderBottomWidth: 1,
-                          borderBottomColor: Colors.borderColor,
-                          backgroundColor: Colors.white,
-
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue( 13 ),
+                          color: Colors.textColorGrey,
+                          marginLeft: wp( '3%' ),
                         }}
                       >
-                        <Text
-                          style={{
-                            fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue( 13 ),
-                            color: Colors.textColorGrey,
-                            marginLeft: wp( '3%' ),
-                          }}
-                        >
-                          {item.name}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  )
-                } )}
-              </ScrollView>
-            </View>
-          )}
-        </View>
+                        {item.name}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )
+              } )}
+            </ScrollView>
+          </View>
+        )}
       </View>
-    </>
+    </View>
+
   )
 
 
