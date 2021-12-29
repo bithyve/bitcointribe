@@ -132,7 +132,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         </View>
 
         <ScrollView style={{
-          marginBottom: 20, flex:1
+          marginBottom: 20, flex:1, marginTop: 0
         }}>
           <HomeAccountCardsList
             contentContainerStyle={{
