@@ -531,7 +531,7 @@ const styles = StyleSheet.create( {
     fontWeight:'400'
   },
   otpInput:{
-    letterSpacing:7,
+    // letterSpacing:2,
     fontSize:22,
   },
   otpInputFieldContainer:{

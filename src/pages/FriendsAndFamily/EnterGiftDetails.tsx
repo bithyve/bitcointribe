@@ -44,6 +44,7 @@ import RadioButton from '../../components/RadioButton'
 import Feather from 'react-native-vector-icons/Feather'
 import ModalContainer from '../../components/home/ModalContainer'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import Toast from '../../components/Toast'
 
 enum AdvancedSetting {
   FNF_IDENTIFICATION = 'FNF_IDENTIFICATION',
@@ -159,11 +160,11 @@ const GiftDetails = ( { navigation } ) => {
 
   useEffect( () => {
     setDropdownBoxList( ThemeList )
-    }, [] )
-    
-    useEffect( () => {
+  }, [] )
+
+  useEffect( () => {
     setName( wallet.userName? wallet.userName: wallet.walletName )
-    }, [ wallet.walletName, wallet.userName ] )
+  }, [ wallet.walletName, wallet.userName ] )
 
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
@@ -571,6 +572,12 @@ const GiftDetails = ( { navigation } ) => {
               setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
+            if( encryptionType === DeepLinkEncryptionType.SECRET_PHRASE ) {
+              if( !secretPhrase.trim() || !secretPhraseHint.trim() ){
+                Toast( 'Enter secret phrase and hint' )
+                return
+              }
+            }
             navigation.replace( 'SendGift', {
               fromScreen: 'Gift',
               giftId,
@@ -1057,7 +1064,8 @@ const styles = StyleSheet.create( {
     color: Colors.lightTextColor,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginHorizontal: wp( 2 )
+    marginHorizontal: wp( 2 ),
+    width: 240,
   },
   dot: {
     height: 8,
