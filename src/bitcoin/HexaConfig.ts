@@ -148,8 +148,8 @@ class HexaConfig {
       upperBound: 10,
     },
     [ AccountType.LIGHTNING_ACCOUNT ]: {
-      series: 40,
-      upperBound: 10,
+      series: 1,
+      upperBound: 2,
     },
   }
 

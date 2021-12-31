@@ -3,6 +3,7 @@ import {
   AccountType,
   Balances,
   TransactionDetails,
+  LNNode
 } from '../../../../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../../enums/AccountVisibility'
 import SourceAccountKind from '../../../enums/SourceAccountKind'
@@ -22,6 +23,7 @@ implements HexaSubAccountDescribing {
   xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
+  node: LNNode;
 
   kind: SubAccountKind = SubAccountKind.LIGHTNING_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
@@ -56,7 +58,8 @@ implements HexaSubAccountDescribing {
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     transactions = [],
-  }: ConstructorProps ) {
+    node = null
+  } ) {
     this.id = id
     this.xPub = xPub
     this.isUsable = isUsable,
@@ -69,5 +72,6 @@ implements HexaSubAccountDescribing {
     this.customDescription = customDescription
     this.visibility = visibility
     this.transactions = transactions
+    this.node = node
   }
 }

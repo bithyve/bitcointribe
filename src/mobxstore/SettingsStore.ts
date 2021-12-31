@@ -29,52 +29,6 @@ interface Settings {
     onChainAddress?: string;
 }
 
-export const LOCALE_KEYS = [
-  {
-    key: 'English', value: 'English'
-  },
-  {
-    key: 'Español', value: 'Español'
-  },
-  {
-    key: 'Português', value: 'Português'
-  },
-  {
-    key: 'Češka', value: 'Češka'
-  },
-  {
-    key: 'Slovák', value: 'Slovák'
-  },
-  {
-    key: 'Deutsch', value: 'Deutsch'
-  },
-  {
-    key: 'Türkçe', value: 'Türkçe'
-  },
-  {
-    key: 'magyar nyelv', value: 'magyar nyelv'
-  },
-  {
-    key: '简化字', value: '简化字'
-  },
-  // in progress
-  {
-    key: 'Ελληνικά', value: 'Ελληνικά'
-  },
-  {
-    key: 'زبان فارسي', value: 'زبان فارسي'
-  },
-  {
-    key: 'Français', value: 'Français'
-  },
-  {
-    key: 'Nederlands', value: 'Nederlands'
-  }
-]
-
-export const DEFAULT_THEME = 'dark'
-export const DEFAULT_FIAT = 'Disabled'
-export const DEFAULT_LOCALE = 'English'
 export default class SettingsStore {
     @observable settings: Settings = {
     };

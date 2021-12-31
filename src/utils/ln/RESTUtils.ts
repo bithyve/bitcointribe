@@ -20,7 +20,7 @@ class RESTUtils {
     }
 
     getClass = () => {
-      const { implementation } = stores.settingsStore
+      const  implementation  =  'lnd'
       switch ( implementation ) {
           case 'lnd':
             return this.lnd
@@ -41,6 +41,13 @@ class RESTUtils {
       const cls: any = this.getClass()
       return cls[ funcName ].apply( cls, args )
     };
+
+    checkInfo = ( data: any ) => {
+      const { implementation } = data
+      if( implementation === 'lnd' ) {
+        return this.lnd.checkNodeInfo( data )
+      }
+    }
 
     getTransactions = ( ...args: any[] ) => this.call( 'getTransactions', args );
     getChannels = ( ...args: any[] ) => this.call( 'getChannels', args );
@@ -101,6 +108,7 @@ class RESTUtils {
     supportsAccounts = () => this.call( 'supportsAccounts' );
     supportsRouting = () => this.call( 'supportsRouting' );
     supportsNodeInfo = () => this.call( 'supportsNodeInfo' );
+    checkNodeInfo= ( data ) => this.checkInfo(  data );
 }
 
 const restUtils = new RESTUtils()

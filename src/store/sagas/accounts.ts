@@ -75,6 +75,7 @@ import {
   Trusted_Contacts,
   UnecryptedStreamData,
   Wallet,
+  LNNode
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -96,6 +97,7 @@ import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/Hexa
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import LightningSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
 
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
@@ -791,6 +793,17 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           serviceAccountKind,
         } )
         break
+      case AccountType.LIGHTNING_ACCOUNT:
+        primarySubAccount = new LightningSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          node: account.node
+        } )
+        break
   }
 
   const accountShell = new AccountShell( {
@@ -908,6 +921,21 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( accountType === AccountType.SWAN_ACCOUNT ) serviceAccount.isUsable = false
 
         return serviceAccount
+      case AccountType.LIGHTNING_ACCOUNT:
+        const { node } = accountDetails
+        const lnAccountCount = ( accounts[ accountType ] )?.length | 0
+        const lnAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: lnAccountCount,
+          accountName: accountName? accountName: defaultAccountName,
+          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
+          primarySeed,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, lnAccountCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+          node
+        } )
+        return lnAccount
   }
 }
 export interface newAccountDetails {
@@ -915,6 +943,7 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
+  node?: LNNode
 }
 export interface newAccountsInfo {
   accountType: AccountType,
@@ -928,13 +957,14 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const accountIds = []
   let testcoinsToAccount
 
-  for ( const { accountType, accountDetails } of newAccountsInfo ){
+  for ( const { accountType, accountDetails,  } of newAccountsInfo ){
     const account: Account | MultiSigAccount | DonationAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
       }
     )
+    console.log( 'account', account )
     accountIds.push( account.id )
     const accountShell = yield call( generateShellFromAccount, account )
     newAccountShells.push( accountShell )

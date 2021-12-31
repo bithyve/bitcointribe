@@ -53,6 +53,7 @@ export default class LND {
               return response.json()
             } else {
               const errorInfo = response.json()
+              console.log( 'errorInfo', errorInfo )
               throw new Error(
                 ( errorInfo.error && errorInfo.error.message ) ||
                                 errorInfo.message ||
@@ -189,6 +190,30 @@ export default class LND {
       )
     };
 
+    getInfo = ( node: any ) => {
+      const {
+        host,
+        lndhubUrl,
+        port,
+        macaroonHex,
+        accessToken,
+        certVerification,
+        enableTor
+      } = node
+      const auth = macaroonHex || accessToken
+      const headers: any = this.getHeaders( auth )
+      headers[ 'Content-Type' ] = 'application/json'
+      const url = this.getURL( host || lndhubUrl, port, '/v1/getinfo' )
+      return this.restReq(
+        headers,
+        url,
+        'get',
+        null,
+        certVerification,
+        enableTor
+      )
+    };
+
     getRequest = ( route: string ) => this.request( route, 'get', null );
     postRequest = ( route: string, data?: any ) =>
       this.request( route, 'post', data );
@@ -316,4 +341,5 @@ export default class LND {
     supportsNodeInfo = () => true;
     supportsCoinControl = () => this.supports( 'v0.12.0' );
     supportsAccounts = () => this.supports( 'v0.13.0' );
+    checkNodeInfo = ( data: any ) => this.getInfo( data );
 }

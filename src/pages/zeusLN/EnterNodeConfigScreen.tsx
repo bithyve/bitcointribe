@@ -16,7 +16,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
@@ -29,12 +28,20 @@ import { translations } from '../../common/content/LocContext'
 import { inject, observer } from 'mobx-react'
 import AddressUtils, { DEFAULT_LNDHUB } from './../../utils/ln/AddressUtils'
 import LndConnectUtils from './../../utils/ln/LndConnectUtils'
+import RESTUtils from './../../utils/ln/RESTUtils'
+import { newAccountsInfo } from '../../store/sagas/accounts'
 import SettingsStore from './../../mobxstore/SettingsStore'
 import { Picker } from '@react-native-picker/picker'
 import { Button, CheckBox, Header, Icon, Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
+import { connect } from 'react-redux'
+import { addNewAccountShells } from '../../store/actions/accounts'
+import idx from 'idx'
+import { withNavigationFocus } from 'react-navigation'
+import Toast from '../../components/Toast'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -143,6 +150,7 @@ const styles = StyleSheet.create( {
 interface EnterNodeConfigProps {
   navigation: any;
   SettingsStore: SettingsStore;
+  addNewAccountShells: any
 }
 
 const nodeTypes = [
@@ -247,7 +255,7 @@ const Menu = ( { label, value, onPress, arrow } ) => {
 
 @inject( 'SettingsStore' )
 @observer
-export default class EnterNodeConfigScreen extends React.Component<
+class EnterNodeConfigScreen extends React.Component<
 EnterNodeConfigProps,
 EnterNodeConfigState
 > {
@@ -255,9 +263,9 @@ EnterNodeConfigState
   isComponentMounted = false;
 
   state = {
-    host: '',
+    host: 'https://testnet.demo.btcpayserver.org/lnd-rest/btc/',
     port: '',
-    macaroonHex: '',
+    macaroonHex: '0201036c6e6402bb01030a1002c733cd1cb35204eba836d2d5d24f321201301a160a0761646472657373120472656164120577726974651a130a04696e666f120472656164120577726974651a170a08696e766f69636573120472656164120577726974651a160a076d657373616765120472656164120577726974651a170a086f6666636861696e120472656164120577726974651a160a076f6e636861696e120472656164120577726974651a140a0570656572731204726561641205777269746500000620cd11cf634d69fc486b46489b31d924fcbb86aedf0387a6f491b7ea916f7fb609',
     saved: false,
     index: 0,
     active: false,
@@ -363,12 +371,12 @@ EnterNodeConfigState
     const { setSettings, settings } = SettingsStore
     const { lurkerMode, passphrase, fiat, locale } = settings
 
-    if (
+    /*if (
       implementation === 'lndhub' &&
         ( !lndhubUrl || !username || !password )
     ) {
       throw new Error( 'lndhub settings missing.' )
-    }
+    }*/
 
     const node = {
       host,
@@ -392,33 +400,41 @@ EnterNodeConfigState
     } else {
       nodes = [ node ]
     }
-
-    setSettings(
-      JSON.stringify( {
-        nodes,
-        theme: settings.theme,
-        selectedNode: settings.selectedNode,
-        onChainAddress: settings.onChainAddress,
-        fiat,
-        locale,
-        lurkerMode,
-        passphrase
-      } )
-    ).then( () => {
-      this.setState( {
-        saved: true
-      } )
-
-      if ( nodes.length === 1 ) {
-        navigation.navigate( 'Wallet', {
-          refresh: true
+    RESTUtils.checkNodeInfo( node )
+      .then( res => {
+        console.log( res )
+        setSettings(
+          JSON.stringify( {
+            nodes,
+            selectedNode: settings.selectedNode,
+            onChainAddress: settings.onChainAddress,
+            fiat,
+            locale,
+            lurkerMode,
+            passphrase
+          } )
+        ).then( () => {
+          const accountsInfo: newAccountsInfo = {
+            accountType: AccountType.LIGHTNING_ACCOUNT,
+            accountDetails: {
+              name: 'Lightning Account',
+              description: `Connected to ${implementation} node`,
+              node,
+            }
+          }
+          this.props.addNewAccountShells( [ accountsInfo ] )
+          this.setState( {
+            saved: true
+          } )
+          navigation.pop( 3 )
+          navigation.goBack()
+          Toast( 'LN account created' )
         } )
-      } else {
-        navigation.navigate( 'Settings', {
-          refresh: true
-        } )
-      }
-    } )
+      } )
+      .catch( e=> {
+        Toast( e.toString() )
+      } )
+
   };
 
 deleteNodeConfig = () => {
@@ -555,6 +571,7 @@ render() {
               {nodeTypes.map( ( item ) => {
                 return (
                   <TouchableOpacity
+                    disabled
                     onPress={() => {
                       this.setState( {
                         showNodeTypePicker: false
@@ -875,7 +892,7 @@ render() {
                     secureTextEntry={saved}
                     placeholderTextColor="gray"
                   />
-                  {saved && (
+                  {/* {saved && (
                     <CollapsedQR
                       showText={localeString(
                         'views.Settings.AddEditNode.showAccountQR'
@@ -891,7 +908,7 @@ render() {
                       }
                       hideText
                     />
-                  )}
+                  )} */}
                 </>
               )}
             </>
@@ -956,6 +973,7 @@ render() {
             flexDirection: 'row'
           }}>
             <TouchableOpacity
+              disabled
               onPress={() =>
                 this.setState( {
                   enableTor: !enableTor,
@@ -1009,7 +1027,7 @@ render() {
           style={styles.buttonView}
           activeOpacity={0.6}
           onPress={() => {
-
+            this.saveNodeConfiguration()
           }}
         >
           <Text style={styles.buttonText}>Connect</Text>
@@ -1022,68 +1040,16 @@ render() {
 }
 }
 
+const mapDispatchToProps = ( dispatch ) => ( {
+  addNewAccountShells: data => {
+    dispatch( addNewAccountShells( data ) )
+  },
+} )
 
-const EnterNodeConfig = ( { navigation } ) => {
-  const { translations } = useContext( LocalizationContext )
-  const strings = translations[ 'zeusLN' ]
-  const common = translations[ 'common' ]
-  const [ knowMore, setKnowMore ] = useState( true )
-
-  return (
-    <SafeAreaView style={styles.viewContainer}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor,
-        marginRight: wp( 4 )
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-        <View style={{
-          flex: 1
-        }}/>
-        <TouchableOpacity
-          activeOpacity={0.6}
-          onPress={() => setKnowMore( true )}
-          style={{
-            ...styles.selectedContactsView,
-          }}
-        >
-          <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
-        </TouchableOpacity>
-      </View>
-      <KeyboardAwareScrollView
-        contentContainerStyle={{
-          flexGrow: 1
-        }}
-        showsVerticalScrollIndicator={false}
-        overScrollMode="never"
-        bounces={false}
-        keyboardShouldPersistTaps='handled'>
-
-
-        <HeaderTitle
-          firstLineTitle={strings.Connectyournode}
-          secondLineTitle={strings.SetupLightningAccount}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
-
-      </KeyboardAwareScrollView>
-
-    </SafeAreaView>
-  )
+const mapStateToProps = ( state ) => {
+  return {
+    accounts: state.accounts || [],
+  }
 }
+
+export default connect( mapStateToProps, mapDispatchToProps )( EnterNodeConfigScreen )
