@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Accounts } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, ShortLinkImage, ShortLinkTitle, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Accounts } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -351,6 +351,30 @@ export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: Tr
   return deepLinkKind
 }
 
+const getLinkImage = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkImage.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT
+   || linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+   || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ) {
+    return ShortLinkImage.FF
+  } else {
+    return ''
+  }
+}
+
+const getLinkTitle = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkTitle.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT
+   || linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+   || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ) {
+    return ShortLinkTitle.FF
+  } else {
+    return ''
+  }
+}
+
 export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData, currentLevel }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any, currentLevel?: string } ) => {
 
   let encryptedChannelKeys: string
@@ -426,9 +450,9 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
           forcedRedirectEnabled:  false
         },
         social: {
-          descriptionText: '',
-          title: '',
-          //imageUrl:''
+          imageUrl: getLinkImage( deepLinkKind ),
+          title: getLinkTitle( deepLinkKind ),
+          descriptionText: ''
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
