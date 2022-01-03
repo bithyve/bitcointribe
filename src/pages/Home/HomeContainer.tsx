@@ -89,7 +89,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.markAccountChecked( selectedAccount.id )
     }
     if( selectedAccount.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
-
+      this.props.navigation.navigate( 'LNAccountDetails', {
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent,
+        node: selectedAccount.primarySubAccount.node
+      } )
     } else {
       this.props.navigation.navigate( 'AccountDetails', {
         accountShellID: selectedAccount.id,
