@@ -985,6 +985,18 @@ export enum GiftThemeId {
   SIX= 'SIX'
 }
 
+export enum ShortLinkImage {
+  GIFT = 'https://hexawallet.io/wp-content/uploads/2019/07/bitcoingift.png',
+  FF = 'https://hexawallet.io/wp-content/uploads/2019/07/faf.png',
+  DONATION = 'https://hexawallet.io/images/donation.png',
+}
+
+export enum ShortLinkTitle {
+  GIFT = 'Bitcoin gift',
+  FF = 'Friends & Family request',
+  DONATION = 'Bitcoin donation',
+}
+
 export enum GiftType {
   SENT = 'SENT',
   RECEIVED = 'RECEIVED'
