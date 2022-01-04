@@ -149,7 +149,7 @@ const CreateGift = ( { navigation } ) => {
 
   useEffect( () => {
     if( accountsState.selectedGiftId && initGiftCreation && giftCreationStatus ) {
-      const createdGift = accountsState.gifts[ accountsState.selectedGiftId ]
+      const createdGift = accountsState.gifts? accountsState.gifts[ accountsState.selectedGiftId ]: null
       if( createdGift ){
         setCreatedGift( createdGift )
         setGiftModal( true )
