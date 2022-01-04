@@ -111,7 +111,8 @@ function* updateWalletWorker( { payload } ) {
 export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
 
 function* associateGiftWorker( { payload }: { payload: { giftId: string, accountId?: string } } ) {
-  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts ) || {
+  }
   const gift: Gift = storedGifts[ payload.giftId ]
 
   const accountsState: AccountsState = yield select( state => state.accounts )
@@ -166,7 +167,8 @@ export const associateGiftWatcher = createWatcher(
 
 function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: string, decryptionKey: string } } ) {
   const accountsState: AccountsState = yield select( ( state ) => state.accounts )
-  const storedGifts: {[id: string]: Gift} = accountsState.gifts
+  const storedGifts: {[id: string]: Gift} = accountsState.gifts || {
+  }
   const exclusiveGiftCodes: {[exclusiveGiftCode: string]: boolean} = accountsState.exclusiveGiftCodes
 
   const { channelAddress } = payload
@@ -311,7 +313,8 @@ export const rejectGiftWatcher = createWatcher(
 )
 
 function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
-  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts ) || {
+  }
   const gift: Gift = storedGifts[ payload.giftId ]
 
   if( gift.status === GiftStatus.ACCEPTED || gift.status === GiftStatus.RECLAIMED ) throw new Error( 'Cannot reclaim gift' )
@@ -360,7 +363,8 @@ export const reclaimGiftWatcher = createWatcher(
 )
 
 function* syncGiftsStatusWorker() {
-  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+  const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts ) || {
+  }
 
   const giftChannelsToSync: {
       [channelAddress: string]: {
@@ -875,7 +879,8 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   // prepare gift data
   let giftDeepLink
   if( giftId && flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
-    const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
+    const gifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts ) || {
+    }
     const giftToSend = gifts[ giftId ]
     const senderName = wallet.userName? wallet.userName: wallet.walletName
 
