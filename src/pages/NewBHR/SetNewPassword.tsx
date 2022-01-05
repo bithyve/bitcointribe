@@ -11,6 +11,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
+  Clipboard
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -27,9 +28,9 @@ import Feather from 'react-native-vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
 import HeaderTitle from '../../components/HeaderTitle'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
 
 import { useDispatch, useSelector } from 'react-redux'
-import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { changeQuestionAnswer, setupPassword } from '../../store/actions/BHR'
@@ -42,10 +43,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
-import PassActive from '../../assets/images/svgs/icon_password_active.svg'
-import PassInActive from '../../assets/images/svgs/icon_password.svg'
-import QueActive from '../../assets/images/svgs/icon_question.svg'
-import QueInActive from '../../assets/images/svgs/question_inactive.svg'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -120,6 +118,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const [ hintText, setHint ] = useState( '' )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const [ showNote, setShowNote ] = useState( true )
+  const [ showAGSPmodal, setShowAGSPmodal ] = useState( false )
+  const [ copied, setCopied ] = useState( false )
+  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ) )
   const [ securityQue, showSecurityQue ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
@@ -276,14 +277,21 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
   const onPressProceed = ( isSkip? ) => {
     showLoader()
+    setShowAGSPmodal( false )
     let security = null
     if ( activeIndex === 0 ) {
+      security = {
+        questionId: '0',
+        question: 'App generated password',
+        answer: appGeneratedPassword,
+      }
+    }else if ( activeIndex === 1 ) {
       security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
         answer,
       }
-    } else {
+    } else if ( activeIndex === 2 ){
       security = {
         questionId: 0,
         question: hintText,
@@ -318,19 +326,137 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     return <LoaderModal headerText={message} messageText={subTextMessage} />
   }, [ message, subTextMessage ] )
 
-  const confirmAction = () => {
+  const confirmAction = ( index ) => {
     // dispatch( updateCloudPermission( true ) )
-    if ( activeIndex === 0 ) {
+    if ( index === 0 ) {
+      setShowAGSPmodal( true )
+    }else if ( index === 1 ) {
       showSecurityQue( true )
       setAnswer( '' )
       setConfirmAnswer( '' )
-    } else {
+    } else if ( index === 2 ){
       showEncryptionPswd( true )
       setTempPswd( '' )
       setConfirmPswdMasked( '' )
       setPswd( '' )
       setPswdMasked( '' )
     }
+  }
+
+  const renderAGSP = () => {
+    return(
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        scrollEnabled={false}
+        // style={styles.rootContainer}
+        style={{
+          backgroundColor: Colors.backgroundColor,
+        }}
+      >
+        <View style={{
+          height: hp( '60%' ),
+          marginHorizontal: wp( 3 )
+        }}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {
+              showSecurityQue( false )
+              showEncryptionPswd( false )
+              setShowAGSPmodal( false )
+              setAnswerError( '' )
+            }}
+            style={{
+              width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+              alignSelf: 'flex-end',
+              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+              marginTop: wp( 3 ),
+            }}
+          >
+            <FontAwesome name="close" color={Colors.white} size={19} style={{
+            // marginTop: hp( 0.5 )
+            }} />
+          </TouchableOpacity>
+          <View style={{
+            marginHorizontal: wp( '6%' )
+          }}>
+            <Text style={{
+              color: Colors.blue,
+              fontSize: RFValue( 18 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }} >{strings.HexaWalletcreated}</Text>
+            <Text style={[ styles.bottomNoteInfoText, {
+              color: Colors.lightTextColor,
+              marginTop: 10
+            } ]}>{strings.Makesureyou}</Text>
+
+            <TouchableOpacity
+              onPress={()=> {
+                Clipboard.setString( appGeneratedPassword )
+                setCopied( true )
+                setTimeout( () => {
+                  setCopied( false )
+                }, 1500 )
+              }}
+              style={styles.containerPasscode}>
+              <Text style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+            </TouchableOpacity>
+
+            {
+              copied && (
+                <Text style={{
+                  textAlign: 'center',
+                  color: Colors.lightTextColor,
+                  marginBottom: 10
+                }}>
+                  Copied to clipboard
+                </Text>
+              )
+            }
+
+
+            <Text style={[ styles.bottomNoteInfoText, {
+              marginTop: 10
+            } ]}>{strings.Itmayalso}</Text>
+          </View>
+
+          <View style={{
+            alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
+            flexDirection: 'row', marginTop: hp( 10 )
+          }}>
+            <TouchableOpacity
+              onPress={() => {onPressProceed()}}
+              style={ButtonStyles.primaryActionButton}
+            >
+              <Text style={{
+                fontSize: RFValue( 13 ),
+                color: Colors.white,
+                fontFamily: Fonts.FiraSansMedium,
+                alignSelf: 'center',
+              }}>{`${strings.UseStrongPasscode}`}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                showSecurityQue( false )
+                showEncryptionPswd( false )
+                setShowAGSPmodal( false )
+                setAnswerError( '' )
+              }}
+            >
+              <Text style={{
+                fontSize: RFValue( 13 ),
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansMedium,
+                alignSelf: 'center',
+                marginLeft: wp( '5%' )
+              }}>{`${common.cancel}`}</Text>
+            </TouchableOpacity>
+          </View>
+
+        </View>
+      </KeyboardAwareScrollView>
+    )
   }
 
   const renderEncryptionPswd = () => {
@@ -966,7 +1092,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             {answer.length === 0 && confirmAnswer.length === 0 &&
             <BottomInfoBox
               title={common.note}
-              infoText={strings.TheAnswer}
+              infoText={`${strings.TheAnswer}  ${strings.encrypt} ${strings.backup} ${strings.securityQuestion} ${strings.hint}`}
               italicText={''}
               backgroundColor={Colors.white}
             />
@@ -1032,24 +1158,40 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               step={''}
             />
             <CardWithRadioBtn
-              geticon={() => {if( activeIndex === 0 ) { return <QueActive /> } else { return <QueInActive/>}}}
-              mainText={strings.AnsweraSecurityQuestion}
-              subText={strings.Easiertoremember}
-              isSelected={activeIndex === 0}
-              setActiveIndex={setActiveIndex}
+              geticon={''}
+              mainText={strings.AGSP}
+              subText={strings.Hexawillgenerate}
+              isSelected={false}
               index={0}
+              setActiveIndex={()=> confirmAction( 0 )}
               italicText={''}
               changeBgColor={true}
+              tag={strings.MostSecure}
+              hideRadioBtn
             />
             <CardWithRadioBtn
-              geticon={() => {if( activeIndex === 0 ) { return  <PassInActive/>} else { return <PassActive />}}}
-              mainText={strings.Useencryptionpassword}
-              subText={strings.Createapassword}
-              isSelected={activeIndex === 1}
-              setActiveIndex={setActiveIndex}
+              geticon={''}
+              mainText={strings.AnsweraSecurityQuestion}
+              subText={strings.Easiertoremember}
+              isSelected={false}
+              setActiveIndex={()=> confirmAction( 1 )}
               index={1}
               italicText={''}
               changeBgColor={true}
+              tag={strings.MostMemorable}
+              hideRadioBtn
+            />
+            <CardWithRadioBtn
+              geticon={''}
+              mainText={strings.Useencryptionpassword}
+              subText={strings.Createapassword}
+              isSelected={false}
+              setActiveIndex={()=> confirmAction( 2 )}
+              index={2}
+              italicText={''}
+              changeBgColor={true}
+              tag={strings.UserDefined}
+              hideRadioBtn
             />
           </TouchableOpacity>
 
@@ -1076,7 +1218,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           />
         </View>
       ) : null}
-      <View style={{
+      {/* <View style={{
         alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '9%' ),
         flexDirection: 'row'
       }}>
@@ -1095,9 +1237,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             fontFamily: Fonts.FiraSansMedium,
             alignSelf: 'center',
             marginLeft: wp( '5%' )
-          }}>Cancel</Text>
+          }}>{common.cancel}</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
       {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
       </ModalContainer> */}
@@ -1109,6 +1251,12 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
       </ModalContainer>
       <ModalContainer onBackground={()=>setLoaderModal( false )} visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
         {renderLoaderModalContent()}
+      </ModalContainer>
+      <ModalContainer
+        onBackground={()=>{setShowAGSPmodal( false )}}
+        visible={showAGSPmodal}
+        closeBottomSheet={()=>{setShowAGSPmodal( false )}} >
+        {renderAGSP()}
       </ModalContainer>
 
     </View>
@@ -1251,7 +1399,13 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     paddingRight: 15,
   },
-
+  bottomNoteInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    lineHeight: 18
+  },
   helpText: {
     fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
@@ -1261,5 +1415,21 @@ const styles = StyleSheet.create( {
     width: wp( '54%' ),
     textAlign: 'right',
     marginTop: hp( 0.5 )
-  }
+  },
+  containerPasscode: {
+    backgroundColor: Colors.white,
+    paddingHorizontal: wp( '3%' ),
+    paddingVertical: wp( '3%' ),
+    borderRadius: wp( '1%' ),
+    marginVertical: wp( '4%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: wp( '2%' ),
+  },
+
+  textPasscode: {
+    fontSize: RFValue( 20 ),
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+  },
 } )
