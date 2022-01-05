@@ -547,9 +547,7 @@ export default class AccountUtilities {
               } )
             }
           }
-        console.log( {
-          postUpdate: UTXOs
-        } )
+
         // process txs
         const addressesInfo = Txs
         const txIdMap = cachedTxIdMap
