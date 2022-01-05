@@ -88,6 +88,7 @@ export default function AccountSelection( { onClose, onChangeType } ) {
                     setActiveIndex( index )
                     setActiveId( item.primarySubAccount.id )
                   }}
+                  boldText={''}
                   index={item.primarySubAccount.type}
                   changeBgColor={false}
                 />

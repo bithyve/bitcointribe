@@ -145,7 +145,8 @@
         "toremember": "to remember",
         "Easiertoremember": "Easier to remember. Recommended",
         "Useencryptionpassword": "Use your own encryption password",
-        "Createapassword": "Create a password. Make sure to remember it",
+        "Createapassword": "Create a password. ",
+        "MakeSureToRememberIt": "Make sure to remember it",
         "Backuplets": "Backup lets you recover your wallet even if you lose your phone. Manage from",
         "questionList": [
           {

@@ -1261,6 +1261,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               setActiveIndex={setActiveIndex}
               index={0}
               italicText={''}
+              boldText={''}
               changeBgColor={true}
             />
             <CardWithRadioBtn
@@ -1271,6 +1272,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               setActiveIndex={setActiveIndex}
               index={1}
               italicText={''}
+              boldText={strings.MakeSureToRememberIt}
               changeBgColor={true}
             />
           </TouchableOpacity>
