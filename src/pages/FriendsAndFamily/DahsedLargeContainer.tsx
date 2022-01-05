@@ -63,7 +63,7 @@ const DashedLargeContainer = ( props ) => {
       return text.replace( /%20/g, ' ' )
     }
   }
-
+  
   return(
     <TouchableOpacity
       activeOpacity={0.7}

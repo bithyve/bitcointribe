@@ -170,7 +170,6 @@ const GiftDetails = ( { navigation } ) => {
 
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
-
   const IdentificationCard = ( { type, title, subtitle } ) => {
     return (
       <AppBottomSheetTouchableWrapper
@@ -571,8 +570,9 @@ const GiftDetails = ( { navigation } ) => {
             navigation.navigate( 'AddContact', {
               fromScreen: 'GiftDetails',
               giftId,
+              senderName: name,
               setActiveTab: navigation.state.params.setActiveTab
-            } )
+            })
           } else {
             if( encryptionType === DeepLinkEncryptionType.SECRET_PHRASE ) {
               if( !secretPhrase.trim() || !secretPhraseHint.trim() ){
