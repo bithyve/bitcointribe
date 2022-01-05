@@ -526,10 +526,9 @@ export default class AccountUtilities {
       }
 
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName, transactionsNote } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName, transactionsNote, hardRefresh } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
-        const UTXOs = cachedUTXOs
-
+        const UTXOs = hardRefresh? []: cachedUTXOs // completely refresh UTXO set on hard-refresh(rather than soft-refresh's append)
         // (re)categorise UTXOs
         if ( Utxos )
           for ( const addressSpecificUTXOs of Utxos ) {
@@ -548,7 +547,9 @@ export default class AccountUtilities {
               } )
             }
           }
-
+        console.log( {
+          postUpdate: UTXOs
+        } )
         // process txs
         const addressesInfo = Txs
         const txIdMap = cachedTxIdMap
