@@ -116,6 +116,11 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
   }
   const gift: Gift = storedGifts[ payload.giftId ]
 
+  if( gift.status === GiftStatus.ASSOCIATED ){
+    Toast( 'Gift already added to the account' )
+    return
+  }
+
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
 
@@ -156,7 +161,6 @@ function* associateGiftWorker( { payload }: { payload: { giftId: string, account
     updateGifts: true,
     giftIds: [ gift.id ]
   } ) )
-  // Toast( 'Gift is added to account' )
   yield put( giftAddedToAccount( payload.giftId ) )
 }
 
