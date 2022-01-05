@@ -44,6 +44,7 @@ function SecurityQuestion( props ) {
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question ? security.question : ''
   const securityAnswer = security.answer ? security.answer : ''
+  console.log( security )
   const showAnswerProp = props.showAnswer
   const [ showAnswer, setShowAnswer ] = useState( props.showAnswer ? props.showAnswer : false )
   const [ answer, setAnswer ] = useState( '' )
