@@ -257,6 +257,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         >
           <TextInput
             style={styles.modalInputBox}
+            multiline={true}
+            numberOfLines={3}
+            textAlignVertical={'bottom'}
             placeholder={`${common.note} (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
@@ -341,8 +344,8 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
-    width: '90%'
-
+    width: '90%',
+    paddingTop:17
   },
   modalInfoText: {
     width: widthPercentageToDP( 90 ),
