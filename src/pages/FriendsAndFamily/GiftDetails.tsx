@@ -894,10 +894,9 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginRight: wp( 10 ),
     justifyContent:'center',
     textAlign: 'center',
-    letterSpacing: 8
+    letterSpacing: 2
   },
   deepLinkEncryptionTextContainer: {
     width: wp( '80%' ),

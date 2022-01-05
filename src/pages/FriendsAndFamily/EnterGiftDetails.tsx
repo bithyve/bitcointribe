@@ -788,13 +788,13 @@ const GiftDetails = ( { navigation } ) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
-            >
+             >
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}
-              >
+               >
                 <View
                   style={{
                     margin: wp( 1 ),
@@ -1075,7 +1075,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     marginHorizontal: wp( 2 ),
-    width: 240,
+    width:wp( 55 ),
   },
   dot: {
     height: 8,
