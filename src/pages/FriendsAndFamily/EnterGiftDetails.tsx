@@ -152,6 +152,8 @@ const GiftDetails = ( { navigation } ) => {
   const [ secretPhraseHint, setSecretPhraseHint ] = useState( '' )
   const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
 
+  const [disableReturn , setDisableReturn] = useState(0);
+
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
     title: 'Gift Sats',
@@ -605,6 +607,12 @@ const GiftDetails = ( { navigation } ) => {
     )
   }
 
+  const  handleKeyPress = ({ nativeEvent: { key: keyValue } }) => {
+    if(keyValue === 'Enter')
+    {
+      setDisableReturn(1);
+    }
+};
   return (
     <ScrollView
       contentContainerStyle={{
@@ -903,8 +911,9 @@ const GiftDetails = ( { navigation } ) => {
             placeholderTextColor={Colors.gray1}
             value={note}
             keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-            returnKeyType="done"
-            returnKeyLabel="Done"
+            // returnKeyType="done"
+            // returnKeyLabel="Done"
+            enablesReturnKeyAutomatically = {true}
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
@@ -913,6 +922,7 @@ const GiftDetails = ( { navigation } ) => {
             onChangeText={( text ) => {
               setNote( text )
             }}
+            onKeyPress={handleKeyPress}
           />
         </View>
 
