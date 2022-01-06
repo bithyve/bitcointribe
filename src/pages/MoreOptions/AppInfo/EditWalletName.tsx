@@ -155,12 +155,12 @@ export default function EditWalletName( props ) {
             value={answer}
             autoCompleteType="off"
             textContentType="none"
-            returnKeyType="next"
+            returnKeyType="done"
             autoCorrect={false}
             editable={isEditable}
             autoCapitalize="none"
             onSubmitEditing={() =>
-              ( confirmAnswerTextInput as any ).current.focus()
+              props.onPressConfirm( answer )
             }
             keyboardType={
               Platform.OS == 'ios'
