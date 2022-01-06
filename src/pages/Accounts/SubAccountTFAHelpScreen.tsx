@@ -66,7 +66,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   ] = useState( React.createRef<BottomSheet>() )
   const [ serverNotRespondingModal, showServerNotRespondingModal ] = useState( false )
   const accountsState: AccountsState = useAccountsState()
-  const sourceAccountShell = useAccountShellForID( navigation.getParam( 'accountShellID' ) )
+  const sourceAccountShell = navigation.getParam( 'sourceAccountShell' )
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
@@ -123,6 +123,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     const generatedSecureXPriv = idx( accountsState.twoFAHelpFlags, ( _ ) => _.xprivGenerated )
     if ( generatedSecureXPriv ) {
       dispatch( resetSendState() )
+      dispatch( sourceAccountSelectedForSending( sourceAccountShell ) )
       navigation.navigate( 'Send', {
         subAccountKind: sourceAccountShell.primarySubAccount.kind,
       } )
@@ -164,13 +165,6 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }}
         onBackPress={() => {
           showQRModel( false )
-        }}
-        onPressContinue={async() => {
-          const qrData = '{"type":"APPROVE_KEEPER","walletName":"Sfds","channelId":"d0926718fd1ac3ea9459bdfee1fe5020ae1b012293a755e41c3f2b4b3173aefc","streamId":"1a28214d4","secondaryChannelKey":"7k1DPsBhjk0qIiBKzlz2eExl","version":"2.0.0","walletId":"1acc5378bfb653ebe3dfb2ff0b9099aca7430c3e1a0c06e2bb790d4c80fd1c9d"}'
-          if ( qrData ) {
-            showQRModel( false )
-            getQrCodeData( qrData )
-          }
         }}
       />
     )
