@@ -124,7 +124,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     if ( generatedSecureXPriv ) {
       dispatch( resetSendState() )
       dispatch( sourceAccountSelectedForSending( sourceAccountShell ) )
-      navigation.navigate( 'Send', {
+      navigation.replace( 'Send', {
         subAccountKind: sourceAccountShell.primarySubAccount.kind,
       } )
       dispatch( secondaryXprivGenerated( null ) )
@@ -146,7 +146,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     }, 2 )
     if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
     if( qrData && qrData.includes( '{' ) && JSON.parse( qrData ).type == QRCodeTypes.APPROVE_KEEPER ){
-      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, sourceAccountShell ) )
+      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType? actionType: 'Sweep Funds', sourceAccountShell ) )
     } else { Toast( 'You have scanned wrong QR' ) }
   }
 
