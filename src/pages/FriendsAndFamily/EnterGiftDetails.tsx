@@ -110,7 +110,8 @@ const FNFIDENTIFICATIONDATA = [
 ]
 
 const GiftDetails = ( { navigation } ) => {
-
+  console.log(navigation.state.params.giftMsg);
+  
 
   const renderItem = ( { item } ) => {
     if( addfNf ){
@@ -133,7 +134,9 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
+  const [ note, setNote ] = useState( 
+    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+    'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
