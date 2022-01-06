@@ -748,25 +748,30 @@ const CreateGift = ( { navigation } ) => {
                 color: Colors.lightBlue, fontSize: RFValue( 18 ),
               }}>|</Text>}
             </Text>
-            <AppBottomSheetTouchableWrapper
-              onPress={handleSendMaxPress}
-              style={{
-                padding: 16,
-              }}
-              disabled={spendableBalance <= 0}
-            >
-              <Text
+
+            {
+              Number( numbersOfGift ) === 1 &&
+              <AppBottomSheetTouchableWrapper
+                onPress={handleSendMaxPress}
                 style={{
-                  color: Colors.blue,
-                  textAlign: 'center',
-                  // paddingHorizontal: 10,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansItalic,
+                  padding: 16,
                 }}
+                disabled={spendableBalance <= 0}
               >
-                {strings.SendMax}
-              </Text>
-            </AppBottomSheetTouchableWrapper>
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    textAlign: 'center',
+                    // paddingHorizontal: 10,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansItalic,
+                  }}
+                >
+                  {strings.SendMax}
+                </Text>
+              </AppBottomSheetTouchableWrapper>
+            }
+
           </View>
 
           {numbersOfGift > 1 ? <View style={{
