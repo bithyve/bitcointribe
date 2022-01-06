@@ -12,7 +12,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
-  Image,
+  Clipboard,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -48,12 +48,8 @@ import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../common/content/LocContext'
-
-import PassActive from '../assets/images/svgs/icon_password_active.svg'
-import PassInActive from '../assets/images/svgs/icon_password.svg'
-import QueActive from '../assets/images/svgs/icon_question.svg'
-import QueInActive from '../assets/images/svgs/question_inactive.svg'
 import ButtonStyles from '../common/Styles/ButtonStyles'
+import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -143,6 +139,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ visibleButton, setVisibleButton ] = useState( false )
   const [ showNote, setShowNote ] = useState( true )
   const [ securityQue, showSecurityQue ] = useState( false )
+  const [ showAGSPmodal, setShowAGSPmodal ] = useState( false )
+  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ) )
+  const [ copied, setCopied ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
@@ -331,14 +330,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const onPressProceed = ( isSkip? ) => {
     setSignUpStarted( true )
     showLoader()
+    setShowAGSPmodal( false )
     let security = null
     if ( activeIndex === 0 ) {
+      security = {
+        questionId: '0',
+        question: 'App generated password',
+        answer: appGeneratedPassword,
+      }
+    }else if ( activeIndex === 1 ) {
       security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
         answer,
       }
-    } else {
+    } else if ( activeIndex === 2 ){
       security = {
         questionId: '0',
         question: hintText,
@@ -408,19 +414,138 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     return <LoaderModal headerText={message} messageText={subTextMessage} subPoints={subPoints} bottomText={bottomTextMessage} />
   }, [ message, subTextMessage, loaderModal,  ] )
 
-  const confirmAction = () => {
+  const confirmAction = ( index ) => {
     dispatch( updateCloudPermission( true ) )
-    if ( activeIndex === 0 ) {
+    if ( index === 0 ) {
+      setShowAGSPmodal( true )
+      showSecurityQue( false )
+      setAnswer( '' )
+    } else if ( index === 1 ) {
       showSecurityQue( true )
       setAnswer( '' )
       setConfirmAnswer( '' )
-    } else {
+    } else if( index === 2 ) {
       showEncryptionPswd( true )
       setTempPswd( '' )
       setConfirmPswdMasked( '' )
       setPswd( '' )
       setPswdMasked( '' )
     }
+  }
+
+
+  const renderAGSP = () => {
+    return(
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        scrollEnabled={false}
+        // style={styles.rootContainer}
+        style={{
+          backgroundColor: Colors.backgroundColor,
+        }}
+      >
+        <View style={{
+          height: hp( '60%' ),
+          marginHorizontal: wp( 3 )
+        }}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {
+              showSecurityQue( false )
+              showEncryptionPswd( false )
+              setShowAGSPmodal( false )
+              setAnswerError( '' )
+            }}
+            style={{
+              width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+              alignSelf: 'flex-end',
+              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+              marginTop: wp( 3 ),
+            }}
+          >
+            <FontAwesome name="close" color={Colors.white} size={19} style={{
+            // marginTop: hp( 0.5 )
+            }} />
+          </TouchableOpacity>
+          <View style={{
+            marginHorizontal: wp( '6%' )
+          }}>
+            <Text style={{
+              color: Colors.blue,
+              fontSize: RFValue( 18 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }} >{strings.HexaWalletcreated}</Text>
+            <Text style={[ styles.bottomNoteInfoText, {
+              color: Colors.lightTextColor,
+              marginTop: 10
+            } ]}>{strings.Makesureyou}</Text>
+
+            <TouchableOpacity
+              onPress={()=> {
+                Clipboard.setString( appGeneratedPassword )
+                setCopied( true )
+                setTimeout( () => {
+                  setCopied( false )
+                }, 1500 )
+              }}
+              style={styles.containerPasscode}>
+              <Text style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+            </TouchableOpacity>
+            {
+              copied && (
+                <Text style={{
+                  textAlign: 'center',
+                  color: Colors.lightTextColor,
+                  marginBottom: 10
+                }}>
+                  Copied to clipboard
+                </Text>
+              )
+            }
+
+            <Text style={[ styles.bottomNoteInfoText, {
+              marginTop: 10
+            } ]}>{strings.Itmayalso}</Text>
+          </View>
+
+          <View style={{
+            alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
+            flexDirection: 'row', marginTop: hp( 10 )
+          }}>
+            <TouchableOpacity
+              onPress={() => {onPressProceed()}}
+              style={ButtonStyles.primaryActionButton}
+            >
+              <Text style={{
+                fontSize: RFValue( 13 ),
+                color: Colors.white,
+                fontFamily: Fonts.FiraSansMedium,
+                alignSelf: 'center',
+              }}>{`${strings.UseStrongPasscode}`}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                showSecurityQue( false )
+                showEncryptionPswd( false )
+                setShowAGSPmodal( false )
+                setAnswerError( '' )
+              }}
+            >
+              <Text style={{
+                fontSize: RFValue( 13 ),
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansMedium,
+                alignSelf: 'center',
+                marginLeft: wp( '5%' )
+              }}>{`${common.cancel}`}</Text>
+            </TouchableOpacity>
+          </View>
+
+        </View>
+      </KeyboardAwareScrollView>
+    )
   }
 
   const renderEncryptionPswd = () => {
@@ -1254,53 +1379,91 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               step={''}
             />
             <CardWithRadioBtn
-              geticon={() => {if( activeIndex === 0 ) { return <QueActive /> } else { return <QueInActive/>}}}
+              geticon={''}
+              mainText={strings.AGSP}
+              subText={strings.Hexawillgenerate}
+              isSelected={false}
+              setActiveIndex={()=> confirmAction( 0 )}
+              index={0}
+              italicText={''}
+              changeBgColor={true}
+              tag={strings.MostSecure}
+              hideRadioBtn
+            />
+            <CardWithRadioBtn
+              geticon={''}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
-              isSelected={activeIndex === 0}
-              setActiveIndex={setActiveIndex}
-              index={0}
+              isSelected={false}
+              setActiveIndex={()=> confirmAction( 1 )}
+              index={1}
               italicText={''}
               boldText={''}
               changeBgColor={true}
+              tag={strings.MostMemorable}
+              hideRadioBtn
             />
             <CardWithRadioBtn
-              geticon={() => {if( activeIndex === 0 ) { return <PassInActive /> } else { return <PassActive/>}}}
+              geticon={''}
               mainText={strings.Useencryptionpassword}
               subText={strings.Createapassword}
-              isSelected={activeIndex === 1}
-              setActiveIndex={setActiveIndex}
-              index={1}
+              isSelected={false}
+              setActiveIndex={()=> confirmAction( 2 )}
+              index={2}
               italicText={''}
               boldText={strings.MakeSureToRememberIt}
               changeBgColor={true}
+              tag={strings.UserDefined}
+              hideRadioBtn
             />
+
+            <View style={{
+              marginTop: 10
+            }}>
+              <CardWithRadioBtn
+                geticon={''}
+                mainText={strings.Skipinitialcloud}
+                subText={strings.fromSecurityCenter}
+                isSelected={false}
+                setActiveIndex={()=> {
+                  setIsSkipClicked( true )
+                  dispatch( updateCloudPermission( false ) )
+                  onPressProceed( true )
+                }}
+                index={2}
+                italicText={''}
+                changeBgColor={true}
+                hideRadioBtn
+              />
+            </View>
           </TouchableOpacity>
 
         </View>
+
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          {/* <View style={styles.statusIndicatorInactiveView} /> */}
+          <View style={styles.statusIndicatorActiveView} />
+        </View>
+        {showNote && !visibleButton ? (
+          <View
+            style={{
+              marginBottom:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
+            }}
+          >
+            <BottomInfoBox
+              title={common.note}
+              infoText={`${strings.Backuplets} `}
+              italicText={'Security Centre'}
+              backgroundColor={Colors.white}
+            />
+          </View>
+        ) : null}
       </ScrollView>
 
-      <View style={styles.statusIndicatorView}>
-        <View style={styles.statusIndicatorInactiveView} />
-        {/* <View style={styles.statusIndicatorInactiveView} /> */}
-        <View style={styles.statusIndicatorActiveView} />
-      </View>
-      {showNote && !visibleButton ? (
-        <View
-          style={{
-            marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
-          }}
-        >
-          <BottomInfoBox
-            title={common.note}
-            infoText={`${strings.Backuplets} `}
-            italicText={'Security Centre'}
-            backgroundColor={Colors.white}
-          />
-        </View>
-      ) : null}
-      <View style={{
+
+      {/* <View style={{
         alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '4%' ),
         flexDirection: 'row', marginTop: hp( 2 )
       }}>
@@ -1330,7 +1493,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             marginLeft: wp( '5%' )
           }}>{`${common.skip} Backup`}</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <ModalContainer
         onBackground={()=>onBackgroundOfLoader()}
@@ -1345,6 +1508,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <ModalContainer onBackground={()=>{showEncryptionPswd( false )}} visible={encryptionPswd} closeBottomSheet={()=>{showEncryptionPswd( false )}} >
         {renderEncryptionPswd()}
       </ModalContainer>
+      <ModalContainer
+        onBackground={()=>{setShowAGSPmodal( false )}}
+        visible={showAGSPmodal}
+        closeBottomSheet={()=>{setShowAGSPmodal( false )}} >
+        {renderAGSP()}
+      </ModalContainer>
     </View>
   )
 }
@@ -1352,7 +1521,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     letterSpacing: 0.6,
     lineHeight: 18
@@ -1508,5 +1677,22 @@ const styles = StyleSheet.create( {
     width: wp( '54%' ),
     textAlign: 'right',
     marginTop: hp( 0.5 )
-  }
+  },
+
+  containerPasscode: {
+    backgroundColor: Colors.white,
+    paddingHorizontal: wp( '3%' ),
+    paddingVertical: wp( '3%' ),
+    borderRadius: wp( '1%' ),
+    marginVertical: wp( '4%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: wp( '2%' ),
+  },
+
+  textPasscode: {
+    fontSize: RFValue( 20 ),
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+  },
 } )

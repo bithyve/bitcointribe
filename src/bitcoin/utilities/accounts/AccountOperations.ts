@@ -892,25 +892,23 @@ export default class AccountOperations {
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
     inputs.forEach( ( input ) => {
-      const { multiSig, primaryPriv, secondaryPriv } = AccountUtilities.signingEssentialsForMultiSig(
+      const { multiSig, secondaryPriv } = AccountUtilities.signingEssentialsForMultiSig(
         account,
         input.address,
       )
 
-      for( const priv of [ primaryPriv, secondaryPriv ] ){
-        const keyPair = bip32.fromBase58( priv, network )
-        const redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
-        const witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
+      const keyPair = bip32.fromBase58( secondaryPriv, network )
+      const redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
+      const witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
 
-        txb.sign(
-          vin,
-          keyPair,
-          redeemScript,
-          null,
-          input.value,
-          witnessScript,
-        )
-      }
+      txb.sign(
+        vin,
+        keyPair,
+        redeemScript,
+        null,
+        input.value,
+        witnessScript,
+      )
       vin += 1
     } )
 

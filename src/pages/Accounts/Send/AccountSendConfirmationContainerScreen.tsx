@@ -28,7 +28,7 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
-import { AccountType, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
+import { AccountType, MultiSigAccount, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
@@ -153,7 +153,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
-    if( sourceAccountShell.primarySubAccount.isTFAEnabled )
+    if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
         note
