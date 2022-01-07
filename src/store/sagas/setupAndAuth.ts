@@ -195,9 +195,7 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
   const storedVersion = wallet.version
 
-  console.log( {
-    storedVersion
-  } )
+
   if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
   if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
 
