@@ -327,6 +327,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   }, [ message, subTextMessage ] )
 
   const confirmAction = ( index ) => {
+    setActiveIndex( index )
     // dispatch( updateCloudPermission( true ) )
     if ( index === 0 ) {
       setShowAGSPmodal( true )
