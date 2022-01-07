@@ -80,6 +80,7 @@ import { setVersion } from '../../store/actions/versionHistory'
 import QuestionList from '../../common/QuestionList'
 import SecurityQuestion from './SecurityQuestion'
 import { initializeRecovery } from '../../store/actions/setupAndAuth'
+import Toast from '../../components/Toast'
 
 
 
@@ -501,6 +502,8 @@ class RestoreWithICloud extends Component<
       selectedBackup.shares &&
       selectedBackup.keeperData
       ) {
+        if( this.SecurityQuestionBottomSheet as any )
+          ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
         this.setState( {
           cloudBackup: true
         } )
@@ -542,10 +545,18 @@ class RestoreWithICloud extends Component<
         // if(selectedBackup.type == "device"){
         ( this.RestoreFromICloud as any ).current.snapTo( 0 )
       } else if ( decryptedCloudDataJson && !selectedBackup.shares ) {
+        if( this.SecurityQuestionBottomSheet as any )
+          ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
         this.showLoaderModal()
         recoverWalletUsingIcloud( decryptedCloudDataJson )
       } else {
-        ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
+        Toast( 'The answer entered is incorrect. Please enter the correct answer or encryption password.' )
+        // this.setState( {
+        //   errorModal: true,
+        //   errorModalTitle: this.state.strings[ 'ErrorreceivingRecoveryKey' ],
+        //   errorModalInfo: 'The answer entered is incorrect. Please enter the correct answer or encryption password.',
+        // } )
+        //( this.ErrorBottomSheet as any ).current.snapTo( 1 )
       }
     }
     catch ( error ) {
@@ -1357,6 +1368,7 @@ class RestoreWithICloud extends Component<
           renderContent={()=>(
             <SecurityQuestion
               question={this.state.question}
+              selectedBackup={this.state.selectedBackup}
               // onFocus={() => {
               //   if ( Platform.OS == 'ios' ){
               //     if( this.SecurityQuestionBottomSheet as any )
@@ -1369,8 +1381,6 @@ class RestoreWithICloud extends Component<
               // }}
               onPressConfirm={( answer ) => {
                 Keyboard.dismiss()
-                if( this.SecurityQuestionBottomSheet as any )
-                  ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
                 this.setState( ( state ) => ( {
                   answer: answer
                 } ) )

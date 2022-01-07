@@ -60,6 +60,9 @@ function SecurityQuestion( props ) {
                 Specify the answer{'\n'}as you did at
                 the time of setting up the wallet
               </Text>
+              <Text style={{
+                fontSize: 11, color: Colors.textColorGrey
+              }}>{`(q: ${props.selectedBackup.question}, qId: ${props.selectedBackup.questionId})`}</Text>
             </View>
           </View>
           <ScrollView style={{
