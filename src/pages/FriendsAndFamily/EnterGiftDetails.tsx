@@ -35,6 +35,8 @@ import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import Halloween from '../../assets/images/svgs/halloween.svg'
 import Birthday from '../../assets/images/svgs/birthday.svg'
+import Setting from '../../assets/images/svgs/setting_icon.svg'
+import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
 import ThemeList from './Theme'
 import { updateUserName } from '../../store/actions/storage'
 
@@ -108,7 +110,8 @@ const FNFIDENTIFICATIONDATA = [
 ]
 
 const GiftDetails = ( { navigation } ) => {
-
+  console.log(navigation.state.params.giftMsg);
+  
 
   const renderItem = ( { item } ) => {
     if( addfNf ){
@@ -131,7 +134,9 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
+  const [ note, setNote ] = useState( 
+    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+    'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -150,6 +155,8 @@ const GiftDetails = ( { navigation } ) => {
   const [ secretPhraseHint, setSecretPhraseHint ] = useState( '' )
   const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
 
+  const [disableReturn , setDisableReturn] = useState(0);
+
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
     title: 'Gift Sats',
@@ -167,7 +174,6 @@ const GiftDetails = ( { navigation } ) => {
   }, [ wallet.walletName, wallet.userName ] )
 
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
-
 
   const IdentificationCard = ( { type, title, subtitle } ) => {
     return (
@@ -569,8 +575,9 @@ const GiftDetails = ( { navigation } ) => {
             navigation.navigate( 'AddContact', {
               fromScreen: 'GiftDetails',
               giftId,
+              senderName: name,
               setActiveTab: navigation.state.params.setActiveTab
-            } )
+            })
           } else {
             if( encryptionType === DeepLinkEncryptionType.SECRET_PHRASE ) {
               if( !secretPhrase.trim() || !secretPhraseHint.trim() ){
@@ -603,6 +610,12 @@ const GiftDetails = ( { navigation } ) => {
     )
   }
 
+  const  handleKeyPress = ({ nativeEvent: { key: keyValue } }) => {
+    if(keyValue === 'Enter')
+    {
+      setDisableReturn(1);
+    }
+};
   return (
     <ScrollView
       contentContainerStyle={{
@@ -642,16 +655,24 @@ const GiftDetails = ( { navigation } ) => {
               disabled={addfNf}
               style={{
                 height: 30,
-                width: 100,
-                justifyContent: 'center',
+                width: 150,
+                paddingHorizontal:6,
+                flexDirection:'row',
+                justifyContent: 'space-around',
                 alignItems: 'center',
                 borderRadius: 8,
                 backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
               }}
             >
+              <View style={styles.settingIcon}>
+              <Setting/>
+              </View>
               <Text style={{
                 color: 'white'
-              }}>{'Advanced'}</Text>
+              }}>{'Custom Phrase'}</Text>
+              <View style={styles.menuIcon}>
+              <Menu/>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -778,13 +799,13 @@ const GiftDetails = ( { navigation } ) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
-            >
+             >
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}
-              >
+               >
                 <View
                   style={{
                     margin: wp( 1 ),
@@ -893,8 +914,9 @@ const GiftDetails = ( { navigation } ) => {
             placeholderTextColor={Colors.gray1}
             value={note}
             keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-            returnKeyType="done"
-            returnKeyLabel="Done"
+            // returnKeyType="done"
+            // returnKeyLabel="Done"
+            enablesReturnKeyAutomatically = {true}
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
@@ -903,6 +925,7 @@ const GiftDetails = ( { navigation } ) => {
             onChangeText={( text ) => {
               setNote( text )
             }}
+            onKeyPress={handleKeyPress}
           />
         </View>
 
@@ -1065,7 +1088,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     marginHorizontal: wp( 2 ),
-    width: 240,
+    width:wp( 55 ),
   },
   dot: {
     height: 8,
@@ -1356,6 +1379,12 @@ const styles = StyleSheet.create( {
     fontWeight:'500',
     fontSize:15,
     fontFamily: Fonts.FiraSansRegular
+  },
+  menuIcon:{
+    paddingTop:hp( 0.6 ),
+  },
+  settingIcon:{
+    paddingTop:hp( 0.3 ),
   }
 } )
 

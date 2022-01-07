@@ -1177,6 +1177,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               setActiveIndex={()=> confirmAction( 1 )}
               index={1}
               italicText={''}
+              boldText={''}
               changeBgColor={true}
               tag={strings.MostMemorable}
               hideRadioBtn
@@ -1189,6 +1190,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               setActiveIndex={()=> confirmAction( 2 )}
               index={2}
               italicText={''}
+              boldText={''}
               changeBgColor={true}
               tag={strings.UserDefined}
               hideRadioBtn

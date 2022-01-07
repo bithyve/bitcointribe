@@ -15,7 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import CheckMark from '../assets/images/svgs/checkmark.svg'
 import Arrow from '../assets/images/svgs/icon_arrow.svg'
 
-export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, mainText, subText, italicText, isSelected, index, changeBgColor, tag = '', hideRadioBtn = false } ) {
+export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, mainText, subText, italicText, isSelected, index, changeBgColor, boldText } ) {
   return (
     <TouchableOpacity
       onPress={() => setActiveIndex( index )}
@@ -117,7 +117,13 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
             color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
             width: wp( 65 )
           }}>
-            {subText}
+            {subText} 
+            {
+              boldText !== '' && 
+              <Text style={{fontWeight: '600'}}>
+                {boldText}
+              </Text>
+            }
           </Text>
           }
           {italicText !== '' &&
