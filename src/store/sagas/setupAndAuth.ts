@@ -38,6 +38,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
 import semverLte from 'semver/functions/lte'
+import { accountVisibilityResetter, testAccountEnabler } from './upgrades'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -194,25 +195,11 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
   const storedVersion = wallet.version
 
-  if( semver.lt( storedVersion, '2.0.66' ) ){
-    const accountShells: AccountShell[] = yield select(
-      ( state ) => state.accounts.accountShells
-    )
-
-    let testAccountShell: AccountShell
-    accountShells.forEach( shell => {
-      if( shell.primarySubAccount.type === AccountType.TEST_ACCOUNT ) testAccountShell = shell
-    } )
-
-    if( testAccountShell.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
-      const settings = {
-        visibility: AccountVisibility.DEFAULT
-      }
-      yield put( updateAccountSettings( {
-        accountShell: testAccountShell, settings
-      } ) )
-    }
-  }
+  console.log( {
+    storedVersion
+  } )
+  if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
+  if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
 
   // update wallet version
   yield put( updateWallet( {
