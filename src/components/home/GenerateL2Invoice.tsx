@@ -20,7 +20,12 @@ const ReceiveAmountContent = ( {
   onPressConfirm,
   onPressBack
 } ) => {
+  // console.log(lnModal, "_+_++++")
   const [ amount, setAmount ] = useState( selectedAmount )
+
+  const [ expirationTime, setExpirationTime ] = useState(0)
+
+  const [ memo, setMemo ] = useState( '' )
   const common  = translations[ 'common' ]
   return (
     <View style={styles.modalContentContainer}>
@@ -34,28 +39,63 @@ const ReceiveAmountContent = ( {
           }}>{message}</Text>
         </View>
         <View style={styles.textBoxView}>
-          <View style={styles.amountInputImage}>
-            <Image
-              style={styles.textBoxImage}
-              source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
+          <View style={{
+            flex: 1
+          }}>
+            <TextInput
+              style={{
+                ...styles.textBox, paddingLeft: 10
+              }}
+              placeholder={'sats'}
+              value={amount}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              keyboardType={'numeric'}
+              onChangeText={( value ) => setAmount( value )}
+              placeholderTextColor={Colors.borderColor}
+              autoCorrect={false}
+              autoFocus={false}
+              autoCompleteType="off"
             />
           </View>
-          <TextInput
-            style={{
-              ...styles.textBox, paddingLeft: 10
-            }}
-            placeholder={'sats'}
-            value={amount}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            keyboardType={'numeric'}
-            onChangeText={( value ) => setAmount( value )}
-            placeholderTextColor={Colors.borderColor}
-            autoCorrect={false}
-            autoFocus={false}
-            autoCompleteType="off"
-          />
-        </View>
+          <View style={{
+            flex: 1
+          }}>
+            <TextInput
+              style={{
+                ...styles.textBox, paddingLeft: 10
+              }}
+              placeholder={'expiration'}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              keyboardType={'numeric'}
+              onChangeText={( value ) => setExpirationTime( value )}
+              placeholderTextColor={Colors.borderColor}
+              autoCorrect={false}
+              autoFocus={false}
+              autoCompleteType="off"
+            />
+          </View>
+
+          <View style={{
+            flex: 1
+          }}>
+            <TextInput
+              style={{
+                ...styles.textBox, paddingLeft: 10
+              }}
+              placeholder={'memo'}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              keyboardType={'default'}
+              onChangeText={( value ) => setMemo( value )}
+              placeholderTextColor={Colors.borderColor}
+              autoCorrect={false}
+              autoFocus={false}
+              autoCompleteType="off"
+            />
+          </View>
+          </View>
         <View style={{
           marginTop: 'auto',
         }}>
@@ -68,7 +108,7 @@ const ReceiveAmountContent = ( {
           >
             <TouchableOpacity
               onPress={() => {
-                onPressConfirm( amount )
+                onPressConfirm( amount, expirationTime, memo )
               }}
               style={styles.successModalButtonView}
             >
@@ -143,11 +183,11 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   textBoxView: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.borderColor,
-    height: 50,
+    height: 150,
     marginRight: wp( '10%' ),
     marginLeft: wp( '10%' ),
     marginBottom: hp( 4 ),

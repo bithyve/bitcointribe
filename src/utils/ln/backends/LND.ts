@@ -190,6 +190,58 @@ export default class LND {
       )
     };
 
+
+    getRequestNode = (node: any, link: string) => {
+      const {
+        host,
+        lndhubUrl,
+        port,
+        macaroonHex,
+        accessToken,
+        certVerification,
+        enableTor
+      } = node
+      const auth = macaroonHex || accessToken
+      const headers: any = this.getHeaders( auth )
+      headers[ 'Content-Type' ] = 'application/json'
+      const url = this.getURL( host || lndhubUrl, port, link )
+      return this.restReq(
+        headers,
+        url,
+        'get',
+        null,
+        certVerification,
+        enableTor
+      )
+    };
+
+
+    postRequestNode = (node: any, link: string, data: any) => {
+      console.log("india")
+      const {
+        host,
+        lndhubUrl,
+        port,
+        macaroonHex,
+        accessToken,
+        certVerification,
+        enableTor
+      } = node
+      const auth = macaroonHex || accessToken
+      const headers: any = this.getHeaders( auth )
+      headers[ 'Content-Type' ] = 'application/json'
+      const url = this.getURL( host || lndhubUrl, port, link )
+      return this.restReq(
+        headers,
+        url,
+        'post',
+        data,
+        certVerification,
+        enableTor
+      )
+    };
+
+
     getInfo = ( node: any ) => {
       const {
         host,
@@ -218,16 +270,12 @@ export default class LND {
     postRequest = ( route: string, data?: any ) =>
       this.request( route, 'post', data );
     deleteRequest = ( route: string ) => this.request( route, 'delete', null );
-
-    getTransactions = () =>
-      this.getRequest( '/v1/transactions' ).then( ( data: any ) => ( {
-        transactions: data.transactions.reverse()
-      } ) );
     getChannels = () => this.getRequest( '/v1/channels' );
     getChannelInfo = ( chanId: string ) =>
       this.getRequest( `/v1/graph/edge/${chanId}` );
-    getBlockchainBalance = () => this.getRequest( '/v1/balance/blockchain' );
-    getLightningBalance = () => this.getRequest( '/v1/balance/channels' );
+    getBlockchainBalance = (node: any) =>
+      this.getRequestNode( node, '/v1/balance/blockchain' )
+    getLightningBalance = (node: any) => this.getRequestNode( node, '/v1/balance/channels' );
     sendCoins = ( data: any ) =>
       this.postRequest( '/v1/transactions', {
         addr: data.addr,
@@ -237,9 +285,12 @@ export default class LND {
     getMyNodeInfo = () => this.getRequest( '/v1/getinfo' );
     getInvoices = () =>
       this.getRequest( '/v1/invoices?reversed=true&num_max_invoices=100' );
-    createInvoice = ( data: any ) => this.postRequest( '/v1/invoices', data );
+    createInvoice = ( node:any, data: any ) => this.postRequestNode(node, '/v1/invoices', data);
+    // createInvoice = (node:any, data:any) => {
+    //   console.log("++++++++++++")
+    // }
     getPayments = () => this.getRequest( '/v1/payments' );
-    getNewAddress = () => this.getRequest( '/v1/newaddress' );
+    getNewAddress = (node: any) => this.getRequestNode( node ,'/v1/newaddress' );
     openChannel = ( data: OpenChannelRequest ) =>
       this.postRequest( '/v1/channels', data );
     openChannelStream = ( data: OpenChannelRequest ) =>
@@ -342,4 +393,5 @@ export default class LND {
     supportsCoinControl = () => this.supports( 'v0.12.0' );
     supportsAccounts = () => this.supports( 'v0.13.0' );
     checkNodeInfo = ( data: any ) => this.getInfo( data );
+    getTransactions = (data: any) => this.getRequestNode(data, '/v1/transactions')
 }

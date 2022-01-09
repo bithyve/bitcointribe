@@ -57,6 +57,8 @@ import Home from '../../../pages/Home/Home'
 import Header from '../Header'
 import Login from '../../../pages/Login'
 import { translations } from '../../../common/content/LocContext'
+import TransactionInfo from '../../../pages/zeusLN/screens/TransactionInfoScreen'
+import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -105,6 +107,20 @@ const HomeStack = createStackNavigator(
     },
     LNAccountDetails: {
       screen: LNAccountDetails,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
+    ReceiveCoinScreen: {
+      screen: ReceiveCoinScreen,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
+    TransactionInfo: {
+      screen: TransactionInfo,
       navigationOptions: {
         header: null,
         // tabBarVisibl

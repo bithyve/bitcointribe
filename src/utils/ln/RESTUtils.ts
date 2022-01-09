@@ -60,6 +60,10 @@ class RESTUtils {
     getMyNodeInfo = ( ...args: any[] ) => this.call( 'getMyNodeInfo', args );
     getInvoices = ( ...args: any[] ) => this.call( 'getInvoices', args );
     createInvoice = ( ...args: any[] ) => this.call( 'createInvoice', args );
+    // createInvoice = (...args: any[]) => {
+    //   console.log("+_+_+__+_+_+_")
+    //   return 23
+    // }
     getPayments = ( ...args: any[] ) => this.call( 'getPayments', args );
     getNewAddress = ( ...args: any[] ) => this.call( 'getNewAddress', args );
     openChannel = ( ...args: any[] ) => this.call( 'openChannel', args );
