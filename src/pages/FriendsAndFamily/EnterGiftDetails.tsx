@@ -35,6 +35,8 @@ import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import Halloween from '../../assets/images/svgs/halloween.svg'
 import Birthday from '../../assets/images/svgs/birthday.svg'
+import Setting from '../../assets/images/svgs/setting_icon.svg'
+import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
 import ThemeList from './Theme'
 import { updateUserName } from '../../store/actions/storage'
 
@@ -635,16 +637,24 @@ const GiftDetails = ( { navigation } ) => {
               disabled={addfNf}
               style={{
                 height: 30,
-                width: 100,
-                justifyContent: 'center',
+                width: 150,
+                paddingHorizontal:6,
+                flexDirection:'row',
+                justifyContent: 'space-around',
                 alignItems: 'center',
                 borderRadius: 8,
                 backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
               }}
             >
+              <View style={styles.settingIcon}>
+              <Setting/>
+              </View>
               <Text style={{
                 color: 'white'
-              }}>{'Advanced'}</Text>
+              }}>{'Custom Phrase'}</Text>
+              <View style={styles.menuIcon}>
+              <Menu/>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -1347,6 +1357,12 @@ const styles = StyleSheet.create( {
     fontWeight:'500',
     fontSize:15,
     fontFamily: Fonts.FiraSansRegular
+  },
+  menuIcon:{
+    paddingTop:hp( 0.6 ),
+  },
+  settingIcon:{
+    paddingTop:hp( 0.3 ),
   }
 } )
 
