@@ -31,7 +31,7 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
         flexDirection:'row',
         alignItems: 'center',
         // justifyContent: 'space-between',
-        marginHorizontal: wp( '5%' ),
+        marginHorizontal: wp( '4%' ),
         flex: 1,
         marginVertical: hp( '1.8%' )
       }}>
@@ -70,41 +70,47 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
         </View>
         }
         <View style={{
-          marginLeft: wp( '2%' ),
           flex: 1
         }}>
 
           <View style={{
-            flexDirection: 'row'
+            flexDirection: 'row', alignItems: 'center',
           }}>
             <Text style={{
-              fontSize: RFValue( 13 ),
-              fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
-              color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.blue,
-              marginBottom: hp( 0.5 ),
+
             }}>
-              {mainText}
+              <Text style={{
+                fontSize: RFValue( 13 ),
+                fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
+                color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.blue,
+                marginBottom: hp( 0.5 ),
+
+              }}>
+                {`${mainText} `}
+              </Text>
+              {
+                tag !== '' && (
+                  <View style={{
+                    alignItems: 'center',
+                    borderRadius: 5,
+                    backgroundColor: isSelected ? Colors.white : Colors.lightBlue,
+                    justifyContent: 'center',
+                    marginLeft: wp( 5 ),
+                    paddingHorizontal: wp( 1 ),
+                  }}>
+                    <Text
+                      style={{
+                        fontSize: RFValue( 11 ),
+                        fontFamily: Fonts.FiraSansRegular,
+                        color: isSelected ? Colors.lightBlue : Colors.white,
+                      }}
+                    >{tag}</Text>
+                  </View>
+                )
+              }
             </Text>
-            {
-              tag !== '' && (
-                <View style={{
-                  alignItems: 'center',
-                  borderRadius: wp( '1%' ),
-                  backgroundColor: isSelected ? Colors.white : Colors.lightBlue,
-                  justifyContent: 'center',
-                  marginLeft: wp( '2%' ),
-                  paddingHorizontal: wp( '1.5%' ),
-                }}>
-                  <Text
-                    style={{
-                      fontSize: RFValue( 11 ),
-                      fontFamily: Fonts.FiraSansRegular,
-                      color: isSelected ? Colors.lightBlue : Colors.white,
-                    }}
-                  >{tag}</Text>
-                </View>
-              )
-            }
+
+
 
           </View>
 
@@ -115,7 +121,6 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
             fontSize: RFValue( 11 ),
             fontFamily: Fonts.FiraSansRegular,
             color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
-            width: wp( 65 )
           }}>
             {subText}
             {

@@ -189,9 +189,9 @@ export default function NewWalletName( props ) {
             flex: 1
           }} >
             <HeaderTitle
-              firstLineTitle={strings.Step1}
-              secondLineBoldTitle={'New Wallet '}
-              secondLineTitle={strings.creation}
+              firstLineTitle={`${strings.Step1} ${strings.creation}`}
+              secondLineBoldTitle={'Name your Wallet'}
+              secondLineTitle={''}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -229,12 +229,12 @@ export default function NewWalletName( props ) {
                 alignSelf: 'flex-end'
               }}>
                 {strings.WalletCreationNumbers}</Text>
-              <Text style={{
+              {/* <Text style={{
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
-                {strings.numbers}</Text>
+                {strings.numbers}</Text> */}
             </View>
           </View>
           {/* </KeyboardAvoidingView> */}
