@@ -369,6 +369,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignContent: 'center',
     justifyContent: 'center',
+    marginBottom: heightPercentageToDP('2%')
   },
 
 } )
