@@ -1,285 +1,330 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   View,
+  Text,
   StyleSheet,
-  SafeAreaView,
-  StatusBar,
+  TextInput,
   Platform,
-  Keyboard,
+  TouchableOpacity,
+  KeyboardAvoidingView,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { LocalizationContext } from '../../common/content/LocContext'
+
+import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useDispatch } from 'react-redux'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import moment from 'moment'
-import _ from 'underscore'
-import HistoryPageComponent from './HistoryPageComponent'
-import ModalHeader from '../../components/ModalHeader'
-import BottomSheet from 'reanimated-bottom-sheet'
-import SecurityQuestion from './SecurityQuestion'
-import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import {
-  updateMSharesHealth,
-} from '../../store/actions/BHR'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import HistoryHeaderComponent from './HistoryHeaderComponent'
-import ModalContainer from '../../components/home/ModalContainer'
+import { withNavigation } from 'react-navigation'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { translations } from '../../common/content/LocContext'
 
-const SecurityQuestionHistory = ( props ) => {
-  const strings  = translations[ 'bhr' ]
 
-  const [ securityQuestionsHistory, setSecuirtyQuestionHistory ] = useState( [
-    {
-      id: 1,
-      title: strings.Questionscreated,
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 2,
-      title: strings.Passwordconfirmed,
-      date: null,
-      info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 3,
-      title: strings.Questionsunconfirmed,
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-  ] )
-  const [
-    SecurityQuestionBottomSheet,
-    setSecurityQuestionBottomSheet,
-  ] = useState( React.createRef() )
-  const [
-    questionModal,
-    showQuestionModal,
-  ] = useState( false )
-  const [
-    successModal,
-    showSuccessModal,
-  ] = useState( false )
-  const [ showAnswer, setShowAnswer ] = useState( false )
-  const [
-    HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
-  ] = useState( React.createRef() )
-  const levelHealth: {
-    level: number;
-    levelInfo: {
-      shareType: string;
-      updatedAt: string;
-      status: string;
-      shareId: string;
-      reshareVersion?: number;
-      name?: string;
-    }[];
-  }[] = useSelector( ( state ) => state.bhr.levelHealth )
-  const currentLevel: Number = useSelector(
-    ( state ) => state.bhr.currentLevel,
+const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
+
+function validateAllowedCharacters( answer: string ): boolean {
+  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+}
+
+function SecurityQuestion( props ) {
+  const { security }: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
-  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
-  const next = props.navigation.getParam( 'next' )
-  const dispatch = useDispatch()
+  const { translations } = useContext( LocalizationContext )
+  const common = translations[ 'common' ]
+  const strings = translations[ 'bhr' ]
+  const stringsLogin = translations[ 'login' ]
 
-  const renderSecurityQuestionContent = useCallback( () => {
-    return (
-      <SecurityQuestion
-        onClose={() => showQuestionModal( false )}
-        onPressConfirm={async () => {
-          Keyboard.dismiss()
-          saveConfirmationHistory()
-          updateHealthForSQ()
-          showQuestionModal( false )
-          showSuccessModal( true )
-        }}
-        onPasscodeVerify={()=>{ showQuestionModal( true ); setShowAnswer( true ) }}
-        showAnswer={showAnswer}
-      />
-    )
-  }, [ showAnswer, questionModal ] )
-
-  const renderHealthCheckSuccessModalContent = useCallback( () => {
-    return (
-      <ErrorModalContents
-        modalRef={HealthCheckSuccessBottomSheet}
-        title={strings.HealthCheckSuccessful}
-        info={strings.Passwordbackedupsuccessfully}
-        note={''}
-        proceedButtonText={strings.ViewHealth}
-        isIgnoreButton={false}
-        onPressProceed={() => {
-          // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
-          showSuccessModal( false )
-          props.navigation.goBack()
-        }}
-        isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/success.png' )}
-      />
-    )
-  }, [] )
-
-
-  const sortedHistory = ( history ) => {
-    const currentHistory = history.filter( ( element ) => {
-      if ( element.date ) return element
-    } )
-
-    const sortedHistory = _.sortBy( currentHistory, 'date' )
-    sortedHistory.forEach( ( element ) => {
-      element.date = moment( element.date )
-        .utc()
-        .local()
-        .format( 'DD MMMM YYYY HH:mm' )
-    } )
-
-    return sortedHistory
-  }
-
-  const updateHistory = ( securityQuestionHistory ) => {
-    const updatedSecurityQuestionsHistory = [ ...securityQuestionsHistory ]
-    if ( securityQuestionHistory.created )
-      updatedSecurityQuestionsHistory[ 0 ].date = securityQuestionHistory.created
-
-    if ( securityQuestionHistory.confirmed )
-      updatedSecurityQuestionsHistory[ 1 ].date =
-        securityQuestionHistory.confirmed
-
-    if ( securityQuestionHistory.unconfirmed )
-      updatedSecurityQuestionsHistory[ 2 ].date =
-        securityQuestionHistory.unconfirmed
-    setSecuirtyQuestionHistory( updatedSecurityQuestionsHistory )
-  }
-
-  const saveConfirmationHistory = async () => {
-    const securityQuestionHistory = JSON.parse(
-      await AsyncStorage.getItem( 'securityQuestionHistory' ),
-    )
-    if ( securityQuestionHistory ) {
-      const updatedSecurityQuestionsHistory = {
-        ...securityQuestionHistory,
-        confirmed: Date.now(),
+  let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
+  const securityQuestion = security.question ? security.question : ''
+  const securityAnswer = security.answer ? security.answer : ''
+  const showAnswerProp = props.showAnswer
+  const [ showAnswer, setShowAnswer ] = useState( props.showAnswer ? props.showAnswer : false )
+  const [ answer, setAnswer ] = useState( '' )
+  const [ errorText, setErrorText ] = useState( '' )
+  const [ isDisabled, setIsDisabled ] = useState( true )
+  const setConfirm = () => {
+    if ( answer.length > 0 && answer != securityAnswer ) {
+      if ( AnswerCounter < 2 ) {
+        AnswerCounter++
+        setAnswerCounter( AnswerCounter )
+      } else {
+        props.onClose()
+        props.navigation.navigate( 'ReLogin', {
+          isPasscodeCheck: true,
+          onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
+        } )
+        setShowAnswer( true )
+        setErrorText( '' )
+        return
       }
-      updateHistory( updatedSecurityQuestionsHistory )
-      await AsyncStorage.setItem(
-        'securityQuestionHistory',
-        JSON.stringify( updatedSecurityQuestionsHistory ),
-      )
+      setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
+    } else {
+      setErrorText( '' )
+    }
+  }
+
+  useEffect( ()=>{
+    setShowAnswer( showAnswerProp )
+    if( showAnswerProp ) setErrorText( '' )
+  }, [ showAnswerProp ] )
+
+  const setBackspace = ( event ) => {
+    if ( event.nativeEvent.key == 'Backspace' ) {
+      setErrorText( '' )
     }
   }
 
   useEffect( () => {
-    if ( next )showQuestionModal( true )
-  }, [ next ] )
+    if( security.questionId ) {
+      if ( answer.trim() == securityAnswer.trim() ) {
+        setErrorText( '' )
+      }
+    }
+  }, [ answer ] )
 
   useEffect( () => {
-    ( async () => {
-      const securityQuestionHistory = JSON.parse(
-        await AsyncStorage.getItem( 'securityQuestionHistory' ),
-      )
-      console.log( {
-        securityQuestionHistory
-      } )
-      if ( securityQuestionHistory ) updateHistory( securityQuestionHistory )
-    } )()
-  }, [] )
-
-  const updateHealthForSQ = () => {
-    if ( levelHealth.length > 0 && levelHealth[ 0 ].levelInfo.length > 0 ) {
-      const shareObj =
-        {
-          walletId: wallet.walletId,
-          shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
-          reshareVersion: levelHealth[ 0 ].levelInfo[ 0 ].reshareVersion,
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
-          shareType: 'securityQuestion',
-          name: 'Encryption Password'
-        }
-      dispatch( updateMSharesHealth( shareObj, true ) )
-    }
-  }
+    if ( ( !errorText && !answer && answer ) || answer ) setIsDisabled( false )
+    else setIsDisabled( true )
+  }, [ answer, errorText ] )
 
   return (
-    <View style={{
-      flex: 1, backgroundColor: Colors.backgroundColor
-    }}>
-      <SafeAreaView
-        style={{
-          flex: 0, backgroundColor: Colors.backgroundColor
-        }}
-      />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <HistoryHeaderComponent
-        onPressBack={() => props.navigation.goBack()}
-        selectedTitle={strings.EncryptionPassword}
-        selectedTime={props.navigation.state.params.selectedTime}
-        moreInfo={''}
-        headerImage={require( '../../assets/images/icons/icon_password.png' )}
-      />
-      <View style={{
-        flex: 1
+    <KeyboardAwareScrollView
+      resetScrollToCoords={{
+        x: 0, y: 0
+      }}
+      scrollEnabled={false}
+      style={{
+        ...styles.modalContentContainer
       }}>
-        <HistoryPageComponent
-          showButton={true}
-          infoBoxTitle={strings.PasswordHistory}
-          infoBoxInfo={strings.Thehistory}
-          type={'security'}
-          IsReshare
-          onPressConfirm={() => {
-            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
-            showQuestionModal( true )
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={props.onClose}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+          // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity>
+      <View style={styles.modalContentContainer}>
+        <View>
+          <View style={{
+            paddingHorizontal: wp( '7%' )
+          }}>
+            <View style={{
+              flex: 1, justifyContent: 'center'
+            }}>
+              <Text style={styles.modalTitleText}>
+                {strings.HealthCheckConfirmPassword}
+              </Text>
+              <Text style={{
+                ...styles.modalInfoText, marginTop: wp( '1.5%' )
+              }}>
+                {strings.Specifythepassword}
+              </Text>
+            </View>
+          </View>
+          <View style={{
+            paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
+          }}>
+            <View style={styles.dropdownBox}>
+              {parseInt( security.questionId ) > 0 ? <Text style={styles.dropdownBoxText}>{securityQuestion}</Text> :
+                <Text style={styles.dropdownBoxText}>{`${strings.Hint}: ${securityQuestion}`}</Text>
+              }
+            </View>
+            <KeyboardAwareScrollView
+              resetScrollToCoords={{
+                x: 0, y: 0
+              }}
+              scrollEnabled={false}
+              // style={styles.rootContainer}
+              style={{
+                flex: 1
+                // height: `${height}%`
+
+              }}
+            >
+              <TextInput
+                style={{
+                  ...styles.inputBox,
+                  width: '100%',
+                  marginBottom: hp( '1%' ),
+                  borderColor:
+                    errorText == stringsLogin.Answerisincorrect
+                      ? Colors.red
+                      : Colors.borderColor,
+                }}
+                placeholder={stringsLogin.Enteranswer}
+                placeholderTextColor={Colors.borderColor}
+                value={answer}
+                textContentType="none"
+                autoCompleteType="off"
+                autoCorrect={false}
+                autoCapitalize="none"
+                onKeyPress={( event ) => {
+                  setBackspace( event )
+                }}
+                onChangeText={( text ) => {
+                  setAnswer( text )
+                }}
+                onBlur={() => {
+                  if( parseInt( security.questionId ) > 0  ) {
+                    if ( validateAllowedCharacters( answer ) == false ) {
+                      setErrorText( stringsLogin.Answersmust )
+                    }
+                  }
+                }}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                onSubmitEditing={( event ) => setConfirm()}
+              />
+              {errorText ? (
+                <Text
+                  style={{
+                    marginLeft: 'auto',
+                    color: Colors.red,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                  }}
+                >
+                  {errorText}
+                </Text>
+              ) : null}
+            </KeyboardAwareScrollView>
+            {showAnswer && (
+              <View
+                style={{
+                  ...styles.inputBox,
+                  width: '100%',
+                  marginBottom: hp( '1%' ),
+                  borderColor: Colors.borderColor,
+                  justifyContent: 'center'
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: RFValue( 13 ),
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {securityAnswer}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+        <View
+          style={{
+            paddingLeft: wp( '6%' ),
+            paddingRight: wp( '6%' ),
+            height: hp( '15%' ),
+            justifyContent: 'center',
           }}
-          data={sortedHistory( securityQuestionsHistory )}
-          confirmButtonText={strings.ConfirmPassword}
-          reshareButtonText={strings.ConfirmPassword}
-          // changeButtonText={'Change Question'}
-          disableChange={true}
-          onPressReshare={() => {
-            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
-            showQuestionModal( true )
-          }}
-          onPressChange={() => {
-            props.navigation.navigate( 'NewOwnQuestions' )
-          }}
-        />
+        >
+          <AppBottomSheetTouchableWrapper
+            disabled={isDisabled}
+            onPress={() => {
+              setConfirm()
+              if ( answer.trim() == securityAnswer.trim() ) {
+                AsyncStorage.setItem(
+                  'SecurityAnsTimestamp',
+                  JSON.stringify( Date.now() ),
+                ).then( () => {
+                  props.onPressConfirm()
+                } )
+              } else if( parseInt( security.questionId ) > 0  ) {
+                if ( validateAllowedCharacters( answer ) == false ) {
+                  setErrorText( stringsLogin.Answersmust )
+                }
+              } else {
+                setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
+              }
+              setIsDisabled( false )
+            }}
+            style={{
+              ...styles.questionConfirmButton,
+              backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+            }}
+          >
+            <Text style={styles.proceedButtonText}>
+              {!errorText ? common.confirm : common.tryAgain}
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+        </View>
       </View>
-      <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
-        {renderSecurityQuestionContent()}
-      </ModalContainer>
-      <ModalContainer onBackground={()=>showSuccessModal( false )} visible={successModal} closeBottomSheet={() => {showSuccessModal( false )}} >
-        {renderHealthCheckSuccessModalContent()}
-      </ModalContainer>
-    </View>
+    </KeyboardAwareScrollView>
   )
 }
 
-export default SecurityQuestionHistory
+export default withNavigation( SecurityQuestion )
 
 const styles = StyleSheet.create( {
-  modalHeaderTitleText: {
+  modalContentContainer: {
+    // height: '100%',
+    backgroundColor: Colors.white,
+  },
+  modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  modalInfoText: {
+    marginTop: hp( '3%' ),
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
   },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
+  dropdownBoxText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 13 ),
+    color: Colors.black,
+  },
+  dropdownBox: {
+    marginTop: hp( '2%' ),
+    height: 50,
+    paddingLeft: 15,
+    paddingRight: 15,
+    // alignItems: 'center',
+  },
+  questionConfirmButton: {
+    height: wp( '13%' ),
+    width: wp( '35%' ),
+    justifyContent: 'center',
+    borderRadius: 8,
     alignItems: 'center',
-    flexDirection: 'row',
-    paddingRight: 10,
-    paddingBottom: hp( '3%' ),
-    marginTop: 20,
-    marginBottom: 15,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+  },
+  inputBox: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    width: wp( '85%' ),
+    height: 50,
+    paddingLeft: 15,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
   },
 } )
