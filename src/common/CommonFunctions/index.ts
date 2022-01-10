@@ -476,6 +476,12 @@ export const processDeepLink = ( deepLink: string ) => {
         }
       }
 
+    if ( splits.includes( 'wyre' ) ) {
+      if( splits.includes( 'failed' ) ) {
+        Alert.alert( 'Wyre purchase failed', 'Please try again after sometime.' )
+      }
+      return
+    }
     // hexa links
     if ( splits[ 3 ] !== config.APP_STAGE ){
       Alert.alert(
