@@ -103,7 +103,7 @@ const MODAL_ROUTES = [
 const styles= StyleSheet.create( {
   activeStyle:{
     alignSelf: 'center',
-    marginTop: 2,
+    marginTop: 5,
     width: widthPercentageToDP( 1 ),
     height: widthPercentageToDP( 1 ),
     borderRadius: widthPercentageToDP( 0.5 ),
@@ -127,7 +127,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
-              // marginVertical: hp( '2%' )
+              marginTop: hp( '1.3%' )
             }}>
               {focused ?
                 <HomeSVG/>
@@ -156,7 +156,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
-              // marginVertical: hp( '2%' )
+              marginTop: hp( '1.3%' )
             }}>
               {focused ?
                 <FnF /> : <FnFInactive />
@@ -242,7 +242,9 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return (
+            <View style={{marginTop: hp( '1.3%' )}}>
             <IconWithBadge focused={focused} />
+            </View>
           )
         }
       },
@@ -254,6 +256,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
+              marginTop: hp( '1.3%' )
             }}>
               {focused ?
                 <Settings />
