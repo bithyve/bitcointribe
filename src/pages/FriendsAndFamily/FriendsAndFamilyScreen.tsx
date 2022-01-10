@@ -580,7 +580,7 @@ class FriendsAndFamilyScreen extends React.Component<
               }}
             >
               <Text style={[ styles.contactText, {
-                fontSize: RFValue( 24 ),
+                fontSize: RFValue( 24 ), lineHeight:30
               } ]}>+</Text>
               {/* <Image
                     style={styles.addGrayImage}

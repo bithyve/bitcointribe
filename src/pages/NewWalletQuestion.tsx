@@ -1399,6 +1399,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               setActiveIndex={()=> confirmAction( 0 )}
               index={0}
               italicText={''}
+              boldText={''}
               changeBgColor={true}
               tag={strings.MostSecure}
               hideRadioBtn
@@ -1426,7 +1427,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               setActiveIndex={()=> confirmAction( 1 )}
               index={1}
               italicText={''}
-              boldText={''}
+              boldText={strings.MakeSureToRememberIt}
               changeBgColor={true}
               tag={strings.MostMemorable}
               hideRadioBtn

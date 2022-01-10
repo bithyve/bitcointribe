@@ -368,7 +368,7 @@ const styles = StyleSheet.create( {
     height: '100%',
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     padding: 0,
   },
 

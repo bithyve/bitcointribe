@@ -139,7 +139,8 @@
       "toremember": "lembrar",
       "Easiertoremember": "Mais fácil de lembrar. Recomendado",
       "Useencryptionpassword": "Use sua própria senha de criptografia",
-      "Createapassword": "Criar uma senha. Tenha certeza de se lembrar disso",
+      "Createapassword": "Criar uma senha. ",
+      "MakeSureToRememberIt": "Tenha certeza de se lembrar disso",
       "Backuplets": "O backup permite que você recupere sua carteira mesmo que perca seu telefone. Gerenciar da",
       "questionList": [
           {

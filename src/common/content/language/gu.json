@@ -141,7 +141,8 @@
     "toremember": "યાદ રાખવું",
     "Easiertoremember": "યાદ રાખવા માટે સરળ. ભલામણ કરેલ",
     "Useencryptionpassword": "તમારા પોતાના એન્ક્રિપ્શન પાસવર્ડનો ઉપયોગ કરો",
-    "Createapassword": "પાસવર્ડ બનાવો. તેને યાદ રાખવાની ખાતરી કરો",
+    "Createapassword": "પાસવર્ડ બનાવો. ",
+    "MakeSureToRememberIt": "તેને યાદ રાખવાની ખાતરી કરો",
     "Backuplets": "જો તમે તમારો ફોન ગુમાવો તો પણ બેકઅપ તમને તમારું વletલેટ પુન recoverપ્રાપ્ત કરવા દે છે. થી મેનેજ કરો",
     "questionList": [
       {

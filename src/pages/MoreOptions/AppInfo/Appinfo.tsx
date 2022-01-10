@@ -39,6 +39,7 @@ import { updateCloudData } from '../../../store/actions/cloud'
 import { NavigationActions, StackActions } from 'react-navigation'
 // import { goHomeAction } from '../../../navigation/actions/NavigationActions'
 import { translations } from '../../../common/content/LocContext'
+import Options from '../../../assets/images/svgs/options.svg'
 
 interface MenuOption {
     title: string;
@@ -253,7 +254,10 @@ const AppInfo = ( props ) => {
               <View style={{
                 justifyContent: 'center', marginLeft: 10
               }}>
+                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                 <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
+                <TouchableOpacity style={{padding:5,zIndex:1}}><Options/></TouchableOpacity>
+                </View>
                 <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
               </View>
               <View style={{
