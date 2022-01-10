@@ -572,6 +572,7 @@ const GiftDetails = ( { navigation } ) => {
             navigation.navigate( 'AddContact', {
               fromScreen: 'GiftDetails',
               giftId,
+              senderName: name,
               setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
