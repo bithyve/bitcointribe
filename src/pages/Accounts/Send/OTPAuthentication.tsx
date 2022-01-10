@@ -390,7 +390,9 @@ export default function OTPAuthenticationScreen( { navigation } ) {
 
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate( 'SubAccountTFAHelp' )
+                navigation.navigate( 'SubAccountTFAHelp', {
+                  sourceAccountShell: sourceAccountShell
+                } )
               }}
               style={{
                 width: wp( '30%' ),
