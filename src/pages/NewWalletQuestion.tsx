@@ -328,8 +328,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ confirmPswd ] )
 
   const onPressProceed = ( isSkip? ) => {
-    // setSignUpStarted( true )
-    // showLoader()
+    setSignUpStarted( true )
+    showLoader()
     setShowAGSPmodal( false )
     let security = null
     if ( activeIndex === 0 ) {
