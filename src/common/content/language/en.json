@@ -112,7 +112,7 @@
         "creation": "creation",
         "walletName": "Enter wallet name",
         "numbers": "Numbers or special characters are not supported",
-        "WalletCreationNumbers": "Wallet Name must contain only Alphabets",
+        "WalletCreationNumbers": "Wallet Name must contain only alphabets",
         "Next": "Next",
         "info": "Wallet name is used in the messages you send to your Friends & Family contacts",
         "Creatingyourwallet": "Creating your wallet",
