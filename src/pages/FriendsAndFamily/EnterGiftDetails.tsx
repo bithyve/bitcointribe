@@ -37,6 +37,7 @@ import Halloween from '../../assets/images/svgs/halloween.svg'
 import Birthday from '../../assets/images/svgs/birthday.svg'
 import ThemeList from './Theme'
 import { updateUserName } from '../../store/actions/storage'
+import Toast from '../../components/Toast'
 
 import { translations } from '../../common/content/LocContext'
 
@@ -159,11 +160,11 @@ const GiftDetails = ( { navigation } ) => {
 
   useEffect( () => {
     setDropdownBoxList( ThemeList )
-    }, [] )
-    
-    useEffect( () => {
+  }, [] )
+
+  useEffect( () => {
     setName( wallet.userName? wallet.userName: wallet.walletName )
-    }, [ wallet.walletName, wallet.userName ] )
+  }, [ wallet.walletName, wallet.userName ] )
 
   const { title, walletName, gift, avatar }: {title: string, walletName: string, gift: Gift, avatar: boolean} = navigation.state.params
 
@@ -571,6 +572,12 @@ const GiftDetails = ( { navigation } ) => {
               setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
+            if( encryptionType === DeepLinkEncryptionType.SECRET_PHRASE ) {
+              if( !secretPhrase.trim() || !secretPhraseHint.trim() ){
+                Toast( 'Enter secret phrase and hint' )
+                return
+              }
+            }
             navigation.replace( 'SendGift', {
               fromScreen: 'Gift',
               giftId,
