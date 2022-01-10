@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   Text,
   ScrollView,
-  FlatList, Image
+  FlatList, Image,RefreshControl
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -120,6 +120,10 @@ const ManageGifts = ( { navigation } ) => {
     dispatch( syncGiftsStatus() )
     getIsVisited()
   }, [] )
+
+  function performRefreshOnPullDown() {
+    dispatch( syncGiftsStatus() )
+  }
 
   const getIsVisited = async () => {
     const isVisited = await AsyncStorage.getItem( 'GiftVisited' )
@@ -339,6 +343,14 @@ const ManageGifts = ( { navigation } ) => {
 
         <FlatList
           // extraData={selectedDestinationID}
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              onRefresh={() => {
+                performRefreshOnPullDown()
+              }}
+            />
+          }
           style={{
             height: hp( giftsArr?.[ `${active}` ].length === 0 ? 0 : 69 ),
           }}
