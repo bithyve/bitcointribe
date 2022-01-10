@@ -50,6 +50,7 @@ import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../common/content/LocContext'
 import ButtonStyles from '../common/Styles/ButtonStyles'
 import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
+import WalletInitKnowMore from '../components/know-more-sheets/WalletInitKnowMore'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -119,6 +120,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
   const [ isSkipClicked, setIsSkipClicked ] = useState( false )
+  const [ knowMore, setKnowMore ] = useState( false )
 
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
@@ -1341,7 +1343,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           backgroundColor: Colors.backgroundColor
         }}>
           <View style={[ CommonStyles.headerContainer, {
-            backgroundColor: Colors.backgroundColor
+            backgroundColor: Colors.backgroundColor,
+            justifyContent: 'space-between'
           } ]}>
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
@@ -1356,6 +1359,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   size={17}
                 />
               </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setKnowMore( true )}
+              style={{
+                ...styles.selectedContactsView,
+              }}
+            >
+              <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
+
             </TouchableOpacity>
           </View>
 
@@ -1372,8 +1384,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <HeaderTitle
               firstLineTitle={strings.Step2}
-              secondLineBoldTitle={'New Wallet '}
-              secondLineTitle={strings.creation}
+              secondLineBoldTitle={'Create initial cloud backup'}
+              secondLineTitle={''}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -1390,6 +1402,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               changeBgColor={true}
               tag={strings.MostSecure}
               hideRadioBtn
+              boldText=""
+            />
+
+            <CardWithRadioBtn
+              geticon={''}
+              mainText={strings.Useencryptionpassword}
+              subText={strings.Createapassword}
+              isSelected={false}
+              setActiveIndex={()=> confirmAction( 2 )}
+              index={2}
+              italicText={''}
+              boldText={strings.MakeSureToRememberIt}
+              changeBgColor={true}
+              tag={strings.UserDefined}
+              hideRadioBtn
             />
             <CardWithRadioBtn
               geticon={''}
@@ -1404,20 +1431,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               tag={strings.MostMemorable}
               hideRadioBtn
             />
-            <CardWithRadioBtn
-              geticon={''}
-              mainText={strings.Useencryptionpassword}
-              subText={strings.Createapassword}
-              isSelected={false}
-              setActiveIndex={()=> confirmAction( 2 )}
-              index={2}
-              italicText={''}
-              boldText={strings.MakeSureToRememberIt}
-              changeBgColor={true}
-              tag={strings.UserDefined}
-              hideRadioBtn
-            />
-
             <View style={{
               marginTop: 10
             }}>
@@ -1431,6 +1444,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   dispatch( updateCloudPermission( false ) )
                   onPressProceed( true )
                 }}
+                boldText=""
                 index={2}
                 italicText={''}
                 changeBgColor={true}
@@ -1455,8 +1469,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <BottomInfoBox
               title={common.note}
-              infoText={`${strings.Backuplets} `}
-              italicText={'Security Centre'}
+              infoText={'Key option chosen above is used to encrypt your wallet backup and can also help you if you forget your '}
+              italicText={'login passcode'}
               backgroundColor={Colors.white}
             />
           </View>
@@ -1514,6 +1528,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         visible={showAGSPmodal}
         closeBottomSheet={()=>{setShowAGSPmodal( false )}} >
         {renderAGSP()}
+      </ModalContainer>
+      <ModalContainer
+        onBackground={()=>setKnowMore( false )}
+        visible={knowMore}
+        closeBottomSheet={() => setKnowMore( false )}>
+        <WalletInitKnowMore closeModal={() => setKnowMore( false )} />
       </ModalContainer>
     </View>
   )
@@ -1689,6 +1709,25 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: wp( '2%' ),
+  },
+
+  selectedContactsView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: Colors.lightBlue,
+    borderRadius: wp( 2 ),
+    height: hp( 3.6 ),
+    paddingHorizontal: wp( 2 ),
+    marginTop: wp( 2.7 ),
+    alignSelf: 'flex-start',
+    marginHorizontal:  wp( 2 ),
+  },
+
+  contactText: {
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.white,
   },
 
   textPasscode: {
