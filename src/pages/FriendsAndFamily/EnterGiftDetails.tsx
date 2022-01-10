@@ -886,8 +886,7 @@ const GiftDetails = ( { navigation } ) => {
             placeholderTextColor={Colors.gray1}
             value={note}
             keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-            returnKeyType="done"
-            returnKeyLabel="Done"
+            blurOnSubmit={true}
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
