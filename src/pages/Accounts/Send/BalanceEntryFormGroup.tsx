@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Platform } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { Input } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
@@ -26,6 +26,7 @@ import idx from 'idx'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { translations } from '../../../common/content/LocContext'
 
+const placeholder = Platform.OS =='ios' ? 12 : 9;
 export type Props = {
   currentRecipient: RecipientDescribing,
   subAccountKind: SubAccountKind;
@@ -368,7 +369,7 @@ const styles = StyleSheet.create( {
     height: '100%',
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( placeholder ),
     padding: 0,
   },
 
