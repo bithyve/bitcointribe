@@ -164,7 +164,20 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitleTransaction}>{common.fees}</Text>
-          <Text style={ListStyles.listItemSubtitle}>{feeText()}</Text>
+          {/* <Text style={ListStyles.listItemSubtitle}>{feeText()}</Text> */}
+          <LabeledBalanceDisplay
+            balance={Number( transaction.fee )}
+            isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
+            unitTextStyle={{
+              ...ListStyles.listItemSubtitle, marginBottom: 3
+            }}
+            amountTextStyle={{
+              ...ListStyles.listItemSubtitle, marginBottom: -3, marginLeft: -2
+            }}
+            currencyImageStyle={{
+              marginBottom: -3
+            }}
+          />
         </View>
 
         <View style={styles.lineItem}>
