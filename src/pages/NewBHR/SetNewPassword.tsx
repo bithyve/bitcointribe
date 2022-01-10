@@ -1025,6 +1025,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               setActiveIndex={setActiveIndex}
               index={0}
               italicText={''}
+              boldText={''}
               changeBgColor={true}
             />
             <CardWithRadioBtn
@@ -1035,6 +1036,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               setActiveIndex={setActiveIndex}
               index={1}
               italicText={''}
+              boldText={''}
               changeBgColor={true}
             />
           </TouchableOpacity>
