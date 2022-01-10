@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import idx from 'idx'
-
+import DeviceInfo from 'react-native-device-info'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -66,8 +66,8 @@ const AppInfo = ( props ) => {
     ( state ) => state.storage.wallet?.walletName,
   )
 
-  const walletNameLength = walletName?.split('').length;
-  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+  const walletNameLength = walletName?.split( '' ).length
+  const walletNameNew = walletName.split( '' )[ walletNameLength - 1 ].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`
 
   const walletId = useSelector(
     ( state ) => state.storage.wallet?.walletId,
@@ -273,7 +273,7 @@ const AppInfo = ( props ) => {
                   <Text style={styles.headerTitleText}>{`${walletId.length > 22 ? walletId.substr( 0, 22 )+'...' : walletId}`}</Text>
                 }
                 { menuOption.title === 'Version History' &&
-                  <Text style={styles.headerTitleText}>{`Hexa ${data && data.length && data[ 0 ].version}`}</Text>
+                  <Text style={styles.headerTitleText}>{`Hexa ${DeviceInfo.getVersion()}`}</Text>
                 }
               </View>
             </View>
