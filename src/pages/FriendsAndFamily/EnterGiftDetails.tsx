@@ -1077,7 +1077,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     marginHorizontal: wp( 2 ),
-    width:wp( 55 ),
+    width: 240,
   },
   dot: {
     height: 8,
