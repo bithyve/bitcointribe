@@ -538,10 +538,10 @@ const styles = StyleSheet.create( {
     marginTop:20,
     borderRadius: 10,
     backgroundColor:'#fff',
-    height:50,
+    // height:50,
     justifyContent:'center',
     alignItems:'center',
-    padding:7,
+    padding:10,
     marginHorizontal:30,
   },
   btnContainer:{

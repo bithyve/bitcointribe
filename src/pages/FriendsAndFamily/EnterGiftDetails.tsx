@@ -1069,7 +1069,8 @@ const styles = StyleSheet.create( {
     color: Colors.lightTextColor,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginHorizontal: wp( 2 )
+    marginHorizontal: wp( 2 ),
+    width:wp( 55 ),
   },
   dot: {
     height: 8,
@@ -1078,6 +1079,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 2 ),
     alignSelf: 'center'
+    
   },
   timeInfo:{
     width: '87%',

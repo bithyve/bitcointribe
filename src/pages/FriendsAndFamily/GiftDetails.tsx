@@ -873,7 +873,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( 10 ),
     justifyContent:'center',
     textAlign: 'center',
-    letterSpacing: 8
+    letterSpacing: 2
   },
   deepLinkEncryptionTextContainer: {
     width: wp( '80%' ),
