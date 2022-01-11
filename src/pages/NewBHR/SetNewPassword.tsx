@@ -44,6 +44,8 @@ import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { LocalizationContext } from '../../common/content/LocContext'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import ModalContainerScroll from '../../components/home/ModalContainerScroll'
+import WalletInitKnowMore from '../../components/know-more-sheets/WalletInitKnowMore'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -101,6 +103,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
   const [ isSkipClicked, setIsSkipClicked ] = useState( false )
+  const [ knowMore, setKnowMore ] = useState( false )
 
   const dispatch = useDispatch()
 
@@ -1121,7 +1124,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           backgroundColor: Colors.backgroundColor
         }}>
           <View style={[ CommonStyles.headerContainer, {
-            backgroundColor: Colors.backgroundColor
+            backgroundColor: Colors.backgroundColor,
+            justifyContent: 'space-between'
           } ]}>
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
@@ -1136,6 +1140,15 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   size={17}
                 />
               </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setKnowMore( true )}
+              style={{
+                ...styles.selectedContactsView,
+              }}
+            >
+              <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
+
             </TouchableOpacity>
           </View>
 
@@ -1261,6 +1274,13 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         closeBottomSheet={()=>{setShowAGSPmodal( false )}} >
         {renderAGSP()}
       </ModalContainer>
+
+      <ModalContainerScroll
+        onBackground={()=>setKnowMore( false )}
+        visible={knowMore}
+        closeBottomSheet={() => setKnowMore( false )}>
+        <WalletInitKnowMore closeModal={() => setKnowMore( false )} />
+      </ModalContainerScroll>
 
     </View>
   )
@@ -1434,5 +1454,24 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
+  },
+
+  selectedContactsView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: Colors.lightBlue,
+    borderRadius: wp( 2 ),
+    height: hp( 3.6 ),
+    paddingHorizontal: wp( 2 ),
+    marginTop: wp( 2.7 ),
+    alignSelf: 'flex-start',
+    marginHorizontal:  wp( 2 ),
+  },
+
+  contactText: {
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.white,
   },
 } )

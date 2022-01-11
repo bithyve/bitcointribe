@@ -118,15 +118,25 @@ function SecurityQuestion( props ) {
         }} />
       </TouchableOpacity>
       <View style={styles.modalContentContainer}>
+
         <View>
           <View style={{
             paddingHorizontal: wp( '7%' )
           }}>
+            {
+              props.title1 && (
+                <Text style={{
+                  ...styles.modalInfoText, marginTop: wp( '1.5%' )
+                }}>
+                  {props.title1}
+                </Text>
+              )
+            }
             <View style={{
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                {strings.HealthCheckConfirmPassword}
+                {props.title ? props.title : strings.HealthCheckConfirmPassword}
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
@@ -203,6 +213,15 @@ function SecurityQuestion( props ) {
                 </Text>
               ) : null}
             </KeyboardAwareScrollView>
+            {
+              props.note && (
+                <Text style={{
+                  ...styles.modalInfoText, marginTop: wp( '1.5%' )
+                }}>
+                  {props.note}
+                </Text>
+              )
+            }
             {showAnswer && (
               <View
                 style={{

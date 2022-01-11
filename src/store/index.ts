@@ -35,6 +35,7 @@ import {
   credentialsAuthWatcher,
   changeAuthCredWatcher,
   applicationUpdateWatcher,
+  resetPinCredWatcher,
 } from './sagas/setupAndAuth'
 
 import {
@@ -180,6 +181,7 @@ const rootSaga = function* () {
     credentialsAuthWatcher,
     changeAuthCredWatcher,
     applicationUpdateWatcher,
+    resetPinCredWatcher,
 
     // accounts watchers
     syncAccountsWatcher,

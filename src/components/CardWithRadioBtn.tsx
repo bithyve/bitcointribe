@@ -76,9 +76,7 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
           <View style={{
             flexDirection: 'row', alignItems: 'center',
           }}>
-            <Text style={{
-
-            }}>
+            <Text>
               <Text style={{
                 fontSize: RFValue( 13 ),
                 fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
@@ -88,29 +86,27 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
               }}>
                 {`${mainText} `}
               </Text>
-              {
-                tag !== '' && (
-                  <View style={{
-                    alignItems: 'center',
-                    borderRadius: 5,
-                    backgroundColor: isSelected ? Colors.white : Colors.lightBlue,
-                    justifyContent: 'center',
-                    marginLeft: wp( 5 ),
-                    paddingHorizontal: wp( 1 ),
-                  }}>
-                    <Text
-                      style={{
-                        fontSize: RFValue( 11 ),
-                        fontFamily: Fonts.FiraSansRegular,
-                        color: isSelected ? Colors.lightBlue : Colors.white,
-                      }}
-                    >{tag}</Text>
-                  </View>
-                )
-              }
             </Text>
-
-
+            {
+              tag !== '' && (
+                <View style={{
+                  alignItems: 'center',
+                  borderRadius: 5,
+                  backgroundColor: isSelected ? Colors.white : Colors.lightBlue,
+                  justifyContent: 'center',
+                  marginLeft:2,
+                  padding: 2,
+                }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue( 11 ),
+                      fontFamily: Fonts.FiraSansRegular,
+                      color: isSelected ? Colors.lightBlue : Colors.white,
+                    }}
+                  >{tag}</Text>
+                </View>
+              )
+            }
 
           </View>
 

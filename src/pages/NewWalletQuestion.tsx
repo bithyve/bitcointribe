@@ -7,7 +7,6 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  KeyboardAvoidingView,
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
@@ -40,6 +39,8 @@ import { initNewBHRFlow } from '../store/actions/BHR'
 import {  setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
+import ModalContainerScroll from '../components/home/ModalContainerScroll'
+
 import ButtonBlue from '../components/ButtonBlue'
 import { updateCloudPermission } from '../store/actions/BHR'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
@@ -1530,12 +1531,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         closeBottomSheet={()=>{setShowAGSPmodal( false )}} >
         {renderAGSP()}
       </ModalContainer>
-      <ModalContainer
+      <ModalContainerScroll
         onBackground={()=>setKnowMore( false )}
         visible={knowMore}
         closeBottomSheet={() => setKnowMore( false )}>
         <WalletInitKnowMore closeModal={() => setKnowMore( false )} />
-      </ModalContainer>
+      </ModalContainerScroll>
     </View>
   )
 }

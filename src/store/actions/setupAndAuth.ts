@@ -7,6 +7,7 @@ export const WALLET_SETUP_COMPLETION = 'WALLET_SETUP_COMPLETION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
+export const RESET_PIN = 'RESET_PIN'
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED'
 export const INIT_RECOVERY_COMPLETED = 'INIT_RECOVERY_COMPLETED'
 import { AccountType } from '../../bitcoin/utilities/Interface'
@@ -77,6 +78,14 @@ export const changeAuthCred = ( oldPasscode, newPasscode ) => {
   return {
     type: CHANGE_AUTH_CRED, payload: {
       oldPasscode, newPasscode
+    }
+  }
+}
+
+export const resetPin = ( newPasscode ) => {
+  return {
+    type: RESET_PIN, payload: {
+      newPasscode
     }
   }
 }
