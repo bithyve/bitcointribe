@@ -530,8 +530,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text.toLowerCase() )
-                setPswdMasked( text )
+                setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -653,12 +653,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               </TouchableWithoutFeedback>
             ) : null}
           </View>
-          {pswdError.length == 0 && (
-            <Text style={styles.helpText}>
-              {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              {strings.Numbersorspecial}
-            </Text>
-          )}
+
           <View
             style={{
               ...hintInputStyle,
@@ -761,7 +756,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
             title={common.note}
-            infoText={strings.Makesure}
+            infoText={strings.Youcanuse}
             italicText={''}
             backgroundColor={Colors.white}
           />
@@ -1183,7 +1178,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               tag={strings.MostSecure}
               hideRadioBtn
             />
-            <CardWithRadioBtn
+            {/* <CardWithRadioBtn
               geticon={''}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
@@ -1195,7 +1190,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               changeBgColor={true}
               tag={strings.MostMemorable}
               hideRadioBtn
-            />
+            /> */}
             <CardWithRadioBtn
               geticon={''}
               mainText={strings.Useencryptionpassword}

@@ -619,8 +619,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text )
-                setPswdMasked( text )
+                setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -849,7 +849,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
             title={common.note}
-            infoText={strings.Makesure}
+            infoText={strings.Youcanuse}
             italicText={''}
             backgroundColor={Colors.white}
           />
@@ -1420,7 +1420,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               tag={strings.UserDefined}
               hideRadioBtn
             />
-            <CardWithRadioBtn
+            {/* <CardWithRadioBtn
               geticon={''}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
@@ -1432,7 +1432,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               changeBgColor={true}
               tag={strings.MostMemorable}
               hideRadioBtn
-            />
+            /> */}
             <View style={{
               marginTop: 10
             }}>
