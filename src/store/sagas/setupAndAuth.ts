@@ -14,6 +14,7 @@ import {
   switchReLogin,
   INIT_RECOVERY,
   CHANGE_AUTH_CRED,
+  RESET_PIN,
   credsChanged,
   pinChangedFailed,
   initializeRecoveryCompleted,
@@ -109,17 +110,26 @@ export const credentialStorageWatcher = createWatcher(
 )
 
 function* credentialsAuthWorker( { payload } ) {
+  console.log( payload.passcode )
   console.clear()
   // let t = timer('credentialsAuthWorker')
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
   try {
     const hash = yield call( Cipher.hash, payload.passcode )
+    console.log( 'hash', hash )
+
     const encryptedKey = yield call( SecureStore.fetch, hash )
+    console.log( 'encryptedKey', encryptedKey )
+
     key = yield call( Cipher.decrypt, encryptedKey, hash )
+    console.log( 'key', key )
+
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
+    console.log( 'err', err )
+
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
     return
@@ -181,6 +191,34 @@ function* changeAuthCredWorker( { payload } ) {
     yield put( credsChanged( 'not-changed' ) )
   }
 }
+
+function* resetPinWorker( { payload } ) {
+  const { newPasscode } = payload
+  try {
+    const key = yield select( ( state ) => state.storage.key )
+    // setup new pin
+    const newHash = yield call( Cipher.hash, newPasscode )
+    const encryptedKey = yield call( Cipher.encrypt, key, newHash )
+
+    //store the AES key against the hash
+    if ( !( yield call( SecureStore.store, newHash, encryptedKey ) ) ) {
+      throw new Error( 'Unable to access secure store' )
+    }
+    yield put( credsChanged( 'changed' ) )
+  } catch ( err ) {
+    console.log( {
+      err
+    } )
+    yield put( pinChangedFailed( true ) )
+    // Alert.alert('Pin change failed!', err.message);
+    yield put( credsChanged( 'not-changed' ) )
+  }
+}
+
+export const resetPinCredWatcher = createWatcher(
+  resetPinWorker,
+  RESET_PIN,
+)
 
 export const changeAuthCredWatcher = createWatcher(
   changeAuthCredWorker,
