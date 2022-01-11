@@ -26,12 +26,12 @@ export default function TestAccountKnowMoreSheetContents( props ) {
       text2:  strings.AGSP2,
       image: require( '../../assets/images/icons/walletinit-2.png' )
     },
-    {
-      title: strings.SecurityQuestion,
-      text1: strings.SecurityQuestion1,
-      text2: strings.SecurityQuestion2,
-      image: require( '../../assets/images/icons/walletinit-3.png' )
-    },
+    // {
+    //   title: strings.SecurityQuestion,
+    //   text1: strings.SecurityQuestion1,
+    //   text2: strings.SecurityQuestion2,
+    //   image: require( '../../assets/images/icons/walletinit-3.png' )
+    // },
     {
       title: strings.UserDefinedPassphrase,
       text1: strings.UserDefinedPassphrase1,
@@ -73,6 +73,8 @@ export default function TestAccountKnowMoreSheetContents( props ) {
           snapToInterval={hp( 81 )}
           decelerationRate="fast"
           data={data}
+          initialScrollIndex={props.index ? props.index : 0}
+          onScrollToIndexFailed={( info ) => {console.log( info )}}
           renderItem={( { item } ) =>
             <View style={styles.ElementView}>
               <Text style={styles.headerText}>{item.title}</Text>
