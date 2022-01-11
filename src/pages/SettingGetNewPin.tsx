@@ -119,6 +119,9 @@ export default function SettingGetNewPin( props ) {
       setIsDisabled( false )
       if( oldPasscode === '' ) {
         props.navigation.goBack()
+        if ( props.navigation.state.params.onPasscodeReset ) {
+          props.navigation.state.params.onPasscodeReset(  )
+        }
       } else {
         props.navigation.navigate( 'PasscodeChangeSuccessPage' )
       }

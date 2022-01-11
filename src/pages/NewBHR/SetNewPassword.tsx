@@ -1473,7 +1473,7 @@ const styles = StyleSheet.create( {
   },
 
   textPasscode: {
-    fontSize: RFValue( 20 ),
+    fontSize: RFValue( 18 ),
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
     flex: 1,

@@ -63,6 +63,9 @@
     "login": {
         "welcome": "Welcome back!",
         "enter_your": "Please enter your ",
+        "ForgotPasscode": "Forgot passcode?",
+        "EncryptionKeyNotSet": "Encryption Key not set",
+        "Youcanreset": "You can reset your Login Passcode if you have set up an Encryption Key (Strong Password, Own Passphrase or Security Answer). It seems you have not set up any",
         "existingPasscode": "existing passcode",
         "passcode": "passcode",
         "tos": "Terms of Service",
