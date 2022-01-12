@@ -764,7 +764,7 @@ export const uplaodFileWatcher = createWatcher(
   UPLOAD_FILE,
 )
 
-function* updateCloudBackupWorker( ) {
+export function* updateCloudBackupWorker( ) {
   try{
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {

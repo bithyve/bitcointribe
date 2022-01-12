@@ -43,6 +43,7 @@ import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { setCloudBackupStatus } from '../store/actions/cloud'
 import SecurityQuestion from './NewBHR/SecurityQuestion'
+import Toast from '../components/Toast'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -58,6 +59,9 @@ export default function Login( props ) {
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
+  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
+  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
+
   const getRandomMessage = () => {
     //const randomIndex = Math.floor( Math.random() * 5 )
     //return strings.loaderMessages[ randomIndex ]
@@ -346,6 +350,11 @@ export default function Login( props ) {
     }
   }
 
+  const onPasscodeReset= () => {
+    setCheckAuth( false )
+    Toast( 'Passcode reset successfully, please login with new passcode' )
+  }
+
   const renderSecurityQuestionContent = useCallback( () => {
     return (
       <SecurityQuestion
@@ -354,7 +363,8 @@ export default function Login( props ) {
           Keyboard.dismiss()
           showQuestionModal( false )
           props.navigation.navigate( 'SettingGetNewPin', {
-            oldPasscode: ''
+            oldPasscode: '',
+            onPasscodeReset:onPasscodeReset
           } )
         }}
         title="Enter your Passphrase"
@@ -594,12 +604,18 @@ export default function Login( props ) {
                     marginHorizontal: 15,
                   }}
                   onPress={()=> {
+                    if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+                      setJailBrokenTitle( strings.EncryptionKeyNotSet )
+                      setJailBrokenInfo( strings.Youcanreset )
+                      setErrorModal( true )
+                      return
+                    }
                     showQuestionModal( true )
                   }}>
                   <Text style={{
                     color: Colors.blue,
                     fontFamily: Fonts.FiraSansMedium
-                  }}>Forgot passcode?</Text>
+                  }}>{strings.ForgotPasscode}</Text>
                 </TouchableOpacity>
               )
             }

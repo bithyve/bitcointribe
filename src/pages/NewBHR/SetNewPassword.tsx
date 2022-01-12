@@ -11,7 +11,8 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
-  Clipboard
+  Clipboard,
+  Image
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -134,6 +135,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
   const isChange = props.navigation.getParam( 'isChange' )
+  const [ knowMoreIndex, setKnowMoreIndex ] = useState( 0 )
+
+
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -361,26 +365,25 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
       >
         <View style={{
           height: hp( '60%' ),
-          marginHorizontal: wp( 3 )
+          marginHorizontal: wp( 4 )
         }}>
           <TouchableOpacity
             activeOpacity={1}
             onPress={() => {
+              setKnowMoreIndex( 1 )
+              setShowAGSPmodal( false )
+              setKnowMore( true )
               showSecurityQue( false )
               showEncryptionPswd( false )
               setShowAGSPmodal( false )
               setAnswerError( '' )
             }}
             style={{
-              width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-              alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-              marginTop: wp( 3 ),
+              ...styles.selectedContactsView,
+              alignSelf: 'flex-end'
             }}
           >
-            <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
-            }} />
+            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
           </TouchableOpacity>
           <View style={{
             marginHorizontal: wp( '6%' )
@@ -404,7 +407,25 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                 }, 1500 )
               }}
               style={styles.containerPasscode}>
-              <Text style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+              <View
+                style={{
+                  width: wp( '12%' ),
+                  height: wp( '12%' ),
+                  backgroundColor: Colors.borderColor,
+                  borderTopRightRadius: wp( 3 ),
+                  borderBottomRightRadius: wp( 3 ),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Image
+                  style={{
+                    width: 18, height: 20
+                  }}
+                  source={require( '../../assets/images/icons/icon-copy.png' )}
+                />
+              </View>
             </TouchableOpacity>
 
             {
@@ -421,13 +442,15 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
 
             <Text style={[ styles.bottomNoteInfoText, {
-              marginTop: 10
+              marginTop: 10, color: Colors.blue
+            } ]}>{common.note}</Text>
+            <Text style={[ styles.bottomNoteInfoText, {
             } ]}>{strings.Itmayalso}</Text>
           </View>
 
           <View style={{
             alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
-            flexDirection: 'row', marginTop: hp( 10 )
+            flexDirection: 'row', marginTop: hp( 7 )
           }}>
             <TouchableOpacity
               onPress={() => {onPressProceed()}}
@@ -480,17 +503,21 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         }}>
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => {showSecurityQue( false ); showEncryptionPswd( false ); setPswdError( '' ); setHint( '' )}}
+            onPress={() => {
+              setKnowMoreIndex( 2 )
+              showSecurityQue( false )
+              showEncryptionPswd( false )
+              setPswdError( '' )
+              setKnowMore( true )
+              setHint( '' )}
+            }
             style={{
-              width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-              alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-              marginTop: wp( 3 ), marginRight: wp( 3 )
+              ...styles.selectedContactsView,
+              alignSelf: 'flex-end'
             }}
           >
-            <FontAwesome name="close" color={Colors.white} size={19} style={{
-              // marginTop: hp( 0.5 )
-            }} />
+            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
+
           </TouchableOpacity>
           <Text style={{
             // marginBottom: wp( '%' ),
@@ -530,8 +557,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text.toLowerCase() )
-                setPswdMasked( text )
+                setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -653,12 +680,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               </TouchableWithoutFeedback>
             ) : null}
           </View>
-          {pswdError.length == 0 && (
-            <Text style={styles.helpText}>
-              {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              {strings.Numbersorspecial}
-            </Text>
-          )}
+
           <View
             style={{
               ...hintInputStyle,
@@ -761,7 +783,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
             title={common.note}
-            infoText={strings.Makesure}
+            infoText={strings.Youcanuse}
             italicText={''}
             backgroundColor={Colors.white}
           />
@@ -1142,7 +1164,10 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => setKnowMore( true )}
+              onPress={() => {
+                setKnowMoreIndex( 0 )
+                setKnowMore( true )}
+              }
               style={{
                 ...styles.selectedContactsView,
               }}
@@ -1183,7 +1208,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               tag={strings.MostSecure}
               hideRadioBtn
             />
-            <CardWithRadioBtn
+            {/* <CardWithRadioBtn
               geticon={''}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
@@ -1195,7 +1220,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               changeBgColor={true}
               tag={strings.MostMemorable}
               hideRadioBtn
-            />
+            /> */}
             <CardWithRadioBtn
               geticon={''}
               mainText={strings.Useencryptionpassword}
@@ -1279,7 +1304,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         onBackground={()=>setKnowMore( false )}
         visible={knowMore}
         closeBottomSheet={() => setKnowMore( false )}>
-        <WalletInitKnowMore closeModal={() => setKnowMore( false )} />
+        <WalletInitKnowMore index={knowMoreIndex} closeModal={() => setKnowMore( false )} />
       </ModalContainerScroll>
 
     </View>
@@ -1441,19 +1466,20 @@ const styles = StyleSheet.create( {
   },
   containerPasscode: {
     backgroundColor: Colors.white,
-    paddingHorizontal: wp( '3%' ),
-    paddingVertical: wp( '3%' ),
-    borderRadius: wp( '1%' ),
+    borderRadius: wp( '3%' ),
     marginVertical: wp( '4%' ),
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: wp( '2%' ),
+    marginHorizontal: wp( '1%' ),
+    flexDirection: 'row'
   },
 
   textPasscode: {
-    fontSize: RFValue( 20 ),
+    fontSize: RFValue( 18 ),
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
+    flex: 1,
+    marginLeft: 5
   },
 
   selectedContactsView: {

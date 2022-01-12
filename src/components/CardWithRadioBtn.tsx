@@ -76,17 +76,21 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
           <View style={{
             flexDirection: 'row', alignItems: 'center',
           }}>
-            <Text>
-              <Text style={{
-                fontSize: RFValue( 13 ),
-                fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
-                color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.blue,
-                marginBottom: hp( 0.5 ),
+            <View style={{
+              flex: 1
+            }}>
+              <Text>
+                <Text style={{
+                  fontSize: RFValue( 13 ),
+                  fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
+                  color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.blue,
+                  marginBottom: hp( 0.5 ),
 
-              }}>
-                {`${mainText} `}
+                }}>
+                  {`${mainText} `}
+                </Text>
               </Text>
-            </Text>
+            </View>
             {
               tag !== '' && (
                 <View style={{

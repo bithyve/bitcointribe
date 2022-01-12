@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   Clipboard,
+  Image,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -52,6 +53,7 @@ import { LocalizationContext } from '../common/content/LocContext'
 import ButtonStyles from '../common/Styles/ButtonStyles'
 import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
 import WalletInitKnowMore from '../components/know-more-sheets/WalletInitKnowMore'
+import Toast from '../components/Toast'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -158,6 +160,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
   const bottomSheetRef = createRef<BottomSheet>()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
+  const [ knowMoreIndex, setKnowMoreIndex ] = useState( 0 )
 
   const getNextMessage = () => {
     if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
@@ -452,26 +455,20 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       >
         <View style={{
           height: hp( '60%' ),
-          marginHorizontal: wp( 3 )
+          marginHorizontal: wp( 4 )
         }}>
           <TouchableOpacity
-            activeOpacity={1}
             onPress={() => {
-              showSecurityQue( false )
-              showEncryptionPswd( false )
+              setKnowMoreIndex( 1 )
               setShowAGSPmodal( false )
-              setAnswerError( '' )
+              setKnowMore( true )
             }}
             style={{
-              width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-              alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-              marginTop: wp( 3 ),
+              ...styles.selectedContactsView,
+              alignSelf: 'flex-end'
             }}
           >
-            <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
-            }} />
+            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
           </TouchableOpacity>
           <View style={{
             marginHorizontal: wp( '6%' )
@@ -495,7 +492,25 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 }, 1500 )
               }}
               style={styles.containerPasscode}>
-              <Text style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+              <View
+                style={{
+                  width: wp( '12%' ),
+                  height: wp( '12%' ),
+                  backgroundColor: Colors.borderColor,
+                  borderTopRightRadius: wp( 3 ),
+                  borderBottomRightRadius: wp( 3 ),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Image
+                  style={{
+                    width: 18, height: 20
+                  }}
+                  source={require( '../assets/images/icons/icon-copy.png' )}
+                />
+              </View>
             </TouchableOpacity>
             {
               copied && (
@@ -508,15 +523,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 </Text>
               )
             }
-
             <Text style={[ styles.bottomNoteInfoText, {
-              marginTop: 10
+              marginTop: 10, color: Colors.blue
+            } ]}>{common.note}</Text>
+            <Text style={[ styles.bottomNoteInfoText, {
             } ]}>{strings.Itmayalso}</Text>
           </View>
 
           <View style={{
             alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
-            flexDirection: 'row', marginTop: hp( 10 )
+            flexDirection: 'row', marginTop: hp( 6 )
           }}>
             <TouchableOpacity
               onPress={() => {onPressProceed()}}
@@ -568,18 +584,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           height: hp( '72%' )
         }}>
           <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {showSecurityQue( false ); showEncryptionPswd( false ); setPswdError( '' ); setHint( '' )}}
+            onPress={() => {
+              setKnowMoreIndex( 2 )
+              showEncryptionPswd( false )
+              setKnowMore( true )
+            }}
             style={{
-              width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-              alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-              marginTop: wp( 3 ), marginRight: wp( 3 )
+              ...styles.selectedContactsView,
+              alignSelf: 'flex-end'
             }}
           >
-            <FontAwesome name="close" color={Colors.white} size={19} style={{
-              // marginTop: hp( 0.5 )
-            }} />
+            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
           </TouchableOpacity>
           <Text style={{
             // marginBottom: wp( '%' ),
@@ -619,8 +634,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text )
-                setPswdMasked( text )
+                setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -849,7 +864,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
             title={common.note}
-            infoText={strings.Makesure}
+            infoText={strings.Youcanuse}
             italicText={''}
             backgroundColor={Colors.white}
           />
@@ -1362,7 +1377,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => setKnowMore( true )}
+              onPress={() => {
+                setKnowMoreIndex( 0 )
+                setKnowMore( true )}
+              }
               style={{
                 ...styles.selectedContactsView,
               }}
@@ -1420,7 +1438,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               tag={strings.UserDefined}
               hideRadioBtn
             />
-            <CardWithRadioBtn
+            {/* <CardWithRadioBtn
               geticon={''}
               mainText={strings.AnsweraSecurityQuestion}
               subText={strings.Easiertoremember}
@@ -1432,7 +1450,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               changeBgColor={true}
               tag={strings.MostMemorable}
               hideRadioBtn
-            />
+            /> */}
             <View style={{
               marginTop: 10
             }}>
@@ -1471,8 +1489,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <BottomInfoBox
               title={common.note}
-              infoText={'Key option chosen above is used to encrypt your wallet backup and can also help you if you forget your '}
-              italicText={'login passcode'}
+              infoText={'If you forget this, you will not be able to access the wallet backup or reset the Login Passcode. It may be a good idea to secure more than one copy of the Encryption Passphrase'}
+              italicText={''}
               backgroundColor={Colors.white}
             />
           </View>
@@ -1535,7 +1553,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         onBackground={()=>setKnowMore( false )}
         visible={knowMore}
         closeBottomSheet={() => setKnowMore( false )}>
-        <WalletInitKnowMore closeModal={() => setKnowMore( false )} />
+        <WalletInitKnowMore index={knowMoreIndex} closeModal={() => setKnowMore( false )} />
       </ModalContainerScroll>
     </View>
   )
@@ -1704,13 +1722,12 @@ const styles = StyleSheet.create( {
 
   containerPasscode: {
     backgroundColor: Colors.white,
-    paddingHorizontal: wp( '3%' ),
-    paddingVertical: wp( '3%' ),
-    borderRadius: wp( '1%' ),
+    borderRadius: wp( '3%' ),
     marginVertical: wp( '4%' ),
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: wp( '2%' ),
+    marginHorizontal: wp( '1%' ),
+    flexDirection: 'row'
   },
 
   selectedContactsView: {
@@ -1733,8 +1750,10 @@ const styles = StyleSheet.create( {
   },
 
   textPasscode: {
-    fontSize: RFValue( 20 ),
+    fontSize: RFValue( 18 ),
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
+    flex: 1,
+    marginLeft: 5
   },
 } )

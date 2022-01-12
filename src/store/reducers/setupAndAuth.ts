@@ -10,6 +10,7 @@ import {
   PIN_CHANGED_FAILED,
   INIT_RECOVERY_COMPLETED,
   WALLET_SETUP_FAILED,
+  COMPLETED_PASSWORD_RESET
 
 } from '../actions/setupAndAuth'
 
@@ -28,6 +29,7 @@ const initialState: {
   credsChanged: string;
   pinChangedFailed: Boolean;
   initializeRecoveryCompleted: boolean;
+  passwordResetState: string
 } = {
   hasCreds: false,
   isAuthenticated: false,
@@ -42,7 +44,8 @@ const initialState: {
   },
   credsChanged: '',
   pinChangedFailed: false,
-  initializeRecoveryCompleted: false
+  initializeRecoveryCompleted: false,
+  passwordResetState: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -52,7 +55,10 @@ export default ( state = initialState, action ) => {
           .setIn( [ 'hasCreds' ], true )
           .setIn( [ 'loading', 'storingCreds' ], false )
           .value()
-
+      case COMPLETED_PASSWORD_RESET:
+        return chain( state )
+          .setIn( [ 'passwordResetState' ], action.payload.state )
+          .value()
       case CREDS_AUTHENTICATED:
         return chain( state )
           .setIn( [ 'isAuthenticated' ], action.payload.isAuthenticated )
