@@ -69,6 +69,7 @@
         "existingPasscode": "existing passcode",
         "passcode": "passcode",
         "tos": "Terms of Service",
+        "ChangeEncryptionMethod": "Change Encryption Method",
         "tos_agree": "By proceeding to the next step, you agree to our ",
         "Incorrect": "Incorrect Passcode, Try Again!",
         "loaderMessages": [
@@ -289,7 +290,6 @@
         "Changeyourpasscode": "Change your passcode",
         "ChangeCurrency": "Currency & Language",
         "Chooseyourcurrency": "Choose your currency & language",
-        "ChangeEncryptionMethod": "Change Encryption Method",
         "AlternateCurrency": "Alternate Currency",
         "LanguageSettings": "Language Settings",
         "Chooseyourlanguage": "Choose your language preference",
