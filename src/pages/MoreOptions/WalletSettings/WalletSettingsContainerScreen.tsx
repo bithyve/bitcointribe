@@ -25,7 +25,9 @@ import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Feather from 'react-native-vector-icons/Feather'
 import { resetEncryptionPassword } from '../../../store/actions/setupAndAuth'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import LoaderModal from '../../../components/LoaderModal'
+import Toast from '../../../components/Toast'
 
 export type Props = {
   navigation: any;
@@ -82,10 +84,12 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
+  const passwordResetState = useSelector( ( state ) => state.setupAndAuth.passwordResetState )
   const [ showAGSPmodal, setShowAGSPmodal ] = useState( false )
   const [ showNote, setShowNote ] = useState( true )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ resetStarted, setresetStarted ] = useState( false )
+  const [ loading, setLoading ] = useState( false )
   const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ) )
   const menuOptions: MenuOption[] = [
     {
@@ -107,6 +111,15 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       screenName: 'ChangeEncryptionMethod',
     },
   ]
+
+  useEffect( () => {
+    if( passwordResetState === 'init' ) {
+      setLoading( true )
+    } else if( passwordResetState === 'completed' ) {
+      setLoading( false )
+      Toast( 'Password reset successfully' )
+    }
+  }, [ passwordResetState ] )
 
   const confirmAction = ( index ) => {
     setActiveIndex( index )
@@ -704,6 +717,14 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
     )
   }
 
+  const renderLoaderModalContent = useCallback( () => {
+    return <LoaderModal
+      headerText={'Reseting password'}
+      messageText={'Please wait'}
+      subPoints={''}
+      bottomText={''} />
+  }, [ loading ] )
+
   return (
     <View style={styles.modalContainer}>
       <ScrollView style={{
@@ -781,6 +802,13 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
         visible={showSelectMethodModal}
         closeBottomSheet={() => {setShowSelectMethodModal( false )}} >
         {renderSelectMethods()}
+      </ModalContainer>
+      <ModalContainer
+        onBackground={()=>()=>setLoading( false )}
+        visible={loading}
+        closeBottomSheet={null}
+      >
+        {renderLoaderModalContent()}
       </ModalContainer>
     </View>
   )

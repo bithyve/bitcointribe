@@ -53,6 +53,7 @@ import { LocalizationContext } from '../common/content/LocContext'
 import ButtonStyles from '../common/Styles/ButtonStyles'
 import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
 import WalletInitKnowMore from '../components/know-more-sheets/WalletInitKnowMore'
+import Toast from '../components/Toast'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,

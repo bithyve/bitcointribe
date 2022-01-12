@@ -23,6 +23,7 @@ import {
   updateApplication,
   UPDATE_APPLICATION,
   RESET_ENC_PASSWORD,
+  setPasswordResetState
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
@@ -113,8 +114,8 @@ export const credentialStorageWatcher = createWatcher(
 )
 
 function* resetPasswordWorker( { payload } ) {
+  yield put( setPasswordResetState( 'init' ) )
   const wallet: Wallet = yield select( state => state.storage.wallet )
-  console.log( wallet )
   yield put( updateWallet( {
     ...wallet,
     security: payload
@@ -123,8 +124,8 @@ function* resetPasswordWorker( { payload } ) {
     ...wallet,
     security: payload
   } )
-  yield call( updateCloudBackupWorker )
-  const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
+  yield put( updateCloudData() )
+  yield put( setPasswordResetState( 'completed' ) )
 }
 
 export const resetPasswordWatcher = createWatcher(

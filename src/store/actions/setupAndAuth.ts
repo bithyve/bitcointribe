@@ -108,6 +108,7 @@ export const switchCredsChanged = () => {
 export const CREDS_STORED = 'CREDS_STORED'
 export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED'
 export const COMPLETED_WALLET_SETUP = 'COMPLETED_WALLET_SETUP'
+export const COMPLETED_PASSWORD_RESET = 'COMPLETED_PASSWORD_RESET'
 export const WALLET_SETUP_FAILED = 'WALLET_SETUP_FAILED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
@@ -124,6 +125,14 @@ export const credsAuthenticated = isAuthenticated => {
   return {
     type: CREDS_AUTHENTICATED, payload: {
       isAuthenticated
+    }
+  }
+}
+
+export const setPasswordResetState = ( state ) => {
+  return {
+    type: COMPLETED_PASSWORD_RESET, payload: {
+      state,
     }
   }
 }
