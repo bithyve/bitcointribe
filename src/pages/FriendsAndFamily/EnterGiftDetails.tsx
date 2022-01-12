@@ -661,7 +661,7 @@ const GiftDetails = ( { navigation } ) => {
               </View>
               <Text style={{
                 color: 'white'
-              }}>{'Custom Phrase'}</Text>
+              }}>{'Advanced'}</Text>
               <View style={styles.menuIcon}>
               <Menu/>
               </View>
@@ -790,12 +790,14 @@ const GiftDetails = ( { navigation } ) => {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                width:'100%'
               }}
             >
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
+                  width:'97%'
                 }}
               >
                 <View
