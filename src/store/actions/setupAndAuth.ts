@@ -2,6 +2,7 @@
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
 export const SETUP_WALLET = 'SETUP_WALLET'
+export const RESET_ENC_PASSWORD = 'RESET_ENC_PASSWORD'
 
 export const WALLET_SETUP_COMPLETION = 'WALLET_SETUP_COMPLETION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
@@ -21,6 +22,12 @@ export const storeCreds = passcode => {
     type: STORE_CREDS, payload: {
       passcode
     }
+  }
+}
+
+export const resetEncryptionPassword = payload => {
+  return {
+    type: RESET_ENC_PASSWORD, payload
   }
 }
 

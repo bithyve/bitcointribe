@@ -22,10 +22,13 @@ import {
   WALLET_SETUP_COMPLETION,
   updateApplication,
   UPDATE_APPLICATION,
+  RESET_ENC_PASSWORD,
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
 import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
+import { updateCloudData } from '../actions/cloud'
+import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
@@ -107,6 +110,26 @@ function* credentialsStorageWorker( { payload } ) {
 export const credentialStorageWatcher = createWatcher(
   credentialsStorageWorker,
   STORE_CREDS,
+)
+
+function* resetPasswordWorker( { payload } ) {
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  console.log( wallet )
+  yield put( updateWallet( {
+    ...wallet,
+    security: payload
+  } ) )
+  yield call( dbManager.updateWallet, {
+    ...wallet,
+    security: payload
+  } )
+  yield call( updateCloudBackupWorker )
+  const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
+}
+
+export const resetPasswordWatcher = createWatcher(
+  resetPasswordWorker,
+  RESET_ENC_PASSWORD,
 )
 
 function* credentialsAuthWorker( { payload } ) {
