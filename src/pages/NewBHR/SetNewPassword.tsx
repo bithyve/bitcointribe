@@ -442,13 +442,15 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
 
             <Text style={[ styles.bottomNoteInfoText, {
-              marginTop: 10
+              marginTop: 10, color: Colors.blue
+            } ]}>{common.note}</Text>
+            <Text style={[ styles.bottomNoteInfoText, {
             } ]}>{strings.Itmayalso}</Text>
           </View>
 
           <View style={{
             alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
-            flexDirection: 'row', marginTop: hp( 10 )
+            flexDirection: 'row', marginTop: hp( 7 )
           }}>
             <TouchableOpacity
               onPress={() => {onPressProceed()}}

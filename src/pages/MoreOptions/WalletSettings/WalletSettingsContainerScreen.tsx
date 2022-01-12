@@ -673,15 +673,16 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
                 </Text>
               )
             }
-
             <Text style={[ styles.bottomNoteInfoText, {
-              marginTop: 10
-            } ]}>{loginStrings.Itmayalso}</Text>
+              marginTop: 10, color: Colors.blue
+            } ]}>{common.note}</Text>
+            <Text style={[ styles.bottomNoteInfoText, {
+            } ]}>{strings.Itmayalso}</Text>
           </View>
 
           <View style={{
             alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
-            flexDirection: 'row', marginTop: hp( 10 )
+            flexDirection: 'row', marginTop: hp( 7 )
           }}>
             <TouchableOpacity
               onPress={() => {onPressProceed()}}

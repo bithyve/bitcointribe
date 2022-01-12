@@ -220,7 +220,7 @@
         "Skipinitialcloud": "Skip initial cloud backup",
         "HexaWalletcreated": "Hexa Wallet created a App Generated Strong Passcode",
         "Makesureyou": "Make sure you have noted down the Strong Password and secured it",
-        "Itmayalso": "It may also be a good idea to make more than one copy of the Strong Password",
+        "Itmayalso": "If you lose this, you will not be able to access the wallet backup or reset the Login Passcode. It may be a good idea to secure more than one copy of the Strong Password",
         "UseStrongPasscode": "Use Strong Passcode",
         "fromSecurityCenter": "You can also set this up later from Security Center"
     },

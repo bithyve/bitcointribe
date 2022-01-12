@@ -523,15 +523,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 </Text>
               )
             }
-
             <Text style={[ styles.bottomNoteInfoText, {
-              marginTop: 10
+              marginTop: 10, color: Colors.blue
+            } ]}>{common.note}</Text>
+            <Text style={[ styles.bottomNoteInfoText, {
             } ]}>{strings.Itmayalso}</Text>
           </View>
 
           <View style={{
             alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
-            flexDirection: 'row', marginTop: hp( 10 )
+            flexDirection: 'row', marginTop: hp( 6 )
           }}>
             <TouchableOpacity
               onPress={() => {onPressProceed()}}
@@ -1488,8 +1489,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <BottomInfoBox
               title={common.note}
-              infoText={'Key option chosen above is used to encrypt your wallet backup and can also help you if you forget your '}
-              italicText={'login passcode'}
+              infoText={'If you forget this, you will not be able to access the wallet backup or reset the Login Passcode. It may be a good idea to secure more than one copy of the Encryption Passphrase'}
+              italicText={''}
               backgroundColor={Colors.white}
             />
           </View>
