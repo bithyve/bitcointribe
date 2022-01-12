@@ -27,7 +27,7 @@ import {
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
+import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange } from '../actions/BHR'
 import { updateCloudData } from '../actions/cloud'
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
@@ -114,18 +114,24 @@ export const credentialStorageWatcher = createWatcher(
 )
 
 function* resetPasswordWorker( { payload } ) {
-  yield put( setPasswordResetState( 'init' ) )
-  const wallet: Wallet = yield select( state => state.storage.wallet )
-  yield put( updateWallet( {
-    ...wallet,
-    security: payload
-  } ) )
-  yield call( dbManager.updateWallet, {
-    ...wallet,
-    security: payload
-  } )
-  yield put( updateCloudData() )
-  yield put( setPasswordResetState( 'completed' ) )
+  try {
+    yield put( setPasswordResetState( 'init' ) )
+    const wallet: Wallet = yield select( state => state.storage.wallet )
+    yield put( updateWallet( {
+      ...wallet,
+      security: payload
+    } ) )
+    yield call( dbManager.updateWallet, {
+      ...wallet,
+      security: payload
+    } )
+    yield call( updateCloudBackupWorker )
+    yield put( setPasswordResetState( 'completed' ) )
+    yield put ( resetLevelsAfterPasswordChange() )
+    yield put( setPasswordResetState( '' ) )
+  } catch ( error ) {
+    console.log( error )
+  }
 }
 
 export const resetPasswordWatcher = createWatcher(

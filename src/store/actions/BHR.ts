@@ -72,12 +72,19 @@ export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
 export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
+export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
     type: INIT_NEW_BHR, payload: {
       newBHRFlowStarted
     }
+  }
+}
+
+export const resetLevelsAfterPasswordChange =() => {
+  return {
+    type: RESET_LEVEL_AFTER_PASSWORD_CHANGE,
   }
 }
 
