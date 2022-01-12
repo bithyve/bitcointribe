@@ -126,7 +126,7 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
             {
               boldText !== '' &&
               <Text style={{
-                fontWeight: '600'
+                fontWeight: '700'
               }}>
                 {boldText}
               </Text>
