@@ -1191,7 +1191,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               setActiveIndex={()=> confirmAction( 2 )}
               index={2}
               italicText={''}
-              boldText={''}
+              boldText={strings.MakeSureToRememberIt}
               changeBgColor={true}
               tag={strings.UserDefined}
               hideRadioBtn
