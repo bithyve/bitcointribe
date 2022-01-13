@@ -59,7 +59,9 @@ import Login from '../../../pages/Login'
 import { translations } from '../../../common/content/LocContext'
 import TransactionInfo from '../../../pages/zeusLN/screens/TransactionInfoScreen'
 import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
-
+import SendCoinScreen from '../../../pages/zeusLN/screens/SendCoinScreen'
+import ChannelScreen from '../../../pages/zeusLN/screens/ChannelScreen'
+import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -119,6 +121,13 @@ const HomeStack = createStackNavigator(
         // tabBarVisibl
       },
     },
+
+    SendCoinScreen: {
+      screen: SendCoinScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
     TransactionInfo: {
       screen: TransactionInfo,
       navigationOptions: {
@@ -126,6 +135,21 @@ const HomeStack = createStackNavigator(
         // tabBarVisibl
       },
     },
+    
+    ChannelScreen: {
+      screen: ChannelScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
+
+    ChannelInfoScreen: {
+      screen: ChannelInfoScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
+
     NewWyreAccountDetails: {
       screen: NewWyreAccountDetailsScreen,
       navigationOptions: {

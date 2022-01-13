@@ -270,7 +270,8 @@ export default class LND {
     postRequest = ( route: string, data?: any ) =>
       this.request( route, 'post', data );
     deleteRequest = ( route: string ) => this.request( route, 'delete', null );
-    getChannels = () => this.getRequest( '/v1/channels' );
+    // getChannels = () => this.getRequest( '/v1/channels' );
+    getChannels = (node: any) => this.getRequestNode( node, '/v1/channels');
     getChannelInfo = ( chanId: string ) =>
       this.getRequest( `/v1/graph/edge/${chanId}` );
     getBlockchainBalance = (node: any) =>
@@ -286,9 +287,6 @@ export default class LND {
     getInvoices = () =>
       this.getRequest( '/v1/invoices?reversed=true&num_max_invoices=100' );
     createInvoice = ( node:any, data: any ) => this.postRequestNode(node, '/v1/invoices', data);
-    // createInvoice = (node:any, data:any) => {
-    //   console.log("++++++++++++")
-    // }
     getPayments = () => this.getRequest( '/v1/payments' );
     getNewAddress = (node: any) => this.getRequestNode( node ,'/v1/newaddress' );
     openChannel = ( data: OpenChannelRequest ) =>
