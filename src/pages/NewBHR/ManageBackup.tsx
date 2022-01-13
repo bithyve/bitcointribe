@@ -573,7 +573,7 @@ export default function ManageBackup( props ) {
           marginHorizontal: wp( 4 ),
           paddingBottom: hp( 1 )
         }}>
-          {strings[ 'SecurityPrivacy' ]}
+          {strings[ 'SecurityCenter' ]}
         </Text>
         <ScrollView
           refreshControl={
