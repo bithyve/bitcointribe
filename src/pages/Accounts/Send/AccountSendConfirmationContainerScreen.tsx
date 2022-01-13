@@ -370,8 +370,9 @@ const styles = StyleSheet.create( {
   footerSection: {
     flexDirection: 'row',
     alignContent: 'center',
-    justifyContent: 'center',
-    marginBottom: heightPercentageToDP('2%')
+    justifyContent: 'space-evenly',
+    marginBottom: heightPercentageToDP('2%'),
+    paddingHorizontal:10,
   },
 
 } )

@@ -173,7 +173,6 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
               <Text style={{
                 ...styles.priorityTableText,
-                flex: 1,
               }}>
                 ~
                 {timeConvertNear30(
@@ -278,7 +277,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
     borderTopColor: Colors.borderColor,
     borderTopWidth: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 25,
   },
 
   priorityValueContainer: {
