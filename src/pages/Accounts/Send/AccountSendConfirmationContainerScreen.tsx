@@ -61,7 +61,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const account = accountState.accounts[ sourcePrimarySubAccount.id ]
   const sendingState = useSendingState()
   const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
+    bitcoinUnit: sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
   } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
@@ -239,11 +239,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           subAccountKind={sourcePrimarySubAccount.kind}
         />
       </View>
-      <SendConfirmationCurrentTotalHeader />
+      <SendConfirmationCurrentTotalHeader
+        Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
+        />
 
       <TransactionPriorityMenu
         accountShell={sourceAccountShell}
-        bitcoinDisplayUnit={sourceAccountShell.unit}
+        bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
         onTransactionPriorityChanged={setTransactionPriority}
       />
       {selectedRecipients.length === 1 &&

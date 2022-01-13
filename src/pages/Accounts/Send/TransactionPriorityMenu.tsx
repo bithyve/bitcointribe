@@ -140,7 +140,13 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
         {transactionPriorities.map( priority => {
           return (
-            <View style={styles.priorityRowContainer} key={priority}>
+            <TouchableOpacity 
+            style={styles.priorityRowContainer} 
+            key={priority}
+            onPress={() => {
+              setTransactionPriority( priority )
+              onTransactionPriorityChanged( priority )
+            }}>
               <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -176,7 +182,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                 )}
               </Text>
               <TextValue amt={transactionFeeInfo[ priority.toUpperCase() ].amount} unit={{
-                bitcoinUnit: BitcoinUnit.SATS,
+                bitcoinUnit: bitcoinDisplayUnit,
               }}/>
               {/* <Text style={{
                 ...styles.priorityTableText,
@@ -186,7 +192,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                   bitcoinUnit: BitcoinUnit.SATS,
                 } )}
               </Text> */}
-            </View>
+            </TouchableOpacity>
           )
         } )}
 
