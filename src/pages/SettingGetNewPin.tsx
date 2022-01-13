@@ -23,6 +23,7 @@ import {
   changeAuthCred,
   pinChangedFailed,
   resetPin,
+  switchCredsChanged
 } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
@@ -118,6 +119,7 @@ export default function SettingGetNewPin( props ) {
     if ( credsChanged == 'changed' ) {
       setIsDisabled( false )
       if( oldPasscode === '' ) {
+        dispatch( switchCredsChanged() )
         props.navigation.goBack()
         if ( props.navigation.state.params.onPasscodeReset ) {
           props.navigation.state.params.onPasscodeReset(  )

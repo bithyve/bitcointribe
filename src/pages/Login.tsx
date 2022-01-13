@@ -352,6 +352,7 @@ export default function Login( props ) {
 
   const onPasscodeReset= () => {
     setCheckAuth( false )
+    setAttempts( 0 )
     Toast( 'Passcode reset successfully, please login with new passcode' )
   }
 
