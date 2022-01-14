@@ -137,7 +137,7 @@ const SecurityQuestionHistory = ( props ) => {
   )
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
-  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ) )
+  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ).match( /.{1,6}/g ).join( '-' ) )
   const dispatch = useDispatch()
 
   const renderSecurityQuestionContent = useCallback( () => {
@@ -270,7 +270,7 @@ const SecurityQuestionHistory = ( props ) => {
     let security = null
     if ( activeIndex === 0 ) {
       security = {
-        questionId: '0',
+        questionId: '100', //for AGSP
         question: 'App generated password',
         answer: appGeneratedPassword,
       }
@@ -644,7 +644,7 @@ const SecurityQuestionHistory = ( props ) => {
                 }, 1500 )
               }}
               style={styles.containerPasscode}>
-              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword}</Text>
               <View
                 style={{
                   width: wp( '12%' ),
