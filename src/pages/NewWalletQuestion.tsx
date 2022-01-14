@@ -13,6 +13,7 @@ import {
   TextInput,
   Clipboard,
   Image,
+  Dimensions
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -162,6 +163,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
   const [ knowMoreIndex, setKnowMoreIndex ] = useState( 0 )
 
+  const windowHeight = Dimensions.get('window').height;
+  
   const getNextMessage = () => {
     if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
     return loaderMessages[ messageIndex++ ]
@@ -454,24 +457,27 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         }}
       >
         <View style={{
-          height: hp( '60%' ),
-          marginHorizontal: wp( 4 )
+          height: hp( windowHeight >= 800 ? '55%' :  windowHeight >= 600 && '64%'),
+          marginHorizontal: wp( 6 ),
         }}>
-          <TouchableOpacity
-            onPress={() => {
-              setKnowMoreIndex( 1 )
-              setShowAGSPmodal( false )
-              setKnowMore( true )
-            }}
-            style={{
-              ...styles.selectedContactsView,
-              alignSelf: 'flex-end'
-            }}
-          >
-            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
-          </TouchableOpacity>
+          <View style={{paddingTop:10, paddingBottom:4}} >
+            <TouchableOpacity
+              onPress={() => {
+                setKnowMoreIndex( 1 )
+                setShowAGSPmodal( false )
+                setKnowMore( true )
+              }}
+              style={{
+                ...styles.selectedContactsView,
+                alignSelf: 'flex-end'
+              }}
+            >
+              <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
+            </TouchableOpacity>
+          </View>
           <View style={{
-            marginHorizontal: wp( '6%' )
+            marginHorizontal: wp( '2%' ),
+            paddingTop:5
           }}>
             <Text style={{
               color: Colors.blue,
@@ -480,7 +486,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             }} >{strings.HexaWalletcreated}</Text>
             <Text style={[ styles.bottomNoteInfoText, {
               color: Colors.lightTextColor,
-              marginTop: 10
+              marginTop: 10,
+              paddingRight:15
             } ]}>{strings.Makesureyou}</Text>
 
             <TouchableOpacity
@@ -531,18 +538,20 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View>
 
           <View style={{
-            alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
-            flexDirection: 'row', marginTop: hp( 6 )
+            alignItems: 'center', marginLeft: wp( '2%' ), marginBottom: hp( '4%' ),
+            flexDirection: 'row', marginTop: hp( 5 )
           }}>
             <TouchableOpacity
               onPress={() => {onPressProceed()}}
-              style={ButtonStyles.primaryActionButton}
+              style={ButtonStyles.primaryActionButtonShadow}
             >
+
               <Text style={{
                 fontSize: RFValue( 13 ),
                 color: Colors.white,
                 fontFamily: Fonts.FiraSansMedium,
                 alignSelf: 'center',
+                
               }}>{`${strings.UseStrongPasscode}`}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -558,16 +567,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansMedium,
                 alignSelf: 'center',
-                marginLeft: wp( '5%' )
+                marginLeft: wp( '7%' )
               }}>{`${common.cancel}`}</Text>
             </TouchableOpacity>
           </View>
-
         </View>
       </KeyboardAwareScrollView>
     )
   }
-
   const renderEncryptionPswd = () => {
     return(
       <KeyboardAwareScrollView
@@ -581,7 +588,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         }}
       >
         <View style={{
-          height: hp( '72%' )
+          height: hp( '72%' ),
+          paddingHorizontal:8,
+          paddingTop:8
         }}>
           <TouchableOpacity
             onPress={() => {
@@ -591,7 +600,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             }}
             style={{
               ...styles.selectedContactsView,
-              alignSelf: 'flex-end'
+              alignSelf: 'flex-end',
+              marginRight:15
             }}
           >
             <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
@@ -601,7 +611,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             color: Colors.blue,
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
-            marginLeft: wp( '6%' )
+            marginLeft: wp( '8%' )
           }} >{strings.encryptionpassword}</Text>
           <View
             style={{
@@ -1356,7 +1366,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <ScrollView>
         <View style={{
           flex: 1,
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor,
         }}>
           <View style={[ CommonStyles.headerContainer, {
             backgroundColor: Colors.backgroundColor,
@@ -1403,8 +1413,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <HeaderTitle
               firstLineTitle={strings.Step2}
-              secondLineBoldTitle={'Create initial cloud backup'}
               secondLineTitle={''}
+              secondLineBoldTitle={'Create initial cloud backup'}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -1451,7 +1461,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               hideRadioBtn
             /> */}
             <View style={{
-              marginTop: 10
+              marginTop: 10,
             }}>
               <CardWithRadioBtn
                 geticon={''}
@@ -1474,11 +1484,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
         </View>
 
-        <View style={styles.statusIndicatorView}>
-          <View style={styles.statusIndicatorInactiveView} />
-          {/* <View style={styles.statusIndicatorInactiveView} /> */}
-          <View style={styles.statusIndicatorActiveView} />
-        </View>
         {showNote && !visibleButton ? (
           <View
             style={{
@@ -1494,6 +1499,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             />
           </View>
         ) : null}
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          {/* <View style={styles.statusIndicatorInactiveView} /> */}
+          <View style={styles.statusIndicatorActiveView} />
+        </View>
       </ScrollView>
 
 
@@ -1561,7 +1571,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     letterSpacing: 0.6,
     lineHeight: 18
@@ -1725,7 +1735,7 @@ const styles = StyleSheet.create( {
     marginVertical: wp( '4%' ),
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: wp( '1%' ),
+    marginHorizontal: wp( '0%' ),
     flexDirection: 'row'
   },
 
@@ -1753,6 +1763,6 @@ const styles = StyleSheet.create( {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
     flex: 1,
-    marginLeft: 5
+    marginLeft: 8
   },
 } )

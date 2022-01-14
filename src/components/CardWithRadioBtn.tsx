@@ -31,9 +31,10 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
         flexDirection:'row',
         alignItems: 'center',
         // justifyContent: 'space-between',
+        
         marginHorizontal: wp( '4%' ),
         flex: 1,
-        marginVertical: hp( '1.8%' )
+        marginVertical: hp( '1.8%' ),
       }}>
         {
           !hideRadioBtn && (
@@ -74,10 +75,11 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
         }}>
 
           <View style={{
-            flexDirection: 'row', alignItems: 'center',
+            flexDirection: 'row',
+            alignItems:'center'
           }}>
             <View style={{
-              flex: 1
+              // // flex: 1,
             }}>
               <Text>
                 <Text style={{
@@ -98,8 +100,8 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
                   borderRadius: 5,
                   backgroundColor: isSelected ? Colors.white : Colors.lightBlue,
                   justifyContent: 'center',
-                  marginLeft:2,
-                  padding: 2,
+                  marginLeft:3,
+                  padding: 3,
                 }}>
                   <Text
                     style={{
@@ -115,7 +117,7 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
           </View>
 
 
-
+<View style={{paddingTop:5}} >
           {subText !== '' &&
           <Text style={{
             fontSize: RFValue( 11 ),
@@ -144,6 +146,7 @@ export default function CardWithRadioBtn( { setActiveIndex, geticon=undefined, m
             {italicText}
           </Text>
           }
+          </View>
         </View>
         <Arrow color="red" height={15} width={15} style={{
           marginLeft: 6,
