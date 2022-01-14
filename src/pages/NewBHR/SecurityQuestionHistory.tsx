@@ -847,7 +847,7 @@ const SecurityQuestionHistory = ( props ) => {
           data={sortedHistory( securityQuestionsHistory )}
           confirmButtonText={strings.ConfirmPassword}
           reshareButtonText={strings.ConfirmPassword}
-          changeButtonText={'Change Password'}
+          //changeButtonText={'Change Password'}
           isChangeKeeperAllow
           disableChange={false}
           onPressReshare={() => {
@@ -856,8 +856,8 @@ const SecurityQuestionHistory = ( props ) => {
             showQuestionModal( true )
           }}
           onPressChange={() => {
-            setType( 'change' )
-            showQuestionModal( true )
+            // setType( 'change' )
+            // showQuestionModal( true )
           }}
         />
       </View>
