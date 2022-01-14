@@ -146,7 +146,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ showNote, setShowNote ] = useState( true )
   const [ securityQue, showSecurityQue ] = useState( false )
   const [ showAGSPmodal, setShowAGSPmodal ] = useState( false )
-  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ) )
+  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ).match( /.{1,6}/g ).join( '-' ) )
   const [ copied, setCopied ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
@@ -343,7 +343,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     let security = null
     if ( activeIndex === 0 ) {
       security = {
-        questionId: '0',
+        questionId: '100', //for AGSP
         question: 'App generated password',
         answer: appGeneratedPassword,
       }
@@ -499,7 +499,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 }, 1500 )
               }}
               style={styles.containerPasscode}>
-              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword}</Text>
               <View
                 style={{
                   width: wp( '12%' ),
