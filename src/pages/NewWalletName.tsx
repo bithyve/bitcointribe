@@ -189,7 +189,7 @@ export default function NewWalletName( props ) {
             flex: 1
           }} >
             <HeaderTitle
-              firstLineTitle={`${strings.Step1} ${strings.creation}`}
+              firstLineTitle={`${strings.Step1}`}
               secondLineBoldTitle={'Name your Wallet'}
               secondLineTitle={''}
               infoTextNormal={''}

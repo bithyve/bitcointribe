@@ -67,7 +67,8 @@ import {
   setOpenToApproval,
   getApprovalFromKeepers,
   REJECTED_EC_REQUEST,
-  setSecondaryDataInfoStatus
+  setSecondaryDataInfoStatus,
+  RESET_LEVEL_AFTER_PASSWORD_CHANGE
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -1681,6 +1682,22 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
 export const createOrChangeGuardianWatcher = createWatcher(
   createOrChangeGuardianWorker,
   CREATE_OR_CHANGE_GUARDIAN
+)
+
+function* resetLevelAfterPasswordChange() {
+  const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
+  levelData.forEach( ( level, index ) => {
+    if( levelData[ index ].id !== 1 ) {
+      levelData[ index ].keeper1.status= 'notAccessible'
+      levelData[ index ].keeper2.status= 'notAccessible'
+    }
+  } )
+  yield put ( updateLevelData( levelData, false ) )
+}
+
+export const resetLevelAfterPasswordChangeWatcher = createWatcher(
+  resetLevelAfterPasswordChange,
+  RESET_LEVEL_AFTER_PASSWORD_CHANGE
 )
 
 function* modifyLevelDataWorker( ss?:{ payload } ) {

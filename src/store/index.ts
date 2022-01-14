@@ -35,6 +35,8 @@ import {
   credentialsAuthWatcher,
   changeAuthCredWatcher,
   applicationUpdateWatcher,
+  resetPinCredWatcher,
+  resetPasswordWatcher,
 } from './sagas/setupAndAuth'
 
 import {
@@ -144,6 +146,7 @@ import {
   updateSecondaryShardWatcher,
   getApprovalFromKeeperWatcher,
   rejectedExistingContactRequestWatcher,
+  resetLevelAfterPasswordChangeWatcher
 } from './sagas/BHR'
 
 import {
@@ -180,6 +183,8 @@ const rootSaga = function* () {
     credentialsAuthWatcher,
     changeAuthCredWatcher,
     applicationUpdateWatcher,
+    resetPinCredWatcher,
+    resetPasswordWatcher,
 
     // accounts watchers
     syncAccountsWatcher,
@@ -271,7 +276,7 @@ const rootSaga = function* () {
     updateSecondaryShardWatcher,
     getApprovalFromKeeperWatcher,
     rejectedExistingContactRequestWatcher,
-
+    resetLevelAfterPasswordChangeWatcher,
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
     redeemSwanCodeForTokenWatcher,

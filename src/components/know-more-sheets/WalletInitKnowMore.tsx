@@ -1,5 +1,5 @@
-import React, { useRef } from 'react'
-import { View, Image, Text, StyleSheet } from 'react-native'
+import React from 'react'
+import { View, Image, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -7,15 +7,38 @@ import {
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import openLink from '../../utils/OpenLink'
-import { ScrollView } from 'react-native-gesture-handler'
 import { translations } from '../../common/content/LocContext'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export default function TestAccountKnowMoreSheetContents( props ) {
-  const scrollViewRef = useRef<ScrollView>()
   const strings  = translations[ 'login' ]
+
+  const data= [
+    {
+      title: strings.Initialbackup,
+      text1: strings.Selectanencryption,
+      text2: strings.Youcanincrease,
+      image: require( '../../assets/images/icons/walletinit-1.png' )
+    },
+    {
+      title: strings.AGSP,
+      text1:  strings.AGSP1,
+      text2:  strings.AGSP2,
+      image: require( '../../assets/images/icons/walletinit-2.png' )
+    },
+    // {
+    //   title: strings.SecurityQuestion,
+    //   text1: strings.SecurityQuestion1,
+    //   text2: strings.SecurityQuestion2,
+    //   image: require( '../../assets/images/icons/walletinit-3.png' )
+    // },
+    {
+      title: strings.UserDefinedPassphrase,
+      text1: strings.UserDefinedPassphrase1,
+      text2: strings.UserDefinedPassphrase2,
+      image: require( '../../assets/images/icons/walletinit-4.png' )
+    }
+  ]
 
   return (
     <View style={{
@@ -24,72 +47,67 @@ export default function TestAccountKnowMoreSheetContents( props ) {
       <View style={{
         height: hp( 81 )
       }}>
-        <AppBottomSheetTouchableWrapper
+        <TouchableOpacity
           style={{
-            justifyContent: 'center', alignItems: 'center'
+            justifyContent: 'center', alignItems: 'center',
+            backgroundColor: Colors.lightBlue,
+            height: 30,
+            width: 30,
+            borderRadius: 15,
+            padding: 4,
+            marginHorizontal: 10,
+            marginTop: 10,
+            alignSelf: 'flex-end'
           }}
           activeOpacity={10}
-          onPress={() => props.titleClicked && props.titleClicked()}
+          onPress={() => props.closeModal()}
         >
-        </AppBottomSheetTouchableWrapper>
-        <ScrollView
-          ref={scrollViewRef}
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <FlatList
+          pagingEnabled
           style={{
-            flex: 1,
+            // flex: 1,
             backgroundColor: Colors.blue,
           }}
-          snapToInterval={hp( '70%' )}
+          snapToInterval={hp( 81 )}
           decelerationRate="fast"
-        >
-          <View style={styles.ElementView}>
-            <Text style={styles.headerText}>{strings.Initialbackup}</Text>
-            <Text
-              style={{
-                ...styles.infoText,
-                marginTop: wp( '5%' ),
-                marginBottom: wp( '1%' ),
-              }}
-            >
-              {strings.Selectanencryption}
-            </Text>
-            <View style={{
-              justifyContent: 'center', alignItems: 'center'
-            }}>
-              <Image
-                source={require( '../../assets/images/icons/walletinit-1.png' )}
-                style={styles.helperImage}
-              />
+          data={data}
+          initialScrollIndex={props.index ? props.index : 0}
+          onScrollToIndexFailed={( info ) => {console.log( info )}}
+          renderItem={( { item } ) =>
+            <View style={styles.ElementView}>
+              <Text style={styles.headerText}>{item.title}</Text>
+              <Text
+                style={{
+                  ...styles.infoText,
+                  marginTop: wp( '3%' ),
+                  marginBottom: wp( '1%' ),
+                }}
+              >
+                {item.text1}
+              </Text>
+              <View style={{
+                justifyContent: 'center', alignItems: 'center'
+              }}>
+                <Image
+                  source={item.image}
+                  style={styles.helperImage}
+                />
+              </View>
+              <Text
+                style={{
+                  ...styles.infoText,
+                  marginBottom: wp( '15%' ),
+                }}
+              >
+                {item.text2}
+              </Text>
+              {/* <View style={styles.separatorView} /> */}
             </View>
-            <Text
-              style={{
-                ...styles.infoText,
-                marginBottom: wp( '15%' ),
-              }}
-            >
-              {strings.Youcanincrease}
-            </Text>
-            <AppBottomSheetTouchableWrapper
-              style={{
-                alignItems: 'center'
-              }}
-              onPress={() => {
-                scrollViewRef.current &&
-                scrollViewRef.current.scrollTo( {
-                  x: 0,
-                  y: hp( '75%' ),
-                  animated: true,
-                } )
-              }}
-            >
-              <FontAwesome
-                name="angle-double-down"
-                color={Colors.white}
-                size={40}
-              />
-            </AppBottomSheetTouchableWrapper>
-            {/* <View style={styles.separatorView} /> */}
-          </View>
-        </ScrollView>
+          }
+        />
+
       </View>
     </View>
   )
@@ -105,7 +123,7 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 20 ),
-    marginTop: hp( '5%' ),
+    marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
     textAlign: 'center',
     paddingHorizontal:wp( '5%' ),
@@ -145,7 +163,7 @@ const styles = StyleSheet.create( {
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp( '70%' ),
+    height: hp( 81 ),
     justifyContent: 'space-between',
   },
   separatorView: {
