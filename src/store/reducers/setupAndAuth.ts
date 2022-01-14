@@ -29,7 +29,6 @@ const initialState: {
   credsChanged: string;
   pinChangedFailed: Boolean;
   initializeRecoveryCompleted: boolean;
-  passwordResetState: string
 } = {
   hasCreds: false,
   isAuthenticated: false,
@@ -45,7 +44,6 @@ const initialState: {
   credsChanged: '',
   pinChangedFailed: false,
   initializeRecoveryCompleted: false,
-  passwordResetState: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -54,10 +52,6 @@ export default ( state = initialState, action ) => {
         return chain( state )
           .setIn( [ 'hasCreds' ], true )
           .setIn( [ 'loading', 'storingCreds' ], false )
-          .value()
-      case COMPLETED_PASSWORD_RESET:
-        return chain( state )
-          .setIn( [ 'passwordResetState' ], action.payload.state )
           .value()
       case CREDS_AUTHENTICATED:
         return chain( state )
