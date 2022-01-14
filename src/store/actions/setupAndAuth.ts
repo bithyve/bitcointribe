@@ -2,7 +2,6 @@
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
 export const SETUP_WALLET = 'SETUP_WALLET'
-export const RESET_ENC_PASSWORD = 'RESET_ENC_PASSWORD'
 
 export const WALLET_SETUP_COMPLETION = 'WALLET_SETUP_COMPLETION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
@@ -25,11 +24,6 @@ export const storeCreds = passcode => {
   }
 }
 
-export const resetEncryptionPassword = payload => {
-  return {
-    type: RESET_ENC_PASSWORD, payload
-  }
-}
 
 export const credsAuth = ( passcode, reLogin? ) => {
   return {
@@ -108,7 +102,6 @@ export const switchCredsChanged = () => {
 export const CREDS_STORED = 'CREDS_STORED'
 export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED'
 export const COMPLETED_WALLET_SETUP = 'COMPLETED_WALLET_SETUP'
-export const COMPLETED_PASSWORD_RESET = 'COMPLETED_PASSWORD_RESET'
 export const WALLET_SETUP_FAILED = 'WALLET_SETUP_FAILED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
@@ -125,14 +118,6 @@ export const credsAuthenticated = isAuthenticated => {
   return {
     type: CREDS_AUTHENTICATED, payload: {
       isAuthenticated
-    }
-  }
-}
-
-export const setPasswordResetState = ( state ) => {
-  return {
-    type: COMPLETED_PASSWORD_RESET, payload: {
-      state,
     }
   }
 }

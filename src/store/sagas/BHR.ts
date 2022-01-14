@@ -68,13 +68,17 @@ import {
   getApprovalFromKeepers,
   REJECTED_EC_REQUEST,
   setSecondaryDataInfoStatus,
-  RESET_LEVEL_AFTER_PASSWORD_CHANGE
+  RESET_LEVEL_AFTER_PASSWORD_CHANGE,
+  updateMetaSharesKeeper,
+  updateOldMetaSharesKeeper,
+  CHANGE_ENC_PASSWORD,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
   switchS3LoadingStatus,
   healthCheckInitialized,
   GENERATE_META_SHARE,
+  setPasswordResetState,
 } from '../actions/BHR'
 import { NativeModules, Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -133,6 +137,7 @@ import { setVersionHistory } from '../actions/versionHistory'
 import Toast from '../../components/Toast'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import { updateCloudData } from '../actions/cloud'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -221,6 +226,7 @@ function* generateLevel1SharesWorker( { payload } ){
     // dbManager.updateWallet( {
     //   smShare: encryptedSecondarySecrets[ 0 ] ? encryptedSecondarySecrets[ 0 ] : ''
     // } )
+    yield put( updateMetaSharesKeeper( metaShares ) )
     yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -249,13 +255,13 @@ export const generateLevel1SharesWatcher = createWatcher(
 function* generateLevel2SharesWorker( { payload } ){
   const { level, version } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-  const s3 = yield call( dbManager.getBHR )
-  console.log( 's3', Array.from( s3 ) )
-  const existingMetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+  const existingMetaShares: MetaShare[] = yield select( ( state ) => state.storage.wallet )
   const { shares } = BHROperations.generateLevel2Shares( existingMetaShares, wallet.security.answer )
   const { encryptedPrimarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
   const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, existingMetaShares, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
+    yield put( updateMetaSharesKeeper( metaShares ) )
+
     yield call( dbManager.updateBHR, {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -2348,6 +2354,7 @@ function* retrieveMetaSharesWorker( { payload } ) {
         }
       }
     }
+    yield put( updateMetaSharesKeeper( metaShares ) )
     dbManager.updateBHR( {
       encryptedSecretsKeeper: encryptedPrimarySecrets,
       metaSharesKeeper: metaShares,
@@ -2562,6 +2569,123 @@ export const getApprovalFromKeeperWatcher = createWatcher(
   GET_APPROVAL_FROM_KEEPER,
 )
 
+function* changeEncPasswordWorker( { payload } ) {
+  try {
+    yield put( setPasswordResetState( 'init' ) )
+    const { questionId, question, answer } = payload
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const { security } = wallet
+    const oldSecurity =  {
+      ...security
+    }
+
+    const updatedWallet: Wallet = {
+      ...wallet,
+      security: {
+        questionId, question, answer
+      },
+    }
+    yield put( updateWallet( updatedWallet ) )
+    yield call( dbManager.updateWallet, {
+      security: {
+        questionId, question, answer
+      }
+    } )
+    // update cloud
+    yield put( updateCloudData() )
+    // update shares
+    const contacts: Trusted_Contacts = yield select(
+      ( state ) => state.trustedContacts.contacts
+    )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const { metaSharesKeeper, oldMetaSharesKeeper } = yield select( ( state ) => state.bhr )
+    const metaShares: MetaShare[] = [ ...metaSharesKeeper ]
+    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} =
+     yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, oldSecurity.answer, answer, payload )
+
+    yield put( updateMetaSharesKeeper( updatedMetaShares ) )
+    yield put( updateOldMetaSharesKeeper( updatedOldMetaShares ) )
+
+    if( contacts ){
+      const channelUpdates = []
+      for( const ck of Object.keys( contacts ) ){
+        const channelKey = ck
+        if( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER ){
+          const res = yield call( TrustedContactsOperations.retrieveFromStream, {
+            walletId: wallet.walletId, channelKey: ck, options: {
+              retrieveBackupData: true,
+            }
+          } )
+          if( res.backupData && res.backupData.primaryMnemonicShard ){
+            const metaShareData: MetaShare = res.backupData.primaryMnemonicShard
+
+            const primaryData: PrimaryStreamData = {
+              contactDetails: contacts[ channelKey ].contactDetails,
+              walletID: wallet.walletId,
+              walletName: wallet.walletName,
+            }
+            const backupData: BackupStreamData = {
+              primaryMnemonicShard: updatedMetaShares.find( value=>value.shareId==metaShareData.shareId ),
+              keeperInfo
+            }
+            const streamUpdates: UnecryptedStreamData = {
+              streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+              primaryData,
+              backupData,
+              metaData: {
+                flags:{
+                  active: true,
+                  newData: true,
+                  lastSeen: Date.now(),
+                },
+                version: DeviceInfo.getVersion()
+              }
+            }
+            // initiate permanent channel
+            channelUpdates.push( {
+              channelKey,
+              streamId: streamUpdates.streamId,
+              contactDetails: contacts[ channelKey ].contactDetails,
+              contact: contacts[ channelKey ],
+              unEncryptedOutstreamUpdates: streamUpdates,
+            } )
+          }
+        }
+      }
+      const { updated, updatedContacts }: {
+      updated: boolean;
+      updatedContacts: Trusted_Contacts
+      } = yield call(
+        TrustedContactsOperations.syncPermanentChannels,
+        channelUpdates
+      )
+      yield put( setPasswordResetState( 'completed' ) )
+      delay( 1000 )
+      yield put( setPasswordResetState( '' ) )
+      yield call( dbManager.updateBHR, {
+        metaSharesKeeper: updatedMetaShares,
+        oldMetaSharesKeeper: updatedOldMetaShares
+      } )
+    }else {
+      yield put( setPasswordResetState( 'completed' ) )
+      delay( 1000 )
+      yield put( setPasswordResetState( '' ) )
+      yield call( dbManager.updateBHR, {
+        metaSharesKeeper: updatedMetaShares,
+        oldMetaSharesKeeper: updatedOldMetaShares
+      } )
+    }
+
+  } catch ( error ) {
+    console.log( 'CHANGE_QUESTION_ANSWER Error', error )
+  }
+}
+
+export const changeEncPasswordWatcher = createWatcher(
+  changeEncPasswordWorker,
+  CHANGE_ENC_PASSWORD,
+)
+
 function* rejectedExistingContactRequestWorker( { payload } ) {
   const { channelKey } = payload
   const { walletId, walletName }: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -2571,7 +2695,8 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
   const KeeperInfoElement: KeeperInfoInterface = {
     ...keeperInfo.find( value=>value.channelKey == channelKey )
   }
-  if( contacts[ channelKey ] && contacts[ channelKey ].isActive && contacts[ channelKey ].unencryptedPermanentChannel && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ] && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ].primaryData.relationType == TrustedContactRelationTypes.CONTACT ) return
+  console.log( 'contacts[ channelKey ]', contacts )
+  if( contacts && contacts[ channelKey ] && contacts[ channelKey ].isActive && contacts[ channelKey ].unencryptedPermanentChannel && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ] && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ].primaryData.relationType == TrustedContactRelationTypes.CONTACT ) return
   if( KeeperInfoElement ){
 
     const primaryData: PrimaryStreamData = {

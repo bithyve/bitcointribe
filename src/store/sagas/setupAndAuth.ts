@@ -22,8 +22,6 @@ import {
   WALLET_SETUP_COMPLETION,
   updateApplication,
   UPDATE_APPLICATION,
-  RESET_ENC_PASSWORD,
-  setPasswordResetState
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
@@ -117,6 +115,11 @@ function* resetPasswordWorker( { payload } ) {
   try {
     yield put( setPasswordResetState( 'init' ) )
     const wallet: Wallet = yield select( state => state.storage.wallet )
+    const { security } = wallet
+    const oldSecurity =  {
+      ...security
+    }
+    console.log( oldSecurity )
     yield put( updateWallet( {
       ...wallet,
       security: payload
@@ -125,7 +128,21 @@ function* resetPasswordWorker( { payload } ) {
       ...wallet,
       security: payload
     } )
+    // update cloud
     yield call( updateCloudBackupWorker )
+    // update shares
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const { metaSharesKeeper, oldMetaSharesKeeper } = yield select( ( state ) => state.bhr )
+    const metaShares: MetaShare[] = [ ...metaSharesKeeper ]
+
+    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer, payload )
+    yield put( updateMetaSharesKeeper( updatedMetaShares ) )
+    yield put( updateOldMetaSharesKeeper( updatedOldMetaShares ) )
+    yield call( dbManager.updateBHR, {
+      metaSharesKeeper: updatedMetaShares,
+      oldMetaSharesKeeper: updatedOldMetaShares
+    } )
+
     yield put( setPasswordResetState( 'completed' ) )
     yield put ( resetLevelsAfterPasswordChange() )
     yield put( setPasswordResetState( '' ) )
@@ -134,10 +151,6 @@ function* resetPasswordWorker( { payload } ) {
   }
 }
 
-export const resetPasswordWatcher = createWatcher(
-  resetPasswordWorker,
-  RESET_ENC_PASSWORD,
-)
 
 function* credentialsAuthWorker( { payload } ) {
   console.log( payload.passcode )

@@ -28,13 +28,12 @@ import HistoryPageComponent from './HistoryPageComponent'
 import SecurityQuestion from './SecurityQuestion'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import {
-  updateMSharesHealth,
+  updateMSharesHealth, changeEncryptionPassword, setPasswordResetState
 } from '../../store/actions/BHR'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import ModalContainer from '../../components/home/ModalContainer'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { translations } from '../../common/content/LocContext'
-import { resetEncryptionPassword } from '../../store/actions/setupAndAuth'
 import { useDispatch, useSelector } from 'react-redux'
 import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
@@ -125,7 +124,7 @@ const SecurityQuestionHistory = ( props ) => {
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
-  const passwordResetState = useSelector( ( state ) => state.setupAndAuth.passwordResetState )
+  const passwordResetState = useSelector( ( state ) => state.bhr.passwordResetState )
   const [ showAGSPmodal, setShowAGSPmodal ] = useState( false )
   const [ showNote, setShowNote ] = useState( true )
   const [ isEditable, setIsEditable ] = useState( true )
@@ -137,7 +136,7 @@ const SecurityQuestionHistory = ( props ) => {
   )
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
-  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ) )
+  const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ).match( /.{1,6}/g ).join( '-' ) )
   const dispatch = useDispatch()
 
   const renderSecurityQuestionContent = useCallback( () => {
@@ -185,11 +184,18 @@ const SecurityQuestionHistory = ( props ) => {
   }, [] )
 
   useEffect( () => {
+    dispatch( setPasswordResetState( '' ) )
+    console.log( 'passwordResetState', passwordResetState )
     if( passwordResetState === 'init' ) {
       setLoading( true )
     } else if( passwordResetState === 'completed' ) {
       setLoading( false )
       Toast( 'Password reset successfully' )
+    }  else if( passwordResetState === '' ) {
+      if( loading ) {
+        Toast( 'Password reset successfully' )
+      }
+      setLoading( false )
     }
   }, [ passwordResetState ] )
 
@@ -270,7 +276,7 @@ const SecurityQuestionHistory = ( props ) => {
     let security = null
     if ( activeIndex === 0 ) {
       security = {
-        questionId: '0',
+        questionId: '100', //for AGSP
         question: 'App generated password',
         answer: appGeneratedPassword,
       }
@@ -282,7 +288,7 @@ const SecurityQuestionHistory = ( props ) => {
       }
     }
     setLoading( true )
-    dispatch( resetEncryptionPassword(  security ) )
+    dispatch( changeEncryptionPassword(  security ) )
     showSecurityQue( false )
     showEncryptionPswd( false )
   }
@@ -644,7 +650,7 @@ const SecurityQuestionHistory = ( props ) => {
                 }, 1500 )
               }}
               style={styles.containerPasscode}>
-              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword.match( /.{1,6}/g ).join( '-' )}</Text>
+              <Text numberOfLines={1} style={styles.textPasscode}>{appGeneratedPassword}</Text>
               <View
                 style={{
                   width: wp( '12%' ),
@@ -841,7 +847,7 @@ const SecurityQuestionHistory = ( props ) => {
           data={sortedHistory( securityQuestionsHistory )}
           confirmButtonText={strings.ConfirmPassword}
           reshareButtonText={strings.ConfirmPassword}
-          changeButtonText={'Change Password'}
+          //changeButtonText={'Change Password'}
           isChangeKeeperAllow
           disableChange={false}
           onPressReshare={() => {
@@ -850,8 +856,8 @@ const SecurityQuestionHistory = ( props ) => {
             showQuestionModal( true )
           }}
           onPressChange={() => {
-            setType( 'change' )
-            showQuestionModal( true )
+            // setType( 'change' )
+            // showQuestionModal( true )
           }}
         />
       </View>
@@ -880,7 +886,7 @@ const SecurityQuestionHistory = ( props ) => {
       <ModalContainer
         onBackground={()=>setLoading( false )}
         visible={loading}
-        closeBottomSheet={null}
+        closeBottomSheet={()=> {}}
       >
         {renderLoaderModalContent()}
       </ModalContainer>
