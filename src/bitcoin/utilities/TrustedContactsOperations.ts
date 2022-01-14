@@ -32,7 +32,7 @@ export default class TrustedContactsOperations {
    static generateKey = ( length: number ): string => {
      let result = ''
      const characters =
-     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+     '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz' // base-58
      const charactersLength = characters.length
      for ( let itr = 0; itr < length; itr++ ) {
        result += characters.charAt( Math.floor( Math.random() * charactersLength ) )
