@@ -53,7 +53,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const common  = translations[ 'common' ]
   const [ isSendingMax, setIsSendingMax ] = useState( false )
   const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
-  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String(  currentAmount ? currentAmount : 0 ) )
+  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( Number(  currentAmount ? currentAmount : 0 ) )
   const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ) )
 
   const currentSatsAmountFormValue = useMemo( () => {
@@ -219,7 +219,6 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             )}
         </TouchableOpacity>
 
-
         {/* BTC Amount */}
         <TouchableOpacity
           style={{
@@ -257,7 +256,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                   : `${strings.ConvertedIn} sats`
             }
             placeholderTextColor={FormStyles.placeholderText.color}
-            value={currentSatsAmountTextValue}
+            value={String(currentSatsAmountTextValue)}
             returnKeyLabel="Done"
             returnKeyType="done"
             keyboardType={'numeric'}
@@ -265,7 +264,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
               const regEx = /^[0-9]+$/
               if( regEx.test( value ) || value === '' ) {
                 setIsSendingMax( false )
-                setCurrentSatsAmountTextValue( value )
+                setCurrentSatsAmountTextValue( Number( value ) )
                 setCurrentFiatAmountTextValue( String( convertSatsToFiat( Number( value ) ?? 0 ).toFixed( 2 ) ) )
                 onAmountChanged( Number( value ) ?? 0 )
               }

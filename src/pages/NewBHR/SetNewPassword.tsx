@@ -12,7 +12,8 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   Clipboard,
-  Image
+  Image,
+  Dimensions
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -137,6 +138,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const isChange = props.navigation.getParam( 'isChange' )
   const [ knowMoreIndex, setKnowMoreIndex ] = useState( 0 )
 
+  const windowHeight = Dimensions.get('window').height;
 
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
@@ -364,9 +366,10 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         }}
       >
         <View style={{
-          height: hp( '60%' ),
+          height: hp(  windowHeight >= 800 ? '55%' :  windowHeight >= 600 && '64%' ),
           marginHorizontal: wp( 4 )
         }}>
+           <View style={{paddingTop:10, paddingBottom:4}}>
           <TouchableOpacity
             activeOpacity={1}
             onPress={() => {
@@ -383,10 +386,13 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               alignSelf: 'flex-end'
             }}
           >
+            
             <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
           </TouchableOpacity>
+          </View>
           <View style={{
-            marginHorizontal: wp( '6%' )
+            marginHorizontal: wp( '2%' ),
+            paddingTop:5
           }}>
             <Text style={{
               color: Colors.blue,
@@ -395,7 +401,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             }} >{strings.HexaWalletcreated}</Text>
             <Text style={[ styles.bottomNoteInfoText, {
               color: Colors.lightTextColor,
-              marginTop: 10
+              marginTop: 10,
+              paddingRight:15
             } ]}>{strings.Makesureyou}</Text>
 
             <TouchableOpacity
@@ -449,12 +456,12 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           </View>
 
           <View style={{
-            alignItems: 'center', marginLeft: wp( '5%' ), marginBottom: hp( '4%' ),
-            flexDirection: 'row', marginTop: hp( 7 )
+            alignItems: 'center', marginLeft: wp( '2%' ), marginBottom: hp( '4%' ),
+            flexDirection: 'row', marginTop: hp( 5 )
           }}>
             <TouchableOpacity
               onPress={() => {onPressProceed()}}
-              style={ButtonStyles.primaryActionButton}
+              style={ButtonStyles.primaryActionButtonShadow}
             >
               <Text style={{
                 fontSize: RFValue( 13 ),
@@ -476,7 +483,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansMedium,
                 alignSelf: 'center',
-                marginLeft: wp( '5%' )
+                marginLeft: wp( '7%' )
               }}>{`${common.cancel}`}</Text>
             </TouchableOpacity>
           </View>
@@ -499,7 +506,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         }}
       >
         <View style={{
-          height: hp( '72%' )
+          height: hp( '72%' ),
+          paddingHorizontal:8,
+          paddingTop:8
         }}>
           <TouchableOpacity
             activeOpacity={1}
@@ -513,7 +522,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             }
             style={{
               ...styles.selectedContactsView,
-              alignSelf: 'flex-end'
+              alignSelf: 'flex-end',
+              marginRight:15
             }}
           >
             <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
@@ -524,7 +534,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             color: Colors.blue,
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
-            marginLeft: wp( '6%' )
+            marginLeft: wp( '8%' )
           }} >{strings.encryptionpassword}</Text>
           <View
             style={{
