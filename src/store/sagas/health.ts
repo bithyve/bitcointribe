@@ -1473,6 +1473,7 @@ function* fetchWalletImageWorker( { payload } ) {
       console.log( 'Failed to fetch Wallet Image' )
     }
   } catch ( error ) {
+    yield put( walletImageChecked( false ) )
     console.log( 'ERROR', error )
   }
 }
