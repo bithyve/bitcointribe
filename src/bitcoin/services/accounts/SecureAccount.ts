@@ -1005,6 +1005,19 @@ export default class SecureAccount {
         txHex,
         childIndexArray,
       )
+
+      if( txid.includes( 'sendrawtransaction RPC error' ) ){
+        let err
+        try{
+          err = ( txid.split( ':' )[ 3 ] ).split( '"' )[ 1 ]
+        } catch( err ){
+          console.log( {
+            err
+          } )
+        }
+        throw new Error( err )
+      }
+
       if( txid ){
         // chip consumed utxos
         this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
