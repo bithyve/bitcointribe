@@ -998,6 +998,13 @@ export enum ShortLinkTitle {
   DONATION = 'Bitcoin donation',
 }
 
+export enum ShortLinkDescription {
+  GIFT = 'You\'ve received some sats from your contact! open the link to accept the gift. You can add the gift to your account or forward it to your friends and family at no extra fees.',
+  FF = 'You\'ve received a request to be added as a contact. You\'ll be able to transact bitcoin more efficiently if you accept this request.',
+  DONATION = 'You can give sats as donation with this link. Accepting the link will take you to a webpage for you to donate sats to the cause.',
+  KEEPER = 'You\'ve received a request to store a Recovery Key. You\'ll be able to help your contact recover their wallet if you choose to become their Keeper.'
+}
+
 export interface Gift {
   id: string,
   privateKey: string,
