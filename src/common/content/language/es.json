@@ -138,9 +138,8 @@
       "hint": "insinuación",
       "toremember": "recordar",
       "Easiertoremember": "Más fácil de recordar. Recomendado",
-      "Useencryptionpassword": "Utilice su propia contraseña de cifrado",
-      "Createapassword": "Crea una contraseña. ",
-      "MakeSureToRememberIt": "Asegúrate de recordarlo",
+      "Useencryptionpassword": "Crea tu propia frase de contraseña",
+      "Createapassword": "Proporcione una frase de contraseña, use una 'Pista' para recordar ",
       "Backuplets": "La copia de seguridad le permite recuperar su billetera incluso si pierde su teléfono. Gestionar desde",
       "questionList": [
           {

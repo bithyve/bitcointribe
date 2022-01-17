@@ -366,7 +366,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         }}
       >
         <View style={{
-          height: hp(  windowHeight >= 800 ? '55%' :  windowHeight >= 600 && '64%' ),
+          height: hp(windowHeight >= 800 ? '56%' : windowHeight >= 600 ? '67%' :  windowHeight >= 500 && '72%'),
           marginHorizontal: wp( 4 )
         }}>
            <View style={{paddingTop:10, paddingBottom:4}}>
@@ -1239,7 +1239,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               setActiveIndex={()=> confirmAction( 2 )}
               index={2}
               italicText={''}
-              boldText={strings.MakeSureToRememberIt}
+              boldText={''}
               changeBgColor={true}
               tag={strings.UserDefined}
               hideRadioBtn
