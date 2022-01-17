@@ -190,9 +190,9 @@ function SecurityQuestion( props ) {
                 }}
                 onBlur={() => {
                   if( parseInt( security.questionId ) > 0  ) {
-                    if ( validateAllowedCharacters( answer ) == false ) {
-                      setErrorText( stringsLogin.Answersmust )
-                    }
+                    // if ( validateAllowedCharacters( answer ) == false ) {
+                    //   setErrorText( stringsLogin.Answersmust )
+                    // }
                   }
                 }}
                 keyboardType={
@@ -265,9 +265,9 @@ function SecurityQuestion( props ) {
                   props.onPressConfirm()
                 } )
               } else if( parseInt( security.questionId ) > 0  ) {
-                if ( validateAllowedCharacters( answer ) == false ) {
-                  setErrorText( stringsLogin.Answersmust )
-                }
+                // if ( validateAllowedCharacters( answer ) == false ) {
+                //   setErrorText( stringsLogin.Answersmust )
+                // }
               } else {
                 setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
               }
