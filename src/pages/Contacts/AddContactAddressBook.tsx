@@ -314,6 +314,7 @@ export default function AddContactAddressBook( props ) {
           contactText:strings.adding,
           senderName: props?.navigation?.state?.params?.senderName,
           showDone:true,
+          note : props?.navigation?.state?.params?.note
         } )
       }
 

@@ -573,6 +573,7 @@ const GiftDetails = ( { navigation } ) => {
             navigation.navigate( 'AddContact', {
               fromScreen: 'GiftDetails',
               giftId,
+              note,
               senderName: name,
               setActiveTab: navigation.state.params.setActiveTab
             } )
