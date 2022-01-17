@@ -75,6 +75,7 @@ import {
   Trusted_Contacts,
   UnecryptedStreamData,
   Wallet,
+  LNNode
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -96,6 +97,7 @@ import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/Hexa
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import LightningSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
 
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
@@ -791,6 +793,17 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           serviceAccountKind,
         } )
         break
+      case AccountType.LIGHTNING_ACCOUNT:
+        primarySubAccount = new LightningSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          node: account.node
+        } )
+        break
   }
 
   const accountShell = new AccountShell( {
@@ -908,6 +921,21 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( accountType === AccountType.SWAN_ACCOUNT ) serviceAccount.isUsable = false
 
         return serviceAccount
+      case AccountType.LIGHTNING_ACCOUNT:
+        const { node } = accountDetails
+        const lnAccountCount = ( accounts[ accountType ] )?.length | 0
+        const lnAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: lnAccountCount,
+          accountName: accountName? accountName: defaultAccountName,
+          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
+          primarySeed,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, lnAccountCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+          node
+        } )
+        return lnAccount
   }
 }
 export interface newAccountDetails {
@@ -915,6 +943,7 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
+  node?: LNNode
 }
 export interface newAccountsInfo {
   accountType: AccountType,
@@ -928,13 +957,14 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const accountIds = []
   let testcoinsToAccount
 
-  for ( const { accountType, accountDetails } of newAccountsInfo ){
+  for ( const { accountType, accountDetails,  } of newAccountsInfo ){
     const account: Account | MultiSigAccount | DonationAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
       }
     )
+    console.log( 'account', account )
     accountIds.push( account.id )
     const accountShell = yield call( generateShellFromAccount, account )
     newAccountShells.push( accountShell )
@@ -1086,12 +1116,11 @@ export const mergeAccountShellsWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
     const { qrdata, QRModalHeader, accountShell } = payload
-    const walletDB = yield call( dbManager.getWallet )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const walletId = wallet.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     let secondaryMnemonic
-    const sharesArray = [ walletDB.smShare ]
+    const sharesArray = [ wallet.smShare ]
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
@@ -1112,7 +1141,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const shard: string = res.secondaryData.secondaryMnemonicShard
     sharesArray.push( shard )
     if( sharesArray.length>1 ){
-      secondaryMnemonic = BHROperations.getMnemonics( sharesArray, wallet.security.answer )
+      secondaryMnemonic = BHROperations.getMnemonics( sharesArray )
     }
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
@@ -1130,50 +1159,6 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-function parseAA( addresses ) {
-  try {
-    if( addresses.length > 0 ) {
-      const obj = {
-      }
-      addresses.forEach( aa => {
-        const tmp = {
-          index : aa.index
-        }
-        if( aa.assignee ) {
-          const assignee = {
-            ...aa.assignee
-          }
-          if( aa.assignee.recipientInfo ) {
-            const recipientInfo = {
-            }
-            aa.assignee.recipientInfo.forEach( info => {
-              recipientInfo[ info.txid ] = info.recipient
-            } )
-            assignee.recipientInfo = recipientInfo
-            tmp.assignee = assignee
-          }
-        }
-        obj[ aa.address ] = tmp
-      } )
-      return obj
-    } else {
-      return {
-      }
-    }
-  } catch ( error ) {
-    console.log( error )
-    return {
-    }
-  }
-}
-
-function getAA( activeAddresses:{external: [], internal: []} ) {
-  return {
-    external: parseAA( activeAddresses.external ),
-    internal: parseAA( activeAddresses.internal  )
-  }
-}
-
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
@@ -1186,10 +1171,9 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
     if( account.type === AccountType.SAVINGS_ACCOUNT && account.isUsable ) yield put( setAllowSecureAccount( true ) )
 
     accountShell.primarySubAccount.visibility = account.accountVisibility
-    const aa = getAA( account.activeAddresses )  // TODO: check whether active addresses are getting restored
-    account.activeAddresses = aa
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
+    accountShell.primarySubAccount.transactions = account.transactionsMeta
   }
 
   // update redux store & database

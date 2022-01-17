@@ -132,7 +132,6 @@ const styles= StyleSheet.create( {
     width: widthPercentageToDP( 1 ),
     height: widthPercentageToDP( 1 ),
     borderRadius: widthPercentageToDP( 0.5 ),
-    // backgroundColor: Colors.white
   }
 } )
 

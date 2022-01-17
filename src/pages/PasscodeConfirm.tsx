@@ -108,7 +108,7 @@ export default function PasscodeConfirm( props ) {
               {strings.create} <Text style={ styles.boldItalicText }>{strings.passcode}</Text>
             </Text>
 
-            <View>
+            <View >
               <View style={ styles.passcodeTextInputView }>
                 <View
                   style={ [
@@ -711,6 +711,6 @@ const styles = StyleSheet.create( {
   passcodeTextInputView: {
     flexDirection: 'row',
     marginTop: hp( '4.5%' ),
-    marginBottom: hp( '4.5%' )
+    marginBottom: hp( '4.5%' ),
   }
 } )

@@ -575,6 +575,8 @@
       "HealthCheckConfirmPassword": "Verificación de estado Confirmar contraseña",
       "Specifythepassword": "Especifique la contraseña como lo hizo en el momento de configurar la billetera",
       "Hint": "Insinuación",
+      "Backupwithcloud": "Copia de seguridad con la nube",
+      "BackupwithcloudSub": "Haga una copia de seguridad de la clave de recuperación en la nube",
       "Backupwithcontact": "Backup con contacto",
       "BackupwithcontactSub": "Haga una copia de seguridad de la clave de recuperación con un amigo o familiar",
       "Backuponadevice": "Copia de seguridad en un dispositivo",

@@ -30,7 +30,7 @@ import { updateCloudData } from '../actions/cloud'
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
@@ -270,9 +270,10 @@ export const changeAuthCredWatcher = createWatcher(
 
 
 function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, previousVersion: string }} ) {
-  const { newVersion } = payload
+  const { newVersion, previousVersion } = payload
 
   const wallet: Wallet = yield select( state => state.storage.wallet )
+  const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
   const storedVersion = wallet.version
 
 
@@ -316,6 +317,11 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   yield put( updateWalletImageHealth( {
     updateVersion: true
   } ) )
+  if( semverLte( previousVersion, '2.0.6' ) ){
+    if( levelData.find( value=>value.keeper1.shareType == 'pdf' || value.keeper2.shareType == 'pdf' ) ){
+      yield put( upgradePDF() )
+    }
+  }
 }
 
 export const applicationUpdateWatcher = createWatcher(

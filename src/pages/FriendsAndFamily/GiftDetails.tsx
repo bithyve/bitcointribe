@@ -413,6 +413,8 @@ const GiftDetails = ( { navigation } ) => {
           </View>
         </TouchableOpacity>
 
+{deepLinkConfig ?
+  <View>
         <View style={{
           backgroundColor: Colors.backgroundColor,
           paddingBottom: hp( 4 ),
@@ -456,7 +458,8 @@ const GiftDetails = ( { navigation } ) => {
                 gift.type === GiftType.RECEIVED &&
                 ( item[ 0 ] == 'created' ||
                   item[ 0 ] == 'sent' ||
-                  item[ 0 ] == 'reclaimed' )
+                  item[ 0 ] == 'reclaimed' ||
+                  item[ 0 ] == 'associated' )
               ) {
                 return null
               }
@@ -509,6 +512,28 @@ const GiftDetails = ( { navigation } ) => {
               )
             } )}
         </View>
+      </View>
+      : 
+      <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text
+              style={{
+                ...styles.modalTitleText,
+                fontSize: 18,
+                marginTop:12,
+                textAlign: 'center',
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              No Second Factor Used
+            </Text>
+          </View>
+        </View>
+       }
       </SafeAreaView>
       <View style={{
         marginBottom: wp( '3%' ), flexDirection: 'row',

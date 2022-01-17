@@ -216,9 +216,10 @@ export default function SettingsContents( props ) {
           <ScrollView style={{
             flex: 1
           }}>
-            {PageData.map( ( item ) => {
+            {PageData.map( ( item, index ) => {
               return (
                 <AppBottomSheetTouchableWrapper
+                  key={index}
                   onPress={
                     () => {
                       if ( item.type == 'ManagePin' ) {

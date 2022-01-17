@@ -37,23 +37,23 @@ export enum TransactionType {
 }
 export interface Transaction {
   txid: string;
-  status: string;
-  confirmations: number;
+  status?: string;
+  confirmations?: number;
 
   /**
    * Sats per byte
    */
-  fee: string;
+  fee?: string;
 
   /**
    * UTC string
    */
-  date: string;
+  date?: string;
 
   /**
    * Inbound(Received)/Outbound(Sent) transaction
    */
-  transactionType: TransactionType;
+  transactionType?: TransactionType;
 
   /**
    * Amount in Satoshis.
@@ -850,7 +850,23 @@ export interface Wallet {
   accounts: {
     [accountType: string]: string[] // array of accountIds
   },
-  version: string
+  version: string,
+  smShare?: string,
+}
+
+export interface LNNode {
+  host?: string,
+  port?: string,
+  url?: string,
+  lndhubUrl?: string,
+  existingAccount?: boolean,
+  macaroonHex?: string,
+  accessKey?: string,
+  username?: string,
+  password?: string,
+  implementation?: string,
+  certVerification?: boolean,
+  enableTor?: boolean
 }
 
 export interface Account {
@@ -887,7 +903,20 @@ export interface Account {
       address: string,
       privateKey: string
     }
-  }
+  },
+  transactionsMeta?: {
+    receivers: {name: string, amount: number}[];
+    sender: string;
+    txid: string;
+    notes: string;
+    tags: string[]
+    amount: number;
+    accountType: string;
+    address: string;
+    isNew: boolean
+    type: string;
+  }[],
+  node?: LNNode
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -930,7 +959,8 @@ export enum AccountType {
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
-  FNF_ACCOUNT = 'FNF_ACCOUNT'
+  FNF_ACCOUNT = 'FNF_ACCOUNT',
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
 }
 
 export interface Accounts {
@@ -983,6 +1013,7 @@ export enum GiftStatus {
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
   RECLAIMED = 'RECLAIMED',
+  ASSOCIATED = 'ASSOCIATED',
   EXPIRED = 'EXPIRED',
 }
 
@@ -1019,6 +1050,7 @@ export interface Gift {
     sent?: number,
     accepted?: number,
     reclaimed?: number,
+    associated?: number,
     rejected?: number,
   },
   validitySpan?: number,
@@ -1056,12 +1088,12 @@ export interface GiftMetaData {
 }
 
 export interface cloudDataInterface {
-  levelStatus: number;
-  encryptedCloudDataJson: string;
-  walletName: string;
-  questionId: string;
-  question: string;
-  keeperData: string;
+  levelStatus?: number;
+  encryptedCloudDataJson?: string;
+  walletName?: string;
+  questionId?: string;
+  question?: string;
+  keeperData?: string;
   bhXpub?: string;
   shares?: any;
   secondaryShare?: string;

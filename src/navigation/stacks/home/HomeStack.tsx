@@ -27,6 +27,7 @@ import Receive from '../../../pages/Accounts/Receive'
 import PairNewWallet from '../../../pages/FastBitcoin/PairNewWallet'
 import Intermediate from '../../../pages/Intermediate'
 import NewOwnQuestions from '../../../pages/NewOwnQuestions'
+import LNAccountDetails from '../../../pages/zeusLN/AccountDetails'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
 import Launch from '../../../pages/Launch'
@@ -97,6 +98,13 @@ const HomeStack = createStackNavigator(
     },
     AccountDetails: {
       screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
+    LNAccountDetails: {
+      screen: LNAccountDetails,
       navigationOptions: {
         header: null,
         // tabBarVisibl

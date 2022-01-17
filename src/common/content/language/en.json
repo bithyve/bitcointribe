@@ -398,7 +398,7 @@
       "sendRecoveryKey": "Send Recovery Key",
       "Nocontacts1": "No contacts",
       "Selectfromaddressbook": "Select from address book",
-      "sendRecoveryKeyTo": "Send Recovery Key to an existing contact or choose a new from the address book.",
+      "sendRecoveryKeyTo": "Send Recovery Key to an existing contact or choose a new contact from the address book.",
       "Weneither": "We neither store this data nor pass it to anyone else. This is for your convenience only",
       "Nocontacts": "No contacts found. Please add contacts to your Address Book and try again",
       "Ifyouwantto": "If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image",
@@ -525,7 +525,8 @@
       "swanautowithdrawal": "This is your Swan Bitcoin auto-withdrawal wallet. When you stack with Swan Bitcoin, your sats will automatically get transferred to this self-custody account in Hexa once it reaches 0.01 btc. \n\nClaim a signup credit of $10 when you complete the process.",
       "Byproceeding": "By proceeding you understand that you will be taken to Swan Bitcoin to complete the process.\n\nPlease check the available payment methods along with Terms and Conditions for using Swan Bitcoin as per your jurisdiction.",
       "Onceyoucomplete": "Once you complete the registration process or login in to your Swan Bitcoin account, you can use this wallet",
-      "NotNow": "Not Now"
+      "NotNow": "Not Now",
+      "LightningaWallet": "Lightning Wallet"
     },
     "bhr": {
       "Pleaseapprovethis": "Please approve this request by scanning the Approval Key stored with any of the other backups",
@@ -602,6 +603,8 @@
       "HealthCheckConfirmPassword": "Health Check Confirm Password",
       "Specifythepassword": "Specify the password as you did at the time of setting up the wallet",
       "Hint": "Hint",
+      "Backupwithcloud": "Backup with cloud",
+      "BackupwithcloudSub": "Backup the Recovery Key on cloud",
       "Backupwithcontact": "Backup with contact",
       "BackupwithcontactSub": "Backup the Recovery Key with a friend or family member",
       "Backuponadevice": "Backup on a device",
@@ -662,8 +665,15 @@
       "4": "You are not logged-in into your Google Drive account. Please log in from your Phone Settings.",
       "15": "Request timed out. Please try again.",
       "30": "Please check authentication with your google account in settings and try again.",
-      "errorinuploadingdata": "Error in uploading data. Please re-try again.",
+      "errorinuploadingdata": "Error in uploading data. Please try again later.",
       "12501": "We recommend signing in as it easily allows you to backup your wallet on your personal cloud.",
       "default": "We encountered a non-standard error. Please try again after sometime or contact us"
+    },
+    "zeusLN": {
+      "Connectyournode": "Connect your node",
+      "SetupLightningAccount": "Set up Lightning Account",
+      "Entermanually": "Enter manually",
+      "NoLNDnode": "No LND node",
+      "NoLNDnodeSub": "Elit culpa consectetur elit ex consectetur quis culpa veniam est consequat."
     }
 }

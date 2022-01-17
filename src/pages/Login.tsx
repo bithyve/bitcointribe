@@ -44,6 +44,7 @@ import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { setCloudBackupStatus } from '../store/actions/cloud'
 import SecurityQuestion from './NewBHR/SecurityQuestion'
 import Toast from '../components/Toast'
+import { setOpenToApproval } from '../store/actions/BHR'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -129,6 +130,7 @@ export default function Login( props ) {
 
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    dispatch( setOpenToApproval( false, [], null ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )

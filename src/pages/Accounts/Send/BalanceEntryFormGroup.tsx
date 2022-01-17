@@ -125,13 +125,13 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
       ? (
         ( fiatAmount / exchangeRates[ currencyCode ].last ) * SATOSHIS_IN_BTC
       )
-      : 0
+      : ''
   }
 
   function convertSatsToFiat( amount: Satoshis ) {
     return exchangeRates && exchangeRates[ currencyCode ]
       ? ( amount / SATOSHIS_IN_BTC ) * exchangeRates[ currencyCode ].last
-      : 0
+      : ''
   }
 
   return (

@@ -67,7 +67,7 @@ const FNFToKeeper = ( props ) => {
       const contact = contacts[ channelKey ]
       if ( ( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) && contact.contactDetails.contactName ) {
         const instream: StreamData = useStreamFromContact( contact, wallet.walletId, true )
-        if( instream ) c.push( {
+        if( instream && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) c.push( {
           ...contact, channelKey
         } )
       }

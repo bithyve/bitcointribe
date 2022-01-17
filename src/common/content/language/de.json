@@ -575,6 +575,8 @@
       "HealthCheckConfirmPassword": "Systemdiagnose Passwort bestätigen",
       "Specifythepassword": "Geben Sie das Passwort wie beim Einrichten der Wallet an",
       "Hint": "Hinweis",
+      "Backupwithcloud": "Backup mit Cloud",
+      "BackupwithcloudSub": "Sichern Sie den Wiederherstellungsschlüssel in der Cloud",
       "Backupwithcontact": "Backup mit Kontakt",
       "BackupwithcontactSub": "Sichern Sie den Wiederherstellungsschlüssel mit einem Freund oder Familienmitglied",
       "Backuponadevice": "Backup auf einem Gerät",

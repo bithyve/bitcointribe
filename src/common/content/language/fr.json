@@ -575,6 +575,8 @@
       "HealthCheckConfirmPassword": "Vérification de l'état Confirmer le mot de passe",
       "Specifythepassword": "Spécifiez le mot de passe comme vous l'avez fait au moment de la configuration du portefeuille",
       "Hint": "Indice",
+      "Backupwithcloud": "Sauvegarde avec le cloud",
+      "BackupwithcloudSub": "Sauvegarder la clé de récupération sur le cloud",
       "Backupwithcontact": "Sauvegarde avec contact",
       "BackupwithcontactSub": "Sauvegardez la clé de récupération avec un ami ou un membre de la famille",
       "Backuponadevice": "Sauvegarde sur un appareil",

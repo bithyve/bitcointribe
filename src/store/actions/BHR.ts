@@ -12,6 +12,8 @@ export const UPDATE_HEALTH = 'UPDATE_HEALTH'
 export const ERROR_SENDING = 'ERROR_SENDING'
 export const UPDATE_SHARES_HEALTH = 'UPDATE_SHARES_HEALTH'
 export const GENERATE_META_SHARE = 'GENERATE_META_SHARE'
+export const UPDATE_META_SHARES_KEEPER= 'UPDATE_META_SHARES_KEEPER'
+export const UPDATE_OLD_META_SHARES_KEEPER= 'UPDATE_OLD_META_SHARES_KEEPER'
 export const MSHARES = 'MSHARES'
 export const UPDATE_OLD_META_SHARES_KEEPER= 'UPDATE_OLD_META_SHARES_KEEPER'
 export const SET_PASSWORD_RESET_STATE = 'SET_PASSWORD_RESET_STATE'
@@ -77,6 +79,8 @@ export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
 export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
+export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
+export const PDF_UPGRADE = 'PDF_UPGRADE'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -208,6 +212,24 @@ export const generateMetaShare = ( level, isUpgrade? ) => {
   }
 }
 
+export const updateMetaSharesKeeper = ( metaSharesKeeper: MetaShare[] ) => {
+  return {
+    type: UPDATE_META_SHARES_KEEPER,
+    payload: {
+      metaSharesKeeper
+    }
+  }
+}
+
+export const updateOldMetaSharesKeeper = ( oldMetaSharesKeeper: MetaShare[] ) => {
+  return {
+    type: UPDATE_OLD_META_SHARES_KEEPER,
+    payload: {
+      oldMetaSharesKeeper
+    }
+  }
+}
+
 export const sharesGenerated = ( shares ) => {
   return {
     type: MSHARES, payload: {
@@ -280,7 +302,7 @@ export const recoverWallet = ( payload: { level: number, answer: string, selecte
   primaryData?: PrimaryStreamData;
   backupData?: BackupStreamData;
   secondaryData?: SecondaryStreamData;
-}[] } ) => {
+}[], isWithoutCloud?: boolean } ) => {
   return {
     type: RECOVER_WALLET_HEALTH, payload: payload
   }
@@ -664,6 +686,10 @@ export const ALLOW_SECURE_ACCOUNT = 'ALLOW_SECURE_ACCOUNT'
 export const UPDATE_SECONDARY_SHARD = 'UPDATE_SECONDARY_SHARD'
 export const OPEN_CLOSE_APPROVAL = 'OPEN_CLOSE_APPROVAL'
 export const GET_APPROVAL_FROM_KEEPER = 'GET_APPROVAL_FROM_KEEPER'
+export const CHANGE_QUESTION_ANSWER = 'CHANGE_QUESTION_ANSWER'
+export const SET_IS_CURRENT_LEVEL0 = 'SET_IS_CURRENT_LEVEL0'
+export const UPGRADE_PDF = 'UPGRADE_PDF'
+export const UPGRADE_LEVEL1_KEEPER = 'UPGRADE_LEVEL1_KEEPER'
 
 export const onPressKeeper = ( value, number ) => {
   return {
@@ -750,5 +776,49 @@ export const rejectedExistingContactRequest = ( channelKey ) => {
     type: REJECTED_EC_REQUEST, payload: {
       channelKey
     }
+  }
+}
+
+export const changeQuestionAnswer = ( questionId, question, answer ) => {
+  return {
+    type: CHANGE_QUESTION_ANSWER, payload: {
+      questionId, question, answer
+    }
+  }
+}
+
+export const setIsCurrentLevel0 = ( flag ) => {
+  return {
+    type: SET_IS_CURRENT_LEVEL0, payload: {
+      flag
+    }
+  }
+}
+
+export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
+  return {
+    type: RECOVER_WALLET_WITHOUT_ICLOUD, payload: {
+      backupData, answer
+    }
+  }
+}
+
+export const setPdfUpgrade = ( flag ) => {
+  return {
+    type: PDF_UPGRADE, payload: {
+      flag
+    }
+  }
+}
+
+export const upgradePDF = ( ) => {
+  return {
+    type: UPGRADE_PDF
+  }
+}
+
+export const upgradeLevelOneKeeper = ( ) => {
+  return {
+    type: UPGRADE_LEVEL1_KEEPER
   }
 }

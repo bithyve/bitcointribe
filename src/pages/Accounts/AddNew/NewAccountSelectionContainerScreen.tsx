@@ -92,6 +92,12 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   function handleProceedButtonPress() {
     switch ( selectedChoice.kind ) {
         case SubAccountKind.TEST_ACCOUNT:
+
+        case SubAccountKind.LIGHTNING_ACCOUNT:
+          navigation.navigate( 'ScanNodeConfig', {
+            currentSubAccount: selectedChoice,
+          } )
+          break
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
           navigation.navigate( 'NewHexaAccountDetails', {
@@ -128,7 +134,9 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   function handleChoiceSelection( choice: SubAccountDescribing ) {
     if( choice.type == AccountType.SAVINGS_ACCOUNT && !AllowSecureAccount ) {
       setSecureAccountAlert( true )
-    } else setSelectedChoice( choice )
+    } else  {
+      setSelectedChoice( choice )
+    }
   }
 
   const ListFooter: React.FC = () => {
@@ -187,7 +195,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           }}
           style={{
             height: 30, width: 30, justifyContent: 'center',
-            marginLeft: wp( '5%' ),marginTop:hp('4%')
+            marginLeft: wp( '5%' ), marginTop:hp( '4%' )
           }}
         >
           <FontAwesome
