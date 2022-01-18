@@ -39,10 +39,7 @@ import Setting from '../../assets/images/svgs/setting_icon.svg'
 import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
 import ThemeList from './Theme'
 import { updateUserName } from '../../store/actions/storage'
-import Toast from '../../components/Toast'
-
 import { translations } from '../../common/content/LocContext'
-
 import RadioButton from '../../components/RadioButton'
 import Feather from 'react-native-vector-icons/Feather'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -134,9 +131,9 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( 
+  const [ note, setNote ] = useState(
     navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
-    'Bitcoin is a new type of money that is not controlled by any government or company' )
+      'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -659,13 +656,13 @@ const GiftDetails = ( { navigation } ) => {
               }}
             >
               <View style={styles.settingIcon}>
-              <Setting/>
+                <Setting/>
               </View>
               <Text style={{
                 color: 'white'
               }}>{'Advanced'}</Text>
               <View style={styles.menuIcon}>
-              <Menu/>
+                <Menu/>
               </View>
             </TouchableOpacity>
           </View>
@@ -1090,7 +1087,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 2 ),
     alignSelf: 'center'
-    
+
   },
   timeInfo:{
     width: '87%',
