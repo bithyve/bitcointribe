@@ -138,9 +138,8 @@
       "hint": "indice",
       "toremember": "vous en rappeler",
       "Easiertoremember": "Plus facile à mémoriser. Recommandé",
-      "Useencryptionpassword": "Utilisez votre propre mot de passe de chiffrement",
-      "Createapassword": "Créez un mot de passe. ",
-      "MakeSureToRememberIt": "Assurez-vous de vous en souvenir",
+      "Useencryptionpassword": "Créez votre propre phrase de passe",
+      "Createapassword": "Fournissez une phrase de passe, utilisez un 'indice' pour vous en souvenir",
       "Backuplets": "La sauvegarde vous permet de récupérer votre portefeuille même si vous perdez votre téléphone. Gérer depuis",
       "questionList": [
           {

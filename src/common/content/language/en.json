@@ -151,10 +151,9 @@
         "hint": "hint",
         "toremember": "to remember",
         "Easiertoremember": "Easier to remember. Recommended",
-        "Useencryptionpassword": "Use your own encryption password",
+        "Useencryptionpassword": "Create your own passphrase",
         "Youcanuse": "You can use a mix of lowercase, capital letters & numbers. Because this maybe difficult to remember, its best to note it down",
-        "Createapassword": "Create a password. ",
-        "MakeSureToRememberIt": "Make sure to remember it",
+        "Createapassword": "Provide a passphrase, use a 'Hint' to remember",
         "Backuplets": "Backup lets you recover your wallet even if you lose your phone. Manage from",
         "questionList": [
           {
@@ -204,7 +203,7 @@
         "passwordisincorrect": "Password is incorrect",
         "Specifythe": "Specify the answer as you did at the time of setting up the wallet",
         "Enteranswer": "Enter answer",
-        "AGSP": "App Generated Strong Password",
+        "AGSP": "Use App Generated Strong Password",
         "AGSP1": "This is the most secure option for encrypting your backup. It is also the least memorable. Strong Password is used to encrypt the backup & can also be used when you forget your login passcode",
         "AGSP2": "If someone gets access to your cloud, this option makes your Level 1 backup even resistant to brute force attack",
         "AGSPsub": "App Generated Strong Password",

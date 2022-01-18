@@ -138,9 +138,8 @@
       "hint": "Hinweis",
       "toremember": "sich merken",
       "Easiertoremember": "Es ist leichter zu merken. Und es wird empfohlen",
-      "Useencryptionpassword": "Verwende dein eigenes Verschlüsselungspasswort",
-      "Createapassword": "Erstelle ein Passwort. ",
-      "MakeSureToRememberIt": " Achte drauf, dass du es leicht merken kannst",
+      "Useencryptionpassword": "Erstellen Sie Ihre eigene Passphrase",
+      "Createapassword": "Geben Sie eine Passphrase an, verwenden Sie einen „Hinweis“, um sich daran zu erinnern ",
       "Backuplets": "Mit einem Backup kannst Du deine Wallet wiederherstellen, auch wenn Du dein Telefon verlierst. Verwalte von",
       "questionList": [
           {

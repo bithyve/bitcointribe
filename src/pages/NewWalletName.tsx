@@ -26,7 +26,7 @@ import {
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
-import HeaderTitle from '../components/HeaderTitle'
+import HeaderTitle1 from '../components/HeaderTitle1'
 import BottomInfoBox from '../components/BottomInfoBox'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { updateCloudPermission } from '../store/actions/BHR'
@@ -188,7 +188,7 @@ export default function NewWalletName( props ) {
           <View style={{
             flex: 1
           }} >
-            <HeaderTitle
+            <HeaderTitle1
               firstLineTitle={`${strings.Step1}`}
               secondLineBoldTitle={'Name your Wallet'}
               secondLineTitle={''}

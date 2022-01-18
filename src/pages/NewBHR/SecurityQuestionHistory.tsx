@@ -250,7 +250,7 @@ const SecurityQuestionHistory = ( props ) => {
           setActiveIndex={()=> confirmAction( 2 )}
           index={2}
           italicText={''}
-          boldText={loginStrings.MakeSureToRememberIt}
+          boldText={''}
           changeBgColor={true}
           tag={loginStrings.UserDefined}
           hideRadioBtn
