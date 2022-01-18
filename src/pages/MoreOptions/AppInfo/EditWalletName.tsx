@@ -148,7 +148,7 @@ export default function EditWalletName( props ) {
           }}
         >
           <TextInput
-            maxLength={24}
+            maxLength={10}
             style={styles.modalInputBox}
             placeholder={strings.Enternewwalletname}
             placeholderTextColor={Colors.borderColor}
@@ -214,8 +214,9 @@ export default function EditWalletName( props ) {
             width: wp( 80 )
           }}
         >
-          <TextInput
+          {/* <TextInput
             style={styles.modalInputBox}
+            maxLength = {10}
             ref={confirmAnswerTextInput}
             placeholder={strings.Confirmnewwalletname}
             placeholderTextColor={Colors.borderColor}
@@ -249,7 +250,7 @@ export default function EditWalletName( props ) {
               setConfirmAnswerInputStyle( styles.inputBox )
               handleSubmit()
             }}
-          />
+          /> */}
           {/* {tempAns ? (
             <TouchableWithoutFeedback
               onPress={() => {
