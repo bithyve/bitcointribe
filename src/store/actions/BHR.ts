@@ -12,8 +12,6 @@ export const UPDATE_HEALTH = 'UPDATE_HEALTH'
 export const ERROR_SENDING = 'ERROR_SENDING'
 export const UPDATE_SHARES_HEALTH = 'UPDATE_SHARES_HEALTH'
 export const GENERATE_META_SHARE = 'GENERATE_META_SHARE'
-export const UPDATE_META_SHARES_KEEPER= 'UPDATE_META_SHARES_KEEPER'
-export const UPDATE_OLD_META_SHARES_KEEPER= 'UPDATE_OLD_META_SHARES_KEEPER'
 export const MSHARES = 'MSHARES'
 export const UPDATE_OLD_META_SHARES_KEEPER= 'UPDATE_OLD_META_SHARES_KEEPER'
 export const SET_PASSWORD_RESET_STATE = 'SET_PASSWORD_RESET_STATE'
@@ -212,14 +210,6 @@ export const generateMetaShare = ( level, isUpgrade? ) => {
   }
 }
 
-export const updateMetaSharesKeeper = ( metaSharesKeeper: MetaShare[] ) => {
-  return {
-    type: UPDATE_META_SHARES_KEEPER,
-    payload: {
-      metaSharesKeeper
-    }
-  }
-}
 
 export const updateOldMetaSharesKeeper = ( oldMetaSharesKeeper: MetaShare[] ) => {
   return {
@@ -379,14 +369,6 @@ export const updateMetaSharesKeeper = ( metaSharesKeeper: MetaShare[] ) => {
   }
 }
 
-export const updateOldMetaSharesKeeper = ( oldMetaSharesKeeper: MetaShare[] ) => {
-  return {
-    type: UPDATE_OLD_META_SHARES_KEEPER,
-    payload: {
-      oldMetaSharesKeeper
-    }
-  }
-}
 
 export const changeEncryptionPassword = payload => {
   return {
