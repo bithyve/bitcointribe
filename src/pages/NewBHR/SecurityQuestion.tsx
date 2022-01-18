@@ -55,13 +55,17 @@ function SecurityQuestion( props ) {
         AnswerCounter++
         setAnswerCounter( AnswerCounter )
       } else {
-        props.onClose()
-        props.navigation.navigate( 'ReLogin', {
-          isPasscodeCheck: true,
-          onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
-        } )
-        setShowAnswer( true )
-        setErrorText( '' )
+        if( !props.title1 ) {
+          props.onClose()
+          props.navigation.navigate( 'ReLogin', {
+            isPasscodeCheck: true,
+            onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
+          } )
+          setShowAnswer( true )
+          setErrorText( '' )
+        } else {
+          setAnswerCounter( 0 )
+        }
         return
       }
       setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
