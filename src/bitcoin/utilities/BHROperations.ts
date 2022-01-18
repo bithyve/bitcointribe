@@ -887,6 +887,7 @@ export default class BHROperations {
         updatedMetaShares, updatedOldMetaShares
       }
     } catch ( err ) {
+      console.log( 'encryptMetaSharesWithNewAnswer', err )
       return {
         updatedMetaShares:metaShares, updatedOldMetaShares: oldMetaShares
       }

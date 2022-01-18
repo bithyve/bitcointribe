@@ -101,7 +101,7 @@ export default function PasscodeConfirm( props ) {
       <View style={ {
         flex: 1
       } }>
-        <View >
+        <View>
           <Text style={ styles.headerTitleText }>{strings.Hello}</Text>
           <View>
             <Text style={ styles.headerInfoText }>

@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import idx from 'idx'
-
+import DeviceInfo from 'react-native-device-info'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -254,9 +254,13 @@ const AppInfo = ( props ) => {
               <View style={{
                 justifyContent: 'center', marginLeft: 10
               }}>
-                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
-                <TouchableOpacity style={{padding:5,zIndex:1}}><Options/></TouchableOpacity>
+                <View style={{
+                  flexDirection:'row', alignItems:'center', justifyContent:'space-between'
+                }}>
+                  <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
+                  <TouchableOpacity style={{
+                    padding:5, zIndex:1
+                  }}><Options/></TouchableOpacity>
                 </View>
                 <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
               </View>
@@ -277,7 +281,7 @@ const AppInfo = ( props ) => {
                   <Text style={styles.headerTitleText}>{`${walletId.length > 22 ? walletId.substr( 0, 22 )+'...' : walletId}`}</Text>
                 }
                 { menuOption.title === 'Version History' &&
-                  <Text style={styles.headerTitleText}>{`Hexa ${data && data.length && data[ data.length - 1  ].version}`}</Text>
+                  <Text style={styles.headerTitleText}>{`Hexa ${DeviceInfo.getVersion()}`}</Text>
                 }
               </View>
             </View>

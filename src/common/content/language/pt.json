@@ -138,8 +138,8 @@
       "hint": "dica",
       "toremember": "lembrar",
       "Easiertoremember": "Mais fácil de lembrar. Recomendado",
-      "Useencryptionpassword": "Use sua própria senha de criptografia",
-      "Createapassword": "Criar uma senha. Tenha certeza de se lembrar disso",
+      "Useencryptionpassword": "Crie sua própria senha",
+      "Createapassword": "Forneça uma senha, use uma 'Dica' para lembrar",
       "Backuplets": "O backup permite que você recupere sua carteira mesmo que perca seu telefone. Gerenciar da",
       "questionList": [
           {
@@ -503,6 +503,7 @@
       "Generatingyour": "Gerando seu",
       "Itmaytake": "Pode demorar um pouco enquanto a carteira cria Chaves de Recuperação. Não feche o aplicativo ou volte",
       "SecurityPrivacy": "Segurança e Privacidade",
+      "SecurityCenter": "Centro de Segurança",
       "Contactswhose": "Contatos cujas carteiras eu posso ajudar a restaurar",
       "Whenyouhave": "Quando você tiver amigos e família para ajudar na recuperação da carteira, eles serão listados aqui",
       "WalletBackup": "Backup da carteira",

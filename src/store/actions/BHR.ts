@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-import { BackupStreamData, cloudDataInterface, LevelHealthInterface, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, cloudDataInterface, MetaShare, LevelHealthInterface, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -15,6 +15,10 @@ export const GENERATE_META_SHARE = 'GENERATE_META_SHARE'
 export const UPDATE_META_SHARES_KEEPER= 'UPDATE_META_SHARES_KEEPER'
 export const UPDATE_OLD_META_SHARES_KEEPER= 'UPDATE_OLD_META_SHARES_KEEPER'
 export const MSHARES = 'MSHARES'
+export const UPDATE_OLD_META_SHARES_KEEPER= 'UPDATE_OLD_META_SHARES_KEEPER'
+export const SET_PASSWORD_RESET_STATE = 'SET_PASSWORD_RESET_STATE'
+export const CHANGE_ENC_PASSWORD = 'CHANGE_ENC_PASSWORD'
+export const UPDATE_META_SHARES_KEEPER= 'UPDATE_META_SHARES_KEEPER'
 export const IS_LEVEL_TWO_METASHARE = 'IS_LEVEL_TWO_METASHARE'
 export const IS_LEVEL_THREE_METASHARE = 'IS_LEVEL_THREE_METASHARE'
 export const INIT_LEVEL_TWO = 'INIT_LEVEL_TWO'
@@ -76,12 +80,19 @@ export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
 export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
 export const PDF_UPGRADE = 'PDF_UPGRADE'
+export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
     type: INIT_NEW_BHR, payload: {
       newBHRFlowStarted
     }
+  }
+}
+
+export const resetLevelsAfterPasswordChange =() => {
+  return {
+    type: RESET_LEVEL_AFTER_PASSWORD_CHANGE,
   }
 }
 
@@ -351,6 +362,37 @@ export const recoverMmnemonic = ( metaShares, securityAns, isPrimary? ) => {
   }
 }
 
+export const setPasswordResetState = ( state ) => {
+  return {
+    type: SET_PASSWORD_RESET_STATE, payload: {
+      state,
+    }
+  }
+}
+
+export const updateMetaSharesKeeper = ( metaSharesKeeper: MetaShare[] ) => {
+  return {
+    type: UPDATE_META_SHARES_KEEPER,
+    payload: {
+      metaSharesKeeper
+    }
+  }
+}
+
+export const updateOldMetaSharesKeeper = ( oldMetaSharesKeeper: MetaShare[] ) => {
+  return {
+    type: UPDATE_OLD_META_SHARES_KEEPER,
+    payload: {
+      oldMetaSharesKeeper
+    }
+  }
+}
+
+export const changeEncryptionPassword = payload => {
+  return {
+    type: CHANGE_ENC_PASSWORD, payload
+  }
+}
 
 export const removeSecondaryMnemonic = () => {
   return {

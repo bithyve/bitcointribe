@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Platform } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { Input } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
@@ -26,6 +26,7 @@ import idx from 'idx'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { translations } from '../../../common/content/LocContext'
 
+const placeholder = Platform.OS =='ios' ? 12 : 9
 export type Props = {
   currentRecipient: RecipientDescribing,
   subAccountKind: SubAccountKind;
@@ -52,8 +53,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const common  = translations[ 'common' ]
   const [ isSendingMax, setIsSendingMax ] = useState( false )
   const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
-  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String(  currentAmount ? currentAmount : '' ) )
-  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ?  convertSatsToFiat( Number( currentSatsAmountTextValue ) ) : '' ) )
+  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( Number(  currentAmount ? currentAmount : 0 ) )
+  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ) )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( currentSatsAmountTextValue )
@@ -218,7 +219,6 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             )}
         </TouchableOpacity>
 
-
         {/* BTC Amount */}
         <TouchableOpacity
           style={{
@@ -256,7 +256,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                   : `${strings.ConvertedIn} sats`
             }
             placeholderTextColor={FormStyles.placeholderText.color}
-            value={currentSatsAmountTextValue}
+            value={String( currentSatsAmountTextValue )}
             returnKeyLabel="Done"
             returnKeyType="done"
             keyboardType={'numeric'}
@@ -264,7 +264,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
               const regEx = /^[0-9]+$/
               if( regEx.test( value ) || value === '' ) {
                 setIsSendingMax( false )
-                setCurrentSatsAmountTextValue( value )
+                setCurrentSatsAmountTextValue( Number( value ) )
                 setCurrentFiatAmountTextValue( String( convertSatsToFiat( Number( value ) ?? 0 ).toFixed( 2 ) ) )
                 onAmountChanged( Number( value ) ?? 0 )
               }
@@ -368,7 +368,7 @@ const styles = StyleSheet.create( {
     height: '100%',
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( placeholder ),
     padding: 0,
   },
 

@@ -41,10 +41,11 @@ import {
   ALLOW_SECURE_ACCOUNT,
   OPEN_CLOSE_APPROVAL,
   SET_SECONDARY_DATA_INFO_STATUS,
+  SET_IS_CURRENT_LEVEL0,
+  PDF_UPGRADE,
+  SET_PASSWORD_RESET_STATE,
   UPDATE_META_SHARES_KEEPER,
   UPDATE_OLD_META_SHARES_KEEPER,
-  SET_IS_CURRENT_LEVEL0,
-  PDF_UPGRADE
 } from '../actions/BHR'
 
 const initialState: {
@@ -125,6 +126,7 @@ const initialState: {
   approvalContactData: ContactRecipientDescribing;
   IsCurrentLevel0: boolean;
   pdfUpgrade: boolean;
+  passwordResetState: string
 } = {
   mnemonic: '',
   loading: {
@@ -196,7 +198,8 @@ const initialState: {
   availableKeepers: [],
   approvalContactData: null,
   IsCurrentLevel0: false,
-  pdfUpgrade: false
+  pdfUpgrade: false,
+  passwordResetState: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -466,6 +469,11 @@ export default ( state = initialState, action ) => {
             ...state.loading,
             getSecondaryDataInfoStatus: action.payload.flag,
           },
+        }
+      case SET_PASSWORD_RESET_STATE:
+        return {
+          ...state,
+          passwordResetState: action.payload.state,
         }
 
       case SET_IS_CURRENT_LEVEL0:

@@ -180,7 +180,7 @@ const styles = StyleSheet.create( {
   rootContainer: {
     borderRadius: 10,
     width: widthPercentageToDP( 43 ),
-    height: heightPercentageToDP( 20 ),
+    height: heightPercentageToDP( 23 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,

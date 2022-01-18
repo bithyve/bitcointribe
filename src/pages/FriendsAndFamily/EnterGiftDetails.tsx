@@ -35,8 +35,11 @@ import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import Halloween from '../../assets/images/svgs/halloween.svg'
 import Birthday from '../../assets/images/svgs/birthday.svg'
+import Setting from '../../assets/images/svgs/setting_icon.svg'
+import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
 import ThemeList from './Theme'
 import { updateUserName } from '../../store/actions/storage'
+import Toast from '../../components/Toast'
 
 import { translations } from '../../common/content/LocContext'
 
@@ -131,7 +134,9 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( 'Bitcoin is a new type of money that is not controlled by any government or company' )
+  const [ note, setNote ] = useState( 
+    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+    'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -569,6 +574,8 @@ const GiftDetails = ( { navigation } ) => {
             navigation.navigate( 'AddContact', {
               fromScreen: 'GiftDetails',
               giftId,
+              note,
+              senderName: name,
               setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
@@ -642,16 +649,24 @@ const GiftDetails = ( { navigation } ) => {
               disabled={addfNf}
               style={{
                 height: 30,
-                width: 100,
-                justifyContent: 'center',
+                width: 150,
+                paddingHorizontal:6,
+                flexDirection:'row',
+                justifyContent: 'space-around',
                 alignItems: 'center',
                 borderRadius: 8,
                 backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
               }}
             >
+              <View style={styles.settingIcon}>
+              <Setting/>
+              </View>
               <Text style={{
                 color: 'white'
               }}>{'Advanced'}</Text>
+              <View style={styles.menuIcon}>
+              <Menu/>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -777,12 +792,14 @@ const GiftDetails = ( { navigation } ) => {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                width:'100%'
               }}
             >
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
+                  width:'97%'
                 }}
               >
                 <View
@@ -893,8 +910,7 @@ const GiftDetails = ( { navigation } ) => {
             placeholderTextColor={Colors.gray1}
             value={note}
             keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-            returnKeyType="done"
-            returnKeyLabel="Done"
+            blurOnSubmit={true}
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
@@ -1074,6 +1090,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 2 ),
     alignSelf: 'center'
+    
   },
   timeInfo:{
     width: '87%',
@@ -1356,6 +1373,12 @@ const styles = StyleSheet.create( {
     fontWeight:'500',
     fontSize:15,
     fontFamily: Fonts.FiraSansRegular
+  },
+  menuIcon:{
+    paddingTop:hp( 0.6 ),
+  },
+  settingIcon:{
+    paddingTop:hp( 0.3 ),
   }
 } )
 

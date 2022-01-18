@@ -312,7 +312,9 @@ export default function AddContactAddressBook( props ) {
           headerText: strings.addContact,
           subHeaderText:strings.send,
           contactText:strings.adding,
+          senderName: props?.navigation?.state?.params?.senderName,
           showDone:true,
+          note : props?.navigation?.state?.params?.note
         } )
       }
 
