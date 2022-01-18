@@ -67,6 +67,7 @@ export default function Secure2FA( props ) {
             index={DeepLinkEncryptionType.NUMBER}
             geticon={''}
             italicText={''}
+            boldText={''}
             changeBgColor={true}
           />
           : null}
@@ -79,6 +80,7 @@ export default function Secure2FA( props ) {
             index={DeepLinkEncryptionType.EMAIL}
             geticon={''}
             italicText={''}
+            boldText={''}
             changeBgColor={true}
           />
           : null }
@@ -90,6 +92,7 @@ export default function Secure2FA( props ) {
           index={DeepLinkEncryptionType.OTP}
           geticon={''}
           italicText={''}
+          boldText={''}
           changeBgColor={true}
         />
       </View>

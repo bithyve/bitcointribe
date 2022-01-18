@@ -33,9 +33,26 @@ export default StyleSheet.create( {
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },
+  //
+  headerTitles1: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 18 ),
+    letterSpacing: 0.01,
+    marginLeft: 20,
+    fontFamily: Fonts.FiraSansRegular
+  },
   subHeaderTitles: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
+    marginLeft: 20,
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop: heightPercentageToDP( 0.5 ),
+    letterSpacing: 0.6
+  },
+  //
+  subHeaderTitlesBold: {
+    color: Colors.blue,
+    fontSize: RFValue( 23 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
     marginTop: heightPercentageToDP( 0.5 ),
