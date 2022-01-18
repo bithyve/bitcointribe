@@ -159,9 +159,9 @@ export default function EditWalletName( props ) {
             autoCorrect={false}
             editable={isEditable}
             autoCapitalize="none"
-            onSubmitEditing={() =>
-              props.onPressConfirm( answer )
-            }
+            // onSubmitEditing={() =>
+            //   props.onPressConfirm( answer )
+            // }
             keyboardType={
               Platform.OS == 'ios'
                 ? 'ascii-capable'
@@ -232,7 +232,7 @@ export default function EditWalletName( props ) {
             editable={isEditable}
             autoCapitalize="none"
             onChangeText={( text ) => {
-              setTempAns( text )
+              setTempAns( text.replace( /[^A-Za-z]/g, '' ) )
             }}
             onSubmitEditing={handleSubmit}
             onFocus={() => {
