@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, FlatList, TouchableOpacity } from 'react-native'
+import { Text, View, FlatList, TouchableOpacity, Button } from 'react-native'
 import RESTUtils from '../../../utils/ln/RESTUtils'
 import ChannelList from '../components/channels/ChannelListComponent'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
@@ -39,6 +39,7 @@ interface ChannelFrame {
 export default class ChannelScreen extends Component {
     constructor(props) {
         super(props)
+        console.log(this.props.navigation.getParam('node'), "+++++++++")
         this.state = {
             node: this.props.navigation.getParam('node'),
             channels: []
@@ -47,6 +48,7 @@ export default class ChannelScreen extends Component {
 
     componentDidMount(): void {
         this.channelList()
+        console.log(this.state.node, "---")
     }
 
     uniqueKey = (item:any, index: number) => index;
@@ -60,7 +62,8 @@ export default class ChannelScreen extends Component {
             // })
 
             this.props.navigation.navigate('ChannelInfoScreen', {
-                channelInfo: item
+                channelInfo: item,
+                node: this.state.node
             })
           }}
         >
@@ -90,6 +93,18 @@ export default class ChannelScreen extends Component {
     render() {
         return (
             <View>
+                <Button
+                    onPress={()=> {
+                        this.props.navigation.navigate('OpenChannelScreen', {
+                          node: this.state.node
+                        })
+                        // this.props.navigation.navigate('ChannelScreen', {
+                        //   node: this.state.node
+                        // })
+                        // console.log(this.state.node, "90")
+                    }}
+                    title='Open Channel'
+                />
                 <FlatList
          style={{
           margin: 5

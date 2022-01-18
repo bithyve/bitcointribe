@@ -62,6 +62,8 @@ import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
 import SendCoinScreen from '../../../pages/zeusLN/screens/SendCoinScreen'
 import ChannelScreen from '../../../pages/zeusLN/screens/ChannelScreen'
 import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
+import OpenChannelScreen from '../../../pages/zeusLN/screens/OpenChannelScreen'
+
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -145,6 +147,13 @@ const HomeStack = createStackNavigator(
 
     ChannelInfoScreen: {
       screen: ChannelInfoScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
+
+    OpenChannelScreen: {
+      screen: OpenChannelScreen,
       navigationOptions: {
         header: null,
       },

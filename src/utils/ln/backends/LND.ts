@@ -166,7 +166,7 @@ export default class LND {
       return `${baseUrl}${route}`
     };
 
-    request = ( route: string, method: string, data?: any ) => {
+    request = ( node: any, link: string ) => {
       const {
         host,
         lndhubUrl,
@@ -175,16 +175,16 @@ export default class LND {
         accessToken,
         certVerification,
         enableTor
-      } = stores.settingsStore
+      } = node
       const auth = macaroonHex || accessToken
       const headers: any = this.getHeaders( auth )
       headers[ 'Content-Type' ] = 'application/json'
-      const url = this.getURL( host || lndhubUrl, port, route )
+      const url = this.getURL( host || lndhubUrl, port, link )
       return this.restReq(
         headers,
         url,
-        method,
-        data,
+        'delete',
+        null,
         certVerification,
         enableTor
       )
@@ -217,7 +217,6 @@ export default class LND {
 
 
     postRequestNode = (node: any, link: string, data: any) => {
-      console.log("india")
       const {
         host,
         lndhubUrl,
@@ -266,10 +265,10 @@ export default class LND {
       )
     };
 
-    getRequest = ( route: string ) => this.request( route, 'get', null );
+    getRequest = ( route: string ) => this.request( route, 'get');
     postRequest = ( route: string, data?: any ) =>
-      this.request( route, 'post', data );
-    deleteRequest = ( route: string ) => this.request( route, 'delete', null );
+      this.request( route, 'post');
+    deleteRequest = ( node:any, route: string ) => this.request( node, route);
     // getChannels = () => this.getRequest( '/v1/channels' );
     getChannels = (node: any) => this.getRequestNode( node, '/v1/channels');
     getChannelInfo = ( chanId: string ) =>
@@ -289,11 +288,11 @@ export default class LND {
     createInvoice = ( node:any, data: any ) => this.postRequestNode(node, '/v1/invoices', data);
     getPayments = () => this.getRequest( '/v1/payments' );
     getNewAddress = (node: any) => this.getRequestNode( node ,'/v1/newaddress' );
-    openChannel = ( data: OpenChannelRequest ) =>
-      this.postRequest( '/v1/channels', data );
+    openChannel = ( node:any, data: OpenChannelRequest ) =>
+      this.postRequestNode( node, '/v1/channels', data );
     openChannelStream = ( data: OpenChannelRequest ) =>
       this.wsReq( '/v1/channels/stream', 'POST', data );
-    connectPeer = ( data: any ) => this.postRequest( '/v1/peers', data );
+    connectPeer = ( node:any, data: any ) => this.postRequestNode( node, '/v1/peers', data );
     listNode = () => this.getRequest( '/v1/network/listNode' );
     decodePaymentRequest = ( urlParams?: Array<string> ) =>
       this.getRequest( `/v1/payreq/${urlParams && urlParams[ 0 ]}` );
@@ -303,15 +302,15 @@ export default class LND {
       this.postRequest( '/v2/router/send', data );
     payLightningInvoiceV2Streaming = ( data: any ) =>
       this.wsReq( '/v2/router/send', 'POST', data );
-    closeChannel = ( urlParams?: Array<string> ) => {
-      if ( urlParams && urlParams.length === 4 ) {
-        return this.deleteRequest(
-          `/v1/channels/${urlParams && urlParams[ 0 ]}/${urlParams &&
-                    urlParams[ 1 ]}?force=${urlParams &&
-                    urlParams[ 2 ]}&sat_per_byte=${urlParams && urlParams[ 3 ]}`
-        )
-      }
-      return this.deleteRequest(
+    closeChannel = ( node:any , urlParams?: Array<string> ) => {
+      // if ( urlParams && urlParams.length === 4 ) {
+      //   return this.deleteRequest(node,
+      //     `/v1/channels/${urlParams && urlParams[ 0 ]}/${urlParams &&
+      //               urlParams[ 1 ]}?force=${urlParams &&
+      //               urlParams[ 2 ]}&sat_per_byte=${urlParams && urlParams[ 3 ]}`
+      //   )
+      // }
+      return this.request(node,
         `/v1/channels/${urlParams && urlParams[ 0 ]}/${urlParams &&
                 urlParams[ 1 ]}?force=${urlParams && urlParams[ 2 ]}`
       )
