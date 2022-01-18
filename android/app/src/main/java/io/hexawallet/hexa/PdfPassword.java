@@ -119,7 +119,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 
         Paragraph preface = new Paragraph();
         preface.add(new Paragraph(jsonObj.getString("title"), catFont));
-        preface.add(new Paragraph("Follow the instructions on the app to scan the 8 QRs below", subFont));
+        preface.add(new Paragraph("Follow the instructions in the app to scan the 8 QR below", subFont));
         document.add(preface);
         addEmptyLine(preface, 1);
         // part 1
@@ -344,7 +344,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 
         Paragraph preface = new Paragraph();
         preface.add(new Paragraph(jsonObj.getString("title"), catFont));
-        preface.add(new Paragraph("Follow the instructions on the app to scan QRs below", subFont));
+        preface.add(new Paragraph("Follow the instructions in the app to scan QR below", subFont));
         document.add(preface);
         addEmptyLine(preface, 1);
         // part 1

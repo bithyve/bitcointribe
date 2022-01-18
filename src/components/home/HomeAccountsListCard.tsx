@@ -180,11 +180,11 @@ const styles = StyleSheet.create( {
   rootContainer: {
     borderRadius: 10,
     width: widthPercentageToDP( 43 ),
-    height: heightPercentageToDP( 20 ),
+    height: heightPercentageToDP( 23 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,
-    paddingVertical: widthPercentageToDP( 2.5 ),
+    paddingVertical: widthPercentageToDP( 4.5 ),
     backgroundColor: Colors.white,
     justifyContent: 'space-between',
     shadowColor: Colors.shadowColor,
@@ -198,6 +198,7 @@ const styles = StyleSheet.create( {
   headerSectionContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginBottom:0,
   },
 
   headerAccountSync: {

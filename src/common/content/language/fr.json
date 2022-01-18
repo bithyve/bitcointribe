@@ -138,8 +138,8 @@
       "hint": "indice",
       "toremember": "vous en rappeler",
       "Easiertoremember": "Plus facile à mémoriser. Recommandé",
-      "Useencryptionpassword": "Utilisez votre propre mot de passe de chiffrement",
-      "Createapassword": "Créez un mot de passe. Assurez-vous de vous en souvenir",
+      "Useencryptionpassword": "Créez votre propre phrase de passe",
+      "Createapassword": "Fournissez une phrase de passe, utilisez un 'indice' pour vous en souvenir",
       "Backuplets": "La sauvegarde vous permet de récupérer votre portefeuille même si vous perdez votre téléphone. Gérer depuis",
       "questionList": [
           {
@@ -503,6 +503,7 @@
       "Generatingyour": "Génération de votre",
       "Itmaytake": "Cela peut prendre un peu de temps car le portefeuille crée des clés de récupération. Ne fermez pas l'application et ne revenez pas en arrière",
       "SecurityPrivacy": "Sécurité & Confidentialité",
+      "SecurityCenter": "centre de sécurité",
       "Contactswhose": "Contacts dont je peux aider à restaurer les portefeuilles",
       "Whenyouhave": "Lorsque vous avez des Amis & Famille dont vous pouvez aider à récupérer le portefeuille, ils seront répertoriés ici",
       "WalletBackup": "Sauvegarde du portefeuille",

@@ -985,6 +985,26 @@ export enum GiftStatus {
   RECLAIMED = 'RECLAIMED',
   EXPIRED = 'EXPIRED',
 }
+
+export enum ShortLinkImage {
+  GIFT = 'https://hexawallet.io/wp-content/uploads/2019/07/bitcoingift.png',
+  FF = 'https://hexawallet.io/wp-content/uploads/2019/07/faf.png',
+  DONATION = 'https://hexawallet.io/images/donation.png',
+}
+
+export enum ShortLinkTitle {
+  GIFT = 'Bitcoin gift',
+  FF = 'Friends & Family request',
+  DONATION = 'Bitcoin donation',
+}
+
+export enum ShortLinkDescription {
+  GIFT = 'You\'ve received some sats from your contact! Open the link to accept the gift.',
+  FF = 'You\'ve received a request to be added as a contact. Accept and transact bitcoin more efficiently.',
+  DONATION = 'You can give sats as a donation with this link. Open the link to donate sats to the cause.',
+  KEEPER = 'You\'ve received a request to store a Recovery Key. Accept and help your contact backup their app.'
+}
+
 export interface Gift {
   id: string,
   privateKey: string,
