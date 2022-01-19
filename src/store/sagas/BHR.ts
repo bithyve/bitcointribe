@@ -543,7 +543,7 @@ function* recoverWalletWorker( { payload } ) {
       for ( let i = 0; i < shares.length; i++ ) {
         const element = shares[ i ]
         pmShares.push( element.backupData.primaryMnemonicShard.encryptedShare.pmShare )
-        if( element.secondaryData.secondaryMnemonicShard ) smShares.push( element.secondaryData.secondaryMnemonicShard )
+        if( element.secondaryData && element.secondaryData.secondaryMnemonicShard ) smShares.push( element.secondaryData.secondaryMnemonicShard )
       }
       secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
       primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
@@ -1120,6 +1120,7 @@ export const sharePDFWatcher = createWatcher( sharePDFWorker, SHARE_PDF )
 
 function* confirmPDFSharedWorker( { payload } ) {
   try {
+    console.log( 'confirmPDFSharedWorker' )
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -1137,7 +1138,7 @@ function* confirmPDFSharedWorker( { payload } ) {
       shareIndex = oldMetaShare.findIndex( ( value ) => value.shareId == shareId )
     }
     const keeperInfo: KeeperInfoInterface = keeperInfos.find( value=>value.shareId == shareId )
-
+    console.log( 'keeperInfo', keeperInfo )
     const scannedObj:  {
       type: QRCodeTypes;
       walletName: string;
@@ -1149,7 +1150,13 @@ function* confirmPDFSharedWorker( { payload } ) {
       encryptedKey: string;
       walletId: string;
     } = JSON.parse( scannedData )
+    console.log( 'scannedData', scannedData )
+
+    console.log( 'scannedObj', scannedObj )
+
     const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedData
+    console.log( 'decryptedData', decryptedData )
+
     if( decryptedData == shareId && scannedObj.walletId == walletId ){
       const shareObj = {
         walletId: walletId,
@@ -1164,6 +1171,7 @@ function* confirmPDFSharedWorker( { payload } ) {
         shareType: 'pdf',
         status: 'accessible',
       }
+
       yield put( updateMSharesHealth( shareObj, false ) )
     }
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
@@ -2457,10 +2465,6 @@ function* retrieveMetaSharesWorker( { payload } ) {
         }
       }
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> development
     yield put( updateMetaSharesKeeper( metaShares ) )
     dbManager.updateBHR( {
       metaSharesKeeper: metaShares,

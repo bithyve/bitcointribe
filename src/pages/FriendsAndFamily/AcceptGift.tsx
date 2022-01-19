@@ -754,7 +754,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           marginHorizontal: wp( 5 )
         }}>
           <View style={{
-            flexDirection: 'row', backgroundColor: 'red'
+            flexDirection: 'row'
           }}>
             {
               WrongInputError !== '' && (
