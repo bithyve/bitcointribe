@@ -65,6 +65,7 @@ import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
 import { calculateSendMaxFee } from '../../store/actions/sending'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { Shadow } from 'react-native-shadow-2'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -211,6 +212,7 @@ const CreateGift = ( { navigation } ) => {
     }
 
     return(
+      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[8,8]}>
       <TouchableOpacity
         disabled={isDisabled}
         onPress={()=>{
@@ -264,6 +266,7 @@ const CreateGift = ( { navigation } ) => {
       >
         <Text style={styles.buttonText}>{text}</Text>
       </TouchableOpacity>
+      </Shadow>
     )
   }
 
@@ -1176,13 +1179,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.blue,
-    marginLeft: wp( 2 )
   },
   disabledButtonView: {
     height: wp( '12%' ),
@@ -1190,13 +1187,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.lightBlue,
-    marginLeft: wp( 2 )
   },
   imageView: {
     width: 18,

@@ -231,7 +231,7 @@ const HomeHeader = ( {
 
   return (
     <View style={{
-      ...styles.headerViewContainer, flex: 1
+      ...styles.headerViewContainer
     }}>
       <View style={{
         flexDirection: 'row', alignItems: 'center'
@@ -305,7 +305,7 @@ const HomeHeader = ( {
           <ImageBackground
             source={require( '../../assets/images/icons/qr.png' )}
             style={{
-              width: wp( '7%' ), height: wp( '7%' ), marginLeft: 'auto',
+              width: wp( '7%' ), height: wp( '7%' ), marginLeft: 0,
             }}
             resizeMode={'contain'}
           >
@@ -390,7 +390,7 @@ const styles = StyleSheet.create( {
   headerViewContainer: {
     marginTop: hp( '3.6%' ),
     marginLeft: wp( 3 ),
-    marginRight: wp( 3 )
+    marginRight: wp( 3 ),
   },
   headerTitleText: {
     color: Colors.white,
