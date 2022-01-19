@@ -18,7 +18,7 @@ import CopyThisText from '../CopyThisText'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import dynamicLinks from '@react-native-firebase/dynamic-links'
-import { ShortLinkDomain, } from '../../bitcoin/utilities/Interface'
+import { ShortLinkDomain, ShortLinkImage, ShortLinkTitle, ShortLinkDescription } from '../../bitcoin/utilities/Interface'
 
 export default function DonationWebPageBottomSheet( props ) {
   const [ link, setLink ] = useState( '' )
@@ -39,6 +39,11 @@ export default function DonationWebPageBottomSheet( props ) {
       const shortLink = await dynamicLinks().buildShortLink( {
         link: url,
         domainUriPrefix: domain,
+        social: {
+          imageUrl: ShortLinkImage.DONATION,
+          title: ShortLinkTitle.DONATION,
+          descriptionText: ShortLinkDescription.DONATION
+        }
       }, dynamicLinks.ShortLinkType.SHORT )
       setLink ( shortLink )
     } catch ( error ) {

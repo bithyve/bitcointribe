@@ -14,6 +14,7 @@ import {
   switchReLogin,
   INIT_RECOVERY,
   CHANGE_AUTH_CRED,
+  RESET_PIN,
   credsChanged,
   pinChangedFailed,
   initializeRecoveryCompleted,
@@ -24,7 +25,9 @@ import {
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
+import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange } from '../actions/BHR'
+import { updateCloudData } from '../actions/cloud'
+import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
@@ -37,7 +40,8 @@ import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/tru
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
-
+import semverLte from 'semver/functions/lte'
+import { accountVisibilityResetter, testAccountEnabler } from './upgrades'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -107,18 +111,68 @@ export const credentialStorageWatcher = createWatcher(
   STORE_CREDS,
 )
 
+function* resetPasswordWorker( { payload } ) {
+  try {
+    yield put( setPasswordResetState( 'init' ) )
+    const wallet: Wallet = yield select( state => state.storage.wallet )
+    const { security } = wallet
+    const oldSecurity =  {
+      ...security
+    }
+    console.log( oldSecurity )
+    yield put( updateWallet( {
+      ...wallet,
+      security: payload
+    } ) )
+    yield call( dbManager.updateWallet, {
+      ...wallet,
+      security: payload
+    } )
+    // update cloud
+    yield call( updateCloudBackupWorker )
+    // update shares
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const { metaSharesKeeper, oldMetaSharesKeeper } = yield select( ( state ) => state.bhr )
+    const metaShares: MetaShare[] = [ ...metaSharesKeeper ]
+
+    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer, payload )
+    yield put( updateMetaSharesKeeper( updatedMetaShares ) )
+    yield put( updateOldMetaSharesKeeper( updatedOldMetaShares ) )
+    yield call( dbManager.updateBHR, {
+      metaSharesKeeper: updatedMetaShares,
+      oldMetaSharesKeeper: updatedOldMetaShares
+    } )
+
+    yield put( setPasswordResetState( 'completed' ) )
+    yield put ( resetLevelsAfterPasswordChange() )
+    yield put( setPasswordResetState( '' ) )
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+
 function* credentialsAuthWorker( { payload } ) {
+  console.log( payload.passcode )
   console.clear()
   // let t = timer('credentialsAuthWorker')
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
   try {
     const hash = yield call( Cipher.hash, payload.passcode )
+    console.log( 'hash', hash )
+
     const encryptedKey = yield call( SecureStore.fetch, hash )
+    console.log( 'encryptedKey', encryptedKey )
+
     key = yield call( Cipher.decrypt, encryptedKey, hash )
+    console.log( 'key', key )
+
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
+    console.log( 'err', err )
+
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
     return
@@ -181,6 +235,34 @@ function* changeAuthCredWorker( { payload } ) {
   }
 }
 
+function* resetPinWorker( { payload } ) {
+  const { newPasscode } = payload
+  try {
+    const key = yield select( ( state ) => state.storage.key )
+    // setup new pin
+    const newHash = yield call( Cipher.hash, newPasscode )
+    const encryptedKey = yield call( Cipher.encrypt, key, newHash )
+
+    //store the AES key against the hash
+    if ( !( yield call( SecureStore.store, newHash, encryptedKey ) ) ) {
+      throw new Error( 'Unable to access secure store' )
+    }
+    yield put( credsChanged( 'changed' ) )
+  } catch ( err ) {
+    console.log( {
+      err
+    } )
+    yield put( pinChangedFailed( true ) )
+    // Alert.alert('Pin change failed!', err.message);
+    yield put( credsChanged( 'not-changed' ) )
+  }
+}
+
+export const resetPinCredWatcher = createWatcher(
+  resetPinWorker,
+  RESET_PIN,
+)
+
 export const changeAuthCredWatcher = createWatcher(
   changeAuthCredWorker,
   CHANGE_AUTH_CRED,
@@ -193,25 +275,9 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   const wallet: Wallet = yield select( state => state.storage.wallet )
   const storedVersion = wallet.version
 
-  if( semver.lt( storedVersion, '2.0.66' ) ){
-    const accountShells: AccountShell[] = yield select(
-      ( state ) => state.accounts.accountShells
-    )
 
-    let testAccountShell: AccountShell
-    accountShells.forEach( shell => {
-      if( shell.primarySubAccount.type === AccountType.TEST_ACCOUNT ) testAccountShell = shell
-    } )
-
-    if( testAccountShell.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
-      const settings = {
-        visibility: AccountVisibility.DEFAULT
-      }
-      yield put( updateAccountSettings( {
-        accountShell: testAccountShell, settings
-      } ) )
-    }
-  }
+  if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
+  if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
 
   // update wallet version
   yield put( updateWallet( {

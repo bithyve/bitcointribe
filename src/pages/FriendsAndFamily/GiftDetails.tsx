@@ -438,7 +438,7 @@ const GiftDetails = ( { navigation } ) => {
             style={styles.deepLinkEncryptionTextContainer}
             >
               <Text style={styles.deepLinkEncryptionText}>
-                {deepLinkConfig?.encryptionKey}
+                {deepLinkConfig?.encryptionKey == undefined ? 'No Second Factor' : deepLinkConfig?.encryptionKey}
               </Text>
           </View>
         </View>
@@ -526,6 +526,7 @@ const GiftDetails = ( { navigation } ) => {
         { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT, GiftStatus.REJECTED ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
+            giftMsg:gift.note,
             setActiveTab: navigation.state.params.setActiveTab
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
@@ -872,7 +873,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( 10 ),
     justifyContent:'center',
     textAlign: 'center',
-    letterSpacing: 8
+    letterSpacing: 2
   },
   deepLinkEncryptionTextContainer: {
     width: wp( '80%' ),

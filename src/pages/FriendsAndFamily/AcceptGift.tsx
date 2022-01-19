@@ -75,7 +75,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ addGiftToAccountFlow, setAddGiftToAccountFlow ] = useState( false )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
   const acceptedGiftId = useSelector( ( state ) => state.accounts.acceptedGiftId )
-  const gifts = useSelector( ( state ) => state.accounts.gifts )
+  const gifts = useSelector( ( state ) => state.accounts.gifts ) || {
+  }
   const [ acceptedGift, setAcceptedGift ] = useState( null )
   const addedGiftId = useSelector( ( state ) => state.accounts.addedGift )
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )

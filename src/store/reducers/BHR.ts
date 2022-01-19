@@ -40,7 +40,10 @@ import {
   TYPE_BOTTOMSHEET_OPEN,
   ALLOW_SECURE_ACCOUNT,
   OPEN_CLOSE_APPROVAL,
-  SET_SECONDARY_DATA_INFO_STATUS
+  SET_SECONDARY_DATA_INFO_STATUS,
+  SET_PASSWORD_RESET_STATE,
+  UPDATE_META_SHARES_KEEPER,
+  UPDATE_OLD_META_SHARES_KEEPER,
 } from '../actions/BHR'
 
 const initialState: {
@@ -80,6 +83,8 @@ const initialState: {
     levelInfo: LevelInfo[];
   }[];
   keeperInfo: KeeperInfoInterface[];
+  metaSharesKeeper: MetaShare[];
+  oldMetaSharesKeeper: MetaShare[];
   shares: any;
   metaShare: MetaShare;
   errorReceiving: Boolean;
@@ -116,7 +121,8 @@ const initialState: {
   AllowSecureAccount: boolean;
   openApproval: boolean;
   availableKeepers: KeeperInfoInterface[]
-  approvalContactData: ContactRecipientDescribing
+  approvalContactData: ContactRecipientDescribing,
+  passwordResetState: string
 } = {
   mnemonic: '',
   loading: {
@@ -184,7 +190,10 @@ const initialState: {
   AllowSecureAccount: false,
   openApproval: false,
   availableKeepers: [],
-  approvalContactData: null
+  metaSharesKeeper: [],
+  oldMetaSharesKeeper: [],
+  approvalContactData: null,
+  passwordResetState: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -443,7 +452,22 @@ export default ( state = initialState, action ) => {
             getSecondaryDataInfoStatus: action.payload.flag,
           },
         }
+      case SET_PASSWORD_RESET_STATE:
+        return {
+          ...state,
+          passwordResetState: action.payload.state,
+        }
+      case UPDATE_META_SHARES_KEEPER:
+        return {
+          ...state,
+          metaSharesKeeper: action.payload.metaSharesKeeper
+        }
 
+      case UPDATE_OLD_META_SHARES_KEEPER:
+        return {
+          ...state,
+          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
+        }
   }
   return state
 }

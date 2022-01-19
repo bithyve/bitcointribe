@@ -60,6 +60,7 @@ export default function ChangeSelection( props ) {
           index={0}
           geticon={''}
           italicText={''}
+          boldText={''}
           changeBgColor={true}
         />
         <CardWithRadioBtn
@@ -70,6 +71,7 @@ export default function ChangeSelection( props ) {
           index={1}
           geticon={''}
           italicText={''}
+          boldText={''}
           changeBgColor={true}
         />
       </View>

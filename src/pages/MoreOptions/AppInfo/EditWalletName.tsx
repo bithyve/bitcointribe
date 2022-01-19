@@ -148,20 +148,20 @@ export default function EditWalletName( props ) {
           }}
         >
           <TextInput
-            maxLength={24}
+            maxLength={10}
             style={styles.modalInputBox}
             placeholder={strings.Enternewwalletname}
             placeholderTextColor={Colors.borderColor}
             value={answer}
             autoCompleteType="off"
             textContentType="none"
-            returnKeyType="next"
+            returnKeyType="done"
             autoCorrect={false}
             editable={isEditable}
             autoCapitalize="none"
-            onSubmitEditing={() =>
-              ( confirmAnswerTextInput as any ).current.focus()
-            }
+            // onSubmitEditing={() =>
+            //   props.onPressConfirm( answer )
+            // }
             keyboardType={
               Platform.OS == 'ios'
                 ? 'ascii-capable'
@@ -214,8 +214,9 @@ export default function EditWalletName( props ) {
             width: wp( 80 )
           }}
         >
-          <TextInput
+          {/* <TextInput
             style={styles.modalInputBox}
+            maxLength = {10}
             ref={confirmAnswerTextInput}
             placeholder={strings.Confirmnewwalletname}
             placeholderTextColor={Colors.borderColor}
@@ -232,7 +233,7 @@ export default function EditWalletName( props ) {
             editable={isEditable}
             autoCapitalize="none"
             onChangeText={( text ) => {
-              setTempAns( text )
+              setTempAns( text.replace( /[^A-Za-z]/g, '' ) )
             }}
             onSubmitEditing={handleSubmit}
             onFocus={() => {
@@ -249,7 +250,7 @@ export default function EditWalletName( props ) {
               setConfirmAnswerInputStyle( styles.inputBox )
               handleSubmit()
             }}
-          />
+          /> */}
           {/* {tempAns ? (
             <TouchableWithoutFeedback
               onPress={() => {
