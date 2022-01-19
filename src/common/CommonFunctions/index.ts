@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Accounts } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkImage, ShortLinkTitle, ShortLinkDescription, Trusted_Contacts, Accounts, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -351,7 +351,44 @@ export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: Tr
   return deepLinkKind
 }
 
-export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData, currentLevel }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any, currentLevel?: string } ) => {
+const getLinkImage = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkImage.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT
+   || linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+   || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ) {
+    return ShortLinkImage.FF
+  } else {
+    return ''
+  }
+}
+
+const getLinkTitle = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkTitle.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT
+   || linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+   || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ) {
+    return ShortLinkTitle.FF
+  } else {
+    return ''
+  }
+}
+
+const getLinkDescription = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkDescription.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT ) {
+    return ShortLinkDescription.FF
+  } else if( linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+    || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ){
+    return ShortLinkDescription.KEEPER
+  }else {
+    return ''
+  }
+}
+
+export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any } ) => {
 
   let encryptedChannelKeys: string
   let encryptionHint: string
@@ -426,9 +463,9 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
           forcedRedirectEnabled:  false
         },
         social: {
-          descriptionText: '',
-          title: '',
-          //imageUrl:''
+          descriptionText: getLinkDescription( deepLinkKind ),
+          title: getLinkTitle( deepLinkKind ),
+          imageUrl: getLinkImage( deepLinkKind ),
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
@@ -453,6 +490,12 @@ export const processDeepLink = ( deepLink: string ) => {
         }
       }
 
+    if ( splits.includes( 'wyre' ) ) {
+      if( splits.includes( 'failed' ) ) {
+        Alert.alert( 'Wyre purchase failed', 'Please try again after sometime.' )
+      }
+      return
+    }
     // hexa links
     if ( splits[ 3 ] !== config.APP_STAGE ){
       Alert.alert(

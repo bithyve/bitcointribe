@@ -22,6 +22,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   changeAuthCred,
   pinChangedFailed,
+  resetPin,
+  switchCredsChanged
 } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
@@ -116,7 +118,15 @@ export default function SettingGetNewPin( props ) {
   useEffect( () => {
     if ( credsChanged == 'changed' ) {
       setIsDisabled( false )
-      props.navigation.navigate( 'PasscodeChangeSuccessPage' )
+      if( oldPasscode === '' ) {
+        dispatch( switchCredsChanged() )
+        props.navigation.goBack()
+        if ( props.navigation.state.params.onPasscodeReset ) {
+          props.navigation.state.params.onPasscodeReset(  )
+        }
+      } else {
+        props.navigation.navigate( 'PasscodeChangeSuccessPage' )
+      }
     }
   }, [ credsChanged ] )
 
@@ -175,31 +185,35 @@ export default function SettingGetNewPin( props ) {
       }}>
         <View style={{
         }}>
-          {/* <View style={styles.modalHeaderTitleView}>
-            <View style={{
-              flexDirection: 'row', alignItems: 'center'
-            }}>
-              <TouchableOpacity
-                onPress={() => props.navigation.goBack()}
-                hitSlop={{
-                  top: 20, left: 20, bottom: 20, right: 20
-                }}
-                style={{
-                  height: 30, width: 30, justifyContent: 'center'
-                }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Manage Passcode'}
-              </Text>
-            </View>
-          </View> */}
-          {/* <Text style={ styles.headerTitleText }>Hello!</Text> */}
+          {
+            oldPasscode ===''&& (
+              <View style={styles.modalHeaderTitleView}>
+                <View style={{
+                  flexDirection: 'row', alignItems: 'center'
+                }}>
+                  <TouchableOpacity
+                    onPress={() => props.navigation.goBack()}
+                    hitSlop={{
+                      top: 20, left: 20, bottom: 20, right: 20
+                    }}
+                    style={{
+                      height: 30, width: 30, justifyContent: 'center'
+                    }}
+                  >
+                    <FontAwesome
+                      name="long-arrow-left"
+                      color={Colors.blue}
+                      size={17}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.modalHeaderTitleText}>
+                    {'Manage Passcode'}
+                  </Text>
+                </View>
+              </View>
+            )
+          }
+
           <View>
             <Text style={styles.headerInfoText}>
               Please enter a new{' '}
@@ -539,7 +553,11 @@ export default function SettingGetNewPin( props ) {
               <TouchableOpacity
                 disabled={isDisabled}
                 onPress={() => {
-                  dispatch( changeAuthCred( oldPasscode, passcode ) )
+                  if( oldPasscode === '' ) {
+                    dispatch( resetPin( passcode ) )
+                  } else {
+                    dispatch( changeAuthCred( oldPasscode, passcode ) )
+                  }
                   setTimeout( () => {
                     setIsDisabled( true )
                   }, 2 )

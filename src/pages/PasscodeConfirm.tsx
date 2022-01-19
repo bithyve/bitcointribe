@@ -94,14 +94,14 @@ export default function PasscodeConfirm( props ) {
 
   return (
     <SafeAreaView style={ {
-      flex: 1
+      flex: 1,
+      backgroundColor:'#F5F5F5'
     } }>
       <StatusBar />
       <View style={ {
         flex: 1
       } }>
-        <View style={ {
-        } }>
+        <View>
           <Text style={ styles.headerTitleText }>{strings.Hello}</Text>
           <View>
             <Text style={ styles.headerInfoText }>
@@ -639,7 +639,7 @@ const styles = StyleSheet.create( {
     color: Colors.black,
     fontSize: RFValue( 13 ),
     textAlign: 'center',
-    lineHeight: 18
+    lineHeight: 35
   },
   keyPadRow: {
     flexDirection: 'row',
@@ -686,7 +686,7 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 25 ),
+    fontSize: RFValue( 28 ),
     marginLeft: 20,
     marginTop: hp( '10%' ),
     fontFamily: Fonts.FiraSansRegular
@@ -705,8 +705,8 @@ const styles = StyleSheet.create( {
   },
   passcodeTextInputText: {
     color: Colors.blue,
-    fontWeight: 'bold',
-    fontSize: RFValue( 13 )
+    fontWeight: '100',
+    fontSize: RFValue( 34 )
   },
   passcodeTextInputView: {
     flexDirection: 'row',

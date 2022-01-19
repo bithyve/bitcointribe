@@ -52,7 +52,7 @@ import QRCoder
     v1.addSubview(txtTitle)
 
     let txtSubHeading = UILabel();
-    txtSubHeading.text = "Follow the instructions on the app to scan the 8 QRs below"
+    txtSubHeading.text = "Follow the instructions in the app to scan the 8 QRs below"
     txtSubHeading.lineBreakMode = .byWordWrapping
     txtSubHeading.numberOfLines = 0
     txtSubHeading.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender-1,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
@@ -294,7 +294,7 @@ import QRCoder
     v1.addSubview(txtTitle)
 
     let txtSubHeading = UILabel();
-    txtSubHeading.text = "Follow the instructions on the app to scan QRs below"
+    txtSubHeading.text = "Follow the instructions in the app to scan QR below"
     txtSubHeading.lineBreakMode = .byWordWrapping
     txtSubHeading.numberOfLines = 0
     txtSubHeading.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender-1,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)

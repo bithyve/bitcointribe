@@ -148,7 +148,7 @@ const HomeBuyCard = ( {
           shadowColor: Colors.shadowBlue,
           shadowOpacity: 1,
           shadowOffset: {
-            width: 11, height: 12
+            width: 9, height: 10
           },
           elevation: 15
         }}

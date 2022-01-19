@@ -99,7 +99,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           subtitle: strings[ '2FASettingsSub' ],
           screenName: 'SubAccountTFAHelp',
           screenParams: {
-            accountShellID: accountShell.id,
+            sourceAccountShell: accountShell,
           },
           imageSource: () => <Xpub />,
         }

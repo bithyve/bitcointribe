@@ -45,6 +45,7 @@ import {
   UPDATE_OLD_META_SHARES_KEEPER,
   SET_IS_CURRENT_LEVEL0,
   PDF_UPGRADE
+  SET_PASSWORD_RESET_STATE,
 } from '../actions/BHR'
 
 const initialState: {
@@ -85,6 +86,8 @@ const initialState: {
     levelInfo: LevelInfo[];
   }[];
   keeperInfo: KeeperInfoInterface[];
+  metaSharesKeeper: MetaShare[];
+  oldMetaSharesKeeper: MetaShare[];
   shares: any;
   metaSharesKeeper: MetaShare[];
   oldMetaSharesKeeper: MetaShare[];
@@ -125,6 +128,7 @@ const initialState: {
   approvalContactData: ContactRecipientDescribing;
   IsCurrentLevel0: boolean;
   pdfUpgrade: boolean;
+  passwordResetState: string
 } = {
   mnemonic: '',
   loading: {
@@ -196,7 +200,8 @@ const initialState: {
   availableKeepers: [],
   approvalContactData: null,
   IsCurrentLevel0: false,
-  pdfUpgrade: false
+  pdfUpgrade: false,
+  passwordResetState: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -467,6 +472,16 @@ export default ( state = initialState, action ) => {
             getSecondaryDataInfoStatus: action.payload.flag,
           },
         }
+      case SET_PASSWORD_RESET_STATE:
+        return {
+          ...state,
+          passwordResetState: action.payload.state,
+        }
+      case UPDATE_META_SHARES_KEEPER:
+        return {
+          ...state,
+          metaSharesKeeper: action.payload.metaSharesKeeper
+        }
 
       case SET_IS_CURRENT_LEVEL0:
         return {
@@ -480,6 +495,11 @@ export default ( state = initialState, action ) => {
           pdfUpgrade: action.payload.flag,
         }
 
+      case UPDATE_OLD_META_SHARES_KEEPER:
+        return {
+          ...state,
+          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
+        }
   }
   return state
 }

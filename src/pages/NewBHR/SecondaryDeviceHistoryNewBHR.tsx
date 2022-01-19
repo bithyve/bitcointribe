@@ -286,7 +286,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
         if( DeepLinkEncryptionType.DEFAULT === encryptionType ) encryption_key = encryptionKey
       }
-
+      console.log( 'encryption_key', getDeepLinkKindFromContactsRelationType( currentContact.relationType ) )
       if( !encryption_key ){
         const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
         const { encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
@@ -297,6 +297,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           keysToEncrypt,
           currentLevel
         } )
+        console.log( 'keysToEncrypt', keysToEncrypt )
+        console.log( 'keysToEncrypt', encryptedChannelKeys, encryptionType, encryptionHint )
+
         const QRData = JSON.stringify( {
           type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
           encryptedChannelKeys: encryptedChannelKeys,
