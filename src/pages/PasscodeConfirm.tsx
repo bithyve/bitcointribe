@@ -264,11 +264,11 @@ export default function PasscodeConfirm( props ) {
                         ? styles.textBoxActive
                         : {
                           ...styles.textBoxStyles,
-                          borderColor:
-                            passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
+                          // borderColor:
+                          //   passcode != confirmPasscode &&
+                          //     confirmPasscode.length == 4
+                          //     ? Colors.red
+                          //     : Colors.borderColor
                         }
                     ] }
                   >
@@ -305,11 +305,11 @@ export default function PasscodeConfirm( props ) {
                         ? styles.textBoxActive
                         : {
                           ...styles.textBoxStyles,
-                          borderColor:
-                            passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
+                          // borderColor:
+                          //   passcode != confirmPasscode &&
+                          //     confirmPasscode.length == 4
+                          //     ? Colors.red
+                          //     : Colors.borderColor
                         }
                     ] }
                   >
@@ -322,11 +322,11 @@ export default function PasscodeConfirm( props ) {
                           }
                           : styles.textStyles,
                         {
-                          borderColor:
-                            passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
+                          // borderColor:
+                          //   passcode != confirmPasscode &&
+                          //     confirmPasscode.length == 4
+                          //     ? Colors.red
+                          //     : Colors.borderColor
                         }
                       ] }
                     >
@@ -353,11 +353,11 @@ export default function PasscodeConfirm( props ) {
                         ? styles.textBoxActive
                         : {
                           ...styles.textBoxStyles,
-                          borderColor:
-                            passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
+                          // borderColor:
+                          //   passcode != confirmPasscode &&
+                          //     confirmPasscode.length == 4
+                          //     ? Colors.red
+                          //     : Colors.borderColor
                         }
                     ] }
                   >
@@ -370,11 +370,11 @@ export default function PasscodeConfirm( props ) {
                           }
                           : styles.textStyles,
                         {
-                          borderColor:
-                            passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
+                          // borderColor:
+                          //   passcode != confirmPasscode &&
+                          //     confirmPasscode.length == 4
+                          //     ? Colors.red
+                          //     : Colors.borderColor
                         }
                       ] }
                     >
@@ -401,11 +401,11 @@ export default function PasscodeConfirm( props ) {
                         ? styles.textBoxActive
                         : {
                           ...styles.textBoxStyles,
-                          borderColor:
-                            passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
+                          // borderColor:
+                          //   passcode != confirmPasscode &&
+                          //     confirmPasscode.length == 4
+                          //     ? Colors.red
+                          //     : Colors.borderColor
                         }
                     ] }
                   >
@@ -609,22 +609,22 @@ const styles = StyleSheet.create( {
     width: wp( '13%' ),
     borderRadius: 7,
     marginLeft: 20,
-    borderColor: Colors.borderColor,
+    borderColor: Colors.backgroundColor1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.white
+    backgroundColor: Colors.backgroundColor1
   },
   textBoxActive: {
     height: wp( '13%' ),
     width: wp( '13%' ),
     borderRadius: 7,
     marginLeft: 20,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 0, height: 3
-    },
+    // elevation: 10,
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 0, height: 3
+    // },
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
@@ -705,7 +705,7 @@ const styles = StyleSheet.create( {
   },
   passcodeTextInputText: {
     color: Colors.blue,
-    fontWeight: '100',
+    fontWeight: '400',
     fontSize: RFValue( 34 )
   },
   passcodeTextInputView: {
