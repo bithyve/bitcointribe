@@ -31,7 +31,6 @@ import LndConnectUtils from './../../utils/ln/LndConnectUtils'
 import RESTUtils from './../../utils/ln/RESTUtils'
 import { newAccountsInfo } from '../../store/sagas/accounts'
 import SettingsStore from './../../mobxstore/SettingsStore'
-import { Picker } from '@react-native-picker/picker'
 import { Button, CheckBox, Header, Icon, Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -42,6 +41,7 @@ import idx from 'idx'
 import { withNavigationFocus } from 'react-navigation'
 import Toast from '../../components/Toast'
 import { AccountType } from '../../bitcoin/utilities/Interface'
+import { goHomeAction } from '../../navigation/actions/NavigationActions'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -426,8 +426,7 @@ EnterNodeConfigState
           this.setState( {
             saved: true
           } )
-          navigation.pop( 3 )
-          navigation.goBack()
+          navigation.dispatch( goHomeAction() )
           Toast( 'LN account created' )
         } )
       } )
