@@ -256,7 +256,7 @@ export default function PasscodeConfirm( props ) {
               </Text>
               <View>
                 <View style={ {
-                  flexDirection: 'row', marginTop: hp( '4.5%' ),
+                  flexDirection: 'row', marginTop: hp( '3%' ),
                 } }>
                   <View
                     style={ [
@@ -460,7 +460,7 @@ export default function PasscodeConfirm( props ) {
           ) : null }
         </View>
         <View style={ {
-          marginTop: 'auto'
+          marginTop: 'auto',
         } }>
           <View style={ styles.keyPadRow }>
             <TouchableOpacity
@@ -710,7 +710,7 @@ const styles = StyleSheet.create( {
   },
   passcodeTextInputView: {
     flexDirection: 'row',
-    marginTop: hp( '4.5%' ),
-    marginBottom: hp( '4.5%' )
+    marginTop: hp( '3%' ),
+    marginBottom: hp( '3%' ),
   }
 } )
