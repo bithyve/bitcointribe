@@ -190,6 +190,21 @@ export default class LND {
       )
     };
 
+    getLndConfig = ( url: string ) => {
+      console.log( 'getLndConfig', url )
+      const headers: any = {
+        'Content-Type' :'application/json'
+      }
+      return this.restReq(
+        headers,
+        url,
+        'get',
+        null,
+        false,
+        false
+      )
+    }
+
     getInfo = ( node: any ) => {
       const {
         host,
@@ -342,4 +357,5 @@ export default class LND {
     supportsCoinControl = () => this.supports( 'v0.12.0' );
     supportsAccounts = () => this.supports( 'v0.13.0' );
     checkNodeInfo = ( data: any ) => this.getInfo( data );
+    processLndQR = ( url: any ) => this.getLndConfig( url );
 }
