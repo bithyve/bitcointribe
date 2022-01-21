@@ -49,6 +49,10 @@ class RESTUtils {
       }
     }
 
+    processLndQR= ( url: any ) => {
+      return this.lnd.processLndQR( url )
+    }
+
     getTransactions = ( ...args: any[] ) => this.call( 'getTransactions', args );
     getChannels = ( ...args: any[] ) => this.call( 'getChannels', args );
     getChannelInfo = ( ...args: any[] ) => this.call( 'getChannelInfo', args );

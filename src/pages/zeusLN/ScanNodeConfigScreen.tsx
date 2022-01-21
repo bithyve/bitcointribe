@@ -64,26 +64,34 @@ export default function ScanNodeConfig( { navigation } ) {
   const common = translations[ 'common' ]
   const [ knowMore, setKnowMore ] = useState( true )
 
-  function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    try {
-      const {
-        host,
-        port,
-        macaroonHex
-      } = LndConnectUtils.processLndConnectUrl( scannedData )
-      if ( host && port && macaroonHex ) {
-        navigation.navigate( 'EnterNodeConfig', {
-          node: {
-            host, port, macaroonHex
-          },
-        } )
-      } else {
+  async function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
+    if( scannedData.includes( 'config' ) ){
+      const url = scannedData.split( 'config=' )[ 1 ]
+      console.log( 'input', url )
+      LndConnectUtils.processLndConnectUrl( url ).then(
+        res=> {
+          console.log( res )
+          const {
+            uri,
+            macaroon,
+            chainType
+          } = res.configurations[ 0 ]
+          if ( uri && macaroon ) {
+            navigation.navigate( 'EnterNodeConfig', {
+              node: {
+                host: uri, port: '', macaroonHex: macaroon
+              },
+            } )
+          } else {
+            Toast( 'Error fetching lndconnect config' )
+          }
+        }
+      ).catch( e=> {
+        console.log( e )
         Toast( 'Error fetching lndconnect config' )
-      }
-    } catch ( error ) {
 
+      } )
     }
-
   }
 
   return (

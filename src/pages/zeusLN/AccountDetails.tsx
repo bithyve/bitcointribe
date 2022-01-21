@@ -1,28 +1,44 @@
 import React, { Component, ReactElement } from 'react'
-import { Text, View, FlatList, StyleSheet } from 'react-native'
+import { Text, View, SectionList, StyleSheet, RefreshControl, FlatList } from 'react-native'
 import { Button } from 'react-native-elements/dist/buttons/Button'
 import RESTUtils from '../../utils/ln/RESTUtils'
-import axios from "axios";
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter';
-import { TouchableOpacity } from '@gorhom/bottom-sheet';
+import axios from 'axios'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation';
-import TransactionListComponent from './components/transactions/TransactionListComponent';
+import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import TransactionListComponent from './components/transactions/TransactionListComponent'
 import RNFetchBlob from 'rn-fetch-blob'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
 import Transaction from '../../models/Transaction'
 import { useDispatch, useSelector } from 'react-redux'
-import { sourceAccountSelectedForSending } from '../../store/actions/sending';
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
+import { sourceAccountSelectedForSending } from '../../store/actions/sending'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { connect } from 'react-redux'
-import { inject, observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react'
+import { NavigationScreenConfig } from 'react-navigation'
+import { NavigationStackOptions } from 'react-navigation-stack'
+import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
+import AccountDetailsCard from './components/AccountDetailsCard'
 
-@inject('TransactionsStore',
-'BalancesStore',
-'InvoicesStore'
+enum SectionKind {
+  ACCOUNT_CARD,
+  TRANSACTIONS_LIST_PREVIEW,
+  SEND_AND_RECEIVE_FOOTER,
+}
+
+export enum Mode {
+  ON_CHAIN,
+  LIGHTNING,
+}
+
+@inject( 'TransactionsStore',
+  'BalancesStore',
+  'InvoicesStore'
 )
 @observer
 export class AccountDetails extends Component {
@@ -31,28 +47,21 @@ export class AccountDetails extends Component {
     super( props )
     this.state = {
       node: props.navigation.getParam( 'node' ),
+      accountShellID:props.navigation.getParam( 'accountShellID' ),
       transactions: [],
       offChainBalance: '',
       onChainBalance: '',
-      address: 'jhj'
+      address: 'jhj',
+      accountShell: props.accountShells.find( accountShell => accountShell.id === props.navigation.getParam( 'accountShellID' ) )
     }
-    // this.transactionsStore = this.props.TransactionsStore;
-    // this.balancesStore = this.props.BalancesStore;
-    // this.invoicesStore = this.props.InvoicesStore
   }
 
 
-  // dispatch = useDispatch()
-
-  // accountShell = useAccountShellFromNavigation(this.props.navigation)
-
-  // primarySubAccount = usePrimarySubAccountForShell(this.accountShell)
-
   componentDidMount(): void {
-      this.props.TransactionsStore.fetchTransactions(this.state.node)
-      this.props.BalancesStore.getOffChainBalance(this.state.node)
-      this.props.BalancesStore.getOnChainBalance(this.state.node)
-      this.props.InvoicesStore.fetchAddress(this.state.node)  
+    this.props.TransactionsStore.fetchTransactions( this.state.node )
+    this.props.BalancesStore.getOffChainBalance( this.state.node )
+    this.props.BalancesStore.getOnChainBalance( this.state.node )
+    this.props.InvoicesStore.fetchAddress( this.state.node )
   }
 
 
@@ -62,122 +71,142 @@ export class AccountDetails extends Component {
     this.props.navigation.navigate( 'Send', {
       subAccountKind: this.primarySubAccount.kind,
     } )
-    console.log("pressed")
-  }
-  // accountShell = useAccountShellFromNavigation(this.props.navigation) // this line gives the hook error
-  uniqueKey = (item:any, index:number) => index.toString();
-  renderTemplate = ( {item} : {item: Transaction}): ReactElement => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          // this.props.navigation.navigate('TransactionInfo')
-          this.props.navigation.navigate('TransactionInfo', {
-            transactionData: item
-          })
-        }}
-      >
-        <TransactionListComponent
-        params = {item}
-        />
-
-        <View style={{
-          borderBottomWidth: 1, borderColor: 'grey', marginHorizontal: widthPercentageToDP( 4 )
-        }} />
-      </TouchableOpacity>
-    )
   }
 
-  public fetchTransactions = async (node:any) => {
+   sections = ()=>{
+     return [
+       {
+         kind: SectionKind.ACCOUNT_CARD,
+         data: [ null ],
+         renderItem: () => {
+           return (
+             <View style={styles.viewAccountDetailsCard}>
+               <AccountDetailsCard
+                 onKnowMorePressed={()=> {}}
+                 onSettingsPressed={()=>{}}
+                 balance={this.props.BalancesStore.onChainBalance}
+                 accountShell={this.state.accountShell}
+                 mode={Mode.ON_CHAIN}
+               />
+               <View style={{
+                 marginVertical: 10
+               }}/>
+               <AccountDetailsCard
+                 onKnowMorePressed={()=> {}}
+                 onSettingsPressed={()=>{}}
+                 balance={this.props.BalancesStore.offChainBalance}
+                 accountShell={this.state.accountShell}
+                 mode={Mode.LIGHTNING}
+               />
+             </View>
+           )
+         },
+       },
+       {
+         kind: SectionKind.SEND_AND_RECEIVE_FOOTER,
+         data: [ null ],
+         renderItem: () => {
+           return (
+             <View style={styles.viewSectionContainer}>
+               <View style={styles.footerSection}>
+                 <SendAndReceiveButtonsFooter
+                   onSendPressed={() => {
+                     //onSendBittonPress()
+                   }}
+                   onReceivePressed={() => {
+
+                   }}
+                   averageTxFees={''}
+                   // network={
+                   //   config.APP_STAGE === 'dev' ||
+                   //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+                   //     ? NetworkKind.TESTNET
+                   //     : NetworkKind.MAINNET
+                   // }
+                 />
+
+
+               </View>
+
+             </View>
+           )
+         },
+       },
+     ]
+   }
+
+
+  public fetchTransactions = async ( node:any ) => {
     try {
-      await RESTUtils.getTransactions(node).then((data:any) => {
+      await RESTUtils.getTransactions( node ).then( ( data:any ) => {
         // console.log("this.sta")
-        this.setState({transactions: data.transactions})
-      }) 
-    } catch {(err: any) => {console.log(err)}
+        this.setState( {
+          transactions: data.transactions
+        } )
+      } )
+    } catch {( err: any ) => {console.log( err )}
     }
-};
+  };
 
-public fetchBalance = async (node: any) => {
+public fetchBalance = async ( node: any ) => {
   try{
-    await RESTUtils.getBlockchainBalance(node).then((data:any) => {
-      this.setState({onChainBalance: data.total_balance})
-    })
+    await RESTUtils.getBlockchainBalance( node ).then( ( data:any ) => {
+      this.setState( {
+        onChainBalance: data.total_balance
+      } )
+    } )
 
-    await RESTUtils.getLightningBalance(node).then((data:any) => {
-      this.setState({offChainBalance: data.balance})
-    })
-  } catch{(err: any) => {
-    console.log(err)
+    await RESTUtils.getLightningBalance( node ).then( ( data:any ) => {
+      this.setState( {
+        offChainBalance: data.balance
+      } )
+    } )
+  } catch{( err: any ) => {
+    console.log( err )
   }}
 }
 
-  public fetchAddress = async (node: any) => {
+  public fetchAddress = async ( node: any ) => {
     try {
-      await RESTUtils.getNewAddress(node).then((data: any) => {
+      await RESTUtils.getNewAddress( node ).then( ( data: any ) => {
         // console.log(data, "+++_")
-        this.setState({address: data.address})
-      })
-    } catch {(err: any) => {
-      console.log(err)
+        this.setState( {
+          address: data.address
+        } )
+      } )
+    } catch {( err: any ) => {
+      console.log( err )
     }
-  }
+    }
   }
 
 
 
   render() {
-    console.log(this.props.BalancesStore.offChainBalance, "offchain")
     return (
-      <View style = {styles.container}>
-        <View style={{ flex: 2, 
-          backgroundColor: "pink", 
-          flexDirection: 'row', 
-          justifyContent: 'space-around', 
-          alignItems: 'center' }}>
-          <Text>offChain: {this.props.BalancesStore.offChainBalance}</Text>
-          <Text>onChain: {this.props.BalancesStore.onChainBalance}</Text>
-        </View>
-        <Button onPress={() => {
-          this.props.navigation.navigate('ChannelScreen', {
-            node: this.state.node
-          })
-        }}
-        title={'channels'} titleStyle = {{
-          color: 'black'
-        }}/>
-        <View style={{ flex: 3 }}>
-        <FlatList
-         style={{
-          margin: 5
-        }}
-        data={this.props.TransactionsStore.transactions}
-        renderItem={this.renderTemplate}
-        keyExtractor={this.uniqueKey}
-      />
       <View style = {{
-        margin: 5
+        backgroundColor: Colors.backgroundColor, flex: 1
       }}>
-        <SendAndReceiveButtonsFooter
-        onSendPressed={() => {
-          this.props.navigation.navigate('SendCoinScreen')
-          // this.onSendBittonPress()
-        }}
-
-        onReceivePressed={() => {
-          this.props.navigation.navigate('ReceiveCoinScreen', {
-            node: this.state.node,
-            address: this.props.InvoicesStore.invoice,
-            title: 'lightning',
-            size: hp( '27%' )
-          })
-        }}
+        <SectionList
+          contentContainerStyle={styles.scrollViewContainer}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
+          refreshControl={
+            <RefreshControl
+              onRefresh={()=> {}}
+              refreshing={false}
+              style={{
+                backgroundColor: Colors.backgroundColor,
+              }}
+            />
+          }
+          sections={this.sections()}
+          stickySectionHeadersEnabled={false}
+          keyExtractor={( index )=> String( index )}
         />
-      </View>
-        
-      </View>
 
       </View>
-      
+
     )
   }
 }
@@ -187,25 +216,58 @@ public fetchBalance = async (node: any) => {
 const mapDispatchToProps = ( dispatch ) => ( {
   addNewAccountShells: data => {
     dispatch( addNewAccountShells( data ) )
-  },AccountDetails
+  }, AccountDetails
 } )
 
 const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
+    accountShells:state.accounts.accountShells
   }
 }
 
 
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "column"
+const styles = StyleSheet.create( {
+  rootContainer: {
+    height: '100%',
+  },
+
+  scrollViewContainer: {
+    paddingTop: 20,
+    // height: '100%',
+    paddingHorizontal: 0,
+    backgroundColor: Colors.backgroundColor,
+  },
+
+  viewSectionContainer: {
+    marginBottom: 10,
+  },
+
+  viewAccountDetailsCard: {
+    paddingHorizontal: 20,
+  },
+
+  footerSection: {
+    paddingVertical: 15,
+  },
+} )
+
+AccountDetails.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
+  return {
+    header() {
+      const { accountShellID } = navigation.state.params
+      return (
+        <NavHeader
+          accountShellID={accountShellID}
+          onBackPressed={() => navigation.pop()}
+        />
+      )
+    },
   }
-});
+}
 
 // export default connect( mapStateToProps, mapDispatchToProps )( EnterNodeConfigScreen )
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountDetails)
+export default connect( mapStateToProps, mapDispatchToProps )( AccountDetails )

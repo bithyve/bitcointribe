@@ -191,7 +191,7 @@ export default class LND {
     };
 
 
-    getRequestNode = (node: any, link: string) => {
+    getRequestNode = ( node: any, link: string ) => {
       const {
         host,
         lndhubUrl,
@@ -216,7 +216,7 @@ export default class LND {
     };
 
 
-    postRequestNode = (node: any, link: string, data: any) => {
+    postRequestNode = ( node: any, link: string, data: any ) => {
       const {
         host,
         lndhubUrl,
@@ -240,6 +240,20 @@ export default class LND {
       )
     };
 
+    getLndConfig = ( url: string ) => {
+      console.log( 'getLndConfig', url )
+      const headers: any = {
+        'Content-Type' :'application/json'
+      }
+      return this.restReq(
+        headers,
+        url,
+        'get',
+        null,
+        false,
+        false
+      )
+    }
 
     getInfo = ( node: any ) => {
       const {
@@ -265,17 +279,17 @@ export default class LND {
       )
     };
 
-    getRequest = ( route: string ) => this.request( route, 'get');
+    getRequest = ( route: string ) => this.request( route, 'get' );
     postRequest = ( route: string, data?: any ) =>
-      this.request( route, 'post');
-    deleteRequest = ( node:any, route: string ) => this.request( node, route);
+      this.request( route, 'post' );
+    deleteRequest = ( node:any, route: string ) => this.request( node, route );
     // getChannels = () => this.getRequest( '/v1/channels' );
-    getChannels = (node: any) => this.getRequestNode( node, '/v1/channels');
+    getChannels = ( node: any ) => this.getRequestNode( node, '/v1/channels' );
     getChannelInfo = ( chanId: string ) =>
       this.getRequest( `/v1/graph/edge/${chanId}` );
-    getBlockchainBalance = (node: any) =>
+    getBlockchainBalance = ( node: any ) =>
       this.getRequestNode( node, '/v1/balance/blockchain' )
-    getLightningBalance = (node: any) => this.getRequestNode( node, '/v1/balance/channels' );
+    getLightningBalance = ( node: any ) => this.getRequestNode( node, '/v1/balance/channels' );
     sendCoins = ( data: any ) =>
       this.postRequest( '/v1/transactions', {
         addr: data.addr,
@@ -285,9 +299,9 @@ export default class LND {
     getMyNodeInfo = () => this.getRequest( '/v1/getinfo' );
     getInvoices = () =>
       this.getRequest( '/v1/invoices?reversed=true&num_max_invoices=100' );
-    createInvoice = ( node:any, data: any ) => this.postRequestNode(node, '/v1/invoices', data);
+    createInvoice = ( node:any, data: any ) => this.postRequestNode( node, '/v1/invoices', data );
     getPayments = () => this.getRequest( '/v1/payments' );
-    getNewAddress = (node: any) => this.getRequestNode( node ,'/v1/newaddress' );
+    getNewAddress = ( node: any ) => this.getRequestNode( node, '/v1/newaddress' );
     openChannel = ( node:any, data: OpenChannelRequest ) =>
       this.postRequestNode( node, '/v1/channels', data );
     openChannelStream = ( data: OpenChannelRequest ) =>
@@ -302,7 +316,7 @@ export default class LND {
       this.postRequest( '/v2/router/send', data );
     payLightningInvoiceV2Streaming = ( data: any ) =>
       this.wsReq( '/v2/router/send', 'POST', data );
-    closeChannel = ( node:any , urlParams?: Array<string> ) => {
+    closeChannel = ( node:any, urlParams?: Array<string> ) => {
       // if ( urlParams && urlParams.length === 4 ) {
       //   return this.deleteRequest(node,
       //     `/v1/channels/${urlParams && urlParams[ 0 ]}/${urlParams &&
@@ -310,7 +324,7 @@ export default class LND {
       //               urlParams[ 2 ]}&sat_per_byte=${urlParams && urlParams[ 3 ]}`
       //   )
       // }
-      return this.request(node,
+      return this.request( node,
         `/v1/channels/${urlParams && urlParams[ 0 ]}/${urlParams &&
                 urlParams[ 1 ]}?force=${urlParams && urlParams[ 2 ]}`
       )
@@ -390,5 +404,6 @@ export default class LND {
     supportsCoinControl = () => this.supports( 'v0.12.0' );
     supportsAccounts = () => this.supports( 'v0.13.0' );
     checkNodeInfo = ( data: any ) => this.getInfo( data );
-    getTransactions = (data: any) => this.getRequestNode(data, '/v1/transactions')
+    getTransactions = ( data: any ) => this.getRequestNode( data, '/v1/transactions' );
+    processLndQR = ( url: any ) => this.getLndConfig( url );
 }
