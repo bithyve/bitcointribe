@@ -26,7 +26,7 @@ import {
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
-import HeaderTitle from '../components/HeaderTitle'
+import HeaderTitle1 from '../components/HeaderTitle1'
 import BottomInfoBox from '../components/BottomInfoBox'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { updateCloudPermission } from '../store/actions/BHR'
@@ -188,10 +188,10 @@ export default function NewWalletName( props ) {
           <View style={{
             flex: 1
           }} >
-            <HeaderTitle
-              firstLineTitle={strings.Step1}
-              secondLineBoldTitle={'New Wallet '}
-              secondLineTitle={strings.creation}
+            <HeaderTitle1
+              firstLineTitle={`${strings.Step1}`}
+              secondLineBoldTitle={'Name your Wallet'}
+              secondLineTitle={''}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -229,12 +229,12 @@ export default function NewWalletName( props ) {
                 alignSelf: 'flex-end'
               }}>
                 {strings.WalletCreationNumbers}</Text>
-              <Text style={{
+              {/* <Text style={{
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
-                {strings.numbers}</Text>
+                {strings.numbers}</Text> */}
             </View>
           </View>
           {/* </KeyboardAvoidingView> */}

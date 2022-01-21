@@ -531,17 +531,17 @@ const styles = StyleSheet.create( {
     fontWeight:'400'
   },
   otpInput:{
-    // letterSpacing:2,
+    //letterSpacing:7,
     fontSize:22,
   },
   otpInputFieldContainer:{
     marginTop:20,
     borderRadius: 10,
     backgroundColor:'#fff',
-    height:50,
+    // height:50,
     justifyContent:'center',
     alignItems:'center',
-    padding:7,
+    padding:10,
     marginHorizontal:30,
   },
   btnContainer:{

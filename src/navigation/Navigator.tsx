@@ -6,6 +6,7 @@ import {
 } from 'react-navigation-stack'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
+import SettingGetNewPin from '../pages/SettingGetNewPin'
 import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
 import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
@@ -53,11 +54,27 @@ import SecurityStack from './stacks/security/Security&Privacy'
 import BuyStack from './stacks/buy/BuyStack'
 import Header from './stacks/Header'
 import IconWithBadge from './stacks/security/IconWithBadge'
+import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
+import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
 
 const SetupNavigator = createStackNavigator(
   {
     Launch,
     Login,
+    SettingGetNewPin: {
+      screen: SettingGetNewPin,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => {
+              navigation.popToTop() }} />
+          },
+          title: 'Manage Passcode',
+          headerShown: true
+        }
+      },
+    },
     PasscodeConfirm,
     NewWalletName,
     AccountSelection,

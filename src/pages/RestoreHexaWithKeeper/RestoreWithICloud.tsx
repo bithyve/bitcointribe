@@ -489,7 +489,12 @@ class RestoreWithICloud extends Component<
   };
 
   getSecurityQuestion = ( questionId, question1 ) => {
-    if ( Number( questionId ) > 0 ) {
+    if( Number( questionId )=== 100 ) {
+      this.setState( {
+        question: 'App generated password',
+        encryptionType: 'password'
+      } )
+    }else if ( Number( questionId ) > 0 ) {
       const question = this.getQuestion( questionId )
       this.setState( {
         question: question[ 0 ].question,

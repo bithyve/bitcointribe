@@ -10,15 +10,16 @@ import useTotalSpendingAmount from '../../utils/hooks/sending-utils/UseTotalSpen
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
+  Unit
 };
 
-const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {}: Props ) => {
+const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {Unit}: Props ) => {
 
   const totalAmount = useTotalSpendingAmount()
 
   const formattedAmountText = useFormattedAmountText( totalAmount )
   const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
+    bitcoinUnit: Unit,
   } )
 
   return (

@@ -124,8 +124,8 @@ const HomeHeader = ( {
   }, [ cloudErrorMessage, cloudBackupStatus ] )
 
 
-  const walletNameLength = walletName?.split('').length;
-  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+  const walletNameLength = walletName?.split( '' ).length
+  const walletNameNew = walletName.split( '' )[ walletNameLength - 1 ].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
@@ -160,11 +160,11 @@ const HomeHeader = ( {
         </View>
       }
       {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp(0.8)
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageOne}</Text>{messageTwo}</Text> : <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp(0.8)
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp( 0.8 )
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageTwo}</Text></Text>}
@@ -335,7 +335,7 @@ const HomeHeader = ( {
           <ImageBackground
             source={require( '../../assets/images/icons/icon_notification.png' )}
             style={{
-              width: wp( '5%' ), height: wp( '6%' ), marginLeft: 'auto',marginRight:3
+              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto', marginRight:3
             }}
             resizeMode={'contain'}
           >

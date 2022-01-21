@@ -7,7 +7,8 @@ import {
   StatusBar,
   Platform,
   BackHandler,
-  Linking
+  Linking,
+  Keyboard
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -42,6 +43,8 @@ import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { setCloudBackupStatus } from '../store/actions/cloud'
 import { setOpenToApproval } from '../store/actions/BHR'
+import SecurityQuestion from './NewBHR/SecurityQuestion'
+import Toast from '../components/Toast'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -57,6 +60,9 @@ export default function Login( props ) {
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
+  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
+  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
+
   const getRandomMessage = () => {
     //const randomIndex = Math.floor( Math.random() * 5 )
     //return strings.loaderMessages[ randomIndex ]
@@ -67,6 +73,10 @@ export default function Login( props ) {
       subText: ''
     }
   }
+  const [
+    questionModal,
+    showQuestionModal,
+  ] = useState( false )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
   const [ subTextMessage1 ] = useState( initialMessage.text )
@@ -77,6 +87,7 @@ export default function Login( props ) {
   const [ JailBrokenInfo, setJailBrokenInfo ] = useState( '' )
   const [ passcodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
+  const [ attempts, setAttempts ] = useState( 0 )
   // const [ loaderBottomSheet ] = useState(
   //   React.createRef<BottomSheet>(),
   // )
@@ -341,11 +352,39 @@ export default function Login( props ) {
     }
   }
 
+  const onPasscodeReset= () => {
+    setCheckAuth( false )
+    setAttempts( 0 )
+    Toast( 'Passcode reset successfully, please login with new passcode' )
+  }
+
+  const renderSecurityQuestionContent = useCallback( () => {
+    return (
+      <SecurityQuestion
+        onClose={() => showQuestionModal( false )}
+        onPressConfirm={async () => {
+          Keyboard.dismiss()
+          showQuestionModal( false )
+          props.navigation.navigate( 'SettingGetNewPin', {
+            oldPasscode: '',
+            onPasscodeReset:onPasscodeReset
+          } )
+        }}
+        title="Enter your Passphrase"
+        title1="Forgot Passcode"
+        note="You will be prompted to change your passcode"
+        onPasscodeVerify={()=>{ showQuestionModal( true )  }}
+        showAnswer={false}
+      />
+    )
+  }, [ questionModal ] )
+
   useEffect( () => {
     if ( authenticationFailed && passcode ) {
       setCheckAuth( true )
       checkPasscode()
       setPasscode( '' )
+      setAttempts( attempts + 1 )
     } else {
       setCheckAuth( false )
     }
@@ -533,31 +572,57 @@ export default function Login( props ) {
             </View>
           </View>
 
-          {passcode.length == 4 ? (
-            <View>
-              <TouchableOpacity
-                disabled={isDisabledProceed}
-                onPress={() => {
-                  setCheckAuth( false )
-                  setTimeout( () => {
-                    setIsDisabledProceed( true )
-                    setElevation( 0 )
-                  }, 2 )
-                  setTimeout( () => setloaderModal( true ), 2 )
-                  handleLoaderMessages( passcode )
-                }}
-                style={{
-                  ...styles.proceedButtonView,
-                  elevation: Elevation,
-                  backgroundColor: isDisabledProceed
-                    ? Colors.lightBlue
-                    : Colors.blue,
-                }}
-              >
-                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}>
+            <TouchableOpacity
+              disabled={passcode.length !==4}
+              onPress={() => {
+                setCheckAuth( false )
+                setTimeout( () => {
+                  setIsDisabledProceed( true )
+                  setElevation( 0 )
+                }, 2 )
+                setTimeout( () => setloaderModal( true ), 2 )
+                handleLoaderMessages( passcode )
+              }}
+              style={{
+                ...styles.proceedButtonView,
+                elevation: Elevation,
+                backgroundColor: isDisabledProceed
+                  ? Colors.lightBlue
+                  : Colors.blue,
+              }}
+            >
+              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+            </TouchableOpacity>
+
+            {
+              attempts >= 3&&(
+                <TouchableOpacity
+                  style={{
+                    ...styles.proceedButtonView,
+                    elevation: Elevation,
+                    marginHorizontal: 15,
+                  }}
+                  onPress={()=> {
+                    if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+                      setJailBrokenTitle( strings.EncryptionKeyNotSet )
+                      setJailBrokenInfo( strings.Youcanreset )
+                      setErrorModal( true )
+                      return
+                    }
+                    showQuestionModal( true )
+                  }}>
+                  <Text style={{
+                    color: Colors.blue,
+                    fontFamily: Fonts.FiraSansMedium
+                  }}>{strings.ForgotPasscode}</Text>
+                </TouchableOpacity>
+              )
+            }
+          </View>
         </View>
 
         <View style={{
@@ -715,6 +780,9 @@ export default function Login( props ) {
       </View>
       <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => {}}>
         {renderErrorModalContent()}
+      </ModalContainer>
+      <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
+        {renderSecurityQuestionContent()}
       </ModalContainer>
       {/* <BottomSheet
         onCloseEnd={() => {

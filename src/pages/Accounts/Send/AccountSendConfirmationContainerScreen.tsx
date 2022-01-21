@@ -28,7 +28,7 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
-import { AccountType, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
+import { AccountType, MultiSigAccount, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
@@ -61,7 +61,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const account = accountState.accounts[ sourcePrimarySubAccount.id ]
   const sendingState = useSendingState()
   const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
+    bitcoinUnit: sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
   } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
@@ -153,7 +153,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
-    if( sourceAccountShell.primarySubAccount.isTFAEnabled )
+    if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
         note
@@ -239,11 +239,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           subAccountKind={sourcePrimarySubAccount.kind}
         />
       </View>
-      <SendConfirmationCurrentTotalHeader />
+      <SendConfirmationCurrentTotalHeader
+        Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
+        />
 
       <TransactionPriorityMenu
         accountShell={sourceAccountShell}
-        bitcoinDisplayUnit={sourceAccountShell.unit}
+        bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
         onTransactionPriorityChanged={setTransactionPriority}
       />
       {selectedRecipients.length === 1 &&
@@ -257,6 +259,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         >
           <TextInput
             style={styles.modalInputBox}
+            multiline={true}
+            numberOfLines={3}
+            textAlignVertical={'bottom'}
             placeholder={`${common.note} (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
@@ -341,8 +346,8 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
-    width: '90%'
-
+    width: '90%',
+    paddingTop:17
   },
   modalInfoText: {
     width: widthPercentageToDP( 90 ),
@@ -365,7 +370,9 @@ const styles = StyleSheet.create( {
   footerSection: {
     flexDirection: 'row',
     alignContent: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
+    marginBottom: heightPercentageToDP('2%'),
+    paddingHorizontal:10,
   },
 
 } )
