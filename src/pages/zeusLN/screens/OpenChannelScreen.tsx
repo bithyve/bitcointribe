@@ -4,6 +4,8 @@ import { TextInput } from 'react-native-paper'
 import RESTUtils from '../../../utils/ln/RESTUtils'
 import CoveredQRCodeScanner from '../../../components/qr-code-scanning/CoveredQRCodeScanner'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { inject, observer } from 'mobx-react'
+import Toast from '../../../components/Toast'
 
 interface OpenChannelRequest {
     min_confs?: number;
@@ -23,6 +25,11 @@ interface OpenChannelRequest {
     announce?: boolean;
     utxos?: string[];
 }
+
+@inject(
+    'ChannelsStore'
+)
+@observer
 export default class OpenChannelScreen extends Component {
     constructor(props) {
         super(props)
@@ -126,7 +133,10 @@ export default class OpenChannelScreen extends Component {
                     local_funding_amount: this.state.local_funding_amount,
                     host: this.state.host
                 }
-                this.connectPeer(req)
+                // this.connectPeer(req)
+                this.props.ChannelsStore.connectPeer(this.state.node, req)
+                this.props.navigation.goBack()
+                Toast('Channel Opening Initiated')
                 // console.log(typeof parseInt (this.state.min_confs))
             }}/>
           </View>

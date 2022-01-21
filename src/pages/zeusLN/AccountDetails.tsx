@@ -36,23 +36,13 @@ export class AccountDetails extends Component {
       onChainBalance: '',
       address: 'jhj'
     }
-    // this.transactionsStore = this.props.TransactionsStore;
-    // this.balancesStore = this.props.BalancesStore;
-    // this.invoicesStore = this.props.InvoicesStore
   }
-
-
-  // dispatch = useDispatch()
-
-  // accountShell = useAccountShellFromNavigation(this.props.navigation)
-
-  // primarySubAccount = usePrimarySubAccountForShell(this.accountShell)
 
   componentDidMount(): void {
       this.props.TransactionsStore.fetchTransactions(this.state.node)
       this.props.BalancesStore.getOffChainBalance(this.state.node)
       this.props.BalancesStore.getOnChainBalance(this.state.node)
-      this.props.InvoicesStore.fetchAddress(this.state.node)  
+      this.props.InvoicesStore.fetchAddress(this.state.node)
   }
 
 
@@ -64,13 +54,12 @@ export class AccountDetails extends Component {
     } )
     console.log("pressed")
   }
-  // accountShell = useAccountShellFromNavigation(this.props.navigation) // this line gives the hook error
+
   uniqueKey = (item:any, index:number) => index.toString();
   renderTemplate = ( {item} : {item: Transaction}): ReactElement => {
     return (
       <TouchableOpacity
         onPress={() => {
-          // this.props.navigation.navigate('TransactionInfo')
           this.props.navigation.navigate('TransactionInfo', {
             transactionData: item
           })
@@ -87,46 +76,7 @@ export class AccountDetails extends Component {
     )
   }
 
-  public fetchTransactions = async (node:any) => {
-    try {
-      await RESTUtils.getTransactions(node).then((data:any) => {
-        // console.log("this.sta")
-        this.setState({transactions: data.transactions})
-      }) 
-    } catch {(err: any) => {console.log(err)}
-    }
-};
-
-public fetchBalance = async (node: any) => {
-  try{
-    await RESTUtils.getBlockchainBalance(node).then((data:any) => {
-      this.setState({onChainBalance: data.total_balance})
-    })
-
-    await RESTUtils.getLightningBalance(node).then((data:any) => {
-      this.setState({offChainBalance: data.balance})
-    })
-  } catch{(err: any) => {
-    console.log(err)
-  }}
-}
-
-  public fetchAddress = async (node: any) => {
-    try {
-      await RESTUtils.getNewAddress(node).then((data: any) => {
-        // console.log(data, "+++_")
-        this.setState({address: data.address})
-      })
-    } catch {(err: any) => {
-      console.log(err)
-    }
-  }
-  }
-
-
-
   render() {
-    console.log(this.props.BalancesStore.offChainBalance, "offchain")
     return (
       <View style = {styles.container}>
         <View style={{ flex: 2, 
@@ -160,7 +110,6 @@ public fetchBalance = async (node: any) => {
         <SendAndReceiveButtonsFooter
         onSendPressed={() => {
           this.props.navigation.navigate('SendCoinScreen')
-          // this.onSendBittonPress()
         }}
 
         onReceivePressed={() => {
@@ -183,7 +132,6 @@ public fetchBalance = async (node: any) => {
 }
 
 
-
 const mapDispatchToProps = ( dispatch ) => ( {
   addNewAccountShells: data => {
     dispatch( addNewAccountShells( data ) )
@@ -196,16 +144,11 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column"
   }
 });
-
-// export default connect( mapStateToProps, mapDispatchToProps )( EnterNodeConfigScreen )
 
 export default connect(mapStateToProps, mapDispatchToProps)(AccountDetails)
