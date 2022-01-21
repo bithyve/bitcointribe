@@ -1,16 +1,19 @@
+import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import { Text, View ,Button } from 'react-native'
 import RESTUtils from '../../../utils/ln/RESTUtils'
+import Toast from '../../../components/Toast'
 
 interface CloseChannelRequest {
   funding_txid_str: string;
   output_index: string;
 }
 
+@inject('ChannelsStore')
+@observer
 export default class ChannelInfoSceen extends Component {
     constructor(props) {
         super(props)
-        console.log(this.props.navigation.getParam('channelInfo'), "+++")
         this.state = {
             channelInfo: this.props.navigation.getParam('channelInfo'),
             node: this.props.navigation.getParam('node')
@@ -86,12 +89,11 @@ export default class ChannelInfoSceen extends Component {
                     <Button
                     title = 'close channel'
                     onPress = {() => {
-                      let [funding_txid, output_idx] = this.state.channelInfo.channel_point.split(':')
-                      let req = {
-                        funding_txid,
-                        output_idx
-                      }
-                      this.closeChannel(req)
+                      let [funding_txid_str, output_index] = this.state.channelInfo.channel_point.split(':')
+                      let req = {funding_txid_str, output_index}
+                      this.props.ChannelsStore.closeChannel(this.state.node, req)
+                      this.props.navigation.goBack()
+                      Toast( 'Channel Close Intitiated' )
                     }}
                     />
                   </View>

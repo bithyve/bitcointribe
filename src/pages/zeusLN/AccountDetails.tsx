@@ -212,7 +212,6 @@ public fetchBalance = async ( node: any ) => {
 }
 
 
-
 const mapDispatchToProps = ( dispatch ) => ( {
   addNewAccountShells: data => {
     dispatch( addNewAccountShells( data ) )

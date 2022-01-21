@@ -3,6 +3,7 @@ import { Text, View, FlatList, TouchableOpacity, Button } from 'react-native'
 import RESTUtils from '../../../utils/ln/RESTUtils'
 import ChannelList from '../components/channels/ChannelListComponent'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { inject, observer } from 'mobx-react'
 
 interface HTLC {
     hash_lock: string;
@@ -35,11 +36,11 @@ interface ChannelFrame {
     channel_id?: string;
     alias?: string;
 }
-
+@inject('ChannelsStore')
+@observer
 export default class ChannelScreen extends Component {
     constructor(props) {
         super(props)
-        console.log(this.props.navigation.getParam('node'), "+++++++++")
         this.state = {
             node: this.props.navigation.getParam('node'),
             channels: []
@@ -47,20 +48,14 @@ export default class ChannelScreen extends Component {
     }
 
     componentDidMount(): void {
-        this.channelList()
-        console.log(this.state.node, "---")
+        this.props.ChannelsStore.channelList(this.state.node)
     }
 
-    uniqueKey = (item:any, index: number) => index;
+    uniqueKey = (item:any, index: number) => index.toString();
     renderTemplate = ( {item} : {item: ChannelFrame}): ReactElement => {
       return (
         <TouchableOpacity
           onPress={() => {
-            // this.props.navigation.navigate('TransactionInfo')
-            // this.props.navigation.navigate('TransactionInfo', {
-            //   transactionData: item
-            // })
-
             this.props.navigation.navigate('ChannelInfoScreen', {
                 channelInfo: item,
                 node: this.state.node
@@ -78,18 +73,6 @@ export default class ChannelScreen extends Component {
       )
     }
 
-    channelList = async () => {
-        try {
-            await RESTUtils.getChannels(this.state.node).then((resp: any) => {
-              console.log(resp.channels[0])
-              this.setState({channels: resp.channels})
-            })
-          } catch { (err) => {
-            console.log(err)
-            }
-          }
-    }
-
     render() {
         return (
             <View>
@@ -98,27 +81,18 @@ export default class ChannelScreen extends Component {
                         this.props.navigation.navigate('OpenChannelScreen', {
                           node: this.state.node
                         })
-                        // this.props.navigation.navigate('ChannelScreen', {
-                        //   node: this.state.node
-                        // })
-                        // console.log(this.state.node, "90")
+                        }}
+                        title='Open Channel'
+                  />
+                  <FlatList
+                    style={{
+                      margin: 5
                     }}
-                    title='Open Channel'
-                />
-                <FlatList
-         style={{
-          margin: 5
-        }}
-        data={this.state.channels}
-        renderItem={this.renderTemplate}
-        keyExtractor={this.uniqueKey}
-      />
-            </View>
-    // <View>
-    //     <Text>
-    //         HELL
-    //     </Text>
-    // </View>
+                    data={this.props.ChannelsStore.channels}
+                    renderItem={this.renderTemplate}
+                    keyExtractor={this.uniqueKey}
+                  />
+              </View>
         )
-    }
+      }
 }
