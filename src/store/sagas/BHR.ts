@@ -2457,10 +2457,6 @@ function* retrieveMetaSharesWorker( { payload } ) {
         }
       }
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> development
     yield put( updateMetaSharesKeeper( metaShares ) )
     dbManager.updateBHR( {
       metaSharesKeeper: metaShares,
