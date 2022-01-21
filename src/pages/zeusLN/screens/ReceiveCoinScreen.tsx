@@ -15,7 +15,10 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import ModalContainer from '../../../components/home/ModalContainer'
 import ReceiveAmountContent from '../../../components/home/ReceiveAmountContent'
 import GenerateL2Invoice from '../../../components/home/GenerateL2Invoice';
+import { inject, observer } from 'mobx-react'
 
+@inject('InvoicesStore')
+@observer
 export default class ReceiveCoinScreen extends Component {
     constructor(props: any) {
         super(props)
@@ -32,22 +35,8 @@ export default class ReceiveCoinScreen extends Component {
         }
     }
   
-    public fetchInvoice = async (expiry, memo, value) => {
-        let body = {
-          memo,
-          value,
-          expiry
-        }
-        console.log(this.state.node)
-        try {
-          await RESTUtils.createInvoice(this.state.node, body).then((resp: any) => {
-            console.log(resp.payment_request)
-            this.setState({address: resp.payment_request})
-          })
-        } catch { (err) => {
-          console.log(err)
-          }
-        }
+    public fetchInvoice = (expiry: number, memo: string, value: number) => {
+        this.props.InvoicesStore.fetchInvoice(this.state.node, expiry, memo, value)
     }
 
     render() {
@@ -65,7 +54,7 @@ export default class ReceiveCoinScreen extends Component {
               logoMargin={2}
               logoBackgroundColor="white"
               logoBorderRadius={50}
-              value={this.state.address}
+              value={this.props.InvoicesStore.invoice}
               size={this.state.size}
               />
                     {
@@ -76,7 +65,7 @@ export default class ReceiveCoinScreen extends Component {
           </View>
           <CopyThisText
                 backgroundColor='white'
-                text={this.state.address}
+                text={this.props.InvoicesStore.invoice}
             />
 {/********************************** for on chain invoice *********************************************/}
             <AppBottomSheetTouchableWrapper

@@ -13,25 +13,18 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import Transaction from '../../models/Transaction'
 import { useDispatch, useSelector } from 'react-redux'
 import { sourceAccountSelectedForSending } from '../../store/actions/sending';
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import { connect } from 'react-redux'
+import { inject, observer } from 'mobx-react';
 
-interface transaction {
-  tx_hash: string;
-  amount: string;
-  num_confirmations: number;
-  block_hash: string;
-  block_height: 0;
-  time_stamp: string;
-  total_fees: string;
-  dest_addresses: string[];
-  raw_tx_hex: string;
-  label: string;
-}
-
-
+@inject('TransactionsStore',
+'BalancesStore',
+'InvoicesStore'
+)
+@observer
 export class AccountDetails extends Component {
 
   constructor( props: any ) {
@@ -43,7 +36,12 @@ export class AccountDetails extends Component {
       onChainBalance: '',
       address: 'jhj'
     }
+    // this.transactionsStore = this.props.TransactionsStore;
+    // this.balancesStore = this.props.BalancesStore;
+    // this.invoicesStore = this.props.InvoicesStore
   }
+
+
   // dispatch = useDispatch()
 
   // accountShell = useAccountShellFromNavigation(this.props.navigation)
@@ -52,10 +50,16 @@ export class AccountDetails extends Component {
 
   componentDidMount(): void {
     // console.log(this.state.node, "++")
-    this.fetchTransactions(this.state.node)
-    this.fetchBalance(this.state.node)
-    this.fetchAddress(this.state.node)
+    try {
+      this.props.TransactionsStore.fetchTransactions(this.state.node)
+      this.props.BalancesStore.getOffChainBalance(this.state.node)
+      this.props.BalancesStore.getOnChainBalance(this.state.node)
+      this.props.InvoicesStore.fetchAddress(this.state.node)  
+    } catch(err) {
+      console.log(err, "error!!!")
+    }
   }
+
 
   onSendBittonPress = () => {
     this.dispatch( sourceAccountSelectedForSending( this.accountShell ) )
@@ -67,7 +71,7 @@ export class AccountDetails extends Component {
   }
   // accountShell = useAccountShellFromNavigation(this.props.navigation) // this line gives the hook error
   uniqueKey = (item:any, index: number) => index;
-  renderTemplate = ( {item} : {item: transaction}): ReactElement => {
+  renderTemplate = ( {item} : {item: Transaction}): ReactElement => {
     return (
       <TouchableOpacity
         onPress={() => {
@@ -110,8 +114,6 @@ public fetchBalance = async (node: any) => {
   } catch{(err: any) => {
     console.log(err)
   }}
-
-
 }
 
   public fetchAddress = async (node: any) => {
@@ -129,6 +131,7 @@ public fetchBalance = async (node: any) => {
 
 
   render() {
+    console.log(this.props.BalancesStore.offChainBalance, "offchain")
     return (
       <View style = {styles.container}>
         <View style={{ flex: 2, 
@@ -136,8 +139,8 @@ public fetchBalance = async (node: any) => {
           flexDirection: 'row', 
           justifyContent: 'space-around', 
           alignItems: 'center' }}>
-          <Text>offChain: {this.state.offChainBalance}</Text>
-          <Text>onChain: {this.state.onChainBalance}</Text>
+          <Text>offChain: {this.props.BalancesStore.offChainBalance}</Text>
+          <Text>onChain: {this.props.BalancesStore.onChainBalance}</Text>
         </View>
         <Button onPress={() => {
           this.props.navigation.navigate('ChannelScreen', {
@@ -152,7 +155,7 @@ public fetchBalance = async (node: any) => {
          style={{
           margin: 5
         }}
-        data={this.state.transactions}
+        data={this.props.TransactionsStore.transactions}
         renderItem={this.renderTemplate}
         keyExtractor={this.uniqueKey}
       />
@@ -168,7 +171,7 @@ public fetchBalance = async (node: any) => {
         onReceivePressed={() => {
           this.props.navigation.navigate('ReceiveCoinScreen', {
             node: this.state.node,
-            address: this.state.address,
+            address: this.props.InvoicesStore.invoice,
             title: 'lightning',
             size: hp( '27%' )
           })

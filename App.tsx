@@ -57,6 +57,9 @@ export default function AppWrapper() {
     <RootSiblingParent>
       <MobxProvider
         SettingsStore={Stores.settingsStore}
+        TransactionsStore={Stores.transactionsStore}
+        BalancesStore={Stores.balancesStore}
+        InvoicesStore={Stores.invoicesStore}
       >
         <Provider store={store} uriPrefix={URI_PREFIX}>
           <BottomSheetModalProvider>
