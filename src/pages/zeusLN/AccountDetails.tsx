@@ -49,15 +49,10 @@ export class AccountDetails extends Component {
   // primarySubAccount = usePrimarySubAccountForShell(this.accountShell)
 
   componentDidMount(): void {
-    // console.log(this.state.node, "++")
-    try {
       this.props.TransactionsStore.fetchTransactions(this.state.node)
       this.props.BalancesStore.getOffChainBalance(this.state.node)
       this.props.BalancesStore.getOnChainBalance(this.state.node)
       this.props.InvoicesStore.fetchAddress(this.state.node)  
-    } catch(err) {
-      console.log(err, "error!!!")
-    }
   }
 
 
@@ -70,7 +65,7 @@ export class AccountDetails extends Component {
     console.log("pressed")
   }
   // accountShell = useAccountShellFromNavigation(this.props.navigation) // this line gives the hook error
-  uniqueKey = (item:any, index: number) => index;
+  uniqueKey = (item:any, index:number) => index.toString();
   renderTemplate = ( {item} : {item: Transaction}): ReactElement => {
     return (
       <TouchableOpacity
