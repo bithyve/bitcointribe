@@ -131,7 +131,7 @@ const HomeBuyCard = ( {
           <Text>{incramount}</Text>
         </View>
       </View>
-    <Shadow startColor={Colors.shadowBlue} distance={5} offset={[5,7] }>
+    <Shadow startColor={Colors.shadowBlue} distance={11} offset={[9 ,10] }>
       <TouchableOpacity
         // icon={
         //   <Image

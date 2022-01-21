@@ -162,7 +162,7 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
 
   return (
-    <Shadow  distance={3} startColor={Colors.shadowColor}  offset={[7, 7]}>
+    <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[7, 7]}>
     <View style={opacityChange ? {
       ...styles.rootContainer, opacity:0.3
     } : styles.rootContainer}>
