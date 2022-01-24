@@ -13,7 +13,8 @@ const Details2FA = 'Details2FA'
 const Balances = 'Balances'
 const Bip32 = 'Bip32'
 const Network = 'Network'
-const XPUB = 'XPUB'
+const MultiSigXpubs = 'MultiSigXpubs'
+const MultiSigXprivs = 'MultiSigXprivs'
 const TxIdMap = 'TxIdMap'
 const AccountId = 'AccountId'
 const ContactDetails = 'ContactDetails'
@@ -82,11 +83,14 @@ export const AccountSchema: ObjectSchema = {
     xpriv: {
       type: 'string', optional: true
     },
+    is2FA: {
+      type: 'bool', optional: true
+    },
     xpubs: {
-      type: XPUB, optional: true
+      type: MultiSigXpubs, optional: true
     },
     xprivs: {
-      type: XPUB, optional: true
+      type: MultiSigXprivs, optional: true
     },
     nextFreeAddressIndex: {
       type: 'int', optional: true
@@ -270,15 +274,21 @@ export const BalancesSchema: ObjectSchema = {
 //   },
 // }
 
-export const XPubSchema: ObjectSchema = {
-  name: XPUB,
+export const MultiSigXPubSchema: ObjectSchema = {
+  name: MultiSigXpubs,
   properties: {
+    secondary: {
+      type: 'string', optional: true
+    },
     bithyve: {
       type: 'string', optional: true
-    },
-    primary: {
-      type: 'string', optional: true
-    },
+    }
+  },
+}
+
+export const MultiSigXPrivSchema: ObjectSchema = {
+  name: MultiSigXprivs,
+  properties: {
     secondary: {
       type: 'string', optional: true
     }
@@ -892,7 +902,8 @@ export default {
   Balances,
   Bip32,
   Network,
-  XPUB,
+  MultiSigXpubs,
+  MultiSigXprivs,
   AccountId,
   ContactDetails,
   TrustedContact,
