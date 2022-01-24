@@ -411,7 +411,6 @@ export default class AccountUtilities {
     }>,
     cachedTxs: Transaction[],
     cachedTxIdMap: {[txid: string]: string[]},
-    cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -437,7 +436,6 @@ export default class AccountUtilities {
       }>;
       txIdMap:  {[txid: string]: string[]},
       transactions: Transaction[];
-      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       activeAddresses: ActiveAddresses;
@@ -526,9 +524,9 @@ export default class AccountUtilities {
       }
 
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName, transactionsNote, hardRefresh } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, accountType, primaryAccType, accountName, transactionsNote } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
-        const UTXOs = hardRefresh? []: cachedUTXOs // completely refresh UTXO set on hard-refresh(rather than soft-refresh's append)
+        const UTXOs = cachedUTXOs
         // (re)categorise UTXOs
         if ( Utxos )
           for ( const addressSpecificUTXOs of Utxos ) {
@@ -692,8 +690,6 @@ export default class AccountUtilities {
           if( tx.confirmations > 6 ){
             const addresses = txIdMap[ tx.txid ]
             addresses.forEach( address => {
-              // if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
-              // else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
               if( activeAddresses.external[ address ] ) delete activeAddresses.external[ address ]
               else if( activeAddresses.internal[ address ] ) delete activeAddresses.internal[ address ]
             } )
@@ -709,7 +705,6 @@ export default class AccountUtilities {
           UTXOs,
           txIdMap,
           transactions,
-          addressQueryList: cachedAQL,
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
           activeAddresses,
