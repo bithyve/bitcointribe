@@ -116,9 +116,6 @@ export const AccountSchema: ObjectSchema = {
     txIdMap: {
       type: 'list', objectType: TxIdMap, default: []
     },
-    addressQueryList: {
-      type: 'string?[]', optional: true
-    },
     instanceNum: {
       type: 'int', optional: true
     },

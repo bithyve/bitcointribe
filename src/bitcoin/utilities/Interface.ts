@@ -209,7 +209,6 @@ export interface DerivativeAccountElements {
   };
   transactions?: Transaction[];
   txIdMap?: {[txid: string]: string[]};
-  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: Transaction[];
   blindGeneration?: boolean // temporarily generated during blind refresh
@@ -877,7 +876,6 @@ export interface Account {
   lastSynched: number;                  // account's last sync timestamp
   newTransactions?: Transaction[];      // new transactions arrived during the current sync
   txIdMap?: {[txid: string]: string[]}; // tx-mapping; tx insertion checker
-  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
   hasNewTxn?: boolean;                  // indicates new txns
   transactionsNote : {
     [txId: string]: string
