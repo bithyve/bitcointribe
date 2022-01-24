@@ -107,7 +107,9 @@ import {
   cloudDataInterface,
   Accounts,
   AccountType,
-  ContactDetails
+  ContactDetails,
+  Account,
+  MultiSigAccount
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -516,15 +518,25 @@ function* recoverWalletWorker( { payload } ) {
       image = getWI.data.walletImage
     }
     const accounts = image.accounts
-    const acc = []
+    const acc: Account[] = []
     const accountData = {
     }
 
     const decryptionKey = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
     Object.keys( accounts ).forEach( ( key ) => {
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
-      accountData[ JSON.parse( decryptedData ).type ] = JSON.parse( decryptedData ).id
-      acc.push( JSON.parse( decryptedData ) )
+      const account: Account | MultiSigAccount = JSON.parse( decryptedData )
+      accountData[ account.type ] = account.id
+
+      if([AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT].includes(account.type)){ // patch: fixes multisig account restore, being restored from a missing 2FA-flag backup(version < 2.0.69)
+        if((account as MultiSigAccount).xpubs && (account as MultiSigAccount).xpubs.secondary){ // level-2 activated multisig account found
+          if(!(account as MultiSigAccount).is2FA){ // faulty backup found
+            (account as MultiSigAccount).is2FA = true 
+          }
+        }
+      }
+
+      acc.push( account )
     } )
 
     let secondaryXpub, details2FA
