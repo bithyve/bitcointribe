@@ -1,5 +1,5 @@
 import React, { Component, ReactElement } from 'react'
-import { Text, View, SectionList, StyleSheet, RefreshControl, FlatList } from 'react-native'
+import { Text, View, SectionList, StyleSheet, RefreshControl, FlatList, SafeAreaView, StatusBar } from 'react-native'
 import { Button } from 'react-native-elements/dist/buttons/Button'
 import RESTUtils from '../../utils/ln/RESTUtils'
 import axios from 'axios'
@@ -56,6 +56,27 @@ export class AccountDetails extends Component {
     }
   }
 
+  uniqueKey = (item:any, index: number) => index.toString();
+
+  renderTemplate = ( {item} : {item: Transaction}): ReactElement => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          // this.props.navigation.navigate('TransactionInfo')
+          this.props.navigation.navigate('TransactionInfo', {
+            transactionData: item
+          })
+        }}
+      >
+        <TransactionListComponent
+        params = {item}
+        />
+        <View style={{
+          borderBottomWidth: 1, borderColor: 'grey', marginHorizontal: widthPercentageToDP( 4 )
+        }} />
+      </TouchableOpacity>
+    )
+  }
 
   componentDidMount(): void {
     this.props.TransactionsStore.fetchTransactions( this.state.node )
@@ -103,35 +124,51 @@ export class AccountDetails extends Component {
          },
        },
        {
-         kind: SectionKind.SEND_AND_RECEIVE_FOOTER,
-         data: [ null ],
-         renderItem: () => {
-           return (
-             <View style={styles.viewSectionContainer}>
-               <View style={styles.footerSection}>
-                 <SendAndReceiveButtonsFooter
-                   onSendPressed={() => {
-                     //onSendBittonPress()
-                   }}
-                   onReceivePressed={() => {
-
-                   }}
-                   averageTxFees={''}
-                   // network={
-                   //   config.APP_STAGE === 'dev' ||
-                   //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
-                   //     ? NetworkKind.TESTNET
-                   //     : NetworkKind.MAINNET
-                   // }
-                 />
-
-
-               </View>
-
-             </View>
-           )
-         },
+        kind: SectionKind.TRANSACTIONS_LIST_PREVIEW,
+        data: [ null ],
+        renderItem: () => {
+          return (
+            <View 
+            style={styles.container}>
+              <FlatList
+                data={this.props.TransactionsStore.transactions}
+                renderItem={this.renderTemplate}
+                keyExtractor={this.uniqueKey}
+              />
+            </View>
+          )
+        }
        },
+      //  {
+      //    kind: SectionKind.SEND_AND_RECEIVE_FOOTER,
+      //    data: [ null ],
+      //    renderItem: () => {
+      //      return (
+      //       //  <View style={styles.viewSectionContainer}>
+      //       //    <View style={styles.footerSection}>
+      //       //      <SendAndReceiveButtonsFooter
+      //       //        onSendPressed={() => {
+      //       //          //onSendBittonPress()
+      //       //        }}
+      //       //        onReceivePressed={() => {
+
+      //       //        }}
+      //       //        averageTxFees={''}
+      //       //        // network={
+      //       //        //   config.APP_STAGE === 'dev' ||
+      //       //        //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+      //       //        //     ? NetworkKind.TESTNET
+      //       //        //     : NetworkKind.MAINNET
+      //       //        // }
+      //       //      />
+
+
+      //       //    </View>
+
+      //       //  </View>
+      //      )
+      //    },
+      //  },
      ]
    }
 
@@ -183,6 +220,7 @@ public fetchBalance = async ( node: any ) => {
 
 
   render() {
+    console.log(this.props.BalancesStore.offChainBalance, "++")
     return (
       <View style = {{
         backgroundColor: Colors.backgroundColor, flex: 1
@@ -204,6 +242,29 @@ public fetchBalance = async ( node: any ) => {
           stickySectionHeadersEnabled={false}
           keyExtractor={( index )=> String( index )}
         />
+
+<View style={styles.viewSectionContainer}>
+               <View style={styles.footerSection}>
+                 <SendAndReceiveButtonsFooter
+                   onSendPressed={() => {
+                     //onSendBittonPress()
+                   }}
+                   onReceivePressed={() => {
+
+                   }}
+                   averageTxFees={''}
+                   // network={
+                   //   config.APP_STAGE === 'dev' ||
+                   //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+                   //     ? NetworkKind.TESTNET
+                   //     : NetworkKind.MAINNET
+                   // }
+                 />
+
+
+               </View>
+
+             </View>
 
       </View>
 
@@ -229,6 +290,11 @@ const mapStateToProps = ( state ) => {
 
 
 const styles = StyleSheet.create( {
+  container: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
+  },
+
   rootContainer: {
     height: '100%',
   },
@@ -241,6 +307,7 @@ const styles = StyleSheet.create( {
   },
 
   viewSectionContainer: {
+    position: 'absolute',
     marginBottom: 10,
   },
 
