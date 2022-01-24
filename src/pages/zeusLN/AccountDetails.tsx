@@ -24,6 +24,7 @@ import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
 import AccountDetailsCard from './components/AccountDetailsCard'
+import TransactionsListItem from '../../components/account-details/AccountDetailsTransactionsListItem'
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -71,6 +72,7 @@ export class AccountDetails extends Component {
         <TransactionListComponent
         params = {item}
         />
+        {/* <TransactionsListItem accountShellId={this.state.accountShellId} transaction={item} /> */}
         <View style={{
           borderBottomWidth: 1, borderColor: 'grey', marginHorizontal: widthPercentageToDP( 4 )
         }} />
@@ -95,6 +97,8 @@ export class AccountDetails extends Component {
   }
 
    sections = ()=>{
+     console.log("account shell id", this.state.accountShellId);
+     
      return [
        {
          kind: SectionKind.ACCOUNT_CARD,
@@ -309,6 +313,8 @@ const styles = StyleSheet.create( {
   viewSectionContainer: {
     position: 'absolute',
     marginBottom: 10,
+    bottom:10,
+    width:'100%',
   },
 
   viewAccountDetailsCard: {
