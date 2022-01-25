@@ -76,7 +76,6 @@ export default class BalanceStore {
       this.resetLightningBalance()
       RESTUtils.getLightningBalance()
         .then( ( data: any ) => {
-          console.log( data.balance )
           this.pendingOpenBalance = Number( data.pending_open_balance )
           this.lightningBalance = Number( data.balance )
           this.loading = false
