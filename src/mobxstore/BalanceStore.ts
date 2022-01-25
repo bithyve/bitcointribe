@@ -1,20 +1,29 @@
-import { action, reaction, observable, makeAutoObservable, makeObservable } from 'mobx'
+import { action, reaction, observable } from 'mobx'
 import SettingsStore from './SettingsStore'
 import RESTUtils from '../utils/ln/RESTUtils'
 
 export default class BalanceStore {
-    public totalBlockchainBalance: number | string;
-    public confirmedBlockchainBalance: number | string;
-    public unconfirmedBlockchainBalance: number | string;
-    public loading = false;
-    public error = false;
-    public pendingOpenBalance: number | string;
-    public lightningBalance: number | string;
+    @observable public totalBlockchainBalance: number | string;
+    @observable public confirmedBlockchainBalance: number | string;
+    @observable public unconfirmedBlockchainBalance: number | string;
+    @observable public loading = false;
+    @observable public error = false;
+    @observable public pendingOpenBalance: number | string;
+    @observable public lightningBalance: number | string;
     settingsStore: SettingsStore;
 
     constructor( settingsStore: SettingsStore ) {
-      makeAutoObservable( this )
       this.settingsStore = settingsStore
+
+      reaction(
+        () => this.settingsStore.settings,
+        () => {
+          if ( this.settingsStore.hasCredentials() ) {
+            this.getBlockchainBalance()
+            this.getLightningBalance()
+          }
+        }
+      )
     }
 
     reset = () => {
