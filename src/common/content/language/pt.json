@@ -309,7 +309,7 @@
   },
   "accManagement": {
       "AccountManagement": "Gestão de Contas",
-      "Rearrange": "Reorganize, arquive e restabeleça contas a partir daqui",
+      "Rearrange": "Reorganize e restabeleça contas a partir daqui",
       "HiddenAccounts": "Contas ocultas",
       "ArchivedAccounts": "Contas Arquivadas",
       "Save": "Salvar novo pedido",

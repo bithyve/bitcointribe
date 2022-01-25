@@ -33,7 +33,7 @@ const AccountCardColumn: React.FC<Props> = ( {
   return (
     <View style={styles.rootContainer} key={index}>
 
-      {cardData.map( ( accountShell ) => {
+      {(index%2 != 0 ? cardData.reverse() : cardData).map( ( accountShell ) => {
         const disabled = false
         // if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
         return typeof accountShell === 'string' ?
