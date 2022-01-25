@@ -120,6 +120,7 @@ export class AccountDetails extends Component {
             <View>
 
             <TransactionListComponent
+              navigation={this.props.navigation}
               transactions={this.props.TransactionsStore.transactions}
             />
 
@@ -136,7 +137,7 @@ export class AccountDetails extends Component {
                <View style={styles.footerSection}>
                  <SendAndReceiveButtonsFooter
                    onSendPressed={() => {
-                     //onSendBittonPress()
+                     this.onSendButtonPress()
                    }}
                    onReceivePressed={() => {
 
