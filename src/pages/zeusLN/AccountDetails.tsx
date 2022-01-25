@@ -180,17 +180,23 @@ export class AccountDetails extends Component {
                     <InvoicesList
                       availableBalance={lightningBalance}
                       bitcoinUnit={BitcoinUnit.SATS}
-                      onViewMorePressed={()=> {}}
+                      onViewMorePressed={()=> this.props.navigation.navigate( 'ViewAll', {
+                        mode: this.state.mode,
+                        accountShellID: this.state.accountShellID
+                      } )}
                       invoices={invoices.slice( 0, 2 )}
-                      accountShellId={this.state.accountShellId}
+                      accountShellId={this.state.accountShellID}
                       loading={loadingInvoices}
                     />:
                     <TransactionList
                       availableBalance={totalBlockchainBalance}
                       bitcoinUnit={BitcoinUnit.SATS}
-                      onViewMorePressed={()=> {}}
+                      onViewMorePressed={()=> this.props.navigation.navigate( 'ViewAll', {
+                        mode: this.state.mode,
+                        accountShellID: this.state.accountShellID
+                      } )}
                       transactions={transactions.slice( 0, 2 )}
-                      accountShellId={this.state.accountShellId}
+                      accountShellId={this.state.accountShellID}
                       loading={loadingTransactions}
                     />
                 }

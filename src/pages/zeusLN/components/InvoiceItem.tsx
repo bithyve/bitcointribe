@@ -79,14 +79,12 @@ const styles = StyleSheet.create( {
 
 type Props = {
     invoice: Invoice,
-  accountShellId: string,
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind | null;
 }
 
 const TransactionItem = ( {
   invoice,
-  accountShellId,
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
 }: Props ) => {
