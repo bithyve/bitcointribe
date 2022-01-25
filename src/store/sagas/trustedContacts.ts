@@ -431,7 +431,7 @@ export const syncGiftsStatusWatcher = createWatcher(
   SYNC_GIFTS_STATUS,
 )
 
-export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, updateWI?: boolean, }} ) {
+export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, updateWI?: boolean, updateWI_2FA?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -456,7 +456,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
   let contactIdentifier: string
   let synchingPrimaryKeeperChannelKey: string
 
-  const { permanentChannelsSyncKind, channelUpdates, metaSync, hardSync, updateWI } = payload
+  const { permanentChannelsSyncKind, channelUpdates, metaSync, hardSync, updateWI, updateWI_2FA } = payload
   switch( permanentChannelsSyncKind ){
       case PermanentChannelsSyncKind.SUPPLIED_CONTACTS:
         if( !channelUpdates.length ) throw new Error( 'Sync permanent channels failed: supplied channel updates missing' )
@@ -686,7 +686,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
       if( updateWI ||  shouldUpdateSmShare ) yield put( updateWalletImageHealth( {
         updateContacts: true,
         updateSmShare : shouldUpdateSmShare,
-        update2fa: shouldUpdateSmShare
+        update2fa: updateWI_2FA || shouldUpdateSmShare
       } ) )
 
       if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT && permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS ){
@@ -927,6 +927,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   // prepare secondary and backup data
   let secondaryData: SecondaryStreamData
   let backupData: BackupStreamData
+  let updateWI_2FA: boolean
   const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
   if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT && contactInfo.isKeeper && channelAssets ){
     const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard } = channelAssets
@@ -940,6 +941,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       // secondaryData is uploaded by the primary keeper device
       wallet = yield call( setup2FADetails, wallet )
       primaryData.bhXpub = wallet.details2FA.bithyveXpub
+      updateWI_2FA = true
     }
     else if( secondaryMnemonicShard ){
       secondaryData = {
@@ -974,7 +976,8 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     payload: {
       permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
       channelUpdates: [ channelUpdate ],
-      updateWI: true
+      updateWI: true,
+      updateWI_2FA
     }
   } )
 

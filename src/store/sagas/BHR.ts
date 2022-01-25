@@ -750,7 +750,7 @@ function* updateWalletImageWorker( { payload } ) {
   if( update2fa) {
     const details2FA = {
       secondaryXpub: wallet.secondaryXpub,
-      ...wallet.details2FA
+      details2FA: wallet.details2FA
     }
     walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify(details2FA), encryptionKey ).encryptedData
   }
