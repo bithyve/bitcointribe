@@ -12,7 +12,7 @@ import { translations } from '../../../common/content/LocContext'
 import { ListItem } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Invoice from './../../../models/Invoice'
-import AccountSavings from '../../../assets/images/accIcons/lightning.svg'
+import Lightning from '../../../assets/images/accIcons/lightning.svg'
 import moment from 'moment'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
@@ -53,7 +53,6 @@ const styles = StyleSheet.create( {
     width: 45,
     marginRight: 10,
     backgroundColor: '#F4F4F4',
-    padding: 2,
     borderRadius: 45/2,
     borderColor: Colors.white,
     borderWidth: 2,
@@ -113,7 +112,7 @@ const TransactionItem = ( {
       }} pad={1}>
 
         <View style={styles.containerImg}>
-          <Text>@</Text>
+          <Lightning/>
         </View>
         <ListItem.Content style={styles.titleSection}>
           <ListItem.Title style={styles.titleText} numberOfLines={1}>
