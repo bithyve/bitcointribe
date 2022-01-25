@@ -158,6 +158,9 @@ export class AccountDetails extends Component {
                 balance={lightningBalance}
                 accountShell={this.state.accountShell}
                 mode={Mode.LIGHTNING}
+                onItemPressed={()=> this.setState( {
+                  mode: Mode.LIGHTNING
+                } )}
               />
               <View style={{
                 marginVertical: 10
@@ -167,6 +170,9 @@ export class AccountDetails extends Component {
                 onSettingsPressed={()=>{}}
                 balance={totalBlockchainBalance}
                 accountShell={this.state.accountShell}
+                onItemPressed={()=> this.setState( {
+                  mode: Mode.ON_CHAIN
+                } )}
                 mode={Mode.ON_CHAIN}
               />
             </View>
@@ -194,7 +200,7 @@ export class AccountDetails extends Component {
                       loading={loadingInvoices}
                     />:
                     <TransactionList
-                      availableBalance={lightningBalance}
+                      availableBalance={totalBlockchainBalance}
                       bitcoinUnit={accountShell.unit}
                       onViewMorePressed={()=> {}}
                       transactions={transactions.slice( 0, 2 )}

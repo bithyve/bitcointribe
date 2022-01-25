@@ -78,7 +78,7 @@ const TransactionsList: React.FC<Props> = ( {
   return (
     <View style={styles.rootContainer}>
       <Text style={{
-        ...ListStyles.listItemTitle, marginBottom: 12,  color: Colors.mango
+        ...ListStyles.listItemTitle, marginBottom: 12,  color: Colors.orange
       }}>
         {`${strings.availableToSpend}: ${formattedBalanceText} ${formattedUnitText}`}
       </Text>

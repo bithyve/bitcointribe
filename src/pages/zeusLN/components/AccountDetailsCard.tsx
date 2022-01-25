@@ -33,6 +33,7 @@ export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
+  onItemPressed: () => void;
   navigation: any;
   balance: string;
   mode: Mode
@@ -63,6 +64,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
+  onItemPressed,
   navigation,
   balance,
   mode
@@ -178,7 +180,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
 
 
   return (
-    <View style={rootContainerStyle}>
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={onItemPressed}
+      style={rootContainerStyle}>
       <View
         style={{
           ...StyleSheet.absoluteFillObject,
@@ -192,7 +197,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           <FooterSection />
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
