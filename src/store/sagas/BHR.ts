@@ -547,6 +547,11 @@ function* recoverWalletWorker( { payload } ) {
       details2FA = decrypted2FADetails.details2FA
     }
 
+    let smShare
+    if(image.SM_share){
+     smShare = BHROperations.decryptWithAnswer( image.SM_share, decryptionKey ).decryptedData
+    }
+
     // Update Wallet
     const wallet: Wallet = {
       walletId: image.walletId,
@@ -562,7 +567,8 @@ function* recoverWalletWorker( { payload } ) {
       version: DeviceInfo.getVersion(),
       primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
       secondaryXpub,
-      details2FA
+      details2FA,
+      smShare
     }
     // restore Contacts
     if( image.contacts ) {
@@ -741,12 +747,12 @@ function* updateWalletImageWorker( { payload } ) {
   if( updateSmShare ) {
     walletImage.SM_share = BHROperations.encryptWithAnswer( wallet.smShare, encryptionKey ).encryptedData
   }
-  if( update2fa && wallet.secondaryXpub ) {
+  if( update2fa) {
     const details2FA = {
       secondaryXpub: wallet.secondaryXpub,
       ...wallet.details2FA
     }
-    walletImage.details2FA = BHROperations.encryptWithAnswer( details2FA, encryptionKey ).encryptedData
+    walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify(details2FA), encryptionKey ).encryptedData
   }
   if( updateAccounts && accountIds.length > 0 ) {
     const accounts = yield call( dbManager.getAccounts )

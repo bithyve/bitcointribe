@@ -845,7 +845,8 @@ export interface Wallet {
   details2FA? : {
     bithyveXpub?: string,
     twoFAKey?: string,
-  }
+  },
+  smShare?: string,
   accounts: {
     [accountType: string]: string[] // array of accountIds
   },
