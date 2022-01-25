@@ -6,7 +6,8 @@ export default class InvoicesStore {
         makeObservable(this, {
             invoice: observable,
             fetchAddress: action,
-            fetchInvoice: action
+            fetchInvoice: action,
+            addSatToInvoice: action
         })
     }
 
@@ -14,7 +15,8 @@ export default class InvoicesStore {
         this.invoice = ''
     }
 
-    public addSatToInvoice = (val:string) => {
+    public addSatToInvoice = (node: any, val: string) => {
+        this.fetchAddress(node)
         this.invoice = 'bitcoin:' + this.invoice + '?amount=' + val
     }
 

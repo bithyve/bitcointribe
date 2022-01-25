@@ -104,7 +104,7 @@ export default class ReceiveCoinScreen extends Component {
         onPressConfirm={( amt ) => {
           this.setState({amount: amt, showModal: false, showLnModal: false})
           console.log(this.state.amount, this.state.showModal, "()")
-          this.props.InvoicesStore.addSatToInvoice(amt)
+          this.props.InvoicesStore.addSatToInvoice(this.state.node, amt)
         }}
         selectedAmount={this.state.amount}
         onPressBack={() => {

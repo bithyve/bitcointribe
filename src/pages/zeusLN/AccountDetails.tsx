@@ -137,10 +137,15 @@ export class AccountDetails extends Component {
                <View style={styles.footerSection}>
                  <SendAndReceiveButtonsFooter
                    onSendPressed={() => {
-                     this.onSendButtonPress()
+                     this.onSendButtonPress(this.state.node)
                    }}
                    onReceivePressed={() => {
-
+                    this.onReceiveButtonPress(
+                      this.props.InvoicesStore.invoice,
+                      hp('27%'),
+                      'lightning',
+                      this.state.node
+                    )
                    }}
                    averageTxFees={''}
                    // network={
