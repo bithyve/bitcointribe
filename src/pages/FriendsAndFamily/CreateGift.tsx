@@ -427,7 +427,7 @@ const CreateGift = ( { navigation } ) => {
     </ScrollView>
   }
 
-  const AdvanceGiftOptions = ( { title, infoText, stateToUpdate, imageToShow } ) => {
+  const AdvanceGiftOptions = ( { title , stateToUpdate, imageToShow } ) => {
     const plus = () =>{
       if( stateToUpdate == 'gift' ){
         setNumbersOfGift( numbersOfGift + 1 )
@@ -467,7 +467,10 @@ const CreateGift = ( { navigation } ) => {
             }}>{title}</Text>
             <Text style={{
               color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
-            }}>{infoText}</Text>
+            }}>Gift Sats created will be of the 
+            <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>same amount</Text>
+             and can be 
+             <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>sent separately</Text></Text>
           </View>
           <View style={{
             flexDirection:'row', alignItems: 'center',
@@ -529,7 +532,7 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               fontSize: RFValue( 11 ),
             }}>
-            (Restricts the gift to one per user/ Hexa app)
+            (Restricts the gift to <Text style={{ fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic }}>one per Hexa app</Text> )
             </Text>
           </Text>
 
@@ -566,7 +569,7 @@ const CreateGift = ( { navigation } ) => {
       </View>
       <AdvanceGiftOptions
         title={'No. of Gifts'}
-        infoText={'Gift Sats created will be of the same amount and can be sent separately'}
+        // infoText={'Gift Sats created will be of the same amount and can be sent separately'}
         stateToUpdate={'gift'}
         imageToShow={require( '../../assets/images/icons/gift.png' )}
       />
@@ -875,7 +878,8 @@ const CreateGift = ( { navigation } ) => {
           }}>
             <Text>{'Minimum gift value '}</Text>
             <Text style={{
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              fontFamily: Fonts.FiraSansItalic
             }}>{prefersBitcoin? minimumGiftValue: convertSatsToFiat( minimumGiftValue )} {prefersBitcoin? 'sats': currencyCode}</Text>
           </Text>
         </View>
