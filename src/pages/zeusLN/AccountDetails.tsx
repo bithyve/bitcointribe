@@ -24,8 +24,6 @@ import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
 import AccountDetailsCard from './components/AccountDetailsCard'
-import TransactionsListItem from '../../components/account-details/AccountDetailsTransactionsListItem'
-
 enum SectionKind {
   ACCOUNT_CARD,
   TRANSACTIONS_LIST_PREVIEW,
@@ -55,30 +53,11 @@ export class AccountDetails extends Component {
       address: 'jhj',
       accountShell: props.accountShells.find( accountShell => accountShell.id === props.navigation.getParam( 'accountShellID' ) )
     }
+    // console.log(props.navigation.getParam( 'accountShellID' ), "+++---\n", props.accountShells.find( accountShell => accountShell.id === props.navigation.getParam( 'accountShellID' ) ))
   }
+
 
   uniqueKey = (item:any, index: number) => index.toString();
-
-  renderTemplate = ( {item} : {item: Transaction}): ReactElement => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          // this.props.navigation.navigate('TransactionInfo')
-          this.props.navigation.navigate('TransactionInfo', {
-            transactionData: item
-          })
-        }}
-      >
-        <TransactionListComponent
-        params = {item}
-        />
-        {/* <TransactionsListItem accountShellId={this.state.accountShellId} transaction={item} /> */}
-        <View style={{
-          borderBottomWidth: 1, borderColor: 'grey', marginHorizontal: widthPercentageToDP( 4 )
-        }} />
-      </TouchableOpacity>
-    )
-  }
 
   componentDidMount(): void {
     this.props.TransactionsStore.fetchTransactions( this.state.node )
@@ -88,17 +67,23 @@ export class AccountDetails extends Component {
   }
 
 
-  onSendBittonPress = () => {
-    this.dispatch( sourceAccountSelectedForSending( this.accountShell ) )
+  onSendButtonPress = (node:any) => {
+    this.props.navigation.navigate('SendCoinScreen', {
+      node
+    })
+  }
 
-    this.props.navigation.navigate( 'Send', {
-      subAccountKind: this.primarySubAccount.kind,
-    } )
+
+  onReceiveButtonPress = (address:string, size:any, title:string, node:any) => {
+    this.props.navigation.navigate('ReceiveCoinScreen', {
+      address,
+      size,
+      title,
+      node
+    })
   }
 
    sections = ()=>{
-     console.log("account shell id", this.state.accountShellId);
-     
      return [
        {
          kind: SectionKind.ACCOUNT_CARD,
@@ -132,47 +117,46 @@ export class AccountDetails extends Component {
         data: [ null ],
         renderItem: () => {
           return (
-            <View 
-            style={styles.container}>
-              <FlatList
-                data={this.props.TransactionsStore.transactions}
-                renderItem={this.renderTemplate}
-                keyExtractor={this.uniqueKey}
-              />
+            <View>
+
+            <TransactionListComponent
+              transactions={this.props.TransactionsStore.transactions}
+            />
+
             </View>
           )
         }
        },
-      //  {
-      //    kind: SectionKind.SEND_AND_RECEIVE_FOOTER,
-      //    data: [ null ],
-      //    renderItem: () => {
-      //      return (
-      //       //  <View style={styles.viewSectionContainer}>
-      //       //    <View style={styles.footerSection}>
-      //       //      <SendAndReceiveButtonsFooter
-      //       //        onSendPressed={() => {
-      //       //          //onSendBittonPress()
-      //       //        }}
-      //       //        onReceivePressed={() => {
+       {
+         kind: SectionKind.SEND_AND_RECEIVE_FOOTER,
+         data: [ null ],
+         renderItem: () => {
+           return (
+             <View style={styles.viewSectionContainer}>
+               <View style={styles.footerSection}>
+                 <SendAndReceiveButtonsFooter
+                   onSendPressed={() => {
+                     //onSendBittonPress()
+                   }}
+                   onReceivePressed={() => {
 
-      //       //        }}
-      //       //        averageTxFees={''}
-      //       //        // network={
-      //       //        //   config.APP_STAGE === 'dev' ||
-      //       //        //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
-      //       //        //     ? NetworkKind.TESTNET
-      //       //        //     : NetworkKind.MAINNET
-      //       //        // }
-      //       //      />
+                   }}
+                   averageTxFees={''}
+                   // network={
+                   //   config.APP_STAGE === 'dev' ||
+                   //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+                   //     ? NetworkKind.TESTNET
+                   //     : NetworkKind.MAINNET
+                   // }
+                 />
 
 
-      //       //    </View>
+               </View>
 
-      //       //  </View>
-      //      )
-      //    },
-      //  },
+             </View>
+           )
+         },
+       },
      ]
    }
 
@@ -224,7 +208,8 @@ public fetchBalance = async ( node: any ) => {
 
 
   render() {
-    console.log(this.props.BalancesStore.offChainBalance, "++")
+    // console.log(this.props.BalancesStore.offChainBalance, "++")
+    console.log(this.props.TransactionsStore.transactions.slice(0, 3), ";")
     return (
       <View style = {{
         backgroundColor: Colors.backgroundColor, flex: 1
@@ -247,14 +232,19 @@ public fetchBalance = async ( node: any ) => {
           keyExtractor={( index )=> String( index )}
         />
 
-<View style={styles.viewSectionContainer}>
+{/* <View style={styles.viewSectionContainer}>
                <View style={styles.footerSection}>
                  <SendAndReceiveButtonsFooter
                    onSendPressed={() => {
-                     //onSendBittonPress()
+                     this.onSendButtonPress(this.state.node)
                    }}
                    onReceivePressed={() => {
-
+                      this.onReceiveButtonPress(
+                        this.props.InvoicesStore.invoice,
+                        hp('27%'),
+                        'lightning',
+                        this.state.node
+                      )
                    }}
                    averageTxFees={''}
                    // network={
@@ -268,7 +258,7 @@ public fetchBalance = async ( node: any ) => {
 
                </View>
 
-             </View>
+             </View> */}
 
       </View>
 
@@ -311,10 +301,7 @@ const styles = StyleSheet.create( {
   },
 
   viewSectionContainer: {
-    position: 'absolute',
     marginBottom: 10,
-    bottom:10,
-    width:'100%',
   },
 
   viewAccountDetailsCard: {

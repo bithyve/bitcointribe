@@ -16,6 +16,18 @@ export default class TransactionsStore {
         this.transactions = []
     }
 
+
+    public sendCoinsOnChain = async (node:any, data:any) => {
+        try {
+            await RESTUtils.sendCoins(node, data).then((data: any) => {
+                console.log(data, "\n")
+            })
+
+        } catch(err: any) {
+            console.log(err)
+        }
+    }
+
     public fetchTransactions = async (node: any) => {
         try {
             await RESTUtils.getTransactions(node).then((data: any) => {

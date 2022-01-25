@@ -290,8 +290,8 @@ export default class LND {
     getBlockchainBalance = ( node: any ) =>
       this.getRequestNode( node, '/v1/balance/blockchain' )
     getLightningBalance = ( node: any ) => this.getRequestNode( node, '/v1/balance/channels' );
-    sendCoins = ( data: any ) =>
-      this.postRequest( '/v1/transactions', {
+    sendCoins = ( node:any ,data: any ) =>
+      this.postRequestNode( node, '/v1/transactions', {
         addr: data.addr,
         sat_per_byte: data.sat_per_byte,
         amount: data.amount

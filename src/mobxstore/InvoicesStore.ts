@@ -14,6 +14,10 @@ export default class InvoicesStore {
         this.invoice = ''
     }
 
+    public addSatToInvoice = (val:string) => {
+        this.invoice = 'bitcoin:' + this.invoice + '?amount=' + val
+    }
+
     public fetchAddress = async (node: any) => {
         try {
             await RESTUtils.getNewAddress(node).then((data: any) => {
