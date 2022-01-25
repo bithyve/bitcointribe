@@ -35,15 +35,15 @@ export enum Mode {
   ON_CHAIN,
   LIGHTNING,
 }
-import BalanceStore from './../../mobxstore/BalanceStore'
-import SettingsStore from './../../mobxstore/SettingsStore'
-import NodeInfoStore from './../../mobxstore/NodeInfoStore'
+
 
 @inject(
+  'InvoicesStore',
   'BalanceStore',
+  'TransactionsStore',
   'SettingsStore',
   'NodeInfoStore',
-  'FeeStore'
+  'FeeStore',
 )
 @observer
 export class AccountDetails extends Component {
@@ -62,18 +62,26 @@ export class AccountDetails extends Component {
   }
 
   async getSettingsAndRefresh() {
-    const {
-      SettingsStore,
-      BalanceStore,
-    } = this.props
+    try {
+      const {
+        SettingsStore,
+        BalanceStore,
+        InvoicesStore,
+        NodeInfoStore,
+        TransactionsStore
+      } = this.props
 
-    //NodeInfoStore.reset()
-    //BalanceStore.reset()
-
-    // This awaits on settings, so should await on Tor being bootstrapped before making requests
-    await SettingsStore.getSettings().then( () => {
-      this.refresh()
-    } )
+      NodeInfoStore.reset()
+      BalanceStore.reset()
+      InvoicesStore.reset()
+      TransactionsStore.reset()
+      // This awaits on settings, so should await on Tor being bootstrapped before making requests
+      await SettingsStore.getSettings().then( () => {
+        this.refresh()
+      } )
+    } catch ( error ) {
+      console.log( error )
+    }
   }
 
 
@@ -82,10 +90,10 @@ export class AccountDetails extends Component {
       const {
         NodeInfoStore,
         BalanceStore,
-        ChannelsStore,
+        InvoicesStore,
         FeeStore,
         SettingsStore,
-        FiatStore
+        TransactionsStore
       } = this.props
       const {
         settings,
@@ -99,11 +107,14 @@ export class AccountDetails extends Component {
           login: username, password
         } ).then( () => {
           BalanceStore.getLightningBalance()
+          InvoicesStore.getInvoices()
         } )
       } else {
         NodeInfoStore.getNodeInfo()
         BalanceStore.getBlockchainBalance()
         BalanceStore.getLightningBalance()
+        InvoicesStore.getInvoices()
+        TransactionsStore.getTransactions()
       }
 
       if ( implementation === 'lnd' ) {
@@ -126,6 +137,9 @@ export class AccountDetails extends Component {
       pendingOpenBalance,
       loading
     } = this.props.BalanceStore
+    const { invoices, invoicesCount } = this.props.InvoicesStore
+    const { transactions } = this.props.TransactionsStore
+    //console.log( 'transactions', transactions[ 0 ] )
     return [
       {
         kind: SectionKind.ACCOUNT_CARD,
