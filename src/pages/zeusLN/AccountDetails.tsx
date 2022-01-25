@@ -18,7 +18,7 @@ import Transaction from '../../models/Transaction'
 import { sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { connect } from 'react-redux'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-
+import  BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { inject, observer } from 'mobx-react'
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
@@ -143,8 +143,7 @@ export class AccountDetails extends Component {
     } = this.props.BalanceStore
     const { invoices, invoicesCount, loading: loadingInvoices  } = this.props.InvoicesStore
     const { transactions, loading: loadingTransactions } = this.props.TransactionsStore
-    // console.log( 'transactions', transactions[ 0 ] )
-    // console.log( 'invoices', invoices[ 0 ] )
+
     return [
       {
         kind: SectionKind.ACCOUNT_CARD,
@@ -193,7 +192,7 @@ export class AccountDetails extends Component {
                   this.state.mode === Mode.LIGHTNING ?
                     <InvoicesList
                       availableBalance={lightningBalance}
-                      bitcoinUnit={accountShell.unit}
+                      bitcoinUnit={BitcoinUnit.SATS}
                       onViewMorePressed={()=> {}}
                       invoices={invoices.slice( 0, 2 )}
                       accountShellId={this.state.accountShellId}
@@ -201,7 +200,7 @@ export class AccountDetails extends Component {
                     />:
                     <TransactionList
                       availableBalance={totalBlockchainBalance}
-                      bitcoinUnit={accountShell.unit}
+                      bitcoinUnit={BitcoinUnit.SATS}
                       onViewMorePressed={()=> {}}
                       transactions={transactions.slice( 0, 2 )}
                       accountShellId={this.state.accountShellId}

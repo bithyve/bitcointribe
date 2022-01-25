@@ -28,6 +28,7 @@ import { withNavigation } from 'react-navigation'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../../common/content/LocContext'
 import { Mode } from '../AccountDetails'
+import  BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 
 export type Props = {
   accountShell: AccountShell;
@@ -123,7 +124,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
         }}>
           <LabeledBalanceDisplay
             balance={balance}
-            bitcoinUnit={accountShell.unit}
+            bitcoinUnit={BitcoinUnit.SATS}
             amountTextStyle={styles.balanceAmountText}
             unitTextStyle={styles.balanceUnitText}
             currencyImageStyle={styles.balanceCurrencyIcon}
