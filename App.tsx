@@ -54,10 +54,22 @@ export default function AppWrapper() {
   }, [] )
 
   return (
-    <RootSiblingParent>
-      <MobxProvider
-        SettingsStore={Stores.settingsStore}
-      >
+
+    <MobxProvider
+      SettingsStore={Stores.settingsStore}
+      BalanceStore={Stores.walletStore}
+      TransactionsStore={Stores.transactionsStore}
+      ChannelsStore={Stores.channelsStore}
+      NodeInfoStore={Stores.nodeInfoStore}
+      InvoicesStore={Stores.invoicesStore}
+      FiatStore={Stores.fiatStore}
+      UnitsStore={Stores.unitsStore}
+      PaymentsStore={Stores.paymentsStore}
+      FeeStore={Stores.feeStore}
+      UTXOsStore={Stores.utxosStore}
+      ActivityStore={Stores.activityStore}
+    >
+      <RootSiblingParent>
         <Provider store={store} uriPrefix={URI_PREFIX}>
           <BottomSheetModalProvider>
             <LocalizationProvider>
@@ -65,9 +77,10 @@ export default function AppWrapper() {
             </LocalizationProvider>
           </BottomSheetModalProvider>
         </Provider>
-      </MobxProvider>
+      </RootSiblingParent>
 
-    </RootSiblingParent>
+    </MobxProvider>
+
 
   )
 }
