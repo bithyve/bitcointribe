@@ -1,5 +1,5 @@
 import React, { Component, ReactElement } from 'react'
-import { Text, View, SectionList, StyleSheet, RefreshControl, FlatList, SafeAreaView, StatusBar } from 'react-native'
+import { Text, View, SectionList, StyleSheet, RefreshControl, FlatList, ActivityIndicator, StatusBar, } from 'react-native'
 import { Button } from 'react-native-elements/dist/buttons/Button'
 import RESTUtils from '../../utils/ln/RESTUtils'
 import axios from 'axios'
@@ -15,15 +15,18 @@ import {
 import Colors from '../../common/Colors'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import Transaction from '../../models/Transaction'
-import { useDispatch, useSelector } from 'react-redux'
 import { sourceAccountSelectedForSending } from '../../store/actions/sending'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { connect } from 'react-redux'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+
 import { inject, observer } from 'mobx-react'
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
 import AccountDetailsCard from './components/AccountDetailsCard'
+import TransactionPreviewHeader from '../../pages/Accounts/Details/TransactionPreviewHeader'
+import TransactionList from './components/TransactionsList'
+import InvoicesList from './components/InvoicesList'
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -130,6 +133,7 @@ export class AccountDetails extends Component {
   };
 
   sections = ()=>{
+    const { accountShell } = this.state
     const {
       totalBlockchainBalance,
       unconfirmedBlockchainBalance,
@@ -137,9 +141,10 @@ export class AccountDetails extends Component {
       pendingOpenBalance,
       loading
     } = this.props.BalanceStore
-    const { invoices, invoicesCount } = this.props.InvoicesStore
-    const { transactions } = this.props.TransactionsStore
-    //console.log( 'transactions', transactions[ 0 ] )
+    const { invoices, invoicesCount, loading: loadingInvoices  } = this.props.InvoicesStore
+    const { transactions, loading: loadingTransactions } = this.props.TransactionsStore
+    // console.log( 'transactions', transactions[ 0 ] )
+    // console.log( 'invoices', invoices[ 0 ] )
     return [
       {
         kind: SectionKind.ACCOUNT_CARD,
@@ -150,9 +155,9 @@ export class AccountDetails extends Component {
               <AccountDetailsCard
                 onKnowMorePressed={()=> {}}
                 onSettingsPressed={()=>{}}
-                balance={totalBlockchainBalance}
+                balance={lightningBalance}
                 accountShell={this.state.accountShell}
-                mode={Mode.ON_CHAIN}
+                mode={Mode.LIGHTNING}
               />
               <View style={{
                 marginVertical: 10
@@ -160,10 +165,45 @@ export class AccountDetails extends Component {
               <AccountDetailsCard
                 onKnowMorePressed={()=> {}}
                 onSettingsPressed={()=>{}}
-                balance={lightningBalance}
+                balance={totalBlockchainBalance}
                 accountShell={this.state.accountShell}
-                mode={Mode.LIGHTNING}
+                mode={Mode.ON_CHAIN}
               />
+            </View>
+          )
+        },
+      },
+      {
+        kind: SectionKind.TRANSACTIONS_LIST_PREVIEW,
+        data: [ null ],
+        renderItem: () => {
+          return (
+            <View>
+              <View style={{
+                paddingVertical: 20,
+                paddingHorizontal: 20,
+              }}>
+                {
+                  this.state.mode === Mode.LIGHTNING ?
+                    <InvoicesList
+                      availableBalance={lightningBalance}
+                      bitcoinUnit={accountShell.unit}
+                      onViewMorePressed={()=> {}}
+                      invoices={invoices.slice( 0, 2 )}
+                      accountShellId={this.state.accountShellId}
+                      loading={loadingInvoices}
+                    />:
+                    <TransactionList
+                      availableBalance={lightningBalance}
+                      bitcoinUnit={accountShell.unit}
+                      onViewMorePressed={()=> {}}
+                      transactions={transactions.slice( 0, 2 )}
+                      accountShellId={this.state.accountShellId}
+                      loading={loadingTransactions}
+                    />
+                }
+
+              </View>
             </View>
           )
         },
@@ -177,11 +217,12 @@ export class AccountDetails extends Component {
               <View style={styles.footerSection}>
                 <SendAndReceiveButtonsFooter
                   onSendPressed={() => {
-                    this.onSendButtonPress()
+                    //this.onSendButtonPress()
                   }}
                   onReceivePressed={() => {
 
                   }}
+                  isTestAccount={false}
                   averageTxFees={''}
                   // network={
                   //   config.APP_STAGE === 'dev' ||
@@ -213,7 +254,7 @@ export class AccountDetails extends Component {
           nestedScrollEnabled
           refreshControl={
             <RefreshControl
-              onRefresh={()=> {}}
+              onRefresh={()=> this.getSettingsAndRefresh()}
               refreshing={false}
               style={{
                 backgroundColor: Colors.backgroundColor,
@@ -271,7 +312,7 @@ const styles = StyleSheet.create( {
   },
 
   footerSection: {
-    paddingVertical: 15,
+    paddingVertical: 5,
   },
 } )
 

@@ -77,6 +77,8 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
       case SubAccountKind.SECURE_ACCOUNT:
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
+      case SubAccountKind.LIGHTNING_ACCOUNT:
+        return Colors.orange
         return Colors.kashmirBlue
       case SubAccountKind.SERVICE:
         switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){

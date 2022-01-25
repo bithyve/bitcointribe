@@ -60,5 +60,9 @@ const Colors = {
   primaryAccent: '#006CB4',
   primaryAccentLighter1: '#61ACE1',
   primaryAccentLighter2: '#77B9EB',
+
+  // lightning account
+  orange: '#FF7761',
+  mango: '#FABA5F'
 }
 export default Colors
