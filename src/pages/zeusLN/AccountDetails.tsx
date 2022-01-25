@@ -27,6 +27,7 @@ import AccountDetailsCard from './components/AccountDetailsCard'
 import TransactionPreviewHeader from '../../pages/Accounts/Details/TransactionPreviewHeader'
 import TransactionList from './components/TransactionsList'
 import InvoicesList from './components/InvoicesList'
+import AccountCard from './components/AccountCard'
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -151,28 +152,14 @@ export class AccountDetails extends Component {
         renderItem: () => {
           return (
             <View style={styles.viewAccountDetailsCard}>
-              <AccountDetailsCard
-                onKnowMorePressed={()=> {}}
-                onSettingsPressed={()=>{}}
-                balance={lightningBalance}
-                accountShell={this.state.accountShell}
-                mode={Mode.LIGHTNING}
-                onItemPressed={()=> this.setState( {
-                  mode: Mode.LIGHTNING
+              <AccountCard
+                mode={this.state.mode}
+                lightningBalance={lightningBalance}
+                totalBlockchainBalance={totalBlockchainBalance}
+                setMode={( mode: Mode )=> this.setState( {
+                  mode
                 } )}
-              />
-              <View style={{
-                marginVertical: 10
-              }}/>
-              <AccountDetailsCard
-                onKnowMorePressed={()=> {}}
-                onSettingsPressed={()=>{}}
-                balance={totalBlockchainBalance}
-                accountShell={this.state.accountShell}
-                onItemPressed={()=> this.setState( {
-                  mode: Mode.ON_CHAIN
-                } )}
-                mode={Mode.ON_CHAIN}
+                accountShell={accountShell}
               />
             </View>
           )
