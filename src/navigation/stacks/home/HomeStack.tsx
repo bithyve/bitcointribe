@@ -57,6 +57,7 @@ import Home from '../../../pages/Home/Home'
 import Header from '../Header'
 import Login from '../../../pages/Login'
 import { translations } from '../../../common/content/LocContext'
+import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -146,6 +147,13 @@ const HomeStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+
+    ReceiveCoinScreen: {
+      screen: ReceiveCoinScreen,
+      navigationOptions: {
+        header: null
+      }
     },
     // MoreOptions: {
     //   screen: MoreOptionsStack,

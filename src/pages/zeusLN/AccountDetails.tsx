@@ -61,6 +61,15 @@ export class AccountDetails extends Component {
     }
   }
 
+
+  onReceiveButtonPress = (size:any, title:string, node:any) => {
+    this.props.navigation.navigate('ReceiveCoinScreen', {
+      size,
+      title,
+      node
+    })
+  }
+
   async UNSAFE_componentWillMount() {
     this.getSettingsAndRefresh()
   }
@@ -218,7 +227,11 @@ export class AccountDetails extends Component {
                     //this.onSendButtonPress()
                   }}
                   onReceivePressed={() => {
-
+                    this.onReceiveButtonPress(
+                      hp('27%'),
+                      'lightning',
+                      this.state.node
+                    )
                   }}
                   isTestAccount={false}
                   averageTxFees={''}

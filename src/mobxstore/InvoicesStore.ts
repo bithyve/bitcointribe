@@ -22,6 +22,7 @@ export default class InvoicesStore {
     @observable creatingInvoice = false;
     @observable creatingInvoiceError = false;
     @observable invoicesCount: number;
+    @observable onChainAddress: string
     settingsStore: SettingsStore;
 
     // lnd
@@ -97,6 +98,14 @@ export default class InvoicesStore {
           this.resetInvoices()
         } )
     };
+
+    @action
+    public getNewAddress = () => {
+        return RESTUtils.getNewAddress().then((data: any) => {
+            this.onChainAddress = data.address || data[0].address;
+        });
+    };
+
 
     @action
     public createInvoice = (
