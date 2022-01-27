@@ -260,7 +260,6 @@ EnterNodeConfigProps,
 EnterNodeConfigState
 > {
 
-  isComponentMounted = false;
 
   state = {
     host: '',
@@ -286,18 +285,12 @@ EnterNodeConfigState
   };
 
   async componentDidMount() {
-    this.isComponentMounted = true
     this.initFromProps( this.props )
-  }
-
-  componentWillUnmount() {
-    this.isComponentMounted = false
   }
 
   UNSAFE_componentWillReceiveProps( nextProps: any ) {
     this.initFromProps( nextProps )
   }
-
 
   initFromProps( props: any ) {
     const { navigation } = props
