@@ -257,8 +257,9 @@ export default class AccountUtilities {
     for ( let itr = 0; itr <= closingExtIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
-      }, 2, network, itr, false )
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+    }, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -275,8 +276,9 @@ export default class AccountUtilities {
     for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
-      }, 2, network, itr, true )
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+    }, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -367,8 +369,9 @@ export default class AccountUtilities {
         if( ( account as MultiSigAccount ).is2FA )
           changeAddress = AccountUtilities.createMultiSig( {
             primary: account.xpub,
-            ...( account as MultiSigAccount ).xpubs
-          }, 2, network, nextFreeChangeAddressIndex, true ).address
+            secondary: ( account as MultiSigAccount ).xpubs.secondary,
+            bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+            }, 2, network, nextFreeChangeAddressIndex, true ).address
         else
           changeAddress = AccountUtilities.getAddressByIndex(
             account.xpub,
@@ -1031,9 +1034,11 @@ export default class AccountUtilities {
     setupSuccessful: boolean;
   }> => {
 
-    const xpubs = []
-    if( account.xpub ) xpubs.push( account.xpub )
-    else xpubs.push( ...Object.values( ( account as MultiSigAccount ).xpubs ) )
+    const xpubs = [account.xpub]
+    if( (account as MultiSigAccount).is2FA ){
+      xpubs.push(( account as MultiSigAccount ).xpubs.secondary)
+      xpubs.push(( account as MultiSigAccount ).xpubs.bithyve)
+    }
 
     let res: AxiosResponse
     try {
