@@ -100,7 +100,7 @@ const createAccount = async ( account ) => {
       }
     }
     db.create( schema.Account, {
-      ...data, addressQueryList: []
+      ...data
     }, true )
   } catch ( error ) {
     console.log( error )
@@ -151,7 +151,7 @@ const updateAccount = async ( accountId, account ) => {
         data.transactions[ i ].recipientAddresses = []
       }
     }
-    data.addressQueryList = []
+
     acccountRef = data
     db.create( schema.Account, acccountRef, true )  }
   catch ( error ) {
