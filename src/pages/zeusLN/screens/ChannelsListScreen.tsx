@@ -70,7 +70,7 @@ export default class ChannelScreen extends Component {
   };
 
   render() {
-    console.log(this.props.ChannelsStore.channels, "channels..!!")
+    console.log(this.props.ChannelsStore.channels, "channels..!!");
     return (
       <View>
         <Button
@@ -79,7 +79,9 @@ export default class ChannelScreen extends Component {
             this.props.navigation.navigate("ChannelOpenScreen");
           }}
         />
-        {this.props.ChannelsStore.channels.length > 0 ? (
+        {this.props.ChannelsStore.loading ? (
+          <Text>Loading...</Text>
+        ) : (
           <FlatList
             style={{
               margin: 5,
@@ -88,8 +90,6 @@ export default class ChannelScreen extends Component {
             renderItem={this.renderTemplate}
             keyExtractor={this.uniqueKey}
           />
-        ) : (
-          <Text>Loading...</Text>
         )}
       </View>
     );
