@@ -151,41 +151,6 @@ const HomeStack = createStackNavigator(
         header: null,
       },
     },
-
-    ReceiveCoinScreen: {
-      screen: ReceiveCoinScreen,
-      navigationOptions: {
-        header: null
-      }
-    },
-    
-    SettingsScreen: {
-      screen: SettingsScreen,
-      navigationOptions: {
-        header: null
-      }
-    },
-
-    ChannelsListScreen: {
-      screen: ChannelsListScreen,
-      navigationOptions: {
-        header: null
-      }
-    },
-
-    ChannelInfoScreen: {
-      screen: ChannelInfoScreen,
-      navigationOptions: {
-        header: null
-      }
-    },
-
-    ChannelOpenScreen: {
-      screen: ChannelOpenScreen,
-      navigationOptions: {
-        header: null
-      }
-    },
     // MoreOptions: {
     //   screen: MoreOptionsStack,
     //   navigationOptions: {

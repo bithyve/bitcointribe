@@ -6,6 +6,10 @@ import ViewAllScreen from '../../../pages/zeusLN/ViewAllScreen'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
+import SettingsScreen from '../../../pages/zeusLN/screens/SettingsScreen'
+import ChannelsListScreen from '../../../pages/zeusLN/screens/ChannelsListScreen'
+import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
+import ChannelOpenScreen from '../../../pages/zeusLN/screens/ChannelOpenScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -16,7 +20,35 @@ const AccountDetailsStack = createStackNavigator(
       navigationOptions: {
         title: 'Receive'
       }
-    }
+    },
+
+    SettingsScreen: {
+      screen: SettingsScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+
+    ChannelsListScreen: {
+      screen: ChannelsListScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+
+    ChannelInfoScreen: {
+      screen: ChannelInfoScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+
+    ChannelOpenScreen: {
+      screen: ChannelOpenScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
   },
   {
     initialRouteName: 'AccountDetailsRoot',

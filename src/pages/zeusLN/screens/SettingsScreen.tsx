@@ -67,7 +67,7 @@ export default class SettingsScreen extends Component {
   render() {
     return (
       <View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             this.props.navigation.goBack();
@@ -76,7 +76,7 @@ export default class SettingsScreen extends Component {
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <FlatList
           style={{
             margin: 5,
