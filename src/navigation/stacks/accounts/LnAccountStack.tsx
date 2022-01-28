@@ -3,13 +3,10 @@ import { createStackNavigator } from 'react-navigation-stack'
 import { translations } from '../../../common/content/LocContext'
 import LNAccountDetails from '../../../pages/zeusLN/AccountDetails'
 import ViewAllScreen from '../../../pages/zeusLN/ViewAllScreen'
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
-import SettingsScreen from '../../../pages/zeusLN/screens/SettingsScreen'
-import ChannelsListScreen from '../../../pages/zeusLN/screens/ChannelsListScreen'
-import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
-import ChannelOpenScreen from '../../../pages/zeusLN/screens/ChannelOpenScreen'
+import SendScreen from '../../../pages/zeusLN/SendScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -18,7 +15,23 @@ const AccountDetailsStack = createStackNavigator(
     ReceiveCoin:{
       screen: ReceiveCoinScreen,
       navigationOptions: {
-        title: 'Receive'
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
+    SendScreen: {
+      screen: SendScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
       }
     },
 
