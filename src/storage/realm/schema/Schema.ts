@@ -475,6 +475,9 @@ export const Details2FASchema: ObjectSchema = {
   properties: {
     bithyveXpub: 'string',
     twoFAKey: 'string',
+    twoFAValidated: {
+      type: 'bool', optional: true
+    },
   },
 }
 

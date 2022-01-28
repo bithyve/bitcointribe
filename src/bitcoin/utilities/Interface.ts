@@ -845,6 +845,7 @@ export interface Wallet {
   details2FA? : {
     bithyveXpub?: string,
     twoFAKey?: string,
+    twoFAValidated?: boolean,
   },
   smShare?: string,
   accounts: {

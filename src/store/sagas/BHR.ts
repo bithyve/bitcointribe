@@ -119,7 +119,7 @@ import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
-import { restoreAccountShells, updateAccountShells, setGifts } from '../actions/accounts'
+import { restoreAccountShells, updateAccountShells, setGifts, twoFAValid } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
@@ -513,7 +513,6 @@ function* recoverWalletWorker( { payload } ) {
     }
 
     const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
-    console.log( 'getWI', getWI )
     if( getWI.status == 200 ) {
       image = getWI.data.walletImage
     }
@@ -545,6 +544,7 @@ function* recoverWalletWorker( { payload } ) {
       const decrypted2FADetails = JSON.parse( decryptedData )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
+      if(details2FA && details2FA.twoFAValidated) yield put(twoFAValid(true))
     }
 
     let smShare
