@@ -23,9 +23,8 @@ export default class OpenChannelScreen extends Component {
     super(props);
     this.state = {
       node: props.navigation.getParam("node"),
-      node_pubkey_string:
-        "",
-      local_funding_amount: "200000",
+      node_pubkey_string: "",
+      local_funding_amount: "",
       min_confs: "1",
       sat_per_byte: "2",
       private: false,
@@ -155,6 +154,21 @@ export default class OpenChannelScreen extends Component {
         <View>
           {(connectingToPeer || openingChannel) && (
             <ActivityIndicator size="large" color="#0000ff" />
+          )}
+          {peerSuccess && (
+            <Text style={{ color: "green" }}>
+              {'Peer Connected...'}
+            </Text>
+          )}
+          {channelSuccess && (
+            <Text style={{ color: "green" }}>
+              {"Channel Established..."}
+            </Text>
+          )}
+          {(errorMsgPeer || errorMsgChannel) && (
+            <Text style={{ color: "red" }}>
+              {errorMsgChannel || errorMsgPeer || 'error'}
+            </Text>
           )}
         </View>
       </View>
