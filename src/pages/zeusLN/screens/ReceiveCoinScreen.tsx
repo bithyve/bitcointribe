@@ -53,7 +53,6 @@ export default class ReceiveCoinScreen extends Component {
 
     return (
       <View>
-        
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
@@ -112,7 +111,7 @@ export default class ReceiveCoinScreen extends Component {
             {this.state.title !== "" && (
               <Text style={styles.textQr}>Lightning Address</Text>
             )}
-          </View>       
+          </View>
         )}
       </View>
     );

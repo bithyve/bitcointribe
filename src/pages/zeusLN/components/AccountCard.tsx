@@ -11,6 +11,8 @@ type Props = {
     lightningBalance: string,
     totalBlockchainBalance: string,
     setMode: ( mode: Mode ) => void;
+    accountShell: any;
+    onClickSettings: () => void
 }
 
 const AccountCard = ( {
@@ -18,13 +20,14 @@ const AccountCard = ( {
   lightningBalance,
   totalBlockchainBalance,
   setMode,
-  accountShell
+  accountShell,
+  onClickSettings
 }: Props ) => {
   return (
     <View>
       <AccountDetailsCard
         onKnowMorePressed={()=> {}}
-        onSettingsPressed={()=>{}}
+        onSettingsPressed={onClickSettings}
         balance={lightningBalance}
         accountShell={accountShell}
         mode={Mode.LIGHTNING}

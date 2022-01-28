@@ -60,7 +60,9 @@ export default class ChannelsStore {
         () => {
           if ( this.channelRequest ) {
             const chanReq = new OpenChannelRequest( this.channelRequest )
-            this.openChannel( chanReq )
+            console.log(chanReq, "+++++++")
+            // this.openChannel( chanReq )
+            this.OpenChannel(chanReq)
           }
         }
       )
@@ -137,6 +139,7 @@ export default class ChannelsStore {
             ) {
               this.getNodeInfo( channel.remote_pubkey ).then(
                 ( nodeInfo: any ) => {
+                  // console.log(nodeInfo, "node information...")
                   if ( !nodeInfo ) return
 
                   this.nodes[ channel.remote_pubkey ] = nodeInfo
@@ -146,6 +149,7 @@ export default class ChannelsStore {
               )
             }
           } )
+          console.log(channels, "channels list!")
           this.channels = channels
           this.error = false
           this.loading = false
@@ -154,6 +158,23 @@ export default class ChannelsStore {
           this.getChannelsError()
         } )
     };
+
+    @action
+    public OpenChannel = async (request: any) => {
+      console.log(request, "open channel request")
+      let req = {
+        local_funding_amount: request.local_funding_amount,
+        min_confs: request.min_confs,
+        node_pubkey_string: request.node_pubkey_string,
+        private: request.private,
+        sat_per_byte: request.sat_per_byte
+      }
+      console.log(req, "+_+()")
+      await RESTUtils.openChannel(req)
+      .then((resp: any) => {
+          console.log(resp, "+_+_+_+_+_+")
+      })
+    }
 
     @action
     public closeChannel = (
@@ -206,7 +227,7 @@ export default class ChannelsStore {
           host: request.host
         }
       } )
-        .then( () => {
+        .then( (data: any) => {
           this.errorPeerConnect = false
           this.connectingToPeer = false
           this.errorMsgPeer = null
@@ -226,6 +247,7 @@ export default class ChannelsStore {
                     this.errorMsgPeer.includes( 'already' )
           ) {
             this.channelRequest = request
+            // console.log(request, "channel reqqquest")
           }
         } )
     };
@@ -269,7 +291,7 @@ export default class ChannelsStore {
         ...request
       }
 
-      console.log( openChanRequest )
+      console.log( openChanRequest, "openChanRequest action intro" )
 
       RESTUtils.openChannelStream( openChanRequest )
         .then( ( data: any ) => {
@@ -290,6 +312,8 @@ export default class ChannelsStore {
             sat_per_vbyte: Number( sat_per_byte )
           }
 
+          console.log(fundPsbtRequest, "partially signed transactions")
+
           RESTUtils.fundPsbt( fundPsbtRequest )
             .then( ( data: any ) => {
               console.log( 'fund' )
@@ -304,6 +328,8 @@ export default class ChannelsStore {
                 },
                 ...request
               }
+
+              console.log(openChanRequest, "open channel Request")
 
               RESTUtils.openChannel( openChanRequest )
                 .then( ( data: any ) => {
@@ -356,15 +382,17 @@ export default class ChannelsStore {
       this.peerSuccess = false
       this.channelSuccess = false
       this.openingChannel = true
-
+      console.log(this.settingsStore.implementation, "implementation", " and", request.utxos)
       if (
         this.settingsStore.implementation === 'lnd' &&
             request.utxos &&
             request.utxos.length > 0
       ) {
+        console.log(request, "openchannel action")
         return this.openChannelLNDCoinControl( request )
       }
 
+      console.log(request, "OpenChannel direct call")
       RESTUtils.openChannel( request )
         .then( ( data: any ) => {
           this.output_index = data.output_index

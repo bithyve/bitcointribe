@@ -169,6 +169,11 @@ export class AccountDetails extends Component {
                   mode
                 } )}
                 accountShell={accountShell}
+                onClickSettings={() => {
+                  this.props.navigation.navigate('SettingsScreen', {
+                    navigation: this.props.navigation,
+                  })
+                }}
               />
             </View>
           )
