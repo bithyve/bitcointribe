@@ -7,6 +7,10 @@ import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHe
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
 import SendScreen from '../../../pages/zeusLN/SendScreen'
+import SettingsScreen from '../../../pages/zeusLN/screens/SettingsScreen'
+import ChannelsListScreen from '../../../pages/zeusLN/screens/ChannelsListScreen'
+import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
+import ChannelOpenScreen from '../../../pages/zeusLN/screens/ChannelOpenScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
