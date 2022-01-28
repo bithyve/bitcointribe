@@ -24,12 +24,12 @@ export default class OpenChannelScreen extends Component {
     this.state = {
       node: props.navigation.getParam("node"),
       node_pubkey_string:
-        "02651acf4a7096091bf42baad19b3643ea318d6979f6dcc16ebaec43d5b0f4baf2",
+        "",
       local_funding_amount: "200000",
       min_confs: "1",
       sat_per_byte: "2",
       private: false,
-      host: "82.119.233.36:19735",
+      host: "",
       suggestImport: "",
       utxos: [],
       utxoBalance: 0,
