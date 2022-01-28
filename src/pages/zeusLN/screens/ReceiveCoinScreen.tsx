@@ -135,19 +135,6 @@ export default class ReceiveCoinScreen extends Component {
 
     return(
       <View>
-<<<<<<< HEAD
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            this.props.navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-=======
         {this.props.InvoicesStore.payment_request ? (
           <View style={styles.center}>
             <QRCode
@@ -158,7 +145,6 @@ export default class ReceiveCoinScreen extends Component {
             <CopyThisText
               backgroundColor={Colors.white}
               text={this.props.InvoicesStore.payment_request}
->>>>>>> 5da6a1e948b3bedc80eb7f055a9c63d90a52d43d
             />
           </View>
         ) : (
@@ -206,31 +192,6 @@ export default class ReceiveCoinScreen extends Component {
             )}
 
           </View>
-<<<<<<< HEAD
-        )}
-        {selectedIndex === 1 && (
-          <View style={styles.containerQrCode}>
-            {this.props.InvoicesStore.payment_request ? (
-              <QR
-                logo={require("../../../../src/assets/images/icons/icon_hexa.png")}
-                logoSize={50}
-                logoMargin={2}
-                logoBackgroundColor="white"
-                logoBorderRadius={50}
-                value={this.props.InvoicesStore.payment_request}
-                size={this.state.size}
-              />
-            ) : (
-              <Text>Loading..</Text>
-            )}
-            {this.state.title !== "" && (
-              <Text style={styles.textQr}>Lightning Address</Text>
-            )}
-          </View>
-        )}
-      </View>
-    );
-=======
         ) :
           <View style={styles.containerCenter}>
             {
@@ -248,7 +209,6 @@ export default class ReceiveCoinScreen extends Component {
         </View>
       </KeyboardAwareScrollView>
     )
->>>>>>> 5da6a1e948b3bedc80eb7f055a9c63d90a52d43d
   }
 }
 
