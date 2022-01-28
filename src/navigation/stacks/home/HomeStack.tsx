@@ -57,15 +57,11 @@ import Home from '../../../pages/Home/Home'
 import Header from '../Header'
 import Login from '../../../pages/Login'
 import { translations } from '../../../common/content/LocContext'
-<<<<<<< HEAD
 import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
 import SettingsScreen from '../../../pages/zeusLN/screens/SettingsScreen'
 import ChannelsListScreen from '../../../pages/zeusLN/screens/ChannelsListScreen'
 import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
 import ChannelOpenScreen from '../../../pages/zeusLN/screens/ChannelOpenScreen'
-=======
-
->>>>>>> 5da6a1e948b3bedc80eb7f055a9c63d90a52d43d
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -156,7 +152,6 @@ const HomeStack = createStackNavigator(
       },
     },
 
-<<<<<<< HEAD
     ReceiveCoinScreen: {
       screen: ReceiveCoinScreen,
       navigationOptions: {
@@ -191,8 +186,6 @@ const HomeStack = createStackNavigator(
         header: null
       }
     },
-=======
->>>>>>> 5da6a1e948b3bedc80eb7f055a9c63d90a52d43d
     // MoreOptions: {
     //   screen: MoreOptionsStack,
     //   navigationOptions: {
