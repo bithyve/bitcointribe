@@ -93,7 +93,7 @@ function* generateSecondaryAssets(){
   }
 }
 
-function* updateWalletWorker( { payload } ) {
+function* updateWalletNameWorker( { payload } ) {
   const { walletName }: { walletName: string } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
 
@@ -103,13 +103,12 @@ function* updateWalletWorker( { payload } ) {
   yield call( dbManager.updateWallet, {
     walletName,
   } )
-  yield call( dbManager.getWallet )
   yield put( updateWalletImageHealth( {
   } ) )
   yield put ( updateWalletNameToChannel() )
 }
 
-export const updateWalletWatcher = createWatcher( updateWalletWorker, UPDATE_WALLET_NAME )
+export const updateWalletNameWatcher = createWatcher( updateWalletNameWorker, UPDATE_WALLET_NAME )
 
 function* associateGiftWorker( { payload }: { payload: { giftId: string, accountId?: string } } ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts ) || {
