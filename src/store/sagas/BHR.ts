@@ -115,7 +115,9 @@ import {
   Accounts,
   AccountType,
   ContactDetails,
-  Gift
+  Gift,
+  Account,
+  MultiSigAccount
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -125,7 +127,7 @@ import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
-import { restoreAccountShells, updateAccountShells, setGifts } from '../actions/accounts'
+import { restoreAccountShells, updateAccountShells, setGifts, twoFAValid } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
@@ -555,15 +557,25 @@ function* recoverWalletWorker( { payload } ) {
       }
     }
     const accounts = image.accounts
-    const acc = []
+    const acc: Account[] = []
     const accountData = {
     }
 
     const decryptionKey = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
     Object.keys( accounts ).forEach( ( key ) => {
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
-      accountData[ JSON.parse( decryptedData ).type ] = JSON.parse( decryptedData ).id
-      acc.push( JSON.parse( decryptedData ) )
+      const account: Account | MultiSigAccount = JSON.parse( decryptedData )
+      accountData[ account.type ] = account.id
+
+      if([AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT].includes(account.type)){ // patch: fixes multisig account restore, being restored from a missing 2FA-flag backup(version < 2.0.69)
+        if((account as MultiSigAccount).xpubs && (account as MultiSigAccount).xpubs.secondary){ // level-2 activated multisig account found
+          if(!(account as MultiSigAccount).is2FA){ // faulty backup found
+            (account as MultiSigAccount).is2FA = true 
+          }
+        }
+      }
+
+      acc.push( account )
     } )
 
     let secondaryXpub, details2FA
@@ -572,6 +584,12 @@ function* recoverWalletWorker( { payload } ) {
       const decrypted2FADetails = JSON.parse( decryptedData )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
+      if(details2FA && details2FA.twoFAValidated) yield put(twoFAValid(true))
+    }
+
+    let smShare
+    if(image.SM_share){
+     smShare = BHROperations.decryptWithAnswer( image.SM_share, decryptionKey ).decryptedData
     }
 
     // Update Wallet
@@ -589,7 +607,8 @@ function* recoverWalletWorker( { payload } ) {
       version: DeviceInfo.getVersion(),
       primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
       secondaryXpub,
-      details2FA
+      details2FA,
+      smShare
     }
     // restore Contacts
     if( image.contacts ) {
@@ -772,12 +791,12 @@ function* updateWalletImageWorker( { payload } ) {
   if( updateSmShare ) {
     walletImage.SM_share = BHROperations.encryptWithAnswer( wallet.smShare, encryptionKey ).encryptedData
   }
-  if( update2fa && wallet.secondaryXpub ) {
+  if( update2fa) {
     const details2FA = {
       secondaryXpub: wallet.secondaryXpub,
-      ...wallet.details2FA
+      details2FA: wallet.details2FA
     }
-    walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify( details2FA ), encryptionKey ).encryptedData
+    walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify(details2FA), encryptionKey ).encryptedData
   }
   if( updateAccounts && accountIds.length > 0 ) {
     const accounts: Accounts = yield select( state => state.accounts.accounts )
