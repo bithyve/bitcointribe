@@ -5,11 +5,18 @@ import LNAccountDetails from '../../../pages/zeusLN/AccountDetails'
 import ViewAllScreen from '../../../pages/zeusLN/ViewAllScreen'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+import ReceiveCoinScreen from '../../../pages/zeusLN/screens/ReceiveCoinScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
     AccountDetailsRoot: LNAccountDetails,
-    ViewAll: ViewAllScreen
+    ViewAll: ViewAllScreen,
+    ReceiveCoin:{
+      screen: ReceiveCoinScreen,
+      navigationOptions: {
+        title: 'Receive'
+      }
+    }
   },
   {
     initialRouteName: 'AccountDetailsRoot',

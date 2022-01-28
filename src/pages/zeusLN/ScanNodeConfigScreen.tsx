@@ -6,17 +6,12 @@ import {
   SafeAreaView,
   Text,
   StatusBar,
-  TextInput,
-  KeyboardAvoidingView,
   ScrollView,
-  Image,
-  TouchableWithoutFeedback
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
@@ -28,7 +23,6 @@ import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCod
 import BottomInfoBox from '../../components/BottomInfoBox'
 import LndConnectUtils from './../../utils/ln/LndConnectUtils'
 import Toast from '../../components/Toast'
-
 
 const styles = StyleSheet.create( {
   viewContainer: {

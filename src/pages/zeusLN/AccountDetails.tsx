@@ -1,21 +1,11 @@
-import React, { Component, ReactElement } from 'react'
-import { Text, View, SectionList, StyleSheet, RefreshControl, FlatList, ActivityIndicator, StatusBar, } from 'react-native'
-import { Button } from 'react-native-elements/dist/buttons/Button'
-import RESTUtils from '../../utils/ln/RESTUtils'
-import axios from 'axios'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
-import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import TransactionListComponent from './components/transactions/TransactionListComponent'
-import RNFetchBlob from 'rn-fetch-blob'
+import React, { Component } from 'react'
+import { View, SectionList, StyleSheet, RefreshControl, StatusBar, } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
-import Transaction from '../../models/Transaction'
-import { sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { connect } from 'react-redux'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import  BitcoinUnit from '../../common/data/enums/BitcoinUnit'
@@ -23,8 +13,6 @@ import { inject, observer } from 'mobx-react'
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
-import AccountDetailsCard from './components/AccountDetailsCard'
-import TransactionPreviewHeader from '../../pages/Accounts/Details/TransactionPreviewHeader'
 import TransactionList from './components/TransactionsList'
 import InvoicesList from './components/InvoicesList'
 import AccountCard from './components/AccountCard'
@@ -62,12 +50,12 @@ export class AccountDetails extends Component {
   }
 
 
-  onReceiveButtonPress = (size:any, title:string, node:any) => {
-    this.props.navigation.navigate('ReceiveCoinScreen', {
+  onReceiveButtonPress = ( size:any, title:string, node:any ) => {
+    this.props.navigation.navigate( 'ReceiveCoin', {
       size,
       title,
       node
-    })
+    } )
   }
 
   async UNSAFE_componentWillMount() {
@@ -233,7 +221,7 @@ export class AccountDetails extends Component {
                   }}
                   onReceivePressed={() => {
                     this.onReceiveButtonPress(
-                      hp('27%'),
+                      hp( '27%' ),
                       'lightning',
                       this.state.node
                     )
