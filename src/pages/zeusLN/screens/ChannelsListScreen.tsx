@@ -70,7 +70,7 @@ export default class ChannelScreen extends Component {
   };
 
   render() {
-    console.log(this.props.ChannelsStore.channels, "channels..!!");
+    console.log(this.props.ChannelsStore.totalOutbound, "\n----", this.props.ChannelsStore.totalInbound, "\n---", this.props.ChannelsStore.totalOffline)
     return (
       <View>
         <Button
@@ -79,6 +79,11 @@ export default class ChannelScreen extends Component {
             this.props.navigation.navigate("ChannelOpenScreen");
           }}
         />
+        <View>
+          <Text>Total Inbound : {this.props.ChannelsStore.totalOutbound}</Text>
+          <Text>Total Outbound: {this.props.ChannelsStore.totalInbound}</Text>
+          <Text>Total Outbound: {this.props.ChannelsStore.totalOffline}</Text>
+        </View>
         {this.props.ChannelsStore.loading ? (
           <Text>Loading...</Text>
         ) : (

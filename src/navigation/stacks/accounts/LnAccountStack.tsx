@@ -27,17 +27,17 @@ const AccountDetailsStack = createStackNavigator(
         },
       }
     },
-    SendScreen: {
-      screen: SendScreen,
-      navigationOptions: {
-        title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
+    // SendScreen: {
+    //   screen: SendScreen,
+    //   navigationOptions: {
+    //     title: '',
+    //     headerStyle:{
+    //       elevation: 0,
+    //       shadowOpacity: 0,
+    //       borderBottomWidth: 0,
+    //     },
+    //   }
+    // },
 
     SettingsScreen: {
       screen: SettingsScreen,
