@@ -82,7 +82,7 @@ export default class ChannelScreen extends Component {
         <View>
           <Text>Total Inbound : {this.props.ChannelsStore.totalOutbound}</Text>
           <Text>Total Outbound: {this.props.ChannelsStore.totalInbound}</Text>
-          <Text>Total Outbound: {this.props.ChannelsStore.totalOffline}</Text>
+          <Text>Total offline: {this.props.ChannelsStore.totalOffline}</Text>
         </View>
         {this.props.ChannelsStore.loading ? (
           <Text>Loading...</Text>

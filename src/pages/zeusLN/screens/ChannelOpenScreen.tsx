@@ -17,16 +17,40 @@ export default class OpenChannelScreen extends Component {
         super(props)
         this.state = {
             node: props.navigation.getParam('node'),
-            node_pubkey_string: '',
-            local_funding_amount: '',
+            node_pubkey_string: '0296e20fa99d2940b8b00117e65d27003f0d8f81a0c960f71a5466d1aadf5ea5ea',
+            local_funding_amount: '200000',
             min_confs: '1',
             sat_per_byte: '2',
             private: false,
-            host: '',
+            host: '69.59.18.201:9735',
             suggestImport: '',
             utxos: [],
             utxoBalance: 0
         }
+    }
+
+
+    connectPeer = (request: any) => {
+        if(request.node_pubkey_string.trim() === "" || request.host.trim() === "") {
+            Toast("All Fields Are Compulsory")
+            return
+        }
+        if(isNaN(request.min_confs) || isNaN (request.local_funding_amount) || isNaN(request.sat_per_byte)) {
+            Toast("All Fields Are Compulsory")
+            return
+        }
+
+        let finalRequest = {
+            node_pubkey_string: this.state.node_pubkey_string,
+            sat_per_byte: parseInt (this.state.sat_per_byte),
+            min_confs: parseInt( this.state.min_confs),
+            private: this.state.private,
+            local_funding_amount: this.state.local_funding_amount,
+            host: this.state.host
+        }
+        this.props.ChannelsStore.connectPeer(finalRequest)
+        this.props.navigation.goBack()
+        Toast('Channel Opening Initiated')
     }
 
     render() {
@@ -37,7 +61,7 @@ export default class OpenChannelScreen extends Component {
               <View style = {{
             margin: 5
           }}>
-            <View style={styles.viewSectionContainer}>
+            {/* <View style={styles.viewSectionContainer}>
                 <CoveredQRCodeScanner
                   containerStyle={styles.qrScannerContainer}
                   onCodeScanned = {(data)=> {
@@ -46,7 +70,7 @@ export default class OpenChannelScreen extends Component {
                   }
                 }
                 />
-              </View>
+              </View> */}
           </View>
             <TextInput 
             onChangeText={(val) => {
@@ -93,17 +117,15 @@ export default class OpenChannelScreen extends Component {
             <Button 
             title='open channel'
             onPress = {() => {
-                let req = {
-                    min_confs: parseInt( this.state.min_confs),
+                let request = {
                     node_pubkey_string: this.state.node_pubkey_string,
                     sat_per_byte: parseInt (this.state.sat_per_byte),
+                    min_confs: parseInt( this.state.min_confs),
                     private: this.state.private,
                     local_funding_amount: this.state.local_funding_amount,
                     host: this.state.host
                 }
-                this.props.ChannelsStore.connectPeer(req)
-                this.props.navigation.goBack()
-                Toast('Channel Opening Initiated')
+                this.connectPeer(request)
                 // console.log(typeof parseInt (this.state.min_confs))
             }}/>
           </View>

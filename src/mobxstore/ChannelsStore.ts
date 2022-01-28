@@ -60,9 +60,8 @@ export default class ChannelsStore {
         () => {
           if ( this.channelRequest ) {
             const chanReq = new OpenChannelRequest( this.channelRequest )
-            console.log(chanReq, "+++++++")
-            // this.openChannel( chanReq )
-            this.OpenChannel(chanReq)
+            this.openChannel( chanReq )
+            // this.OpenChannel(chanReq)
           }
         }
       )
@@ -159,6 +158,7 @@ export default class ChannelsStore {
         } )
     };
 
+    // used it for debugging
     @action
     public OpenChannel = async (request: any) => {
       console.log(request, "open channel request")
@@ -172,7 +172,6 @@ export default class ChannelsStore {
       console.log(req, "+_+()")
       await RESTUtils.openChannel(req)
       .then((resp: any) => {
-          console.log(resp, "+_+_+_+_+_+")
       })
     }
 
@@ -247,7 +246,6 @@ export default class ChannelsStore {
                     this.errorMsgPeer.includes( 'already' )
           ) {
             this.channelRequest = request
-            // console.log(request, "channel reqqquest")
           }
         } )
     };
@@ -391,9 +389,14 @@ export default class ChannelsStore {
         console.log(request, "openchannel action")
         return this.openChannelLNDCoinControl( request )
       }
-
-      console.log(request, "OpenChannel direct call")
-      RESTUtils.openChannel( request )
+      let req = {
+        local_funding_amount: request.local_funding_amount,
+        min_confs: request.min_confs,
+        node_pubkey_string: request.node_pubkey_string,
+        private: request.private,
+        sat_per_byte: request.sat_per_byte
+      }
+      RESTUtils.openChannel( req )
         .then( ( data: any ) => {
           this.output_index = data.output_index
           this.funding_txid_str = data.funding_txid_str

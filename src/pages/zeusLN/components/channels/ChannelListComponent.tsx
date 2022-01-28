@@ -16,18 +16,27 @@ export default class ChannelList extends Component {
   render() {
     return (
       <View>
+        <Text>Channel Name</Text>
         <View style = {{
           flex: 2,
           justifyContent: 'space-around',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           margin: 5
         }}>
+          {this.props.params.active? 
+          <View  style = {{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'row',
+            margin: 5
+          }}>
           <View>
-            <Text>localBalance: {this.props.params.local_balance}</Text>
+            <Text>Local: {this.props.params.local_balance}</Text>
           </View>
           <View>
-            <Text>remoteBalance: {this.props.params.remote_balance}</Text>
+            <Text>Remote: {this.props.params.remote_balance}</Text>
           </View>
+          </View>: <Text>Offline: {this.props.params.remote_balance + this.props.params.local_balance}</Text>}
         </View>
 
         <View style={{
