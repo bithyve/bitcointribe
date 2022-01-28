@@ -36,7 +36,7 @@ export default class ChannelList extends Component {
           <View>
             <Text>Remote: {this.props.params.remote_balance}</Text>
           </View>
-          </View>: <Text>Offline: {this.props.params.remote_balance + this.props.params.local_balance}</Text>}
+          </View>: <Text>Offline: { parseInt (this.props.params.remote_balance) + parseInt(this.props.params.local_balance)}</Text>}
         </View>
 
         <View style={{
