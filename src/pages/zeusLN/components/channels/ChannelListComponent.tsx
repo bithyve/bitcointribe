@@ -16,7 +16,7 @@ export default class ChannelList extends Component {
   render() {
     return (
       <View>
-        <Text>Channel Name</Text>
+        <Text>Alias</Text>
         <View style = {{
           flex: 2,
           justifyContent: 'space-around',
