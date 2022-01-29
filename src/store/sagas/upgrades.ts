@@ -1,10 +1,12 @@
-import { AccountType, MultiSigAccount } from '../../bitcoin/utilities/Interface'
+import { AccountType, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountSettings, updateAccountShells } from '../actions/accounts'
 import { call, put, select } from 'redux-saga/effects'
 import { AccountsState } from '../reducers/accounts'
 import dbManager from '../../storage/realm/dbManager'
+import { updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
+import { updateWallet } from '../actions/storage'
 
 export function* testAccountEnabler( ) {
   const accountShells: AccountShell[] = yield select(
@@ -50,11 +52,11 @@ export function* restoreMultiSigTwoFAFlag( ) {
     ( state ) => state.accounts
   )
 
-  for( const account of Object.values(accountsState.accounts) ){
-    if([AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT].includes(account.type)){ 
-      if((account as MultiSigAccount).xpubs && (account as MultiSigAccount).xpubs.secondary){ // level-2 activated multisig account found
-        if(!(account as MultiSigAccount).is2FA){ // faulty multisig account: missing is2FA flag
-          (account as MultiSigAccount).is2FA = true 
+  for( const account of Object.values( accountsState.accounts ) ){
+    if( [ AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( account.type ) ){
+      if( ( account as MultiSigAccount ).xpubs && ( account as MultiSigAccount ).xpubs.secondary ){ // level-2 activated multisig account found
+        if( !( account as MultiSigAccount ).is2FA ){ // faulty multisig account: missing is2FA flag
+          ( account as MultiSigAccount ).is2FA = true
 
           yield put( updateAccountShells( {
             accounts: {
@@ -64,6 +66,35 @@ export function* restoreMultiSigTwoFAFlag( ) {
           yield call( dbManager.updateAccount, account.id, account )
         }
       }
+    }
+  }
+}
+
+
+export function* restoreManageBackupDataPipeline( ) {
+  // restores critical variables from realm database to appropriate reducers
+
+  const s3 = yield call( dbManager.getMetaShares )   // legacy access(directly from realm)
+  if( s3 ){
+    if( s3.metaSharesKeeper ){
+      const MetaShares: MetaShare[] =  [ ...s3.metaSharesKeeper ]
+      yield put( updateMetaSharesKeeper( MetaShares ) )
+    }
+    if( s3.oldMetaSharesKeeper ){
+      const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
+      yield put( updateOldMetaSharesKeeper( OldMetaShares ) )
+    }
+  }
+
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  if( !wallet.smShare ){
+    const smShare = yield call( dbManager.getSecondaryMnemonicShare )
+    if( smShare ){
+      yield put( updateWallet( {
+        ...wallet,
+        smShare,
+      }
+      ) )
     }
   }
 }

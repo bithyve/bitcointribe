@@ -41,7 +41,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
 import semverLte from 'semver/functions/lte'
-import { accountVisibilityResetter, restoreMultiSigTwoFAFlag, testAccountEnabler } from './upgrades'
+import { accountVisibilityResetter, restoreManageBackupDataPipeline, restoreMultiSigTwoFAFlag, testAccountEnabler } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
@@ -281,6 +281,7 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
   if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
   if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
+  if( semver.lt( storedVersion, '2.0.70' ) ) yield call( restoreManageBackupDataPipeline )
 
   // update wallet version
   yield put( updateWallet( {
