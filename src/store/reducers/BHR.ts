@@ -44,7 +44,7 @@ import {
   UPDATE_META_SHARES_KEEPER,
   UPDATE_OLD_META_SHARES_KEEPER,
   SET_IS_CURRENT_LEVEL0,
-  PDF_UPGRADE
+  PDF_UPGRADE,
   SET_PASSWORD_RESET_STATE,
 } from '../actions/BHR'
 
@@ -86,8 +86,6 @@ const initialState: {
     levelInfo: LevelInfo[];
   }[];
   keeperInfo: KeeperInfoInterface[];
-  metaSharesKeeper: MetaShare[];
-  oldMetaSharesKeeper: MetaShare[];
   shares: any;
   metaSharesKeeper: MetaShare[];
   oldMetaSharesKeeper: MetaShare[];
