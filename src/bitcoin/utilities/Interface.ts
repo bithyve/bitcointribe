@@ -852,7 +852,6 @@ export interface Wallet {
     [accountType: string]: string[] // array of accountIds
   },
   version: string,
-  smShare?: string,
 }
 
 export interface Account {
