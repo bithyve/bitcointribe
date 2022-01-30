@@ -41,7 +41,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
 import semverLte from 'semver/functions/lte'
-import { accountVisibilityResetter, restoreMultiSigTwoFAFlag, testAccountEnabler } from './upgrades'
+import { accountVisibilityResetter, restoreManageBackupDataPipeline, restoreMultiSigTwoFAFlag, testAccountEnabler } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
@@ -154,21 +154,13 @@ function* resetPasswordWorker( { payload } ) {
 
 
 function* credentialsAuthWorker( { payload } ) {
-  console.log( payload.passcode )
-  console.clear()
   // let t = timer('credentialsAuthWorker')
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
   try {
     const hash = yield call( Cipher.hash, payload.passcode )
-    console.log( 'hash', hash )
-
     const encryptedKey = yield call( SecureStore.fetch, hash )
-    console.log( 'encryptedKey', encryptedKey )
-
     key = yield call( Cipher.decrypt, encryptedKey, hash )
-    console.log( 'key', key )
-
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
@@ -276,20 +268,16 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   const wallet: Wallet = yield select( state => state.storage.wallet )
   const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
   const storedVersion = wallet.version
-
-
-  if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
-  if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
-  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
-
   // update wallet version
   yield put( updateWallet( {
     ...wallet,
     version: newVersion
   } ) )
-  yield call( dbManager.updateWallet, {
-    version: newVersion
-  } )
+
+  if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
+  if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
+  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
+  if( semver.lt( storedVersion, '2.0.70' ) ) yield call( restoreManageBackupDataPipeline )
 
   // update permanent channels w/ new version
   const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
