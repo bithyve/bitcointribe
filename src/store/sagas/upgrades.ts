@@ -2,7 +2,7 @@ import { AccountType, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/u
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountSettings, updateAccountShells } from '../actions/accounts'
-import { call, put, select } from 'redux-saga/effects'
+import { call, delay, put, select } from 'redux-saga/effects'
 import { AccountsState } from '../reducers/accounts'
 import dbManager from '../../storage/realm/dbManager'
 import { updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
@@ -73,7 +73,7 @@ export function* restoreMultiSigTwoFAFlag( ) {
 
 export function* restoreManageBackupDataPipeline( ) {
   // restores critical variables from realm database to appropriate reducers
-
+  yield delay( 2000 ) // delaying so that realm initializes properly
   const s3 = yield call( dbManager.getMetaShares )   // legacy access(directly from realm)
   if( s3 ){
     if( s3.metaSharesKeeper ){
@@ -90,11 +90,12 @@ export function* restoreManageBackupDataPipeline( ) {
   if( !wallet.smShare ){
     const smShare = yield call( dbManager.getSecondaryMnemonicShare )
     if( smShare ){
-      yield put( updateWallet( {
+      const updatedWallet =  {
         ...wallet,
         smShare,
       }
-      ) )
+      yield put( updateWallet( updatedWallet ) )
+      yield call( dbManager.updateWallet, updatedWallet )
     }
   }
 }
