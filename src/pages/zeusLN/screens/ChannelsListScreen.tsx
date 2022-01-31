@@ -54,10 +54,14 @@ export default class ChannelScreen extends Component {
         onPress={() => {
           this.props.navigation.navigate("ChannelInfoScreen", {
             channelInfo: item,
+
           });
         }}
       >
-        <ChannelItem params={item} />
+        <ChannelItem 
+        channelParams={item}
+        alias = {this.props.ChannelsStore.aliasesById[item.chan_id] ? this.props.ChannelsStore.aliasesById[item.chan_id] : item.chan_id}
+         />
         <View
           style={{
             borderBottomWidth: 1,

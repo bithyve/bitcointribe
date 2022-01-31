@@ -158,7 +158,7 @@ export default class ChannelsStore {
         } )
     };
 
-    // used it for debugging
+    // used it while debugging
     @action
     public OpenChannel = async (request: any) => {
       console.log(request, "open channel request")
@@ -389,6 +389,9 @@ export default class ChannelsStore {
         console.log(request, "openchannel action")
         return this.openChannelLNDCoinControl( request )
       }
+
+    // opening channel request data had unrecognised fields (id) because of OpenChannelRequest class.. 
+    // so lnd was throwing error, hence created a separate request and added only required fields.
       let req = {
         local_funding_amount: request.local_funding_amount,
         min_confs: request.min_confs,
