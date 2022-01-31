@@ -18,7 +18,7 @@ export function makeAddressRecipientDescription( { address, }: AddressRecipientF
   return {
     id: address,
     kind: RecipientKind.ADDRESS,
-    displayedName: '@',
+    displayedName: 'External Address',
     avatarImageSource: null,
   }
 }
