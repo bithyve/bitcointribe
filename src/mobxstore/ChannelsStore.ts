@@ -182,7 +182,6 @@ export default class ChannelsStore {
       satPerByte?: string | null,
       forceClose?: boolean | string | null
     ) => {
-      this.loading = true
 
       let urlParams: Array<any> = []
       if ( channelId ) {
@@ -209,7 +208,6 @@ export default class ChannelsStore {
           const { chan_close } = data
           this.closeChannelSuccess = chan_close.success
           this.error = false
-          this.loading = false
         } )
         .catch( () => {
           this.getChannelsError()

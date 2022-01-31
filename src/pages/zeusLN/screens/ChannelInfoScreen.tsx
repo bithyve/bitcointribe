@@ -1,6 +1,6 @@
 import { inject, observer } from "mobx-react";
 import React, { Component } from "react";
-import { Text, View, Button } from "react-native";
+import { Text, View, Button, TextInput } from "react-native";
 import Toast from "../../../components/Toast";
 @inject("ChannelsStore")
 @observer
@@ -9,6 +9,8 @@ export default class ChannelInfoScreen extends Component {
     super(props);
     this.state = {
       channelInfo: this.props.navigation.getParam("channelInfo"),
+      feeForm: false,
+      feeValue: null
     };
   }
 
@@ -102,10 +104,32 @@ export default class ChannelInfoScreen extends Component {
           >
             <Button
               title="keysend"
+              onPress={() => {}
+            />
+          </View>
+
+
+          <View
+            style={{
+              margin: 10,
+            }}
+          >
+            <Button
+              title="set fees"
               onPress={() => {
-                console.log("keysend");
+                if(this.state.feeForm) {
+                  this.setState({feeValue: null})
+                }
+                this.setState({feeForm: !this.state.feeForm})
               }}
             />
+            {this.state.feeForm && (<TextInput
+            placeholder = {'fees'}
+            keyboardType="numeric"
+            onChangeText={(value) => {
+              this.setState({feeValue: value})
+            }}
+            />)}
           </View>
 
           <View
@@ -119,7 +143,7 @@ export default class ChannelInfoScreen extends Component {
                 this.closeChannel(
                   this.state.channelInfo.channel_point,
                   null,
-                  null,
+                  this.state.feeValue,
                   true
                 );
               }}
