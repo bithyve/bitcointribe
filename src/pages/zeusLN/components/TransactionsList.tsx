@@ -49,7 +49,8 @@ type Props = {
     onViewMorePressed: () => void;
     transactions: Transaction [],
     accountShellId: string,
-    loading: boolean
+    loading: boolean,
+    navigation: any
 }
 
 const TransactionsList: React.FC<Props> = ( {
@@ -58,7 +59,8 @@ const TransactionsList: React.FC<Props> = ( {
   onViewMorePressed,
   transactions,
   accountShellId,
-  loading
+  loading,
+  navigation
 }:Props ) => {
   const strings  = translations[ 'accounts' ]
 
@@ -71,7 +73,9 @@ const TransactionsList: React.FC<Props> = ( {
   const renderItem = ( { item: transaction, } : {
     item: Transaction;
   } ) => {
-    return ( <TransactionItem transaction={transaction} accountShellId={accountShellId}/>
+    return ( <TransactionItem
+      navigation = {navigation}
+      transaction={transaction} accountShellId={accountShellId}/>
     )
   }
 

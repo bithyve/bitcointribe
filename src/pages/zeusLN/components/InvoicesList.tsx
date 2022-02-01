@@ -39,7 +39,8 @@ const styles = StyleSheet.create( {
   },
 
   activityIndicator: {
-    paddingVertical: 40
+    paddingVertical: 40,
+    color: 'grey'
   }
 } )
 
@@ -49,7 +50,8 @@ type Props = {
     onViewMorePressed: () => void;
     invoices: Invoice [],
     accountShellId: string,
-    loading: boolean
+    loading: boolean,
+    navigation: any
 }
 
 const TransactionsList: React.FC<Props> = ( {
@@ -58,7 +60,8 @@ const TransactionsList: React.FC<Props> = ( {
   onViewMorePressed,
   invoices,
   accountShellId,
-  loading
+  loading,
+  navigation
 }:Props ) => {
   const strings  = translations[ 'accounts' ]
 
@@ -71,7 +74,9 @@ const TransactionsList: React.FC<Props> = ( {
   const renderItem = ( { item: invoice, } : {
     item: Invoice;
   } ) => {
-    return ( <InvoiceItem invoice={invoice} accountShellId={accountShellId}/>
+    return ( <InvoiceItem 
+      navigation = {navigation}
+      invoice={invoice} accountShellId={accountShellId}/>
     )
   }
 
