@@ -77,9 +77,9 @@ const AccountCard = ( {
   ).current
 
   return (
-    <View style={ {
+    <View style={{
       marginTop: 200
-    } }>
+    }}>
       {/* <AccountDetailsCard
         onKnowMorePressed={()=> {}}
         onSettingsPressed={onClickSettings}
