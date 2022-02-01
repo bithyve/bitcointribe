@@ -13,6 +13,8 @@ import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
 import ChannelOpenScreen from '../../../pages/zeusLN/screens/ChannelOpenScreen'
 import PayInvoiceScreen from '../../../pages/zeusLN/PayInvoiceScreen'
 import PaymentsScreen from '../../../pages/zeusLN/PaymentsScreen'
+import InvoiceDetailsScreen from '../../../pages/zeusLN/screens/InvoiceDetailsScreen'
+import TransactionDetailsScreen from '../../../pages/zeusLN/screens/TransactionDetailsScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -96,6 +98,20 @@ const AccountDetailsStack = createStackNavigator(
           shadowOpacity: 0,
           borderBottomWidth: 0,
         },
+      }
+    },
+
+    InvoiceDetailsScreen: {
+      screen: InvoiceDetailsScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+
+    TransactionDetailsScreen: {
+      screen: TransactionDetailsScreen,
+      navigationOptions: {
+        header: null
       }
     },
 

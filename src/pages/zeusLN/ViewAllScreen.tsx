@@ -27,7 +27,9 @@ const ViewAllScreen = inject(
             //keyExtractor={keyExtractor}
             renderItem={( { item: invoice, } : {
             item;
-          } ) => <InvoiceItem invoice={invoice} />}
+          } ) => <InvoiceItem 
+          navigation = {navigation}
+          invoice={invoice} />}
           />:
           <FlatList
             bounces={false}
@@ -35,7 +37,8 @@ const ViewAllScreen = inject(
             //keyExtractor={keyExtractor}
             renderItem={( { item: transaction, } : {
             item;
-          } ) => <TransactionItem transaction={transaction} accountShellId={accountShellId}/>}
+          } ) => <TransactionItem           navigation = {navigation}
+          transaction={transaction} accountShellId={accountShellId}/>}
           />
       }
 

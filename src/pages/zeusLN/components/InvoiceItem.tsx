@@ -81,12 +81,14 @@ type Props = {
     invoice: Invoice,
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind | null;
+  navigation: any
 }
 
 const TransactionItem = ( {
   invoice,
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
+  navigation
 }: Props ) => {
 
   const transactionKindIconColor = useMemo( () => {
@@ -103,7 +105,11 @@ const TransactionItem = ( {
 
   return (
     <TouchableOpacity
-      onPress={() => {}}
+      onPress={() => {
+        navigation.navigate('InvoiceDetailsScreen', {
+          invoice
+        })
+      }}
     >
       <ListItem containerStyle={{
         backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )

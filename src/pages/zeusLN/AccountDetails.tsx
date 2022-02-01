@@ -189,6 +189,7 @@ export class AccountDetails extends Component {
                       invoices={invoices.slice( 0, 3 )}
                       accountShellId={this.state.accountShellID}
                       loading={loadingInvoices}
+                      navigation={this.props.navigation}
                     />:
                     <TransactionList
                       availableBalance={totalBlockchainBalance}
@@ -200,6 +201,7 @@ export class AccountDetails extends Component {
                       transactions={transactions.slice( 0, 3 )}
                       accountShellId={this.state.accountShellID}
                       loading={loadingTransactions}
+                      navigation={this.props.navigation}
                     />
                 }
 
