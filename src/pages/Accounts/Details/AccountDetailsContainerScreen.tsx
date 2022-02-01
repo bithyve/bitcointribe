@@ -418,10 +418,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && (
           <ModalContainer
             onBackground={()=>{
-              setSecureAccountAlert( false )
-              setTimeout( () => {
-                setSecureAccountAlert( true )
-              }, 200 )
+              if( !AllowSecureAccount ){
+                setSecureAccountAlert( false )
+                setTimeout( () => {
+                  setSecureAccountAlert( true )
+                }, 200 )
+              }
             }}
             visible={secureAccountAlert} closeBottomSheet={() => {
 
