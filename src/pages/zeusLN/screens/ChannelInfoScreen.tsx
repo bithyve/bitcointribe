@@ -1,17 +1,17 @@
-import { inject, observer } from "mobx-react";
-import React, { Component } from "react";
-import { Text, View, Button, TextInput } from "react-native";
-import Toast from "../../../components/Toast";
-@inject("ChannelsStore")
+import { inject, observer } from 'mobx-react'
+import React, { Component } from 'react'
+import { Text, View, Button, TextInput } from 'react-native'
+import Toast from '../../../components/Toast'
+@inject( 'ChannelsStore' )
 @observer
 export default class ChannelInfoScreen extends Component {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
     this.state = {
-      channelInfo: this.props.navigation.getParam("channelInfo"),
+      channelInfo: this.props.navigation.getParam( 'channelInfo' ),
       feeForm: false,
       feeValue: null
-    };
+    }
   }
 
   closeChannel = (
@@ -20,34 +20,38 @@ export default class ChannelInfoScreen extends Component {
     satPerByte?: string | null,
     forceClose?: boolean | null
   ) => {
-    const { ChannelsStore, navigation } = this.props;
+    const { ChannelsStore, navigation } = this.props
 
     // lnd
-    if (channelPoint) {
-      const [funding_txid_str, output_index] = channelPoint.split(":");
+    if ( channelPoint ) {
+      const [ funding_txid_str, output_index ] = channelPoint.split( ':' )
 
-      if (satPerByte) {
+      if ( satPerByte ) {
         ChannelsStore.closeChannel(
-          { funding_txid_str, output_index },
+          {
+            funding_txid_str, output_index
+          },
           null,
           satPerByte,
           forceClose
-        );
+        )
       } else {
         ChannelsStore.closeChannel(
-          { funding_txid_str, output_index },
+          {
+            funding_txid_str, output_index
+          },
           null,
           null,
           forceClose
-        );
+        )
       }
-    } else if (channelId) {
+    } else if ( channelId ) {
       // c-lightning, eclair
-      ChannelsStore.closeChannel(null, channelId, satPerByte, forceClose);
+      ChannelsStore.closeChannel( null, channelId, satPerByte, forceClose )
     }
 
-    this.props.navigation.goBack();
-    Toast("Channel Close Intitiated");
+    this.props.navigation.goBack()
+    Toast( 'Channel Close Intitiated' )
   };
 
   render() {
@@ -56,15 +60,15 @@ export default class ChannelInfoScreen extends Component {
         style={{
           margin: 10,
           flex: 1,
-          flexDirection: "column",
+          flexDirection: 'column',
         }}
       >
         <View
           style={{
             flex: 1,
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <Text>{this.state.channelInfo.remote_pubkey}</Text>
@@ -79,22 +83,22 @@ export default class ChannelInfoScreen extends Component {
         <View
           style={{
             flex: 1,
-            flexDirection: "column",
-            justifyContent: "space-around",
+            flexDirection: 'column',
+            justifyContent: 'space-around',
           }}
         >
           <Text>
-            status: {this.state.channelInfo.active ? "active" : "inactive"}
+            status: {this.state.channelInfo.active ? 'active' : 'inactive'}
           </Text>
           <Text>
-            private: {this.state.channelInfo.private ? "true" : "false"}
+            private: {this.state.channelInfo.private ? 'true' : 'false'}
           </Text>
         </View>
         <View
           style={{
             flex: 1,
-            flexDirection: "column",
-            justifyContent: "flex-end",
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
           }}
         >
           <View
@@ -104,7 +108,7 @@ export default class ChannelInfoScreen extends Component {
           >
             <Button
               title="keysend"
-              onPress={() => {}
+              onPress={() => {}}
             />
           </View>
 
@@ -117,19 +121,25 @@ export default class ChannelInfoScreen extends Component {
             <Button
               title="set fees"
               onPress={() => {
-                if(this.state.feeForm) {
-                  this.setState({feeValue: null})
+                if( this.state.feeForm ) {
+                  this.setState( {
+                    feeValue: null
+                  } )
                 }
-                this.setState({feeForm: !this.state.feeForm})
+                this.setState( {
+                  feeForm: !this.state.feeForm
+                } )
               }}
             />
-            {this.state.feeForm && (<TextInput
-            placeholder = {'fees'}
-            keyboardType="numeric"
-            onChangeText={(value) => {
-              this.setState({feeValue: value})
-            }}
-            />)}
+            {this.state.feeForm && ( <TextInput
+              placeholder = {'fees'}
+              keyboardType="numeric"
+              onChangeText={( value ) => {
+                this.setState( {
+                  feeValue: value
+                } )
+              }}
+            /> )}
           </View>
 
           <View
@@ -145,12 +155,12 @@ export default class ChannelInfoScreen extends Component {
                   null,
                   this.state.feeValue,
                   true
-                );
+                )
               }}
             />
           </View>
         </View>
       </View>
-    );
+    )
   }
 }

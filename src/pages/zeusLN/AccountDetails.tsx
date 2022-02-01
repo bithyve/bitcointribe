@@ -217,7 +217,7 @@ export class AccountDetails extends Component {
               <View style={styles.footerSection}>
                 <SendAndReceiveButtonsFooter
                   onSendPressed={() => {
-                    //this.onSendButtonPress()
+                    this.props.navigation.navigate( 'SendScreen' )
                   }}
                   onReceivePressed={() => {
                     this.onReceiveButtonPress(

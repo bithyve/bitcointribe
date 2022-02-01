@@ -1,47 +1,46 @@
-import React, { Component } from "react";
-import { Text, View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import React, { Component } from 'react'
+import { Text, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { Button } from "react-native-elements";
-import Fonts from "../../../../src/common/Fonts.js";
-import Colors from "../../../../src/common/Colors";
-import ListStyles from "../../../common/Styles/ListStyles";
-import { ListItem } from "react-native-elements";
+import { Button } from 'react-native-elements'
+import Fonts from '../../../../src/common/Fonts.js'
+import Colors from '../../../../src/common/Colors'
+import ListStyles from '../../../common/Styles/ListStyles'
+import { ListItem } from 'react-native-elements'
 import CommonStyles from '../../../common/Styles/Styles'
 
 export default class SettingsScreen extends Component {
-  constructor(props: any) {
-    super(props);
+  constructor( props: any ) {
+    super( props )
     this.state = {
-      navigation: this.props.navigation.getParam("navigation"),
-    };
+      navigation: this.props.navigation.getParam( 'navigation' ),
+    }
     this.settingOptions = [
       {
-        Screen: "ChannelsListScreen",
-        Title: "Channels",
-        Description: "view and manage channels",
+        Screen: 'ChannelsListScreen',
+        Title: 'Channels',
+        Description: 'view and manage channels',
       },
       {
-        Screen: "ChannelsListScreen",
-        Title: "Settings",
-        Description: "Description",
+        Screen: 'ChannelsListScreen',
+        Title: 'Payments',
+        Description: 'My LN payments',
       },
-      {
-        Screen: "ChannelsListScreen",
-        Title: "Settings",
-        Description: "Description",
-      },
-    ];
+
+    ]
   }
 
-  uniqueKey = (item: any, index: number) => index.toString();
+  uniqueKey = ( item: any, index: number ) => index.toString();
 
-  renderTemplate = ({ item }: { item: any }): ReactElement => {
+  renderTemplate = ( { item }: { item: any } ): ReactElement => {
     return (
       <ListItem
         bottomDivider
         onPress={() => {
-          this.props.navigation.navigate(item.Screen);
-          // console.log(item)
+          if( item.Title==='Channels' ) {
+            this.props.navigation.navigate( item.Screen )
+          } else if( item.Title==='Payments' ) {
+            this.props.navigation.navigate( 'Payments' )
+          }
         }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
@@ -62,7 +61,7 @@ export default class SettingsScreen extends Component {
         </ListItem.Content>
         <ListItem.Chevron size={22} />
       </ListItem>
-    );
+    )
   };
   render() {
     return (
@@ -86,8 +85,9 @@ export default class SettingsScreen extends Component {
           keyExtractor={this.uniqueKey}
         />
       </View>
-    );
+    )
   }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create( {
+} )
