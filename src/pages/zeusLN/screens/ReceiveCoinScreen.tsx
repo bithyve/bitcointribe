@@ -1,22 +1,13 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native'
-import RESTUtils from '../../../utils/ln/RESTUtils'
 import Fonts from '../../../../src/common/Fonts.js'
 import Colors from '../../../../src/common/Colors'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import CommonStyles from '../../../common/Styles/Styles'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import QR from 'react-native-qrcode-svg'
 import CopyThisText from '../../../components/CopyThisText'
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { RFValue } from 'react-native-responsive-fontsize'
-import ModalContainer from '../../../components/home/ModalContainer'
-import ReceiveAmountContent from '../../../components/home/ReceiveAmountContent'
-// import GenerateL2Invoice from "../../../components/home/GenerateL2Invoice";
 import { inject, observer } from 'mobx-react'
 import { ButtonGroup, Input } from 'react-native-elements'
 import QRCode from '../../../components/QRCode'
@@ -25,6 +16,7 @@ import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import FormStyles from '../../../common/Styles/FormStyles'
 import Toast from '../../../components/Toast'
+import HeaderTitle from '../../../components/HeaderTitle'
 
 @inject( 'InvoicesStore' )
 @observer
@@ -85,7 +77,7 @@ export default class ReceiveCoinScreen extends Component {
               } )
             }
             numberOfLines={1}
-
+            keyboardType="number-pad"
           />
           <Input
             placeholder={'Enter invoice expiration in seconds'}
@@ -101,7 +93,7 @@ export default class ReceiveCoinScreen extends Component {
               } )
             }
             numberOfLines={1}
-
+            keyboardType="number-pad"
           />
           <Input
             placeholder={'Enter memo'}
@@ -113,7 +105,7 @@ export default class ReceiveCoinScreen extends Component {
             placeholderTextColor={FormStyles.placeholderText.color}
             onChangeText={( text: string ) =>
               this.setState( {
-                memo: text.trim(),
+                memo: text,
               } )
             }
             numberOfLines={1}
@@ -163,6 +155,14 @@ export default class ReceiveCoinScreen extends Component {
         contentContainerStyle={styles.container}
         overScrollMode="never"
         bounces={false}>
+        <HeaderTitle
+          firstLineTitle={'Receive'}
+          secondLineTitle={'Generate lightning invoice or bitcoin address'}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
         <ButtonGroup
           onPress={this.updateIndex}
           selectedIndex={selectedIndex}

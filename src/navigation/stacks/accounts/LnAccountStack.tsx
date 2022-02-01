@@ -11,6 +11,8 @@ import SettingsScreen from '../../../pages/zeusLN/screens/SettingsScreen'
 import ChannelsListScreen from '../../../pages/zeusLN/screens/ChannelsListScreen'
 import ChannelInfoScreen from '../../../pages/zeusLN/screens/ChannelInfoScreen'
 import ChannelOpenScreen from '../../../pages/zeusLN/screens/ChannelOpenScreen'
+import PayInvoiceScreen from '../../../pages/zeusLN/PayInvoiceScreen'
+import PaymentsScreen from '../../../pages/zeusLN/PaymentsScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -27,43 +29,85 @@ const AccountDetailsStack = createStackNavigator(
         },
       }
     },
-    // SendScreen: {
-    //   screen: SendScreen,
-    //   navigationOptions: {
-    //     title: '',
-    //     headerStyle:{
-    //       elevation: 0,
-    //       shadowOpacity: 0,
-    //       borderBottomWidth: 0,
-    //     },
-    //   }
-    // },
+    Payments: {
+      screen: PaymentsScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
+    PayInvoice: {
+      screen: PayInvoiceScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
+    SendScreen: {
+      screen: SendScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
 
     SettingsScreen: {
       screen: SettingsScreen,
       navigationOptions: {
-        header: null
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
       }
     },
 
     ChannelsListScreen: {
       screen: ChannelsListScreen,
       navigationOptions: {
-        header: null
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
       }
     },
 
     ChannelInfoScreen: {
       screen: ChannelInfoScreen,
       navigationOptions: {
-        header: null
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
       }
     },
 
     ChannelOpenScreen: {
       screen: ChannelOpenScreen,
       navigationOptions: {
-        header: null
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
       }
     },
   },
