@@ -158,9 +158,9 @@ export class AccountDetails extends Component {
                 } )}
                 accountShell={accountShell}
                 onClickSettings={() => {
-                  this.props.navigation.navigate('SettingsScreen', {
+                  this.props.navigation.navigate( 'SettingsScreen', {
                     navigation: this.props.navigation,
-                  })
+                  } )
                 }}
               />
             </View>
@@ -174,7 +174,7 @@ export class AccountDetails extends Component {
           return (
             <View>
               <View style={{
-                paddingVertical: 20,
+                paddingVertical: 10,
                 paddingHorizontal: 20,
               }}>
                 {
@@ -186,7 +186,7 @@ export class AccountDetails extends Component {
                         mode: this.state.mode,
                         accountShellID: this.state.accountShellID
                       } )}
-                      invoices={invoices.slice( 0, 2 )}
+                      invoices={invoices.slice( 0, 3 )}
                       accountShellId={this.state.accountShellID}
                       loading={loadingInvoices}
                     />:
@@ -197,7 +197,7 @@ export class AccountDetails extends Component {
                         mode: this.state.mode,
                         accountShellID: this.state.accountShellID
                       } )}
-                      transactions={transactions.slice( 0, 2 )}
+                      transactions={transactions.slice( 0, 3 )}
                       accountShellId={this.state.accountShellID}
                       loading={loadingTransactions}
                     />
