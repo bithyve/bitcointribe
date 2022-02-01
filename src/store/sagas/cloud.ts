@@ -311,7 +311,6 @@ export const getCloudBackupRecoveryWatcher = createWatcher(
 function* checkCloudBackupWorker ( { payload } ) {
   try {
     const { data, share } = payload
-    console.log( 'CloudDataBackup STARTED', data )
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
       console.log( 'backedJson checkCloudBackupWorker', backedJson )

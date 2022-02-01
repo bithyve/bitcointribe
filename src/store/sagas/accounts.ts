@@ -548,7 +548,22 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
   const { token } = payload
   try {
     const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
-    if ( valid ) yield put( twoFAValid( true ) )
+    if ( valid ){
+      const details2FA = {
+        ...wallet.details2FA,
+        twoFAValidated: true
+      }
+      const updatedWallet: Wallet = {
+        ...wallet,
+        details2FA
+      }
+      yield put(updateWallet(updatedWallet))
+      yield put( twoFAValid( true ) )
+      yield call ( dbManager.updateWallet, {
+        details2FA
+      } )
+      yield put(updateWalletImageHealth({update2fa: true}))
+    }
     else yield put( twoFAValid( false ) )
   } catch ( error ) {
     yield put( twoFAValid( false ) )
@@ -701,14 +716,18 @@ export function* setup2FADetails( wallet: Wallet ) {
   const { setupData } = yield call( AccountUtilities.setupTwoFA, wallet.walletId )
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
+  const details2FA = {
+    bithyveXpub,
+    twoFAKey
+  };
   const updatedWallet = {
     ...wallet,
-    details2FA: {
-      bithyveXpub,
-      twoFAKey
-    }
+    details2FA
   }
   yield put( updateWallet( updatedWallet ) )
+  yield call( dbManager.updateWallet, {
+    details2FA
+  } )
   return updatedWallet
 }
 
@@ -1086,12 +1105,11 @@ export const mergeAccountShellsWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
     const { qrdata, QRModalHeader, accountShell } = payload
-    const walletDB = yield call( dbManager.getWallet )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const walletId = wallet.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     let secondaryMnemonic
-    const sharesArray = [ walletDB.smShare ]
+    const sharesArray = [ wallet.smShare ]
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
