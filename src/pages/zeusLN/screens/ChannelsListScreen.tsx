@@ -1,10 +1,12 @@
-import React, { Component, ReactElement } from "react";
-import { Text, View, FlatList, TouchableOpacity, Button } from "react-native";
-import RESTUtils from "../../../utils/ln/RESTUtils";
-import ChannelItem from "../components/channels/ChannelListComponent";
-import { widthPercentageToDP } from "react-native-responsive-screen";
-import { inject, observer } from "mobx-react";
-
+import React, { Component, ReactElement } from 'react'
+import { Text, View, FlatList, TouchableOpacity, Button, StyleSheet, Image } from 'react-native'
+import RESTUtils from '../../../utils/ln/RESTUtils'
+import ChannelItem from '../components/channels/ChannelListComponent'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { inject, observer } from 'mobx-react'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
 interface HTLC {
   hash_lock: string;
   expiration_height: number;
@@ -36,58 +38,129 @@ interface ChannelFrame {
   channel_id?: string;
   alias?: string;
 }
-@inject("ChannelsStore")
+@inject( 'ChannelsStore' )
 @observer
 export default class ChannelScreen extends Component {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
   }
 
   componentDidMount(): void {
-    this.props.ChannelsStore.reset();
-    this.props.ChannelsStore.getChannels();
+    this.props.ChannelsStore.reset()
+    this.props.ChannelsStore.getChannels()
   }
 
-  uniqueKey = (item: any, index: number) => index.toString();
-  renderTemplate = ({ item }: { item: ChannelFrame }): ReactElement => {
+  uniqueKey = ( item: any, index: number ) => index.toString();
+  renderTemplate = ( { item }: { item: ChannelFrame } ): ReactElement => {
+    const ChannelBar = ( { count } ) => {
+      return(
+        <>
+          {count >= 2  && <View style={[ styles.skyBlueBoxContainer, {
+            backgroundColor: Colors.primaryAccentLighter2
+          } ]}>
+            <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
+          </View>}
+          {count ==3 && <View style={[ styles.blueBoxContainer, {
+            backgroundColor:Colors.darkBlue
+          } ]}>
+            <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
+          </View>}
+          <View style={[ styles.grayBoxContainer, {
+            backgroundColor:Colors.gray11, borderRadius:count==1 && 20
+          } ]}>
+            <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
+          </View>
+        </>
+      )
+    }
+
     return (
       <TouchableOpacity
+        style={styles.signleChannelItem}
         onPress={() => {
-          this.props.navigation.navigate("ChannelInfoScreen", {
+          this.props.navigation.navigate( 'ChannelInfoScreen', {
             channelInfo: item
-          });
+          } )
         }}
       >
-        <ChannelItem 
-        channelParams={item}
-        alias = {this.props.ChannelsStore.aliasesById[item.chan_id] || item.chan_id || item.alias}
-         />
+        {/* <ChannelItem
+          channelParams={item}
+          alias = {this.props.ChannelsStore.aliasesById[ item.chan_id ] || item.chan_id || item.alias}
+        />
         <View
           style={{
             borderBottomWidth: 1,
-            borderColor: "grey",
-            marginHorizontal: widthPercentageToDP(4),
+            borderColor: 'grey',
+            marginHorizontal: widthPercentageToDP( 4 ),
           }}
-        />
+        /> */}
+        <View style={styles.myPrivateChannelContainer}>
+          <View style={styles.goodContainer}>
+            <Text style={styles.goodText}>Good</Text>
+          </View>
+          <Text style={styles.privateChannelText}>My Private Channel</Text>
+        </View>
+
+        <View style={styles.channelBoxesMaincontainer}>
+          <View style={styles.channelBoxescontainer}>
+            <ChannelBar count={3} />
+          </View>
+          <Image style={styles.rightArrow} source={require( '../../../assets/images/icons/icon_arrow.png' )}/>
+        </View>
       </TouchableOpacity>
-    );
+    )
   };
 
   render() {
-    console.log(this.props.ChannelsStore.totalOutbound, "\n----", this.props.ChannelsStore.totalInbound, "\n---", this.props.ChannelsStore.totalOffline)
+    // console.log( this.props.ChannelsStore.totalOutbound, '\n----', this.props.ChannelsStore.totalInbound, '\n---', this.props.ChannelsStore.totalOffline )
 
     return (
-      <View>
-        <Button
+      <View style={styles.container}>
+        {/* <Button
           title="Open Channel"
           onPress={() => {
-            this.props.navigation.navigate("ChannelOpenScreen");
+            this.props.navigation.navigate( 'ChannelOpenScreen' )
           }}
-        />
-        <View>
-          <Text>Total Inbound : {this.props.ChannelsStore.totalOutbound}</Text>
-          <Text>Total Outbound: {this.props.ChannelsStore.totalInbound}</Text>
-          <Text>Total offline: {this.props.ChannelsStore.totalOffline}</Text>
+        /> */}
+        <View >
+          <Text style = {styles.header}>
+            Channels
+          </Text>
+        </View>
+
+
+        <View style={styles.whiteBoxContainer}>
+
+          <View style={styles.totalAmountContainer}>
+            <View style={styles.borderAmountContainer}>
+              <View style={[ styles.border, {
+                backgroundColor:  Colors.darkBlue
+              } ]}></View>
+              <Text style={styles.totalInbound}>Total Inbound</Text>
+            </View>
+            <Text style={styles.priceText}>{this.props.ChannelsStore.totalOutbound} <Text style={styles.sats}>sats</Text></Text>
+          </View>
+          <View style={styles.totalAmountContainer}>
+            <View style={styles.borderAmountContainer}>
+              <View style={[ styles.border, {
+                backgroundColor: Colors.lightBlue
+              } ]}></View>
+              <Text style={styles.totalInbound}>Total Outbound</Text>
+            </View>
+            <Text style={styles.priceText}>{this.props.ChannelsStore.totalInbound} <Text style={styles.sats}>sats</Text></Text>
+          </View>
+          <View style={styles.totalAmountContainer}>
+            <View style={styles.borderAmountContainer}>
+              <View style={[ styles.border, {
+                backgroundColor: Colors.gray11
+              } ]}></View>
+              <Text style={styles.totalInbound}>Total offline</Text>
+            </View>
+            <Text style={styles.priceText}>{this.props.ChannelsStore.totalOffline} <Text style={styles.sats}>sats</Text></Text>
+          </View>
+
+          {/* <Text>Total Outbound: </Text>
+          <Text>Total offline: </Text> */}
         </View>
         {this.props.ChannelsStore.loading ? (
           <Text>Loading...</Text>
@@ -102,6 +175,203 @@ export default class ChannelScreen extends Component {
           />
         )}
       </View>
-    );
+    )
   }
 }
+const styles = StyleSheet.create( {
+  container: {
+    padding: 10,
+    backgroundColor:'#F5F5F5',
+    flex:1
+  },
+  header:{
+    color:Colors.darkBlue,
+    fontSize: RFValue( 25 ),
+    paddingLeft:10,
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  mainContentContainer: {
+    position: 'relative',
+    width: '100%',
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    overflow: 'hidden',
+    justifyContent: 'space-between',
+  },
+
+  cardImageContainer: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+
+  accountKindDetailsSection: {
+    flex: 1,
+    width: '100%',
+  },
+
+  accountKindBadgeImage: {
+    width: widthPercentageToDP( 16 ),
+    height: widthPercentageToDP( 16 ),
+    resizeMode: 'contain',
+  },
+
+  title1Text: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 15 ),
+    color: Colors.white,
+    letterSpacing: 0.01
+  },
+
+  title2Text: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    color: Colors.white,
+    marginTop: 2,
+  },
+
+  footerSection: {
+    marginTop: 'auto',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+  },
+
+  balanceAmountText: {
+    fontFamily: Fonts.OpenSans,
+    fontSize: 21,
+  },
+
+  balanceUnitText: {
+    fontSize: 13,
+    fontFamily: Fonts.FiraSansRegular,
+  },
+
+  balanceCurrencyIcon: {
+    width: 16,
+    height: 16,
+    resizeMode: 'contain',
+  },
+
+  settingsButtonContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 44,
+    height: 44,
+  },
+
+  settingsButtonImage: {
+    height: 24,
+    width: 24,
+  },
+  whiteBoxContainer:{
+    borderRadius:10,
+    backgroundColor:Colors.gray7,
+    padding:10,
+    marginTop:30
+  },
+  totalAmountContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    marginVertical:7,
+    paddingHorizontal:12,
+  },
+  borderAmountContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+  },
+  border:{
+    width:60,
+    height:6,
+    borderRadius:10,
+    marginRight:10
+  },
+  totalInbound:{
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 11 ),
+    color:Colors.textColorGrey,
+  },
+  priceText:{
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 16 ),
+    color:Colors.black,
+  },
+  sats:{
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 10 ),
+    color:Colors.gray10,
+  },
+  signleChannelItem:{
+    backgroundColor:Colors.backgroundColor1,
+    borderRadius:10,
+    padding:12,
+    marginTop:10
+  },
+  myPrivateChannelContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+  },
+  goodContainer:{
+    backgroundColor:Colors.lightGreen1,
+    paddingVertical:5,
+    paddingHorizontal:8,
+    borderRadius:8,
+    marginRight:10
+  },
+  goodText:{
+    textAlign:'center',
+    fontSize: RFValue( 10 ),
+    fontWeight:'800',
+    color:Colors.darkGreen,
+  },
+  privateChannelText:{
+    color:Colors.gray4,
+    fontSize: RFValue( 12 ),
+    fontWeight:'700'
+  },
+  channelBoxesMaincontainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width:'100%',
+    marginTop:13
+  },
+  channelBoxescontainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    width:'90%',
+  },
+  skyBlueBoxContainer:{
+    padding:4,
+    borderTopLeftRadius:12,
+    borderBottomLeftRadius:12,
+    marginRight:2,
+  },
+  blueBoxContainer:{
+    padding:4,
+    borderRadius:3,
+    marginRight:2
+  },
+  grayBoxContainer:{
+    padding:4,
+    borderTopRightRadius:12,
+    borderBottomRightRadius:12,
+  },
+  channelPrice:{
+    color:Colors.backgroundColor1,
+    fontSize: RFValue( 12 ),
+    marginLeft:7,
+  },
+  channelSats:{
+    color:Colors.backgroundColor1,
+    fontSize: RFValue( 8 ),
+  },
+  rightArrow:{
+    width: widthPercentageToDP( 4 ),
+    height: widthPercentageToDP( 4 ),
+    resizeMode:'contain'
+  }
+
+} )
