@@ -44,6 +44,7 @@ export default class ChannelScreen extends Component {
   }
 
   componentDidMount(): void {
+    this.props.ChannelsStore.reset();
     this.props.ChannelsStore.getChannels();
   }
 
@@ -53,11 +54,14 @@ export default class ChannelScreen extends Component {
       <TouchableOpacity
         onPress={() => {
           this.props.navigation.navigate("ChannelInfoScreen", {
-            channelInfo: item,
+            channelInfo: item
           });
         }}
       >
-        <ChannelItem params={item} />
+        <ChannelItem 
+        channelParams={item}
+        alias = {this.props.ChannelsStore.aliasesById[item.chan_id] || item.chan_id || item.alias}
+         />
         <View
           style={{
             borderBottomWidth: 1,
@@ -71,6 +75,7 @@ export default class ChannelScreen extends Component {
 
   render() {
     console.log(this.props.ChannelsStore.totalOutbound, "\n----", this.props.ChannelsStore.totalInbound, "\n---", this.props.ChannelsStore.totalOffline)
+
     return (
       <View>
         <Button

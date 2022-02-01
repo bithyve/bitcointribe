@@ -16,14 +16,14 @@ export default class ChannelList extends Component {
   render() {
     return (
       <View>
-        <Text>Alias</Text>
+        <Text>{this.props.alias}</Text>
         <View style = {{
           flex: 2,
           justifyContent: 'space-around',
           alignItems: 'center',
           margin: 5
         }}>
-          {this.props.params.active? 
+          {this.props.channelParams.active? 
           <View  style = {{
             justifyContent: 'center',
             alignItems: 'center',
@@ -31,12 +31,12 @@ export default class ChannelList extends Component {
             margin: 5
           }}>
           <View>
-            <Text>Local: {this.props.params.local_balance}</Text>
+            <Text>Local: {this.props.channelParams.local_balance}</Text>
           </View>
           <View>
-            <Text>Remote: {this.props.params.remote_balance}</Text>
+            <Text>Remote: {this.props.channelParams.remote_balance}</Text>
           </View>
-          </View>: <Text>Offline: { parseInt (this.props.params.remote_balance) + parseInt(this.props.params.local_balance)}</Text>}
+          </View>: <Text>Offline: { parseInt (this.props.channelParams.remote_balance) + parseInt(this.props.channelParams.local_balance)}</Text>}
         </View>
 
         <View style={{

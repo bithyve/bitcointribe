@@ -83,22 +83,22 @@ type Props = {
   currencyKind?: CurrencyKind | null;
 }
 
-const TransactionItem = ( {
-  invoice,
+const PaymentItem = ( {
+  payment,
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
 }: Props ) => {
 
   const transactionKindIconColor = useMemo( () => {
     return Colors.green
-  }, [ invoice ] )
+  }, [ payment ] )
 
   const amountTextStyle = useMemo( () => {
     return {
       ...styles.amountText,
       color: transactionKindIconColor,
     }
-  }, [ invoice ] )
+  }, [ payment ] )
 
 
   return (
@@ -114,16 +114,16 @@ const TransactionItem = ( {
         </View>
         <ListItem.Content style={styles.titleSection}>
           <ListItem.Title style={styles.titleText} numberOfLines={1}>
-            {invoice.getMemo}
+            {payment.getMemo}
           </ListItem.Title>
           <ListItem.Subtitle style={styles.subtitleText}>
-            {`${invoice.isPaid? 'Paid': 'Unpaid'} ${moment( invoice.getDate ).format( 'DD/MM/YY • hh:MMa' )}`}
+            {`${payment.isPaid? 'Paid': 'Unpaid'} ${moment( payment.getDate ).format( 'DD/MM/YY • hh:MMa' )}`}
           </ListItem.Subtitle>
         </ListItem.Content>
 
         <ListItem.Content style={styles.amountSection}>
           <LabeledBalanceDisplay
-            balance={invoice.getAmount}
+            balance={payment.getAmount}
             bitcoinUnit={bitcoinUnit}
             currencyKind={currencyKind}
             amountTextStyle={amountTextStyle}
@@ -145,5 +145,5 @@ const TransactionItem = ( {
   )
 }
 
-export default TransactionItem
+export default PaymentItem
 
