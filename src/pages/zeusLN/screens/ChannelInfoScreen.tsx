@@ -104,7 +104,7 @@ export default class ChannelInfoScreen extends Component {
           >
             <Button
               title="keysend"
-              onPress={() => {}
+              onPress={() => {}}
             />
           </View>
 
