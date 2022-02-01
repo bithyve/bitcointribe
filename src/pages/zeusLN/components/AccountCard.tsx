@@ -33,10 +33,12 @@ const AccountCard = ( {
       Animated.timing( pan, {
         toValue: 0,
         duration: 300,
+        useNativeDriver: false
       } ).start()
       Animated.timing( pan1, {
         toValue: 1,
         duration: 300,
+        useNativeDriver: false
       } ).start( () => {
         pan1.setValue( 0 )
         type == 'pressOut' && setIsLightning( ( prev ) => {
@@ -52,6 +54,7 @@ const AccountCard = ( {
       Animated.timing( pan, {
         toValue: 0,
         duration: 300,
+        useNativeDriver: false
       } ).start()
       pan1.setValue( 0 )
     }
