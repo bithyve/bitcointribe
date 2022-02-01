@@ -567,10 +567,10 @@ function* recoverWalletWorker( { payload } ) {
       const account: Account | MultiSigAccount = JSON.parse( decryptedData )
       accountData[ account.type ] = account.id
 
-      if([AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT].includes(account.type)){ // patch: fixes multisig account restore, being restored from a missing 2FA-flag backup(version < 2.0.69)
-        if((account as MultiSigAccount).xpubs && (account as MultiSigAccount).xpubs.secondary){ // level-2 activated multisig account found
-          if(!(account as MultiSigAccount).is2FA){ // faulty backup found
-            (account as MultiSigAccount).is2FA = true 
+      if( [ AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( account.type ) ){ // patch: fixes multisig account restore, being restored from a missing 2FA-flag backup(version < 2.0.69)
+        if( ( account as MultiSigAccount ).xpubs && ( account as MultiSigAccount ).xpubs.secondary ){ // level-2 activated multisig account found
+          if( !( account as MultiSigAccount ).is2FA ){ // faulty backup found
+            ( account as MultiSigAccount ).is2FA = true
           }
         }
       }
@@ -584,12 +584,12 @@ function* recoverWalletWorker( { payload } ) {
       const decrypted2FADetails = JSON.parse( decryptedData )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
-      if(details2FA && details2FA.twoFAValidated) yield put(twoFAValid(true))
+      if( details2FA && details2FA.twoFAValidated ) yield put( twoFAValid( true ) )
     }
 
     let smShare
-    if(image.SM_share){
-     smShare = BHROperations.decryptWithAnswer( image.SM_share, decryptionKey ).decryptedData
+    if( image.SM_share ){
+      smShare = BHROperations.decryptWithAnswer( image.SM_share, decryptionKey ).decryptedData
     }
 
     // Update Wallet
@@ -791,12 +791,12 @@ function* updateWalletImageWorker( { payload } ) {
   if( updateSmShare ) {
     walletImage.SM_share = BHROperations.encryptWithAnswer( wallet.smShare, encryptionKey ).encryptedData
   }
-  if( update2fa) {
+  if( update2fa ) {
     const details2FA = {
       secondaryXpub: wallet.secondaryXpub,
       details2FA: wallet.details2FA
     }
-    walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify(details2FA), encryptionKey ).encryptedData
+    walletImage.details2FA = BHROperations.encryptWithAnswer( JSON.stringify( details2FA ), encryptionKey ).encryptedData
   }
   if( updateAccounts && accountIds.length > 0 ) {
     const accounts: Accounts = yield select( state => state.accounts.accounts )

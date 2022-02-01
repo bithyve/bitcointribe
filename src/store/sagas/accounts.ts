@@ -557,12 +557,14 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
         ...wallet,
         details2FA
       }
-      yield put(updateWallet(updatedWallet))
+      yield put( updateWallet( updatedWallet ) )
       yield put( twoFAValid( true ) )
       yield call ( dbManager.updateWallet, {
         details2FA
       } )
-      yield put(updateWalletImageHealth({update2fa: true}))
+      yield put( updateWalletImageHealth( {
+        update2fa: true
+      } ) )
     }
     else yield put( twoFAValid( false ) )
   } catch ( error ) {
@@ -719,7 +721,7 @@ export function* setup2FADetails( wallet: Wallet ) {
   const details2FA = {
     bithyveXpub,
     twoFAKey
-  };
+  }
   const updatedWallet = {
     ...wallet,
     details2FA
