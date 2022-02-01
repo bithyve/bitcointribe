@@ -25,12 +25,12 @@ import {
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange } from '../actions/BHR'
+import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
 import { updateCloudData } from '../actions/cloud'
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
@@ -41,7 +41,8 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
 import semverLte from 'semver/functions/lte'
-import { accountVisibilityResetter, testAccountEnabler } from './upgrades'
+import { accountVisibilityResetter, restoreMultiSigTwoFAFlag, testAccountEnabler } from './upgrades'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -135,7 +136,7 @@ function* resetPasswordWorker( { payload } ) {
     const { metaSharesKeeper, oldMetaSharesKeeper } = yield select( ( state ) => state.bhr )
     const metaShares: MetaShare[] = [ ...metaSharesKeeper ]
 
-    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, answer, payload )
+    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, payload.answer, payload )
     yield put( updateMetaSharesKeeper( updatedMetaShares ) )
     yield put( updateOldMetaSharesKeeper( updatedOldMetaShares ) )
     yield call( dbManager.updateBHR, {
@@ -278,6 +279,7 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
 
   if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
   if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
+  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
 
   // update wallet version
   yield put( updateWallet( {
