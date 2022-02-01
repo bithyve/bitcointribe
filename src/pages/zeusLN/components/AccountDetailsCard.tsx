@@ -181,9 +181,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
 
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onItemPressed}
+    <View
       style={rootContainerStyle}>
       <View
         style={{
@@ -198,7 +196,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           <FooterSection />
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   )
 }
 
