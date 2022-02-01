@@ -23,20 +23,20 @@ export default class ChannelList extends Component {
           alignItems: 'center',
           margin: 5
         }}>
-          {this.props.channelParams.active? 
-          <View  style = {{
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'row',
-            margin: 5
-          }}>
-          <View>
-            <Text>Local: {this.props.channelParams.local_balance}</Text>
-          </View>
-          <View>
-            <Text>Remote: {this.props.channelParams.remote_balance}</Text>
-          </View>
-          </View>: <Text>Offline: { parseInt (this.props.channelParams.remote_balance) + parseInt(this.props.channelParams.local_balance)}</Text>}
+          {this.props.channelParams.active?
+            <View style = {{
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'row',
+              margin: 5
+            }}>
+              <View>
+                <Text>Local: {this.props.channelParams.local_balance}</Text>
+              </View>
+              <View>
+                <Text>Remote: {this.props.channelParams.remote_balance}</Text>
+              </View>
+            </View>: <Text>Offline: { parseInt ( this.props.channelParams.remote_balance ) + parseInt( this.props.channelParams.local_balance )}</Text>}
         </View>
 
         <View style={{
