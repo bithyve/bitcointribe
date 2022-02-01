@@ -436,7 +436,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       >
         <View
           style={{
-            height: hp( windowHeight >= 800 ? '56%' : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%' ),
+            height: hp( windowHeight >= 800 ? ( Platform.OS== 'ios' ? '56%' : '65%' ) : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%' ),
             marginHorizontal: wp( 6 ),
           }}
         >

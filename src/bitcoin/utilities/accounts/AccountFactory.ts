@@ -65,12 +65,6 @@ export function generateAccount(
     lastSynched: 0,
     txIdMap: {
     },
-    addressQueryList: {
-      external: {
-      },
-      internal: {
-      }
-    },
     transactionsNote: {
     },
     importedAddresses: {
@@ -170,12 +164,6 @@ export function generateMultiSigAccount(
     transactions: [],
     lastSynched: 0,
     txIdMap: {
-    },
-    addressQueryList: {
-      external: {
-      },
-      internal: {
-      }
     },
     transactionsNote: {
     },

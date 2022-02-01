@@ -134,6 +134,7 @@ const GiftDetails = ( { navigation } ) => {
       contentContainerStyle={{
         flexGrow: 1,
         height: '100%',
+        backgroundColor: Colors.backgroundColor,
       }}
       keyboardShouldPersistTaps="handled"
     >

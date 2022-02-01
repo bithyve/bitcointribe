@@ -366,7 +366,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         }}
       >
         <View style={{
-          height: hp( windowHeight >= 800 ? '56%' : windowHeight >= 600 ? '67%' :  windowHeight >= 500 && '72%' ),
+          height: hp( windowHeight >= 800 ? ( Platform.OS== 'ios' ? '56%' : '65%' ) : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%' ),
           marginHorizontal: wp( 4 )
         }}>
           <View style={{
