@@ -34,7 +34,7 @@ export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
-  onItemPressed: () => void;
+  onPressOut: () => void;
   navigation: any;
   balance: string;
   mode: Mode
@@ -65,7 +65,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
-  onItemPressed,
+  onPressOut,
   navigation,
   balance,
   mode
@@ -183,7 +183,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={onItemPressed}
+      onPressOut={onPressOut}
       style={rootContainerStyle}>
       <View
         style={{
