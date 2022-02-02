@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { StyleSheet, View, PanResponder, Animated, Dimensions } from 'react-native'
+import { StyleSheet, View, PanResponder, Animated, Dimensions, Platform } from 'react-native'
 import AccountDetailsCard from './AccountDetailsCard'
 import { Mode } from '../AccountDetails'
 
@@ -41,14 +41,23 @@ const AccountCard = ( {
         useNativeDriver: false
       } ).start( () => {
         pan1.setValue( 0 )
-        type == 'pressOut' && setIsLightning( ( prev ) => {
-          if ( prev == true ) {
-            setMode( Mode.ON_CHAIN )
-          } else {
-            setMode( Mode.LIGHTNING )
-          }
-          return !prev
-        } )
+        Platform.OS == 'ios' ? type == 'pressOut' &&
+          setIsLightning( ( prev ) => {
+            if ( prev == true ) {
+              setMode( Mode.ON_CHAIN )
+            } else {
+              setMode( Mode.LIGHTNING )
+            }
+            return !prev
+          } ) :
+          setIsLightning( ( prev ) => {
+            if ( prev == true ) {
+              setMode( Mode.ON_CHAIN )
+            } else {
+              setMode( Mode.LIGHTNING )
+            }
+            return !prev
+          } )
       } )
     }else{
       Animated.timing( pan, {
