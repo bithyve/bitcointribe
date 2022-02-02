@@ -50,7 +50,7 @@ export default class TransactionDetailsScreen extends Component {
             accountShellId={this.state.accountShellId}
           ></TransactionItem>
         </View>
-        
+
         <View style={styles.bodySection}>
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>Amount</Text>
@@ -84,7 +84,7 @@ export default class TransactionDetailsScreen extends Component {
 
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>
-              Destination Adresses
+              Destination Addresses
             </Text>
             <Text
               style={{
