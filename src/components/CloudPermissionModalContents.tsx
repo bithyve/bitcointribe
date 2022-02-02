@@ -233,7 +233,7 @@ const styles = StyleSheet.create( {
     height: wp( '25%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
-    marginBottom: Platform.OS == 'ios' && DeviceInfo.hasNotch() ? -15 : 5,
+    marginBottom: Platform.OS == 'ios' && DeviceInfo.hasNotch() ? -30 : -15,
   },
   proceedButtonText: {
     color: Colors.white,
