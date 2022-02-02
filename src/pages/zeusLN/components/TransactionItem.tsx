@@ -83,15 +83,13 @@ type Props = {
   accountShellId: string,
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind | null;
-  navigation: any;
 }
 
 const TransactionItem = ( {
   transaction,
   accountShellId,
   bitcoinUnit = BitcoinUnit.SATS,
-  currencyKind = useCurrencyKind(),
-  navigation
+  currencyKind = useCurrencyKind()
 }: Props ) => {
 
   const transactionKindIconColor = useMemo( () => {
@@ -107,13 +105,7 @@ const TransactionItem = ( {
 
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('TransactionDetailsScreen', {
-          transaction
-        })
-      }}
-    >
+    <View>
       <ListItem containerStyle={{
         backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )
       }} pad={1}>
@@ -150,7 +142,7 @@ const TransactionItem = ( {
       <View style={{
         borderBottomWidth: 1, borderColor: Colors.gray1, marginHorizontal: widthPercentageToDP( 4 )
       }} />
-    </TouchableOpacity>
+      </View>
   )
 }
 

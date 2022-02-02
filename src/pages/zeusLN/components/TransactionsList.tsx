@@ -73,11 +73,20 @@ const TransactionsList: React.FC<Props> = ( {
   const renderItem = ( { item: transaction, } : {
     item: Transaction;
   } ) => {
-    return ( <TransactionItem
-      navigation = {navigation}
+    return ( 
+    <TouchableOpacity
+    onPress={() => {
+      navigation.navigate('TransactionDetailsScreen', {
+        transaction,
+        accountShellId
+      })
+    }}><TransactionItem
       transaction={transaction} accountShellId={accountShellId}/>
+
+    </TouchableOpacity>
     )
   }
+  
 
   return (
     <View style={styles.rootContainer}>

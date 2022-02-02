@@ -74,9 +74,18 @@ const TransactionsList: React.FC<Props> = ( {
   const renderItem = ( { item: invoice, } : {
     item: Invoice;
   } ) => {
-    return ( <InvoiceItem 
+    return ( 
+    <TouchableOpacity
+    onPress={()=>{
+      navigation.navigate('InvoiceDetailsScreen', {
+        invoice
+      })
+    }}
+    >
+      <InvoiceItem 
       navigation = {navigation}
-      invoice={invoice} accountShellId={accountShellId}/>
+      invoice={invoice}/>
+      </TouchableOpacity>
     )
   }
 

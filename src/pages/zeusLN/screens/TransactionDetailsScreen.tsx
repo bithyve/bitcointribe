@@ -8,7 +8,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import openLink from '../../../utils/OpenLink'
+import openLink from "../../../utils/OpenLink";
 import RESTUtils from "../../../utils/ln/RESTUtils";
 import ChannelItem from "../components/channels/ChannelListComponent";
 import { widthPercentageToDP } from "react-native-responsive-screen";
@@ -20,6 +20,7 @@ import Colors from "../../../common/Colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Fonts from "../../../common/Fonts";
 import TransactionKind from "../../../common/data/enums/TransactionKind";
+import TransactionItem from "../components/TransactionItem";
 
 export default class TransactionDetailsScreen extends Component {
   constructor(props) {
@@ -27,6 +28,7 @@ export default class TransactionDetailsScreen extends Component {
     // console.log(this.props.)
     this.state = {
       transaction: this.props.navigation.getParam("transaction"),
+      accountShellId: this.props.navigation.getParam("accountShellId"),
     };
   }
 
@@ -38,8 +40,17 @@ export default class TransactionDetailsScreen extends Component {
         overScrollMode="never"
         bounces={false}
       >
+
         <Text style={styles.textHeader}>Transaction Details</Text>
 
+
+        <View>
+          <TransactionItem
+            transaction={this.state.transaction}
+            accountShellId={this.state.accountShellId}
+          ></TransactionItem>
+        </View>
+        
         <View style={styles.bodySection}>
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>Amount</Text>

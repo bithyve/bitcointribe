@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import openLink from "../../../utils/OpenLink";
 import RESTUtils from "../../../utils/ln/RESTUtils";
+import Clipboard from "@react-native-clipboard/clipboard";
 import ChannelItem from "../components/channels/ChannelListComponent";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { inject, observer } from "mobx-react";
@@ -21,11 +22,18 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Fonts from "../../../common/Fonts";
 import TransactionKind from "../../../common/data/enums/TransactionKind";
 import Invoice from "../../../models/Invoice";
+import Toast from "../../../components/Toast";
+import InvoiceItem from "../components/InvoiceItem";
 
 export default class TransactionDetailsScreen extends Component {
   constructor(props) {
     super(props);
   }
+
+  writeToClipboard = (text: string) => {
+    Clipboard.setString(text);
+    Toast("Text Copied");
+  };
 
   render() {
     const invoice: Invoice = this.props.navigation.getParam("invoice", null);
@@ -55,8 +63,32 @@ export default class TransactionDetailsScreen extends Component {
         bounces={false}
       >
         <Text style={styles.textHeader}>Invoice Details</Text>
+        <InvoiceItem
+        invoice={invoice}
+        >
+
+        </InvoiceItem>
 
         <View style={styles.bodySection}>
+          {!!payment_request && (
+            <TouchableOpacity
+            onPress={() => {this.writeToClipboard(payment_request)}}
+            >
+              <View style={styles.lineItem}>
+                <Text style={ListStyles.listItemTitleTransaction}>
+                  Payment Request
+                </Text>
+                <Text
+                  style={{
+                    ...ListStyles.listItemSubtitle,
+                    marginBottom: 3,
+                  }}
+                >
+                  {payment_request}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>
               {isPaid ? "Paid Amount" : "Unpaid Amount"}
@@ -146,130 +178,112 @@ export default class TransactionDetailsScreen extends Component {
 
           {!!privateInvoice && (
             <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-              Private Invoice
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {privateInvoice}
-            </Text>
-          </View>
+              <Text style={ListStyles.listItemTitleTransaction}>
+                Private Invoice
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {privateInvoice}
+              </Text>
+            </View>
           )}
 
           {!!fallback_addr && (
             <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-            Fallback Address
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {fallback_addr}
-            </Text>
-          </View>
+              <Text style={ListStyles.listItemTitleTransaction}>
+                Fallback Address
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {fallback_addr}
+              </Text>
+            </View>
           )}
 
           {!!cltv_expiry && (
             <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-              CLTV Verify
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {cltv_expiry}
-            </Text>
-          </View>
+              <Text style={ListStyles.listItemTitleTransaction}>
+                CLTV Verify
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {cltv_expiry}
+              </Text>
+            </View>
           )}
 
           {!!r_hash && typeof r_hash === "string" && (
             <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-              R Hash
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {r_hash}
-            </Text>
-          </View>
+              <Text style={ListStyles.listItemTitleTransaction}>R Hash</Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {r_hash}
+              </Text>
+            </View>
           )}
 
           {!!r_preimage && (
             <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-              R Pre-image
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {r_preimage}
-            </Text>
-          </View>
+              <Text style={ListStyles.listItemTitleTransaction}>
+                R Pre-image
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {r_preimage}
+              </Text>
+            </View>
           )}
 
           {!!description_hash && (
             <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-              Description Hash
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {description_hash}
-            </Text>
-          </View>
+              <Text style={ListStyles.listItemTitleTransaction}>
+                Description Hash
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {description_hash}
+              </Text>
+            </View>
           )}
 
           {!!payment_hash && (
-           <View style={styles.lineItem}>
-           <Text style={ListStyles.listItemTitleTransaction}>
-             Creation Date
-           </Text>
-           <Text
-             style={{
-               ...ListStyles.listItemSubtitle,
-               marginBottom: 3,
-             }}
-           >
-             {invoice.creationDate}
-           </Text>
-         </View>
-          )}
-
-          {!!payment_request && (
             <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-              Payment Request
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {payment_request}
-            </Text>
-          </View>
+              <Text style={ListStyles.listItemTitleTransaction}>
+                Creation Date
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {invoice.creationDate}
+              </Text>
+            </View>
           )}
         </View>
       </ScrollView>
