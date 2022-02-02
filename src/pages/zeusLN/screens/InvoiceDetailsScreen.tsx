@@ -63,16 +63,14 @@ export default class TransactionDetailsScreen extends Component {
         bounces={false}
       >
         <Text style={styles.textHeader}>Invoice Details</Text>
-        <InvoiceItem
-        invoice={invoice}
-        >
-
-        </InvoiceItem>
+        <InvoiceItem invoice={invoice}></InvoiceItem>
 
         <View style={styles.bodySection}>
           {!!payment_request && (
             <TouchableOpacity
-            onPress={() => {this.writeToClipboard(payment_request)}}
+              onPress={() => {
+                this.writeToClipboard(payment_request);
+              }}
             >
               <View style={styles.lineItem}>
                 <Text style={ListStyles.listItemTitleTransaction}>
@@ -139,7 +137,9 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {invoice.settleDate}
+                {moment(new Date(parseInt(invoice.settleDate))).format(
+                  "DD/MM/YY • hh:MMa"
+                )}
               </Text>
             </View>
           )}
@@ -155,7 +155,9 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {invoice.creationDate}
+                {moment(new Date(parseInt(invoice.creationDate))).format(
+                  "DD/MM/YY • hh:MMa"
+                )}
               </Text>
             </View>
           )}
@@ -171,7 +173,9 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {expirationDate}
+                {moment(new Date(parseInt(expirationDate))).format(
+                  "DD/MM/YY • hh:MMa"
+                )}
               </Text>
             </View>
           )}
