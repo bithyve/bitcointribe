@@ -257,8 +257,9 @@ export default class AccountUtilities {
     for ( let itr = 0; itr <= closingExtIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
-      }, 2, network, itr, false )
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+    }, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -275,8 +276,9 @@ export default class AccountUtilities {
     for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
-      }, 2, network, itr, true )
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+    }, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -367,8 +369,9 @@ export default class AccountUtilities {
         if( ( account as MultiSigAccount ).is2FA )
           changeAddress = AccountUtilities.createMultiSig( {
             primary: account.xpub,
-            ...( account as MultiSigAccount ).xpubs
-          }, 2, network, nextFreeChangeAddressIndex, true ).address
+            secondary: ( account as MultiSigAccount ).xpubs.secondary,
+            bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+            }, 2, network, nextFreeChangeAddressIndex, true ).address
         else
           changeAddress = AccountUtilities.getAddressByIndex(
             account.xpub,
@@ -411,7 +414,6 @@ export default class AccountUtilities {
     }>,
     cachedTxs: Transaction[],
     cachedTxIdMap: {[txid: string]: string[]},
-    cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -437,7 +439,6 @@ export default class AccountUtilities {
       }>;
       txIdMap:  {[txid: string]: string[]},
       transactions: Transaction[];
-      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       activeAddresses: ActiveAddresses;
@@ -526,9 +527,9 @@ export default class AccountUtilities {
       }
 
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName, transactionsNote, hardRefresh } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, accountType, primaryAccType, accountName, transactionsNote } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
-        const UTXOs = hardRefresh? []: cachedUTXOs // completely refresh UTXO set on hard-refresh(rather than soft-refresh's append)
+        const UTXOs = cachedUTXOs
         // (re)categorise UTXOs
         if ( Utxos )
           for ( const addressSpecificUTXOs of Utxos ) {
@@ -692,8 +693,6 @@ export default class AccountUtilities {
           if( tx.confirmations > 6 ){
             const addresses = txIdMap[ tx.txid ]
             addresses.forEach( address => {
-              // if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
-              // else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
               if( activeAddresses.external[ address ] ) delete activeAddresses.external[ address ]
               else if( activeAddresses.internal[ address ] ) delete activeAddresses.internal[ address ]
             } )
@@ -709,7 +708,6 @@ export default class AccountUtilities {
           UTXOs,
           txIdMap,
           transactions,
-          addressQueryList: cachedAQL,
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
           activeAddresses,
@@ -1036,9 +1034,11 @@ export default class AccountUtilities {
     setupSuccessful: boolean;
   }> => {
 
-    const xpubs = []
-    if( account.xpub ) xpubs.push( account.xpub )
-    else xpubs.push( ...Object.values( ( account as MultiSigAccount ).xpubs ) )
+    const xpubs = [account.xpub]
+    if( (account as MultiSigAccount).is2FA ){
+      xpubs.push(( account as MultiSigAccount ).xpubs.secondary)
+      xpubs.push(( account as MultiSigAccount ).xpubs.bithyve)
+    }
 
     let res: AxiosResponse
     try {
