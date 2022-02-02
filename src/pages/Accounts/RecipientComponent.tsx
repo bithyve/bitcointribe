@@ -43,7 +43,7 @@ function RecipientComponent( {
 
   const displayedNameText = useMemo( () => {
     if ( recipient.kind === RecipientKind.ADDRESS ) {
-      return `${recipient.displayedName}${recipient.id}`
+      return `${recipient.id}`
     } else {
       return recipient.displayedName
     }

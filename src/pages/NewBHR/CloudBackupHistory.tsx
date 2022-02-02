@@ -60,6 +60,7 @@ const CloudBackupHistory = ( props ) => {
   const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const [ errorMsg, setErrorMsg ] = useState( '' )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
+  const [ cloudBackupInitiated, setCloudBackupInitiated ] = useState( false )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const dispatch = useDispatch()
@@ -91,6 +92,10 @@ const CloudBackupHistory = ( props ) => {
   useEffect( ()=>{
     setInfoOnBackup()
   }, [] )
+
+  useEffect( () =>{
+    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) props.navigation.goBack()
+  }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
     if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
@@ -168,6 +173,7 @@ const CloudBackupHistory = ( props ) => {
         setConfirmationModal( false )
         dispatch( updateCloudPermission( flag ) )
         dispatch( updateCloudData() )
+        setCloudBackupInitiated( true )
       }}
       onPressIgnore={( flag )=> {
         setConfirmationModal( false )

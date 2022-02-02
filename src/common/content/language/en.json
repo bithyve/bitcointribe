@@ -213,7 +213,7 @@
         "UserDefinedPassphrase": "User defined passphrase",
         "UserDefinedPassphrase1": "The security and the memorability of this option depends on the input provided by the user",
         "UserDefinedPassphrase2": "If someone does get access to your cloud, this option makes your Level 1 backup resistant to manual guessing and computer brute force attack depending on the strength of the passphrase used",
-        "MostSecure": "Most Secure",
+        "MostSecure": "More Secure",
         "MostMemorable": "Most Memorable",
         "UserDefined": "User Defined",
         "Hexawillgenerate": "Hexa will generate a strong password for you",

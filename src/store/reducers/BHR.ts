@@ -86,8 +86,6 @@ const initialState: {
     levelInfo: LevelInfo[];
   }[];
   keeperInfo: KeeperInfoInterface[];
-  metaSharesKeeper: MetaShare[];
-  oldMetaSharesKeeper: MetaShare[];
   shares: any;
   metaSharesKeeper: MetaShare[];
   oldMetaSharesKeeper: MetaShare[];

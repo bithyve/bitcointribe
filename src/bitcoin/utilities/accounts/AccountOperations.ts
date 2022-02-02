@@ -34,8 +34,9 @@ export default class AccountOperations {
     const network = AccountUtilities.getNetworkByType( account.networkType )
     if( ( account as MultiSigAccount ).is2FA ) receivingAddress = AccountUtilities.createMultiSig(  {
       primary: account.xpub,
-      ...( account as MultiSigAccount ).xpubs
-    }, 2, network, account.nextFreeAddressIndex, false ).address
+      secondary: ( account as MultiSigAccount ).xpubs.secondary,
+      bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+}, 2, network, account.nextFreeAddressIndex, false ).address
     else {
       const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
       receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
@@ -64,16 +65,18 @@ export default class AccountOperations {
     let externalAddress: string
     if( ( account as MultiSigAccount ).is2FA ) externalAddress = AccountUtilities.createMultiSig( {
       primary: account.xpub,
-      ...( account as MultiSigAccount ).xpubs
-    }, 2, network, account.nextFreeAddressIndex + hardGapLimit - 1, false ).address
+      secondary: ( account as MultiSigAccount ).xpubs.secondary,
+      bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+}, 2, network, account.nextFreeAddressIndex + hardGapLimit - 1, false ).address
     else externalAddress = AccountUtilities.getAddressByIndex( account.xpub, false,  account.nextFreeAddressIndex + hardGapLimit - 1, network, purpose )
 
 
     let internalAddress: string
     if( ( account as MultiSigAccount ).is2FA ) internalAddress = AccountUtilities.createMultiSig( {
       primary: account.xpub,
-      ...( account as MultiSigAccount ).xpubs
-    }, 2, network, account.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
+      secondary: ( account as MultiSigAccount ).xpubs.secondary,
+      bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+}, 2, network, account.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
     else internalAddress = AccountUtilities.getAddressByIndex( account.xpub, true, account.nextFreeChangeAddressIndex + hardGapLimit - 1, network, purpose )
 
     const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], network )
@@ -130,7 +133,6 @@ export default class AccountOperations {
         }>,
         cachedTxs: Transaction[],
         cachedTxIdMap: {[txid: string]: string[]},
-        cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
         lastUsedAddressIndex: number,
         lastUsedChangeAddressIndex: number,
         accountType: string,
@@ -150,7 +152,6 @@ export default class AccountOperations {
       }
     } = {
     }
-
     for( const account of Object.values( accounts ) ){
       const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
       const ownedAddresses = [] // owned address mapping
@@ -163,7 +164,8 @@ export default class AccountOperations {
         let address: string
         if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig( {
           primary: account.xpub,
-          ...( account as MultiSigAccount ).xpubs
+          secondary: ( account as MultiSigAccount ).xpubs.secondary,
+          bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
         }, 2, network, itr, false ).address
         else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
         externalAddresses[ address ] = itr
@@ -184,7 +186,8 @@ export default class AccountOperations {
         let address: string
         if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  {
           primary: account.xpub,
-          ...( account as MultiSigAccount ).xpubs
+          secondary: ( account as MultiSigAccount ).xpubs.secondary,
+          bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
         }, 2, network, itr, true ).address
         else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
         internalAddresses[ address ] = itr
@@ -192,10 +195,9 @@ export default class AccountOperations {
       }
 
       // garner cached params for bal-tx sync
-      const cachedUTXOs = [ ...account.confirmedUTXOs, ...account.unconfirmedUTXOs ]
-      const cachedTxIdMap = account.txIdMap
-      const cachedTxs = account.transactions
-      const cachedAQL = account.addressQueryList
+      const cachedUTXOs = hardRefresh? []: [ ...account.confirmedUTXOs, ...account.unconfirmedUTXOs ]
+      const cachedTxIdMap = hardRefresh? {}: account.txIdMap
+      const cachedTxs = hardRefresh? []: account.transactions
 
       let shouldHardRefresh = hardRefresh
       if( !shouldHardRefresh ){
@@ -211,7 +213,6 @@ export default class AccountOperations {
         cachedUTXOs,
         cachedTxs,
         cachedTxIdMap,
-        cachedAQL,
         lastUsedAddressIndex: account.nextFreeAddressIndex - 1,
         lastUsedChangeAddressIndex: account.nextFreeChangeAddressIndex - 1,
         transactionsNote: account.transactionsNote,
@@ -235,7 +236,6 @@ export default class AccountOperations {
         UTXOs,
         transactions,
         txIdMap,
-        addressQueryList,
         nextFreeAddressIndex,
         nextFreeChangeAddressIndex,
         activeAddresses,
@@ -281,7 +281,6 @@ export default class AccountOperations {
       account.unconfirmedUTXOs = unconfirmedUTXOs
       account.confirmedUTXOs = confirmedUTXOs
       account.balances = balances
-      account.addressQueryList = addressQueryList
       account.nextFreeAddressIndex = nextFreeAddressIndex
       account.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
       account.activeAddresses = activeAddresses
@@ -289,8 +288,9 @@ export default class AccountOperations {
 
       if( ( account as MultiSigAccount ).is2FA ) account.receivingAddress = AccountUtilities.createMultiSig( {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
-      }, 2, network, account.nextFreeAddressIndex, false ).address
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+    }, 2, network, account.nextFreeAddressIndex, false ).address
       else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
 
       // find tx delta(missing txs): hard vs soft refresh
@@ -329,8 +329,9 @@ export default class AccountOperations {
       let address
       if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
-      }, 2, network, itr, true ).address
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+    }, 2, network, itr, true ).address
       else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
       internalAddresses.push( address )
     }
@@ -364,59 +365,13 @@ export default class AccountOperations {
     account.lastSynched = lastSynched
     if( ( account as MultiSigAccount ).is2FA ) account.receivingAddress = AccountUtilities.createMultiSig(  {
       primary: account.xpub,
-      ...( account as MultiSigAccount ).xpubs
-    }, 2, network, account.nextFreeAddressIndex, false ).address
+      secondary: ( account as MultiSigAccount ).xpubs.secondary,
+      bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+}, 2, network, account.nextFreeAddressIndex, false ).address
     else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
 
     return {
       synchedAccount: account
-    }
-  }
-
-  static updateQueryList = ( account: Account, consumedUTXOs: {[txid: string]: InputUTXOs} ) => {
-    const softGapLimit = 5
-    const network = AccountUtilities.getNetworkByType( account.networkType )
-
-    // updates query list(primary: reg/test) with out of bound(lower bound) external/internal addresses
-    const startingExtIndex = account.nextFreeAddressIndex - softGapLimit >= 0? account.nextFreeAddressIndex - softGapLimit : 0
-    const startingIntIndex = account.nextFreeChangeAddressIndex - softGapLimit >= 0? account.nextFreeChangeAddressIndex - softGapLimit : 0
-
-    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
-    for( const consumedUTXO of Object.values( consumedUTXOs ) ){
-      let found = false
-      // is out of bound external address?
-      if( startingExtIndex )
-        for ( let itr = 0; itr < startingExtIndex; itr++ ) {
-          let address: string
-          if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig( {
-            primary: account.xpub,
-            ...( account as MultiSigAccount ).xpubs
-          }, 2, network, itr, false ).address
-          else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
-
-          if( consumedUTXO.address === address ){
-            account.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
-            found = true
-            break
-          }
-        }
-
-      // is out of bound internal address?
-      if( startingIntIndex && !found )
-        for ( let itr = 0; itr < startingIntIndex; itr++ ) {
-          let address: string
-          if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig( {
-            primary: account.xpub,
-            ...( account as MultiSigAccount ).xpubs
-          }, 2, network, itr, true ).address
-          else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
-
-          if( consumedUTXO.address === address ){
-            account.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
-            found = true
-            break
-          }
-        }
     }
   }
 
@@ -449,7 +404,8 @@ export default class AccountOperations {
         let address: string
         if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig( {
           primary: account.xpub,
-          ...( account as MultiSigAccount ).xpubs
+          secondary: ( account as MultiSigAccount ).xpubs.secondary,
+          bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
         }, 2, network, itr, false ).address
         else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
 
@@ -485,8 +441,9 @@ export default class AccountOperations {
           let address: string
           if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig( {
             primary: account.xpub,
-            ...( account as MultiSigAccount ).xpubs
-          }, 2, network, itr, true ).address
+            secondary: ( account as MultiSigAccount ).xpubs.secondary,
+            bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+            }, 2, network, itr, true ).address
           else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
 
           if( consumedUTXO.address === address ){
@@ -521,8 +478,9 @@ export default class AccountOperations {
 
     if( ( account as MultiSigAccount ).is2FA ) changeAddress = AccountUtilities.createMultiSig(  {
       primary: account.xpub,
-      ...( account as MultiSigAccount ).xpubs
-    }, 2, network, account.nextFreeChangeAddressIndex, true ).address
+      secondary: ( account as MultiSigAccount ).xpubs.secondary,
+      bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+}, 2, network, account.nextFreeChangeAddressIndex, true ).address
     else changeAddress = AccountUtilities.getAddressByIndex(
       account.xpub,
       true,
@@ -564,7 +522,6 @@ export default class AccountOperations {
     } )
 
     account.confirmedUTXOs = updatedUTXOSet
-    // AccountOperations.updateQueryList( account, consumedUTXOs )
     AccountOperations.updateActiveAddresses( account, consumedUTXOs, txid, recipients )
   }
 
