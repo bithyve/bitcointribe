@@ -74,17 +74,17 @@ const TransactionsList: React.FC<Props> = ( {
   const renderItem = ( { item: invoice, } : {
     item: Invoice;
   } ) => {
-    return ( 
-    <TouchableOpacity
-    onPress={()=>{
-      navigation.navigate('InvoiceDetailsScreen', {
-        invoice
-      })
-    }}
-    >
-      <InvoiceItem 
-      navigation = {navigation}
-      invoice={invoice}/>
+    return (
+      <TouchableOpacity
+        onPress={()=>{
+          navigation.navigate( 'InvoiceDetailsScreen', {
+            invoice
+          } )
+        }}
+      >
+        <InvoiceItem
+          navigation = {navigation}
+          invoice={invoice}/>
       </TouchableOpacity>
     )
   }
@@ -112,7 +112,7 @@ const TransactionsList: React.FC<Props> = ( {
         </TouchableOpacity>
       </View>
       {
-        loading ? <ActivityIndicator size="large" style={styles.activityIndicator}/>:
+        loading ? <ActivityIndicator color={Colors.blue} size="large" style={styles.activityIndicator}/>:
           <FlatList
             data={invoices}
             //keyExtractor={keyExtractor}

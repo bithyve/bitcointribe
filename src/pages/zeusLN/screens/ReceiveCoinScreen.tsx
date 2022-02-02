@@ -167,8 +167,12 @@ export default class ReceiveCoinScreen extends Component {
           onPress={this.updateIndex}
           selectedIndex={selectedIndex}
           buttons={buttons}
+          selectedButtonStyle={{
+            backgroundColor: Colors.blue,
+            borderRadius: 8,
+          }}
           containerStyle={{
-            height: hp( '6%' )
+            height: hp( '6%' ),
           }}
         />
         {selectedIndex === 1 ? (

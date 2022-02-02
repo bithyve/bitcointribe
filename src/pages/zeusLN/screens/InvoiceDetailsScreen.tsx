@@ -1,42 +1,33 @@
-import React, { Component, ReactElement } from "react";
+import React, { Component } from 'react'
 import {
   Text,
   View,
-  FlatList,
   TouchableOpacity,
-  Button,
   StyleSheet,
   ScrollView,
-} from "react-native";
-import openLink from "../../../utils/OpenLink";
-import RESTUtils from "../../../utils/ln/RESTUtils";
-import Clipboard from "@react-native-clipboard/clipboard";
-import ChannelItem from "../components/channels/ChannelListComponent";
-import { widthPercentageToDP } from "react-native-responsive-screen";
-import { inject, observer } from "mobx-react";
-import ListStyles from "../../../common/Styles/ListStyles";
-import LabeledBalanceDisplay from "../../../components/LabeledBalanceDisplay";
-import moment from "moment";
-import Colors from "../../../common/Colors";
-import { RFValue } from "react-native-responsive-fontsize";
-import Fonts from "../../../common/Fonts";
-import TransactionKind from "../../../common/data/enums/TransactionKind";
-import Invoice from "../../../models/Invoice";
-import Toast from "../../../components/Toast";
-import InvoiceItem from "../components/InvoiceItem";
+} from 'react-native'
+import Clipboard from '@react-native-clipboard/clipboard'
+import ListStyles from '../../../common/Styles/ListStyles'
+import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
+import moment from 'moment'
+import Colors from '../../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../../common/Fonts'
+import Invoice from '../../../models/Invoice'
+import Toast from '../../../components/Toast'
 
 export default class TransactionDetailsScreen extends Component {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
   }
 
-  writeToClipboard = (text: string) => {
-    Clipboard.setString(text);
-    Toast("Text Copied");
+  writeToClipboard = ( text: string ) => {
+    Clipboard.setString( text )
+    Toast( 'Text Copied' )
   };
 
   render() {
-    const invoice: Invoice = this.props.navigation.getParam("invoice", null);
+    const invoice: Invoice = this.props.navigation.getParam( 'invoice', null )
     const {
       fallback_addr,
       r_hash,
@@ -51,11 +42,10 @@ export default class TransactionDetailsScreen extends Component {
       expirationDate,
       payment_request,
       bolt11,
-    } = invoice;
+    } = invoice
 
-    const privateInvoice = invoice.private;
+    const privateInvoice = invoice.private
 
-    console.log(invoice, "+_+_+");
     return (
       <ScrollView
         contentContainerStyle={styles.rootContainer}
@@ -63,13 +53,12 @@ export default class TransactionDetailsScreen extends Component {
         bounces={false}
       >
         <Text style={styles.textHeader}>Invoice Details</Text>
-        <InvoiceItem invoice={invoice}></InvoiceItem>
 
         <View style={styles.bodySection}>
           {!!payment_request && (
             <TouchableOpacity
               onPress={() => {
-                this.writeToClipboard(payment_request);
+                this.writeToClipboard( payment_request )
               }}
             >
               <View style={styles.lineItem}>
@@ -89,7 +78,7 @@ export default class TransactionDetailsScreen extends Component {
           )}
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>
-              {isPaid ? "Paid Amount" : "Unpaid Amount"}
+              {isPaid ? 'Paid Amount' : 'Unpaid Amount'}
             </Text>
             <Text
               style={{
@@ -137,8 +126,8 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment(new Date(parseInt(invoice.settleDate))).format(
-                  "DD/MM/YY • hh:MMa"
+                {moment( new Date( parseInt( invoice.settleDate ) ) ).format(
+                  'DD/MM/YY • hh:MMa'
                 )}
               </Text>
             </View>
@@ -155,8 +144,8 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment(new Date(parseInt(invoice.creationDate))).format(
-                  "DD/MM/YY • hh:MMa"
+                {moment( new Date( parseInt( invoice.creationDate ) ) ).format(
+                  'DD/MM/YY • hh:MMa'
                 )}
               </Text>
             </View>
@@ -173,8 +162,8 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment(new Date(parseInt(expirationDate))).format(
-                  "DD/MM/YY • hh:MMa"
+                {moment( new Date( parseInt( expirationDate ) ) ).format(
+                  'DD/MM/YY • hh:MMa'
                 )}
               </Text>
             </View>
@@ -228,7 +217,7 @@ export default class TransactionDetailsScreen extends Component {
             </View>
           )}
 
-          {!!r_hash && typeof r_hash === "string" && (
+          {!!r_hash && typeof r_hash === 'string' && (
             <View style={styles.lineItem}>
               <Text style={ListStyles.listItemTitleTransaction}>R Hash</Text>
               <Text
@@ -291,11 +280,11 @@ export default class TransactionDetailsScreen extends Component {
           )}
         </View>
       </ScrollView>
-    );
+    )
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
@@ -314,8 +303,8 @@ const styles = StyleSheet.create({
   },
 
   lineItem: {
-    marginBottom: RFValue(16),
-    backgroundColor: "white",
+    marginBottom: RFValue( 16 ),
+    backgroundColor: 'white',
     padding: 10,
     paddingHorizontal: 10,
     elevation: 4,
@@ -323,7 +312,7 @@ const styles = StyleSheet.create({
   },
 
   containerRec: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-});
+} )

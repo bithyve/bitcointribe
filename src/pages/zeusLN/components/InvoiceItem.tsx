@@ -98,7 +98,6 @@ const InvoiceItem = ( {
   const amountTextStyle = useMemo( () => {
     return {
       ...styles.amountText,
-      color: transactionKindIconColor,
     }
   }, [ invoice ] )
 
@@ -141,7 +140,7 @@ const InvoiceItem = ( {
       <View style={{
         borderBottomWidth: 1, borderColor: Colors.gray1, marginHorizontal: widthPercentageToDP( 4 )
       }} />
-      </View>
+    </View>
   )
 }
 

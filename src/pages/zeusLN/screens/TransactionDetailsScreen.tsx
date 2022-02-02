@@ -1,39 +1,29 @@
-import React, { Component, ReactElement } from "react";
+import React, { Component } from 'react'
 import {
   Text,
   View,
-  FlatList,
-  TouchableOpacity,
-  Button,
   StyleSheet,
   ScrollView,
-} from "react-native";
-import openLink from "../../../utils/OpenLink";
-import RESTUtils from "../../../utils/ln/RESTUtils";
-import ChannelItem from "../components/channels/ChannelListComponent";
-import { widthPercentageToDP } from "react-native-responsive-screen";
-import { inject, observer } from "mobx-react";
-import ListStyles from "../../../common/Styles/ListStyles";
-import LabeledBalanceDisplay from "../../../components/LabeledBalanceDisplay";
-import moment from "moment";
-import Colors from "../../../common/Colors";
-import { RFValue } from "react-native-responsive-fontsize";
-import Fonts from "../../../common/Fonts";
-import TransactionKind from "../../../common/data/enums/TransactionKind";
-import TransactionItem from "../components/TransactionItem";
+} from 'react-native'
+import openLink from '../../../utils/OpenLink'
+import ListStyles from '../../../common/Styles/ListStyles'
+import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
+import Colors from '../../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../../common/Fonts'
 
 export default class TransactionDetailsScreen extends Component {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
     // console.log(this.props.)
     this.state = {
-      transaction: this.props.navigation.getParam("transaction"),
-      accountShellId: this.props.navigation.getParam("accountShellId"),
-    };
+      transaction: this.props.navigation.getParam( 'transaction' ),
+      accountShellId: this.props.navigation.getParam( 'accountShellId' ),
+    }
   }
 
   render() {
-    console.log(this.props.navigation.getParam("transaction"), "transac");
+    console.log( this.props.navigation.getParam( 'transaction' ), 'transac' )
     return (
       <ScrollView
         contentContainerStyle={styles.rootContainer}
@@ -42,14 +32,6 @@ export default class TransactionDetailsScreen extends Component {
       >
 
         <Text style={styles.textHeader}>Transaction Details</Text>
-
-
-        <View>
-          <TransactionItem
-            transaction={this.state.transaction}
-            accountShellId={this.state.accountShellId}
-          ></TransactionItem>
-        </View>
 
         <View style={styles.bodySection}>
           <View style={styles.lineItem}>
@@ -92,7 +74,7 @@ export default class TransactionDetailsScreen extends Component {
                 marginBottom: 3,
               }}
             >
-              {JSON.stringify(this.state.transaction.dest_addresses)}
+              {this.state.transaction.dest_addresses.join( '\n' ) }
             </Text>
           </View>
 
@@ -118,17 +100,17 @@ export default class TransactionDetailsScreen extends Component {
               }}
             >
               {this.state.transaction.num_confirmations > 6
-                ? "+6"
+                ? '+6'
                 : this.state.transaction.num_confirmations}
             </Text>
           </View>
         </View>
       </ScrollView>
-    );
+    )
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
@@ -147,8 +129,8 @@ const styles = StyleSheet.create({
   },
 
   lineItem: {
-    marginBottom: RFValue(16),
-    backgroundColor: "white",
+    marginBottom: RFValue( 16 ),
+    backgroundColor: 'white',
     padding: 10,
     paddingHorizontal: 10,
     elevation: 4,
@@ -156,7 +138,7 @@ const styles = StyleSheet.create({
   },
 
   containerRec: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-});
+} )

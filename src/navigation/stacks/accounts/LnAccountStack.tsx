@@ -104,14 +104,24 @@ const AccountDetailsStack = createStackNavigator(
     InvoiceDetailsScreen: {
       screen: InvoiceDetailsScreen,
       navigationOptions: {
-        header: null
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
       }
     },
 
     TransactionDetailsScreen: {
       screen: TransactionDetailsScreen,
       navigationOptions: {
-        header: null
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
       }
     },
 

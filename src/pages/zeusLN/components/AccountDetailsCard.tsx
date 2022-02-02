@@ -29,6 +29,10 @@ import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../../common/content/LocContext'
 import { Mode } from '../AccountDetails'
 import  BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 export type Props = {
   accountShell: AccountShell;
@@ -181,24 +185,25 @@ const AccountDetailsCard: React.FC<Props> = ( {
 
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPressOut={onPressOut}
-      style={rootContainerStyle}>
-      <View
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          borderRadius: cardBorderRadius,
-          backgroundColor: shadowColorForAccountKind( mode )
-        }}
-        //imageStyle={styles.cardImageContainer}
-      >
-        <View style={styles.mainContentContainer}>
-          <AccountKindDetailsSection />
-          <FooterSection />
-        </View>
+    <ImageBackground
+      //activeOpacity={0.7}
+      source={
+        mode === Mode.LIGHTNING ?
+          require( '../../../assets/images/carouselImages/bg-ln-card.png' ) :
+          require( '../../../assets/images/carouselImages/bg-onchain-card.png' )
+      }
+      //onPressOut={onPressOut}
+      style={{
+        height: hp( '20%' )
+      }}
+      imageStyle={[ styles.cardImageContainer, {
+        backgroundColor: shadowColorForAccountKind( mode )
+      } ]}>
+      <View style={styles.mainContentContainer}>
+        <AccountKindDetailsSection />
+        <FooterSection />
       </View>
-    </TouchableOpacity>
+    </ImageBackground>
   )
 }
 
