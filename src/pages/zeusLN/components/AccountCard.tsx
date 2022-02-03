@@ -131,7 +131,7 @@ const AccountCard = ( {
       >
         <AccountDetailsCard
           onKnowMorePressed={() => { }}
-          onSettingsPressed={onClickSettings}
+          onSettingsPressed={() => { }}
           balance={!isLightning ? totalBlockchainBalance : lightningBalance}
           accountShell={accountShell}
           mode={!isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}

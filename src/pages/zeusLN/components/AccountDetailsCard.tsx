@@ -185,25 +185,27 @@ const AccountDetailsCard: React.FC<Props> = ( {
 
 
   return (
-    <ImageBackground
+    <TouchableOpacity activeOpacity={1.0} onPressOut={onPressOut}>
+      <ImageBackground
       //activeOpacity={0.7}
-      source={
-        mode === Mode.LIGHTNING ?
-          require( '../../../assets/images/carouselImages/bg-ln-card.png' ) :
-          require( '../../../assets/images/carouselImages/bg-onchain-card.png' )
-      }
-      //onPressOut={onPressOut}
-      style={{
-        height: hp( '20%' )
-      }}
-      imageStyle={[ styles.cardImageContainer, {
-        backgroundColor: shadowColorForAccountKind( mode )
-      } ]}>
-      <View style={styles.mainContentContainer}>
-        <AccountKindDetailsSection />
-        <FooterSection />
-      </View>
-    </ImageBackground>
+        source={
+          mode === Mode.LIGHTNING ?
+            require( '../../../assets/images/carouselImages/bg-ln-card.png' ) :
+            require( '../../../assets/images/carouselImages/bg-onchain-card.png' )
+        }
+        //onPressOut={onPressOut}
+        style={{
+          height: hp( '20%' )
+        }}
+        imageStyle={[ styles.cardImageContainer, {
+          backgroundColor: shadowColorForAccountKind( mode )
+        } ]}>
+        <View style={styles.mainContentContainer}>
+          <AccountKindDetailsSection />
+          <FooterSection />
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
   )
 }
 
