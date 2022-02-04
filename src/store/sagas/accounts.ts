@@ -1196,13 +1196,7 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account's balance and transactions
   const syncAll = true
   const hardRefresh = true
-
-  yield call( autoSyncShellsWorker, {
-    payload: {
-      syncAll, hardRefresh
-    }
-  } )
-  //yield call( syncTxAfterRestore, restoredAccounts )
+  yield put( autoSyncShells( syncAll, hardRefresh ) )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(
