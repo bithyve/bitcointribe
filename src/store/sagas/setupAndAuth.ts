@@ -41,7 +41,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
 import semverLte from 'semver/functions/lte'
-import { accountVisibilityResetter, restoreManageBackupDataPipeline, restoreMultiSigTwoFAFlag, testAccountEnabler } from './upgrades'
+import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
@@ -274,10 +274,9 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
     version: newVersion
   } ) )
 
-  if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
-  if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
-  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
-  if( semver.lt( storedVersion, '2.0.70' ) ) yield call( restoreManageBackupDataPipeline )
+  yield call( applyUpgradeSequence, {
+    storedVersion, newVersion
+  } )
 
   // update permanent channels w/ new version
   const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
