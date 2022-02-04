@@ -332,7 +332,7 @@
     },
     "accManagement": {
       "AccountManagement": "Account Management",
-      "Rearrange": "Rearrange, archive and reinstate accounts from here",
+      "Rearrange": "Rearrange reinstate accounts from here",
       "HiddenAccounts": "Hidden Accounts",
       "ArchivedAccounts": "Archived Accounts",
       "Save": "Save New Ordering",

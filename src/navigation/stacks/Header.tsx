@@ -546,7 +546,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
             if( nextAppState === 'background' ) {
-              this.closeBottomSheet()
+              // this.closeBottomSheet()
             }
             // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
@@ -1640,7 +1640,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // >
       <View
         style={{
-          height: heightPercentageToDP( '21.9%' ),
+          height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
           backgroundColor: Colors.blue,
           paddingTop:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch
@@ -1676,9 +1676,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // overallHealth={overallHealth}
           />
           <ModalContainer
-            onBackground={()=>this.setState( {
+            onBackground={()=>{
+              const perviousState = this.state.currentBottomSheetKind   
+              this.setState( {
               currentBottomSheetKind: null
-            } )}
+            } )
+            setTimeout( () => {
+              this.setState( {
+                currentBottomSheetKind: perviousState} 
+              )
+            }, 200 )
+          }}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
           >

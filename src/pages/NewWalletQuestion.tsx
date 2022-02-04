@@ -1508,27 +1508,24 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             </View>
           </TouchableOpacity>
         </View>
+        <View style={{ marginBottom:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0, flexDirection:'row',alignItems:'flex-end',marginTop:hp(20)}}>
         {showNote && !visibleButton ? (
           <View
-            style={{
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
-              marginTop:20,
-            }}
           >
             <BottomInfoBox
               title={common.note}
               infoText={strings.Backuplets}
               italicText={
                 ' '+bhr.SecurityCenter}
-              backgroundColor={Colors.white}
-            />
+              width =  {'47%'}  />
           </View>
         ) : null}
         <View style={styles.statusIndicatorView}>
           <View style={styles.statusIndicatorInactiveView} />
           {/* <View style={styles.statusIndicatorInactiveView} /> */}
           <View style={styles.statusIndicatorActiveView} />
+        </View>
         </View>
       </ScrollView>
 
@@ -1682,8 +1679,8 @@ const styles = StyleSheet.create( {
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
-    marginHorizontal: wp( '6%' ),
-    marginBottom: hp( 2 )
+    marginHorizontal: wp( '4%' ),
+    marginBottom: hp( 3.8 )
   },
   statusIndicatorActiveView: {
     height: 5,

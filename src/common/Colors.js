@@ -53,6 +53,7 @@ const Colors = {
   gray6: '#2F2F2F',
   gray7: '#FCFCFC',
   gray8: '#A0A0A0',
+  gray9: '#D0D0D0',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',
