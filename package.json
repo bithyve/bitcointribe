@@ -132,6 +132,7 @@
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screen-corner-radius": "^0.1.1",
     "react-native-screens": "^2.9.0",
+    "react-native-shadow-2": "^6.0.1",
     "react-native-share": "^3.7.0",
     "react-native-slider": "^0.11.0",
     "react-native-snap-carousel": "^4.0.0-beta.5",

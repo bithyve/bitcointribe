@@ -309,7 +309,7 @@
   },
   "accManagement": {
       "AccountManagement": "Gestion de compte",
-      "Rearrange": "Réorganisez, archivez et restaurez les comptes à partir d'ici",
+      "Rearrange": "Réorganiser et restaurer les comptes à partir d'ici",
       "HiddenAccounts": "Comptes cachés",
       "ArchivedAccounts": "Comptes archivés",
       "Save": "Enregistrer la disposition",

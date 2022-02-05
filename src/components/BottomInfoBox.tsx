@@ -36,7 +36,7 @@ export default function BottomInfoBox( props ) {
           {props.title}
         </Text>
         }
-        <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding ] : styles.bottomNoteInfoText}>
+        <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding ] : {...styles.bottomNoteInfoText, width : props?.width}}>
           {props.infoText}
           {props.linkText ? (
             <Text

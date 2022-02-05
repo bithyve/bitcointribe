@@ -6,6 +6,7 @@ import {
   ViewStyle,
   StyleProp,
   Image,
+  Platform
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -131,8 +132,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <ToggleContainer />
         </View>
 
-        <ScrollView style={{
-          marginBottom: 20, flex:1, marginTop: 0
+        <View style={{
+          marginBottom: 0, flex:1,
         }}>
           <HomeAccountCardsList
             contentContainerStyle={{
@@ -142,25 +143,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onAddNewSelected={this.navigateToAddNewAccountScreen}
             onCardSelected={this.handleAccountCardSelection}
           />
+          <View style={{justifyContent:'center',flexDirection:'row'}}>
           <HomeBuyCard
             cardContainer={{
               backgroundColor: 'white',
-              marginLeft: wp( 4 ),
-              marginRight: wp( 6 ),
-              height: hp( '13%' ),
+              // marginLeft: wp( 4 ),
+              marginRight: wp( 2),
+              height: hp(Platform.OS == 'ios' ? '13%' : '15%' ),
+              width:wp('91%'),
               alignItems: 'center',
               justifyContent: 'space-between',
               paddingHorizontal: hp( 3 ),
-              marginBottom: hp( 3 ),
+              marginBottom: hp(Platform.OS == 'ios' ? 4 : 2 ),
               borderRadius: wp( 2 ),
               padding: hp( '1.4%' ),
               flexDirection: 'row',
-              shadowColor: Colors.shadowColor,
-              shadowOpacity: 1,
-              shadowOffset: {
-                width: 10, height: 10
-              },
-              elevation: 6
+              // shadowColor: Colors.shadowColor,
+              // shadowOpacity: 1,
+              // shadowOffset: {
+              //   width: 10, height: 10
+              // },
+              // elevation: 6
             }}
             amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
             incramount={''}
@@ -169,7 +172,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             openBottomSheet={( type ) => this.props.openBottomSheet( type )}
             currencyCode={currencyCode}
           />
-        </ScrollView>
+          </View>
+        </View>
       </View>
     )
   }

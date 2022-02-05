@@ -188,7 +188,6 @@ export default function AddContactAddressBook( props ) {
   }, [] )
 
   const filterContacts = ( keyword ) => {
-    console.log( 'filterContacts keyword', keyword )
     if ( contactData.length > 0 ) {
       if ( !keyword.length ) {
         setFilterContactData( contactData )
@@ -197,6 +196,8 @@ export default function AddContactAddressBook( props ) {
       const isFilter = true
       const filterContactsForDisplay = []
       for ( let i = 0; i < contactData.length; i++ ) {
+        const contactWords = contactData[ i ].name.split( ' ' ).length
+        const middleName = contactData[ i ].name.split( ' ' ).slice( 1, contactWords-1 ).join( ' ' )
         if (
           ( contactData[ i ].firstName &&
             contactData[ i ].firstName
@@ -205,8 +206,16 @@ export default function AddContactAddressBook( props ) {
           ( contactData[ i ].lastName &&
             contactData[ i ].lastName
               .toLowerCase()
-              .startsWith( keyword.toLowerCase() ) )
-        ) {
+              .startsWith( keyword.toLowerCase() ) ) ||
+              ( contactData[ i ].name &&
+                contactData[ i ].name
+                  .toLowerCase()
+                  .startsWith( keyword.toLowerCase() ) ) ||
+                  ( middleName &&
+                    middleName
+                      .toLowerCase()
+                      .startsWith( keyword.toLowerCase() ) )
+        )  {
           filterContactsForDisplay.push( contactData[ i ] )
         }
       }
@@ -530,7 +539,7 @@ export default function AddContactAddressBook( props ) {
                         onpress={() => onContactSelect( index )}
                       />
                       <Text style={styles.contactText}>
-                        {item.name && item.name.split( ' ' )[ 0 ]
+                        {/* {item.name && item.name.split( ' ' )[ 0 ]
                           ? item.name.split( ' ' )[ 0 ]
                           : ''}{' '}
                         <Text style={{
@@ -539,7 +548,22 @@ export default function AddContactAddressBook( props ) {
                           {item.name && item.name.split( ' ' )[ 1 ]
                             ? item.name.split( ' ' )[ 1 ]
                             : ''}
-                        </Text>
+                        </Text> */}
+
+                        {item.name && item.name.split( ' ' ).map( ( x, index )=> {
+                          const i = item.name.split( ' ' ).length
+                          return (
+                            <Text>
+                              {index !== i-1 ? `${x} ` :
+                                <Text style={{
+                                  fontFamily: Fonts.FiraSansMedium
+                                }}>
+                                  {x}
+                                </Text>
+                              }
+                            </Text>
+                          )
+                        } )}
                       </Text>
                     </AppBottomSheetTouchableWrapper>
                   )
