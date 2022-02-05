@@ -150,6 +150,7 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import { updateCloudData } from '../actions/cloud'
 import { restoreAccountShellsWorker } from './accounts'
 import { applyUpgradeSequence } from './upgrades'
+import semver from 'semver'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -594,7 +595,6 @@ function* recoverWalletWorker( { payload } ) {
       smShare = BHROperations.decryptWithAnswer( image.SM_share, decryptionKey ).decryptedData
     }
 
-    const backupVersion = image.version
     const appVersion = DeviceInfo.getVersion()
 
     // RESTORE: Wallet
@@ -633,8 +633,12 @@ function* recoverWalletWorker( { payload } ) {
     yield call( dbManager.createWallet, wallet )
 
     // RESTORE: Version history
+    let versionHistory = []
     try{
-      if( image.versionHistory ) yield put( setVersionHistory( JSON.parse( BHROperations.decryptWithAnswer( image.versionHistory, decryptionKey ).decryptedData ) ) )
+      if( image.versionHistory ) {
+        versionHistory = JSON.parse( BHROperations.decryptWithAnswer( image.versionHistory, decryptionKey ).decryptedData )
+        yield put( setVersionHistory( versionHistory ) )
+      }
     } catch( err ){
       console.log( 'Unable to set version history' )
     }
@@ -672,6 +676,14 @@ function* recoverWalletWorker( { payload } ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
 
     // APPLY: upgrades
+    let backupVersion = image.version
+    if( !backupVersion ) { // pick the latest version from the version history
+      let latestBackupVersion
+      versionHistory.forEach( ( { version } ) => {
+        if( !latestBackupVersion || semver.lt( latestBackupVersion, version ) ) latestBackupVersion = version
+      } )
+      backupVersion = latestBackupVersion
+    }
     if( backupVersion )
       yield call( applyUpgradeSequence, {
         storedVersion: backupVersion, newVersion: appVersion
