@@ -97,8 +97,11 @@ function* updateWalletNameWorker( { payload } ) {
   const { walletName }: { walletName: string } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
 
+  // if username defaults to walletname(no manually change to username) then update the username as well
+  const updatedUserName = wallet.userName === wallet.walletName ? walletName: wallet.userName
+
   yield put( updateWallet( {
-    ...wallet, walletName: walletName
+    ...wallet, walletName: walletName, userName: updatedUserName
   } ) )
   yield call( dbManager.updateWallet, {
     walletName,
