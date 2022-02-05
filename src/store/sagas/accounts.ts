@@ -662,6 +662,7 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   )
 
   const shellsToSync: AccountShell[] = []
+  const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
@@ -669,6 +670,7 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
+            if( syncAll ) testShellsToSync.push( shell )
             break
 
           case AccountType.DONATION_ACCOUNT:
@@ -684,6 +686,15 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
     payload: {
       shells: shellsToSync,
+      options: {
+        hardRefresh
+      }
+    }
+  } )
+
+  if( syncAll && testShellsToSync.length )  yield call( refreshAccountShellsWorker, {
+    payload: {
+      shells: testShellsToSync,
       options: {
         hardRefresh
       }
