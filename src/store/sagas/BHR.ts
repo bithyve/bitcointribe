@@ -148,6 +148,9 @@ import Toast from '../../components/Toast'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import { updateCloudData } from '../actions/cloud'
+import { restoreAccountShellsWorker } from './accounts'
+import { applyUpgradeSequence } from './upgrades'
+import semver from 'semver'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -592,7 +595,9 @@ function* recoverWalletWorker( { payload } ) {
       smShare = BHROperations.decryptWithAnswer( image.SM_share, decryptionKey ).decryptedData
     }
 
-    // Update Wallet
+    const appVersion = DeviceInfo.getVersion()
+
+    // RESTORE: Wallet
     const wallet: Wallet = {
       walletId: image.walletId,
       walletName: image.name,
@@ -604,13 +609,14 @@ function* recoverWalletWorker( { payload } ) {
       userName: image.userName ? image.userName: '',
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
-      version: DeviceInfo.getVersion(),
+      version: appVersion,
       primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
       secondaryXpub,
       details2FA,
       smShare
     }
-    // restore Contacts
+
+    // RESTORE: Contacts
     if( image.contacts ) {
       const decryptedChannelIds = BHROperations.decryptWithAnswer( image.contacts, decryptionKey ).decryptedData
       const contactsChannelKeys = JSON.parse( decryptedChannelIds )
@@ -625,23 +631,32 @@ function* recoverWalletWorker( { payload } ) {
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
     yield call( dbManager.createWallet, wallet )
-    // Version histroy Restore
-    if( image.versionHistory ) yield put( setVersionHistory( JSON.parse( BHROperations.decryptWithAnswer( image.versionHistory, decryptionKey ).decryptedData ) ) )
-    // restore Accounts
-    // restore health
+
+    // RESTORE: Version history
+    let versionHistory = []
+    try{
+      if( image.versionHistory ) {
+        versionHistory = JSON.parse( BHROperations.decryptWithAnswer( image.versionHistory, decryptionKey ).decryptedData )
+        yield put( setVersionHistory( versionHistory ) )
+      }
+    } catch( err ){
+      console.log( 'Unable to set version history' )
+    }
+
+    // RESTORE: Health
     yield call( setupLevelHealthWorker, {
       payload: {
         level: level, keeperInfo: JSON.parse( selectedBackup.keeperData )
       }
     } )
 
-    // restore Metashres
+    // RESTORE: Metashres
     if( level > 1 ) {
       yield put( retrieveMetaShares( shares ) )
       yield put( setAllowSecureAccount( true ) )
     }
 
-    // restore gifts
+    // RESTORE: Gifts
     if( image.gifts ) {
       const gifts = {
       }
@@ -654,8 +669,25 @@ function* recoverWalletWorker( { payload } ) {
       yield call( dbManager.createGifts, data )
     }
 
-    yield put( restoreAccountShells( acc ) )
+    // RESTORE: Accounts
+    yield call( restoreAccountShellsWorker, {
+      payload: acc
+    }  )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+
+    // APPLY: upgrades
+    let backupVersion = image.version
+    if( !backupVersion ) { // pick the latest version from the version history
+      let latestBackupVersion
+      versionHistory.forEach( ( { version } ) => {
+        if( !latestBackupVersion || semver.lt( latestBackupVersion, version ) ) latestBackupVersion = version
+      } )
+      backupVersion = latestBackupVersion
+    }
+    if( backupVersion )
+      yield call( applyUpgradeSequence, {
+        storedVersion: backupVersion, newVersion: appVersion
+      } )
   } catch ( err ) {
     console.log( err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
@@ -785,7 +817,8 @@ function* updateWalletImageWorker( { payload } ) {
   const walletImage : NewWalletImage = {
     name: wallet.walletName,
     walletId : wallet.walletId,
-    userName: wallet.userName ? wallet.userName : ''
+    userName: wallet.userName ? wallet.userName : '',
+    version: wallet.version,
   }
   const encryptionKey = bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' )
   if( updateSmShare ) {

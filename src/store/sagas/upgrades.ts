@@ -7,6 +7,14 @@ import { AccountsState } from '../reducers/accounts'
 import dbManager from '../../storage/realm/dbManager'
 import { updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
 import { updateWallet } from '../actions/storage'
+import semver from 'semver'
+
+export function* applyUpgradeSequence( { storedVersion, newVersion }: {storedVersion: string, newVersion: string} ) {
+  if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
+  if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
+  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
+  if( semver.lt( storedVersion, '2.0.70' ) ) yield call( restoreManageBackupDataPipeline )
+}
 
 export function* testAccountEnabler( ) {
   const accountShells: AccountShell[] = yield select(
