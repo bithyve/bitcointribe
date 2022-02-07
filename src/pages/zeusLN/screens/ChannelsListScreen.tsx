@@ -60,27 +60,21 @@ export default class ChannelScreen extends Component {
       console.log(((remote_balance) / (remote_balance + local_balance)), ",", (local_balance) / (remote_balance + local_balance), "+()")
       return(
         <>
-        {
-          offline ? 
-          <View style={[ styles.grayBoxContainer, {
+          <View style={offline ? [ styles.grayBoxContainer, {
             backgroundColor:Colors.gray11, borderRadius:20
-          } ]}>
-            <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
-          </View> :
-          <>
-          <View style={[ styles.skyBlueBoxContainer, {
+          }, {flex: remoteEquity} ] : [ styles.skyBlueBoxContainer, {
             backgroundColor: Colors.primaryAccentLighter2
           }, {flex: localEquity} ]}>
-            <Text style={styles.channelPrice}>{local_balance}<Text style={styles.channelSats}>sats</Text></Text>
+            <Text numberOfLines={1} style={styles.channelPrice}>{local_balance}<Text style={styles.channelSats}>sats</Text></Text>
           </View>
-          <View style={[ styles.blueBoxContainer, {
-            backgroundColor:Colors.darkBlue
+          <View style={offline ? [ styles.grayBoxContainer, {
+            backgroundColor:Colors.gray11, borderRadius:20
+          }, {flex: remoteEquity}] : [ styles.blueBoxContainer, {
+            backgroundColor: offline? styles.grayBoxContainer: Colors.darkBlue
           }, {flex: remoteEquity} ]}>
-            <Text style={styles.channelPrice}>{remote_balance}<Text style={styles.channelSats}>sats</Text></Text>
+            <Text numberOfLines={1} style={styles.channelPrice}>{remote_balance}<Text style={styles.channelSats}>sats</Text></Text>
           </View>
           </>
-    }
-        </>
       )
     }
 
