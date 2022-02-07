@@ -810,7 +810,7 @@ export const updateWalletNameToChannelWatcher = createWatcher(
   UPDATE_WALLET_NAME_TO_CHANNEL,
 )
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string, giftNote?: string, isCurrentLevel0?: boolean }} ) {
+export function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, isPrimaryKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string, giftId?: string, giftNote?: string, isCurrentLevel0?: boolean }} ) {
   const { contact, flowKind, isKeeper, isPrimaryKeeper, channelKey, contactsSecondaryChannelKey, shareId, giftId, giftNote, isCurrentLevel0 } = payload
 
   const accountsState: AccountsState = yield select( state => state.accounts )
