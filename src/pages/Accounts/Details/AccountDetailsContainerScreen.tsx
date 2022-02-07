@@ -137,7 +137,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   function performRefreshOnPullDown() {
     dispatch( refreshAccountShell( accountShell, {
-      autoSync: false
+      autoSync: false,
+      hardRefresh: true,
     } ) )
   }
 
