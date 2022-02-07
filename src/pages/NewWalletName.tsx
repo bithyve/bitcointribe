@@ -13,6 +13,7 @@ import {
   TextInput,
   InteractionManager,
   Keyboard,
+  Dimensions
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -23,6 +24,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import { Checkbox } from 'react-native-paper'
 import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
 import HeaderTitle1 from '../components/HeaderTitle1'
@@ -43,6 +45,7 @@ import { setVersion } from '../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initNewBHRFlow } from '../store/actions/BHR'
 import LoaderModal from '../components/LoaderModal'
+import CheckMark from '../assets/images/svgs/checkmarktick.svg'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -52,6 +55,7 @@ export enum BottomSheetState {
   Closed,
   Open,
 }
+const windowHeight = Dimensions.get( 'window' ).height
 
 export default function NewWalletName( props ) {
   // const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
@@ -59,6 +63,8 @@ export default function NewWalletName( props ) {
   // const [ intervalRef, setIntervalRef ] = useState( null )
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
+  const [ errorMsg, setErrorMsg ] = useState( false )
+  const [ newUser, setNewUser ] = useState( false )
   const [ note, showNote ] = useState( true )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
@@ -94,6 +100,38 @@ export default function NewWalletName( props ) {
       showGif={false}
     />
   }, [ message, subTextMessage, loaderModal ] )
+  useEffect( ()=>{
+    errorMsg ? setInputStyle( ( prev )=>{
+      return {
+        ...prev, borderWidth: 1, borderColor: Colors.tomatoRed
+      }
+    } ) :
+      setInputStyle( ( prev )=>{
+        return {
+          ...prev, borderWidth: 0
+        }
+      } )
+  }, [ errorMsg ] )
+  // useEffect( () => {
+  //   if( timeLeft===0 ){
+  //     props.autoClose()
+  //     setTimeLeft( null )
+  //   }
+  //   if ( !timeLeft ) return
+  //   const intervalId = setInterval( () => {
+  //     setTimeLeft( timeLeft - 1 )
+  //     if( timeLeft - 1 == 2 ){ setTimerArray( [ 1, 1, 0 ] )
+  //     } else if( timeLeft - 1 == 1 ){
+  //       setTimerArray( [ 1, 0, 0 ] )
+  //     }
+  //     else if( timeLeft - 1 == 0 ){
+  //       setTimerArray( [ 0, 0, 0 ] )
+  //     }
+  //   }, 1000 )
+  //   console.log( 'timeLeft', timeLeft )
+  //   setIntervalRef( intervalId )
+  //   return () => { clearInterval( intervalId ) }
+  // }, [ timeLeft ] )
 
   const renderBottomSheetContent = () =>{
 
@@ -202,13 +240,14 @@ export default function NewWalletName( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1
+            flexGrow: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <View style={{
-            flex: 1
+            flex: 1,
+            marginTop:hp( 2.5 )
           }} >
             <HeaderTitle1
               firstLineTitle={`${strings.Step1}`}
@@ -219,18 +258,26 @@ export default function NewWalletName( props ) {
               infoTextNormal1={''}
               step={''}
             />
+            <Text style={styles.walletNameDescription}>Wallet name is use in the messages you send to your Friends & Family contacts</Text>
             <TextInput
-              style={inputStyle}
+              style={{
+                ...inputStyle
+              }}
               placeholder={strings.walletName}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               keyboardType={
                 Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
               }
-              maxLength={10}
+              maxLength={12}
               onChangeText={( text ) => {
-                text = text.replace( /[^A-Za-z]/g, '' )
                 setWalletName( text )
+                // text = text.replace( /[^A-Za-z-0-9]/g, '' )
+                if( text.match( /[^A-Za-z-0-9]/g ) ){
+                  setErrorMsg( true )
+                }else{
+                  setErrorMsg( false )
+                }
               }}
               onFocus={() => {
                 setInputStyle( styles.inputBoxFocused )
@@ -242,15 +289,35 @@ export default function NewWalletName( props ) {
               autoCorrect={false}
               autoCompleteType="off"
             />
+            {/* <Checkbox status={newUser ? 'checked' : 'unchecked'} onPress={()=>{setNewUser( prev => !prev )}}/> */}
+            {/* <Checkbox
+              color='red'
+              status={checked ? 'checked' : 'unchecked'}
+              onPress={() => {
+                setChecked( !checked )
+              }}
+            /> */}
+            <View style={styles.checkBoxDirectionContainer}>
+              {newUser ? <TouchableOpacity activeOpacity={1} style={styles.checkBoxColorContainer} onPress={() => setNewUser( !newUser )}>
+                <CheckMark />
+              </TouchableOpacity> :
+                <TouchableOpacity activeOpacity={1} style={styles.checkBoxBorderContainer} onPress={() => setNewUser( !newUser )}>
+                  {/* <CheckMark /> */}
+                </TouchableOpacity>}
+              <View>
+                <Text style={styles.checkBoxHeading}>I am new to bitcoin</Text>
+                <Text style={styles.checkBoxParagraph}>A Test Account preloaded with test bitcoin (sats) will be enabled for you</Text>
+              </View>
+            </View>
             <View style={{
               marginRight: wp( 6 )
             }}>
-              <Text style={{
+              {errorMsg && <Text style={{
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansItalic, color: Colors.tomatoRed,
                 alignSelf: 'flex-end'
               }}>
-                {strings.WalletCreationNumbers}</Text>
+                {strings.WalletCreationNumbers}</Text>}
               {/* <Text style={{
                 fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
@@ -260,11 +327,7 @@ export default function NewWalletName( props ) {
             </View>
           </View>
           {/* </KeyboardAvoidingView> */}
-          <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorActiveView} />
-            <View style={styles.statusIndicatorInactiveView} />
-            {/* <View style={styles.statusIndicatorInactiveView} /> */}
-          </View>
+
           <View style={styles.bottomButtonView}>
             {walletName.trim() != '' ? (
               <View
@@ -279,25 +342,30 @@ export default function NewWalletName( props ) {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    setLoaderModal( true )
+                    // setLoaderModal( true )
                     Keyboard.dismiss()
                     //setTimeout( () => {
                     // props.navigation.navigate( 'NewWalletQuestion', {
                     //   walletName,
                     // } )
-                    setTimeout( () => {
-                      setSignUpStarted( true )
-                      dispatch( updateCloudPermission( false ) )
-                      dispatch( setupWallet( walletName, null ) )
-                      dispatch( initNewBHRFlow( true ) )
-                      dispatch( setVersion( 'Current' ) )
-                      const current = Date.now()
-                      AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
-                      const securityQuestionHistory = {
-                        created: current,
-                      }
-                      AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
-                    }, 1000 )
+                    // setTimeout( () => {
+                    //   setSignUpStarted( true )
+                    //   dispatch( updateCloudPermission( false ) )
+                    //   dispatch( setupWallet( walletName, null ) )
+                    //   dispatch( initNewBHRFlow( true ) )
+                    //   dispatch( setVersion( 'Current' ) )
+                    //   const current = Date.now()
+                    //   AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
+                    //   const securityQuestionHistory = {
+                    //     created: current,
+                    //   }
+                    //   AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
+                    // }, 1000 )
+                    props.navigation.navigate( 'NewWalletQuestion', {
+                      walletName, newUser
+                    } )
+                  // setIsCloudPermissionRender( true )
+                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
                   }}
                   style={styles.buttonView}
                 >
@@ -305,12 +373,15 @@ export default function NewWalletName( props ) {
                 </TouchableOpacity>
               </View>
             ) : null}
-
-
+            <View style={styles.statusIndicatorView}>
+              <View style={styles.statusIndicatorInactiveView} />
+              <View style={styles.statusIndicatorActiveView} />
+              {/* <View style={styles.statusIndicatorInactiveView} /> */}
+            </View>
           </View>
         </KeyboardAvoidingView>
         {/* {walletName.trim() == '' ? ( */}
-        {note ? (
+        {/* {note ? (
           <View style={{
             marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
           }}>
@@ -321,7 +392,7 @@ export default function NewWalletName( props ) {
               }
             />
           </View>
-        ) : null}
+        ) : null} */}
 
       </View>
       {/* <BottomSheetBackground
@@ -334,7 +405,6 @@ export default function NewWalletName( props ) {
     </SafeAreaView>
   )
 }
-
 const styles = StyleSheet.create( {
   pageTitle: {
     color: Colors.blue,
@@ -407,19 +477,19 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flexDirection: 'row',
-    paddingHorizontal: hp( 6 ),
-    paddingBottom: DeviceInfo.hasNotch() ? hp( 4 ) : hp( 3 ),
-    // paddin: hp( 9 ),
+    paddingHorizontal: hp( 2.5 ),
+    paddingBottom: hp( windowHeight >= 800 ?  8  : windowHeight >= 700 ? 7 :  6 ),
+    // padding: hp( 9 ),
     alignItems: 'center',
   },
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
-    paddingHorizontal: hp( 3 )
+    paddingHorizontal: hp( 1 ),
   },
   statusIndicatorActiveView: {
     height: 5,
-    width: 25,
+    width: 30,
     backgroundColor: Colors.blue,
     borderRadius: 10,
   },
@@ -427,7 +497,7 @@ const styles = StyleSheet.create( {
     width: 5,
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
-    marginLeft: 5,
+    marginRight: 5,
   },
   checkbox: {
     width: wp( '7%' ),
@@ -461,4 +531,51 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
   },
+  walletNameDescription:{
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 12 ),
+    paddingHorizontal:wp( 5 ),
+    width:wp( '80%' ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop:hp( -1.7 ),
+    letterSpacing:0.4,
+    marginBottom:hp( 3 )
+  },
+  checkBoxBorderContainer:{
+    borderWidth:1,
+    borderColor:Colors.gray12,
+    width:wp( 5 ),
+    height:20,
+    borderRadius:3,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  checkBoxDirectionContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    paddingHorizontal:wp( 6 ),
+    paddingVertical:hp( 6 )
+  },
+  checkBoxColorContainer:{
+    width:wp( 5 ),
+    height:20,
+    borderRadius:3,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Colors.green,
+  },
+  checkBoxHeading:{
+    color: Colors.checkBlue,
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft:wp( 4 )
+  },
+  checkBoxParagraph:{
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 11 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft:wp( 4 ),
+    width:wp( '70%' ),
+    marginTop:hp( 0.6 )
+  }
 } )

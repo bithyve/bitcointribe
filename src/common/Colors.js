@@ -57,6 +57,7 @@ const Colors = {
   gray6: '#2F2F2F',
   gray7: '#FCFCFC',
   gray8: '#A0A0A0',
+
   gray9: '#D0D0D0',
   gray12: '#BABABA',
   gray10: '#969696',
