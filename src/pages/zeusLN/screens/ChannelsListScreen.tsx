@@ -66,7 +66,7 @@ export default class ChannelScreen extends Component {
             <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
           </View>}
           <View style={[ styles.grayBoxContainer, {
-            backgroundColor:Colors.gray11, borderRadius:count==1 && 20
+            backgroundColor:Colors.gray11, borderRadius:20
           } ]}>
             <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
           </View>
