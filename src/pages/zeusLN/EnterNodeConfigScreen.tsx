@@ -959,7 +959,7 @@ render() {
             </>
           )}
 
-          <View style={{
+          {/* <View style={{
             marginBottom: hp( 2 ),
             marginHorizontal: wp( 3 ),
             flexDirection: 'row'
@@ -992,7 +992,7 @@ render() {
               Connect via Tor
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
           {/* {!enableTor && (
             <View
               style={{

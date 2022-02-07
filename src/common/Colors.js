@@ -19,6 +19,8 @@ const Colors = {
   white: '#ffffff',
   offWhite: '#F5F5F5',
   red: '#FF7761',
+  darkRed: '#F67761',
+  lightRed1: '#F0C9C2',
   tomatoRed: '#FF7861',
   homepageButtonColor: '#2C85C1',
   yellow: '#F7C910',

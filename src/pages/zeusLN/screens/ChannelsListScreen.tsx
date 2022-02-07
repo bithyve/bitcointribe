@@ -1,5 +1,5 @@
 import React, { Component, ReactElement } from 'react'
-import { Text, View, FlatList, TouchableOpacity, Button, StyleSheet, Image } from 'react-native'
+import { Text, View, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, Image } from 'react-native'
 import RESTUtils from '../../../utils/ln/RESTUtils'
 import ChannelItem from '../components/channels/ChannelListComponent'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
@@ -53,28 +53,37 @@ export default class ChannelScreen extends Component {
   uniqueKey = ( item: any, index: number ) => index.toString();
   renderTemplate = ( { item }: { item: ChannelFrame } ): ReactElement => {
     const ChannelBar = ( { offline } ) => {
-      let remote_balance: number = parseInt(item.remote_balance)
-      let local_balance:number = parseInt(item.local_balance)
-      let remoteEquity: number = ((remote_balance) / (remote_balance + local_balance))
-      let localEquity: number = ((local_balance) / (remote_balance + local_balance))
-      console.log(((remote_balance) / (remote_balance + local_balance)), ",", (local_balance) / (remote_balance + local_balance), "+()")
+      const remote_balance: number = parseInt( item.remote_balance )
+      const local_balance:number = parseInt( item.local_balance )
+      const remoteEquity: number = ( ( remote_balance ) / ( remote_balance + local_balance ) )
+      const localEquity: number = ( ( local_balance ) / ( remote_balance + local_balance ) )
       return(
         <>
-          <View style={offline ? [ styles.grayBoxContainer, {
-            backgroundColor:Colors.gray11, borderRadius:20
-          }, {flex: remoteEquity} ] : [ styles.skyBlueBoxContainer, {
-            backgroundColor: Colors.primaryAccentLighter2
-          }, {flex: localEquity} ]}>
-            <Text numberOfLines={1} style={styles.channelPrice}>{local_balance}<Text style={styles.channelSats}>sats</Text></Text>
-          </View>
-          <View style={offline ? [ styles.grayBoxContainer, {
-            backgroundColor:Colors.gray11, borderRadius:20
-          }, {flex: remoteEquity}] : [ styles.blueBoxContainer, {
-            backgroundColor: offline? styles.grayBoxContainer: Colors.darkBlue
-          }, {flex: remoteEquity} ]}>
-            <Text numberOfLines={1} style={styles.channelPrice}>{remote_balance}<Text style={styles.channelSats}>sats</Text></Text>
-          </View>
-          </>
+          {
+            offline ?
+              <View style={[ styles.grayBoxContainer, {
+                backgroundColor:Colors.gray11, borderRadius:20
+              } ]}>
+                <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
+              </View> :
+              <>
+                <View style={[ styles.skyBlueBoxContainer, {
+                  backgroundColor: Colors.primaryAccentLighter2
+                }, {
+                  flex: localEquity
+                } ]}>
+                  <Text style={styles.channelPrice}>{local_balance}<Text style={styles.channelSats}>sats</Text></Text>
+                </View>
+                <View style={[ styles.blueBoxContainer, {
+                  backgroundColor:Colors.darkBlue
+                }, {
+                  flex: remoteEquity
+                } ]}>
+                  <Text style={styles.channelPrice}>{remote_balance}<Text style={styles.channelSats}>sats</Text></Text>
+                </View>
+              </>
+          }
+        </>
       )
     }
 
@@ -87,22 +96,11 @@ export default class ChannelScreen extends Component {
           } )
         }}
       >
-        {/* <ChannelItem
-          channelParams={item}
-          alias = {this.props.ChannelsStore.aliasesById[ item.chan_id ] || item.chan_id || item.alias}
-        />
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderColor: 'grey',
-            marginHorizontal: widthPercentageToDP( 4 ),
-          }}
-        /> */}
         <View style={styles.myPrivateChannelContainer}>
-          <View style={styles.goodContainer}>
-            <Text style={styles.goodText}>Good</Text>
+          <View style={item.active ? styles.goodContainer: styles.badContainer}>
+            <Text style={item.active ? styles.goodText: styles.badText}>{item.active ? 'Active': 'Offline'}</Text>
           </View>
-          <Text style={styles.privateChannelText}>My Private Channel</Text>
+          <Text style={styles.privateChannelText}>{this.props.ChannelsStore.aliasesById[ item.chan_id ] || item.chan_id || item.alias}</Text>
         </View>
 
         <View style={styles.channelBoxesMaincontainer}>
@@ -167,7 +165,7 @@ export default class ChannelScreen extends Component {
           <Text>Total offline: </Text> */}
         </View>
         {this.props.ChannelsStore.loading ? (
-          <Text>Loading...</Text>
+          <ActivityIndicator color={Colors.blue} size="large" style={styles.activityIndicator}/>
         ) : (
           <FlatList
             style={{
@@ -193,6 +191,9 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 25 ),
     paddingLeft:10,
     fontFamily: Fonts.FiraSansRegular,
+  },
+  activityIndicator: {
+    paddingVertical: 40
   },
   mainContentContainer: {
     position: 'relative',
@@ -324,11 +325,24 @@ const styles = StyleSheet.create( {
     borderRadius:8,
     marginRight:10
   },
+  badContainer:{
+    backgroundColor:Colors.lightRed1,
+    paddingVertical:5,
+    paddingHorizontal:8,
+    borderRadius:8,
+    marginRight:10
+  },
   goodText:{
     textAlign:'center',
     fontSize: RFValue( 10 ),
     fontWeight:'800',
     color:Colors.darkGreen,
+  },
+  badText: {
+    color: Colors.darkRed,
+    textAlign:'center',
+    fontSize: RFValue( 10 ),
+    fontWeight:'800',
   },
   privateChannelText:{
     color:Colors.gray4,
