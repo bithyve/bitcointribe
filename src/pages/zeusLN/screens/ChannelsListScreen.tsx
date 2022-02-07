@@ -52,24 +52,34 @@ export default class ChannelScreen extends Component {
 
   uniqueKey = ( item: any, index: number ) => index.toString();
   renderTemplate = ( { item }: { item: ChannelFrame } ): ReactElement => {
-    const ChannelBar = ( { count } ) => {
+    const ChannelBar = ( { offline } ) => {
+      let remote_balance: number = parseInt(item.remote_balance)
+      let local_balance:number = parseInt(item.local_balance)
+      let remoteEquity: number = ((remote_balance) / (remote_balance + local_balance))
+      let localEquity: number = ((local_balance) / (remote_balance + local_balance))
+      console.log(((remote_balance) / (remote_balance + local_balance)), ",", (local_balance) / (remote_balance + local_balance), "+()")
       return(
         <>
-          {count >= 2  && <View style={[ styles.skyBlueBoxContainer, {
-            backgroundColor: Colors.primaryAccentLighter2
-          } ]}>
-            <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
-          </View>}
-          {count ==3 && <View style={[ styles.blueBoxContainer, {
-            backgroundColor:Colors.darkBlue
-          } ]}>
-            <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
-          </View>}
+        {
+          offline ? 
           <View style={[ styles.grayBoxContainer, {
-            backgroundColor:Colors.gray11, borderRadius:count==1 && 20
+            backgroundColor:Colors.gray11, borderRadius:20
           } ]}>
             <Text style={styles.channelPrice}>22,000<Text style={styles.channelSats}>sats</Text></Text>
+          </View> :
+          <>
+          <View style={[ styles.skyBlueBoxContainer, {
+            backgroundColor: Colors.primaryAccentLighter2
+          }, {flex: localEquity} ]}>
+            <Text style={styles.channelPrice}>{local_balance}<Text style={styles.channelSats}>sats</Text></Text>
           </View>
+          <View style={[ styles.blueBoxContainer, {
+            backgroundColor:Colors.darkBlue
+          }, {flex: remoteEquity} ]}>
+            <Text style={styles.channelPrice}>{remote_balance}<Text style={styles.channelSats}>sats</Text></Text>
+          </View>
+          </>
+    }
         </>
       )
     }
@@ -103,7 +113,7 @@ export default class ChannelScreen extends Component {
 
         <View style={styles.channelBoxesMaincontainer}>
           <View style={styles.channelBoxescontainer}>
-            <ChannelBar count={3} />
+            <ChannelBar offline={item.active} />
           </View>
           <Image style={styles.rightArrow} source={require( '../../../assets/images/icons/icon_arrow.png' )}/>
         </View>
