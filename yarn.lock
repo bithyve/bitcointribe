@@ -1720,6 +1720,11 @@
   resolved "https://registry.yarnpkg.com/@redux-saga/types/-/types-1.1.0.tgz#0e81ce56b4883b4b2a3001ebe1ab298b84237204"
   integrity sha512-afmTuJrylUU/0OtqzaRkbyYFFNgCF73Bvel/sw90pvGrWIZ+vyoIJqA6eMSoA6+nb443kTmulmBtC9NerXboNg==
 
+"@remobile/react-native-qrcode-local-image@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@remobile/react-native-qrcode-local-image/-/react-native-qrcode-local-image-1.0.4.tgz#471e14ca6be6852578e0ca63c2a8bf67a61b4e47"
+  integrity sha512-tM+komoSgcS+7UzdH0MP2gF0yR8Hc8Dfe3P2iIlQhXyQdHaEVn1dyO6sw+McGfEj+n2DdsP2YXb8g16gW7qcKg==
+
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.8.3.tgz#3802ddd21a50a949b6721ddd72da36e67e7f1b2d"
@@ -8815,6 +8820,11 @@ react-native-get-random-values@^1.4.0:
   dependencies:
     fast-base64-decode "^1.0.0"
 
+react-native-image-picker@^4.1.1:
+  version "4.7.3"
+  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-4.7.3.tgz#f5863b27bf2e76c83649dd8efea4598426bd04e8"
+  integrity sha512-eRKm4wlsmZHmsWFyv77kYc2F+ZyEVqe0m7mqhsMzWk6TQT4FBDtEDxmRDDFq+ivCu/1QD+EPhmYcAIpeGr7Ekg==
+
 react-native-in-app-utils@^6.0.2:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/react-native-in-app-utils/-/react-native-in-app-utils-6.1.0.tgz#e40ac25a5f8720ea7ef164eda3cc747693314c9c"
@@ -9094,6 +9104,11 @@ react-native-video@^4.4.5:
     keymirror "^0.1.1"
     prop-types "^15.5.10"
     shaka-player "^2.4.4"
+
+react-native-view-shot@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-view-shot/-/react-native-view-shot-3.1.2.tgz#8c8e84c67a4bc8b603e697dbbd59dbc9b4f84825"
+  integrity sha512-9u9fPtp6a52UMoZ/UCPrCjKZk8tnkI9To0Eh6yYnLKFEGkRZ7Chm6DqwDJbYJHeZrheCCopaD5oEOnRqhF4L2Q==
 
 react-native@0.63.3:
   version "0.63.3"
