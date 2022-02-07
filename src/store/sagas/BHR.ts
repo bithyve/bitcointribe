@@ -133,7 +133,7 @@ import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../com
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../actions/trustedContacts'
-import { syncPermanentChannelsWorker, restoreTrustedContactsWorker } from './trustedContacts'
+import { syncPermanentChannelsWorker, restoreTrustedContactsWorker, initializeTrustedContactWorker } from './trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWallet } from '../actions/storage'
@@ -1782,14 +1782,16 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
 
       }
     } else {
-      yield put( initializeTrustedContact( {
-        contact: contact,
-        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-        isKeeper: true,
-        isPrimaryKeeper,
-        channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
-        shareId: shareId
-      } ) )
+      yield call( initializeTrustedContactWorker,  {
+        payload: {
+          contact: contact,
+          flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+          isKeeper: true,
+          isPrimaryKeeper,
+          channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
+          shareId: shareId
+        }
+      } )
     }
     if( isChange ) {
       const contactInfo = {
