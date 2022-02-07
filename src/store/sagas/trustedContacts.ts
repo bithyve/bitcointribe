@@ -588,19 +588,14 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
     } = channelSyncUpdate
     if ( !contact ) {
       if ( !contactDetails ) throw new Error( 'Init failed: contact details missing' )
-      channelSyncUpdate.contact = generateTrustedContact( {
+      const newTrustedContact = generateTrustedContact( {
         contactDetails,
         channelKey,
         secondaryChannelKey,
         contactsSecondaryChannelKey,
         unEncryptedOutstreamUpdates,
       } )
-
-      if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT || flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
-        yield put( updateTrustedContacts( {
-          [ channelSyncUpdate.contact.channelKey ]: channelSyncUpdate.contact
-        } ) )
-      }
+      channelSyncUpdate.contact = newTrustedContact
     }
   }
 
