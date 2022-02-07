@@ -8,6 +8,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../common/content/LocContext'
 
@@ -152,30 +153,39 @@ export default function ErrorModalContents( props ) {
             alignItems: 'flex-end',
           }}
         >
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressProceed()}
-            style={{
-              ...styles.successModalButtonView,
-              shadowColor: props.buttonShadowColor
-                ? props.buttonShadowColor
-                : Colors.shadowBlue,
-              backgroundColor: props.buttonColor
-                ? props.buttonColor
-                : Colors.blue,
-            }}
-            delayPressIn={0}
-          >
-            <Text
+          <Shadow viewStyle={{
+            ...styles.successModalButtonView,
+            backgroundColor: props.buttonColor
+              ? props.buttonColor
+              : Colors.blue,
+          }} distance={2}
+          startColor={props.buttonShadowColor
+            ? props.buttonShadowColor
+            : Colors.shadowBlue }
+          offset={[ 42, 14 ]}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressProceed()}
               style={{
-                ...styles.proceedButtonText,
-                color: props.buttonTextColor
-                  ? props.buttonTextColor
-                  : Colors.white,
+                // ...styles.successModalButtonView,
+                shadowColor: props.buttonShadowColor
+                  ? props.buttonShadowColor
+                  : Colors.shadowBlue,
+
               }}
+              delayPressIn={0}
             >
-              {props.proceedButtonText}
-            </Text>
-          </AppBottomSheetTouchableWrapper>
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                  color: props.buttonTextColor
+                    ? props.buttonTextColor
+                    : Colors.white,
+                }}
+              >
+                {props.proceedButtonText}
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </Shadow>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
@@ -251,23 +261,24 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // elevation: 10,
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '8%' ),
+    marginBottom:hp ( '3%' ),
   },
   successModalImage: {
-    width: wp( '23%' ),
+    width: wp( '30%' ),
     height: wp( '30%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
-    marginRight: wp( -2 ),
-    marginBottom: wp( -2 ),
+    marginRight: wp( -3 ),
+    marginBottom: wp( -3 ),
   },
   proceedButtonText: {
     color: Colors.white,

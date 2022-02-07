@@ -25,12 +25,12 @@ import {
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
+import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange, upgradePDF, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
 import { updateCloudData } from '../actions/cloud'
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
@@ -41,7 +41,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import semver from 'semver'
 import semverLte from 'semver/functions/lte'
-import { accountVisibilityResetter, restoreMultiSigTwoFAFlag, testAccountEnabler } from './upgrades'
+import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
@@ -154,21 +154,13 @@ function* resetPasswordWorker( { payload } ) {
 
 
 function* credentialsAuthWorker( { payload } ) {
-  console.log( payload.passcode )
-  console.clear()
   // let t = timer('credentialsAuthWorker')
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
   try {
     const hash = yield call( Cipher.hash, payload.passcode )
-    console.log( 'hash', hash )
-
     const encryptedKey = yield call( SecureStore.fetch, hash )
-    console.log( 'encryptedKey', encryptedKey )
-
     key = yield call( Cipher.decrypt, encryptedKey, hash )
-    console.log( 'key', key )
-
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
@@ -276,19 +268,14 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   const wallet: Wallet = yield select( state => state.storage.wallet )
   const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
   const storedVersion = wallet.version
-
-
-  if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
-  if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
-  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
-
   // update wallet version
   yield put( updateWallet( {
     ...wallet,
     version: newVersion
   } ) )
-  yield call( dbManager.updateWallet, {
-    version: newVersion
+
+  yield call( applyUpgradeSequence, {
+    storedVersion, newVersion
   } )
 
   // update permanent channels w/ new version

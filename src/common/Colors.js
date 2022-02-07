@@ -56,6 +56,7 @@ const Colors = {
   gray10: '#969696',
   gray11: '#D1D1D1',
   lightGreen1: '#70C1B380',
+  gray9: '#D0D0D0',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',

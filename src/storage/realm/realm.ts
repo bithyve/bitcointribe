@@ -52,7 +52,7 @@ class Database  {
 
   init( key ) {
     Realm.open( {
-      schema, schemaVersion: 7, path: 'hexa.realm', encryptionKey: key,
+      schema, schemaVersion: 8, path: 'hexa.realm', encryptionKey: key,
       migration: ( oldRealm, newRealm ) => {
       }
     } )

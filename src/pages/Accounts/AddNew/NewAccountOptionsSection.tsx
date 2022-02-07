@@ -183,14 +183,14 @@ const styles = StyleSheet.create( {
   },
 
   listContentContainer: {
-    height: widthPercentageToDP( 42 ),
+    height: widthPercentageToDP( 40 ),
     paddingVertical: 4,
     justifyContent: 'center',
   },
 
   cardShadowContainer: {
     flex: 1,
-    padding: 10,
+    padding: 3,
   },
 
   cardRootContainer: {

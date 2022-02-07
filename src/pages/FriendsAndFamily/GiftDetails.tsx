@@ -7,11 +7,13 @@ import {
   Text,
   StatusBar,
   ScrollView,
+  Platform,
   Alert,
   FlatList,
   TextInput,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -130,19 +132,12 @@ const GiftDetails = ( { navigation } ) => {
 
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flexGrow: 1,
-        height: '100%',
-        backgroundColor: Colors.backgroundColor,
-      }}
-      keyboardShouldPersistTaps="handled"
-    >
-      <SafeAreaView style={styles.viewContainer}>
-        <StatusBar
-          backgroundColor={Colors.backgroundColor}
-          barStyle="dark-content"
-        />
+    <SafeAreaView style={styles.viewContainer}>
+      <StatusBar
+        backgroundColor={Colors.backgroundColor}
+        barStyle="dark-content"
+      />
+      <ScrollView>
         <View style={styles.advancedButton}>
           <View
             style={[
@@ -414,41 +409,41 @@ const GiftDetails = ( { navigation } ) => {
           </View>
         </TouchableOpacity>
 
-{deepLinkConfig ?
-  <View>
         <View style={{
           backgroundColor: Colors.backgroundColor,
           paddingBottom: hp( 4 ),
           marginTop: 10
         }}>
-        <View>
-          <View
-            style={{
-              marginLeft: wp( 7 ),
-            }}
-          >
-            <Text
+          <View>
+            <View
               style={{
-                ...styles.modalTitleText,
-                fontSize: 14,
-                fontFamily: Fonts.FiraSansRegular,
+                marginLeft: wp( 7 ),
               }}
             >
+              <Text
+                style={{
+                  ...styles.modalTitleText,
+                  fontSize: 14,
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
               Second Factor used for encryption
-            </Text>
-          </View>
-          <View
-            style={styles.deepLinkEncryptionTextContainer}
+              </Text>
+            </View>
+            <View
+              style={styles.deepLinkEncryptionTextContainer}
             >
               <Text style={styles.deepLinkEncryptionText}>
                 {deepLinkConfig?.encryptionKey == undefined ? 'No Second Factor' : deepLinkConfig?.encryptionKey}
               </Text>
+            </View>
           </View>
         </View>
-      </View>
         <View
           style={{
             marginVertical: hp( 2 ),
+            // backgroundColor:'hotpink',
+            marginBottom:hp( Platform.OS == 'ios' ? 12 : 10 ),
           }}
         >
           {Object.entries( gift.timestamps ?? {
@@ -512,34 +507,36 @@ const GiftDetails = ( { navigation } ) => {
                 </View>
               )
             } )}
+
         </View>
-      </View>
-      : 
-      <View>
-          <View
-            style={{
-              marginLeft: wp( 7 ),
-            }}
-          >
-            <Text
-              style={{
-                ...styles.modalTitleText,
-                fontSize: 18,
-                marginTop:12,
-                textAlign: 'center',
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              No Second Factor Used
-            </Text>
+
+        <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
+          <View style={styles.modalContentContainer}>
+            <AddGiftToAccount
+              getTheme={getTheme}
+              navigation={navigation}
+              giftAmount={gift.amount}
+              giftId={( gift as Gift ).id}
+              onCancel={() => setAcceptGiftModal( false )}
+              closeModal={()=>setAcceptGiftModal( false )}
+            />
           </View>
+        </ModalContainer>
+        {/* <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
+        <View style={styles.modalContentContainer}>
+          <AccountSelection
+            onClose={(  ) => {setAcceptGiftModal( false )}}
+            onChangeType={( type ) => { }}
+          />
         </View>
-       }
-      </SafeAreaView>
+      </ModalContainer> */}
+
+      </ScrollView>
       <View style={{
-        marginBottom: wp( '3%' ), flexDirection: 'row',
-        justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ), backgroundColor:'#F5F5F5',
-        paddingVertical: wp( '2%' ),
+        marginBottom: wp( '0%' ), flexDirection: 'row',
+        justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ),
+        paddingVertical: wp( '4%' ),
+        position:'absolute', width:'100%', bottom:0, backgroundColor: Colors.backgroundColor,
       }}>
         {/* Reclaim */}
         {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ? (
@@ -564,27 +561,8 @@ const GiftDetails = ( { navigation } ) => {
             }, 'Add To Account' )
           ) : null}
       </View>
-      <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
-        <View style={styles.modalContentContainer}>
-          <AddGiftToAccount
-            getTheme={getTheme}
-            navigation={navigation}
-            giftAmount={gift.amount}
-            giftId={( gift as Gift ).id}
-            onCancel={() => setAcceptGiftModal( false )}
-            closeModal={()=>setAcceptGiftModal( false )}
-          />
-        </View>
-      </ModalContainer>
-      {/* <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
-        <View style={styles.modalContentContainer}>
-          <AccountSelection
-            onClose={(  ) => {setAcceptGiftModal( false )}}
-            onChangeType={( type ) => { }}
-          />
-        </View>
-      </ModalContainer> */}
-    </ScrollView>
+    </SafeAreaView>
+
   )
 }
 
@@ -668,7 +646,7 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
     alignSelf: 'center',
     paddingLeft: wp( '5%' ),
-    paddingRight: wp( '5%' )
+    paddingRight: wp( '5%' ),
   },
   buttonSubText: {
     marginTop: hp( 0.4 ),
@@ -714,7 +692,8 @@ const styles = StyleSheet.create( {
     paddingBottom: hp( 4 ),
   },
   viewContainer: {
-    flex: 1,
+    // flex: 1,
+    flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
   },
   buttonView: {

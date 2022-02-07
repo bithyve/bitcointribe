@@ -52,14 +52,14 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     // away that this will happen. (See: https://github.com/bithyve/hexa/issues/2250)
     ///////////////////
 
-    const evenIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
+    const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
       if ( index % 2 == 0 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true && current.primarySubAccount.visibility !== AccountVisibility.ARCHIVED ) ) {
         accumulated.push( current )
       }
 
       return accumulated
     }, [] )
-    const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
+    const evenIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
       if ( index % 2 == 1 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true && current.primarySubAccount.visibility !== AccountVisibility.ARCHIVED ) ) {
         accumulated.push( current )
       }

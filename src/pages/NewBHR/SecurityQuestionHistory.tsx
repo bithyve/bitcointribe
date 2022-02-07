@@ -43,6 +43,7 @@ import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import HeaderTitle from '../../components/HeaderTitle'
 import Feather from 'react-native-vector-icons/Feather'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 const SecurityQuestionHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -135,6 +136,8 @@ const SecurityQuestionHistory = ( props ) => {
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ).match( /.{1,6}/g ).join( '-' ) )
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
+
   const dispatch = useDispatch()
 
   useEffect( () => {

@@ -642,6 +642,7 @@ export interface NewWalletImage {
   versionHistory?: string;
   SM_share?: string,
   gifts?:object;
+  version: string,
 }
 
 export interface EncryptedImage {
@@ -852,7 +853,6 @@ export interface Wallet {
     [accountType: string]: string[] // array of accountIds
   },
   version: string,
-  smShare?: string,
 }
 
 export interface LNNode {

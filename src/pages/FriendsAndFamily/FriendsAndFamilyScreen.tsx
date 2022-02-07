@@ -576,7 +576,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 } )
               }}
               style={{
-                ...styles.selectedContactsView,
+                ...styles.selectedContactsView,backgroundColor: Colors.lightBlue,
               }}
             >
               <Text style={[ styles.contactText, {
