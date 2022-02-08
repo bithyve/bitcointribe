@@ -621,14 +621,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const getPasswordLevel = () => {
     if( pswd ==appGeneratedPassword ){
-      return 'Strong'
+      return 'Strong Password'
     }
     if ( passwordScore < 2 ) {
-      return 'Weak'
+      return 'Weak Password'
     } else if( passwordScore < 4 ) {
       return 'Could be stronger'
     }
-    return 'Strong'
+    return 'Strong Password'
   }
 
   const renderEncryptionPswd = () => {
@@ -1824,5 +1824,6 @@ const styles = StyleSheet.create( {
     // color:Colors.green,
     fontSize: RFValue( 10 ),
     fontWeight:'600',
+    fontFamily: Fonts.FiraSansItalic
   }
 } )
