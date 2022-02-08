@@ -1282,24 +1282,25 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   return (
-    <><View
+    <View
       style={{
         flex: 1,
-        position: 'relative',
-        backgroundColor: Colors.backgroundColor
+        position:'relative',
+        backgroundColor:Colors.backgroundColor
       }}
     >
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SafeAreaView
         style={{
-          flex: 0
-        }} />
+          flex: 0,
+        }}
+      />
       <View
         style={[
           CommonStyles.headerContainer,
           {
             backgroundColor: Colors.backgroundColor,
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
           },
         ]}
       >
@@ -1307,7 +1308,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             props.navigation.goBack()
-          } }
+          }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -1315,35 +1316,35 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            setKnowMoreIndex(0)
-            setKnowMore(true)
-          } }
+            setKnowMoreIndex( 0 )
+            setKnowMore( true )
+          }}
           style={{
             ...styles.selectedContactsView,
-            height: hp(3.2)
+            height: hp( 3.2 ),
           }}
         >
           <Text style={{
             ...styles.contactText,
-            fontSize: RFValue(12)
-          }}>{common['knowMore']}</Text>
+            fontSize: RFValue( 12 ),
+          }}>{common[ 'knowMore' ]}</Text>
         </TouchableOpacity>
       </View>
 
       <KeyboardAvoidingView style={{
-        flex: 1
-      }} behavior={Platform.OS == 'ios' ? 'padding' : ''}
-        enabled>
+        flex:1
+      }}   behavior={Platform.OS == 'ios' ? 'padding' : ''}
+      enabled >
         <View style={styles.keyboardAvoidingContainer}>
           <TouchableOpacity
             activeOpacity={10}
             style={{
-              flex: 1
+              flex: 1,
             }}
             onPress={() => {
-              setDropdownBoxOpenClose(false)
+              setDropdownBoxOpenClose( false )
               Keyboard.dismiss()
-            } }
+            }}
             disabled={isDisabled}
           >
             <HeaderTitle1
@@ -1353,15 +1354,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
-              step={''} />
+              step={''}
+            />
             {selectedOption == 0 ? <View style={styles.fieldsButtonContainer}>
-              <TouchableOpacity onPress={() => setSelectedOption(1)} style={styles.passwordButtonContainer}><Text style={styles.enterPassword}>Enter a strong password</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => setSelectedOption( 1 )} style={styles.passwordButtonContainer}><Text style={styles.enterPassword}>Enter a strong password</Text></TouchableOpacity>
               <View style={styles.orBorderContainer}>
                 <Text style={styles.enterPassword}>or</Text>
                 <View style={styles.borderContainer}></View>
               </View>
-              <TouchableOpacity onPress={() => { setSelectedOption(2), setPswd(appGeneratedPassword) } } style={styles.passwordButtonContainer}><Text style={styles.enterPassword}>Generate a strong password for me</Text></TouchableOpacity>
-            </View> :
+              <TouchableOpacity onPress={() => {setSelectedOption( 2 ), setPswd( appGeneratedPassword )}} style={styles.passwordButtonContainer}><Text style={styles.enterPassword}>Generate a strong password for me</Text></TouchableOpacity>
+            </View>:
               <>
                 <View style={styles.fieldsButtonErrorContainer}>
                   <TextInput
@@ -1375,72 +1377,76 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     autoCorrect={false}
                     editable={isEditable}
                     autoCapitalize="none"
-                    onSubmitEditing={() => (confirmPswdTextInput as any).current.focus()}
+                    onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
                     //keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-                    onChangeText={(text) => {
-                      setPswd(text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, ''))
-                      setPswdMasked(text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, ''))
-                      setPswdError('')
-                      setpasswordScore(zxcvbn(text).score)
-                    } }
+                    onChangeText={( text ) => {
+                      setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                      setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                      setPswdError( '' )
+                      setpasswordScore( zxcvbn( text ).score )
+                    }}
                     onFocus={() => {
-                      setShowNote(false)
-                      setDropdownBoxOpenClose(false)
-                      setPswdInputStyle(styles.inputBoxFocused)
-                      if (pswd.length > 0) {
-                        setPswd('')
-                        setPswdMasked('')
-                        setPswdError('')
+                      setShowNote( false )
+                      setDropdownBoxOpenClose( false )
+                      setPswdInputStyle( styles.inputBoxFocused )
+                      if ( pswd.length > 0 ) {
+                        setPswd( '' )
+                        setPswdMasked( '' )
+                        setPswdError( '' )
                       }
-                    } }
+                    }}
                     onBlur={() => {
-                      setShowNote(true)
-                      setPswdInputStyle(styles.inputBox)
-                      setDropdownBoxOpenClose(false)
+                      setShowNote( true )
+                      setPswdInputStyle( styles.inputBox )
+                      setDropdownBoxOpenClose( false )
                       let temp = ''
-                      for (let i = 0; i < pswd.length; i++) {
+                      for ( let i = 0; i < pswd.length; i++ ) {
                         temp += '*'
                       }
-                      setPswdMasked(temp)
+                      setPswdMasked( temp )
                       handlePswdSubmit()
-                    } } />
-                  <Text style={styles.guessableText}>Easily Guessable</Text>
+                    }}
+                  />
+                  {passwordScore == 0 && pswd.length !=0 && pswd !=appGeneratedPassword && <Text style={styles.guessableText}>Easily Guessable</Text>}
                 </View>
                 {pswd.length !== 0 &&
-                  <View style={styles.fieldsButtonContainer}>
-                    <TextInput
-                      style={styles.modalInputBox}
-                      ref={hint}
-                      placeholder={strings.Addhint}
-                      placeholderTextColor={Colors.borderColor}
-                      value={hintText}
-                      autoCompleteType="off"
-                      textContentType="none"
-                      returnKeyType="next"
-                      autoCorrect={false}
-                      editable={isEditable}
-                      autoCapitalize="none"
-                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-                      onChangeText={(text) => {
-                        setHint(text)
-                      } }
-                      onFocus={() => {
-                        setShowNote(false)
-                        setHintInputStyle(styles.inputBoxFocused)
-                      } }
-                      onBlur={() => {
-                        setShowNote(true)
-                        setHintInputStyle(styles.inputBox)
-                      } } />
-                  </View>}
+                <View style={styles.fieldsButtonContainer}>
+                  <TextInput
+                    style={styles.modalInputBox}
+                    ref={hint}
+                    placeholder={strings.Addhint}
+                    placeholderTextColor={Colors.borderColor}
+                    value={hintText}
+                    autoCompleteType="off"
+                    textContentType="none"
+                    returnKeyType="next"
+                    autoCorrect={false}
+                    editable={isEditable}
+                    autoCapitalize="none"
+                    keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                    onChangeText={( text ) => {
+                      setHint( text )
+                    }}
+                    onFocus={() => {
+                      setShowNote( false )
+                      setHintInputStyle( styles.inputBoxFocused )
+                    }}
+                    onBlur={() => {
+                      setShowNote( true )
+                      setHintInputStyle( styles.inputBox )
+                    }}
+                  />
+                </View>}
 
-              </>}
+              </>
+
+            }
 
             <View style={styles.checkBoxDirectionContainer}>
-              {backup ? <TouchableOpacity activeOpacity={1} style={styles.checkBoxColorContainer} onPress={() => setBackup(!backup)}>
+              {backup ? <TouchableOpacity activeOpacity={1} style={styles.checkBoxColorContainer} onPress={() => setBackup( !backup )}>
                 <CheckMark />
               </TouchableOpacity> :
-                <TouchableOpacity activeOpacity={1} style={styles.checkBoxBorderContainer} onPress={() => setBackup(!backup)}>
+                <TouchableOpacity activeOpacity={1} style={styles.checkBoxBorderContainer} onPress={() => setBackup( !backup )}>
                   {/* <CheckMark /> */}
                 </TouchableOpacity>}
               <View>
@@ -1452,11 +1458,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </TouchableOpacity>
 
           <View style={styles.bottomButtonView1}>
-            {pswd.length !== 0 && <TouchableOpacity
+            {pswd.length!==0 && <TouchableOpacity
               onPress={() => {
                 Keyboard.dismiss()
                 onPressProceed()
-              } }
+              }}
               style={styles.buttonView}
             >
               <Text style={styles.buttonText}>{strings.Next}</Text>
@@ -1474,28 +1480,34 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <ModalContainer onBackground={() => onBackgroundOfLoader()} visible={loaderModal} closeBottomSheet={null}>
         {renderLoaderModalContent()}
       </ModalContainer>
-      <ModalContainer onBackground={() => showSecurityQue(false)} visible={securityQue} closeBottomSheet={() => showSecurityQue(false)}>
+      <ModalContainer onBackground={() => showSecurityQue( false )} visible={securityQue} closeBottomSheet={() => showSecurityQue( false )}>
         {renderSecurityQuestion()}
       </ModalContainer>
       <ModalContainer
         onBackground={() => {
-          showEncryptionPswd(false)
-            >
-            { renderEncryptionPswd() }
-        } } />
-    </ModalContainer><ModalContainer
-      onBackground={() => {
-        setShowAGSPmodal(false)
-      } }
-      visible={showAGSPmodal}
-      closeBottomSheet={() => {
-        setShowAGSPmodal(false)
-      } }
-    >
+          showEncryptionPswd( false )
+        }}
+        visible={encryptionPswd}
+        closeBottomSheet={() => {
+          showEncryptionPswd( false )
+        }}
+      >
+        {renderEncryptionPswd()}
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => {
+          setShowAGSPmodal( false )
+        }}
+        visible={showAGSPmodal}
+        closeBottomSheet={() => {
+          setShowAGSPmodal( false )
+        }}
+      >
         {renderAGSP()}
-      </ModalContainer><ModalContainerScroll onBackground={() => setKnowMore(false)} visible={knowMore} closeBottomSheet={() => setKnowMore(false)}>
-        <WalletInitKnowMore index={knowMoreIndex} closeModal={() => setKnowMore(false)} />
-      </ModalContainerScroll></>
+      </ModalContainer>
+      <ModalContainerScroll onBackground={() => setKnowMore( false )} visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
+        <WalletInitKnowMore index={knowMoreIndex} closeModal={() => setKnowMore( false )} />
+      </ModalContainerScroll>
     </View>
   )
 }

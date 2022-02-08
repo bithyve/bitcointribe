@@ -202,7 +202,7 @@ export default function NewWalletName( props ) {
           style={{
             flexGrow: 1
           }}
-          behavior={Platform.OS == 'ios' ? 'height' : ''}
+          behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <View style={{
