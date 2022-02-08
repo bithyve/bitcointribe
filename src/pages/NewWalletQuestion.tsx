@@ -1463,7 +1463,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </TouchableOpacity>
 
           <View style={styles.bottomButtonView1}>
-            {pswd.length!==0 && <TouchableOpacity
+            {pswd.length!==0 && getPasswordLevel()!= 'Weak Password' && <TouchableOpacity
               onPress={() => {
                 Keyboard.dismiss()
                 onPressProceed()
