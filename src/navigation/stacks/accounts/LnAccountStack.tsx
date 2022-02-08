@@ -15,6 +15,8 @@ import PayInvoiceScreen from '../../../pages/zeusLN/PayInvoiceScreen'
 import PaymentsScreen from '../../../pages/zeusLN/PaymentsScreen'
 import InvoiceDetailsScreen from '../../../pages/zeusLN/screens/InvoiceDetailsScreen'
 import TransactionDetailsScreen from '../../../pages/zeusLN/screens/TransactionDetailsScreen'
+import PaymentListScreen from '../../../pages/zeusLN/screens/PaymentsListScreen'
+import PaymentDetailsScreen from '../../../pages/zeusLN/screens/PaymentDetailsScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -127,6 +129,30 @@ const AccountDetailsStack = createStackNavigator(
 
     ChannelOpenScreen: {
       screen: ChannelOpenScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
+
+    PaymentListScreen: {
+      screen: PaymentListScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
+
+    PaymentDetailsScreen: {
+      screen: PaymentDetailsScreen ,
       navigationOptions: {
         title: '',
         headerStyle:{
