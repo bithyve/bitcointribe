@@ -65,6 +65,7 @@ import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
 import { calculateSendMaxFee } from '../../store/actions/sending'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { Shadow } from 'react-native-shadow-2'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -211,6 +212,7 @@ const CreateGift = ( { navigation } ) => {
     }
 
     return(
+      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[8,8]}>
       <TouchableOpacity
         disabled={isDisabled}
         onPress={()=>{
@@ -264,6 +266,7 @@ const CreateGift = ( { navigation } ) => {
       >
         <Text style={styles.buttonText}>{text}</Text>
       </TouchableOpacity>
+      </Shadow>
     )
   }
 
@@ -424,7 +427,7 @@ const CreateGift = ( { navigation } ) => {
     </ScrollView>
   }
 
-  const AdvanceGiftOptions = ( { title, infoText, stateToUpdate, imageToShow } ) => {
+  const AdvanceGiftOptions = ( { title , stateToUpdate, imageToShow } ) => {
     const plus = () =>{
       if( stateToUpdate == 'gift' ){
         setNumbersOfGift( numbersOfGift + 1 )
@@ -464,7 +467,10 @@ const CreateGift = ( { navigation } ) => {
             }}>{title}</Text>
             <Text style={{
               color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
-            }}>{infoText}</Text>
+            }}>Gift Sats created will be of the 
+            <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>same amount</Text>
+             and can be 
+             <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>sent separately</Text></Text>
           </View>
           <View style={{
             flexDirection:'row', alignItems: 'center',
@@ -526,7 +532,7 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               fontSize: RFValue( 11 ),
             }}>
-            (Restricts the gift to one per user/ Hexa app)
+            (Restricts the gift to <Text style={{ fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic }}>one per Hexa app</Text> )
             </Text>
           </Text>
 
@@ -563,7 +569,7 @@ const CreateGift = ( { navigation } ) => {
       </View>
       <AdvanceGiftOptions
         title={'No. of Gifts'}
-        infoText={'Gift Sats created will be of the same amount and can be sent separately'}
+        // infoText={'Gift Sats created will be of the same amount and can be sent separately'}
         stateToUpdate={'gift'}
         imageToShow={require( '../../assets/images/icons/gift.png' )}
       />
@@ -872,7 +878,8 @@ const CreateGift = ( { navigation } ) => {
           }}>
             <Text>{'Minimum gift value '}</Text>
             <Text style={{
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              fontFamily: Fonts.FiraSansItalic
             }}>{prefersBitcoin? minimumGiftValue: convertSatsToFiat( minimumGiftValue )} {prefersBitcoin? 'sats': currencyCode}</Text>
           </Text>
         </View>
@@ -1176,13 +1183,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.blue,
-    marginLeft: wp( 2 )
   },
   disabledButtonView: {
     height: wp( '12%' ),
@@ -1190,13 +1191,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.lightBlue,
-    marginLeft: wp( 2 )
   },
   imageView: {
     width: 18,

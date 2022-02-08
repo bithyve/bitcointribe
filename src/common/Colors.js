@@ -19,6 +19,8 @@ const Colors = {
   white: '#ffffff',
   offWhite: '#F5F5F5',
   red: '#FF7761',
+  darkRed: '#F67761',
+  lightRed1: '#F0C9C2',
   tomatoRed: '#FF7861',
   homepageButtonColor: '#2C85C1',
   yellow: '#F7C910',
@@ -56,6 +58,7 @@ const Colors = {
   gray10: '#969696',
   gray11: '#D1D1D1',
   lightGreen1: '#70C1B380',
+  gray9: '#D0D0D0',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',

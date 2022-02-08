@@ -40,7 +40,7 @@ import { setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ModalContainerScroll from '../components/home/ModalContainerScroll'
-
+import zxcvbn from 'zxcvbn'
 import ButtonBlue from '../components/ButtonBlue'
 import { updateCloudPermission } from '../store/actions/BHR'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
@@ -140,6 +140,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ copied, setCopied ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
+  const [ passwordScore, setpasswordScore ] = useState( 0 )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
@@ -314,9 +315,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ confirmPswd ] )
 
   const onPressProceed = ( isSkip? ) => {
-    setSignUpStarted( true )
-    showLoader()
-    setShowAGSPmodal( false )
     let security = null
     if ( activeIndex === 0 ) {
       security = {
@@ -331,12 +329,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         answer,
       }
     } else if ( activeIndex === 2 ) {
+      if( passwordScore < 2 ){
+        setPswdError( 'Weak password. Try using longer passwords with a mix of lowercase, upper case, numbers and characters' )
+        return
+      }
       security = {
         questionId: '0',
         question: hintText,
         answer: pswd,
       }
     }
+    setSignUpStarted( true )
+    showLoader()
+    setShowAGSPmodal( false )
     if ( isSkip ) {
       security = null
       dispatch( updateCloudPermission( false ) )
@@ -591,6 +596,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       </KeyboardAwareScrollView>
     )
   }
+
+  const getPasswordLevel = () => {
+    if ( passwordScore < 2 ) {
+      return 'Easily Guessable'
+    } else if( passwordScore < 4 ) {
+      return 'Could be stronger'
+    }
+    return 'Strong Password'
+  }
+
   const renderEncryptionPswd = () => {
     return (
       <KeyboardAwareScrollView
@@ -651,19 +666,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               style={styles.modalInputBox}
               placeholder={strings.Enteryourpassword}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowPswd ? pswdMasked : pswd}
-              autoCompleteType="off"
-              textContentType="none"
+              value={pswd}
+              autoCompleteType="password"
+              textContentType="password"
               returnKeyType="next"
               autoCorrect={false}
               editable={isEditable}
+              secureTextEntry
               autoCapitalize="none"
               onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
-              keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+              //keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
               onChangeText={( text ) => {
                 setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
-                // setPswdError( '' )
+                setPswdError( '' )
+                setpasswordScore( zxcvbn( text ).score )
               }}
               onFocus={() => {
                 setShowNote( false )
@@ -693,7 +710,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   setHideShowPswd( !hideShowPswd )
                 }}
               >
-                <Feather
+                <Text
+                  style={{
+                    color: passwordScore > 3 ? Colors.green : passwordScore > 1 ? Colors.coral: Colors.red,
+                    fontFamily: Fonts.FiraSansItalic,
+                    fontSize: RFValue( 11 ),
+                    marginLeft: 4,
+                  }}
+                >{getPasswordLevel()}</Text>
+                {/* <Feather
                   style={{
                     marginLeft: 'auto',
                     padding: 10,
@@ -701,7 +726,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   size={15}
                   color={Colors.blue}
                   name={hideShowPswd ? 'eye-off' : 'eye'}
-                />
+                /> */}
               </TouchableWithoutFeedback>
             ) : null}
           </View>
@@ -1483,27 +1508,26 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             </View>
           </TouchableOpacity>
         </View>
-        {showNote && !visibleButton ? (
-          <View
-            style={{
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
-              marginTop:20,
-            }}
-          >
-            <BottomInfoBox
-              title={common.note}
-              infoText={strings.Backuplets}
-              italicText={
-                ' '+bhr.SecurityCenter}
-              backgroundColor={Colors.white}
-            />
+        <View style={{
+          marginBottom:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0, flexDirection:'row', alignItems:'flex-end', marginTop:hp( 20 )
+        }}>
+          {showNote && !visibleButton ? (
+            <View
+            >
+              <BottomInfoBox
+                title={common.note}
+                infoText={strings.Backuplets}
+                italicText={
+                  ' '+bhr.SecurityCenter}
+                width =  {'47%'}  />
+            </View>
+          ) : null}
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorInactiveView} />
+            {/* <View style={styles.statusIndicatorInactiveView} /> */}
+            <View style={styles.statusIndicatorActiveView} />
           </View>
-        ) : null}
-        <View style={styles.statusIndicatorView}>
-          <View style={styles.statusIndicatorInactiveView} />
-          {/* <View style={styles.statusIndicatorInactiveView} /> */}
-          <View style={styles.statusIndicatorActiveView} />
         </View>
       </ScrollView>
 
@@ -1657,8 +1681,8 @@ const styles = StyleSheet.create( {
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
-    marginHorizontal: wp( '6%' ),
-    marginBottom: hp( 2 )
+    marginHorizontal: wp( '4%' ),
+    marginBottom: hp( 3.8 )
   },
   statusIndicatorActiveView: {
     height: 5,

@@ -309,7 +309,7 @@
   },
   "accManagement": {
       "AccountManagement": "Kontoverwaltung",
-      "Rearrange": "Konten neu anordnen, archivieren und wiederherstellen",
+      "Rearrange": "Konten von hier aus neu anordnen und wiederherstellen",
       "HiddenAccounts": "Versteckte Konten",
       "ArchivedAccounts": "Archivierte Konten",
       "Save": "Neue Sortierung speichern",

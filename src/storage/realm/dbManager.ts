@@ -330,6 +330,31 @@ const updateGift = ( id, gift  ) => {
   }
 }
 
+const getMetaShares = () => {
+  // deprecated(to be only used by upgrade script)
+  try {
+    const dbRef = db.objects( schema.BHR )
+    const bhr = Array.from( dbRef )
+    if( bhr && bhr.length > 0 ) {
+      return bhr[ 0 ]
+    } else {
+      return {
+        metaSharesKeeper: [],
+        oldMetaSharesKeeper:[],
+      }
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+const getSecondaryMnemonicShare = () => {
+  // deprecated(to be only used by upgrade script)
+  const walletsRef = db.objects( schema.Wallet )
+  const wallets = Array.from( walletsRef )
+  return ( wallets[ 0 ] as any ).smShare
+}
+
 export default {
   initDb,
   createWallet,
@@ -344,5 +369,7 @@ export default {
   updateTransactions,
   createGifts,
   createGift,
-  updateGift
+  updateGift,
+  getMetaShares,
+  getSecondaryMnemonicShare,
 }
