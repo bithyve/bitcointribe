@@ -30,7 +30,7 @@ export default class PaymentDetailsScreen extends Component {
         bounces={false}
       >
 
-        <Text style={styles.textHeader}>Transaction Details</Text>
+        <Text style={styles.textHeader}>Payment Details</Text>
 
         <View style={styles.bodySection}>
           <View style={styles.lineItem}>
