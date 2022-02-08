@@ -21,7 +21,7 @@ export default class SettingsScreen extends Component {
         Description: 'view and manage channels',
       },
       {
-        Screen: 'ChannelsListScreen',
+        Screen: 'PaymentListScreen',
         Title: 'Payments',
         Description: 'My LN payments',
       },
@@ -36,11 +36,7 @@ export default class SettingsScreen extends Component {
       <ListItem
         bottomDivider
         onPress={() => {
-          if( item.Title==='Channels' ) {
-            this.props.navigation.navigate( item.Screen )
-          } else if( item.Title==='Payments' ) {
-            this.props.navigation.navigate( 'Payments' )
-          }
+          this.props.navigation.navigate( item.Screen )
         }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
