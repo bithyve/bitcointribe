@@ -1639,14 +1639,16 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   modalInputBox: {
-    height: 29,
+    paddingVertical:hp( 0.6 ),
+    height:30,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 10,
   },
   modalInputBoxError:{
-    height: 29,
+    paddingVertical:hp( 0.6 ),
+    height:30,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,

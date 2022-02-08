@@ -180,7 +180,7 @@ export default function NewWalletName( props ) {
     }}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={{
-        flex: 1
+        flex: 1,
       }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -202,123 +202,125 @@ export default function NewWalletName( props ) {
           style={{
             flexGrow: 1
           }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
+          behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
           enabled
         >
           <View style={{
-            flex: 1,
-            marginTop:hp( 2.5 )
-          }} >
-            <HeaderTitle1
-              firstLineTitle={`${strings.Step1}`}
-              secondLineBoldTitle={'Name your Wallet'}
-              secondLineTitle={''}
-              infoTextNormal={''}
-              infoTextBold={''}
-              infoTextNormal1={''}
-              step={''}
-            />
-            <Text style={styles.walletNameDescription}>Wallet name is use in the messages you send to your Friends & Family contacts</Text>
-            <TextInput
-              style={{
-                ...inputStyle
-              }}
-              placeholder={strings.walletName}
-              placeholderTextColor={Colors.borderColor}
-              value={walletName}
-              keyboardType={
-                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-              }
-              maxLength={12}
-              onChangeText={( text ) => {
-                setWalletName( text )
-                // text = text.replace( /[^A-Za-z-0-9]/g, '' )
-                if( text.match( /[^A-Za-z-0-9]/g ) ){
-                  setErrorMsg( true )
-                }else{
-                  setErrorMsg( false )
+            flex:1,
+            justifyContent:'space-between'
+          }}>
+            <View>
+              <HeaderTitle1
+                firstLineTitle={`${strings.Step1}`}
+                secondLineBoldTitle={'Name your Wallet'}
+                secondLineTitle={''}
+                infoTextNormal={''}
+                infoTextBold={''}
+                infoTextNormal1={''}
+                step={''}
+              />
+              <Text style={styles.walletNameDescription}>Wallet name is use in the messages you send to your Friends & Family contacts</Text>
+              <TextInput
+                style={{
+                  ...inputStyle
+                }}
+                placeholder={strings.walletName}
+                placeholderTextColor={Colors.borderColor}
+                value={walletName}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
-              }}
-              onFocus={() => {
-                setInputStyle( styles.inputBoxFocused )
-                showNote( false )
-              }}
-              onBlur={() => {
-                setInputStyle( styles.inputBox )
-              }}
-              autoCorrect={false}
-              autoCompleteType="off"
-            />
-            {/* <Checkbox status={newUser ? 'checked' : 'unchecked'} onPress={()=>{setNewUser( prev => !prev )}}/> */}
-            {/* <Checkbox
+                maxLength={12}
+                onChangeText={( text ) => {
+                  setWalletName( text )
+                  // text = text.replace( /[^A-Za-z-0-9]/g, '' )
+                  if( text.match( /[^A-Za-z-0-9]/g ) ){
+                    setErrorMsg( true )
+                  }else{
+                    setErrorMsg( false )
+                  }
+                }}
+                onFocus={() => {
+                  setInputStyle( styles.inputBoxFocused )
+                  showNote( false )
+                }}
+                onBlur={() => {
+                  setInputStyle( styles.inputBox )
+                }}
+                autoCorrect={false}
+                autoCompleteType="off"
+              />
+              <View style={{
+                marginRight: wp( 6 )
+              }}>
+                {errorMsg && <Text style={{
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansItalic, color: Colors.tomatoRed,
+                  alignSelf: 'flex-end'
+                }}>
+                  {strings.WalletCreationNumbers}</Text>}
+                {/* <Text style={{
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                    alignSelf: 'flex-end'
+                  }}>
+                    {strings.numbers}</Text> */}
+              </View>
+              {/* <Checkbox status={newUser ? 'checked' : 'unchecked'} onPress={()=>{setNewUser( prev => !prev )}}/> */}
+              {/* <Checkbox
               color='red'
               status={checked ? 'checked' : 'unchecked'}
               onPress={() => {
                 setChecked( !checked )
               }}
             /> */}
-            <View style={styles.checkBoxDirectionContainer}>
-              {newUser ? <TouchableOpacity activeOpacity={1} style={styles.checkBoxColorContainer} onPress={() => setNewUser( !newUser )}>
-                <CheckMark />
-              </TouchableOpacity> :
-                <TouchableOpacity activeOpacity={1} style={styles.checkBoxBorderContainer} onPress={() => setNewUser( !newUser )}>
-                  {/* <CheckMark /> */}
-                </TouchableOpacity>}
-              <View>
-                <Text style={styles.checkBoxHeading}>I am new to bitcoin</Text>
-                <Text style={styles.checkBoxParagraph}>A Test Account preloaded with test bitcoin (sats) will be enabled for you</Text>
+              <View style={styles.checkBoxDirectionContainer}>
+                {newUser ? <TouchableOpacity activeOpacity={1} style={styles.checkBoxColorContainer} onPress={() => setNewUser( !newUser )}>
+                  <CheckMark />
+                </TouchableOpacity> :
+                  <TouchableOpacity activeOpacity={1} style={styles.checkBoxBorderContainer} onPress={() => setNewUser( !newUser )}>
+                    {/* <CheckMark /> */}
+                  </TouchableOpacity>}
+                <View>
+                  <Text style={styles.checkBoxHeading}>I am new to bitcoin</Text>
+                  <Text style={styles.checkBoxParagraph}>A Test Account preloaded with test bitcoin (sats) will be enabled for you</Text>
+                </View>
               </View>
             </View>
-            <View style={{
-              marginRight: wp( 6 )
-            }}>
-              {errorMsg && <Text style={{
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansItalic, color: Colors.tomatoRed,
-                alignSelf: 'flex-end'
-              }}>
-                {strings.WalletCreationNumbers}</Text>}
-              {/* <Text style={{
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
-                alignSelf: 'flex-end'
-              }}>
-                {strings.numbers}</Text> */}
-            </View>
-          </View>
-          {/* </KeyboardAvoidingView> */}
+            {/* </KeyboardAvoidingView> */}
 
-          <View style={styles.bottomButtonView}>
-            {walletName.trim() != '' ? (
-              <View
-                style={{
-                  elevation: 10,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 15, height: 15
-                  },
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    Keyboard.dismiss()
-                    props.navigation.navigate( 'NewWalletQuestion', {
-                      walletName, newUser
-                    } )
-                  // setIsCloudPermissionRender( true )
-                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+            <View style={styles.bottomButtonView}>
+              {walletName.trim() != '' ? (
+                <View
+                  style={{
+                    elevation: 10,
+                    shadowColor: Colors.shadowBlue,
+                    shadowOpacity: 1,
+                    shadowOffset: {
+                      width: 15, height: 15
+                    },
                   }}
-                  style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>{strings.Next}</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Keyboard.dismiss()
+                      props.navigation.navigate( 'NewWalletQuestion', {
+                        walletName, newUser
+                      } )
+                      // setIsCloudPermissionRender( true )
+                      // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+                    }}
+                    style={styles.buttonView}
+                  >
+                    <Text style={styles.buttonText}>{strings.Next}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+              <View style={styles.statusIndicatorView}>
+                <View style={styles.statusIndicatorInactiveView} />
+                <View style={styles.statusIndicatorActiveView} />
+                {/* <View style={styles.statusIndicatorInactiveView} /> */}
               </View>
-            ) : null}
-            <View style={styles.statusIndicatorView}>
-              <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorActiveView} />
-              {/* <View style={styles.statusIndicatorInactiveView} /> */}
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -420,7 +422,7 @@ const styles = StyleSheet.create( {
   bottomButtonView: {
     flexDirection: 'row',
     paddingHorizontal: hp( 2.5 ),
-    paddingBottom: hp( windowHeight >= 800 ?  8  : windowHeight >= 700 ? 7 :  6 ),
+    paddingBottom: hp( windowHeight >= 800 ?  8  : windowHeight >= 700 ? 7 :  5 ),
     // padding: hp( 9 ),
     alignItems: 'center',
   },
