@@ -15,6 +15,7 @@ import PayInvoiceScreen from '../../../pages/lightningAccount/PayInvoiceScreen'
 import PaymentsScreen from '../../../pages/lightningAccount/PaymentsScreen'
 import InvoiceDetailsScreen from '../../../pages/lightningAccount/screens/InvoiceDetailsScreen'
 import TransactionDetailsScreen from '../../../pages/lightningAccount/screens/TransactionDetailsScreen'
+import SubAccountSettingsStack from './SubAccountSettingsStack'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -41,6 +42,12 @@ const AccountDetailsStack = createStackNavigator(
           borderBottomWidth: 0,
         },
       }
+    },
+    AccountSettings: {
+      screen: SubAccountSettingsStack,
+      navigationOptions: {
+        header: null,
+      },
     },
     PayInvoice: {
       screen: PayInvoiceScreen,

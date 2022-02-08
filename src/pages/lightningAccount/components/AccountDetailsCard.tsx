@@ -44,16 +44,6 @@ export type Props = {
   mode: Mode
 };
 
-function backgroundImageForAccountKind(
-  primarySubAccount: SubAccountDescribing,
-): ImageSourcePropType {
-  switch ( primarySubAccount.kind ) {
-
-      default:
-        return require( '../../../assets/images/carouselImages/savings_account_background.png' )
-  }
-}
-
 function shadowColorForAccountKind( mode ): string {
   switch ( mode ) {
       case Mode.ON_CHAIN:
@@ -173,7 +163,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
     return (
       <TouchableOpacity
         style={styles.settingsButtonContainer}
-        onPress={onSettingsPressed}
+        onPress={()=>{
+          onSettingsPressed()
+        }}
       >
         <Image
           source={require( '../../../assets/images/icons/icon_settings.png' )}

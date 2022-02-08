@@ -131,7 +131,7 @@ const AccountCard = ( {
       >
         <AccountDetailsCard
           onKnowMorePressed={() => { }}
-          onSettingsPressed={() => { }}
+          onSettingsPressed={() => {onClickSettings()}}
           balance={!isLightning ? totalBlockchainBalance : lightningBalance}
           accountShell={accountShell}
           mode={!isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
@@ -166,7 +166,7 @@ const AccountCard = ( {
       >
         <AccountDetailsCard
           onKnowMorePressed={() => { }}
-          onSettingsPressed={() => {isLightning && onClickSettings()}}
+          onSettingsPressed={() => {onClickSettings()}}
           balance={isLightning ? lightningBalance : totalBlockchainBalance}
           accountShell={accountShell}
           onPressOut={() => handleAnimation( 'pressOut' )}

@@ -74,7 +74,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           },
           imageSource: () => <NameNDesc />,
         },
-        ...( !accountShell.primarySubAccount.isTFAEnabled ? [
+        ...( !accountShell.primarySubAccount.isTFAEnabled && accountShell.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT ?[
           {
             title: strings.ShowxPub,
             subtitle: strings.ShowxPubSub,

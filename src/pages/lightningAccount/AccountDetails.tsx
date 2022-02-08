@@ -158,9 +158,14 @@ export class AccountDetails extends Component {
                 } )}
                 accountShell={accountShell}
                 onClickSettings={() => {
-                  this.props.navigation.navigate( 'SettingsScreen', {
-                    navigation: this.props.navigation,
-                  } )
+                  if( this.state.mode === Mode.LIGHTNING ){
+                    this.props.navigation.navigate( 'SettingsScreen' )
+                  } else {
+                    this.props.navigation.navigate( 'AccountSettings', {
+                      accountShellID: this.state.accountShellID
+                    } )
+                  }
+
                 }}
               />
             </View>
