@@ -620,12 +620,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   const getPasswordLevel = () => {
+    if( pswd ==appGeneratedPassword ){
+      return 'Strong'
+    }
     if ( passwordScore < 2 ) {
-      return 'Easily Guessable'
+      return 'Weak'
     } else if( passwordScore < 4 ) {
       return 'Could be stronger'
     }
-    return 'Strong Password'
+    return 'Strong'
   }
 
   const renderEncryptionPswd = () => {
@@ -1407,7 +1410,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                       handlePswdSubmit()
                     }}
                   />
-                  {passwordScore == 0 && pswd.length !=0 && pswd !=appGeneratedPassword && <Text style={styles.guessableText}>Easily Guessable</Text>}
+                  {pswd.length !=0 && <Text style={{
+                    ...styles.guessableText, color: pswd ==appGeneratedPassword || passwordScore == 4? Colors.green : passwordScore<2 ? Colors.tomatoRed : passwordScore<4 && Colors.yellow
+                  }}>{getPasswordLevel()}</Text>}
                 </View>
                 {pswd.length !== 0 &&
                 <View style={styles.fieldsButtonContainer}>
@@ -1813,7 +1818,7 @@ const styles = StyleSheet.create( {
     justifyContent:'space-between',
   },
   guessableText:{
-    color:Colors.tomatoRed,
+    // color:Colors.tomatoRed,
     // color:Colors.green,
     fontSize: RFValue( 10 ),
     fontWeight:'600',
