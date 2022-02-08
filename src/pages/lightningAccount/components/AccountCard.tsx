@@ -29,7 +29,7 @@ const AccountCard = ( {
   const windowWidth = Dimensions.get( 'window' ).width
 
   const handleAnimation = ( type:string ) => {
-    if ( pan.x._value != 0 && pan.x._value > 40/100*windowWidth ) {
+    if ( pan.x._value != 0 && pan.x._value > 50/100*windowWidth ) {
       Animated.timing( pan, {
         toValue: 0,
         duration: 300,
@@ -90,7 +90,7 @@ const AccountCard = ( {
 
   return (
     <View style={{
-      marginTop: 210
+      marginTop: 220
     }}>
       {/* <AccountDetailsCard
         onKnowMorePressed={()=> {}}
@@ -135,7 +135,7 @@ const AccountCard = ( {
           balance={!isLightning ? totalBlockchainBalance : lightningBalance}
           accountShell={accountShell}
           mode={!isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
-          onPressOut={() => handleAnimation( 'pressOut' )}
+          onPressOut={() => {}}
         />
       </Animated.View>
 
@@ -169,7 +169,7 @@ const AccountCard = ( {
           onSettingsPressed={() => {isLightning && onClickSettings()}}
           balance={isLightning ? lightningBalance : totalBlockchainBalance}
           accountShell={accountShell}
-          onPressOut={() => {}}
+          onPressOut={() => handleAnimation( 'pressOut' )}
           mode={isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
         />
       </Animated.View>
