@@ -90,7 +90,7 @@ const AccountCard = ( {
 
   return (
     <View style={{
-      marginTop: 200
+      marginTop: 210
     }}>
       {/* <AccountDetailsCard
         onKnowMorePressed={()=> {}}
@@ -117,7 +117,7 @@ const AccountCard = ( {
           position: 'absolute',
           zIndex: 1,
           bottom: pan1.interpolate( {
-            inputRange: [ 0, 1 ], outputRange: [ 40, 0 ]
+            inputRange: [ 0, 1 ], outputRange: [ 50, 0 ]
           } ),
           transform: [ {
             scale: pan1.interpolate( {
@@ -135,7 +135,7 @@ const AccountCard = ( {
           balance={!isLightning ? totalBlockchainBalance : lightningBalance}
           accountShell={accountShell}
           mode={!isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
-          onPressOut={() => setMode( Mode.ON_CHAIN )}
+          onPressOut={() => handleAnimation( 'pressOut' )}
         />
       </Animated.View>
 
@@ -146,7 +146,7 @@ const AccountCard = ( {
           position: 'absolute',
           zIndex: 2,
           bottom: pan1.interpolate( {
-            inputRange: [ 0, 1 ], outputRange: [ 0, 40 ]
+            inputRange: [ 0, 1 ], outputRange: [ 0, 50 ]
           } ),
           opacity: pan1.interpolate ( {
             inputRange: [ 0, 1 ], outputRange: [ 1, 0.6 ]
@@ -169,7 +169,7 @@ const AccountCard = ( {
           onSettingsPressed={() => {isLightning && onClickSettings()}}
           balance={isLightning ? lightningBalance : totalBlockchainBalance}
           accountShell={accountShell}
-          onPressOut={() => handleAnimation( 'pressOut' )}
+          onPressOut={() => {}}
           mode={isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
         />
       </Animated.View>
