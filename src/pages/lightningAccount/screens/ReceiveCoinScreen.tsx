@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native'
-import Fonts from '../../../../src/common/Fonts.js'
-import Colors from '../../../../src/common/Colors'
+import Fonts from '../../../common/Fonts.js'
+import Colors from '../../../common/Colors'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

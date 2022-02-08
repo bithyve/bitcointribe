@@ -11,8 +11,8 @@ import NewSwanAccountDetailsScreen from '../../../pages/Accounts/AddNew/SwanAcco
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import { translations } from '../../../common/content/LocContext'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
-import EnterNodeConfig from '../../../pages/zeusLN/EnterNodeConfigScreen'
-import ScanNodeConfig from '../../../pages/zeusLN/ScanNodeConfigScreen'
+import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
+import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 
 const strings  = translations[ 'stackTitle' ]
 

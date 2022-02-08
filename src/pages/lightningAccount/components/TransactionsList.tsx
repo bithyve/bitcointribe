@@ -11,7 +11,7 @@ import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUn
 import { translations } from '../../../common/content/LocContext'
 import { ListItem } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import Transaction from './../../../models/Transaction'
+import Transaction from '../../../models/Transaction'
 import TransactionItem from './TransactionItem'
 
 const styles = StyleSheet.create( {

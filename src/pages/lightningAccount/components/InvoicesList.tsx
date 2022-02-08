@@ -11,7 +11,7 @@ import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUn
 import { translations } from '../../../common/content/LocContext'
 import { ListItem } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import Invoice from './../../../models/Invoice'
+import Invoice from '../../../models/Invoice'
 import InvoiceItem from './InvoiceItem'
 
 const styles = StyleSheet.create( {

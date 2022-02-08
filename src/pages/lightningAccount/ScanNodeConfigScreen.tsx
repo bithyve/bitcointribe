@@ -21,7 +21,7 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import HeaderTitle from '../../components/HeaderTitle'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import LndConnectUtils from './../../utils/ln/LndConnectUtils'
+import LndConnectUtils from '../../utils/ln/LndConnectUtils'
 import Toast from '../../components/Toast'
 
 const styles = StyleSheet.create( {

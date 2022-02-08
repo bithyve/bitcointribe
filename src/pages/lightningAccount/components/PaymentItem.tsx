@@ -11,8 +11,8 @@ import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUn
 import { translations } from '../../../common/content/LocContext'
 import { ListItem } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import Transaction from './../../../models/Transaction'
-import AccountSavings from '../../../assets/images/accIcons/lightning.svg'
+import Invoice from '../../../models/Invoice'
+import Lightning from '../../../assets/images/accIcons/lightning.svg'
 import moment from 'moment'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
@@ -53,7 +53,6 @@ const styles = StyleSheet.create( {
     width: 45,
     marginRight: 10,
     backgroundColor: '#F4F4F4',
-    padding: 2,
     borderRadius: 45/2,
     borderColor: Colors.white,
     borderWidth: 2,
@@ -79,52 +78,52 @@ const styles = StyleSheet.create( {
 
 
 type Props = {
-  transaction: Transaction,
-  accountShellId: string,
+    invoice: Invoice,
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind | null;
 }
 
-const TransactionItem = ( {
-  transaction,
-  accountShellId,
+const PaymentItem = ( {
+  payment,
   bitcoinUnit = BitcoinUnit.SATS,
-  currencyKind = useCurrencyKind()
+  currencyKind = useCurrencyKind(),
 }: Props ) => {
 
   const transactionKindIconColor = useMemo( () => {
     return Colors.green
-  }, [ transaction ] )
+  }, [ payment ] )
 
   const amountTextStyle = useMemo( () => {
     return {
       ...styles.amountText,
       color: transactionKindIconColor,
     }
-  }, [ transaction ] )
+  }, [ payment ] )
 
 
   return (
-    <View>
+    <TouchableOpacity
+      onPress={() => {}}
+    >
       <ListItem containerStyle={{
         backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )
       }} pad={1}>
 
         <View style={styles.containerImg}>
-          <Text>@</Text>
+          <Lightning/>
         </View>
         <ListItem.Content style={styles.titleSection}>
           <ListItem.Title style={styles.titleText} numberOfLines={1}>
-          External address
+            {payment.getMemo}
           </ListItem.Title>
           <ListItem.Subtitle style={styles.subtitleText}>
-            {moment( transaction.getDate ).format( 'DD/MM/YY • hh:MMa' )}
+            {`${payment.isPaid? 'Paid': 'Unpaid'} ${moment( payment.getDate ).format( 'DD/MM/YY • hh:MMa' )}`}
           </ListItem.Subtitle>
         </ListItem.Content>
 
         <ListItem.Content style={styles.amountSection}>
           <LabeledBalanceDisplay
-            balance={transaction.amount}
+            balance={payment.getAmount}
             bitcoinUnit={bitcoinUnit}
             currencyKind={currencyKind}
             amountTextStyle={amountTextStyle}
@@ -142,9 +141,9 @@ const TransactionItem = ( {
       <View style={{
         borderBottomWidth: 1, borderColor: Colors.gray1, marginHorizontal: widthPercentageToDP( 4 )
       }} />
-      </View>
+    </TouchableOpacity>
   )
 }
 
-export default TransactionItem
+export default PaymentItem
 
