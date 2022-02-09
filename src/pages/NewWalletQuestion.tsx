@@ -1380,7 +1380,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     autoCorrect={false}
                     editable={isEditable}
                     autoCapitalize="none"
-                    onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
+                    // onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
                     //keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                     onChangeText={( text ) => {
                       setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
