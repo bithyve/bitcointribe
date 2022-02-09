@@ -22,24 +22,14 @@ import VersionHistoryReducer from './reducers/versionHistory'
 import cloudReducer from './reducers/cloud'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
 
-<<<<<<< HEAD
 //migration import
-=======
->>>>>>> feature/2.0.70
 import migrations from './migrations'
 
 const config = {
   key: 'root', // key is required
-<<<<<<< HEAD
   version: 0, //migration version code
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders' ],
-=======
-  version: 0, //migration version
-  storage: AsyncStorage, // storage is now required
-  blacklist: [ 'setupAndAuth', 'loaders' ],
-  stateReconciler: autoMergeLevel2,
->>>>>>> feature/2.0.70
   migrate: createMigrate( migrations, {
     debug: true
   } )
