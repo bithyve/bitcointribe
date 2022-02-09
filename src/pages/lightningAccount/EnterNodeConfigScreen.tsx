@@ -420,7 +420,7 @@ EnterNodeConfigState
             saved: true
           } )
           navigation.dispatch( goHomeAction() )
-          Toast( 'LN account created' )
+          Toast( 'Lightning account created' )
         } )
       } )
       .catch( e=> {
