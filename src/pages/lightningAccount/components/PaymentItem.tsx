@@ -11,12 +11,13 @@ import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUn
 import { translations } from '../../../common/content/LocContext'
 import { ListItem } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import Invoice from '../../../models/Invoice'
+import Invoice from './../../../models/Invoice'
 import Lightning from '../../../assets/images/accIcons/lightning.svg'
 import moment from 'moment'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
+import Payment from '../../../models/Payment'
 
 const styles = StyleSheet.create( {
   transactionKindIcon: {
@@ -78,7 +79,7 @@ const styles = StyleSheet.create( {
 
 
 type Props = {
-    invoice: Invoice,
+    payment?: Payment,
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind | null;
 }
@@ -102,9 +103,7 @@ const PaymentItem = ( {
 
 
   return (
-    <TouchableOpacity
-      onPress={() => {}}
-    >
+    <>
       <ListItem containerStyle={{
         backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )
       }} pad={1}>
@@ -114,16 +113,16 @@ const PaymentItem = ( {
         </View>
         <ListItem.Content style={styles.titleSection}>
           <ListItem.Title style={styles.titleText} numberOfLines={1}>
-            {payment.getMemo}
+            {payment.value}
           </ListItem.Title>
           <ListItem.Subtitle style={styles.subtitleText}>
-            {`${payment.isPaid? 'Paid': 'Unpaid'} ${moment( payment.getDate ).format( 'DD/MM/YY • hh:MMa' )}`}
+            {`${payment.status === 'SUCCEEDED' ? 'Succeeded': 'Failed'} ${moment( parseInt( payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )}`}
           </ListItem.Subtitle>
         </ListItem.Content>
 
         <ListItem.Content style={styles.amountSection}>
           <LabeledBalanceDisplay
-            balance={payment.getAmount}
+            balance={parseInt( payment.value )}
             bitcoinUnit={bitcoinUnit}
             currencyKind={currencyKind}
             amountTextStyle={amountTextStyle}
@@ -141,7 +140,7 @@ const PaymentItem = ( {
       <View style={{
         borderBottomWidth: 1, borderColor: Colors.gray1, marginHorizontal: widthPercentageToDP( 4 )
       }} />
-    </TouchableOpacity>
+    </>
   )
 }
 
