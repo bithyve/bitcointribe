@@ -557,12 +557,14 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
         ...wallet,
         details2FA
       }
-      yield put(updateWallet(updatedWallet))
+      yield put( updateWallet( updatedWallet ) )
       yield put( twoFAValid( true ) )
       yield call ( dbManager.updateWallet, {
         details2FA
       } )
-      yield put(updateWalletImageHealth({update2fa: true}))
+      yield put( updateWalletImageHealth( {
+        update2fa: true
+      } ) )
     }
     else yield put( twoFAValid( false ) )
   } catch ( error ) {
@@ -660,6 +662,7 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   )
 
   const shellsToSync: AccountShell[] = []
+  const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
@@ -667,6 +670,7 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
+            if( syncAll ) testShellsToSync.push( shell )
             break
 
           case AccountType.DONATION_ACCOUNT:
@@ -682,6 +686,15 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
     payload: {
       shells: shellsToSync,
+      options: {
+        hardRefresh
+      }
+    }
+  } )
+
+  if( syncAll && testShellsToSync.length )  yield call( refreshAccountShellsWorker, {
+    payload: {
+      shells: testShellsToSync,
       options: {
         hardRefresh
       }
@@ -719,7 +732,7 @@ export function* setup2FADetails( wallet: Wallet ) {
   const details2FA = {
     bithyveXpub,
     twoFAKey
-  };
+  }
   const updatedWallet = {
     ...wallet,
     details2FA
@@ -1130,7 +1143,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const shard: string = res.secondaryData.secondaryMnemonicShard
     sharesArray.push( shard )
     if( sharesArray.length>1 ){
-      secondaryMnemonic = BHROperations.getMnemonics( sharesArray, wallet.security.answer )
+      secondaryMnemonic = BHROperations.getMnemonics( sharesArray )
     }
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
@@ -1148,50 +1161,6 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-function parseAA( addresses ) {
-  try {
-    if( addresses.length > 0 ) {
-      const obj = {
-      }
-      addresses.forEach( aa => {
-        const tmp = {
-          index : aa.index
-        }
-        if( aa.assignee ) {
-          const assignee = {
-            ...aa.assignee
-          }
-          if( aa.assignee.recipientInfo ) {
-            const recipientInfo = {
-            }
-            aa.assignee.recipientInfo.forEach( info => {
-              recipientInfo[ info.txid ] = info.recipient
-            } )
-            assignee.recipientInfo = recipientInfo
-            tmp.assignee = assignee
-          }
-        }
-        obj[ aa.address ] = tmp
-      } )
-      return obj
-    } else {
-      return {
-      }
-    }
-  } catch ( error ) {
-    console.log( error )
-    return {
-    }
-  }
-}
-
-function getAA( activeAddresses:{external: [], internal: []} ) {
-  return {
-    external: parseAA( activeAddresses.external ),
-    internal: parseAA( activeAddresses.internal  )
-  }
-}
-
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
@@ -1204,10 +1173,9 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
     if( account.type === AccountType.SAVINGS_ACCOUNT && account.isUsable ) yield put( setAllowSecureAccount( true ) )
 
     accountShell.primarySubAccount.visibility = account.accountVisibility
-    const aa = getAA( account.activeAddresses )  // TODO: check whether active addresses are getting restored
-    account.activeAddresses = aa
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
+    accountShell.primarySubAccount.transactions = account.transactionsMeta
   }
 
   // update redux store & database
@@ -1239,13 +1207,7 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account's balance and transactions
   const syncAll = true
   const hardRefresh = true
-
-  yield call( autoSyncShellsWorker, {
-    payload: {
-      syncAll, hardRefresh
-    }
-  } )
-  //yield call( syncTxAfterRestore, restoredAccounts )
+  yield put( autoSyncShells( syncAll, hardRefresh ) )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(

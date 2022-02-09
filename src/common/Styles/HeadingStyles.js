@@ -6,7 +6,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 
 const HeadingStyles = StyleSheet.create( {
   listSectionHeading: {
-    fontSize: RFValue( 16 ),
+    fontSize: RFValue( 14 ),
     fontWeight: '300',
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.blue,

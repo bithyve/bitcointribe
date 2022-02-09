@@ -22,14 +22,24 @@ import VersionHistoryReducer from './reducers/versionHistory'
 import cloudReducer from './reducers/cloud'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
 
+<<<<<<< HEAD
 //migration import
+=======
+>>>>>>> feature/2.0.70
 import migrations from './migrations'
 
 const config = {
   key: 'root', // key is required
+<<<<<<< HEAD
   version: 0, //migration version code
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders' ],
+=======
+  version: 0, //migration version
+  storage: AsyncStorage, // storage is now required
+  blacklist: [ 'setupAndAuth', 'loaders' ],
+  stateReconciler: autoMergeLevel2,
+>>>>>>> feature/2.0.70
   migrate: createMigrate( migrations, {
     debug: true
   } )
@@ -122,6 +132,7 @@ import {
   generateMetaSharesWatcher,
   updateHealthLevel2Watcher,
   recoverWalletFromIcloudWatcher,
+  recoverWalletWithoutIcloudWatcher,
   recoverWalletHealthWatcher,
   cloudMetaShareHealthWatcher,
   recoverMnemonicHealthWatcher,
@@ -151,6 +162,9 @@ import {
   updateSecondaryShardWatcher,
   getApprovalFromKeeperWatcher,
   rejectedExistingContactRequestWatcher,
+  changeQuestionAnswerWatcher,
+  upgradePDFWorkerWatcher,
+  upgradeLevelOneKeeperWatcher,
   resetLevelAfterPasswordChangeWatcher,
   changeEncPasswordWatcher
 } from './sagas/BHR'
@@ -181,6 +195,7 @@ import {
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import { updateUserNameWatcher } from './sagas/storage'
+import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -251,6 +266,7 @@ const rootSaga = function* () {
     generateMetaSharesWatcher,
     updateHealthLevel2Watcher,
     recoverWalletFromIcloudWatcher,
+    recoverWalletWithoutIcloudWatcher,
     recoverWalletHealthWatcher,
     cloudMetaShareHealthWatcher,
     updateWalletImageHealthWatcher,
@@ -281,6 +297,10 @@ const rootSaga = function* () {
     updateSecondaryShardWatcher,
     getApprovalFromKeeperWatcher,
     rejectedExistingContactRequestWatcher,
+    changeQuestionAnswerWatcher,
+    upgradePDFWorkerWatcher,
+    upgradeLevelOneKeeperWatcher,
+
     resetLevelAfterPasswordChangeWatcher,
     changeEncPasswordWatcher,
     // Swan Integration

@@ -31,13 +31,13 @@ import {
   setChannelAssets,
   createChannelAssets,
   createOrChangeGuardian,
-  switchS3LoaderKeeper,
+  setApprovalStatus,
+  downloadSMShare,
 } from '../../store/actions/BHR'
 import { useDispatch } from 'react-redux'
 import {
   KeeperInfoInterface,
   Keepers,
-  LevelHealthInterface,
   MetaShare,
   TrustedContact,
   Trusted_Contacts,
@@ -69,8 +69,13 @@ import Toast from '../../components/Toast'
 import Loader from '../../components/loader'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import Relay from '../../bitcoin/utilities/Relay'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { translations } from '../../common/content/LocContext'
+import QRModal from '../Accounts/QRModal'
 
 const TrustedContactHistoryKeeper = ( props ) => {
+  const strings  = translations[ 'bhr' ]
+  const common  = translations[ 'common' ]
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
@@ -120,9 +125,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
-  const s3 = dbManager.getBHR()
-  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
+  const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
+
+  const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
@@ -130,8 +137,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const index = props.navigation.getParam( 'index' )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const dispatch = useDispatch()
+  const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
+  const [ qrModal, setQRModal ] = useState( false )
+  const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
+  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
 
   useEffect( () => {
     setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
@@ -156,6 +166,53 @@ const TrustedContactHistoryKeeper = ( props ) => {
       setShowQrCode( true )
     }
   }, [ isChange ] )
+
+  const sendApprovalRequestToPK = ( ) => {
+    setQrBottomSheetsFlag( true )
+    setQRModal( true )
+    setKeeperTypeModal( false )
+  }
+
+  const renderQrContent = () => {
+    return (
+      <QRModal
+        isFromKeeperDeviceHistory={false}
+        QRModalHeader={'QR scanner'}
+        title={'Note'}
+        infoText={
+          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+        }
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={async( qrScannedData ) => {
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
+        }}
+        onBackPress={() => {
+          setQrBottomSheetsFlag( false )
+          setQRModal( false )
+        }}
+        onPressContinue={async() => {
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
+        }}
+      />
+    )
+  }
+
+  useEffect( ()=>{
+    if( approvalStatus && isChangeClicked ){
+      setQRModal( false )
+      onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
+    }
+  }, [ approvalStatus ] )
+
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
+
 
   //didMount
   useEffect( () => {
@@ -198,7 +255,30 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setErrorModal( true )
       }
     }
-  }, [] )
+    approvalCheck()
+  }, [ ] )
+
+  const approvalCheck = async() => {
+    console.log( 'selectedKeeper',  props.navigation.getParam( 'selectedKeeper' ) )
+    if( props.navigation.getParam( 'selectedKeeper' ).channelKey ){
+      const instream = useStreamFromContact( trustedContacts[ props.navigation.getParam( 'selectedKeeper' ).channelKey ], wallet.walletId, true )
+      console.log( 'approvalCheck instream', instream )
+      const flag = await TrustedContactsOperations.checkSecondaryUpdated(
+        {
+          walletId: wallet.walletId,
+          options:{
+            retrieveSecondaryData: true
+          },
+          channelKey: props.navigation.getParam( 'selectedKeeper' ).channelKey,
+          StreamId: instream.streamId
+        }
+      )
+      console.log( 'approvalCheck flag', flag )
+      if( !flag ){
+        setApprovalErrorModal( true )
+      }
+    }
+  }
 
   const getContacts = useCallback(
     ( selectedContacts ) => {
@@ -522,7 +602,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
         type: shareType,
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
-        currentLevel: currentLevel,
+        currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
           MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
@@ -846,16 +926,30 @@ const TrustedContactHistoryKeeper = ( props ) => {
       </ModalContainer>
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
+          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            onPressChangeKeeperType( type, name )
+            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            else onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}
         />
+      </ModalContainer>
+      <ModalContainer visible={approvalErrorModal} closeBottomSheet={()=>{setApprovalErrorModal( false )}} >
+        <ErrorModalContents
+          title={'Need Approval'}
+          note={'Scan the Approval Key stored on Personal Device 1 in: Security and Privacy> I am the Keeper of > Contact'}
+          proceedButtonText={strings.ok}
+          onPressProceed={() => setApprovalErrorModal( false )}
+          isBottomImage={false}
+        />
+      </ModalContainer>
+      <ModalContainer visible={qrModal} closeBottomSheet={() => {setQRModal( false )}} >
+        {renderQrContent()}
       </ModalContainer>
       {showLoader ? <Loader /> : null}
     </View>

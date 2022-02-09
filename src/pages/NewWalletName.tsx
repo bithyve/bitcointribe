@@ -182,7 +182,7 @@ export default function NewWalletName( props ) {
           style={{
             flex: 1
           }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
+          behavior={Platform.OS == 'ios' ? 'height' : ''}
           enabled
         >
           <View style={{
@@ -372,7 +372,7 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flexDirection: 'row',
-    paddingHorizontal: hp( 6 ),
+    paddingHorizontal: hp( 4.5 ),
     paddingBottom: DeviceInfo.hasNotch() ? hp( 4 ) : hp( 3 ),
     // paddin: hp( 9 ),
     alignItems: 'center',

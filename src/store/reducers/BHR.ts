@@ -41,9 +41,11 @@ import {
   ALLOW_SECURE_ACCOUNT,
   OPEN_CLOSE_APPROVAL,
   SET_SECONDARY_DATA_INFO_STATUS,
-  SET_PASSWORD_RESET_STATE,
   UPDATE_META_SHARES_KEEPER,
   UPDATE_OLD_META_SHARES_KEEPER,
+  SET_IS_CURRENT_LEVEL0,
+  PDF_UPGRADE,
+  SET_PASSWORD_RESET_STATE,
 } from '../actions/BHR'
 
 const initialState: {
@@ -69,6 +71,7 @@ const initialState: {
     generateMetaShareStatus: boolean;
     updateSecondaryShardStatus: boolean;
     getSecondaryDataInfoStatus: boolean;
+    changeAnswerStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -83,10 +86,9 @@ const initialState: {
     levelInfo: LevelInfo[];
   }[];
   keeperInfo: KeeperInfoInterface[];
+  shares: any;
   metaSharesKeeper: MetaShare[];
   oldMetaSharesKeeper: MetaShare[];
-  shares: any;
-  metaShare: MetaShare;
   errorReceiving: Boolean;
   secondaryShareDownloaded: any;
   pdfInfo: {
@@ -116,12 +118,14 @@ const initialState: {
   navigationObj: any;
   errorTitle: string;
   errorInfo: string;
-  status: LevelStatus,
-  isTypeBottomSheetOpen: boolean,
+  status: LevelStatus;
+  isTypeBottomSheetOpen: boolean;
   AllowSecureAccount: boolean;
   openApproval: boolean;
-  availableKeepers: KeeperInfoInterface[]
-  approvalContactData: ContactRecipientDescribing,
+  availableKeepers: KeeperInfoInterface[];
+  approvalContactData: ContactRecipientDescribing;
+  IsCurrentLevel0: boolean;
+  pdfUpgrade: boolean;
   passwordResetState: string
 } = {
   mnemonic: '',
@@ -146,6 +150,7 @@ const initialState: {
     generateMetaShareStatus: false,
     updateSecondaryShardStatus: false,
     getSecondaryDataInfoStatus: false,
+    changeAnswerStatus: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -158,7 +163,8 @@ const initialState: {
   errorSending: false,
   shares: null,
   keeperInfo: [],
-  metaShare: null,
+  metaSharesKeeper: [],
+  oldMetaSharesKeeper: [],
   errorReceiving: false,
   secondaryShareDownloaded: null,
   pdfInfo: {
@@ -190,9 +196,9 @@ const initialState: {
   AllowSecureAccount: false,
   openApproval: false,
   availableKeepers: [],
-  metaSharesKeeper: [],
-  oldMetaSharesKeeper: [],
   approvalContactData: null,
+  IsCurrentLevel0: false,
+  pdfUpgrade: false,
   passwordResetState: ''
 }
 
@@ -221,6 +227,18 @@ export default ( state = initialState, action ) => {
           ...state,
           levelHealth: action.payload.health,
           currentLevel: action.payload.currentLevel,
+        }
+
+      case UPDATE_META_SHARES_KEEPER:
+        return {
+          ...state,
+          metaSharesKeeper: action.payload.metaSharesKeeper
+        }
+
+      case UPDATE_OLD_META_SHARES_KEEPER:
+        return {
+          ...state,
+          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
         }
 
       case ERROR_SENDING:
@@ -461,6 +479,18 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           metaSharesKeeper: action.payload.metaSharesKeeper
+        }
+
+      case SET_IS_CURRENT_LEVEL0:
+        return {
+          ...state,
+          IsCurrentLevel0: action.payload.flag,
+        }
+
+      case PDF_UPGRADE:
+        return {
+          ...state,
+          pdfUpgrade: action.payload.flag,
         }
 
       case UPDATE_OLD_META_SHARES_KEEPER:

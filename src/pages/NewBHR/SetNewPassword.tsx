@@ -138,7 +138,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const isChange = props.navigation.getParam( 'isChange' )
   const [ knowMoreIndex, setKnowMoreIndex ] = useState( 0 )
 
-  const windowHeight = Dimensions.get('window').height;
+  const windowHeight = Dimensions.get( 'window' ).height
 
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
@@ -369,26 +369,28 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           height: hp(windowHeight >= 800 ? (Platform.OS== "ios" ? '56%' : '65%') : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%'),
           marginHorizontal: wp( 4 )
         }}>
-           <View style={{paddingTop:10, paddingBottom:4}}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              setKnowMoreIndex( 1 )
-              setShowAGSPmodal( false )
-              setKnowMore( true )
-              showSecurityQue( false )
-              showEncryptionPswd( false )
-              setShowAGSPmodal( false )
-              setAnswerError( '' )
-            }}
-            style={{
-              ...styles.selectedContactsView,
-              alignSelf: 'flex-end'
-            }}
-          >
-            
-            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
-          </TouchableOpacity>
+          <View style={{
+            paddingTop:10, paddingBottom:4
+          }}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {
+                setKnowMoreIndex( 1 )
+                setShowAGSPmodal( false )
+                setKnowMore( true )
+                showSecurityQue( false )
+                showEncryptionPswd( false )
+                setShowAGSPmodal( false )
+                setAnswerError( '' )
+              }}
+              style={{
+                ...styles.selectedContactsView,
+                alignSelf: 'flex-end'
+              }}
+            >
+
+              <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
+            </TouchableOpacity>
           </View>
           <View style={{
             marginHorizontal: wp( '2%' ),

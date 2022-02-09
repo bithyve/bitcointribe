@@ -312,7 +312,7 @@
   },
   "accManagement": {
     "AccountManagement": "खाते व्यवस्थापन",
-    "Rearrange": "येथून खात्यांची पुनर्रचना, संग्रहण आणि पुनर्स्थापना करा",
+    "Rearrange": "येथे खाती पुनर्संचयित आणि पुनर्संचयित करा",
     "HiddenAccounts": "लपलेली खाती",
     "ArchivedAccounts": "संग्रहित खाती",
     "Save": "नवीन ऑर्डर जतन करा",
@@ -577,6 +577,8 @@
     "HealthCheckConfirmPassword": "आरोग्य तपासणी पासवर्डची पुष्टी करा",
     "Specifythepassword": "वॉलेट सेट करताना तुम्ही सांगितल्याप्रमाणे पासवर्ड निर्दिष्ट करा",
     "Hint": "इशारा",
+    "Backupwithcloud": "मेघ सह बॅकअप",
+    "BackupwithcloudSub": "क्लाउडवर रिकव्हरी कीचा बॅकअप घ्या",
     "Backupwithcontact": "संपर्कासह बॅकअप",
     "BackupwithcontactSub": "मित्र किंवा कुटुंबातील सदस्यासह पुनर्प्राप्ती की बॅकअप घ्या",
     "Backuponadevice": "डिव्हाइसवर बॅकअप",

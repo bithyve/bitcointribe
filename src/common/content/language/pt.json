@@ -309,7 +309,7 @@
   },
   "accManagement": {
       "AccountManagement": "Gestão de Contas",
-      "Rearrange": "Reorganize, arquive e restabeleça contas a partir daqui",
+      "Rearrange": "Reorganize e restabeleça contas a partir daqui",
       "HiddenAccounts": "Contas ocultas",
       "ArchivedAccounts": "Contas Arquivadas",
       "Save": "Salvar novo pedido",
@@ -574,6 +574,8 @@
       "HealthCheckConfirmPassword": "Senha de confirmação de verificação de saúde",
       "Specifythepassword": "Especifique a senha como você fez no momento de configurar a carteira",
       "Hint": "Dica",
+      "Backupwithcloud": "Backup com nuvem",
+      "BackupwithcloudSub": "Faça backup da chave de recuperação na nuvem",
       "Backupwithcontact": "Backup com contato",
       "BackupwithcontactSub": "Faça backup da chave de recuperação com um amigo ou familiar",
       "Backuponadevice": "Backup em um dispositivo",

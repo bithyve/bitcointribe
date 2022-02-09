@@ -1,5 +1,5 @@
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { CLEAR_CLOUD_CACHE, SET_CLOUD_ERROR_MESSAGE, CLOUD_BACKUP_HISTORY, CLOUD_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY } from '../actions/cloud'
+import { CLEAR_CLOUD_CACHE, SET_CLOUD_ERROR_MESSAGE, CLOUD_BACKUP_HISTORY, CLOUD_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY, SET_GOOGLE_LOGIN_CANCELLED } from '../actions/cloud'
 
 interface historyObj {
   title: string,
@@ -16,7 +16,8 @@ const initialState: {
   isCloudBackupSuccess: boolean;
   cloudBackupStatus: CloudBackupStatus,
   cloudBackupHistory: historyObj[],
-  cloudErrorMessage: string
+  cloudErrorMessage: string,
+  isGoogleLoginCancelled: boolean
 } = {
   isGoogleLoginSuccess: false,
   isFileReading: false,
@@ -26,6 +27,7 @@ const initialState: {
   cloudBackupStatus: CloudBackupStatus.PENDING,
   cloudBackupHistory: [],
   cloudErrorMessage: '',
+  isGoogleLoginCancelled: false
 }
 
 export default ( state = initialState, action ) => {
@@ -34,6 +36,11 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           isGoogleLoginSuccess: action.payload.isGoogleLoginSuccess,
+        }
+      case SET_GOOGLE_LOGIN_CANCELLED:
+        return {
+          ...state,
+          isGoogleLoginCancelled: action.payload.status,
         }
 
       case GOOGLE_LOGIN_FAILURE:

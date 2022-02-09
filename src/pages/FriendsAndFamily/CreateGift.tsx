@@ -65,6 +65,7 @@ import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
 import { calculateSendMaxFee } from '../../store/actions/sending'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { Shadow } from 'react-native-shadow-2'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
@@ -77,6 +78,7 @@ const CreateGift = ( { navigation } ) => {
   const fiatCurrencyCode = useCurrencyCode()
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const currencyCode =  useSelector( state => state.preferences.currencyCode )
+  const exchangeRates =  useSelector( state => state.accounts.exchangeRates )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
@@ -172,8 +174,9 @@ const CreateGift = ( { navigation } ) => {
   }, [ giftCreationStatus ] )
 
   useEffect( () => {
-    if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
-  }, [ account, accountState.averageTxFees ] )
+    if( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
+    else if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
+  }, [ account, accountState.averageTxFees, isSendMax, sendMaxFee ] )
 
   useEffect( () => {
     if( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
@@ -209,6 +212,7 @@ const CreateGift = ( { navigation } ) => {
     }
 
     return(
+      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[8,8]}>
       <TouchableOpacity
         disabled={isDisabled}
         onPress={()=>{
@@ -262,6 +266,7 @@ const CreateGift = ( { navigation } ) => {
       >
         <Text style={styles.buttonText}>{text}</Text>
       </TouchableOpacity>
+      </Shadow>
     )
   }
 
@@ -422,7 +427,7 @@ const CreateGift = ( { navigation } ) => {
     </ScrollView>
   }
 
-  const AdvanceGiftOptions = ( { title, infoText, stateToUpdate, imageToShow } ) => {
+  const AdvanceGiftOptions = ( { title , stateToUpdate, imageToShow } ) => {
     const plus = () =>{
       if( stateToUpdate == 'gift' ){
         setNumbersOfGift( numbersOfGift + 1 )
@@ -462,7 +467,10 @@ const CreateGift = ( { navigation } ) => {
             }}>{title}</Text>
             <Text style={{
               color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
-            }}>{infoText}</Text>
+            }}>Gift Sats created will be of the 
+            <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>same amount</Text>
+             and can be 
+             <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>sent separately</Text></Text>
           </View>
           <View style={{
             flexDirection:'row', alignItems: 'center',
@@ -524,7 +532,7 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               fontSize: RFValue( 11 ),
             }}>
-            (Restricts the gift to one per user/ Hexa app)
+            (Restricts the gift to <Text style={{ fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic }}>one per Hexa app</Text> )
             </Text>
           </Text>
 
@@ -561,7 +569,7 @@ const CreateGift = ( { navigation } ) => {
       </View>
       <AdvanceGiftOptions
         title={'No. of Gifts'}
-        infoText={'Gift Sats created will be of the same amount and can be sent separately'}
+        // infoText={'Gift Sats created will be of the same amount and can be sent separately'}
         stateToUpdate={'gift'}
         imageToShow={require( '../../assets/images/icons/gift.png' )}
       />
@@ -805,6 +813,59 @@ const CreateGift = ( { navigation } ) => {
             }}>gifts</Text>
           </View> : null }
         </View>
+        {numbersOfGift > 1 ? <View style={{
+          flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: wp( '5%' ),  marginRight: wp( '5%' ), marginTop: wp( '3%' )
+        }}>
+          <Text style={{
+            color: Colors.greyTextColor, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansMedium
+          }}>Total Amount</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginLeft: 'auto'
+            }}
+          >
+            {prefersBitcoin ? (
+              <Image
+                style={{
+                  ...CommonStyles.homepageAmountImage,
+                  marginTop: hp( 0.2 )
+                }}
+                source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
+              />
+            ) : materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
+              <MaterialCurrencyCodeIcon
+                currencyCode={fiatCurrencyCode}
+                color={Colors.white}
+                size={RFValue( 16 )}
+                style={{
+                  marginRight: wp( 1 ), marginLeft:  [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode  ) ? 0 : -wp( 1 )
+                }}
+              />
+            ) : (
+              <Image
+                style={{
+                  ...styles.cardBitCoinImage,
+                }}
+                source={getCurrencyImageByRegion( fiatCurrencyCode, 'light' )}
+              />
+            )}
+            <Text style={styles.homeHeaderAmountText}>
+              {prefersBitcoin
+                ? UsNumberFormat( parseInt( amount )* numbersOfGift )
+                : exchangeRates && exchangeRates[ currencyCode ]
+                  ? (
+                    ( parseInt( amount )* numbersOfGift / SATOSHIS_IN_BTC ) *
+                    exchangeRates[ currencyCode ].last
+                  ).toFixed( 2 )
+                  : ''}
+            </Text>
+            <Text style={styles.homeHeaderAmountUnitText}>
+              {prefersBitcoin ? 'sats' : fiatCurrencyCode}
+            </Text>
+          </View>
+        </View> :null}
         <View style={{
           marginLeft: wp( '3%' ),
           marginTop: wp( '1.5%' )
@@ -817,7 +878,8 @@ const CreateGift = ( { navigation } ) => {
           }}>
             <Text>{'Minimum gift value '}</Text>
             <Text style={{
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              fontFamily: Fonts.FiraSansItalic
             }}>{prefersBitcoin? minimumGiftValue: convertSatsToFiat( minimumGiftValue )} {prefersBitcoin? 'sats': currencyCode}</Text>
           </Text>
         </View>
@@ -1121,13 +1183,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.blue,
-    marginLeft: wp( 2 )
   },
   disabledButtonView: {
     height: wp( '12%' ),
@@ -1135,13 +1191,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.lightBlue,
-    marginLeft: wp( 2 )
   },
   imageView: {
     width: 18,
@@ -1242,7 +1292,20 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft:'auto'
-  }
+  },
+  homeHeaderAmountText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 20 ),
+    marginRight: 5,
+    color: Colors.black,
+  },
+  homeHeaderAmountUnitText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 11 ),
+    // marginBottom: 3,
+    color: Colors.gray2,
+    marginTop: hp( 0.7 )
+  },
 } )
 
 export default CreateGift

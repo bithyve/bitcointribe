@@ -219,7 +219,7 @@ class ScanRecoveryKey extends Component<
               }}
               onPress={() => {
                 // this.barcodeRecognized( {
-                //   data: '{"type":"RECOVERY_REQUEST","walletName":"saa","channelId":"14dca15627cc10722b71181077cf9fb6a8f5558b26dc3e52982fd8e886546eb5","streamId":"7ff00bdcd","channelKey":"eQon5vv7G1yOcS1ARsDgcHuS","secondaryChannelKey":"k8GSj7PBNAM0ty6cZVUAmcQv","version":"2.0.0","walletId":"3f4cc2d8de0fe50ceb7dcb16b8dcee30761c6d296d6ec3d1d14ae39b1954572c"}'
+                //   data: '{"type":"RECOVERY_REQUEST","walletName":"ShivaniNew","channelId":"016eb4ac3b68d312ac8301e5cedeececdc4b8e42a56e49fd849048ff3642da86","streamId":"65bf22a7c","channelKey":"0BvnLFWTJfNP3hFy43qYk136","secondaryChannelKey":"upToEzzuNHJ75QYqyRz9Q6Lc","version":"2.0.7","walletId":"2ca1d6a049f75ec5c693d76a896745e12438941d97921dfabfa6c3a4a1ac258d"}'
                 // } )
                 this.setState( {
                   isScanned: true
