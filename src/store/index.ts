@@ -13,7 +13,7 @@ import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
 import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
-import { persistStore, persistReducer } from 'redux-persist'
+import { persistStore, persistReducer, createMigrate } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
@@ -22,11 +22,17 @@ import VersionHistoryReducer from './reducers/versionHistory'
 import cloudReducer from './reducers/cloud'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
 
+import migrations from './migrations'
 
 const config = {
   key: 'root', // key is required
+  version: 0, //migration version
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders' ],
+  stateReconciler: autoMergeLevel2,
+  migrate: createMigrate( migrations, {
+    debug: true
+  } )
 }
 
 import {
@@ -179,6 +185,7 @@ import {
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import { updateUserNameWatcher } from './sagas/storage'
+import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
