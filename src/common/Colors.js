@@ -12,6 +12,7 @@ const Colors = {
   green: '#70C1B3',
   purple: '#9D87E0',
   grayShade: '#53D592',
+  grey11: '#BEBEBE',
   greenShade: '#9EE0A4',
   darkGreen: '#33956B',
   pink: '#FBB1A4',
