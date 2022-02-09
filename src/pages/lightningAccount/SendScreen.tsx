@@ -8,7 +8,8 @@ import {  Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
 import AddressUtils from '../../utils/ln/AddressUtils'
 import { inject, observer } from 'mobx-react'
-
+import handleInvoiceData from '../../utils/ln/handleInvoiceData'
+import { Alert } from 'react-native'
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
@@ -47,11 +48,14 @@ const SendScreen = inject(
       if( AddressUtils.isValidBitcoinAddress( qrData, isTestNet || isRegTest ) ) {
         const { value, amount }: any = AddressUtils.processSendAddress( qrData )
         console.log( 'isValidBitcoinAddress' )
-
-      }else if ( AddressUtils.isValidLightningPaymentRequest( qrData ) ) {
-        console.log( 'isValidLightningPaymentRequest' )
-        InvoicesStore.getPayReq( qrData )
-        navigation.replace( 'PayInvoice' )
+      } else {
+        handleInvoiceData( qrData )
+          .then( ( [ route, props ] ) => {
+            navigation.replace( route, props )
+          } )
+          .catch( ( err ) => {
+            console.log( err )
+          } )
       }
     } catch ( error ) {
       console.log( error )
