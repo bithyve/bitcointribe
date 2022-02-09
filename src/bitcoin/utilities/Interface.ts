@@ -37,23 +37,23 @@ export enum TransactionType {
 }
 export interface Transaction {
   txid: string;
-  status: string;
-  confirmations: number;
+  status?: string;
+  confirmations?: number;
 
   /**
    * Sats per byte
    */
-  fee: string;
+  fee?: string;
 
   /**
    * UTC string
    */
-  date: string;
+  date?: string;
 
   /**
    * Inbound(Received)/Outbound(Sent) transaction
    */
-  transactionType: TransactionType;
+  transactionType?: TransactionType;
 
   /**
    * Amount in Satoshis.
@@ -642,6 +642,7 @@ export interface NewWalletImage {
   versionHistory?: string;
   SM_share?: string,
   gifts?:object;
+  version: string,
 }
 
 export interface EncryptedImage {
@@ -851,7 +852,22 @@ export interface Wallet {
   accounts: {
     [accountType: string]: string[] // array of accountIds
   },
-  version: string
+  version: string,
+}
+
+export interface LNNode {
+  host?: string,
+  port?: string,
+  url?: string,
+  lndhubUrl?: string,
+  existingAccount?: boolean,
+  macaroonHex?: string,
+  accessKey?: string,
+  username?: string,
+  password?: string,
+  implementation?: string,
+  certVerification?: boolean,
+  enableTor?: boolean
 }
 
 export interface Account {
@@ -887,7 +903,8 @@ export interface Account {
       address: string,
       privateKey: string
     }
-  }
+  },
+  node?: LNNode
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -930,7 +947,8 @@ export enum AccountType {
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
-  FNF_ACCOUNT = 'FNF_ACCOUNT'
+  FNF_ACCOUNT = 'FNF_ACCOUNT',
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
 }
 
 export interface Accounts {

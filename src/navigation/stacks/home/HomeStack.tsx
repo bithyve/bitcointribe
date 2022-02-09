@@ -52,6 +52,7 @@ import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScr
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 import QRStack from '../home/QRStack'
+import LnAccountStack from '../accounts/LnAccountStack'
 import Home from '../../../pages/Home/Home'
 import Header from '../Header'
 import Login from '../../../pages/Login'
@@ -97,6 +98,13 @@ const HomeStack = createStackNavigator(
     },
     AccountDetails: {
       screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
+    LNAccountDetails: {
+      screen: LnAccountStack,
       navigationOptions: {
         header: null,
         // tabBarVisibl

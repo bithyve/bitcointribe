@@ -11,6 +11,8 @@ import NewSwanAccountDetailsScreen from '../../../pages/Accounts/AddNew/SwanAcco
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import { translations } from '../../../common/content/LocContext'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
+import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -63,6 +65,20 @@ const AddNewAccountStack = createStackNavigator(
       screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {
         title: 'Setup Donation Account'
+      }
+    },
+
+    EnterNodeConfig: {
+      screen: EnterNodeConfig,
+      navigationOptions: {
+        header: null
+      }
+    },
+
+    ScanNodeConfig: {
+      screen: ScanNodeConfig,
+      navigationOptions: {
+        header: null
       }
     },
   },

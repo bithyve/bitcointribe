@@ -22,6 +22,9 @@ import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
 import AccountSavings from '../../assets/images/accIcons/acc_savings.svg'
 import Wallet from '../../assets/images/accIcons/icon_wallet.svg'
 import Watch from '../../assets/images/accIcons/view.svg'
+import Lightning from '../../assets/images/accIcons/lightning.svg'
+import LightningHexa from '../../assets/images/accIcons/icon_ln.svg'
+
 const getAvatarForSubAccount = (
   subAccount: SubAccountDescribing,
   active?: boolean,
@@ -63,6 +66,8 @@ const getAvatarForSubAccount = (
         return <Watch />
       case SubAccountKind.FULLY_IMPORTED_WALLET:
         return <Wallet />
+      case SubAccountKind.LIGHTNING_ACCOUNT:
+        return isHome ? <LightningHexa/> : <Lightning />
       case SubAccountKind.SERVICE:
         return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:

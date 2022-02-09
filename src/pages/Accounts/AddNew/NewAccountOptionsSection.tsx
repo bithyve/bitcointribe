@@ -37,6 +37,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
    */
   function isSubAccountCreationSupported( subAccount: SubAccountDescribing ): boolean {
     switch ( subAccount.kind ) {
+        case SubAccountKind.LIGHTNING_ACCOUNT:
+          return true
         case SubAccountKind.TEST_ACCOUNT:
           return true
         case SubAccountKind.REGULAR_ACCOUNT:
@@ -93,6 +95,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
    */
   function specialTagForChoice( subAccount: SubAccountDescribing ): string | null {
     switch ( subAccount.kind ) {
+        case SubAccountKind.LIGHTNING_ACCOUNT:
+          return 'NEW'
         case SubAccountKind.TEST_ACCOUNT:
           return null
         case SubAccountKind.REGULAR_ACCOUNT:
@@ -179,14 +183,14 @@ const styles = StyleSheet.create( {
   },
 
   listContentContainer: {
-    height: widthPercentageToDP( 42 ),
+    height: widthPercentageToDP( 40 ),
     paddingVertical: 4,
     justifyContent: 'center',
   },
 
   cardShadowContainer: {
     flex: 1,
-    padding: 10,
+    padding: 3,
   },
 
   cardRootContainer: {

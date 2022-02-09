@@ -664,5 +664,12 @@
       "errorinuploadingdata": "Error in uploading data. Please re-try again.",
       "12501": "We recommend signing in as it easily allows you to backup your wallet on your personal cloud.",
       "default": "We encountered a non-standard error. Please try again after sometime or contact us"
+    },
+    "lightningAccount": {
+      "Connectyournode": "Connect your node",
+      "SetupLightningAccount": "Set up Lightning Account",
+      "Entermanually": "Enter manually",
+      "NoLNDnode": "No LND node",
+      "NoLNDnodeSub": "Elit culpa consectetur elit ex consectetur quis culpa veniam est consequat."
     }
 }
