@@ -5,10 +5,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  TextInput
 } from 'react-native'
 import { inject, observer } from 'mobx-react'
-import { Button } from 'react-native-elements'
+import moment from 'moment'
 import HeaderTitle from '../../components/HeaderTitle'
 import { RFValue } from 'react-native-responsive-fontsize'
 import InvoicesStore from '../../mobxstore/InvoicesStore'
@@ -16,7 +17,9 @@ import TransactionsStore from '../../mobxstore/TransactionsStore'
 import UnitsStore from '../../mobxstore/UnitsStore'
 import ChannelsStore from '../../mobxstore/ChannelsStore'
 import SettingsStore from '../../mobxstore/SettingsStore'
-import RESTUtils from '../../utils/ln/RESTUtils'
+import BalanceStore from '../../mobxstore/BalanceStore'
+import BitcoinIcon from '../../assets/images/accIcons/bitcoin.svg'
+import LightningHexa from '../../assets/images/accIcons/icon_ln.svg'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts.js'
 import {  Input } from 'react-native-elements'
@@ -29,6 +32,8 @@ import FormStyles from '../../common/Styles/FormStyles'
 import SendConfirmationContent from '../Accounts/SendConfirmationContent'
 import { translations } from '../../common/content/LocContext'
 import ModalContainer from '../../components/home/ModalContainer'
+import ListStyles from '../../common/Styles/ListStyles'
+import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 
 interface InvoiceProps {
     exitSetup: any;
@@ -38,6 +43,7 @@ interface InvoiceProps {
     UnitsStore: UnitsStore;
     ChannelsStore: ChannelsStore;
     SettingsStore: SettingsStore;
+    BalanceStore: BalanceStore
 }
 
 interface InvoiceState {
@@ -61,7 +67,8 @@ interface InvoiceState {
   'UnitsStore',
   'ChannelsStore',
   'SettingsStore',
-  'TransactionsStore'
+  'TransactionsStore',
+  'BalanceStore',
 )
 @observer
 export default class PayInvoiceScreen extends React.Component<
@@ -174,11 +181,7 @@ export default class PayInvoiceScreen extends React.Component<
             isLnd || !requestAmount || requestAmount === 0
       return (
         <View
-          style={
-            theme === 'dark'
-              ? styles.darkThemeStyle
-              : styles.lightThemeStyle
-          }
+          style={styles.lightThemeStyle}
         >
           <ModalContainer
             onBackground={()=>
@@ -190,7 +193,7 @@ export default class PayInvoiceScreen extends React.Component<
             <SendConfirmationContent
               title={this.state.transactionStatus === 'error' ? strings.SendUnsuccessful: strings.SentSuccessfully}
               info={strings.Transactionsubmitted}
-              infoText={ 'onfp'}
+              infoText={ ''}
               isFromContact={false}
               okButtonText={strings.ViewAccount}
               cancelButtonText={common.back}
@@ -205,293 +208,187 @@ export default class PayInvoiceScreen extends React.Component<
             />
           </ModalContainer>
 
-          <HeaderTitle
-            firstLineTitle={'Pay invoice'}
-            secondLineTitle={''}
-            infoTextNormal={''}
-            infoTextBold={''}
-            infoTextNormal1={''}
-            step={''}
-          />
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <HeaderTitle
+              firstLineTitle={'Pay Invoice'}
+              secondLineTitle={''}
+              infoTextNormal={''}
+              infoTextBold={''}
+              infoTextNormal1={''}
+              step={''}
+            />
 
-          {( loading || loadingFeeEstimate ) && (
-            <ActivityIndicator size="large" color={Colors.blue}/>
-          )}
-
-          <ScrollView>
+            {( loading || loadingFeeEstimate ) && (
+              <ActivityIndicator size="large" color={Colors.blue}/>
+            )}
             {!!getPayReqError && (
               <View style={styles.content}>
-                <Text
-                  style={
-                    theme === 'dark'
-                      ? styles.labelDark
-                      : styles.label
-                  }
-                >
-                  {getPayReqError}
-                </Text>
+                <Text style={ styles.label}>{getPayReqError}</Text>
               </View>
             )}
 
             {!!pay_req && (
               <View style={styles.content}>
-                <View style={styles.center}>
 
-                  {setCustomAmount && (
-                    <Input
-                      keyboardType="numeric"
-                      placeholder={
-                        requestAmount
-                          ? requestAmount.toString()
-                          : '0'
-                      }
-                      inputContainerStyle={[ FormStyles.textInputContainer ]}
-                      inputStyle={FormStyles.inputText}
-                      placeholderTextColor={FormStyles.placeholderText.color}
-                      value={customAmount}
-                      onChangeText={( text: string ) =>
-                        this.setState( {
-                          customAmount: text
-                        } )
-                      }
-                      numberOfLines={1}
-                    />
-                  )}
-                  {!canPayCustomAmount && (
-                    <View style={styles.button}>
-                      <Button
-                        title={
-                          setCustomAmount
-                            ? 'Pay Default'
-                            : 'Pay Custom'
+                <View style={[ styles.lineItem, styles.row ]}>
+                  <BitcoinIcon/>
+                  <View style={{
+                    flex: 1,
+                    marginHorizontal: 5
+                  }}>
+                    <Text style={{
+                      ...ListStyles.listItemSubtitle,
+                    }}>Paying Amount</Text>
+                    <View style={[ styles.row, {
+                      justifyContent: 'flex-start'
+                    } ]}>
+                      <TextInput
+                        keyboardType="numeric"
+                        placeholder={
+                          requestAmount
+                            ? requestAmount.toString()
+                            : '0'
                         }
-                        icon={{
-                          name: 'edit',
-                          size: 25,
-                          color:'white'
+                        style={{
+                          fontSize: RFValue( 22 ),
+                          padding: 5,
+                          marginVertical: 2,
+                          width: wp( '40%' )
                         }}
-                        onPress={() => {
-                          if ( setCustomAmount ) {
-                            this.setState( {
-                              setCustomAmount: false,
-                              customAmount: ''
-                            } )
-                          } else {
-                            this.setState( {
-                              setCustomAmount: true
-                            } )
-                          }
-                        }}
-                        style={styles.button}
-                        titleStyle={{
-                          color: 'white'
-                        }}
-                        buttonStyle={{
-                          backgroundColor:'white',
-                          borderRadius: 30
-                        }}
+                        placeholderTextColor={FormStyles.placeholderText.color}
+                        value={customAmount}
+                        onChangeText={( text: string ) =>
+                          this.setState( {
+                            customAmount: text
+                          } )
+                        }
+                        numberOfLines={1}
                       />
+                      <Text style={{
+                        ...ListStyles.listItemSubtitle,
+                        fontFamily: Fonts.FiraSansItalic,
+                      }}>{' sats'}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={[ styles.lineItem, styles.row ]}>
+                  <LightningHexa/>
+                  <View style={{
+                    flex: 1,
+                    marginHorizontal: 5
+                  }}>
+                    <Text style={{
+                      ...ListStyles.listItemSubtitle,
+                    }}>Paying from</Text>
+                    <Text style={[ ListStyles.listItemTitleTransaction, {
+                      color: Colors.gray,
+                    } ]}>
+                      Lightning Account
+                    </Text>
+                    <Text style={{
+                      ...ListStyles.listItemSubtitle,
+                      fontFamily: Fonts.FiraSansItalic,
+                      color: Colors.blue,
+                    }}>{`Balance ${this.props.BalanceStore.lightningBalance} sats`}</Text>
+                  </View>
+                </View>
+                <View style={styles.lineItem}>
+                  <Text style={{
+                    ...ListStyles.listItemSubtitle,
+                    marginBottom: 3,
+                    textAlign: 'right'
+                  }}>{moment( date ).format( 'DD/MM/YY • hh:MMa' )}</Text>
+                  <Text style={{
+                    ...ListStyles.listItemSubtitle,
+                    marginBottom: 3,
+                  }}>{description}</Text>
+                  <View style={styles.row}>
+                    {( !!feeEstimate || feeEstimate === 0 ) && (
+                      <View>
+                        <Text style={ListStyles.listItemTitleTransaction}>
+                      Fee Estimate:
+                        </Text>
+                        <Text style={{
+                          ...ListStyles.listItemSubtitle,
+                          marginBottom: 3,
+                        }}>{units && getAmount( feeEstimate )}</Text>
+                      </View>
+                    )}
+
+                    {!!successProbability && (
+                      <View>
+                        <Text style={ListStyles.listItemTitleTransaction}>
+                          Success Probability:
+                        </Text>
+                        <Text style={{
+                          ...ListStyles.listItemSubtitle,
+                          marginBottom: 3,
+                        }}>{`${Number( successProbability ).toFixed( 2 )}%`}</Text>
+                      </View>
+
+                    )}
+                  </View>
+                </View>
+
+                <View style={styles.row}>
+                  {!!expiry && (
+                    <View style={styles.lineItem}>
+                      <Text style={ListStyles.listItemTitleTransaction}>
+                        Expiry:
+                      </Text>
+                      <Text style={{
+                        ...ListStyles.listItemSubtitle,
+                        marginBottom: 3,
+                      }}>{expiry}</Text>
+                    </View>
+                  )}
+
+                  {!!cltv_expiry && (
+                    <View style={styles.lineItem}>
+                      <Text style={ListStyles.listItemTitleTransaction}>
+                                        CLTV Expiry:
+                      </Text>
+                      <Text style={{
+                        ...ListStyles.listItemSubtitle,
+                        marginBottom: 3,
+                      }}>{cltv_expiry}</Text>
                     </View>
                   )}
                 </View>
 
-                {( !!feeEstimate || feeEstimate === 0 ) && (
-                  <React.Fragment>
-                    <TouchableOpacity
-                      onPress={() => changeUnits()}
-                    >
-                      <Text
-                        style={
-                          theme === 'dark'
-                            ? styles.labelDark
-                            : styles.label
-                        }
-                      >
-                        Fee Estimate:
-                      </Text>
-                      <Text
-                        style={
-                          theme === 'dark'
-                            ? styles.valueDark
-                            : styles.value
-                        }
-                      >
-                        {units && getAmount( feeEstimate )}
-                      </Text>
-                    </TouchableOpacity>
-                  </React.Fragment>
-                )}
-
-                {!!successProbability && (
-                  <React.Fragment>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.labelDark
-                          : styles.label
-                      }
-                    >
-                      Success Probability
-
-                    </Text>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.valueDark
-                          : styles.value
-                      }
-                    >
-                      {`${successProbability}%`}
-                    </Text>
-                  </React.Fragment>
-                )}
-
-                {!!description && (
-                  <React.Fragment>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.labelDark
-                          : styles.label
-                      }
-                    >
-                      Description
-                                        :
-                    </Text>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.valueDark
-                          : styles.value
-                      }
-                    >
-                      {description}
-                    </Text>
-                  </React.Fragment>
-                )}
-
-                {!!timestamp && (
-                  <React.Fragment>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.labelDark
-                          : styles.label
-                      }
-                    >
-                      Timestamp:
-                    </Text>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.valueDark
-                          : styles.value
-                      }
-                    >
-                      {date}
-                    </Text>
-                  </React.Fragment>
-                )}
-
-                {!!expiry && (
-                  <React.Fragment>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.labelDark
-                          : styles.label
-                      }
-                    >
-                      Expiry:
-                    </Text>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.valueDark
-                          : styles.value
-                      }
-                    >
-                      {expiry}
-                    </Text>
-                  </React.Fragment>
-                )}
-
-                {!!cltv_expiry && (
-                  <React.Fragment>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.labelDark
-                          : styles.label
-                      }
-                    >
-                      CLTV Expiry:
-                    </Text>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.valueDark
-                          : styles.value
-                      }
-                    >
-                      {cltv_expiry}
-                    </Text>
-                  </React.Fragment>
-                )}
 
                 {!!destination && (
-                  <React.Fragment>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.labelDark
-                          : styles.label
-                      }
-                    >
-                      Destination:
+                  <View style={styles.lineItem}>
+                    <Text style={ListStyles.listItemTitleTransaction}>
+                                    Destination:
                     </Text>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.valueDark
-                          : styles.value
-                      }
-                    >
-                      {destination}
-                    </Text>
-                  </React.Fragment>
+                    <Text style={{
+                      ...ListStyles.listItemSubtitle,
+                      marginBottom: 3,
+                    }}>{destination}</Text>
+                  </View>
+
                 )}
 
                 {!!payment_hash && (
-                  <React.Fragment>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.labelDark
-                          : styles.label
-                      }
-                    >
+                  <View style={styles.lineItem}>
+                    <Text style={ListStyles.listItemTitleTransaction}>
                       Payment Hash:
                     </Text>
-                    <Text
-                      style={
-                        theme === 'dark'
-                          ? styles.valueDark
-                          : styles.value
-                      }
-                    >
-                      {payment_hash}
-                    </Text>
-                  </React.Fragment>
+                    <Text style={{
+                      ...ListStyles.listItemSubtitle,
+                      marginBottom: 3,
+                    }}>{payment_hash}</Text>
+                  </View>
                 )}
 
               </View>
             )}
 
-            <View>
+            {/* <View>
               <Text>{RESTUtils.supportsMPP()}</Text>
-            </View>
-
+            </View> */}
 
             {!!pay_req && (
               <View style={styles.button}>
@@ -532,16 +429,17 @@ export default class PayInvoiceScreen extends React.Component<
 
 const styles = StyleSheet.create( {
   lightThemeStyle: {
+    backgroundColor: Colors.backgroundColor,
+    padding: 10,
     flex: 1,
-    backgroundColor: 'white'
-  },
-  darkThemeStyle: {
-    flex: 1,
-    backgroundColor: 'black',
-    color: 'white'
   },
   content: {
     padding: 5
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   label: {
     paddingTop: 5
@@ -558,7 +456,7 @@ const styles = StyleSheet.create( {
     color: 'white'
   },
   button: {
-    paddingTop: 15,
+    paddingTop: 5,
     paddingBottom: 15,
     paddingLeft: 10,
     paddingRight: 10
@@ -574,16 +472,10 @@ const styles = StyleSheet.create( {
   },
   center: {
     alignItems: 'center',
-    paddingTop: 15,
-    paddingBottom: 15
   },
   textInput: {
     fontSize: 20,
     color: 'black'
-  },
-  textInputDark: {
-    fontSize: 20,
-    color: 'white'
   },
   mppForm: {
     paddingLeft: 20,
@@ -593,6 +485,16 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  lineItem: {
+    marginBottom: RFValue( 16 ),
+    backgroundColor: 'white',
+    padding: 10,
+    paddingHorizontal: 10,
+    elevation: 4,
+    borderRadius: 8,
+    flex: 1,
+    marginHorizontal: 5,
   },
 
   buttonView: {
