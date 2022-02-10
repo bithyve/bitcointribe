@@ -44,6 +44,8 @@ const Colors = {
   shadowColor: '#8686860D',
   darkGray: '#00000065',
   whiteGray:'#e5e5e5',
+  checkBlue: '#056EB4',
+
   // Grayscale
   gray1: '#d0d0d0',
   gray2: '#A3A3A3',
@@ -54,6 +56,7 @@ const Colors = {
   gray7: '#FCFCFC',
   gray8: '#A0A0A0',
   gray9: '#D0D0D0',
+  gray12: '#BABABA',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',
