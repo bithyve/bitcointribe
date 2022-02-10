@@ -170,9 +170,16 @@ export default class ReceiveCoinScreen extends Component {
           selectedButtonStyle={{
             backgroundColor: Colors.blue,
             borderRadius: 8,
+            borderWidth: 0,
+            borderColor: 'red'
+          }}
+          innerBorderStyle={{
+            width: 0,
           }}
           containerStyle={{
             height: hp( '6%' ),
+            borderWidth: 0,
+            borderColor: 'red'
           }}
         />
         {selectedIndex === 1 ? (
@@ -228,6 +235,7 @@ const styles = StyleSheet.create( {
   center: {
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
   },
 
   activityIndicator: {
