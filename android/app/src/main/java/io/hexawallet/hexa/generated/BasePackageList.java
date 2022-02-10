@@ -12,8 +12,7 @@ public class BasePackageList {
         new expo.modules.filesystem.FileSystemPackage(),
         new expo.modules.imageloader.ImageLoaderPackage(),
         new expo.modules.permissions.PermissionsPackage(),
-        new expo.modules.securestore.SecureStorePackage(),
-        new expo.modules.sqlite.SQLitePackage()
+        new expo.modules.securestore.SecureStorePackage()
     );
   }
 }
