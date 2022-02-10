@@ -46,7 +46,7 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
+  const { walletName, security, newBie }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean } = payload
   const primaryMnemonic = bip39.generateMnemonic( 256 )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
@@ -56,6 +56,7 @@ function* setupWalletWorker( { payload } ) {
     walletName,
     userName: walletName,
     security,
+    newBie,
     primaryMnemonic,
     primarySeed: primarySeed.toString( 'hex' ),
     accounts: {
@@ -67,8 +68,10 @@ function* setupWalletWorker( { payload } ) {
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
   yield call( dbManager.createWallet, wallet )
   // prepare default accounts for the wallet
-  const accountsInfo: newAccountsInfo[] = [];
-  [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ].forEach( ( accountType ) => {
+  const accountsInfo: newAccountsInfo[] = []
+  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ]
+  !newBie && accountArray.splice( 0, 1 )
+  accountArray.forEach( ( accountType ) => {
     const accountInfo: newAccountsInfo = {
       accountType
     }
