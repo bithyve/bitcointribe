@@ -32,9 +32,13 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
   const [ modalVisible, setModalVisible ] = useState( false )
 
   useEffect( () => {
+    if( numberOfTabs!=0 ){
+      setTimeout( () => {
+        setNumberOfTabs( 0 )
+      }, 1000 )
+    }
     if( numberOfTabs >= 3 ){
       setModalVisible( true )
-      setNumberOfTabs( 0 )
     }
   }, [ numberOfTabs ] )
 
