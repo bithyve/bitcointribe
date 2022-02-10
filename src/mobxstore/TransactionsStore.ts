@@ -64,6 +64,7 @@ export default class TransactionsStore {
           this.transactions = data.transactions
             .slice()
             .reverse()
+            .filter( tx=> tx.amount > 0 )
             .map( ( tx: any ) => new Transaction( tx ) )
           this.loading = false
         } )
