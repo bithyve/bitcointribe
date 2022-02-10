@@ -64,7 +64,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
   const [ ErrorModal, setErrorModal ] = useState( false )
-  const [ SecondaryDeviceMessageModal, setSecondaryDeviceMessageModal ] = useState( false )
+  const [ ConfirmFromSecondaryDeviceModal, setConfirmFromSecondaryDeviceModal ] = useState( false )
   const [ ChangeModal, setChangeModal ] = useState( false )
 
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
@@ -387,7 +387,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }, [ levelData, isShareClicked ] )
 
-  const renderSecondaryDeviceMessageContents = useCallback( () => {
+  const renderConfirmFromSecondaryDeviceModal = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={secondaryDeviceMessageBottomSheet}
@@ -396,8 +396,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           strings.confirmingyourRecovery
         }
         proceedButtonText={strings.ok}
-        onPressProceed={() => setSecondaryDeviceMessageModal( false )}
-        onPressIgnore={() => setSecondaryDeviceMessageModal( false )}
+        onPressProceed={() => setConfirmFromSecondaryDeviceModal( false )}
+        onPressIgnore={() => setConfirmFromSecondaryDeviceModal( false )}
         isBottomImage={false}
       />
     )
@@ -614,6 +614,24 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
+  const initiateSecondaryDeviceFlow = useCallback( () => {
+    if( isChange || selectedKeeper.updatedAt == 0 ){
+      // associate a contact and create guardian
+      props.navigation.navigate( 'ContactsListForAssociateContact', {
+        postAssociation: ( contact ) => {
+          setShowQr( true )
+          createGuardian( {
+            chosenContactTmp: contact
+          } )
+        }
+      } )
+
+    } else {
+      // already shared: show message(confirm from secondary device)
+      setConfirmFromSecondaryDeviceModal( true )
+    }
+  }, [ isChange, selectedKeeper ] )
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -640,21 +658,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
           confirmButtonText={isChange ? 'Share Now' : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
-          onPressConfirm={() => {
-            if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
-              props.navigation.navigate( 'ContactsListForAssociateContact', {
-                postAssociation: ( contact ) => {
-                  setShowQr( true )
-                  createGuardian( {
-                    chosenContactTmp: contact
-                  } )
-                }
-              } )
-
-            } else {
-              setSecondaryDeviceMessageModal( true )
-            }
-          }}
+          onPressConfirm={initiateSecondaryDeviceFlow}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             setReshareModal( true )
@@ -701,8 +705,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         renderContent={renderSecondaryDeviceContents}
         renderHeader={renderSecondaryDeviceHeader}
       /> */}
-      <ModalContainer onBackground={()=>setSecondaryDeviceMessageModal( false )} visible={SecondaryDeviceMessageModal} closeBottomSheet={()=>setSecondaryDeviceMessageModal( false )} >
-        {renderSecondaryDeviceMessageContents()}
+      <ModalContainer onBackground={()=>setConfirmFromSecondaryDeviceModal( false )} visible={ConfirmFromSecondaryDeviceModal} closeBottomSheet={()=>setConfirmFromSecondaryDeviceModal( false )} >
+        {renderConfirmFromSecondaryDeviceModal()}
       </ModalContainer>
       <ModalContainer onBackground={()=>setErrorModal( false )} visible={ErrorModal} closeBottomSheet={()=>setErrorModal( false )} >
         {renderErrorModalContent()}
