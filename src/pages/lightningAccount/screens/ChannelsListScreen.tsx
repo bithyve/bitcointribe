@@ -82,7 +82,7 @@ export default class ChannelScreen extends Component {
                 ? [
                     styles.grayBoxContainer,
                     {
-                      backgroundColor: Colors.gray11,
+                      backgroundColor: Colors.grey11,
                       borderRadius: 20,
                     },
                     {
@@ -111,7 +111,7 @@ export default class ChannelScreen extends Component {
                 ? [
                     styles.grayBoxContainer,
                     {
-                      backgroundColor: Colors.gray11,
+                      backgroundColor: Colors.grey11,
                       borderRadius: 20,
                     },
                     {
@@ -261,7 +261,7 @@ export default class ChannelScreen extends Component {
                 style={[
                   styles.border,
                   {
-                    backgroundColor: Colors.gray11,
+                    backgroundColor: Colors.grey11,
                   },
                 ]}
               ></View>
