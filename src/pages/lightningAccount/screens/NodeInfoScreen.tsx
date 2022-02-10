@@ -15,9 +15,9 @@ import moment from 'moment'
 import HeaderTitle from '../../../components/HeaderTitle'
 import { inject, observer } from 'mobx-react'
 @inject(
-    'NodeInfoStore',
-    'SettingsStore'
-    )
+  'NodeInfoStore',
+  'SettingsStore'
+)
 @observer
 export default class NodeInfoScreen extends Component {
   constructor( props ) {
@@ -28,7 +28,7 @@ export default class NodeInfoScreen extends Component {
   }
 
   render() {
-    console.log(this.props.NodeInfoStore.nodeInfo, "+++")
+    console.log( this.props.NodeInfoStore.nodeInfo, '+++' )
     return (
       <ScrollView
         contentContainerStyle={styles.rootContainer}
@@ -83,7 +83,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {this.state.payment.payment_preimage } */}
-              {this.state.nodeInfo.synced_to_chain ? "Yes" : "No"}
+              {this.state.nodeInfo.synced_to_chain ? 'Yes' : 'No'}
             </Text>
           </View>
 
@@ -125,7 +125,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {this.state.payment.enhancedPath[0].join('\n\n')} */}
-              {this.state.nodeInfo.uris.join('\n\n')}
+              {this.state.nodeInfo.uris.join( '\n\n' )}
 
             </Text>
           </View>

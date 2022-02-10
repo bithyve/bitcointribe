@@ -1,4 +1,4 @@
-import React, { Component, ReactElement } from "react";
+import React, { Component, ReactElement } from 'react'
 import {
   Text,
   View,
@@ -7,19 +7,19 @@ import {
   ActivityIndicator,
   StyleSheet,
   Image,
-} from "react-native";
-import RESTUtils from "../../../utils/ln/RESTUtils";
-import ChannelItem from "../components/channels/ChannelListComponent";
-import { widthPercentageToDP } from "react-native-responsive-screen";
-import { inject, observer } from "mobx-react";
-import { RFValue } from "react-native-responsive-fontsize";
-import Colors from "../../../common/Colors";
-import Fonts from "../../../common/Fonts";
+} from 'react-native'
+import RESTUtils from '../../../utils/ln/RESTUtils'
+import ChannelItem from '../components/channels/ChannelListComponent'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { inject, observer } from 'mobx-react'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
 
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+} from 'react-native-responsive-screen'
 
 interface HTLC {
   hash_lock: string;
@@ -52,52 +52,52 @@ interface ChannelFrame {
   channel_id?: string;
   alias?: string;
 }
-@inject("ChannelsStore")
+@inject( 'ChannelsStore' )
 @observer
 export default class ChannelScreen extends Component {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
   }
 
   componentDidMount(): void {
-    this.props.ChannelsStore.reset();
-    this.props.ChannelsStore.getChannels();
+    this.props.ChannelsStore.reset()
+    this.props.ChannelsStore.getChannels()
   }
 
-  uniqueKey = (item: any, index: number) => index.toString();
-  renderTemplate = ({ item }: { item: ChannelFrame }): ReactElement => {
-    const ChannelBar = ({ offline }) => {
+  uniqueKey = ( item: any, index: number ) => index.toString();
+  renderTemplate = ( { item }: { item: ChannelFrame } ): ReactElement => {
+    const ChannelBar = ( { offline } ) => {
       // console.log(offline, item.remote_pubkey, "---")
-      const remote_balance: number = parseInt(item.remote_balance);
-      const local_balance: number = parseInt(item.local_balance);
+      const remote_balance: number = parseInt( item.remote_balance )
+      const local_balance: number = parseInt( item.local_balance )
       const remoteEquity: number =
-        remote_balance / (remote_balance + local_balance);
+        remote_balance / ( remote_balance + local_balance )
       const localEquity: number =
-        local_balance / (remote_balance + local_balance);
+        local_balance / ( remote_balance + local_balance )
       return (
         <>
           <View
             style={
               offline
                 ? [
-                    styles.grayBoxContainer,
-                    {
-                      backgroundColor: Colors.grey11,
-                      borderRadius: 20,
-                    },
-                    {
-                      flex: localEquity,
-                    },
-                  ]
+                  styles.grayBoxContainer,
+                  {
+                    backgroundColor: Colors.grey11,
+                    borderRadius: 20,
+                  },
+                  {
+                    flex: localEquity,
+                  },
+                ]
                 : [
-                    styles.skyBlueBoxContainer,
-                    {
-                      backgroundColor: Colors.primaryAccentLighter2,
-                    },
-                    {
-                      flex: localEquity,
-                    },
-                  ]
+                  styles.skyBlueBoxContainer,
+                  {
+                    backgroundColor: Colors.primaryAccentLighter2,
+                  },
+                  {
+                    flex: localEquity,
+                  },
+                ]
             }
           >
             <Text numberOfLines={1} style={styles.channelPrice}>
@@ -109,24 +109,25 @@ export default class ChannelScreen extends Component {
             style={
               offline
                 ? [
-                    styles.grayBoxContainer,
-                    {
-                      backgroundColor: Colors.grey11,
-                      borderRadius: 20,
-                    },
-                    {
-                      flex: remoteEquity,
-                    },
-                  ]
+                  styles.grayBoxContainer,
+                  {
+                    backgroundColor: Colors.grey11,
+                    borderRadius: 20,
+                  },
+                  {
+                    flex: remoteEquity,
+                  },
+                ]
                 : [
-                    styles.blueBoxContainer,
-                    {
-                      backgroundColor: Colors.darkBlue,
-                    },
-                    {
-                      flex: remoteEquity,
-                    },
-                  ]
+                  styles.blueBoxContainer,
+                  {
+                    backgroundColor: Colors.darkBlue,
+                    borderRadius: 20,
+                  },
+                  {
+                    flex: remoteEquity,
+                  },
+                ]
             }
           >
             <Text numberOfLines={1} style={styles.channelPrice}>
@@ -135,16 +136,16 @@ export default class ChannelScreen extends Component {
             </Text>
           </View>
         </>
-      );
-    };
+      )
+    }
 
     return (
       <TouchableOpacity
         style={styles.signleChannelItem}
         onPress={() => {
-          this.props.navigation.navigate("ChannelInfoScreen", {
+          this.props.navigation.navigate( 'ChannelInfoScreen', {
             channelInfo: item,
-          });
+          } )
         }}
       >
         <View style={styles.myPrivateChannelContainer}>
@@ -152,11 +153,11 @@ export default class ChannelScreen extends Component {
             style={item.active ? styles.goodContainer : styles.badContainer}
           >
             <Text style={item.active ? styles.goodText : styles.badText}>
-              {item.active ? "Active" : "Offline"}
+              {item.active ? 'Active' : 'Offline'}
             </Text>
           </View>
           <Text style={styles.privateChannelText}>
-            {this.props.ChannelsStore.aliasesById[item.chan_id] ||
+            {this.props.ChannelsStore.aliasesById[ item.chan_id ] ||
               item.chan_id ||
               item.alias}
           </Text>
@@ -168,11 +169,11 @@ export default class ChannelScreen extends Component {
           </View>
           <Image
             style={styles.rightArrow}
-            source={require("../../../assets/images/icons/icon_arrow.png")}
+            source={require( '../../../assets/images/icons/icon_arrow.png' )}
           />
         </View>
       </TouchableOpacity>
-    );
+    )
   };
 
   render() {
@@ -188,17 +189,17 @@ export default class ChannelScreen extends Component {
         /> */}
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: hp(3.5),
-            marginRight: wp(6),
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginTop: hp( 3.5 ),
+            marginRight: wp( 6 ),
           }}
         >
           <Text style={styles.header}>Channels</Text>
           <TouchableOpacity
             onPress={() => {
-              this.props.navigation.navigate("ChannelOpenScreen");
+              this.props.navigation.navigate( 'ChannelOpenScreen' )
             }}
             style={{
               ...styles.selectedContactsView,
@@ -209,14 +210,14 @@ export default class ChannelScreen extends Component {
               style={[
                 styles.contactText,
                 {
-                  fontSize: RFValue(24),
+                  fontSize: RFValue( 24 ),
                   lineHeight: 30,
                 },
               ]}
             >
               +
             </Text>
-            <Text style={styles.contactText}>{"Add New Channel"}</Text>
+            <Text style={styles.contactText}>{'Add New Channel'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -234,7 +235,7 @@ export default class ChannelScreen extends Component {
               <Text style={styles.totalInbound}>Total Inbound</Text>
             </View>
             <Text style={styles.priceText}>
-              {this.props.ChannelsStore.totalOutbound}{" "}
+              {this.props.ChannelsStore.totalOutbound}{' '}
               <Text style={styles.sats}>sats</Text>
             </Text>
           </View>
@@ -251,7 +252,7 @@ export default class ChannelScreen extends Component {
               <Text style={styles.totalInbound}>Total Outbound</Text>
             </View>
             <Text style={styles.priceText}>
-              {this.props.ChannelsStore.totalInbound}{" "}
+              {this.props.ChannelsStore.totalInbound}{' '}
               <Text style={styles.sats}>sats</Text>
             </Text>
           </View>
@@ -268,7 +269,7 @@ export default class ChannelScreen extends Component {
               <Text style={styles.totalInbound}>Total offline</Text>
             </View>
             <Text style={styles.priceText}>
-              {this.props.ChannelsStore.totalOffline}{" "}
+              {this.props.ChannelsStore.totalOffline}{' '}
               <Text style={styles.sats}>sats</Text>
             </Text>
           </View>
@@ -293,36 +294,36 @@ export default class ChannelScreen extends Component {
           />
         )}
       </View>
-    );
+    )
   }
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   contactText: {
     // marginLeft: 10,
     // marginHorizontal: wp ( 1 ),
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
     // padding: wp( 2 )
   },
 
   selectedContactsView: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
     backgroundColor: Colors.blue,
-    borderRadius: wp(2),
-    height: hp(4),
-    paddingHorizontal: wp(2),
+    borderRadius: wp( 2 ),
+    height: hp( 4 ),
+    paddingHorizontal: wp( 2 ),
   },
   container: {
     padding: 10,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
     flex: 1,
   },
   header: {
     color: Colors.darkBlue,
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     paddingLeft: 10,
     fontFamily: Fonts.FiraSansRegular,
   },
@@ -330,51 +331,51 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   mainContentContainer: {
-    position: "relative",
-    width: "100%",
+    position: 'relative',
+    width: '100%',
     flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 14,
-    overflow: "hidden",
-    justifyContent: "space-between",
+    overflow: 'hidden',
+    justifyContent: 'space-between',
   },
 
   cardImageContainer: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 
   accountKindDetailsSection: {
     flex: 1,
-    width: "100%",
+    width: '100%',
   },
 
   accountKindBadgeImage: {
-    width: widthPercentageToDP(16),
-    height: widthPercentageToDP(16),
-    resizeMode: "contain",
+    width: widthPercentageToDP( 16 ),
+    height: widthPercentageToDP( 16 ),
+    resizeMode: 'contain',
   },
 
   title1Text: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(15),
+    fontSize: RFValue( 15 ),
     color: Colors.white,
     letterSpacing: 0.01,
   },
 
   title2Text: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     color: Colors.white,
     marginTop: 2,
   },
 
   footerSection: {
-    marginTop: "auto",
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
+    marginTop: 'auto',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
   },
 
   balanceAmountText: {
@@ -390,12 +391,12 @@ const styles = StyleSheet.create({
   balanceCurrencyIcon: {
     width: 16,
     height: 16,
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
 
   settingsButtonContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     width: 44,
     height: 44,
   },
@@ -411,15 +412,15 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   totalAmountContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginVertical: 7,
     paddingHorizontal: 12,
   },
   borderAmountContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   border: {
     width: 60,
@@ -429,17 +430,17 @@ const styles = StyleSheet.create({
   },
   totalInbound: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     color: Colors.textColorGrey,
   },
   priceText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(16),
+    fontSize: RFValue( 16 ),
     color: Colors.black,
   },
   sats: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     color: Colors.gray10,
   },
   signleChannelItem: {
@@ -449,8 +450,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   myPrivateChannelContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   goodContainer: {
     backgroundColor: Colors.lightGreen1,
@@ -467,33 +468,33 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   goodText: {
-    textAlign: "center",
-    fontSize: RFValue(10),
-    fontWeight: "800",
+    textAlign: 'center',
+    fontSize: RFValue( 10 ),
+    fontWeight: '800',
     color: Colors.darkGreen,
   },
   badText: {
     color: Colors.darkRed,
-    textAlign: "center",
-    fontSize: RFValue(10),
-    fontWeight: "800",
+    textAlign: 'center',
+    fontSize: RFValue( 10 ),
+    fontWeight: '800',
   },
   privateChannelText: {
     color: Colors.gray4,
-    fontSize: RFValue(12),
-    fontWeight: "700",
+    fontSize: RFValue( 12 ),
+    fontWeight: '700',
   },
   channelBoxesMaincontainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
     marginTop: 13,
   },
   channelBoxescontainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "90%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '90%',
   },
   skyBlueBoxContainer: {
     padding: 4,
@@ -513,16 +514,16 @@ const styles = StyleSheet.create({
   },
   channelPrice: {
     color: Colors.backgroundColor1,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginLeft: 7,
   },
   channelSats: {
     color: Colors.backgroundColor1,
-    fontSize: RFValue(8),
+    fontSize: RFValue( 8 ),
   },
   rightArrow: {
-    width: widthPercentageToDP(4),
-    height: widthPercentageToDP(4),
-    resizeMode: "contain",
+    width: widthPercentageToDP( 4 ),
+    height: widthPercentageToDP( 4 ),
+    resizeMode: 'contain',
   },
-});
+} )

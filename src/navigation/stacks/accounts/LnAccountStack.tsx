@@ -17,6 +17,8 @@ import InvoiceDetailsScreen from '../../../pages/lightningAccount/screens/Invoic
 import TransactionDetailsScreen from '../../../pages/lightningAccount/screens/TransactionDetailsScreen'
 import SubAccountSettingsStack from './SubAccountSettingsStack'
 import PaymentDetailsScreen from '../../../pages/lightningAccount/screens/PaymentDetailsScreen'
+import OnChainSendScreen from '../../../pages/lightningAccount/OnChainSendScreen'
+import NodeInfoScreen from '../../../pages/lightningAccount/screens/NodeInfoScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -24,6 +26,17 @@ const AccountDetailsStack = createStackNavigator(
     ViewAll: ViewAllScreen,
     ReceiveCoin:{
       screen: ReceiveCoinScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
+    NodeInfoScreen: {
+      screen: NodeInfoScreen,
       navigationOptions: {
         title: '',
         headerStyle:{
@@ -49,6 +62,17 @@ const AccountDetailsStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+    OnChainSend: {
+      screen: OnChainSendScreen,
+      navigationOptions: {
+        title: 'Send To',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
     },
     PaymentDetailsScreen: {
       screen: PaymentDetailsScreen,

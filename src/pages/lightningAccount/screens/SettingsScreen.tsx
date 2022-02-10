@@ -16,21 +16,20 @@ export default class SettingsScreen extends Component {
     }
     this.settingOptions = [
       {
+        Screen: 'NodeInfoScreen',
+        Title: 'Node Information',
+        Description: 'View Node Information',
+      },
+      {
         Screen: 'ChannelsListScreen',
         Title: 'Channels',
-        Description: 'view and manage channels',
+        Description: 'View and manage channels',
       },
       {
         Screen: 'Payments',
         Title: 'Payments',
-        Description: 'My LN payments',
-      },
-      {
-        Screen: 'NodeInfoScreen',
-        Title: 'Node Information',
-        Description: 'View Node Information',
+        Description: 'My Lightning payments',
       }
-
     ]
   }
 
@@ -41,7 +40,7 @@ export default class SettingsScreen extends Component {
       <ListItem
         bottomDivider
         onPress={() => {
-            this.props.navigation.navigate( item.Screen )
+          this.props.navigation.navigate( item.Screen )
         }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >

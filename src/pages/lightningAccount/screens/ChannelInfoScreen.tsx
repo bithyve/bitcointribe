@@ -15,7 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-@inject( 'ChannelsStore' )
+@inject( 'ChannelsStore', 'InvoicesStore' )
 @observer
 export default class ChannelInfoScreen extends Component {
   constructor( props ) {
@@ -85,46 +85,7 @@ export default class ChannelInfoScreen extends Component {
         </View>
       )
     }
-    const ExternalLink = ( ) => {
-      return (
-        <View>
-          <ListItem containerStyle={{
-            backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )
-          }} pad={1}>
 
-            <View style={styles.containerImg}>
-              <Text>@</Text>
-            </View>
-            <ListItem.Content style={styles.titleSection}>
-              <ListItem.Title style={styles.titleText} numberOfLines={1}>
-          External address
-              </ListItem.Title>
-              <ListItem.Subtitle style={styles.subtitleText}>
-                08:01 PM
-              </ListItem.Subtitle>
-            </ListItem.Content>
-
-            <ListItem.Content style={styles.amountSection}>
-              <LabeledBalanceDisplay
-                balance={600}
-                // bitcoinUnit={'SATS'}
-                // currencyKind={currencyKind}
-                // amountTextStyle={amountTextStyle}
-                currencyImageStyle={styles.bitcoinImage}
-                iconSpacing={2}
-                bitcoinIconColor="gray"
-                textColor="gray"
-                isTestAccount={false}
-              />
-            </ListItem.Content>
-          </ListItem>
-
-          <View style={{
-            borderBottomWidth: 1, borderColor: Colors.gray1, marginHorizontal: widthPercentageToDP( 4 )
-          }} />
-        </View>
-      )
-    }
     const ButtonComponent = ( { text, onPress } ) => {
       return (
         <View style={{
@@ -164,8 +125,6 @@ export default class ChannelInfoScreen extends Component {
             Channel Details
           </Text>
         </View>
-
-        <ExternalLink/>
 
         <View style={styles.bodySection}>
           <ListCard heading={'Channel ID'} data={this.state.channelInfo.remote_pubkey}/>
