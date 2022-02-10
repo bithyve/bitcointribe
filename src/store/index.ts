@@ -21,16 +21,14 @@ import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
 import cloudReducer from './reducers/cloud'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
-
-//migration import
-import migrations from './migrations'
+import reduxPersistMigrations from './redux-persist-migrations'
 
 const config = {
   key: 'root', // key is required
   version: 0, //migration version code
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders' ],
-  migrate: createMigrate( migrations, {
+  migrate: createMigrate( reduxPersistMigrations, {
     debug: true
   } )
 }
