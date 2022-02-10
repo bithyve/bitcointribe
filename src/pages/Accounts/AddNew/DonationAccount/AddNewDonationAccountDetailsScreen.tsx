@@ -163,7 +163,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
 
             <TouchableOpacity
               style={styles.tfaSelectionField}
-              onPress={() =>  !AllowSecureAccount ? Toast( 'Upgrade backup to Level 2 to use this feature' ) : setIsTFAEnabled( !isTFAEnabled )}
+              onPress={() =>  !AllowSecureAccount ? Toast( 'Upgrade backup to Level 2 to use this feature', -11 ) : setIsTFAEnabled( !isTFAEnabled )}
               activeOpacity={1}
               // disabled={( !wallet.secondaryXpub && !wallet.details2FA )}
             >
