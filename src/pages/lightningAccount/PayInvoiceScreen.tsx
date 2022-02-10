@@ -22,18 +22,15 @@ import BitcoinIcon from '../../assets/images/accIcons/bitcoin.svg'
 import LightningHexa from '../../assets/images/accIcons/icon_ln.svg'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts.js'
-import {  Input } from 'react-native-elements'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import BalanceEntryFormGroup from '../Accounts/Send/BalanceEntryFormGroup'
 import FormStyles from '../../common/Styles/FormStyles'
 import SendConfirmationContent from '../Accounts/SendConfirmationContent'
 import { translations } from '../../common/content/LocContext'
 import ModalContainer from '../../components/home/ModalContainer'
 import ListStyles from '../../common/Styles/ListStyles'
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 
 interface InvoiceProps {
     exitSetup: any;
@@ -110,17 +107,17 @@ export default class PayInvoiceScreen extends React.Component<
           showTransactionStatusModal: true,
           transactionStatus: 'error'
         } )
-      } else {
-        // if(
-        //   payment_route || status === 'complete' ||
-        //    status === 'SUCCEEDED' ){
-        //   this.setState( {
-        //     showTransactionStatusModal: true,
-        //     transactionStatus: 'success'
-        //   } )
-        // }
+      } else if( prevProps.TransactionsStore.loading !== loading
+        &&
+        payment_route || status === 'complete' ||
+            status === 'SUCCEEDED'&& !prevState.showTransactionStatusModal ){
+        if( !this.state.showTransactionStatusModal ){
+          this.setState( {
+            showTransactionStatusModal: true,
+            transactionStatus: 'success'
+          } )
+        }
       }
-
     }
 
     render() {
@@ -192,8 +189,8 @@ export default class PayInvoiceScreen extends React.Component<
             closeBottomSheet={() => {}} >
             <SendConfirmationContent
               title={this.state.transactionStatus === 'error' ? strings.SendUnsuccessful: strings.SentSuccessfully}
-              info={strings.Transactionsubmitted}
-              infoText={ ''}
+              info={this.state.transactionStatus === 'error' ? error_msg|| error: strings.SentSuccessfully}
+              infoText={ ' '}
               isFromContact={false}
               okButtonText={strings.ViewAccount}
               cancelButtonText={common.back}
