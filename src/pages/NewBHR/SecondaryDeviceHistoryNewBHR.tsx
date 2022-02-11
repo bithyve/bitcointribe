@@ -5,7 +5,7 @@ import {
   StatusBar,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useDispatch, useSelector } from 'react-redux'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { createChannelAssets, createOrChangeGuardian, ErrorSending, modifyLevelData, setChannelAssets, updatedKeeperInfo, downloadSMShare, setApprovalStatus } from '../../store/actions/BHR'
 import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
@@ -21,10 +21,11 @@ import {
   ChannelAssets,
   DeepLinkEncryptionType,
   KeeperInfoInterface,
+  KeeperType,
   LevelData,
-  LevelHealthInterface,
   MetaShare,
   QRCodeTypes,
+  ShareSplitScheme,
   TrustedContact,
   TrustedContactRelationTypes,
   Trusted_Contacts,
@@ -40,7 +41,6 @@ import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import dbManager from '../../storage/realm/dbManager'
 import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import { translations } from '../../common/content/LocContext'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
@@ -51,11 +51,10 @@ import QRModal from '../Accounts/QRModal'
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
-  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
+  const levelData: LevelData[] = useSelector( ( state: RootStateOrAny ) => state.bhr.levelData )
   const [ qrModal, setQRModal ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const [ blockReshare, setBlockReshare ] = useState( '' )
-  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
+  const approvalStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.approvalStatus )
   // const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ reshareModal, setReshareModal ] = useState( false )
   const [ ChangeBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -88,17 +87,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isChangeClicked, setIsChangeClicked ] = useState( false )
   const [ isShareClicked, setIsShareClicked ] = useState( false )
 
-  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
-  const keeperProcessStatusFlag = useSelector( ( state ) => state.bhr.keeperProcessStatus )
-  const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
-  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
-  const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
-  const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
-  const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
-  const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
-  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
-  const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
+  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state: RootStateOrAny ) => state.bhr.keeperInfo )
+  const isErrorSendingFailed = useSelector( ( state: RootStateOrAny ) => state.bhr.errorSending )
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+  const trustedContacts: Trusted_Contacts = useSelector( ( state: RootStateOrAny ) => state.trustedContacts.contacts )
+  const currentLevel = useSelector( ( state: RootStateOrAny ) => state.bhr.currentLevel )
+  const channelAssets: ChannelAssets = useSelector( ( state: RootStateOrAny ) => state.bhr.channelAssets )
+  const createChannelAssetsStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.loading.createChannelAssetsStatus )
+  const metaSharesKeeper = useSelector( ( state: RootStateOrAny ) => state.bhr.metaSharesKeeper )
+  const oldMetaSharesKeeper = useSelector( ( state: RootStateOrAny ) => state.bhr.oldMetaSharesKeeper )
 
   const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
   const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
@@ -206,46 +203,38 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
-  const saveInTransitHistory = async () => {
-    const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
-    if ( shareHistory ) {
-      const updatedShareHistory = [ ...shareHistory ]
-      updatedShareHistory[ index ] = {
-        ...updatedShareHistory[ index ],
-        inTransit: Date.now(),
-      }
-      updateHistory( updatedShareHistory )
-      await AsyncStorage.setItem(
-        'shareHistory',
-        JSON.stringify( updatedShareHistory ),
-      )
-    }
-  }
-
   const createGuardian = useCallback(
-    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
-      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+    async ( { isChangeTemp, chosenContactTmp, isReshare }: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
+      const isChangeKeeper = isChange ? isChange : isChangeTemp ? isChangeTemp : false
       setIsChange( isChangeKeeper )
-      const isReshareTemp = payload && payload.isReshare ? payload.isReshare : undefined
+      const isReshareTemp = isReshare ? isReshare : null
       if( ( keeperQR || isReshare ) && !isChangeKeeper && !isReshareTemp ) return
       setIsGuardianCreationClicked( true )
       const channelKeyTemp: string = isReshareTemp ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKeyTemp )
-      const contactDetails = payload && payload.chosenContactTmp ? payload.chosenContactTmp : Contact
+      const contactDetails = chosenContactTmp ? chosenContactTmp : Contact
       setContact( contactDetails )
 
-      const obj: KeeperInfoInterface = {
+      let sharePosition: number
+      if( currentLevel === 0 ) sharePosition = -1
+      else{
+        const metaShareIndex = MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
+        if( metaShareIndex >= 0 ) sharePosition = metaShareIndex
+        else {
+          const oldMetaShareIndex = OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
+          if( oldMetaShareIndex >= 0 ) sharePosition = oldMetaShareIndex
+          else sharePosition = 2
+        }
+      }
+
+      const keeperInfo: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: contactDetails ? ( contactDetails.name? contactDetails.name: contactDetails.displayedName ? contactDetails.displayedName: '' ): '',
-        type: isPrimaryKeeper ? 'primaryKeeper' : 'device',
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : currentLevel == 0 ? '1of1' : '2of3',
+        type: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : currentLevel == 0 ? ShareSplitScheme.OneOfOne : ShareSplitScheme.TwoOfThree,
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: currentLevel == 0 ? -1 : MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-          MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
-          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-            OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
-            2,
+        sharePosition,
         data: {
           ...( contactDetails? contactDetails: {
           } ),
@@ -254,10 +243,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         channelKey: channelKeyTemp
       }
 
-      dispatch( updatedKeeperInfo( obj ) )
+      dispatch( updatedKeeperInfo( keeperInfo ) ) // updates the keeper-info in the reducer
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
-    [ trustedContacts, Contact ],
+    [ trustedContacts, Contact, isChange ],
   )
 
   useEffect( ()=> {
@@ -508,16 +497,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     )
   }, [] )
 
-  const renderChangeHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (ChangeBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
-
   const renderHelpContent = () => {
     return (
       <KeeperDeviceHelpContents
@@ -591,7 +570,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if ( currentContact && currentContact.isActive ){
       setReshareModal( false )
       setShowQr( true )
-      createGuardian()
+      createGuardian( {
+      } )
     }
     else {
       setReshareModal( false )

@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-import { BackupStreamData, cloudDataInterface, LevelHealthInterface, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, cloudDataInterface, KeeperInfoInterface, LevelHealthInterface, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -254,7 +254,7 @@ export const isLevel3InitializedStatus = () => {
   }
 }
 
-export const updatedKeeperInfo = ( keeperData ) =>{
+export const updatedKeeperInfo = ( keeperData: KeeperInfoInterface ) =>{
   return {
     type: KEEPER_INFO, payload: {
       keeperData
@@ -262,7 +262,7 @@ export const updatedKeeperInfo = ( keeperData ) =>{
   }
 }
 
-export const putKeeperInfo = ( info ) =>{
+export const putKeeperInfo = ( info: KeeperInfoInterface[] ) =>{
   return {
     type: PUT_KEEPER_INFO, payload: {
       info

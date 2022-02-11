@@ -117,7 +117,8 @@ import {
   ContactDetails,
   Gift,
   Account,
-  MultiSigAccount
+  MultiSigAccount,
+  KeeperType
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -1240,38 +1241,32 @@ export const confirmPDFSharedWatcher = createWatcher(
 
 function* updatedKeeperInfoWorker( { payload } ) {
   try {
-    const { keeperData } = payload
-    const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
-    const keeperInfoTemp: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
-    if( keeperInfoTemp && keeperInfoTemp.length > 0 && keeperInfoTemp.find( value=>value && value.shareId == keeperData.shareId && value.type == 'pdf' ) && keeperData.type != 'pdf' ) {
+    const keeperDataToUpdate: KeeperInfoInterface  = payload.keeperData
+    const storedKeeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
+    const keeperInfo: KeeperInfoInterface[] = [ ...storedKeeperInfo ]
+
+    if( keeperInfo && keeperInfo.length > 0 && keeperInfo.find( info => info && info.shareId == keeperDataToUpdate.shareId && info.type == KeeperType.PDF ) && keeperDataToUpdate.type != KeeperType.PDF ) {
+      // while changing existing PDF keeper to a non-PDF Keeper
       yield put( setPDFInfo( {
         filePath: '', updatedAt: 0, shareId: ''
       } ) )
       yield put( pdfSuccessfullyCreated( false ) )
     }
 
-    let flag = false
-    if ( keeperInfo.length > 0 ) {
-      for ( let i = 0; i < keeperInfo.length; i++ ) {
-        const element = keeperInfo[ i ]
-        if ( element.shareId == keeperData.shareId ) {
-          flag = false
-          keeperInfo[ i ].name = keeperData.name
-          keeperInfo[ i ].scheme = keeperData.scheme
-          keeperInfo[ i ].currentLevel = keeperData.currentLevel
-          keeperInfo[ i ].createdAt = keeperData.createdAt
-          keeperInfo[ i ].type = keeperData.type
-          keeperInfo[ i ].data = keeperData.data
-          keeperInfo[ i ].sharePosition = keeperData.sharePosition
-          keeperInfo[ i ].channelKey = keeperData.channelKey
-          break
-        } else flag = true
+    let updatedExistingKeeperInfo = false
+    for ( let i = 0; i < keeperInfo.length; i++ ) {
+      const element = keeperInfo[ i ]
+      if ( element.shareId == keeperDataToUpdate.shareId ) {
+        keeperInfo[ i ] = {
+          ...keeperDataToUpdate
+        }
+        updatedExistingKeeperInfo = true
+        break
       }
-    } else flag = true
-    if ( flag ) {
-      keeperInfo.push( keeperData )
     }
-    yield put( putKeeperInfo( keeperInfo ) )
+
+    if ( !updatedExistingKeeperInfo ) keeperInfo.push( keeperDataToUpdate )
+    yield put( putKeeperInfo( keeperInfo ) )  // updates keeperInfo variable @bhr-reducer
   } catch ( error ) {
     console.log( 'Error updatedKeeperInfoWorker', error )
   }
