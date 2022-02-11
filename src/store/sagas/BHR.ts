@@ -1548,70 +1548,84 @@ export const setHealthStatusWatcher = createWatcher(
   setHealthStatusWorker,
   SET_HEALTH_STATUS
 )
-
+/**
+ * Generates assets, corresponding to a share, to be uploaded to trusted channel
+ * @param  {} {shareId} id of the share corresponding to which channel assets needs to be generated
+ */
 function* createChannelAssetsWorker( { payload } ) {
   try {
+    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     const { shareId } = payload
-    const { metaSharesKeeper, oldMetaSharesKeeper } = yield select( ( state ) => state.bhr )
-
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const {
+      metaSharesKeeper,
+      oldMetaSharesKeeper,
+      keeperInfo,
+      currentLevel,
+      secondaryShareDownloaded
+    }: {
+      metaSharesKeeper: MetaShare[],
+      oldMetaSharesKeeper: MetaShare[],
+      keeperInfo: KeeperInfoInterface[],
+      currentLevel: number,
+      secondaryShareDownloaded: any,
+    } = yield select( ( state ) => state.bhr )
     const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
     const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
-    if( shareId ){
-      yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-      const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
-      const currentLevel: number = yield select( ( state ) => state.bhr.currentLevel )
-      const secondaryShareDownloadedVar = yield select( ( state ) => state.bhr.secondaryShareDownloaded )
-      const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-      const share = MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ) : OldMetaShares.length && OldMetaShares.find( value=>value.shareId==shareId ) ? OldMetaShares.find( value=>value.shareId==shareId ) : null
-      let primaryMnemonicShardTemp
-      if( currentLevel == 0 ){
-        const timestamp = new Date().toLocaleString( undefined, {
-          day: 'numeric',
-          month: 'numeric',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        } )
-        primaryMnemonicShardTemp = {
-          shareId: shareId,
-          meta: {
-            version: DeviceInfo.getVersion(),
-            validator: '',
-            index: -1,
-            walletId: wallet.walletId,
-            tag: wallet.walletName,
-            timestamp: timestamp,
-            reshareVersion: 0,
-            questionId: wallet.security.questionId,
-            question: wallet.security.question,
-            scheme: '1of1',
-          },
-          encryptedShare: {
-            pmShare: wallet.primaryMnemonic
-          }
-        }
-      } else {
-        primaryMnemonicShardTemp = {
-          shareId: share ? share.shareId : '',
-          meta: share ? share.meta : {
-          },
-          encryptedShare: share ? share.encryptedShare : ''
+
+    const share = MetaShares.find( value => value.shareId == shareId ) || OldMetaShares.find( value => value.shareId == shareId )
+    let primaryMnemonicShardTemp
+
+    if( currentLevel == 0 ){
+      // when KeeperType === PrimaryKeeper/Device/PDF is chosen on level 1
+      primaryMnemonicShardTemp = {
+        shareId: shareId,
+        meta: {
+          version: DeviceInfo.getVersion(),
+          validator: '',
+          index: -1,
+          walletId: wallet.walletId,
+          tag: wallet.walletName,
+          timestamp: new Date().toLocaleString( undefined, {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          } ),
+          reshareVersion: 0,
+          questionId: wallet.security.questionId,
+          question: wallet.security.question,
+          scheme: ShareSplitScheme.OneOfOne,
+        },
+        encryptedShare: {
+          pmShare: wallet.primaryMnemonic
         }
       }
-      const channelAssets: ChannelAssets = {
-        primaryMnemonicShard: primaryMnemonicShardTemp,
-        keeperInfo: keeperInfo,
-        shareId
+    } else {
+      // from level 2 and onwards
+      primaryMnemonicShardTemp = {
+        shareId: share ? share.shareId : '',
+        encryptedShare: share ? share.encryptedShare : '',
+        meta: share ? share.meta : {
+        },
       }
-      if( secondaryShareDownloadedVar ) {
-        channelAssets.secondaryMnemonicShard = secondaryShareDownloadedVar
-        channelAssets.bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-      }
-      yield put( setChannelAssets( channelAssets, secondaryShareDownloadedVar ) )
-      yield put( setApprovalStatus( false ) )
-      // yield put( secondaryShareDownloaded( null ) )
-      yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     }
+
+    const channelAssets: ChannelAssets = {
+      primaryMnemonicShard: primaryMnemonicShardTemp,
+      keeperInfo: keeperInfo,
+      shareId
+    }
+
+    if( secondaryShareDownloaded ) {
+      channelAssets.secondaryMnemonicShard = secondaryShareDownloaded
+      channelAssets.bhXpub = idx( wallet, ( _ ) => _.details2FA.bithyveXpub ) || ''
+    }
+
+    yield put( setChannelAssets( channelAssets, secondaryShareDownloaded ) )
+    yield put( setApprovalStatus( false ) )
+    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     console.log( 'Error CREATE_CHANNEL_ASSETS', error )
