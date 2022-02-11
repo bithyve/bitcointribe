@@ -118,7 +118,8 @@ import {
   Gift,
   Account,
   MultiSigAccount,
-  KeeperType
+  KeeperType,
+  ShareSplitScheme
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -183,8 +184,8 @@ function* initHealthWorker() {
   const obj: KeeperInfoInterface = {
     shareId: randomIdForSecurityQ,
     name: security && security.answer ? 'Encryption Password' : 'Set Password',
-    type: 'securityQuestion',
-    scheme: '1of1',
+    type: KeeperType.SECURITY_QUESTION,
+    scheme: ShareSplitScheme.OneOfOne,
     currentLevel: 0,
     createdAt: moment( new Date() ).valueOf(),
     sharePosition: null,
@@ -1903,9 +1904,9 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
       else currentLevel = 1
     }
     for ( let i = 0; i < keeperInfo.length; i++ ) {
-      if( keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
-      else if( keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
-      else if( keeperInfo[ i ].scheme == '3of5' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      if( keeperInfo[ i ].scheme == ShareSplitScheme.OneOfOne ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      else if( keeperInfo[ i ].scheme == ShareSplitScheme.TwoOfThree ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      else if( keeperInfo[ i ].scheme == ShareSplitScheme.ThreeOfFive ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
     }
     yield put( putKeeperInfo( keeperInfo ) )
     yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
