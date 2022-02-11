@@ -237,7 +237,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     setConfirmPswd( tempPswd )
 
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
-      setPswdError( 'Password do not match' )
+      setPswdError( 'Password mismatch' )
     } else if (
       validateAllowedCharacters( pswd ) == false ||
       validateAllowedCharacters( tempPswd ) == false
@@ -274,7 +274,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
       setVisibleButton( false )
 
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
-        setPswdError( 'Password do not match' )
+        setPswdError( 'Password mismatch' )
       } else if (
         validateAllowedCharacters( pswd ) == false ||
         validateAllowedCharacters( confirmPswd ) == false
@@ -366,7 +366,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         }}
       >
         <View style={{
-          height: hp(windowHeight >= 800 ? (Platform.OS== "ios" ? '56%' : '65%') : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%'),
+          height: hp( windowHeight >= 800 ? ( Platform.OS== 'ios' ? '56%' : '65%' ) : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%' ),
           marginHorizontal: wp( 4 )
         }}>
           <View style={{
