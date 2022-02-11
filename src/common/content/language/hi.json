@@ -286,7 +286,8 @@
       "Confirmnewwalletname": "नए वॉलेट नाम की पुष्टि करें",
       "acrossyour": "वॉलेट का नाम आपके दोस्तों और परिवार नेटवर्क पर अपने आप अपडेट हो जाएगा",
       "ConfirmSecurityQuestion": "सुरक्षा प्रश्न की पुष्टि करें",
-      "ConfirmWalletPin": "वॉलेट पिन की पुष्टि करें"
+      "ConfirmWalletPin": "वॉलेट पिन की पुष्टि करें",
+      "ConfirmEncryptionPassword":"एन्क्रिप्शन पासवर्डची पुष्टी करा"
   },
   "header": {
       "init": "क्लाउड बैकअप आरंभ किया जा रहा है",

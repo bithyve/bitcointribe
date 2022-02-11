@@ -308,7 +308,8 @@
         "Confirmnewwalletname": "Confirm new wallet name",
         "acrossyour": "The wallet's name will get updated automatically across your Friends & Family network",
         "ConfirmSecurityQuestion": "Confirm Security Question",
-        "ConfirmWalletPin": "Confirm Wallet Pin"
+        "ConfirmWalletPin": "Confirm Wallet Pin",
+        "ConfirmEncryptionPassword":"Confirm Encryption Password"
     },
     "header": {
         "init": "Initialising Automated Cloud Backup",
