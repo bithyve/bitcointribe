@@ -66,9 +66,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorModal, setErrorModal ] = useState( false )
   const [ ConfirmFromSecondaryDeviceModal, setConfirmFromSecondaryDeviceModal ] = useState( false )
   const [ ChangeModal, setChangeModal ] = useState( false )
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
 
-  const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
-  const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  const [ oldChannelKey, setOldChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
+  const [ channelKey, setChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
@@ -78,13 +79,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ keeperQR, setKeeperQR ] = useState( '' )
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
   const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
 
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
-  const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
-    ? props.navigation.state.params.isChangeKeeperType
-    : false )
+  const isChangeKeeper = props.navigation.getParam( 'isChangeKeeperType' )
+  const [ isChange, setIsChange ] = useState( isChangeKeeper ? isChangeKeeper : false )
+  const [ isReshare, setIsReshare ] = useState( isChangeKeeper ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
   const [ isChangeClicked, setIsChangeClicked ] = useState( false )
   const [ isShareClicked, setIsShareClicked ] = useState( false )
@@ -110,16 +109,20 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const next = props.navigation.getParam( 'next' )
 
   useEffect( () => {
-    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-    setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
+    const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
+    const isChangeKeeper = props.navigation.getParam( 'isChangeKeeperType' )
+    const selectedRecoveryKeyNum = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
+
+    setSelectedRecoveryKeyNumber( selectedRecoveryKeyNum )
+    setSelectedKeeper( selectedKeeper )
+    setIsReshare( isChangeKeeper ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
     setIsChange(
-      props.navigation.getParam( 'isChangeKeeperType' )
-        ? props.navigation.getParam( 'isChangeKeeperType' )
+      isChangeKeeper
+        ? isChangeKeeper
         : false
     )
-    setChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
-    setOldChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+    setChannelKey( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
+    setOldChannelKey( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
   }, [ props.navigation.state.params ] )
 
   //DidMount
@@ -134,7 +137,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       id: uuid(),
       name: `${firstName} ${lastName ? lastName : ''}`
     }
-    setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+    setContact( isChangeKeeper ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
     approvalCheck()
   }, [ ] )
 
@@ -173,7 +176,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( ()=>{
     if( approvalStatus && isChangeClicked ){
-      console.log( 'APPROVe SD' )
       setQRModal( false )
       onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
     }
@@ -186,21 +188,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }, [ channelAssets ] )
 
   const approvalCheck = async() => {
-    console.log( 'selectedKeeper',  props.navigation.getParam( 'selectedKeeper' ) )
-    if( props.navigation.getParam( 'selectedKeeper' ).channelKey ){
-      const instream = useStreamFromContact( trustedContacts[ props.navigation.getParam( 'selectedKeeper' ).channelKey ], wallet.walletId, true )
-      console.log( 'approvalCheck instream', instream )
+    if( selectedKeeper.channelKey ){
+      const instream = useStreamFromContact( trustedContacts[ selectedKeeper.channelKey ], wallet.walletId, true )
       const flag = await TrustedContactsOperations.checkSecondaryUpdated(
         {
           walletId: wallet.walletId,
           options:{
             retrieveSecondaryData: true
           },
-          channelKey: props.navigation.getParam( 'selectedKeeper' ).channelKey,
+          channelKey: selectedKeeper.channelKey,
           StreamId: instream.streamId
         }
       )
-      console.log( 'approvalCheck flag', flag )
       if( !flag ){
         setApprovalErrorModal( true )
       }
@@ -286,7 +285,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
         if( DeepLinkEncryptionType.DEFAULT === encryptionType ) encryption_key = encryptionKey
       }
-      console.log( 'encryption_key', getDeepLinkKindFromContactsRelationType( currentContact.relationType ) )
       if( !encryption_key ){
         const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
         const { encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
@@ -297,8 +295,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           keysToEncrypt,
           currentLevel
         } )
-        console.log( 'keysToEncrypt', keysToEncrypt )
-        console.log( 'keysToEncrypt', encryptedChannelKeys, encryptionType, encryptionHint )
 
         const QRData = JSON.stringify( {
           type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
@@ -333,7 +329,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const renderSecondaryDeviceContents = useCallback( () => {
-    console.log( keeperQR )
     return (
       <SecondaryDevice
         qrTitle={`Recovery Key ${SelectedRecoveryKeyNumber}`}
@@ -376,7 +371,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if( isShareClicked ){
       if( levelData.find( value=>( value.keeper1.shareId == selectedKeeper.shareId && value.keeper1.status !== 'notSetup' ) || ( value.keeper2.shareId == selectedKeeper.shareId && value.keeper2.status !== 'notSetup' ) ) ) {
         setTimeout( () => {
-          if( props.navigation.getParam( 'isChangeKeeperType' ) ) {
+          if( isChangeKeeper ) {
             props.navigation.pop( 2 )
           } else {
             props.navigation.pop( 1 )
@@ -614,7 +609,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
-  const initiateSecondaryDeviceFlow = useCallback( () => {
+  const initiateBackupWithDeviceFlow = useCallback( () => {
     if( isChange || selectedKeeper.updatedAt == 0 ){
       // associate a contact and create guardian
       props.navigation.navigate( 'ContactsListForAssociateContact', {
@@ -657,14 +652,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
-          confirmButtonText={isChange ? 'Share Now' : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
-          onPressConfirm={initiateSecondaryDeviceFlow}
+          confirmButtonText={isChange ? 'Share Now' : selectedKeeper.updatedAt > 0 ? 'Confirm' : 'Share Now' }
+          onPressConfirm={initiateBackupWithDeviceFlow}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : props.navigation.getParam( 'selectedKeeper' ).status != 'notSetup' && ( ( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 && isPrimaryKeeper ) || ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 && !isPrimaryKeeper ) ) ? true : false}
+          isChangeKeeperAllow={isChange ? false : selectedKeeper.status != 'notSetup' && ( ( selectedKeeper.updatedAt == 0 && isPrimaryKeeper ) || ( selectedKeeper.updatedAt > 0 && !isPrimaryKeeper ) ) ? true : false}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => {
             if( isPrimaryKeeper ){
