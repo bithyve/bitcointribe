@@ -36,7 +36,7 @@ const styles = StyleSheet.create( {
   },
 
   subtitleText: {
-    fontSize: RFValue( 10 ),
+    fontSize: RFValue( 11 ),
     letterSpacing: 0.3,
     color: Colors.gray2
   },
@@ -97,7 +97,7 @@ const PaymentItem = ( {
   const amountTextStyle = useMemo( () => {
     return {
       ...styles.amountText,
-      color: transactionKindIconColor,
+      color: Colors.red,
     }
   }, [ payment ] )
 
@@ -105,22 +105,13 @@ const PaymentItem = ( {
   return (
     <>
       <ListItem containerStyle={{
-        backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )
+        backgroundColor: Colors.backgroundColor, paddingHorizontal: widthPercentageToDP( 5 )
       }} pad={1}>
 
         <View style={styles.containerImg}>
           <Lightning/>
         </View>
         <ListItem.Content style={styles.titleSection}>
-          <ListItem.Title style={styles.titleText} numberOfLines={1}>
-            {payment.value}
-          </ListItem.Title>
-          <ListItem.Subtitle style={styles.subtitleText}>
-            {`${payment.status === 'SUCCEEDED' ? 'Succeeded': 'Failed'} ${moment( parseInt( payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )}`}
-          </ListItem.Subtitle>
-        </ListItem.Content>
-
-        <ListItem.Content style={styles.amountSection}>
           <LabeledBalanceDisplay
             balance={parseInt( payment.value )}
             bitcoinUnit={bitcoinUnit}
@@ -129,11 +120,15 @@ const PaymentItem = ( {
             currencyImageStyle={styles.bitcoinImage}
             iconSpacing={2}
             bitcoinIconColor="gray"
-            textColor="gray"
             isTestAccount={false}
           />
-          <ListItem.Chevron size={22}/>
+          <ListItem.Subtitle style={styles.subtitleText}>
+            {`${moment( parseInt( payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )}`}
+          </ListItem.Subtitle>
+        </ListItem.Content>
 
+        <ListItem.Content style={styles.amountSection}>
+          <ListItem.Chevron size={22}/>
         </ListItem.Content>
       </ListItem>
 

@@ -667,7 +667,7 @@
     },
     "lightningAccount": {
       "Connectyournode": "Connect your node",
-      "SetupLightningAccount": "Set up Lightning Account",
+      "SetupLightningAccount": "Scan lndconnect/ BTCPay config QR",
       "Entermanually": "Enter manually",
       "NoLNDnode": "No LND node",
       "NoLNDnodeSub": "Elit culpa consectetur elit ex consectetur quis culpa veniam est consequat."

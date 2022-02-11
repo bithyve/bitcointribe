@@ -145,7 +145,7 @@ export default function ScanNodeConfig( { navigation } ) {
           <Text style={styles.buttonText}>{strings.Entermanually}</Text>
         </TouchableOpacity>
 
-        <BottomInfoBox
+        {/* <BottomInfoBox
           containerStyle={{
             paddingRight: wp( 15 ),
             backgroundColor: 'transparent',
@@ -153,7 +153,7 @@ export default function ScanNodeConfig( { navigation } ) {
           }}
           title={strings.NoLNDnode}
           infoText={strings.NoLNDnodeSub}
-        />
+        /> */}
       </ScrollView>
 
 

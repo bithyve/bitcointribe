@@ -1,24 +1,25 @@
-import React from "react";
+import React from 'react'
 import {
   StyleSheet,
   Text,
   View,
   FlatList,
   TouchableOpacity,
-} from "react-native";
-import { Mode } from "./AccountDetails";
-import { inject, observer } from "mobx-react";
-import InvoiceItem from "./components/InvoiceItem";
-import TransactionItem from "./components/TransactionItem";
+} from 'react-native'
+import { Mode } from './AccountDetails'
+import { inject, observer } from 'mobx-react'
+import InvoiceItem from './components/InvoiceItem'
+import TransactionItem from './components/TransactionItem'
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create( {
+} )
 
 const ViewAllScreen = inject(
-  "InvoicesStore",
-  "TransactionsStore"
+  'InvoicesStore',
+  'TransactionsStore'
 )(
-  observer(({ InvoicesStore, TransactionsStore, navigation }) => {
-    const { mode, accountShellId } = navigation.state.params;
+  observer( ( { InvoicesStore, TransactionsStore, navigation } ) => {
+    const { mode, accountShellId } = navigation.state.params
     return (
       <View>
         {mode === Mode.LIGHTNING ? (
@@ -26,12 +27,12 @@ const ViewAllScreen = inject(
             bounces={false}
             data={InvoicesStore.invoices}
             //keyExtractor={keyExtractor}
-            renderItem={({ item: invoice }: { item }) => (
+            renderItem={( { item: invoice }: { item } ) => (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("InvoiceDetailsScreen", {
+                  navigation.navigate( 'InvoiceDetailsScreen', {
                     invoice,
-                  });
+                  } )
                 }}
               >
                 <InvoiceItem navigation={navigation} invoice={invoice} />
@@ -43,13 +44,13 @@ const ViewAllScreen = inject(
             bounces={false}
             data={TransactionsStore.transactions}
             //keyExtractor={keyExtractor}
-            renderItem={({ item: transaction }: { item }) => (
+            renderItem={( { item: transaction }: { item } ) => (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("TransactionDetailsScreen", {
+                  navigation.navigate( 'TransactionDetailsScreen', {
                     transaction,
                     accountShellId,
-                  });
+                  } )
                 }}
               >
                 <TransactionItem
@@ -61,8 +62,8 @@ const ViewAllScreen = inject(
           />
         )}
       </View>
-    );
-  })
-);
+    )
+  } )
+)
 
-export default ViewAllScreen;
+export default ViewAllScreen

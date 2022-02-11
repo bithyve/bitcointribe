@@ -9,7 +9,7 @@ import FormStyles from '../../common/Styles/FormStyles'
 import AddressUtils from '../../utils/ln/AddressUtils'
 import { inject, observer } from 'mobx-react'
 import handleInvoiceData from '../../utils/ln/handleInvoiceData'
-import { Alert } from 'react-native'
+
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
@@ -44,10 +44,11 @@ const SendScreen = inject(
     try {
       const { nodeInfo } = NodeInfoStore
       const { isTestNet, isRegTest } = nodeInfo
-      console.log( qrData )
       if( AddressUtils.isValidBitcoinAddress( qrData, isTestNet || isRegTest ) ) {
         const { value, amount }: any = AddressUtils.processSendAddress( qrData )
-        console.log( 'isValidBitcoinAddress' )
+        navigation.replace( 'OnChainSend', {
+          value, amount
+        } )
       } else {
         handleInvoiceData( qrData )
           .then( ( [ route, props ] ) => {

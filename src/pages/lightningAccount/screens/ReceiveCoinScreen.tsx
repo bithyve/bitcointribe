@@ -17,6 +17,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import FormStyles from '../../../common/Styles/FormStyles'
 import Toast from '../../../components/Toast'
 import HeaderTitle from '../../../components/HeaderTitle'
+import CommonStyles from '../../../common/Styles/Styles'
 
 @inject( 'InvoicesStore' )
 @observer
@@ -31,7 +32,7 @@ export default class ReceiveCoinScreen extends Component {
       strings: translations [ 'accounts' ],
       amount: '',
       memo: '',
-      expiry: '',
+      expiry: 0,
       showInvoice: false,
     }
     this.updateIndex = this.updateIndex.bind( this )
@@ -50,7 +51,7 @@ export default class ReceiveCoinScreen extends Component {
     this.setState( {
       showInvoice: true
     } )
-    this.props.InvoicesStore.createInvoice( memo, amount,  expiry === '' ? '3600': expiry )
+    this.props.InvoicesStore.createInvoice( memo, amount,  expiry === 1 ? '43200' : expiry === 2 ? '86400': '3600' )
   }
 
   updateIndex( selectedIndex ) {
@@ -79,7 +80,7 @@ export default class ReceiveCoinScreen extends Component {
             numberOfLines={1}
             keyboardType="number-pad"
           />
-          <Input
+          {/* <Input
             placeholder={'Enter invoice expiration in seconds'}
             value={this.state.expiry}
             containerStyle={{
@@ -94,9 +95,41 @@ export default class ReceiveCoinScreen extends Component {
             }
             numberOfLines={1}
             keyboardType="number-pad"
+          /> */}
+          <Text style={{
+            fontSize: RFValue( 16 ),
+            color: Colors.blue,
+            fontFamily: Fonts.FiraSansRegular,
+            marginLeft: 10
+          } }>
+          Invoice Expiration
+          </Text>
+          <ButtonGroup
+            onPress={( index )=> this.setState( {
+              expiry: index
+            } )}
+            selectedIndex={this.state.expiry}
+            buttons={[ '1 hour', '12 hours', '24 hours' ]}
+            selectedButtonStyle={{
+              backgroundColor: Colors.lightBlue,
+              borderRadius: 8,
+              borderWidth: 0,
+            }}
+            textStyle={{
+              fontFamily: Fonts.FiraSansRegular
+            }}
+            innerBorderStyle={{
+              width: 0,
+            }}
+            containerStyle={{
+              height: hp( '6%' ),
+              borderWidth: 0,
+              marginVertical: 10,
+              marginBottom: 20
+            }}
           />
           <Input
-            placeholder={'Enter memo'}
+            placeholder={'Add a note(optional)'}
             value={this.state.memo}
             containerStyle={{
             }}
@@ -170,9 +203,17 @@ export default class ReceiveCoinScreen extends Component {
           selectedButtonStyle={{
             backgroundColor: Colors.blue,
             borderRadius: 8,
+            borderWidth: 0,
+          }}
+          innerBorderStyle={{
+            width: 0,
+          }}
+          textStyle={{
+            fontFamily: Fonts.FiraSansRegular
           }}
           containerStyle={{
             height: hp( '6%' ),
+            borderWidth: 0,
           }}
         />
         {selectedIndex === 1 ? (
@@ -228,6 +269,7 @@ const styles = StyleSheet.create( {
   center: {
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
   },
 
   activityIndicator: {

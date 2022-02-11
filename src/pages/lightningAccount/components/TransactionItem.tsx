@@ -91,9 +91,13 @@ const TransactionItem = ( {
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind()
 }: Props ) => {
+  const { getAmount } = transaction
 
   const transactionKindIconColor = useMemo( () => {
-    return Colors.green
+    if ( getAmount > 0 ) {
+      return Colors.green
+    }
+    return Colors.red
   }, [ transaction ] )
 
   const amountTextStyle = useMemo( () => {
