@@ -553,12 +553,13 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               style={styles.modalInputBox}
               placeholder={strings.Enteryourpassword}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowPswd ? pswdMasked : pswd}
+              value={pswd}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
               autoCorrect={false}
               editable={isEditable}
+              secureTextEntry = {hideShowPswd ? true : false}
               autoCapitalize="none"
               onSubmitEditing={() =>
                 ( confirmPswdTextInput as any ).current.focus()
@@ -628,12 +629,13 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               ref={confirmPswdTextInput}
               placeholder={strings.Confirmyourpassword}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowConfirmPswd ? confirmPswdMasked : tempPswd}
+              value={tempPswd}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
               autoCorrect={false}
               editable={isEditable}
+              secureTextEntry = {hideShowConfirmPswd ? true : false}
               autoCapitalize="none"
               onSubmitEditing={() => {
                 handlePswdSubmit();
@@ -772,21 +774,17 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               {pswdError}
             </Text>
           </View>
-          {showNote ? <View style={{
-            ...styles.bottomButtonView,
-          }}>
-            {(
-              pswd.trim() === confirmPswd.trim() &&
-            confirmPswd.trim() &&
-            pswd.trim() && pswdError.length === 0 && hintText.length > 0
-            ) && (
-              setButtonVisible()
-            ) || null}
-            {/* <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View> */}
-          </View> : null}
+          {(
+            pswd === tempPswd &&
+              pswd.length!=0 && tempPswd.length!=0 &&
+            pswdError.length === 0
+          ) ? <View style={{
+              ...styles.bottomButtonView,
+            }}>
+
+              {setButtonVisible()}
+
+            </View> : null}
           {showNote &&
         <View style={{
           marginTop: showNote ? hp( '0%' ) :hp( '2%' ),
