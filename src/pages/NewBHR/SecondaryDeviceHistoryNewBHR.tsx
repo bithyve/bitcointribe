@@ -254,7 +254,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     const channelAssetsCreated = !createChannelAssetsStatus
     if( isGuardianCreationClicked && channelAssetsCreated && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( createGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, isPrimaryKeeper
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, isChangeKeeper: isChange, oldChannelKey, isPrimaryKeeper
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )

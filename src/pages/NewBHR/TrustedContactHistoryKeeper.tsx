@@ -633,7 +633,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
       dispatch( createGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
+        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, isChangeKeeper: isChange, oldChannelKey, isExistingContact: shareType == 'existingContact' ? true : false
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets, chosenContact, keeperInfo ] )

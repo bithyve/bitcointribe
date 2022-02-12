@@ -128,7 +128,7 @@ export default function QrAndLink( props ) {
   useEffect( ()=> {
     if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
       dispatch( createGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, isChangeKeeper: isChange, oldChannelKey, isExistingContact: shareType == 'existingContact' ? true : false
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )

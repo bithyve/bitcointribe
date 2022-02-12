@@ -1684,15 +1684,31 @@ export const downloadSMShareWatcher = createWatcher(
 
 function* createGuardianWorker( { payload } ) {
   try {
-    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact, isPrimaryKeeper } = payload
-    const { metaSharesKeeper } = yield select( ( state ) => state.bhr )
-
-    const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    if( existingContact ) {
-      const existingContactDetails = contacts[ channelKey ].contactDetails
-      const instream = useStreamFromContact( contacts[ channelKey ], wallet.walletId, true )
+    const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const { channelKey, shareId, contact, isChangeKeeper, oldChannelKey, isExistingContact, isPrimaryKeeper } = payload
+
+    if( !isExistingContact ) {
+      // case: creating a new F&F + Keeper
+      yield call( initializeTrustedContactWorker,  {
+        payload: {
+          contact: contact,
+          flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+          isKeeper: true,
+          isPrimaryKeeper,
+          channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
+          shareId: shareId
+        }
+      } )
+    } else {
+      // case: upgrading an existing F&F to Keeper
+      const existingContact = contacts[ channelKey ]
+      const existingContactDetails = existingContact.contactDetails
+      const instream = useStreamFromContact( existingContact, wallet.walletId, true )
+
+      // sync permanent channel if its primary data is not available yet(i.e. the contact hasn't been synched even once)
       if( !instream.primaryData ){
         const channelUpdate =  {
           contactInfo: {
@@ -1700,26 +1716,20 @@ function* createGuardianWorker( { payload } ) {
             channelKey,
           }
         }
-        const payloadForSync = {
+        const channelToSync = {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
         }
         yield call( syncPermanentChannelsWorker, {
-          payload: payloadForSync
+          payload: channelToSync
         } )
       }
-    }
-    const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
-    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
-    const walletId = wallet.walletId
-    const { walletName } = yield select( ( state ) => state.storage.wallet )
-    // if( MetaShares && MetaShares.length ) {
-    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    if( existingContact ){
+
+      // upgrade F&F to keeper and upload relevant information to permanant channel
       const primaryData: PrimaryStreamData = {
-        contactDetails: contacts[ channelKey ].contactDetails,
-        walletID: walletId,
-        walletName,
+        contactDetails: existingContact.contactDetails,
+        walletID: wallet.walletId,
+        walletName: wallet.walletName,
         relationType: TrustedContactRelationTypes.KEEPER,
       }
       const backupData: BackupStreamData = {
@@ -1727,7 +1737,7 @@ function* createGuardianWorker( { payload } ) {
         keeperInfo
       }
       const streamUpdates: UnecryptedStreamData = {
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
+        streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
         primaryData,
         backupData,
         metaData: {
@@ -1739,39 +1749,36 @@ function* createGuardianWorker( { payload } ) {
           version: DeviceInfo.getVersion()
         }
       }
-
       const channelSyncDetails = {
         channelKey: channelKey,
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
-        contact: contacts[ channelKey ],
-        contactDetails: contacts[ channelKey ].contactDetails,
-        secondaryChannelKey: contacts[ channelKey ].secondaryChannelKey ? contacts[ channelKey ].secondaryChannelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
+        streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+        contact: existingContact,
+        contactDetails: existingContact.contactDetails,
+        secondaryChannelKey: existingContact.secondaryChannelKey ? existingContact.secondaryChannelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
         metaSync: true,
         unEncryptedOutstreamUpdates: streamUpdates
       }
-
       const { updated }: {
-          updated: boolean;
-        } = yield call(
-          TrustedContactsOperations.syncPermanentChannels,
-          [ channelSyncDetails ]
-        )
+      updated: boolean;
+    } = yield call(
+      TrustedContactsOperations.syncPermanentChannels,
+      [ channelSyncDetails ]
+    )
 
       if( updated ){
-        yield put( setChannelAssets( {
+        yield put( setChannelAssets( { // clean up channel assets once they've been kept on the permanent channel
         }, null ) )
         const appVersion = DeviceInfo.getVersion()
-        const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
-        const instream = useStreamFromContact( temporaryContact, walletId, true )
+        const instream = useStreamFromContact( existingContact, wallet.walletId, true )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const notification: INotification = {
           notificationType: notificationType.FNF_KEEPER_REQUEST,
           title: 'Friends & Family request',
-          body: `You have a Keeper request from ${temporaryContact.contactDetails.contactName}`,
+          body: `You have a Keeper request from ${existingContact.contactDetails.contactName}`,
           data: {
-            walletName: walletName,
+            walletName: wallet.walletName,
             channelKey: channelKey,
-            contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
+            contactsSecondaryChannelKey: existingContact.secondaryChannelKey,
             version: appVersion
           },
           tag: notificationTag.IMP,
@@ -1788,33 +1795,24 @@ function* createGuardianWorker( { payload } ) {
             notification,
           )
           Toast( 'Keeper successfully updated and Keeper notification sent successfully.' )
-        }
-
-      }
-    } else {
-      yield call( initializeTrustedContactWorker,  {
-        payload: {
-          contact: contact,
-          flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-          isKeeper: true,
-          isPrimaryKeeper,
-          channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
-          shareId: shareId
-        }
-      } )
+        } else Toast( 'Keeper successfully updated' )
+      } else console.log( 'Failed to upgrade an existing F&F to keeper' )
     }
-    if( isChange ) {
+
+    // remove details from the permanent channel w/ the previous keeper
+    // and downgrade it to a vanilla F&F in case of changing keeper
+    if( isChangeKeeper ) {
       const contactInfo = {
         channelKey: oldChannelKey,
       }
       const primaryData: PrimaryStreamData = {
         contactDetails: contacts[ oldChannelKey ].contactDetails,
-        walletID: walletId,
-        walletName,
+        walletID: wallet.walletId,
+        walletName: wallet.walletName,
         relationType: TrustedContactRelationTypes.CONTACT,
       }
       const streamUpdates: UnecryptedStreamData = {
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
+        streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
         primaryData,
         secondaryData: null,
         backupData: null,
@@ -1827,7 +1825,6 @@ function* createGuardianWorker( { payload } ) {
           version: DeviceInfo.getVersion()
         }
       }
-      // initiate permanent channel
       const channelUpdate =  {
         contactInfo, streamUpdates
       }
@@ -1836,10 +1833,7 @@ function* createGuardianWorker( { payload } ) {
         channelUpdates: [ channelUpdate ],
       } ) )
     }
-    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    // }
   } catch ( error ) {
-    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     console.log(  {
       error
     } )

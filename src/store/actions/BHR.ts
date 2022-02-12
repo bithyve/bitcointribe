@@ -573,7 +573,7 @@ export const downloadSMShare = ( scannedData ) => {
   }
 }
 
-export const createGuardian = ( payload: {channelKey: string, shareId: string, contact: any, index: number, isChange?: boolean, oldChannelKey?: string, existingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
+export const createGuardian = ( payload: {channelKey: string, shareId: string, contact: any, isChangeKeeper?: boolean, oldChannelKey?: string, isExistingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
   return {
     type: CREATE_GUARDIAN, payload: payload
   }

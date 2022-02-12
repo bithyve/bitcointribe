@@ -483,7 +483,7 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && !isEmpty( channelAssets ) && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( createGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, isChangeKeeper: isChange, oldChannelKey
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
