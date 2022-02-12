@@ -6,7 +6,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { createChannelAssets, createOrChangeGuardian, ErrorSending, modifyLevelData, setChannelAssets, updatedKeeperInfo, downloadSMShare, setApprovalStatus } from '../../store/actions/BHR'
+import { createChannelAssets, createGuardian, ErrorSending, modifyLevelData, setChannelAssets, updatedKeeperInfo, downloadSMShare, setApprovalStatus } from '../../store/actions/BHR'
 import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -203,7 +203,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
-  const createGuardian = useCallback(
+  const initiateGuardianCreation = useCallback(
     async ( { isChangeTemp, chosenContactTmp, isReshare }: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
       const isChangeKeeper = isChange ? isChange : isChangeTemp ? isChangeTemp : false
       setIsChange( isChangeKeeper )
@@ -243,15 +243,17 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         channelKey: channelKeyTemp
       }
 
-      dispatch( updatedKeeperInfo( keeperInfo ) ) // updates the keeper-info in the reducer
+      dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
     [ trustedContacts, Contact, isChange ],
   )
 
   useEffect( ()=> {
-    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
-      dispatch( createOrChangeGuardian( {
+    // invoke create/change guardian saga, once channel assets have been created
+    const channelAssetsCreated = !createChannelAssetsStatus
+    if( isGuardianCreationClicked && channelAssetsCreated && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( createGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, isPrimaryKeeper
       } ) )
     }
@@ -484,7 +486,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             postAssociation: ( contact ) => {
               setShowQr( true )
               setContact( contact )
-              createGuardian( {
+              initiateGuardianCreation( {
                 isChangeTemp: true, chosenContactTmp: contact
               } )
             }
@@ -570,7 +572,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if ( currentContact && currentContact.isActive ){
       setReshareModal( false )
       setShowQr( true )
-      createGuardian( {
+      initiateGuardianCreation( {
       } )
     }
     else {
@@ -580,7 +582,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         postAssociation: ( contact ) => {
           setShowQr( true )
           setContact( contact )
-          createGuardian( {
+          initiateGuardianCreation( {
             isReshare: true, chosenContactTmp: contact
           } )
         }
@@ -595,7 +597,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       props.navigation.navigate( 'ContactsListForAssociateContact', {
         postAssociation: ( contact ) => {
           setShowQr( true )
-          createGuardian( {
+          initiateGuardianCreation( {
             chosenContactTmp: contact
           } )
         }

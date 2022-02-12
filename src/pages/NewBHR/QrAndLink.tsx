@@ -25,7 +25,7 @@ import { ChannelAssets, DeepLinkEncryptionType, KeeperInfoInterface, LevelInfo, 
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { useDispatch, useSelector } from 'react-redux'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
-import { createChannelAssets, createOrChangeGuardian, setChannelAssets, updatedKeeperInfo, updateMSharesHealth } from '../../store/actions/BHR'
+import { createChannelAssets, createGuardian, setChannelAssets, updatedKeeperInfo, updateMSharesHealth } from '../../store/actions/BHR'
 import dbManager from '../../storage/realm/dbManager'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import config from '../../bitcoin/HexaConfig'
@@ -93,10 +93,10 @@ export default function QrAndLink( props ) {
     for( const contact of Object.values( contacts ) ){
       if ( contact.channelKey === channelKey && shareType != 'existingContact' ) return
     }
-    createGuardian( )
+    initiateGuardianCreation( )
   }, [ Contact ] )
 
-  const createGuardian = ( ) => {
+  const initiateGuardianCreation = ( ) => {
     const isChangeKeeper = isChange ? isChange : false
     if( shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper && !recreateChannel ) return
     setIsGuardianCreationClicked( true )
@@ -127,7 +127,7 @@ export default function QrAndLink( props ) {
 
   useEffect( ()=> {
     if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
-      dispatch( createOrChangeGuardian( {
+      dispatch( createGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
       } ) )
     }

@@ -30,7 +30,7 @@ import {
   updatedKeeperInfo,
   setChannelAssets,
   createChannelAssets,
-  createOrChangeGuardian,
+  createGuardian,
   setApprovalStatus,
   downloadSMShare,
 } from '../../store/actions/BHR'
@@ -584,7 +584,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     )
   }
 
-  const createGuardian = async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, shareType?: string, isRecreateChannel?: any} ) => {
+  const initiateGuardianCreation = async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, shareType?: string, isRecreateChannel?: any} ) => {
     const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
     const Contact = payload.chosenContactTmp
     const isRecreateChannel = payload && payload.isRecreateChannel ? payload.isRecreateChannel : false
@@ -632,7 +632,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
-      dispatch( createOrChangeGuardian( {
+      dispatch( createGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: shareType == 'existingContact' ? true : false
       } ) )
     }
@@ -712,7 +712,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); shareType = 'existingContact' }
     setShareType( shareType )
     setTimeout( () => {
-      createGuardian( {
+      initiateGuardianCreation( {
         chosenContactTmp: getContacts( selectedContacts ), shareType, isRecreateChannel: isRecreateChannel
       } )
       setShowQrCode( true )

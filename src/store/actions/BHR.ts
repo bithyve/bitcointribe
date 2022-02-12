@@ -62,7 +62,7 @@ export const SET_CHANNEL_ASSETS = 'SET_CHANNEL_ASSETS'
 export const CREATE_CHANNEL_ASSETS = 'CREATE_CHANNEL_ASSETS'
 export const APPROVAL_STATUS = 'APPROVAL_STATUS'
 export const DOWNLOAD_SM_SHARE = 'DOWNLOAD_SM_SHARE'
-export const CREATE_OR_CHANGE_GUARDIAN = 'CREATE_OR_CHANGE_GUARDIAN'
+export const CREATE_GUARDIAN = 'CREATE_GUARDIAN'
 export const DOWNLOADED_BACKUP_DATA = 'DOWNLOADED_BACKUP_DATA'
 export const DOWNLOAD_BACKUP_DATA = 'DOWNLOAD_BACKUP_DATA'
 export const SETUP_HEALTH_FOR_RESTORE = 'SETUP_HEALTH_FOR_RESTORE'
@@ -573,9 +573,9 @@ export const downloadSMShare = ( scannedData ) => {
   }
 }
 
-export const createOrChangeGuardian = ( payload: {channelKey: string, shareId: string, contact: any, index: number, isChange?: boolean, oldChannelKey?: string, existingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
+export const createGuardian = ( payload: {channelKey: string, shareId: string, contact: any, index: number, isChange?: boolean, oldChannelKey?: string, existingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
   return {
-    type: CREATE_OR_CHANGE_GUARDIAN, payload: payload
+    type: CREATE_GUARDIAN, payload: payload
   }
 }
 

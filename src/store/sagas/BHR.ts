@@ -42,7 +42,7 @@ import {
   setApprovalStatus,
   DOWNLOAD_SM_SHARE,
   secondaryShareDownloaded,
-  CREATE_OR_CHANGE_GUARDIAN,
+  CREATE_GUARDIAN,
   setDownloadedBackupData,
   DOWNLOAD_BACKUP_DATA,
   SETUP_HEALTH_FOR_RESTORE,
@@ -1682,9 +1682,9 @@ export const downloadSMShareWatcher = createWatcher(
   DOWNLOAD_SM_SHARE
 )
 
-function* createOrChangeGuardianWorker( { payload: data } ) {
+function* createGuardianWorker( { payload } ) {
   try {
-    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact, isPrimaryKeeper } = data
+    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact, isPrimaryKeeper } = payload
     const { metaSharesKeeper } = yield select( ( state ) => state.bhr )
 
     const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
@@ -1840,13 +1840,15 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
     // }
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    console.log( 'CREATE_OR_CHANGE_GUARDIAN Error', error )
+    console.log(  {
+      error
+    } )
   }
 }
 
-export const createOrChangeGuardianWatcher = createWatcher(
-  createOrChangeGuardianWorker,
-  CREATE_OR_CHANGE_GUARDIAN
+export const createGuardianWatcher = createWatcher(
+  createGuardianWorker,
+  CREATE_GUARDIAN
 )
 
 function* resetLevelAfterPasswordChange() {
