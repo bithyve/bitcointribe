@@ -260,62 +260,53 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
-    if( !keeperQR ) generate()  // prevents multiple generation as trusted-contact updates twice during init
+    if( Contact ){ // if contact has been associated
+      const currentContact: TrustedContact = trustedContacts[ channelKey ]
+      if( currentContact ){ // if trusted contact has been established(permanent channel setted up)
+        if( !keeperQR ) generateKeeperQR( currentContact )  // prevents multiple generation as trusted-contact updates twice during init
+      }
+    }
   }, [ Contact, trustedContacts ] )
 
-  const generate = async () => {
-    if( !Contact ) return
+  const generateKeeperQR = async ( currentContact: TrustedContact ) => {
+    const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
+    const { encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
+      deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
+      encryptionType: DeepLinkEncryptionType.DEFAULT,
+      encryptionKey: null,
+      walletName: wallet.walletName,
+      keysToEncrypt,
+      currentLevel
+    } )
+    const qrData = JSON.stringify( {
+      type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
+      encryptedChannelKeys: encryptedChannelKeys,
+      encryptionType,
+      encryptionHint,
+      walletName: wallet.walletName,
+      version: DeviceInfo.getVersion(),
+      currentLevel
+    } )
+    setKeeperQR( qrData )
 
-    const contacts: Trusted_Contacts = trustedContacts
-    const currentContact: TrustedContact = contacts[ channelKey ]
+    if( isGuardianCreationClicked ) {
 
-    if ( currentContact ) {
-      const appVersion = DeviceInfo.getVersion()
-      let encryption_key: string
-      if( currentContact.deepLinkConfig ){
-        const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
-        if( DeepLinkEncryptionType.DEFAULT === encryptionType ) encryption_key = encryptionKey
+      let reshareVersion = 0
+      const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+      if( share ) reshareVersion = share.meta.reshareVersion
+      const shareHealth = {
+        walletId: wallet.walletId,
+        shareId: selectedKeeper.shareId,
+        reshareVersion,
+        shareType: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
+        status: 'notAccessible',
+        name: Contact && Contact.name ? Contact.name : '',
+        updatedAt: 0
       }
-      if( !encryption_key ){
-        const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
-        const { encryptedChannelKeys, encryptionType, encryptionHint } = await generateDeepLink( {
-          deepLinkKind: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),
-          encryptionType: DeepLinkEncryptionType.DEFAULT,
-          encryptionKey: encryption_key,
-          walletName: wallet.walletName,
-          keysToEncrypt,
-          currentLevel
-        } )
 
-        const QRData = JSON.stringify( {
-          type: currentContact.relationType === TrustedContactRelationTypes.PRIMARY_KEEPER? QRCodeTypes.PRIMARY_KEEPER_REQUEST: QRCodeTypes.KEEPER_REQUEST,
-          encryptedChannelKeys: encryptedChannelKeys,
-          encryptionType,
-          encryptionHint,
-          walletName: wallet.walletName,
-          version: appVersion,
-          currentLevel
-        } )
-        setKeeperQR( QRData )
-      }
-      if( isGuardianCreationClicked ) {
-        const shareObj = {
-          walletId: wallet.walletId,
-          shareId: selectedKeeper.shareId,
-          reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-            MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion :
-            OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-              OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
-          shareType: isPrimaryKeeper ? 'primaryKeeper' : 'device',
-          status: 'notAccessible',
-          name: Contact && Contact.name ? Contact.name : '',
-          updatedAt: 0
-        }
-
-        dispatch( updateMSharesHealth( shareObj, isChange ) )
-        dispatch( setChannelAssets( {
-        }, null ) )
-      }
+      dispatch( updateMSharesHealth( shareHealth, isChange ) )
+      dispatch( setChannelAssets( {
+      }, null ) )
     }
   }
 

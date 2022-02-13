@@ -1698,7 +1698,7 @@ function* createGuardianWorker( { payload } ) {
           flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
           isKeeper: true,
           isPrimaryKeeper,
-          channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
+          channelKey,
           shareId: shareId
         }
       } )
