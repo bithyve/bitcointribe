@@ -93,6 +93,7 @@ export default class ChannelScreen extends Component {
                   styles.skyBlueBoxContainer,
                   {
                     backgroundColor: Colors.primaryAccentLighter2,
+                    borderRadius: 20,
                   },
                   {
                     flex: localEquity,
