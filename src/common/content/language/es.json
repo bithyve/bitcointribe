@@ -286,7 +286,8 @@
       "Confirmnewwalletname": "Confirmar nuevo nombre de billetera",
       "acrossyour": "El nombre de la billetera se actualizará automáticamente en su red de amigos y familiares",
       "ConfirmSecurityQuestion": "Confirmar pregunta de seguridad",
-      "ConfirmWalletPin": "Confirmar PIN de billetera"
+      "ConfirmWalletPin": "Confirmar PIN de billetera",
+      "ConfirmEncryptionPassword":"Confirmar contraseña de cifrado"
   },
   "header": {
       "init": "Inicialización de la copia de seguridad en la nube",
