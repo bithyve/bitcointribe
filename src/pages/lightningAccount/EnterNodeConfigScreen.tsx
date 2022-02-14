@@ -667,7 +667,7 @@ render() {
 
         <HeaderTitle
           firstLineTitle={strings.Connectyournode}
-          secondLineTitle={strings.SetupLightningAccount}
+          secondLineTitle={strings.Enternode}
           infoTextNormal={''}
           infoTextBold={''}
           infoTextNormal1={''}
