@@ -10,6 +10,8 @@ type Props = {
     mode: Mode,
     lightningBalance: string,
     totalBlockchainBalance: string,
+    pendingOpenBalance: string,
+    unconfirmedBlockchainBalance: string,
     setMode: ( mode: Mode ) => void;
     accountShell: any;
     onClickSettings: () => void
@@ -21,7 +23,9 @@ const AccountCard = ( {
   totalBlockchainBalance,
   setMode,
   accountShell,
-  onClickSettings
+  onClickSettings,
+  pendingOpenBalance,
+  unconfirmedBlockchainBalance
 }: Props ) => {
   const pan: any = useRef( new Animated.ValueXY() ).current
   const pan1: any = useRef( new Animated.Value ( 0 ) ).current
@@ -132,7 +136,7 @@ const AccountCard = ( {
         <AccountDetailsCard
           onKnowMorePressed={() => { }}
           onSettingsPressed={() => {onClickSettings()}}
-          balance={!isLightning ? totalBlockchainBalance : lightningBalance}
+          balance={!isLightning ? `${Number( totalBlockchainBalance ) + Number( unconfirmedBlockchainBalance )}` : `${lightningBalance+ pendingOpenBalance}`}
           accountShell={accountShell}
           mode={!isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
           onPressOut={() => {}}
@@ -167,7 +171,7 @@ const AccountCard = ( {
         <AccountDetailsCard
           onKnowMorePressed={() => { }}
           onSettingsPressed={() => {onClickSettings()}}
-          balance={isLightning ? lightningBalance : totalBlockchainBalance}
+          balance={isLightning ? `${lightningBalance+ pendingOpenBalance}` : `${Number( totalBlockchainBalance ) + Number( unconfirmedBlockchainBalance )}`}
           accountShell={accountShell}
           onPressOut={() => handleAnimation( 'pressOut' )}
           mode={isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
