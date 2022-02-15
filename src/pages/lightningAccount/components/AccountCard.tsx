@@ -139,12 +139,19 @@ const AccountCard = ( {
           balance={!isLightning ? `${Number( totalBlockchainBalance ) + Number( unconfirmedBlockchainBalance )}` : `${lightningBalance+ pendingOpenBalance}`}
           accountShell={accountShell}
           mode={!isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
-          onPressOut={() => {}}
+          onPressOut={() => setIsLightning( ( prev ) => {
+            if ( prev == true ) {
+              setMode( Mode.ON_CHAIN )
+            } else {
+              setMode( Mode.LIGHTNING )
+            }
+            return !prev
+          } )}
         />
       </Animated.View>
 
       <Animated.View
-        {...panResponder.panHandlers}
+        // {...panResponder.panHandlers}
         style={{
           width:'100%', height: 200,
           position: 'absolute',
