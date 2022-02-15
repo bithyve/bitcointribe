@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import QRCode from '../../../components/QRCode'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
@@ -11,13 +11,15 @@ import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import useXPubForSubAccount from '../../../utils/hooks/state-selectors/accounts/UseXPubForSubAccount'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import { Account, MultiSigAccount } from '../../../bitcoin/utilities/Interface'
+import { Account, AccountType, MultiSigAccount, NetworkType } from '../../../bitcoin/utilities/Interface'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../../components/home/ModalContainerScroll'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../../common/Colors'
 import ListStyles from '../../../common/Styles/ListStyles'
-
+import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
+import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperations'
+import { checkBalanceByXpubs, generateDummyAccountFromXpubs } from '../../../store/utils/debugUtilities'
 
 enum XpubTypes {
   PRIMARY = 'PRIMARY',
@@ -34,7 +36,8 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const account: Account | MultiSigAccount = useAccountByAccountShell( accountShell )
   const [ xpubs, setXpubs ] = useState( [] )
   const [ noOfTaps, setNoOfTaps ] = useState( 0 )
-  const [ showModal, setShowModal ] = useState( false )
+  const [ debugModal, setDebugModal ] = useState( false )
+  const [ debugXpubsBalance, setDebugXpubsBalance ] = useState( 0 )
 
   useEffect( () => {
     const availableXpubs = []
@@ -60,60 +63,69 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
   }, [ account ] )
 
   useEffect( () => {
+    const xpubsArray = xpubs.map( xpubInfo => xpubInfo.xpub )
+    if( xpubsArray.length ){
+      checkBalanceByXpubs( xpubsArray ).then( balance => {
+        setDebugXpubsBalance( balance )
+      } )
+    }
+  }, [ xpubs ] )
+
+
+  useEffect( () => {
     if( noOfTaps!=0 ){
       setTimeout( () => {
         setNoOfTaps( 0 )
       }, 1000 )
     }
     if( noOfTaps>=3 ){
-      setShowModal( true )
+      setDebugModal( true )
     }
   }, [ noOfTaps ] )
 
   const closeBottomSheet = () => {
-    setShowModal( false )
+    setDebugModal( false )
   }
-  const KeyValueData = () => {
+
+  const ShowDebugXpubData = useCallback( ( ) => {
     return (
       <View style={styles.lineItem}>
-        <Text style={ListStyles.listItemTitleTransaction}>
-              Title
-        </Text>
-        <Text
-          style={{
-            ...ListStyles.listItemSubtitle,
-            marginBottom: 3,
-          }}
-        >
-              data
-        </Text>
+        <View style={{
+          marginTop: hp( 3 ),
+          marginBottom: hp( 3 )
+        }}>
+          <Text style={HeadingStyles.sectionSubHeadingText}>
+          Xpub Detail
+          </Text>
+        </View>
+
+        {xpubs.map( xpubInfo => {
+          return (
+            <View key={xpubInfo.xpub}>
+              <Text style={HeadingStyles.sectionSubHeadingText}>
+                {xpubInfo.type.toLowerCase()}
+              </Text>
+              <CopyThisText text={xpubInfo.xpub} />
+            </View>
+          )
+        } )}
       </View>
     )
-  }
-  const RenderModal = () => {
+  }, [ xpubs ] )
+
+  const RenderDebuModal = () => {
     return (
       <View style={styles.modalContainer}>
         <View style={styles.crossIconContainer}>
           <FontAwesome name="close" color={Colors.blue} size={24} onPress = {closeBottomSheet}/>
         </View>
         <ScrollView>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
+          <ShowDebugXpubData/>
         </ScrollView>
       </View>
     )
   }
+
   return (
     <>
       <TouchableOpacity activeOpacity={1} style={styles.rootContainer} onPress={()=>{setNoOfTaps( noOfTaps+1 )}}>
@@ -167,9 +179,9 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
           />
         </View>
       </TouchableOpacity>
-      <ModalContainer onBackground={closeBottomSheet} visible={showModal} closeBottomSheet = {closeBottomSheet}>
+      <ModalContainer onBackground={closeBottomSheet} visible={debugModal} closeBottomSheet = {closeBottomSheet}>
         <View style={styles.modalContainer}>
-          <RenderModal/>
+          <RenderDebuModal/>
         </View>
       </ModalContainer>
     </>
