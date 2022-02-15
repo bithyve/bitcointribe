@@ -86,7 +86,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     //   this.props.openBottomSheet( 6, null, true )
 
     // } else {
-    console.log( selectedAccount.primarySubAccount.type )
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }

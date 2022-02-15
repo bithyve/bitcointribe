@@ -153,6 +153,8 @@ export class AccountDetails extends Component {
                 mode={this.state.mode}
                 lightningBalance={lightningBalance}
                 totalBlockchainBalance={totalBlockchainBalance}
+                unconfirmedBlockchainBalance={unconfirmedBlockchainBalance}
+                pendingOpenBalance={pendingOpenBalance}
                 setMode={( mode: Mode )=> this.setState( {
                   mode
                 } )}

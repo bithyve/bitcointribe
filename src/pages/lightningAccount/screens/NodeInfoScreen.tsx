@@ -4,31 +4,39 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  ActivityIndicator
 } from 'react-native'
-import openLink from '../../../utils/OpenLink'
 import ListStyles from '../../../common/Styles/ListStyles'
-import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
-import moment from 'moment'
 import HeaderTitle from '../../../components/HeaderTitle'
 import { inject, observer } from 'mobx-react'
 @inject(
   'NodeInfoStore',
-  'SettingsStore'
 )
 @observer
 export default class NodeInfoScreen extends Component {
-  constructor( props ) {
-    super( props )
-    this.state = {
-      nodeInfo: this.props.NodeInfoStore.nodeInfo,
-    }
+
+  componentDidMount() {
+    this.props.NodeInfoStore.reset()
+    this.props.NodeInfoStore.getNodeInfo()
   }
 
   render() {
-    console.log( this.props.NodeInfoStore.nodeInfo, '+++' )
+    const { NodeInfoStore } = this.props
+    const {  alias, version, synced_to_chain, block_height, block_hash, uris } = NodeInfoStore.nodeInfo
+    if( NodeInfoStore.loading ){
+      return(
+        <ActivityIndicator
+          color={Colors.blue}
+          size="large"
+          style={{
+            height: '90%'
+          }}
+        />
+      )
+    }
     return (
       <ScrollView
         contentContainerStyle={styles.rootContainer}
@@ -54,7 +62,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {this.state.payment.getFee} */}
-              {this.state.nodeInfo.alias}
+              {alias}
             </Text>
           </View>
           <View style={styles.lineItem}>
@@ -68,7 +76,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {this.state.payment.payment_hash} */}
-              {this.state.nodeInfo.version}
+              {version}
             </Text>
           </View>
 
@@ -83,7 +91,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {this.state.payment.payment_preimage } */}
-              {this.state.nodeInfo.synced_to_chain ? 'Yes' : 'No'}
+              {synced_to_chain ? 'Yes' : 'No'}
             </Text>
           </View>
 
@@ -96,7 +104,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {moment( parseInt( this.state.payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )} */}
-              {this.state.nodeInfo.block_height}
+              {block_height}
             </Text>
           </View>
           <View style={styles.lineItem}>
@@ -110,7 +118,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {this.state.payment.enhancedPath[0].join('\n\n')} */}
-              {this.state.nodeInfo.block_hash}
+              {block_hash}
 
             </Text>
           </View>
@@ -125,7 +133,7 @@ export default class NodeInfoScreen extends Component {
               }}
             >
               {/* {this.state.payment.enhancedPath[0].join('\n\n')} */}
-              {this.state.nodeInfo.uris.join( '\n\n' )}
+              {uris ? uris.join( '\n\n' ) : ''}
 
             </Text>
           </View>

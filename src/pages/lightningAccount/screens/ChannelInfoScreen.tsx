@@ -1,16 +1,13 @@
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
-import { Text, View, Button, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import Toast from '../../../components/Toast'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
-import TransactionItem from '../components/TransactionItem'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { ListItem } from 'react-native-elements'
-import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import HeaderTitle from '../../../components/HeaderTitle'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -86,45 +83,32 @@ export default class ChannelInfoScreen extends Component {
       )
     }
 
-    const ButtonComponent = ( { text, onPress } ) => {
+    const ButtonComponent = ( {  onPress } ) => {
       return (
-        <View style={{
-          flexDirection:'row',
-          justifyContent:'flex-start',
-        }}>
-          <TouchableOpacity
-            style={{
-              borderRadius: wp( 2 ),
-              paddingVertical: wp( 3 ),
-              paddingHorizontal: wp( 7 ),
-              backgroundColor: Colors.blue,
-              shadowColor: Colors.shadowBlue,
-              shadowOpacity: 1,
-              shadowOffset: {
-                width: 9, height: 10
-              },
-              elevation: 15,
-            }}
-            onPress={onPress}
-          >
-            <Text style={{
-              ...ButtonStyles.floatingActionButtonText,
-            }}>
-              {text}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.buttonView}
+          activeOpacity={0.6}
+          onPress={() => {
+            onPress()
+          }}
+        >
+          <Text style={styles.buttonText}>Close Channel</Text>
+        </TouchableOpacity>
       )
     }
     return (
       <ScrollView
         style={styles.rootContainer}
       >
-        <View>
-          <Text style={styles.textHeader}>
-            Channel Details
-          </Text>
-        </View>
+        <HeaderTitle
+          firstLineTitle={'Channel Details'}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+
 
         <View style={styles.bodySection}>
           <ListCard heading={'Channel ID'} data={this.state.channelInfo.remote_pubkey}/>
@@ -137,7 +121,7 @@ export default class ChannelInfoScreen extends Component {
         <View style={{
           flexDirection: 'row', justifyContent:'space-evenly'
         }}>
-          <ButtonComponent text={'Keysend'} onPress={() => {}}/>
+          {/* <ButtonComponent text={'Keysend'} onPress={() => {}}/> */}
           <ButtonComponent text={'Close Channel'} onPress={() => {
             this.closeChannel(
               this.state.channelInfo.channel_point,
@@ -334,5 +318,26 @@ const styles = StyleSheet.create( {
     height: 12,
     resizeMode: 'contain',
     alignSelf: 'center',
+  },
+  buttonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  buttonView: {
+    height: wp( '12%' ),
+    width: wp( '40%' ),
+    paddingHorizontal: wp( 2 ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+    backgroundColor: Colors.blue,
+    marginHorizontal: wp( 4 ),
+    marginVertical: hp( '2%' ),
   },
 } )

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeaderTitle from '../../components/HeaderTitle'
@@ -20,6 +20,9 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { translations } from '../../common/content/LocContext'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import Toast from '../../components/Toast'
+import SendConfirmationContent from '../Accounts/SendConfirmationContent'
+import ModalContainer from '../../components/home/ModalContainer'
 
 
 const styles = StyleSheet.create( {
@@ -66,13 +69,13 @@ const styles = StyleSheet.create( {
 } )
 
 const SendScreen = inject(
-  'NodeInfoStore',
+  'TransactionsStore',
   'BalanceStore',
   'UnitsStore',
   'FeeStore',
   'UTXOsStore',
 )( observer( ( {
-  NodeInfoStore,
+  TransactionsStore,
   BalanceStore,
   FeeStore,
   UTXOsStore,
@@ -82,14 +85,25 @@ const SendScreen = inject(
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
   const currentAmount = Number( BalanceStore.totalBlockchainBalance )
-
+  const [ fee, setFee ] = useState( '2' )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
+  const [ recipientAddress ] = useState( navigation.getParam( 'value' ) )
+  const [ showModal, setShowModal ] = useState( false )
   const selectedRecipients = useSelectedRecipientsForSending()
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'value' ) )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( BalanceStore.totalBlockchainBalance )
+  const [ utxos, setUtxos ] = useState( [] )
+  const [ targetConf, setTargetConf ] = useState( '60' )
+
+  useEffect( () => {
+    const { loading, error, error_msg, txid } = TransactionsStore
+    if( !loading && error || error_msg|| txid ){
+      setShowModal( true )
+    }
+  }, [ TransactionsStore.loading ] )
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = 'Lightning Account'
@@ -98,7 +112,29 @@ const SendScreen = inject(
   }, [ formattedAvailableBalanceAmountText ] )
 
   function handleConfirmationButtonPress() {
-    console.log( selectedAmount )
+    if( selectedAmount === 0 ){
+      Toast( 'Please enter amount' )
+      return
+    }
+    let request
+    if ( utxos && utxos.length > 0 ) {
+      request = {
+        addr: recipientAddress,
+        sat_per_byte: fee,
+        amount: `${selectedAmount}`,
+        target_conf: targetConf,
+        utxos
+      }
+    } else {
+      request = {
+        addr: recipientAddress,
+        sat_per_byte: fee,
+        amount: `${selectedAmount}`,
+        target_conf: targetConf
+      }
+    }
+    console.log( request )
+    TransactionsStore.sendCoins( request )
   }
 
   const orderedRecipients = useMemo( () => {
@@ -111,6 +147,29 @@ const SendScreen = inject(
       bounces={false}
       overScrollMode="never"
       style={styles.rootContainer}>
+
+      <ModalContainer
+        onBackground={()=>
+          setShowModal( false )
+        }
+        visible={showModal}
+        closeBottomSheet={() => setShowModal( false )} >
+        <SendConfirmationContent
+          title={TransactionsStore.txid ? strings.SentSuccessfully: strings.SendUnsuccessful}
+          info={TransactionsStore.txid ? strings.SentSuccessfully: TransactionsStore.error_msg}
+          infoText={ ' '}
+          isFromContact={false}
+          okButtonText={strings.ViewAccount}
+          cancelButtonText={common.back}
+          isCancel={false}
+          onPressOk={() => {
+            navigation.goBack()
+          }}
+          onPressCancel={() => setShowModal( false )}
+          isSuccess={true}
+        />
+      </ModalContainer>
+
       <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
           recipients={orderedRecipients}
@@ -156,7 +215,7 @@ const SendScreen = inject(
 
       <View style={styles.footerSection}>
         <TouchableOpacity
-          disabled={!selectedAmount}
+          disabled={!selectedAmount || TransactionsStore.loading}
           onPress={handleConfirmationButtonPress}
           style={{
             ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1

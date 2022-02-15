@@ -167,9 +167,17 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           } )
 
           navigation.dispatch( resetAction )
-          navigation.navigate( 'AccountDetails', {
-            accountShellID: primarySubAccount.accountShellID,
-          } )
+          if( primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
+            navigation.navigate( 'LNAccountDetails', {
+              accountShellID: primarySubAccount.accountShellID,
+              node: primarySubAccount.node
+            } )
+          } else {
+            navigation.navigate( 'AccountDetails', {
+              accountShellID: primarySubAccount.accountShellID,
+            } )
+          }
+
         }
         }
         onClose={() => showSuccessModel( false )}
