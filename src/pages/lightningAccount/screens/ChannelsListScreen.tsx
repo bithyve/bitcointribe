@@ -8,13 +8,13 @@ import {
   StyleSheet,
   Image,
 } from 'react-native'
-import RESTUtils from '../../../utils/ln/RESTUtils'
-import ChannelItem from '../components/channels/ChannelListComponent'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { inject, observer } from 'mobx-react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
+import IconAddLight from '../../../assets/images/svgs/icon_add_dark.svg'
+import HeaderTitle from '../../../components/HeaderTitle'
 
 import {
   widthPercentageToDP as wp,
@@ -67,7 +67,6 @@ export default class ChannelScreen extends Component {
   uniqueKey = ( item: any, index: number ) => index.toString();
   renderTemplate = ( { item }: { item: ChannelFrame } ): ReactElement => {
     const ChannelBar = ( { offline } ) => {
-      // console.log(offline, item.remote_pubkey, "---")
       const remote_balance: number = parseInt( item.remote_balance )
       const local_balance: number = parseInt( item.local_balance )
       const remoteEquity: number =
@@ -178,106 +177,28 @@ export default class ChannelScreen extends Component {
   };
 
   render() {
-    // console.log( this.props.ChannelsStore.totalOutbound, '\n----', this.props.ChannelsStore.totalInbound, '\n---', this.props.ChannelsStore.totalOffline )
-
     return (
       <View style={styles.container}>
-        {/* <Button
-          title="Open Channel"
+        <HeaderTitle
+          firstLineTitle={'Channels'}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+        <TouchableOpacity
           onPress={() => {
             this.props.navigation.navigate( 'ChannelOpenScreen' )
           }}
-        /> */}
-        <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: hp( 3.5 ),
-            marginRight: wp( 6 ),
+            ...styles.selectedContactsView,
           }}
         >
-          <Text style={styles.header}>Channels</Text>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.navigation.navigate( 'ChannelOpenScreen' )
-            }}
-            style={{
-              ...styles.selectedContactsView,
-              backgroundColor: Colors.lightBlue,
-            }}
-          >
-            <Text
-              style={[
-                styles.contactText,
-                {
-                  fontSize: RFValue( 24 ),
-                  lineHeight: 30,
-                },
-              ]}
-            >
-              +
-            </Text>
-            <Text style={styles.contactText}>{'Add New Channel'}</Text>
-          </TouchableOpacity>
-        </View>
+          <IconAddLight />
+          <Text style={styles.contactText}>{'Open a channel'}</Text>
+        </TouchableOpacity>
 
-        <View style={styles.whiteBoxContainer}>
-          <View style={styles.totalAmountContainer}>
-            <View style={styles.borderAmountContainer}>
-              <View
-                style={[
-                  styles.border,
-                  {
-                    backgroundColor: Colors.darkBlue,
-                  },
-                ]}
-              ></View>
-              <Text style={styles.totalInbound}>Total Inbound</Text>
-            </View>
-            <Text style={styles.priceText}>
-              {this.props.ChannelsStore.totalOutbound}{' '}
-              <Text style={styles.sats}>sats</Text>
-            </Text>
-          </View>
-          <View style={styles.totalAmountContainer}>
-            <View style={styles.borderAmountContainer}>
-              <View
-                style={[
-                  styles.border,
-                  {
-                    backgroundColor: Colors.lightBlue,
-                  },
-                ]}
-              ></View>
-              <Text style={styles.totalInbound}>Total Outbound</Text>
-            </View>
-            <Text style={styles.priceText}>
-              {this.props.ChannelsStore.totalInbound}{' '}
-              <Text style={styles.sats}>sats</Text>
-            </Text>
-          </View>
-          <View style={styles.totalAmountContainer}>
-            <View style={styles.borderAmountContainer}>
-              <View
-                style={[
-                  styles.border,
-                  {
-                    backgroundColor: Colors.grey11,
-                  },
-                ]}
-              ></View>
-              <Text style={styles.totalInbound}>Total offline</Text>
-            </View>
-            <Text style={styles.priceText}>
-              {this.props.ChannelsStore.totalOffline}{' '}
-              <Text style={styles.sats}>sats</Text>
-            </Text>
-          </View>
-
-          {/* <Text>Total Outbound: </Text>
-          <Text>Total offline: </Text> */}
-        </View>
         {this.props.ChannelsStore.loading ? (
           <ActivityIndicator
             color={Colors.blue}
@@ -292,6 +213,64 @@ export default class ChannelScreen extends Component {
             data={this.props.ChannelsStore.channels}
             renderItem={this.renderTemplate}
             keyExtractor={this.uniqueKey}
+            ListHeaderComponent={()=>
+              <View style={styles.whiteBoxContainer}>
+                <View style={styles.totalAmountContainer}>
+                  <View style={styles.borderAmountContainer}>
+                    <View
+                      style={[
+                        styles.border,
+                        {
+                          backgroundColor: Colors.darkBlue,
+                        },
+                      ]}
+                    ></View>
+                    <Text style={styles.totalInbound}>Total Inbound</Text>
+                  </View>
+                  <Text style={styles.priceText}>
+                    {this.props.ChannelsStore.totalOutbound}{' '}
+                    <Text style={styles.sats}>sats</Text>
+                  </Text>
+                </View>
+                <View style={styles.totalAmountContainer}>
+                  <View style={styles.borderAmountContainer}>
+                    <View
+                      style={[
+                        styles.border,
+                        {
+                          backgroundColor: Colors.lightBlue,
+                        },
+                      ]}
+                    ></View>
+                    <Text style={styles.totalInbound}>Total Outbound</Text>
+                  </View>
+                  <Text style={styles.priceText}>
+                    {this.props.ChannelsStore.totalInbound}{' '}
+                    <Text style={styles.sats}>sats</Text>
+                  </Text>
+                </View>
+                <View style={styles.totalAmountContainer}>
+                  <View style={styles.borderAmountContainer}>
+                    <View
+                      style={[
+                        styles.border,
+                        {
+                          backgroundColor: Colors.grey11,
+                        },
+                      ]}
+                    ></View>
+                    <Text style={styles.totalInbound}>Total offline</Text>
+                  </View>
+                  <Text style={styles.priceText}>
+                    {this.props.ChannelsStore.totalOffline}{' '}
+                    <Text style={styles.sats}>sats</Text>
+                  </Text>
+                </View>
+
+                {/* <Text>Total Outbound: </Text>
+              <Text>Total offline: </Text> */}
+              </View>
+            }
           />
         )}
       </View>
@@ -300,21 +279,16 @@ export default class ChannelScreen extends Component {
 }
 const styles = StyleSheet.create( {
   contactText: {
-    // marginLeft: 10,
-    // marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
-    color: Colors.white,
-    // padding: wp( 2 )
+    color: Colors.blue,
+    marginHorizontal: wp( 2 ),
   },
 
   selectedContactsView: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: Colors.blue,
     borderRadius: wp( 2 ),
-    height: hp( 4 ),
     paddingHorizontal: wp( 2 ),
   },
   container: {
