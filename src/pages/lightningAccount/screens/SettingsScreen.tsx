@@ -22,13 +22,13 @@ export default class SettingsScreen extends Component {
       {
         Screen: 'ChannelsListScreen',
         Title: 'Channels',
-        Description: 'View and manage channels',
+        Description: 'View and Manage Channels',
         image: () => <Channels />
       },
       {
         Screen: 'Payments',
         Title: 'Payments',
-        Description: 'My Lightning payments',
+        Description: 'My Lightning Payments',
         image: () => <Bitcoin />
       }
     ]
