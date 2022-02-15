@@ -424,7 +424,7 @@ EnterNodeConfigState
         } )
       } )
       .catch( e=> {
-        Toast( e.toString() )
+        Toast( 'Failed to connect to the node' )
       } )
 
   };
