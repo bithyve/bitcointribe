@@ -561,9 +561,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               editable={isEditable}
               secureTextEntry = {hideShowPswd ? true : false}
               autoCapitalize="none"
-              onSubmitEditing={() =>
-                ( confirmPswdTextInput as any ).current.focus()
-              }
+              // onSubmitEditing={() =>
+              //   ( confirmPswdTextInput as any ).current.focus()
+              // }
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
@@ -637,10 +637,10 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               editable={isEditable}
               secureTextEntry = {hideShowConfirmPswd ? true : false}
               autoCapitalize="none"
-              onSubmitEditing={() => {
-                handlePswdSubmit();
-                ( hint as any ).current.focus()
-              }}
+              // onSubmitEditing={() => {
+              //   handlePswdSubmit();
+              //   ( hint as any ).current.focus()
+              // }}
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
@@ -947,9 +947,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   autoCorrect={false}
                   editable={isEditable}
                   autoCapitalize="none"
-                  onSubmitEditing={() =>
-                    ( confirmAnswerTextInput as any ).current.focus()
-                  }
+                  // onSubmitEditing={() =>
+                  //   ( confirmAnswerTextInput as any ).current.focus()
+                  // }
                   keyboardType={
                     Platform.OS == 'ios'
                       ? 'ascii-capable'
