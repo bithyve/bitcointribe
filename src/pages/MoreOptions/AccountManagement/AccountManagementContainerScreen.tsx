@@ -332,6 +332,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     delete debugAccount.txIdMap
     delete debugAccount.hasNewTxn
     delete debugAccount.transactionsNote
+    delete debugAccount.activeAddresses
 
     return (
       <View style={styles.lineItem}>
