@@ -143,35 +143,37 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onAddNewSelected={this.navigateToAddNewAccountScreen}
             onCardSelected={this.handleAccountCardSelection}
           />
-          <View style={{justifyContent:'center',flexDirection:'row'}}>
-          <HomeBuyCard
-            cardContainer={{
-              backgroundColor: 'white',
-              // marginLeft: wp( 4 ),
-              marginRight: wp( 2),
-              height: hp(Platform.OS == 'ios' ? '13%' : '15%' ),
-              width:wp('91%'),
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: hp( 3 ),
-              marginBottom: hp(Platform.OS == 'ios' ? 4 : 2 ),
-              borderRadius: wp( 2 ),
-              padding: hp( '1.4%' ),
-              flexDirection: 'row',
+          <View style={{
+            justifyContent:'center', flexDirection:'row'
+          }}>
+            <HomeBuyCard
+              cardContainer={{
+                backgroundColor: 'white',
+                // marginLeft: wp( 4 ),
+                marginRight: wp( 2 ),
+                height: hp( Platform.OS == 'ios' ? '13%' : '15%' ),
+                width:wp( '91%' ),
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: hp( 3 ),
+                marginBottom: hp( Platform.OS == 'ios' ? 4 : 2 ),
+                borderRadius: wp( 2 ),
+                padding: hp( '1.4%' ),
+                flexDirection: 'row',
               // shadowColor: Colors.shadowColor,
               // shadowOpacity: 1,
               // shadowOffset: {
               //   width: 10, height: 10
               // },
               // elevation: 6
-            }}
-            amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
-            incramount={''}
-            percentIncr={'5%'}
-            asset={'../../assets/images/HomePageIcons/graph.png'}
-            openBottomSheet={( type ) => this.props.openBottomSheet( type )}
-            currencyCode={currencyCode}
-          />
+              }}
+              amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
+              incramount={''}
+              percentIncr={'5%'}
+              asset={'../../assets/images/HomePageIcons/graph.png'}
+              openBottomSheet={( type ) => this.props.openBottomSheet( type )}
+              currencyCode={currencyCode}
+            />
           </View>
         </View>
       </View>
