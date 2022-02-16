@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
-import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { Account, AccountType, MultiSigAccount } from '../../../bitcoin/utilities/Interface'
 import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import ButtonBlue from '../../../components/ButtonBlue'
@@ -32,6 +32,7 @@ import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import { translations } from '../../../common/content/LocContext'
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 
 export type Props = {
   navigation: any;
@@ -42,6 +43,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const strings = translations[ 'accManagement' ]
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
   const accountShells = useSelector( ( state ) => state.accounts.accountShells )
+  const accounts = useSelector( ( state ) => state.accounts.accounts )
+
   // const [ tempValue, setTempValue ] = useState( false )
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const [ orderedAccountShells, setOrderedAccountShells ] = useState( accountShells )
@@ -53,7 +56,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
   const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
-  const [ modalVisible, setModalVisible ] = useState( false )
+  const [ debugModalVisible, setDebugModalVisible ] = useState( false )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
   } )
@@ -130,7 +133,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       }, 1000 )
     }
     if( numberOfTabs >= 3 ){
-      setModalVisible( true )
+      setDebugModalVisible( true )
     }
   }, [ numberOfTabs ] )
   const {
@@ -304,45 +307,68 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     )
   }
   const closeBottomSheet = () => {
-    setModalVisible( false )
+    setDebugModalVisible( false )
   }
-  const KeyValueData = () => {
+
+  const getAccountDebugData = ( shell: AccountShell ) => {
+    const primarySubAcc = shell.primarySubAccount
+    const account: Account = accounts[ primarySubAcc.id ]
+
+    const debugPrimarySub: SubAccountDescribing = {
+      ...primarySubAcc,
+    }
+    // drop unnecessary properties
+    delete debugPrimarySub.transactions
+    delete debugPrimarySub.utxoCompatibilityGroup
+    delete debugPrimarySub.hasNewTxn
+
+    const debugAccount: Account = {
+      ...account,
+    }
+    // drop unnecessary and private properties
+    delete debugAccount.transactions
+    delete debugAccount.xpriv
+    delete ( debugAccount as MultiSigAccount ).xprivs
+    delete debugAccount.txIdMap
+    delete debugAccount.hasNewTxn
+    delete debugAccount.transactionsNote
+
     return (
       <View style={styles.lineItem}>
         <Text style={ListStyles.listItemTitleTransaction}>
-              Title
+          Account Shell
         </Text>
-        <Text
-          style={{
-            ...ListStyles.listItemSubtitle,
-            marginBottom: 3,
-          }}
-        >
-              data
+        <Text style={{
+          fontSize: 10
+        }}>{debugPrimarySub.id}</Text>
+        <Text  style={{
+          ...ListStyles.listItemSubtitle,
+          marginBottom: 3,
+        }}>{JSON.stringify( debugPrimarySub, null, 8 )}</Text>
+        <Text style={ListStyles.listItemTitleTransaction}>
+          Account
         </Text>
+        <Text style={{
+          fontSize: 10
+        }}>{debugAccount.id}</Text>
+        <Text  style={{
+          ...ListStyles.listItemSubtitle,
+          marginBottom: 3,
+        }}>{JSON.stringify( debugAccount, null, 8 )}</Text>
       </View>
     )
   }
-  const RenderModal = () => {
+
+  const RenderDebugModal = () => {
     return (
       <View style={styles.modalContainer}>
         <View style={styles.crossIconContainer}>
           <FontAwesome name="close" color={Colors.blue} size={24} onPress = {closeBottomSheet}/>
         </View>
         <ScrollView>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
-          <KeyValueData/>
+          {accountShells.map( ( shell: AccountShell ) => {
+            return getAccountDebugData( shell )
+          } )}
         </ScrollView>
       </View>
     )
@@ -473,9 +499,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             />
           )}
         </View>
-        <ModalContainer onBackground={closeBottomSheet} visible={modalVisible} closeBottomSheet = {closeBottomSheet}>
+        <ModalContainer onBackground={closeBottomSheet} visible={debugModalVisible} closeBottomSheet = {closeBottomSheet}>
           <View style={styles.modalContainer}>
-            <RenderModal/>
+            <RenderDebugModal/>
           </View>
         </ModalContainer>
       </SafeAreaView>
