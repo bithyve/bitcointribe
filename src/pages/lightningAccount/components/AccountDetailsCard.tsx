@@ -164,10 +164,10 @@ const AccountDetailsCard : React.FC<Props> = inject(
             numberOfLines={2}
             ellipsizeMode={'tail'}
           >
-            Sit exercitation non exercitation in laboris.
+            {''}
           </Text>
         </View>
-        <KnowMoreButton />
+        {/* <KnowMoreButton /> */}
       </View>
     )
   }
