@@ -4,22 +4,20 @@ import QRCode from '../../../components/QRCode'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CopyThisText from '../../../components/CopyThisText'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import useXPubForSubAccount from '../../../utils/hooks/state-selectors/accounts/UseXPubForSubAccount'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import { Account, AccountType, MultiSigAccount, NetworkType } from '../../../bitcoin/utilities/Interface'
+import { Account,  AccountType,  MultiSigAccount, NetworkType, Wallet } from '../../../bitcoin/utilities/Interface'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../../components/home/ModalContainerScroll'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../../common/Colors'
-import ListStyles from '../../../common/Styles/ListStyles'
+import { checkBalanceByXpubs } from '../../../store/utils/debugUtilities'
 import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
 import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperations'
-import { checkBalanceByXpubs, generateDummyAccountFromXpubs } from '../../../store/utils/debugUtilities'
+import _ from 'lodash'
+import { RootStateOrAny, useSelector } from 'react-redux'
+import { ActivityIndicator } from 'react-native-paper'
 
 enum XpubTypes {
   PRIMARY = 'PRIMARY',
@@ -34,10 +32,28 @@ export type Props = {
 const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const accountShell = useAccountShellFromNavigation( navigation )
   const account: Account | MultiSigAccount = useAccountByAccountShell( accountShell )
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ xpubs, setXpubs ] = useState( [] )
+  const [ debugAccount, setDebugAccount ] = useState( null )
+  const [ debugAccountBalance, setDebugAccountBalance ] = useState( 0 )
+  const [ debugXpubs, setDebugXpubs ] = useState( [] )
+
   const [ noOfTaps, setNoOfTaps ] = useState( 0 )
   const [ debugModal, setDebugModal ] = useState( false )
-  const [ debugXpubsBalance, setDebugXpubsBalance ] = useState( 0 )
+  const [ debugSpinner, setDebugSpinner ] = useState( false )
+
+  useEffect( () => {
+    const debugAccount: Account = _.cloneDeep( account )
+    debugAccount.activeAddresses = {
+      external: {
+      },
+      internal: {
+      }
+    }
+    debugAccount.importedAddresses = {
+    }
+    setDebugAccount( debugAccount )
+  }, [ account ] )
 
   useEffect( () => {
     const availableXpubs = []
@@ -60,17 +76,83 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
     }
 
     setXpubs( availableXpubs )
+    setDebugXpubs( availableXpubs )
   }, [ account ] )
 
-  useEffect( () => {
-    const xpubsArray = xpubs.map( xpubInfo => xpubInfo.xpub )
-    if( xpubsArray.length ){
-      checkBalanceByXpubs( xpubsArray ).then( balance => {
-        setDebugXpubsBalance( balance )
-      } )
-    }
-  }, [ xpubs ] )
+  const nextDebugPrimaryXpub = () => {
+    const nextInstanceNumber = ( debugAccount as Account ).instanceNum + 1
+    const debug = true
+    const derivationPathNetwork = debugAccount.type === AccountType.TEST_ACCOUNT? NetworkType.TESTNET: NetworkType.MAINNET
+    const derivationPath = AccountUtilities.getDerivationPath( derivationPathNetwork, ( debugAccount as Account ).type,  nextInstanceNumber, debug )
+    const network = AccountUtilities.getNetworkByType( debugAccount.networkType )
+    const { xpub } = AccountUtilities.generateExtendedKeyPairFromSeed( wallet.primarySeed, network, derivationPath )
+    debugAccount.xpub = xpub
+    debugAccount.derivationPath = derivationPath
+    debugAccount.instanceNum = nextInstanceNumber
+    setDebugAccount( {
+      ...debugAccount
+    } )
 
+    debugXpubs.forEach( xpubInfo => {
+      if( xpubInfo.type === XpubTypes.PRIMARY ) xpubInfo.xpub = xpub
+    } )
+    setDebugXpubs( [
+      ...debugXpubs
+    ]
+    )
+  }
+
+  const initiateDebugBalanceCheck = async () => {
+    if( !debugAccount ) return
+
+    setDebugSpinner( true )
+    const debugAccountsToSync = {
+      [ debugAccount.id ]: debugAccount
+    }
+    const network =  AccountUtilities.getNetworkByType( debugAccount.networkType )
+    const hardRefresh = true
+    const { synchedAccounts } = await AccountOperations.syncAccounts( debugAccountsToSync, network, hardRefresh )
+    const synchedAccount = synchedAccounts[ account.id ]
+    setDebugAccountBalance( synchedAccount.balances.confirmed + synchedAccount.balances.unconfirmed )
+    setDebugSpinner( false )
+  }
+
+  const ShowDebugXpubData = ( ) => {
+    return (
+      <View style={styles.lineItem}>
+        <View style={{
+          marginTop: hp( 3 ),
+          marginBottom: hp( 3 )
+        }}>
+          <Text style={HeadingStyles.sectionSubHeadingText}>
+          Xpub Detail
+          </Text>
+        </View>
+
+        {debugXpubs.map( xpubInfo => {
+          return (
+            <View key={xpubInfo.xpub}>
+              <Text style={HeadingStyles.sectionSubHeadingText}>
+                {xpubInfo.type.toLowerCase()}
+              </Text>
+              {xpubInfo.type === XpubTypes.PRIMARY?
+                <TouchableOpacity onPress={nextDebugPrimaryXpub}>
+                  <Text>Next</Text>
+                </TouchableOpacity>
+                : null}
+              <CopyThisText text={xpubInfo.xpub} />
+            </View>
+          )
+        } )}
+        <Text>{ debugSpinner? <ActivityIndicator/>:  debugAccountBalance}</Text>
+        <TouchableOpacity style={{
+          marginVertical: hp( 3 )
+        }} onPress={initiateDebugBalanceCheck}>
+          <Text>Check balance</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   useEffect( () => {
     if( noOfTaps!=0 ){
@@ -87,33 +169,8 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
     setDebugModal( false )
   }
 
-  const ShowDebugXpubData = useCallback( ( ) => {
-    return (
-      <View style={styles.lineItem}>
-        <View style={{
-          marginTop: hp( 3 ),
-          marginBottom: hp( 3 )
-        }}>
-          <Text style={HeadingStyles.sectionSubHeadingText}>
-          Xpub Detail
-          </Text>
-        </View>
+  const RenderDebugModal = () => {
 
-        {xpubs.map( xpubInfo => {
-          return (
-            <View key={xpubInfo.xpub}>
-              <Text style={HeadingStyles.sectionSubHeadingText}>
-                {xpubInfo.type.toLowerCase()}
-              </Text>
-              <CopyThisText text={xpubInfo.xpub} />
-            </View>
-          )
-        } )}
-      </View>
-    )
-  }, [ xpubs ] )
-
-  const RenderDebuModal = () => {
     return (
       <View style={styles.modalContainer}>
         <View style={styles.crossIconContainer}>
@@ -181,7 +238,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
       </TouchableOpacity>
       <ModalContainer onBackground={closeBottomSheet} visible={debugModal} closeBottomSheet = {closeBottomSheet}>
         <View style={styles.modalContainer}>
-          <RenderDebuModal/>
+          <RenderDebugModal/>
         </View>
       </ModalContainer>
     </>
