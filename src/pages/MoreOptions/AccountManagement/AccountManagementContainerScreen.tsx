@@ -52,6 +52,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ selectedAccount, setSelectedAccount ] = useState( null )
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
+  const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
+  const [ modalVisible, setModalVisible ] = useState( false )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
   } )
@@ -121,7 +123,16 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
     }
   }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
-
+  useEffect( () => {
+    if( numberOfTabs!=0 ){
+      setTimeout( () => {
+        setNumberOfTabs( 0 )
+      }, 1000 )
+    }
+    if( numberOfTabs >= 3 ){
+      setModalVisible( true )
+    }
+  }, [ numberOfTabs ] )
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -225,6 +236,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return (
       <ListItem
         activeOpacity={1}
+        onPress={()=>setNumberOfTabs( prev => prev+1 )}
         containerStyle={{
           marginLeft: wp( '4%' ),
           marginRight: wp( '4%' ),
@@ -291,131 +303,183 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       </ListItem>
     )
   }
+  const closeBottomSheet = () => {
+    setModalVisible( false )
+  }
+  const KeyValueData = () => {
+    return (
+      <View style={styles.lineItem}>
+        <Text style={ListStyles.listItemTitleTransaction}>
+              Title
+        </Text>
+        <Text
+          style={{
+            ...ListStyles.listItemSubtitle,
+            marginBottom: 3,
+          }}
+        >
+              data
+        </Text>
+      </View>
+    )
+  }
+  const RenderModal = () => {
+    return (
+      <View style={styles.modalContainer}>
+        <View style={styles.crossIconContainer}>
+          <FontAwesome name="close" color={Colors.blue} size={24} onPress = {closeBottomSheet}/>
+        </View>
+        <ScrollView>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+          <KeyValueData/>
+        </ScrollView>
+      </View>
+    )
+  }
 
   return (
-    <SafeAreaView style={styles.rootContainer}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
-        {showUnHideArchiveAccountBottomSheet()}
-      </ModalContainer>
-      <ModalContainer onBackground={()=>showSuccessModel( false )} visible={successModel} closeBottomSheet={() => {}} >
-        {showSuccessAccountBottomSheet()}
-      </ModalContainer>
-      <ScrollView>
-        <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
-        } ]}>
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              navigation.pop()
-            }}
-          >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          backgroundColor: Colors.backgroundColor,
-          marginRight: wp( '3%' ),
-          alignItems: 'flex-start'
-        }}>
-          <HeaderTitle
-            firstLineTitle={strings[ 'AccountManagement' ]}
-            secondLineTitle={strings.Rearrange}
-            infoTextNormal={''}
-            infoTextBold={''}
-            infoTextNormal1={''}
-            step={''}
-          />
-          <NavHeaderSettingsButton
-            onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
-            accManagement={true}
-          />
-        </View>
-
-        {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
-          accountShells={orderedAccountShells}
-          onDragEnded={handleDragEnd}
-        />}
-
-        {getnewOrderedAccountShell && <View>
+    <TouchableOpacity style={styles.rootContainer} activeOpacity={1} onPress={()=>setNumberOfTabs( prev => prev+1 )}>
+      <SafeAreaView>
+        <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+        <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
+          {showUnHideArchiveAccountBottomSheet()}
+        </ModalContainer>
+        <ModalContainer onBackground={()=>showSuccessModel( false )} visible={successModel} closeBottomSheet={() => {}} >
+          {showSuccessAccountBottomSheet()}
+        </ModalContainer>
+        <ScrollView>
+          <View style={[ CommonStyles.headerContainer, {
+            backgroundColor: Colors.backgroundColor
+          } ]}>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.pop()
+              }}
+            >
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
           <View style={{
-            marginBottom: 15, backgroundColor: Colors.backgroundColor
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            backgroundColor: Colors.backgroundColor,
+            marginRight: wp( '3%' ),
+            alignItems: 'flex-start'
+          }}>
+            <HeaderTitle
+              firstLineTitle={strings[ 'AccountManagement' ]}
+              secondLineTitle={strings.Rearrange}
+              infoTextNormal={''}
+              infoTextBold={''}
+              infoTextNormal1={''}
+              step={''}
+            />
+            <NavHeaderSettingsButton
+              onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+              accManagement={true}
+            />
+          </View>
+
+          {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
+            accountShells={orderedAccountShells}
+            onDragEnded={handleDragEnd}
+            setNumberOfTabs = {setNumberOfTabs}
+          />}
+
+          {getnewOrderedAccountShell && <View>
+            <View style={{
+              marginBottom: 15, backgroundColor: Colors.backgroundColor
+            }}>
+              <View style={{
+                height: 'auto'
+              }}>
+                {orderedAccountShells.map( ( accountShell: AccountShell ) => {
+                  return renderItem( accountShell )
+                } )
+                }
+              </View>
+            </View>
+          </View>}
+
+          {getHiddenAccountShell && hiddenAccountShells.length > 0 ? <View style={{
+            marginTop: wp( '2%' ), backgroundColor: Colors.backgroundColor
           }}>
             <View style={{
-              height: 'auto'
+              width: '100%',
+              backgroundColor: Colors.white
             }}>
-              {orderedAccountShells.map( ( accountShell: AccountShell ) => {
-                return renderItem( accountShell )
-              } )
-              }
+              <Text style={styles.pageInfoText}>
+                {strings.HiddenAccounts}
+              </Text>
             </View>
-          </View>
-        </View>}
+            <View style={{
+              marginBottom: 15
+            }}>
+              <View style={{
+                height: 'auto'
+              }}>
+                {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
+                  return renderItem( accountShell )
+                } )
+                }
+              </View>
+            </View>
+          </View> : null}
 
-        {getHiddenAccountShell && hiddenAccountShells.length > 0 ? <View style={{
-          marginTop: wp( '2%' ), backgroundColor: Colors.backgroundColor
-        }}>
-          <View style={{
-            width: '100%',
-            backgroundColor: Colors.white
+          {getArchivedAccountShells && archivedAccountShells.length > 0 ? <View style={{
+            marginTop: wp( '2%' ),
           }}>
             <Text style={styles.pageInfoText}>
-              {strings.HiddenAccounts}
+              {strings.ArchivedAccounts}
             </Text>
-          </View>
-          <View style={{
-            marginBottom: 15
-          }}>
             <View style={{
-              height: 'auto'
+              marginBottom: 15
             }}>
-              {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
-                return renderItem( accountShell )
-              } )
-              }
+              <View style={{
+                height: 'auto'
+              }}>
+                {archivedAccountShells.map( ( accountShell: AccountShell ) => {
+                  return renderItem( accountShell )
+                } )
+                }
+              </View>
             </View>
-          </View>
-        </View> : null}
+          </View> : null}
+        </ScrollView>
 
-        {getArchivedAccountShells && archivedAccountShells.length > 0 ? <View style={{
-          marginTop: wp( '2%' ),
-        }}>
-          <Text style={styles.pageInfoText}>
-            {strings.ArchivedAccounts}
-          </Text>
-          <View style={{
-            marginBottom: 15
-          }}>
-            <View style={{
-              height: 'auto'
-            }}>
-              {archivedAccountShells.map( ( accountShell: AccountShell ) => {
-                return renderItem( accountShell )
-              } )
-              }
-            </View>
+        <View style={styles.proceedButtonContainer}>
+          {canSaveOrder && (
+            <ButtonBlue
+              buttonText={strings.Save}
+              handleButtonPress={handleProceedButtonPress}
+            />
+          )}
+        </View>
+        <ModalContainer onBackground={closeBottomSheet} visible={modalVisible} closeBottomSheet = {closeBottomSheet}>
+          <View style={styles.modalContainer}>
+            <RenderModal/>
           </View>
-        </View> : null}
-      </ScrollView>
-
-      <View style={styles.proceedButtonContainer}>
-        {canSaveOrder && (
-          <ButtonBlue
-            buttonText={strings.Save}
-            handleButtonPress={handleProceedButtonPress}
-          />
-        )}
-      </View>
-    </SafeAreaView>
+        </ModalContainer>
+      </SafeAreaView>
+    </TouchableOpacity>
   )
 }
 
@@ -443,6 +507,46 @@ const styles = StyleSheet.create( {
     paddingVertical: hp( 0.5 ),
     letterSpacing: 0.55
   },
+  textHeader: {
+    fontSize: 24,
+    color: Colors.blue,
+    marginHorizontal: 20,
+    marginVertical: 20,
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  bodySection: {
+    marginTop: 24,
+    paddingHorizontal: 10,
+  },
+  lineItem: {
+    marginVertical: hp( 0.9 ),
+    backgroundColor:Colors.white,
+    padding: 10,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 1,
+      height: 3,
+    },
+    shadowOpacity: 0.10,
+    shadowRadius: 1.84,
+    elevation: 2,
+  },
+  containerRec: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  crossIconContainer:{
+    justifyContent:'flex-end',
+    flexDirection:'row',
+    marginBottom:hp( 2 ),
+  },
+  modalContainer:{
+    backgroundColor:Colors.backgroundColor,
+    padding:5,
+    height:hp( '85%' )
+  }
 } )
 
 
