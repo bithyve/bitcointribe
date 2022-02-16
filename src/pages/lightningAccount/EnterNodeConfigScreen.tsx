@@ -644,7 +644,7 @@ render() {
         <View style={{
           flex: 1
         }}/>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={0.6}
           onPress={() => {}}
           style={{
@@ -652,7 +652,7 @@ render() {
           }}
         >
           <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <KeyboardAwareScrollView
         contentContainerStyle={{
