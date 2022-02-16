@@ -12,7 +12,6 @@ import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accou
 import ModalContainer from '../../../components/home/ModalContainerScroll'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../../common/Colors'
-import { checkBalanceByXpubs } from '../../../store/utils/debugUtilities'
 import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
 import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperations'
 import _ from 'lodash'
