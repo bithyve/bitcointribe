@@ -24,7 +24,7 @@ import BottomSheet, { BottomSheetView, useBottomSheetModal } from '@gorhom/botto
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
-import ModalContainer from '../../../components/home/ModalContainer'
+import ModalContainer from '../../../components/home/ModalContainerScroll'
 import { resetStackToAccountDetails, resetToHomeAction } from '../../../navigation/actions/NavigationActions'
 import { NavigationActions, StackActions } from 'react-navigation'
 import { color } from 'react-native-reanimated'
