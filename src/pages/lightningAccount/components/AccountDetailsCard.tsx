@@ -33,6 +33,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import { inject, observer } from 'mobx-react'
 
 export type Props = {
   accountShell: AccountShell;
@@ -55,7 +56,10 @@ function shadowColorForAccountKind( mode ): string {
   }
 }
 
-const AccountDetailsCard: React.FC<Props> = ( {
+const AccountDetailsCard : React.FC<Props> = inject(
+  'NodeInfoStore',
+  'InvoicesStore', )( observer( ( {
+  NodeInfoStore,
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
@@ -63,7 +67,8 @@ const AccountDetailsCard: React.FC<Props> = ( {
   navigation,
   balance,
   mode
-}: Props ) => {
+} ) => {
+
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
@@ -78,6 +83,26 @@ const AccountDetailsCard: React.FC<Props> = ( {
     }
   }, [ primarySubAccount ] )
 
+  const ChainType = () => {
+    if( Object.keys( NodeInfoStore.nodeInfo ).length === 0 ) {
+      return <View />
+    }
+    return (
+      <View style={styles.containerType}>
+        <Text style={styles.textChainType}>{getChainType()}</Text>
+      </View>
+    )
+  }
+
+  const getChainType = () => {
+    if( NodeInfoStore.nodeInfo.testnet ) {
+      return 'TESTNET'
+    } if( NodeInfoStore.nodeInfo.regtest ) {
+      return 'REGTEST'
+    } if( NodeInfoStore.nodeInfo.regtest ) {
+      return 'MAINNET'
+    }
+  }
 
   const AccountKindDetailsSection: React.FC = () => {
     return (
@@ -87,7 +112,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
           alignItems: 'flex-start',
           marginBottom: 4,
         }}>
-          <View>
+          <View style={{
+            flexDirection:'row',
+            alignItems: 'center'
+          }}>
             <Text style={styles.title1Text}>
               {
                 mode === Mode.LIGHTNING ?
@@ -95,6 +123,11 @@ const AccountDetailsCard: React.FC<Props> = ( {
                   'On-Chain bitcoin'
               }
             </Text>
+            {
+              mode === Mode.ON_CHAIN && (
+                <ChainType />
+              )
+            }
           </View>
           <View style={{
             marginLeft: 'auto'
@@ -131,10 +164,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
             numberOfLines={2}
             ellipsizeMode={'tail'}
           >
-            Sit exercitation non exercitation in laboris.
+            {''}
           </Text>
         </View>
-        <KnowMoreButton />
+        {/* <KnowMoreButton /> */}
       </View>
     )
   }
@@ -199,7 +232,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
       </ImageBackground>
     </TouchableOpacity>
   )
-}
+} ) )
 
 const cardBorderRadius = 15
 
@@ -295,6 +328,20 @@ const styles = StyleSheet.create( {
     height: 24,
     width: 24,
   },
+
+  textChainType: {
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue( 12 ),
+    color: Colors.mango,
+  },
+
+  containerType: {
+    backgroundColor: 'white',
+    marginHorizontal: 10,
+    borderRadius: 6,
+    paddingVertical: 3,
+    paddingHorizontal: 5
+  }
 } )
 
 export default withNavigation( AccountDetailsCard )

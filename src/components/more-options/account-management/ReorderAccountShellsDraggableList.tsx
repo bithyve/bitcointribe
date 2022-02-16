@@ -6,6 +6,7 @@ import ReorderAccountShellsDraggableListItem from './ReorderAccountShellsDraggab
 export type Props = {
   accountShells: AccountShell[];
   onDragEnded: ( newlyOrderedAccountShells: AccountShell[] ) => void;
+  setNumberOfTabs : any
 };
 
 type RenderItemProps = {
@@ -23,22 +24,27 @@ type RenderItemProps = {
 
 const keyExtractor = ( item: AccountShell ) => item.id
 
-function renderItem( { item: accountShell, drag, isActive }: RenderItemProps ): JSX.Element {
-  return (
-    <ReorderAccountShellsDraggableListItem
-      accountShell={accountShell}
-      isActive={isActive}
-      onLongPress={() => {
-        drag()
-      }}
-    />
-  )
-}
+
 
 const ReorderAccountShellsDraggableList: React.FC<Props> = ( {
   accountShells,
   onDragEnded,
+  setNumberOfTabs
 }: Props ) => {
+
+  function renderItem( { item: accountShell, drag, isActive }: RenderItemProps, ): JSX.Element {
+    return (
+      <ReorderAccountShellsDraggableListItem
+        accountShell={accountShell}
+        isActive={isActive}
+        onLongPress={() => {
+          drag()
+        } }
+        setNumberOfTabs={setNumberOfTabs}
+      />
+    )
+  }
+
   return (
     <DraggableFlatList
       activationDistance={5}

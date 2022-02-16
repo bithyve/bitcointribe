@@ -142,7 +142,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         <ButtonBlue
           buttonText={common.proceed}
           handleButtonPress={handleProceedButtonPress}
-          buttonDisable={canProceed === false}
+          buttonDisable={selectedChoice === null}
         />
       </View>
     )

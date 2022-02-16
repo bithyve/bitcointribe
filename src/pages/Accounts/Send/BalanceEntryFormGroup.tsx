@@ -26,13 +26,14 @@ import idx from 'idx'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { translations } from '../../../common/content/LocContext'
 
-const placeholder = Platform.OS =='ios' ? 12 : 9;
+const placeholder = Platform.OS =='ios' ? 12 : 9
 export type Props = {
   currentRecipient: RecipientDescribing,
   subAccountKind: SubAccountKind;
   spendableBalance: Satoshis;
   onAmountChanged: ( amount: Satoshis ) => void;
   onSendMaxPressed: ( ) => void;
+  showSendMax: boolean
 };
 
 
@@ -42,6 +43,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   spendableBalance,
   onAmountChanged,
   onSendMaxPressed,
+  showSendMax= true,
 }: Props ) => {
   const exchangeRates = useExchangeRates()
   const currencyCode = useCurrencyCode()
@@ -194,6 +196,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
           />
 
           {
+            showSendMax &&
             ( currencyKindForEntry == CurrencyKind.FIAT ) &&
             ( isSendingMax == false ) &&
             (
@@ -256,7 +259,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                   : `${strings.ConvertedIn} sats`
             }
             placeholderTextColor={FormStyles.placeholderText.color}
-            value={String(currentSatsAmountTextValue)}
+            value={String( currentSatsAmountTextValue )}
             returnKeyLabel="Done"
             returnKeyType="done"
             keyboardType={'numeric'}
@@ -283,7 +286,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             autoCompleteType="off"
           />
 
-          {
+          {showSendMax &&
             ( currencyKindForEntry == CurrencyKind.BITCOIN ) &&
             ( isSendingMax == false ) &&
             (

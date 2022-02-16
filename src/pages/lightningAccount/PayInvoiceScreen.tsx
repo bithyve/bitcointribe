@@ -197,6 +197,8 @@ export default class PayInvoiceScreen extends React.Component<
               isCancel={false}
               onPressOk={() => {
                 this.props.navigation.goBack()
+                this.props.InvoicesStore.getInvoices()
+                this.props.BalanceStore.getLightningBalance()
               }}
               onPressCancel={() => this.setState( {
                 showTransactionStatusModal: false
@@ -391,7 +393,9 @@ export default class PayInvoiceScreen extends React.Component<
               <View style={styles.button}>
 
                 <TouchableOpacity
-                  style={styles.buttonView}
+                  style={[ styles.buttonView, {
+                    opacity: loadingTx ? 0.5: 1
+                  } ]}
                   activeOpacity={0.6}
                   disabled={loadingTx}
                   onPress={() => {

@@ -507,6 +507,37 @@ export default function AddContactAddressBook( props ) {
                 contentInset={{
                   right: 0, top: 0, left: 0, bottom: hp( 24 )
                 }}
+                ListEmptyComponent={()=>
+                  <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: wp( '8%' ),
+                  }}>
+                    <Text
+                      style={{
+                        fontFamily: Fonts.FiraSansRegular,
+                        color: Colors.secondaryText,
+                        textAlign: 'center'
+                      }}
+                    >{strings.cannotSelect}</Text>
+                    {/* <AppBottomSheetTouchableWrapper
+                      onPress={() => getContactPermission()}
+                      style={{
+                        // height: wp( '8%' ),
+                        marginTop: hp( 1.8 ),
+                        paddingLeft: wp( '8%' ),
+                      }}
+                    >
+                      <Text
+                        style={{
+                          ...styles.proceedButtonText,
+                        }}
+                      >
+                        Grant Permission
+                      </Text>
+                    </AppBottomSheetTouchableWrapper> */}
+                  </View>
+                }
                 renderItem={( { item, index } ) => {
                   let selected = false
                   if (
@@ -603,7 +634,7 @@ export default function AddContactAddressBook( props ) {
             }
           </View>
           {/* )} */}
-          <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
+          {/* <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
               title={strings.erroraAccessing}
               info={errorMessage}
@@ -620,7 +651,7 @@ export default function AddContactAddressBook( props ) {
               isBottomImage={true}
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
-          </ModalContainer>
+          </ModalContainer> */}
           <ModalContainer onBackground={()=>setModal( false )} visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
@@ -628,7 +659,7 @@ export default function AddContactAddressBook( props ) {
               info={strings.info}
               otherText={strings.otherText}
               proceedButtonText={common.continue}
-              isIgnoreButton={true}
+              isIgnoreButton={false}
               onPressProceed={() => {
                 getContactPermission()
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )

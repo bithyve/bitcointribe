@@ -1,17 +1,28 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import QRCode from '../../../components/QRCode'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CopyThisText from '../../../components/CopyThisText'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import useXPubForSubAccount from '../../../utils/hooks/state-selectors/accounts/UseXPubForSubAccount'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
+import { Account,  AccountType,  MultiSigAccount, NetworkType, Wallet } from '../../../bitcoin/utilities/Interface'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import ModalContainer from '../../../components/home/ModalContainerScroll'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../../common/Colors'
+import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
+import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperations'
+import _ from 'lodash'
+import { RootStateOrAny, useSelector } from 'react-redux'
+import { ActivityIndicator } from 'react-native-paper'
 
+enum XpubTypes {
+  PRIMARY = 'PRIMARY',
+  SECONDARY = 'SECONDARY',
+  BITHYVE = 'BITHYVE'
+}
 
 export type Props = {
   navigation: any;
@@ -19,39 +30,217 @@ export type Props = {
 
 const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const accountShell = useAccountShellFromNavigation( navigation )
-  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const account: Account | MultiSigAccount = useAccountByAccountShell( accountShell )
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+  const [ xpubs, setXpubs ] = useState( [] )
+  const [ debugAccount, setDebugAccount ] = useState( null )
+  const [ debugAccountBalance, setDebugAccountBalance ] = useState( 0 )
+  const [ debugXpubs, setDebugXpubs ] = useState( [] )
 
-  const xPub = useXPubForSubAccount( primarySubAccount ) || 'No xPub Found'
+  const [ noOfTaps, setNoOfTaps ] = useState( 0 )
+  const [ debugModal, setDebugModal ] = useState( false )
+  const [ debugSpinner, setDebugSpinner ] = useState( false )
 
-  return (
-    <View style={styles.rootContainer}>
-      <View style={styles.headerSectionContainer}>
-        <Text style={HeadingStyles.sectionSubHeadingText}>
-          xPub details for this account
-        </Text>
-      </View>
+  useEffect( () => {
+    const debugAccount: Account = _.cloneDeep( account )
+    debugAccount.activeAddresses = {
+      external: {
+      },
+      internal: {
+      }
+    }
+    debugAccount.importedAddresses = {
+    }
+    setDebugAccount( debugAccount )
+  }, [ account ] )
 
-      <View>
-        <View style={styles.qrCodeContainer}>
-          <QRCode title="xPub" value={xPub} size={heightPercentageToDP( 33 )} />
+  useEffect( () => {
+    const availableXpubs = []
+    const primaryXpub = account.xpub
+    availableXpubs.push( {
+      xpub: primaryXpub,
+      type: XpubTypes.PRIMARY
+    } )
+
+    if( ( account as MultiSigAccount ).is2FA ){
+      const  { secondary, bithyve } = ( account as MultiSigAccount ).xpubs
+      availableXpubs.push( {
+        xpub: secondary,
+        type: XpubTypes.SECONDARY
+      } )
+      availableXpubs.push( {
+        xpub: bithyve,
+        type: XpubTypes.BITHYVE
+      } )
+    }
+
+    setXpubs( availableXpubs )
+    setDebugXpubs( availableXpubs )
+  }, [ account ] )
+
+  const nextDebugPrimaryXpub = () => {
+    const nextInstanceNumber = ( debugAccount as Account ).instanceNum + 1
+    const debug = true
+    const derivationPathNetwork = debugAccount.type === AccountType.TEST_ACCOUNT? NetworkType.TESTNET: NetworkType.MAINNET
+    const derivationPath = AccountUtilities.getDerivationPath( derivationPathNetwork, ( debugAccount as Account ).type,  nextInstanceNumber, debug )
+    const network = AccountUtilities.getNetworkByType( debugAccount.networkType )
+    const { xpub } = AccountUtilities.generateExtendedKeyPairFromSeed( wallet.primarySeed, network, derivationPath )
+    debugAccount.xpub = xpub
+    debugAccount.derivationPath = derivationPath
+    debugAccount.instanceNum = nextInstanceNumber
+    setDebugAccount( {
+      ...debugAccount
+    } )
+
+    debugXpubs.forEach( xpubInfo => {
+      if( xpubInfo.type === XpubTypes.PRIMARY ) xpubInfo.xpub = xpub
+    } )
+    setDebugXpubs( [
+      ...debugXpubs
+    ]
+    )
+  }
+
+  const initiateDebugBalanceCheck = async () => {
+    if( !debugAccount ) return
+
+    setDebugSpinner( true )
+    const debugAccountsToSync = {
+      [ debugAccount.id ]: debugAccount
+    }
+    const network =  AccountUtilities.getNetworkByType( debugAccount.networkType )
+    const hardRefresh = true
+    const { synchedAccounts } = await AccountOperations.syncAccounts( debugAccountsToSync, network, hardRefresh )
+    const synchedAccount = synchedAccounts[ account.id ]
+    setDebugAccountBalance( synchedAccount.balances.confirmed + synchedAccount.balances.unconfirmed )
+    setDebugSpinner( false )
+  }
+
+  const ShowDebugXpubData = ( ) => {
+    return (
+      <View style={styles.lineItem}>
+        <View style={{
+          marginTop: hp( 3 ),
+          marginBottom: hp( 3 )
+        }}>
+          <Text style={HeadingStyles.sectionSubHeadingText}>
+          Xpub Detail
+          </Text>
         </View>
 
-        <CopyThisText text={xPub} />
+        {debugXpubs.map( xpubInfo => {
+          return (
+            <View key={xpubInfo.xpub}>
+              <Text style={HeadingStyles.sectionSubHeadingText}>
+                {xpubInfo.type.toLowerCase()}
+              </Text>
+              {xpubInfo.type === XpubTypes.PRIMARY?
+                <TouchableOpacity onPress={nextDebugPrimaryXpub}>
+                  <Text>Next</Text>
+                </TouchableOpacity>
+                : null}
+              <CopyThisText text={xpubInfo.xpub} />
+            </View>
+          )
+        } )}
+        <Text>{ debugSpinner? <ActivityIndicator/>:  debugAccountBalance}</Text>
+        <TouchableOpacity style={{
+          marginVertical: hp( 3 )
+        }} onPress={initiateDebugBalanceCheck}>
+          <Text>Check balance</Text>
+        </TouchableOpacity>
       </View>
+    )
+  }
 
-      <View
-        style={{
-          marginBottom: heightPercentageToDP( 5 )
-        }}
-      >
-        <BottomInfoBox
-          title={'Note'}
-          infoText={
-            'This xPub is for this particular account only and not for the whole wallet. Each account has its own xPub'
-          }
-        />
+  useEffect( () => {
+    if( noOfTaps!=0 ){
+      setTimeout( () => {
+        setNoOfTaps( 0 )
+      }, 1000 )
+    }
+    if( noOfTaps>=3 ){
+      setDebugModal( true )
+    }
+  }, [ noOfTaps ] )
+
+  const closeBottomSheet = () => {
+    setDebugModal( false )
+  }
+
+  const RenderDebugModal = () => {
+
+    return (
+      <View style={styles.modalContainer}>
+        <View style={styles.crossIconContainer}>
+          <FontAwesome name="close" color={Colors.blue} size={24} onPress = {closeBottomSheet}/>
+        </View>
+        <ScrollView>
+          <ShowDebugXpubData/>
+        </ScrollView>
       </View>
-    </View>
+    )
+  }
+
+  return (
+    <>
+      <TouchableOpacity activeOpacity={1} style={styles.rootContainer} onPress={()=>{setNoOfTaps( noOfTaps+1 )}}>
+        <View style={styles.headerSectionContainer}>
+          <Text style={HeadingStyles.sectionSubHeadingText}>
+          xPub details for this account
+          </Text>
+        </View>
+
+        <FlatList
+          data={xpubs}
+          renderItem={( { item } ) => {
+            let title
+            switch( item.type ){
+                case XpubTypes.PRIMARY:
+                  title = 'xPub'
+                  break
+
+                case XpubTypes.SECONDARY:
+                  title = 'secondary xPub'
+                  break
+
+                case XpubTypes.BITHYVE:
+                  title = 'bithyve xPub'
+                  break
+            }
+
+            return (
+              <View>
+                <View style={styles.qrCodeContainer}>
+                  <QRCode title={title} value={item.xpub} size={hp( 33 )} />
+                </View>
+
+                <CopyThisText text={item.xpub} />
+              </View>
+            )
+          }}
+          keyExtractor={ item => item}
+        />
+
+        <View
+          style={{
+            marginBottom: hp( 5 )
+          }}
+        >
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'This xPub is for this particular account only and not for the whole wallet. Each account has its own xPub'
+            }
+          />
+        </View>
+      </TouchableOpacity>
+      <ModalContainer onBackground={closeBottomSheet} visible={debugModal} closeBottomSheet = {closeBottomSheet}>
+        <View style={styles.modalContainer}>
+          <RenderDebugModal/>
+        </View>
+      </ModalContainer>
+    </>
   )
 }
 
@@ -68,8 +257,35 @@ const styles = StyleSheet.create( {
 
   qrCodeContainer: {
     alignItems: 'center',
-    paddingHorizontal: heightPercentageToDP( 10 ),
-  }
+    paddingHorizontal: hp( 10 ),
+  },
+  modalContainer:{
+    backgroundColor:Colors.backgroundColor,
+    padding:5,
+    height:hp( '85%' )
+  },
+  crossIconContainer:{
+    justifyContent:'flex-end',
+    flexDirection:'row',
+    marginBottom:hp( 2 ),
+  },
+
+  lineItem: {
+    marginVertical: hp( 0.9 ),
+    backgroundColor:Colors.white,
+    padding: 10,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 1,
+      height: 3,
+    },
+    shadowOpacity: 0.10,
+    shadowRadius: 1.84,
+
+    elevation: 2,
+  },
 } )
 
 

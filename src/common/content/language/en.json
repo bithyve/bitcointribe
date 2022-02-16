@@ -401,7 +401,7 @@
       "Weneither": "We neither store this data nor pass it to anyone else. This is for your convenience only",
       "Nocontacts": "No contacts found. Please add contacts to your Address Book and try again",
       "Ifyouwantto": "If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image",
-      "cannotSelect": "Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts"
+      "cannotSelect": "To see a list of address book contacts, you need to enable contact permission.\nGo to Settings> Hexa > Contacts to allow"
     },
     "accounts": {
       "availableToSpend": "Available to spend",

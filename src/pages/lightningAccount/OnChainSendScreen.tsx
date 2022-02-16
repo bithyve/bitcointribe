@@ -84,7 +84,7 @@ const SendScreen = inject(
 
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
-  const currentAmount = Number( BalanceStore.totalBlockchainBalance )
+  const currentAmount = Number( navigation.getParam( 'amount' ) )
   const [ fee, setFee ] = useState( '2' )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const formattedUnitText = useFormattedUnitText( {
@@ -121,7 +121,7 @@ const SendScreen = inject(
       request = {
         addr: recipientAddress,
         sat_per_byte: fee,
-        amount: `${selectedAmount}`,
+        amount: `${Math.floor( selectedAmount )}`,
         target_conf: targetConf,
         utxos
       }
@@ -129,11 +129,10 @@ const SendScreen = inject(
       request = {
         addr: recipientAddress,
         sat_per_byte: fee,
-        amount: `${selectedAmount}`,
+        amount: `${Math.floor( selectedAmount )}`,
         target_conf: targetConf
       }
     }
-    console.log( request )
     TransactionsStore.sendCoins( request )
   }
 
@@ -163,6 +162,8 @@ const SendScreen = inject(
           cancelButtonText={common.back}
           isCancel={false}
           onPressOk={() => {
+            TransactionsStore.getTransactions()
+            BalanceStore.getBlockchainBalance()
             navigation.goBack()
           }}
           onPressCancel={() => setShowModal( false )}
@@ -205,20 +206,21 @@ const SendScreen = inject(
         <BalanceEntryFormGroup
           currentRecipient={currentRecipient}
           subAccountKind={SubAccountKind.LIGHTNING_ACCOUNT}
-          spendableBalance={currentAmount}
+          spendableBalance={Number( BalanceStore.totalBlockchainBalance )}
           onAmountChanged={( amount: Satoshis ) => {
             setSelectedAmount( amount )
           }}
           onSendMaxPressed={()=> {}}
+          showSendMax={false}
         />
       </View>
 
       <View style={styles.footerSection}>
         <TouchableOpacity
-          disabled={!selectedAmount || TransactionsStore.loading}
+          disabled={selectedAmount === 0 || TransactionsStore.loading}
           onPress={handleConfirmationButtonPress}
           style={{
-            ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
+            ...ButtonStyles.primaryActionButton, opacity: selectedAmount === 0 || TransactionsStore.loading ? 0.5: 1
           }}
         >
           <Text style={ButtonStyles.actionButtonText}>{common.confirmProceed}</Text>

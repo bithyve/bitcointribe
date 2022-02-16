@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { Button } from 'react-native-elements'
-import Fonts from '../../../common/Fonts.js'
-import Colors from '../../../common/Colors'
+import {  View, StyleSheet, FlatList, } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import { ListItem } from 'react-native-elements'
-import CommonStyles from '../../../common/Styles/Styles'
+import Node from '../../../assets/images/svgs/node.svg'
+import Channels from '../../../assets/images/svgs/channels.svg'
+import Bitcoin from '../../../assets/images/accIcons/bitcoin.svg'
 
 export default class SettingsScreen extends Component {
   constructor( props: any ) {
@@ -19,16 +17,19 @@ export default class SettingsScreen extends Component {
         Screen: 'NodeInfoScreen',
         Title: 'Node Information',
         Description: 'View Node Information',
+        image: () => <Node />
       },
       {
         Screen: 'ChannelsListScreen',
         Title: 'Channels',
-        Description: 'View and manage channels',
+        Description: 'View and Manage Channels',
+        image: () => <Channels />
       },
       {
         Screen: 'Payments',
         Title: 'Payments',
-        Description: 'My Lightning payments',
+        Description: 'My Lightning Payments',
+        image: () => <Bitcoin />
       }
     ]
   }
@@ -42,8 +43,11 @@ export default class SettingsScreen extends Component {
         onPress={() => {
           this.props.navigation.navigate( item.Screen )
         }}
-        // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
+
+        <View style={ListStyles.thumbnailImageSmall}>
+          {item.image()}
+        </View>
         <ListItem.Content
           style={[
             ListStyles.listItemContentContainer,
