@@ -121,7 +121,7 @@ const SendScreen = inject(
       request = {
         addr: recipientAddress,
         sat_per_byte: fee,
-        amount: `${selectedAmount}`,
+        amount: `${Math.floor( selectedAmount )}`,
         target_conf: targetConf,
         utxos
       }
@@ -129,11 +129,10 @@ const SendScreen = inject(
       request = {
         addr: recipientAddress,
         sat_per_byte: fee,
-        amount: `${selectedAmount}`,
+        amount: `${Math.floor( selectedAmount )}`,
         target_conf: targetConf
       }
     }
-    console.log( request )
     TransactionsStore.sendCoins( request )
   }
 
@@ -163,6 +162,8 @@ const SendScreen = inject(
           cancelButtonText={common.back}
           isCancel={false}
           onPressOk={() => {
+            TransactionsStore.getTransactions()
+            BalanceStore.getBlockchainBalance()
             navigation.goBack()
           }}
           onPressCancel={() => setShowModal( false )}
