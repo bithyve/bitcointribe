@@ -152,7 +152,7 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
-    scheme?: string,
+    scheme?: ShareSplitScheme,
   };
 }
 
@@ -725,11 +725,25 @@ export interface LevelInfo {
   walletId?: string
 }
 
+export enum ShareSplitScheme {
+  OneOfOne = '1of1',
+  TwoOfThree = '2of3',
+  ThreeOfFive = '3of5'
+}
+
+export enum KeeperType {
+  PRIMARY_KEEPER = 'primaryKeeper',
+  DEVICE = 'device',
+  CONTACT = 'contact',
+  PDF = 'pdf',
+  SECURITY_QUESTION = 'securityQuestion',
+}
+
 export interface KeeperInfoInterface {
   shareId: string;
   name: string;
-  type: string;
-  scheme: string;
+  type: KeeperType;
+  scheme: ShareSplitScheme;
   currentLevel: number;
   createdAt: number;
   sharePosition: number;

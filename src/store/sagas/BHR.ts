@@ -42,7 +42,7 @@ import {
   setApprovalStatus,
   DOWNLOAD_SM_SHARE,
   secondaryShareDownloaded,
-  CREATE_OR_CHANGE_GUARDIAN,
+  CREATE_GUARDIAN,
   setDownloadedBackupData,
   DOWNLOAD_BACKUP_DATA,
   SETUP_HEALTH_FOR_RESTORE,
@@ -117,7 +117,9 @@ import {
   ContactDetails,
   Gift,
   Account,
-  MultiSigAccount
+  MultiSigAccount,
+  KeeperType,
+  ShareSplitScheme
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import crypto from 'crypto'
@@ -182,8 +184,8 @@ function* initHealthWorker() {
   const obj: KeeperInfoInterface = {
     shareId: randomIdForSecurityQ,
     name: security && security.answer ? 'Encryption Password' : 'Set Password',
-    type: 'securityQuestion',
-    scheme: '1of1',
+    type: KeeperType.SECURITY_QUESTION,
+    scheme: ShareSplitScheme.OneOfOne,
     currentLevel: 0,
     createdAt: moment( new Date() ).valueOf(),
     sharePosition: null,
@@ -1240,38 +1242,32 @@ export const confirmPDFSharedWatcher = createWatcher(
 
 function* updatedKeeperInfoWorker( { payload } ) {
   try {
-    const { keeperData } = payload
-    const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
-    const keeperInfoTemp: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
-    if( keeperInfoTemp && keeperInfoTemp.length > 0 && keeperInfoTemp.find( value=>value && value.shareId == keeperData.shareId && value.type == 'pdf' ) && keeperData.type != 'pdf' ) {
+    const keeperDataToUpdate: KeeperInfoInterface  = payload.keeperData
+    const storedKeeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
+    const keeperInfo: KeeperInfoInterface[] = [ ...storedKeeperInfo ]
+
+    if( keeperInfo && keeperInfo.length > 0 && keeperInfo.find( info => info && info.shareId == keeperDataToUpdate.shareId && info.type == KeeperType.PDF ) && keeperDataToUpdate.type != KeeperType.PDF ) {
+      // while changing existing PDF keeper to a non-PDF Keeper
       yield put( setPDFInfo( {
         filePath: '', updatedAt: 0, shareId: ''
       } ) )
       yield put( pdfSuccessfullyCreated( false ) )
     }
 
-    let flag = false
-    if ( keeperInfo.length > 0 ) {
-      for ( let i = 0; i < keeperInfo.length; i++ ) {
-        const element = keeperInfo[ i ]
-        if ( element.shareId == keeperData.shareId ) {
-          flag = false
-          keeperInfo[ i ].name = keeperData.name
-          keeperInfo[ i ].scheme = keeperData.scheme
-          keeperInfo[ i ].currentLevel = keeperData.currentLevel
-          keeperInfo[ i ].createdAt = keeperData.createdAt
-          keeperInfo[ i ].type = keeperData.type
-          keeperInfo[ i ].data = keeperData.data
-          keeperInfo[ i ].sharePosition = keeperData.sharePosition
-          keeperInfo[ i ].channelKey = keeperData.channelKey
-          break
-        } else flag = true
+    let updatedExistingKeeperInfo = false
+    for ( let i = 0; i < keeperInfo.length; i++ ) {
+      const element = keeperInfo[ i ]
+      if ( element.shareId == keeperDataToUpdate.shareId ) {
+        keeperInfo[ i ] = {
+          ...keeperDataToUpdate
+        }
+        updatedExistingKeeperInfo = true
+        break
       }
-    } else flag = true
-    if ( flag ) {
-      keeperInfo.push( keeperData )
     }
-    yield put( putKeeperInfo( keeperInfo ) )
+
+    if ( !updatedExistingKeeperInfo ) keeperInfo.push( keeperDataToUpdate )
+    yield put( putKeeperInfo( keeperInfo ) )  // updates keeperInfo variable @bhr-reducer
   } catch ( error ) {
     console.log( 'Error updatedKeeperInfoWorker', error )
   }
@@ -1552,70 +1548,84 @@ export const setHealthStatusWatcher = createWatcher(
   setHealthStatusWorker,
   SET_HEALTH_STATUS
 )
-
+/**
+ * Generates assets, corresponding to a share, to be uploaded to trusted channel
+ * @param  {} {shareId} id of the share corresponding to which channel assets needs to be generated
+ */
 function* createChannelAssetsWorker( { payload } ) {
   try {
+    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     const { shareId } = payload
-    const { metaSharesKeeper, oldMetaSharesKeeper } = yield select( ( state ) => state.bhr )
-
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const {
+      metaSharesKeeper,
+      oldMetaSharesKeeper,
+      keeperInfo,
+      currentLevel,
+      secondaryShareDownloaded
+    }: {
+      metaSharesKeeper: MetaShare[],
+      oldMetaSharesKeeper: MetaShare[],
+      keeperInfo: KeeperInfoInterface[],
+      currentLevel: number,
+      secondaryShareDownloaded: any,
+    } = yield select( ( state ) => state.bhr )
     const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
     const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
-    if( shareId ){
-      yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-      const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
-      const currentLevel: number = yield select( ( state ) => state.bhr.currentLevel )
-      const secondaryShareDownloadedVar = yield select( ( state ) => state.bhr.secondaryShareDownloaded )
-      const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-      const share = MetaShares.find( value=>value.shareId==shareId ) ? MetaShares.find( value=>value.shareId==shareId ) : OldMetaShares.length && OldMetaShares.find( value=>value.shareId==shareId ) ? OldMetaShares.find( value=>value.shareId==shareId ) : null
-      let primaryMnemonicShardTemp
-      if( currentLevel == 0 ){
-        const timestamp = new Date().toLocaleString( undefined, {
-          day: 'numeric',
-          month: 'numeric',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        } )
-        primaryMnemonicShardTemp = {
-          shareId: shareId,
-          meta: {
-            version: DeviceInfo.getVersion(),
-            validator: '',
-            index: -1,
-            walletId: wallet.walletId,
-            tag: wallet.walletName,
-            timestamp: timestamp,
-            reshareVersion: 0,
-            questionId: wallet.security.questionId,
-            question: wallet.security.question,
-            scheme: '1of1',
-          },
-          encryptedShare: {
-            pmShare: wallet.primaryMnemonic
-          }
-        }
-      } else {
-        primaryMnemonicShardTemp = {
-          shareId: share ? share.shareId : '',
-          meta: share ? share.meta : {
-          },
-          encryptedShare: share ? share.encryptedShare : ''
+
+    const share = MetaShares.find( value => value.shareId == shareId ) || OldMetaShares.find( value => value.shareId == shareId )
+    let primaryMnemonicShardTemp
+
+    if( currentLevel == 0 ){
+      // when KeeperType === PrimaryKeeper/Device/PDF is chosen on level 1
+      primaryMnemonicShardTemp = {
+        shareId: shareId,
+        meta: {
+          version: DeviceInfo.getVersion(),
+          validator: '',
+          index: -1,
+          walletId: wallet.walletId,
+          tag: wallet.walletName,
+          timestamp: new Date().toLocaleString( undefined, {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          } ),
+          reshareVersion: 0,
+          questionId: wallet.security.questionId,
+          question: wallet.security.question,
+          scheme: ShareSplitScheme.OneOfOne,
+        },
+        encryptedShare: {
+          pmShare: wallet.primaryMnemonic
         }
       }
-      const channelAssets: ChannelAssets = {
-        primaryMnemonicShard: primaryMnemonicShardTemp,
-        keeperInfo: keeperInfo,
-        shareId
+    } else {
+      // from level 2 and onwards
+      primaryMnemonicShardTemp = {
+        shareId: share ? share.shareId : '',
+        encryptedShare: share ? share.encryptedShare : '',
+        meta: share ? share.meta : {
+        },
       }
-      if( secondaryShareDownloadedVar ) {
-        channelAssets.secondaryMnemonicShard = secondaryShareDownloadedVar
-        channelAssets.bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-      }
-      yield put( setChannelAssets( channelAssets, secondaryShareDownloadedVar ) )
-      yield put( setApprovalStatus( false ) )
-      // yield put( secondaryShareDownloaded( null ) )
-      yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     }
+
+    const channelAssets: ChannelAssets = {
+      primaryMnemonicShard: primaryMnemonicShardTemp,
+      keeperInfo: keeperInfo,
+      shareId
+    }
+
+    if( secondaryShareDownloaded ) {
+      channelAssets.secondaryMnemonicShard = secondaryShareDownloaded
+      channelAssets.bhXpub = idx( wallet, ( _ ) => _.details2FA.bithyveXpub ) || ''
+    }
+
+    yield put( setChannelAssets( channelAssets, secondaryShareDownloaded ) )
+    yield put( setApprovalStatus( false ) )
+    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     console.log( 'Error CREATE_CHANNEL_ASSETS', error )
@@ -1672,17 +1682,33 @@ export const downloadSMShareWatcher = createWatcher(
   DOWNLOAD_SM_SHARE
 )
 
-function* createOrChangeGuardianWorker( { payload: data } ) {
+function* createGuardianWorker( { payload } ) {
   try {
-    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact, isPrimaryKeeper } = data
-    const { metaSharesKeeper } = yield select( ( state ) => state.bhr )
-
-    const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    if( existingContact ) {
-      const existingContactDetails = contacts[ channelKey ].contactDetails
-      const instream = useStreamFromContact( contacts[ channelKey ], wallet.walletId, true )
+    const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const { channelKey, shareId, contact, isChangeKeeper, oldChannelKey, isExistingContact, isPrimaryKeeper } = payload
+
+    if( !isExistingContact ) {
+      // case: creating a new F&F + Keeper
+      yield call( initializeTrustedContactWorker,  {
+        payload: {
+          contact: contact,
+          flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+          isKeeper: true,
+          isPrimaryKeeper,
+          channelKey,
+          shareId: shareId
+        }
+      } )
+    } else {
+      // case: upgrading an existing F&F to Keeper
+      const existingContact = contacts[ channelKey ]
+      const existingContactDetails = existingContact.contactDetails
+      const instream = useStreamFromContact( existingContact, wallet.walletId, true )
+
+      // sync permanent channel if its primary data is not available yet(i.e. the contact hasn't been synched even once)
       if( !instream.primaryData ){
         const channelUpdate =  {
           contactInfo: {
@@ -1690,26 +1716,20 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
             channelKey,
           }
         }
-        const payloadForSync = {
+        const channelToSync = {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
         }
         yield call( syncPermanentChannelsWorker, {
-          payload: payloadForSync
+          payload: channelToSync
         } )
       }
-    }
-    const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
-    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
-    const walletId = wallet.walletId
-    const { walletName } = yield select( ( state ) => state.storage.wallet )
-    // if( MetaShares && MetaShares.length ) {
-    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    if( existingContact ){
+
+      // upgrade F&F to keeper and upload relevant information to permanant channel
       const primaryData: PrimaryStreamData = {
-        contactDetails: contacts[ channelKey ].contactDetails,
-        walletID: walletId,
-        walletName,
+        contactDetails: existingContact.contactDetails,
+        walletID: wallet.walletId,
+        walletName: wallet.walletName,
         relationType: TrustedContactRelationTypes.KEEPER,
       }
       const backupData: BackupStreamData = {
@@ -1717,7 +1737,7 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
         keeperInfo
       }
       const streamUpdates: UnecryptedStreamData = {
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
+        streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
         primaryData,
         backupData,
         metaData: {
@@ -1729,39 +1749,36 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           version: DeviceInfo.getVersion()
         }
       }
-
       const channelSyncDetails = {
         channelKey: channelKey,
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
-        contact: contacts[ channelKey ],
-        contactDetails: contacts[ channelKey ].contactDetails,
-        secondaryChannelKey: contacts[ channelKey ].secondaryChannelKey ? contacts[ channelKey ].secondaryChannelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
+        streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+        contact: existingContact,
+        contactDetails: existingContact.contactDetails,
+        secondaryChannelKey: existingContact.secondaryChannelKey ? existingContact.secondaryChannelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ),
         metaSync: true,
         unEncryptedOutstreamUpdates: streamUpdates
       }
-
       const { updated }: {
-          updated: boolean;
-        } = yield call(
-          TrustedContactsOperations.syncPermanentChannels,
-          [ channelSyncDetails ]
-        )
+      updated: boolean;
+    } = yield call(
+      TrustedContactsOperations.syncPermanentChannels,
+      [ channelSyncDetails ]
+    )
 
       if( updated ){
-        yield put( setChannelAssets( {
+        yield put( setChannelAssets( { // clean up channel assets once they've been kept on the permanent channel
         }, null ) )
         const appVersion = DeviceInfo.getVersion()
-        const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
-        const instream = useStreamFromContact( temporaryContact, walletId, true )
+        const instream = useStreamFromContact( existingContact, wallet.walletId, true )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const notification: INotification = {
           notificationType: notificationType.FNF_KEEPER_REQUEST,
           title: 'Friends & Family request',
-          body: `You have a Keeper request from ${temporaryContact.contactDetails.contactName}`,
+          body: `You have a Keeper request from ${existingContact.contactDetails.contactName}`,
           data: {
-            walletName: walletName,
+            walletName: wallet.walletName,
             channelKey: channelKey,
-            contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
+            contactsSecondaryChannelKey: existingContact.secondaryChannelKey,
             version: appVersion
           },
           tag: notificationTag.IMP,
@@ -1778,33 +1795,24 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
             notification,
           )
           Toast( 'Keeper successfully updated and Keeper notification sent successfully.' )
-        }
-
-      }
-    } else {
-      yield call( initializeTrustedContactWorker,  {
-        payload: {
-          contact: contact,
-          flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-          isKeeper: true,
-          isPrimaryKeeper,
-          channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
-          shareId: shareId
-        }
-      } )
+        } else Toast( 'Keeper successfully updated' )
+      } else console.log( 'Failed to upgrade an existing F&F to keeper' )
     }
-    if( isChange ) {
+
+    // remove details from the permanent channel w/ the previous keeper
+    // and downgrade it to a vanilla F&F in case of changing keeper
+    if( isChangeKeeper ) {
       const contactInfo = {
         channelKey: oldChannelKey,
       }
       const primaryData: PrimaryStreamData = {
         contactDetails: contacts[ oldChannelKey ].contactDetails,
-        walletID: walletId,
-        walletName,
+        walletID: wallet.walletId,
+        walletName: wallet.walletName,
         relationType: TrustedContactRelationTypes.CONTACT,
       }
       const streamUpdates: UnecryptedStreamData = {
-        streamId: TrustedContactsOperations.getStreamId( walletId ),
+        streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
         primaryData,
         secondaryData: null,
         backupData: null,
@@ -1817,7 +1825,6 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
           version: DeviceInfo.getVersion()
         }
       }
-      // initiate permanent channel
       const channelUpdate =  {
         contactInfo, streamUpdates
       }
@@ -1826,17 +1833,16 @@ function* createOrChangeGuardianWorker( { payload: data } ) {
         channelUpdates: [ channelUpdate ],
       } ) )
     }
-    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    // }
   } catch ( error ) {
-    yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    console.log( 'CREATE_OR_CHANGE_GUARDIAN Error', error )
+    console.log(  {
+      error
+    } )
   }
 }
 
-export const createOrChangeGuardianWatcher = createWatcher(
-  createOrChangeGuardianWorker,
-  CREATE_OR_CHANGE_GUARDIAN
+export const createGuardianWatcher = createWatcher(
+  createGuardianWorker,
+  CREATE_GUARDIAN
 )
 
 function* resetLevelAfterPasswordChange() {
@@ -1908,9 +1914,9 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
       else currentLevel = 1
     }
     for ( let i = 0; i < keeperInfo.length; i++ ) {
-      if( keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
-      else if( keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
-      else if( keeperInfo[ i ].scheme == '3of5' ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      if( keeperInfo[ i ].scheme == ShareSplitScheme.OneOfOne ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      else if( keeperInfo[ i ].scheme == ShareSplitScheme.TwoOfThree ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
+      else if( keeperInfo[ i ].scheme == ShareSplitScheme.ThreeOfFive ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
     }
     yield put( putKeeperInfo( keeperInfo ) )
     yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )

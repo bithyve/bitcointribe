@@ -26,12 +26,12 @@ import {
   updatedKeeperInfo,
   updateMSharesHealth,
   createChannelAssets,
-  createOrChangeGuardian,
   setChannelAssets,
   setApprovalStatus,
   downloadSMShare,
   pdfSuccessfullyCreated,
-  setPdfUpgrade
+  setPdfUpgrade,
+  createGuardian
 } from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -202,7 +202,7 @@ const PersonalCopyHistory = ( props ) => {
   // };
 
   const generatePDF = async() => {
-    createGuardian( )
+    initiateGuardianCreation( )
     const shareHistory = JSON.parse(
       await AsyncStorage.getItem( 'shareHistory' )
     )
@@ -449,7 +449,7 @@ const PersonalCopyHistory = ( props ) => {
     )
   }, [] )
 
-  const createGuardian = useCallback(
+  const initiateGuardianCreation = useCallback(
     async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
       if( ( selectedKeeper.channelKey || isReshare ) && !isChangeKeeper && !pdfUpgrade ) return
@@ -482,8 +482,8 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && !isEmpty( channelAssets ) && channelAssets.shareId == selectedKeeper.shareId ){
-      dispatch( createOrChangeGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
+      dispatch( createGuardian( {
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, isChangeKeeper: isChange, oldChannelKey
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
@@ -540,7 +540,7 @@ const PersonalCopyHistory = ( props ) => {
       } )
     }
     if ( type == 'pdf' ) {
-      createGuardian()
+      initiateGuardianCreation()
     }
   }
 
@@ -627,7 +627,7 @@ const PersonalCopyHistory = ( props ) => {
           setIsChangeClicked( true )
           dispatch( pdfSuccessfullyCreated( false ) )
           setQRModal( true )
-          // createGuardian( )
+          // initiateGuardianCreation( )
           setPdfUpgradeModal( false )
         }}
         isBottomImage={true}
