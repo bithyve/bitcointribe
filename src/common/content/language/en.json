@@ -130,7 +130,7 @@
         "multi": "Setting up multiple accounts",
         "Answersdonotmatch":"Answers do not match",
         "Answersmust": "Answers must only contain lowercase characters (a-z) and digits (0-9)",
-        "Passworddonotmatch": "Password do not match",
+        "Passworddonotmatch": "Password mismatch",
         "Passwordmust": "Password must only contain lowercase characters (a-z) and digits (0-9)",
         "encryptionpassword": "Use your own\nencryption password",
         "Enteryourpassword": "Enter your password",
@@ -218,7 +218,7 @@
         "UserDefined": "User Defined",
         "Hexawillgenerate": "Hexa will generate a strong password for you",
         "Skipinitialcloud": "Skip initial cloud backup",
-        "HexaWalletcreated": "Hexa Wallet created a App Generated Strong Passcode",
+        "HexaWalletcreated": "Here's your App Generated Strong Passcode",
         "Makesureyou": "Make sure you have noted down the Strong Password and secured it",
         "Itmayalso": "If you lose this, you will not be able to access the wallet backup or reset the Login Passcode. It may be a good idea to secure more than one copy of the Strong Password",
         "UseStrongPasscode": "Use Strong Passcode",
@@ -308,7 +308,8 @@
         "Confirmnewwalletname": "Confirm new wallet name",
         "acrossyour": "The wallet's name will get updated automatically across your Friends & Family network",
         "ConfirmSecurityQuestion": "Confirm Security Question",
-        "ConfirmWalletPin": "Confirm Wallet Pin"
+        "ConfirmWalletPin": "Confirm Wallet Pin",
+        "ConfirmEncryptionPassword":"Confirm Encryption Password"
     },
     "header": {
         "init": "Initialising Automated Cloud Backup",
@@ -561,7 +562,7 @@
       "QuestionBackedUp": "Question Successfully Backed Up",
       "BackupHistory": "Cloud Backup",
       "historyofyourbackup": "The history of your backup will appear here",
-      "cloudBackupSuccessInfo":"Your have successfully backed up on the cloud.",
+      "cloudBackupSuccessInfo":"You have successfully backed up your on the cloud.",
       "cloudBackupNotSetupInfo": "You can backup on the cloud and use the Recovery Key from the cloud when restoring.",
       "cloudBackupInAccessibleInfo": "You need to confirm your cloud connection, to ensure changes to your backup scheme.",
       "historyofyourRecovery": "The history of your Recovery Key will appear here",

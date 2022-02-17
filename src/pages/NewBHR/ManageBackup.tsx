@@ -301,9 +301,9 @@ export default function ManageBackup( props ) {
       setErrorInfo( errorInfoProp )
       setShowLoader( false )
       dispatch( setLevelCompletionError( null, null, LevelStatus.PENDING ) )
-      setTimeout( () => {
-        setErrorModal( true )
-      }, 600 )
+      // setTimeout( () => {
+      //   setErrorModal( true )
+      // }, 600 )
     }
   }, [ status ] )
 
@@ -473,6 +473,9 @@ export default function ManageBackup( props ) {
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
 
+    if( ( keeperNumber==1 )&&( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) props.navigation.navigate( 'SetNewPassword', {
+      isFromManageBackup: true,
+    } )
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return
