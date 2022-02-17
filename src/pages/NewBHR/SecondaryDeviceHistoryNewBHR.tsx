@@ -467,11 +467,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         cancelButtonText={common.back}
         isIgnoreButton={true}
         onPressProceed={() => {
-          setIsChange( true )
-          setKeeperQR( '' )
-          setIsReshare( false )
+          // setIsChange( true )
+          // setKeeperQR( '' )
+          // setIsReshare( false )
           // ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 );
-          setShowQr( true )
           setChangeModal( false )
           props.navigation.navigate( 'ContactsListForAssociateContact', {
             postAssociation: ( contact ) => {
@@ -528,25 +527,30 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       },
       index: changeIndex,
     }
-    if ( type == 'contact' ) {
-      props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
-        ...navigationParams,
-        isChangeKeeperType: true,
-      } )
-    }
-    if ( type == 'device' ) {
-      setTimeout( () => {
-        setIsChange( true )
-        setKeeperQR( '' )
-        setIsReshare( false )
-      }, 2 )
-      setChangeModal( true )
-    }
-    if ( type == 'pdf' ) {
-      props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
-        ...navigationParams,
-        isChangeKeeperType: true,
-      } )
+
+    switch( type ){
+        case KeeperType.CONTACT:
+          props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
+            ...navigationParams,
+            isChangeKeeperType: true,
+          } )
+          break
+
+        case KeeperType.DEVICE:
+          setTimeout( () => {
+            setIsChange( true )
+            setKeeperQR( '' )
+            setIsReshare( false )
+          }, 2 )
+          setChangeModal( true )
+          break
+
+        case KeeperType.PDF:
+          props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
+            ...navigationParams,
+            isChangeKeeperType: true,
+          } )
+          break
     }
   }
 

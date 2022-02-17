@@ -734,6 +734,7 @@ export enum ShareSplitScheme {
 export enum KeeperType {
   PRIMARY_KEEPER = 'primaryKeeper',
   DEVICE = 'device',
+  CONTACT = 'contact',
   PDF = 'pdf',
   SECURITY_QUESTION = 'securityQuestion',
 }
