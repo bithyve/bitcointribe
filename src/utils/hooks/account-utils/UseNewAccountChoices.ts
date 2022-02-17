@@ -105,13 +105,14 @@ export default function useNewAccountChoices() {
         defaultDescription: 'Learn Bitcoin',
         visibility: isEnabled( AccountType.TEST_ACCOUNT, wallet )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN,
       } ),
-      new LightningSubAccountInfo ( {
+    ]
+    if( !accountShells.some( shell => shell.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) ){
+      hexaAccounts.push( new LightningSubAccountInfo ( {
         defaultTitle: 'Lightning Account',
         defaultDescription: 'User Lightning Account',
         visibility: AccountVisibility.DEFAULT,
-      } ),
-    ]
-
+      } ), )
+    }
     const serviceAccounts = [
       // new ExternalServiceSubAccountInfo( {
       //   instanceNumber: 1,
