@@ -49,6 +49,13 @@ class RESTUtils {
       }
     }
 
+    getBalance = ( data: any ) => {
+      const { implementation } = data
+      if( implementation === 'lnd' ) {
+        return this.lnd.getBalance( data )
+      }
+    }
+
     processLndQR= ( url: any ) => {
       return this.lnd.processLndQR( url )
     }
@@ -113,6 +120,7 @@ class RESTUtils {
     supportsRouting = () => this.call( 'supportsRouting' );
     supportsNodeInfo = () => this.call( 'supportsNodeInfo' );
     checkNodeInfo= ( data ) => this.checkInfo(  data );
+    getNodeBalance= ( data ) => this.getBalance(  data );
 }
 
 const restUtils = new RESTUtils()

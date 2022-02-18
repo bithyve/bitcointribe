@@ -205,6 +205,40 @@ export default class LND {
       )
     }
 
+    getBalance = ( node: any ) => {
+      const {
+        host,
+        lndhubUrl,
+        port,
+        macaroonHex,
+        accessToken,
+        certVerification,
+        enableTor
+      } = node
+      const auth = macaroonHex || accessToken
+      const headers: any = this.getHeaders( auth )
+      headers[ 'Content-Type' ] = 'application/json'
+      return Promise.all( [
+        this.restReq(
+          headers,
+          this.getURL( host || lndhubUrl, port, '/v1/balance/blockchain' ),
+          'get',
+          null,
+          certVerification,
+          enableTor
+        ),
+        this.restReq(
+          headers,
+          this.getURL( host || lndhubUrl, port, '/v1/balance/channels' ),
+          'get',
+          null,
+          certVerification,
+          enableTor
+        )
+      ],
+      )
+    }
+
     getInfo = ( node: any ) => {
       const {
         host,
