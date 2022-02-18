@@ -577,19 +577,35 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const channelKeyTemp: string = isRecreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     setChannelKey( channelKeyTemp )
 
+    let sharePosition: number
+    if( currentLevel === 0 ) sharePosition = -1
+    else{
+      const metaShareIndex = MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
+      if( metaShareIndex >= 0 ) sharePosition = metaShareIndex
+      else {
+        const oldMetaShareIndex = OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
+        if( oldMetaShareIndex >= 0 ) sharePosition = oldMetaShareIndex
+        else sharePosition = 2
+      }
+    }
+
+    let splitScheme: ShareSplitScheme
+    const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+    if( share ) splitScheme = share.meta.scheme
+    else{
+      if( currentLevel == 0 ) splitScheme = ShareSplitScheme.OneOfOne
+      else splitScheme = ShareSplitScheme.TwoOfThree
+    }
+
     if( payload.shareType == 'existingContact' ){
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
         type: shareType,
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : ShareSplitScheme.TwoOfThree,
+        scheme: splitScheme,
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-          MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
-          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-            OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
-            2,
+        sharePosition,
         data: {
           ...Contact, index
         },

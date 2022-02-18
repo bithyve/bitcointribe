@@ -10,7 +10,6 @@ import { createChannelAssets, createGuardian, ErrorSending, modifyLevelData, set
 import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
 import HistoryPageComponent from './HistoryPageComponent'
 import SecondaryDevice from './SecondaryDeviceNewBHR'
 import moment from 'moment'
@@ -223,11 +222,19 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }
       }
 
+      let splitScheme: ShareSplitScheme
+      const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+      if( share ) splitScheme = share.meta.scheme
+      else{
+        if( currentLevel == 0 ) splitScheme = ShareSplitScheme.OneOfOne
+        else splitScheme = ShareSplitScheme.TwoOfThree
+      }
+
       const keeperInfo: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: contactDetails ? ( contactDetails.name? contactDetails.name: contactDetails.displayedName ? contactDetails.displayedName: '' ): '',
         type: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : currentLevel == 0 ? ShareSplitScheme.OneOfOne : ShareSplitScheme.TwoOfThree,
+        scheme: splitScheme,
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition,
