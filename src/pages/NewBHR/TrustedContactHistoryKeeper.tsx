@@ -14,7 +14,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useSelector } from 'react-redux'
+import { RootStateOrAny, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -48,7 +48,8 @@ import {
   notificationType,
   notificationTag,
   LevelInfo,
-  LevelData
+  LevelData,
+  ShareSplitScheme
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
@@ -75,7 +76,6 @@ import QRModal from '../Accounts/QRModal'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const strings  = translations[ 'bhr' ]
-  const common  = translations[ 'common' ]
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const [ HelpModal, setHelpModal ] = useState( false )
@@ -86,7 +86,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ SecondaryDeviceMessageModal, setSecondaryDeviceMessageModal ] = useState( false )
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
-  const [ changeContact, setChangeContact ] = useState( false )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ reshareModal, setReshareModal ] = useState( false )
@@ -105,7 +104,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
-  const [ isNavigation, setNavigation ] = useState( false )
   const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
   const [ selectedTitle, setSelectedTitle ] = useState( props.navigation.getParam( 'selectedTitle' ) )
   const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
@@ -119,29 +117,27 @@ const TrustedContactHistoryKeeper = ( props ) => {
       : null,
   )
   const [ shareType, setShareType ] = useState( props.navigation.getParam( 'selectedKeeper' ).shareType )
-  const [ showQrCode, setShowQrCode ] = useState( false )
   const [ showFNFList, setShowFNFList ] = useState( false )
-  const [ recreateChannel, setRecreateChannel ] = useState( false )
-  const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
-  const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
-  const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
-  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
-  const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
+  const createChannelAssetsStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.loading.createChannelAssetsStatus )
+  const isErrorSendingFailed = useSelector( ( state: RootStateOrAny ) => state.bhr.errorSending )
+  const channelAssets: ChannelAssets = useSelector( ( state: RootStateOrAny ) => state.bhr.channelAssets )
+  const metaSharesKeeper = useSelector( ( state: RootStateOrAny ) => state.bhr.metaSharesKeeper )
+  const oldMetaSharesKeeper = useSelector( ( state: RootStateOrAny ) => state.bhr.oldMetaSharesKeeper )
 
   const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
   const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
-  const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
-  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
-  const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
-  const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
+  const keeperInfo = useSelector( ( state: RootStateOrAny ) => state.bhr.keeperInfo )
+  const levelData: LevelData[] = useSelector( ( state: RootStateOrAny ) => state.bhr.levelData )
+  const currentLevel = useSelector( ( state: RootStateOrAny ) => state.bhr.currentLevel )
+  const trustedContacts: Trusted_Contacts = useSelector( ( state: RootStateOrAny ) => state.trustedContacts.contacts )
   const [ contacts, setContacts ] = useState( [] )
-  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const index = props.navigation.getParam( 'index' )
   const dispatch = useDispatch()
   const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
   const [ qrModal, setQRModal ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const approvalStatus = useSelector( ( state ) => state.bhr.approvalStatus )
+  const approvalStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.approvalStatus )
 
   useEffect( () => {
     setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
@@ -163,7 +159,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ...props.navigation.state.params,
         onPressContinue
       } )
-      setShowQrCode( true )
     }
   }, [ isChange ] )
 
@@ -230,7 +225,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           ...props.navigation.state.params,
           onPressContinue
         } )
-        setShowQrCode( true )
       }
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
@@ -295,10 +289,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     [ chosenContact ],
   )
 
-  const renderContactListItem = useCallback( ( {
-    contactDescription,
-    index,
-  }: {
+  const renderContactListItem = useCallback( ( { contactDescription, }: {
     contactDescription: any;
     index: number;
     contactsType: string;
@@ -367,7 +358,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     return (
       <ShareOtpWithTrustedContact
         renderTimer={renderTimer}
-        onPressOk={( index ) => {
+        onPressOk={( ) => {
           setRenderTimer( false )
           onOTPShare( )
           setOTP( '' )
@@ -473,7 +464,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         } )
       }
     } else {
-      setRecreateChannel( true )
       setReshareModal( false )
       props.navigation.navigate( 'FNFToKeeper', {
         ...props.navigation.state.params,
@@ -496,15 +486,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
-          setTimeout( () => {
-            setChangeContact( true )
-          }, 2 )
 
           props.navigation.navigate( 'FNFToKeeper', {
             ...props.navigation.state.params,
             onPressContinue
           } )
-          setShowQrCode( true )
 
           setChangeModal( false )
         }}
@@ -585,19 +571,18 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const Contact = payload.chosenContactTmp
     const isRecreateChannel = payload && payload.isRecreateChannel ? payload.isRecreateChannel : false
 
-    if( payload.shareType != 'existingContact' && isReshare && !isChangeKeeper && !isRecreateChannel ){
-      console.log( 'RETURN' ); return}
+    if( payload.shareType != 'existingContact' && isReshare && !isChangeKeeper && !isRecreateChannel ) return
+
     setIsGuardianCreationClicked( true )
     const channelKeyTemp: string = isRecreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     setChannelKey( channelKeyTemp )
 
     if( payload.shareType == 'existingContact' ){
-      console.log( 'payload.shareType', payload.shareType )
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
         type: shareType,
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : ShareSplitScheme.TwoOfThree,
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
@@ -610,7 +595,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         },
         channelKey: channelKeyTemp
       }
-      console.log( 'obj', obj )
 
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
@@ -711,7 +695,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       initiateGuardianCreation( {
         chosenContactTmp: getContacts( selectedContacts ), shareType, isRecreateChannel: isRecreateChannel
       } )
-      setShowQrCode( true )
     }, 10 )
   }
 
@@ -765,10 +748,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
           onPressConfirm={() => {
             if( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
-              setTimeout( () => {
-                setShowQrCode( true )
-              }, 2 )
-              setNavigation( false )
               props.navigation.navigate( 'FNFToKeeper', {
                 ...props.navigation.state.params,
                 onPressContinue
