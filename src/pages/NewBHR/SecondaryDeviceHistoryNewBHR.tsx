@@ -162,11 +162,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           setQrBottomSheetsFlag( false )
           setQRModal( false )
         }}
-        onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"erds","channelId":"28cc7e44b3ca629fe98450412f750d29fcf93d2de5057e841a665e8e73e98cfb","streamId":"b83dea121","secondaryChannelKey":"FLPy5dqRHTFCGqhZibhW9SLH","version":"1.8.0","walletId":"23887039bd673cfaa6fdc5ab9786aa130e010e9bbbc6731890361240ed83a55a"}'
-          dispatch( setApprovalStatus( false ) )
-          dispatch( downloadSMShare( qrScannedData ) )
-        }}
+        onPressContinue={() => {}}
       />
     )
   }

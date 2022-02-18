@@ -191,11 +191,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           setQrBottomSheetsFlag( false )
           setQRModal( false )
         }}
-        onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
-          dispatch( setApprovalStatus( false ) )
-          dispatch( downloadSMShare( qrScannedData ) )
-        }}
+        onPressContinue={()=>{}}
       />
     )
   }

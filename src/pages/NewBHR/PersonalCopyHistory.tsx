@@ -573,22 +573,7 @@ const PersonalCopyHistory = ( props ) => {
           // if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
           setQRModal( false )
         }}
-        onPressContinue={async() => {
-          if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asa","channelId":"f1e2b75507eff77de91e56c5e431767eef3c6a6cee1e937fad41864e19892bcb","streamId":"84af9aa6d","channelKey":"ByZowa42G8j1vG6YnCMpDnCc","secondaryChannelKey":"vjzO0spKh4bYVUwYR7tKD5N1","version":"2.0.8","walletId":"30cd144365acc65dc809f5fac231643883d37f256bc9d9d0d09cec5f119b83d9","encryptedKey":"bae794c0051f2898c772b94a53fb465373264e5ef90ab8c0747a4f4bbe2af61d0897ade3ba342fb8e84cb53c86868ec5989451d20c3b2521a946d1aa6f470294402ea677800558403f58267b0b039964"}'
-            dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-            setQrBottomSheetsFlag( false )
-            const popAction = StackActions.pop( {
-              n: isChange ? 2 : 1
-            } )
-            props.navigation.dispatch( popAction )
-          } else {
-            setQRModal( false )
-            const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Asa","channelId":"59554060913cddb8cca36888affd621fc9939e43f57365cc6e87a0b78d018cad","streamId":"84af9aa6d","secondaryChannelKey":"cjIzFMeQiCjzEtC8piv1qSow","version":"2.0.7","walletId":"30cd144365acc65dc809f5fac231643883d37f256bc9d9d0d09cec5f119b83d9"}'
-            dispatch( setApprovalStatus( false ) )
-            dispatch( downloadSMShare( qrScannedData ) )
-          }
-        }}
+        onPressContinue={() => {}}
       />
     )
   }
