@@ -22,6 +22,7 @@ import FormStyles from '../../../common/Styles/FormStyles'
 import Colors from '../../../common/Colors'
 import CheckMark from '../../../assets/images/svgs/checkmark.svg'
 import Fonts from '../../../common/Fonts'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 @inject( 'ChannelsStore' )
 @observer
@@ -179,7 +180,6 @@ export default class OpenChannelScreen extends Component {
           flexDirection: 'row'
         }}>
           <TouchableOpacity
-            disabled
             onPress={() =>{
               this.setState( {
                 private: !this.state.private
@@ -187,22 +187,25 @@ export default class OpenChannelScreen extends Component {
             }}
 
             style={{
-              flexDirection: 'row'
+              flexDirection: 'row',
+              alignItems: 'center'
             }}
           >
-            <View style={styles.imageView}>
-              {this.state.private &&
-                  <CheckMark style={{
-                    marginLeft: 6,
-                    marginTop: 6
-                  }}/>
-              }
-            </View>
+            <Ionicons
+              name={this.state.private ? 'checkmark-circle' : 'checkmark-circle-outline'}
+              color={this.state.private ? Colors.darkBlue: Colors.textColorGrey}
+              size={24}
+              style={{
+                marginLeft: wp( '3%' ),
+                alignSelf: 'center',
+              }}
+            />
+
             <Text style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 14 ),
               fontFamily: Fonts.FiraSansRegular,
-              marginHorizontal: wp( 3 )
+              marginHorizontal: wp( 2 )
             }}>
               Keep channel private
             </Text>
@@ -268,6 +271,10 @@ const styles = StyleSheet.create( {
     marginVertical: 2,
     backgroundColor: 'white',
     height: wp( '13%' ),
+  },
+  imageView: {
+    alignItems: 'center',
+    backgroundColor: 'red'
   },
   viewSectionContainer: {
     marginBottom: 16,

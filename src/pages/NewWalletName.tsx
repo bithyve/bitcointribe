@@ -68,6 +68,7 @@ export default function NewWalletName( props ) {
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const [ loaderModal, setLoaderModal ] = useState( false )
@@ -293,7 +294,7 @@ export default function NewWalletName( props ) {
                   }}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>{strings.Next}</Text>
+                  <Text style={styles.buttonText}>{common.proceed}</Text>
                 </TouchableOpacity>
               </View>
             ) : null}

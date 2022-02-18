@@ -99,9 +99,8 @@ const AccountDetailsCard : React.FC<Props> = inject(
       return 'TESTNET'
     } if( NodeInfoStore.nodeInfo.regtest ) {
       return 'REGTEST'
-    } if( NodeInfoStore.nodeInfo.regtest ) {
-      return 'MAINNET'
     }
+    return 'MAINNET'
   }
 
   const AccountKindDetailsSection: React.FC = () => {
