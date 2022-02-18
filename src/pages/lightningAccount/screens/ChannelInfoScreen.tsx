@@ -112,7 +112,7 @@ export default class ChannelInfoScreen extends Component {
 
         <View style={styles.bodySection}>
           <ListCard heading={'Channel ID'} data={this.state.channelInfo.remote_pubkey}/>
-          <ListCard heading={'Local Balance'} data={this.state.channelInfo.remote_balance}/>
+          <ListCard heading={'Local Balance'} data={this.state.channelInfo.local_balance}/>
           <ListCard heading={'Remote Balance'} data={this.state.channelInfo.remote_balance}/>
           <ListCard heading={'Unsettled Balance'} data={this.state.channelInfo.unsettled_balance}/>
           <ListCard heading={'Status'} data={this.state.channelInfo.active ? 'active' : 'inactive'}/>

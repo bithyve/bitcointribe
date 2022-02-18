@@ -92,7 +92,10 @@ const InvoiceItem = ( {
 }: Props ) => {
 
   const transactionKindIconColor = useMemo( () => {
-    return Colors.green
+    if( invoice.isPaid ){
+      return Colors.green
+    }
+    return Colors.amountText
   }, [ invoice ] )
 
   const amountTextStyle = useMemo( () => {
@@ -129,7 +132,7 @@ const InvoiceItem = ( {
             currencyImageStyle={styles.bitcoinImage}
             iconSpacing={2}
             bitcoinIconColor="gray"
-            textColor="gray"
+            textColor={transactionKindIconColor}
             isTestAccount={false}
           />
           <ListItem.Chevron size={22}/>

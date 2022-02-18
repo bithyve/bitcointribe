@@ -1,10 +1,13 @@
+/* eslint-disable react/jsx-key */
 import React, { Component } from 'react'
 import {
   Text,
   View,
   StyleSheet,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  Clipboard,
+  TouchableOpacity
 } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import Colors from '../../../common/Colors'
@@ -12,6 +15,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
 import HeaderTitle from '../../../components/HeaderTitle'
 import { inject, observer } from 'mobx-react'
+import Toast from '../../../components/Toast'
+
 @inject(
   'NodeInfoStore',
 )
@@ -21,6 +26,11 @@ export default class NodeInfoScreen extends Component {
   componentDidMount() {
     this.props.NodeInfoStore.reset()
     this.props.NodeInfoStore.getNodeInfo()
+  }
+
+  writeToClipboard  ( text: string ) {
+    Clipboard.setString( text )
+    Toast( 'Text Copied' )
   }
 
   render() {
@@ -122,21 +132,29 @@ export default class NodeInfoScreen extends Component {
 
             </Text>
           </View>
-          <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
-              URIs
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {/* {this.state.payment.enhancedPath[0].join('\n\n')} */}
-              {uris ? uris.join( '\n\n' ) : ''}
+          {
+            uris.length > 0 && (
+              uris.map( uri => (
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  onPress={()=>this.writeToClipboard( uri )}
+                  style={styles.lineItem}>
+                  <Text style={ListStyles.listItemTitleTransaction}>
+                  URI
+                  </Text>
+                  <Text
+                    style={{
+                      ...ListStyles.listItemSubtitle,
+                      marginBottom: 3,
+                    }}
+                  >
+                    {uri}
+                  </Text>
+                </TouchableOpacity>
+              ) )
+            )
+          }
 
-            </Text>
-          </View>
         </View>
       </ScrollView>
     )

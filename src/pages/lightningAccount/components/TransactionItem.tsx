@@ -94,7 +94,7 @@ const TransactionItem = ( {
   const { getAmount } = transaction
 
   const transactionKindIconColor = useMemo( () => {
-    if ( getAmount > 0 ) {
+    if ( Number( getAmount ) >= 0 ) {
       return Colors.green
     }
     return Colors.red

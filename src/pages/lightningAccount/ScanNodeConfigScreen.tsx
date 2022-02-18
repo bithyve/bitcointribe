@@ -61,30 +61,45 @@ export default function ScanNodeConfig( { navigation } ) {
   async function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
     if( scannedData.includes( 'config' ) ){
       const url = scannedData.split( 'config=' )[ 1 ]
-      console.log( 'input', url )
-      LndConnectUtils.processLndConnectUrl( url ).then(
+      LndConnectUtils.procesBtcPayConfig( url ).then(
         res=> {
           console.log( res )
           const {
             uri,
             macaroon,
-            chainType
+            chainType,
+            port
           } = res.configurations[ 0 ]
           if ( uri && macaroon ) {
             navigation.navigate( 'EnterNodeConfig', {
               node: {
-                host: uri, port: '', macaroonHex: macaroon
+                host: uri, port, macaroonHex: macaroon
               },
             } )
           } else {
-            Toast( 'Error fetching lndconnect config' )
+            Toast( 'Error fetching config' )
           }
         }
       ).catch( e=> {
         console.log( e )
-        Toast( 'Error fetching lndconnect config' )
+        Toast( 'Error fetching config' )
 
       } )
+    } else {
+      const {
+        host,
+        port,
+        macaroonHex
+      } = LndConnectUtils.processLndConnectUrl( scannedData )
+      if( host &&  macaroonHex ) {
+        navigation.navigate( 'EnterNodeConfig', {
+          node: {
+            host: host, port: port, macaroonHex: macaroonHex
+          },
+        } )
+      } else {
+        Toast( 'Invalid QR' )
+      }
     }
   }
 

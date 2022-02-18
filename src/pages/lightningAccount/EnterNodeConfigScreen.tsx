@@ -205,6 +205,7 @@ const Menu = ( { label, value, onPress, arrow } ) => {
     <TouchableOpacity
       onPress={onPress}
       style={styles.btn}
+      disabled
     >
       <View
         style={{

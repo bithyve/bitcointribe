@@ -133,15 +133,16 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( 
+  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.OTP )
+  const [ note, setNote ] = useState(
     navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
-    'Bitcoin is a new type of money that is not controlled by any government or company' )
+      '' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ advanceSettingsModal, setAdvanceSettingsModal ] = useState( false )
-  const [ selectedAdvancedOption, setSelectedAdvancedOption ] = useState( AdvancedSetting.NO_2FA )
+  const [ selectedAdvancedOption, setSelectedAdvancedOption ] = useState( AdvancedSetting.SIMPLE_OTP )
   const [ FnFIdentificationModal, setFnFIdentificationModal ] = useState( false )
   const [ selectedFAndF, setSelectedFAndF ] = useState( FNF_IDENTIFICATION_TYPE.PHONE_NUMBER )
 
@@ -152,7 +153,6 @@ const GiftDetails = ( { navigation } ) => {
   const [ confirmSecretPhrase, setConfirmSecretPhrase ] = useState( '' )
   const [ confirmSecretPhraseVisibility, setconfirmSecretPhraseVisibility ] = useState( true )
   const [ secretPhraseHint, setSecretPhraseHint ] = useState( '' )
-  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
 
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
@@ -166,6 +166,15 @@ const GiftDetails = ( { navigation } ) => {
     setDropdownBoxList( ThemeList )
   }, [] )
 
+  useEffect( ()=>{
+    setNote( ()=>{
+      if( encryptionType != 'DEFAULT' ){
+        return `Your friend will be prompted to enter their ${encryptionType == 'OTP' ? 'OTP' : encryptionType == 'LONG_OTP' ? 'OTP':encryptionType == 'SECRET_PHRASE' &&'secret phrase' } while accepting the gift. You can change the 2FA from advanced.`
+      }else{
+        return 'No second factor has been used. You can change the 2FA settings from Advanced.'
+      }
+    } )
+  }, [ encryptionType ] )
   useEffect( () => {
     setName( wallet.userName? wallet.userName: wallet.walletName )
   }, [ wallet.walletName, wallet.userName ] )
@@ -224,7 +233,7 @@ const GiftDetails = ( { navigation } ) => {
           break
 
         default:
-          setEncryptionType( DeepLinkEncryptionType.DEFAULT )
+          setEncryptionType( DeepLinkEncryptionType.OTP )
     }
   }
 
@@ -658,13 +667,13 @@ const GiftDetails = ( { navigation } ) => {
               }}
             >
               <View style={styles.settingIcon}>
-              <Setting/>
+                <Setting/>
               </View>
               <Text style={{
                 color: 'white'
               }}>{'Advanced'}</Text>
               <View style={styles.menuIcon}>
-              <Menu/>
+                <Menu/>
               </View>
             </TouchableOpacity>
           </View>
@@ -1089,7 +1098,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 2 ),
     alignSelf: 'center'
-    
+
   },
   timeInfo:{
     width: '87%',

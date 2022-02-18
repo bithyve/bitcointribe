@@ -1,4 +1,4 @@
-import { call, delay, put, select } from 'redux-saga/effects'
+import { all, call, delay, put, select } from 'redux-saga/effects'
 import { createWatcher } from '../utils/utilities'
 import {
   GET_TESTCOINS,
@@ -109,6 +109,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
+import RESTUtils from '../../utils/ln/RESTUtils'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -652,6 +653,48 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
+function* refreshLNShellsWorker( { payload }: { payload: {
+  shells: AccountShell[],
+}} ){
+  const accountShells: AccountShell[] = payload.shells
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accounts: Accounts = accountState.accounts
+  yield put( accountShellRefreshStarted( accountShells ) )
+  const accountsToSync: Accounts = {
+  }
+  for( const accountShell of accountShells ){
+    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
+  }
+  const { synchedAccounts } = yield call( syncLnAccountsWorker, {
+    payload: {
+      accounts: accountsToSync,
+    }
+  } )
+  yield put( updateAccountShells( {
+    accounts: synchedAccounts
+  } ) )
+  yield put( recomputeNetBalance() )
+  yield put( accountShellRefreshCompleted( accountShells ) )
+}
+
+function* syncLnAccountsWorker( { payload }: {payload: {
+  accounts: Accounts }} ) {
+  const { accounts } = payload
+  const nodesToSync: LNNode [] = []
+  for( const account of Object.values( accounts ) ){
+    nodesToSync.push( account.node )
+  }
+  const res = yield call( RESTUtils.getNodeBalance, nodesToSync[ 0 ]  )
+  for( const account of Object.values( accounts ) ){
+    account.balances.confirmed = Number( res[ 0 ].total_balance ) + Number( res[ 1 ].balance )
+  }
+  return {
+    synchedAccounts: accounts
+  }
+}
+
 export const refreshAccountShellsWatcher = createWatcher(
   refreshAccountShellsWorker,
   REFRESH_ACCOUNT_SHELLS
@@ -665,6 +708,7 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
   const shellsToSync: AccountShell[] = []
   const donationShellsToSync: AccountShell[] = []
+  const lnShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
       if( !shell.primarySubAccount.isUsable ) continue
@@ -675,6 +719,10 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
           case AccountType.DONATION_ACCOUNT:
             donationShellsToSync.push( shell )
+            break
+
+          case AccountType.LIGHTNING_ACCOUNT:
+            lnShellsToSync.push( shell )
             break
 
           default:
@@ -689,6 +737,12 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       options: {
         hardRefresh
       }
+    }
+  } )
+
+  if( lnShellsToSync.length ) yield call( refreshLNShellsWorker, {
+    payload: {
+      shells: lnShellsToSync,
     }
   } )
 
