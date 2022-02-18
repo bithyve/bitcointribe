@@ -153,13 +153,15 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       </View>
 
       <Text
+        numberOfLines={1}
         style={{
           ...defaultStyles.amountText,
           color: textColor,
           ...amountTextStyle,
         }}
       >
-        {formattedBalanceText}
+        {/* {formattedBalanceText} */}
+        62,108,155,00
       </Text>
       <Text style={unitTextStyles}>{`${formattedUnitText}`}</Text>
     </View>
@@ -181,9 +183,10 @@ const defaultStyles = StyleSheet.create( {
 
   amountText: {
     fontFamily: Fonts.OpenSans,
-    fontSize: RFValue( 17 ),
+    fontSize: RFValue( 14.5 ),
     marginRight: 3,
     // alignItems: 'baseline',
+    width:wp( 25 )
   },
 
   unitText: {
