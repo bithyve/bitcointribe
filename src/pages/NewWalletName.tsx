@@ -1,5 +1,4 @@
-import React, { useContext, useState, createRef } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useContext, useState, createRef, useEffect, useCallback } from 'react'
 import {
   StyleSheet,
   View,
@@ -38,6 +37,12 @@ import { Easing } from 'react-native-reanimated'
 import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
 import ModalContainer from '../components/home/ModalContainer'
 import { LocalizationContext } from '../common/content/LocContext'
+import { useDispatch, useSelector } from 'react-redux'
+import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
+import { setVersion } from '../store/actions/versionHistory'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { initNewBHRFlow } from '../store/actions/BHR'
+import LoaderModal from '../components/LoaderModal'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -63,27 +68,27 @@ export default function NewWalletName( props ) {
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
+  const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
+  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
+  const [ loaderModal, setLoaderModal ] = useState( false )
+  const [ subTextMessage, setSubTextMessage ] = useState( strings.Thismay )
+  const [ bottomTextMessage ] = useState( strings.Hexaencrypts )
+  const subPoints = [ strings.multi, strings.creatingbackup, strings.preloading ]
+  const [ message, setMessage ] = useState( strings.Creatingyourwallet )
+  const [ signUpStarted, setSignUpStarted ] = useState( false )
 
-  // useEffect( () => {
-  //   if( timeLeft===0 ){
-  //     props.autoClose()
-  //     setTimeLeft( null )
-  //   }
-  //   if ( !timeLeft ) return
-  //   const intervalId = setInterval( () => {
-  //     setTimeLeft( timeLeft - 1 )
-  //     if( timeLeft - 1 == 2 ){ setTimerArray( [ 1, 1, 0 ] )
-  //     } else if( timeLeft - 1 == 1 ){
-  //       setTimerArray( [ 1, 0, 0 ] )
-  //     }
-  //     else if( timeLeft - 1 == 0 ){
-  //       setTimerArray( [ 0, 0, 0 ] )
-  //     }
-  //   }, 1000 )
-  //   console.log( 'timeLeft', timeLeft )
-  //   setIntervalRef( intervalId )
-  //   return () => { clearInterval( intervalId ) }
-  // }, [ timeLeft ] )
+  useEffect( () => {
+    if ( walletSetupCompleted ) {
+      setLoaderModal( false )
+      props.navigation.navigate( 'HomeNav', {
+        walletName,
+      } )
+    }
+  }, [ walletSetupCompleted, cloudBackupStatus ] )
+
+  const renderLoaderModalContent = useCallback( () => {
+    return <LoaderModal headerText={message} messageText={subTextMessage} subPoints={subPoints} bottomText={bottomTextMessage} />
+  }, [ message, subTextMessage, loaderModal ] )
 
   const renderBottomSheetContent = () =>{
 
@@ -154,6 +159,15 @@ export default function NewWalletName( props ) {
     onBottomSheetClosed()
   }
 
+  const onBackgroundOfLoader = () => {
+    setLoaderModal( false )
+    if ( signUpStarted )
+      setTimeout( () => {
+        console.log( 'TIMEOUT' )
+        setLoaderModal( true )
+      }, 100 )
+  }
+
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -162,6 +176,9 @@ export default function NewWalletName( props ) {
       <View style={{
         flex: 1
       }}>
+        <ModalContainer onBackground={() => onBackgroundOfLoader()} visible={loaderModal} closeBottomSheet={null}>
+          {renderLoaderModalContent()}
+        </ModalContainer>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -190,7 +207,7 @@ export default function NewWalletName( props ) {
           }} >
             <HeaderTitle1
               firstLineTitle={`${strings.Step1}`}
-              secondLineBoldTitle={'Name your Wallet'}
+              secondLineBoldTitle={strings.NameyourWallet}
               secondLineTitle={''}
               infoTextNormal={''}
               infoTextBold={''}
@@ -258,11 +275,21 @@ export default function NewWalletName( props ) {
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss()
-                    props.navigation.navigate( 'NewWalletQuestion', {
-                      walletName,
-                    } )
-                  // setIsCloudPermissionRender( true )
-                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+                    // props.navigation.navigate( 'NewWalletQuestion', {
+                    //   walletName,
+                    // } )
+                    setLoaderModal( true )
+                    setSignUpStarted( true )
+                    dispatch( updateCloudPermission( false ) )
+                    dispatch( setupWallet( walletName, null ) )
+                    dispatch( initNewBHRFlow( true ) )
+                    dispatch( setVersion( 'Current' ) )
+                    const current = Date.now()
+                    AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
+                    const securityQuestionHistory = {
+                      created: current,
+                    }
+                    AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
                   }}
                   style={styles.buttonView}
                 >
