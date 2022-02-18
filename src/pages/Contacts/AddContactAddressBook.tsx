@@ -49,6 +49,7 @@ export default function AddContactAddressBook( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const isPermissionSet = useSelector( state => state.preferences.isPermissionSet )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
@@ -144,13 +145,14 @@ export default function AddContactAddressBook( props ) {
   }
 
   const getContactsAsync = async () => {
-    dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
       //console.log("chckContactPermission",chckContactPermission)
       if ( !chckContactPermission ) {
         // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
-        setModal( true )
+        if( !isPermissionSet ){
+          setModal( true )
+        }
       } else {
         getContactPermission()
       }
