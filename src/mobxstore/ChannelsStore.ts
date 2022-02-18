@@ -148,7 +148,6 @@ export default class ChannelsStore {
               )
             }
           } )
-          console.log(channels, "channels list!")
           this.channels = channels
           this.error = false
           this.loading = false
@@ -160,19 +159,17 @@ export default class ChannelsStore {
 
     // used it while debugging
     @action
-    public OpenChannel = async (request: any) => {
-      console.log(request, "open channel request")
-      let req = {
+    public OpenChannel = async ( request: any ) => {
+      const req = {
         local_funding_amount: request.local_funding_amount,
         min_confs: request.min_confs,
         node_pubkey_string: request.node_pubkey_string,
         private: request.private,
         sat_per_byte: request.sat_per_byte
       }
-      console.log(req, "+_+()")
-      await RESTUtils.openChannel(req)
-      .then((resp: any) => {
-      })
+      await RESTUtils.openChannel( req )
+        .then( ( resp: any ) => {
+        } )
     }
 
     @action
@@ -224,7 +221,7 @@ export default class ChannelsStore {
           host: request.host
         }
       } )
-        .then( (data: any) => {
+        .then( ( data: any ) => {
           this.errorPeerConnect = false
           this.connectingToPeer = false
           this.errorMsgPeer = null
@@ -287,7 +284,7 @@ export default class ChannelsStore {
         ...request
       }
 
-      console.log( openChanRequest, "openChanRequest action intro" )
+      console.log( openChanRequest, 'openChanRequest action intro' )
 
       RESTUtils.openChannelStream( openChanRequest )
         .then( ( data: any ) => {
@@ -308,7 +305,7 @@ export default class ChannelsStore {
             sat_per_vbyte: Number( sat_per_byte )
           }
 
-          console.log(fundPsbtRequest, "partially signed transactions")
+          console.log( fundPsbtRequest, 'partially signed transactions' )
 
           RESTUtils.fundPsbt( fundPsbtRequest )
             .then( ( data: any ) => {
@@ -325,7 +322,7 @@ export default class ChannelsStore {
                 ...request
               }
 
-              console.log(openChanRequest, "open channel Request")
+              console.log( openChanRequest, 'open channel Request' )
 
               RESTUtils.openChannel( openChanRequest )
                 .then( ( data: any ) => {
@@ -378,19 +375,19 @@ export default class ChannelsStore {
       this.peerSuccess = false
       this.channelSuccess = false
       this.openingChannel = true
-      console.log(this.settingsStore.implementation, "implementation", " and", request.utxos)
+      console.log( this.settingsStore.implementation, 'implementation', ' and', request.utxos )
       if (
         this.settingsStore.implementation === 'lnd' &&
             request.utxos &&
             request.utxos.length > 0
       ) {
-        console.log(request, "openchannel action")
+        console.log( request, 'openchannel action' )
         return this.openChannelLNDCoinControl( request )
       }
 
-    // opening channel request data had unrecognised fields (id) because of OpenChannelRequest class.. 
-    // so lnd was throwing error, hence created a separate request and added only required fields.
-      let req = {
+      // opening channel request data had unrecognised fields (id) because of OpenChannelRequest class..
+      // so lnd was throwing error, hence created a separate request and added only required fields.
+      const req = {
         local_funding_amount: request.local_funding_amount,
         min_confs: request.min_confs,
         node_pubkey_string: request.node_pubkey_string,
