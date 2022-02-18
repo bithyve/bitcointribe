@@ -313,7 +313,7 @@
     },
     "header": {
         "init": "Initialising Automated Cloud Backup",
-        "incomplete": "Automated Cloud Backup incomplete, please complete Level 1",
+        "incomplete": "Your wallet is not backed up. Create a backup",
         "l1": "Level 1 Automated Cloud Backup is complete",
         "l2": "Level 2 Double Backup is complete",
         "l3": "Level 3 Multi-key Backup is complete",
