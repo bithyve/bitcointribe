@@ -22,6 +22,7 @@ import {
   KeeperInfoInterface,
   KeeperType,
   LevelData,
+  LevelInfo,
   MetaShare,
   QRCodeTypes,
   ShareSplitScheme,
@@ -266,7 +267,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if( Contact ){ // if contact has been associated
       const currentContact: TrustedContact = trustedContacts[ channelKey ]
       if( currentContact ){ // if trusted contact has been established(permanent channel setted up)
-        if( !keeperQR ) generateKeeperQR( currentContact )  // prevents multiple generation as trusted-contact updates twice during init
+        if( !keeperQR ){ // prevents multiple generation as trusted-contact updates twice during init
+          generateKeeperQR( currentContact )
+          initiateKeeperHealth()
+        }
       }
     }
   }, [ Contact, trustedContacts ] )
@@ -291,13 +295,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       currentLevel
     } )
     setKeeperQR( qrData )
+  }
 
+  const initiateKeeperHealth = () => {
     if( isGuardianCreationClicked ) {
-
       let reshareVersion = 0
       const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
       if( share ) reshareVersion = share.meta.reshareVersion
-      const shareHealth = {
+      const shareHealth: LevelInfo = {
         walletId: wallet.walletId,
         shareId: selectedKeeper.shareId,
         reshareVersion,
@@ -310,6 +315,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       dispatch( updateMSharesHealth( shareHealth, isChange ) )
       dispatch( setChannelAssets( {
       }, null ) )
+      setIsGuardianCreationClicked( false )
     }
   }
 

@@ -49,7 +49,8 @@ import {
   notificationTag,
   LevelInfo,
   LevelData,
-  ShareSplitScheme
+  ShareSplitScheme,
+  KeeperType
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
@@ -566,39 +567,42 @@ const TrustedContactHistoryKeeper = ( props ) => {
     )
   }
 
-  const initiateGuardianCreation = async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any, shareType?: string, isRecreateChannel?: any} ) => {
-    const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-    const Contact = payload.chosenContactTmp
-    const isRecreateChannel = payload && payload.isRecreateChannel ? payload.isRecreateChannel : false
-
-    if( payload.shareType != 'existingContact' && isReshare && !isChangeKeeper && !isRecreateChannel ) return
-
+  const initiateGuardianCreation = async (
+    { isChangeTemp, chosenContactTmp, shareType, isRecreateChannel }:
+    {isChangeTemp?: any, chosenContactTmp?: any, shareType?: KeeperType, isRecreateChannel?: any}
+  ) => {
+    const isChangeKeeper = isChange ? isChange : isChangeTemp ? isChangeTemp : false
+    const Contact = chosenContactTmp
+    if( shareType != KeeperType.EXISTING_CONTACT && isReshare && !isChangeKeeper && !isRecreateChannel ) return
     setIsGuardianCreationClicked( true )
-    const channelKeyTemp: string = isRecreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : payload.shareType == 'existingContact' ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    const channelKeyTemp: string = isRecreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : shareType == KeeperType.EXISTING_CONTACT ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
     setChannelKey( channelKeyTemp )
 
-    let sharePosition: number
-    if( currentLevel === 0 ) sharePosition = -1
-    else{
-      const metaShareIndex = MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
-      if( metaShareIndex >= 0 ) sharePosition = metaShareIndex
-      else {
-        const oldMetaShareIndex = OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
-        if( oldMetaShareIndex >= 0 ) sharePosition = oldMetaShareIndex
-        else sharePosition = 2
+
+    if( shareType == KeeperType.EXISTING_CONTACT ){
+
+
+      let sharePosition: number
+      if( currentLevel === 0 ) sharePosition = -1
+      else{
+        const metaShareIndex = MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
+        if( metaShareIndex >= 0 ) sharePosition = metaShareIndex
+        else {
+          const oldMetaShareIndex = OldMetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId )
+          if( oldMetaShareIndex >= 0 ) sharePosition = oldMetaShareIndex
+          else sharePosition = 2
+        }
       }
-    }
 
-    let splitScheme: ShareSplitScheme
-    const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
-    if( share ) splitScheme = share.meta.scheme
-    else{
-      if( currentLevel == 0 ) splitScheme = ShareSplitScheme.OneOfOne
-      else splitScheme = ShareSplitScheme.TwoOfThree
-    }
+      let splitScheme: ShareSplitScheme
+      const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+      if( share ) splitScheme = share.meta.scheme
+      else{
+        if( currentLevel == 0 ) splitScheme = ShareSplitScheme.OneOfOne
+        else splitScheme = ShareSplitScheme.TwoOfThree
+      }
 
-    if( payload.shareType == 'existingContact' ){
-      const obj: KeeperInfoInterface = {
+      const keeperInfo: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
         type: shareType,
@@ -612,13 +616,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
         channelKey: channelKeyTemp
       }
 
-      dispatch( updatedKeeperInfo( obj ) )
+      dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     } else props.navigation.navigate( 'QrAndLink', {
+      // navigate to QRAndLink page and continue keeper(type: contact) creation process there
       contact: Contact,
       selectedKeeper: selectedKeeper,
       isChange: isChangeKeeper,
-      shareType: payload.shareType,
+      shareType,
       isReshare,
       oldChannelKey,
       channelKey: channelKeyTemp,
@@ -627,43 +632,46 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   useEffect( ()=> {
-    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId && shareType == 'existingContact' ) {
+    // invoke create/change guardian saga, once channel assets have been created
+    const channelAssetsCreated = !createChannelAssetsStatus
+
+    if( isGuardianCreationClicked && channelAssetsCreated && channelAssets.shareId == selectedKeeper.shareId && shareType === KeeperType.EXISTING_CONTACT ) {
       dispatch( createGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, isChangeKeeper: isChange, oldChannelKey, isExistingContact: shareType == 'existingContact' ? true : false
+        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, isChangeKeeper: isChange, oldChannelKey, isExistingContact: shareType == KeeperType.EXISTING_CONTACT ? true : false
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets, chosenContact, keeperInfo ] )
 
   useEffect( () => {
-    // capture the contact
-    if( !chosenContact ) return
-    const contacts: Trusted_Contacts = trustedContacts
-    const currentContact: TrustedContact = contacts[ channelKey ]
+    if( chosenContact ){ // if contact has been associated
+      const currentContact: TrustedContact = trustedContacts[ channelKey ]
+      if ( !currentContact || ( currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) return
+      initiateKeeperHealth()
+    }
+  }, [ chosenContact, trustedContacts ] )
 
-    if ( !currentContact || ( currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) return
-
+  const initiateKeeperHealth = () => {
     if( isGuardianCreationClicked ) {
-      const shareObj: LevelInfo = {
+      let reshareVersion = 0
+      const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+      if( share ) reshareVersion = share.meta.reshareVersion
+
+      const shareHealth: LevelInfo = {
         walletId: wallet.walletId,
         shareId: selectedKeeper.shareId,
-        reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-          MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion :
-          OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
-            OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion : 0,
+        reshareVersion,
         shareType: shareType,
         status: 'notAccessible',
         name: chosenContact && chosenContact.name ? chosenContact.name : '',
         updatedAt: 0
       }
 
-      if( shareType == 'existingContact' ) shareObj.updatedAt = 0
-      dispatch( updateMSharesHealth( shareObj, isChange ) )
+      dispatch( updateMSharesHealth( shareHealth, isChange ) )
       dispatch( setChannelAssets( {
       }, null ) )
       setIsGuardianCreationClicked( false )
-      // saveInTransitHistory()
     }
-  }, [ chosenContact, trustedContacts ] )
+  }
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
