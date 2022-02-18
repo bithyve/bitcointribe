@@ -63,8 +63,8 @@ export default class TransactionsStore {
         .then( ( data: any ) => {
           this.transactions = data.transactions
             .slice()
+            .sort( ( a, b )=> a.time_stamp - b.time_stamp )
             .reverse()
-            //.filter( tx=> tx.amount > 0 )
             .map( ( tx: any ) => new Transaction( tx ) )
           this.loading = false
         } )
