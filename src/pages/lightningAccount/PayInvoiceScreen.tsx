@@ -258,7 +258,7 @@ export default class PayInvoiceScreen extends React.Component<
                         value={customAmount}
                         onChangeText={( text: string ) =>
                           this.setState( {
-                            customAmount: text
+                            customAmount: text.replace( /\D/g, '' )
                           } )
                         }
                         numberOfLines={1}
