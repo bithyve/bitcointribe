@@ -160,8 +160,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
           ...amountTextStyle,
         }}
       >
-        {/* {formattedBalanceText} */}
-        62,108,155,00
+        {formattedBalanceText}
       </Text>
       <Text style={unitTextStyles}>{`${formattedUnitText}`}</Text>
     </View>
