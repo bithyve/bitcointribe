@@ -568,20 +568,33 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const initiateGuardianCreation = async (
-    { isChangeTemp, chosenContactTmp, shareType, isRecreateChannel }:
-    {isChangeTemp?: any, chosenContactTmp?: any, shareType?: KeeperType, isRecreateChannel?: any}
+    { changeKeeper, chosenContact, shareType, recreateChannel }:
+    { changeKeeper?: boolean, chosenContact?: any, shareType?: KeeperType, recreateChannel?: any}
   ) => {
-    const isChangeKeeper = isChange ? isChange : isChangeTemp ? isChangeTemp : false
-    const Contact = chosenContactTmp
-    if( shareType != KeeperType.EXISTING_CONTACT && isReshare && !isChangeKeeper && !isRecreateChannel ) return
-    setIsGuardianCreationClicked( true )
-    const channelKeyTemp: string = isRecreateChannel ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : shareType == KeeperType.EXISTING_CONTACT ? Contact.channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-    setChannelKey( channelKeyTemp )
+    const isChangeKeeper = isChange || changeKeeper
+    if( shareType != KeeperType.EXISTING_CONTACT && isReshare && !isChangeKeeper && !recreateChannel ) return
 
+    const contactDetails = chosenContact || {
+    }
+
+    let channelKeyToUse: string
+    if( recreateChannel ) channelKeyToUse =  BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+    else {
+      if( shareType == KeeperType.EXISTING_CONTACT ) channelKeyToUse = contactDetails.channelKey
+      else {
+        if( isChangeKeeper ) channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+        else {
+          if( selectedKeeper.channelKey ) channelKeyToUse = selectedKeeper.channelKey
+          else channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+        }
+      }
+    }
+
+
+    setIsGuardianCreationClicked( true )
+    setChannelKey( channelKeyToUse )
 
     if( shareType == KeeperType.EXISTING_CONTACT ){
-
-
       let sharePosition: number
       if( currentLevel === 0 ) sharePosition = -1
       else{
@@ -604,31 +617,34 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
       const keeperInfo: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
-        name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
+        name: contactDetails.name || contactDetails.displayedName || '',
         type: shareType,
         scheme: splitScheme,
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition,
         data: {
-          ...Contact, index
+          ...contactDetails,
+          index
         },
-        channelKey: channelKeyTemp
+        channelKey: channelKeyToUse
       }
 
       dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
-    } else props.navigation.navigate( 'QrAndLink', {
-      // navigate to QRAndLink page and continue keeper(type: contact) creation process there
-      contact: Contact,
-      selectedKeeper: selectedKeeper,
-      isChange: isChangeKeeper,
-      shareType,
-      isReshare,
-      oldChannelKey,
-      channelKey: channelKeyTemp,
-      recreateChannel: isRecreateChannel
-    } )
+    } else {
+      props.navigation.navigate( 'QrAndLink', {
+        // navigate to QRAndLink page and continue keeper(type: contact) creation process there
+        contact: contactDetails,
+        selectedKeeper: selectedKeeper,
+        isChange: isChangeKeeper,
+        shareType,
+        isReshare,
+        oldChannelKey,
+        channelKey: channelKeyToUse,
+        recreateChannel,
+      } )
+    }
   }
 
   useEffect( ()=> {
@@ -710,14 +726,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }
 
-  const onPressContinue = ( selectedContacts, isRecreateChannel? ) => {
+  const onPressContinue = ( selectedContacts, recreateChannel? ) => {
     Keyboard.dismiss()
-    let shareType = 'contact'
-    if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); shareType = 'existingContact' }
+    let shareType = KeeperType.CONTACT
+    if( selectedContacts.length && selectedContacts[ 0 ].isExisting ){ setChannelKey( selectedContacts[ 0 ].channelKey ); shareType = KeeperType.EXISTING_CONTACT }
     setShareType( shareType )
     setTimeout( () => {
       initiateGuardianCreation( {
-        chosenContactTmp: getContacts( selectedContacts ), shareType, isRecreateChannel: isRecreateChannel
+        chosenContact: getContacts( selectedContacts ), shareType, recreateChannel
       } )
     }, 10 )
   }

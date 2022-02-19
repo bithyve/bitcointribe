@@ -200,16 +200,31 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const initiateGuardianCreation = useCallback(
-    async ( { isChangeTemp, chosenContactTmp, isReshare }: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
-      const isChangeKeeper = isChange ? isChange : isChangeTemp ? isChangeTemp : false
+    async ( { changeKeeper, chosenContact, isReshare }: {changeKeeper?: boolean, chosenContact?: any, isReshare?: boolean} ) => {
+
+      const isChangeKeeper = isChange || changeKeeper
+      if( ( keeperQR || isReshare ) && !isChangeKeeper ) return
+
+      let channelKeyToUse: string
+      if( isReshare ) channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+      else {
+        if( selectedKeeper.shareType == KeeperType.EXISTING_CONTACT ) channelKeyToUse = channelKey
+        else {
+          if( isChangeKeeper ) channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+          else {
+            if( selectedKeeper.channelKey ) channelKeyToUse = selectedKeeper.channelKey
+            else channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+          }
+        }
+      }
+
+      const contactDetails = chosenContact || Contact || {
+      }
+
       setIsChange( isChangeKeeper )
-      const isReshareTemp = isReshare ? isReshare : null
-      if( ( keeperQR || isReshare ) && !isChangeKeeper && !isReshareTemp ) return
       setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = isReshareTemp ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-      setChannelKey( channelKeyTemp )
-      const contactDetails = chosenContactTmp ? chosenContactTmp : Contact
-      setContact( contactDetails )
+      setChannelKey( channelKeyToUse )
+      if( Object.keys( contactDetails ).length ) setContact( contactDetails )
 
       let sharePosition: number
       if( currentLevel === 0 ) sharePosition = -1
@@ -233,18 +248,17 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
       const keeperInfo: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
-        name: contactDetails ? ( contactDetails.name? contactDetails.name: contactDetails.displayedName ? contactDetails.displayedName: '' ): '',
+        name: contactDetails.name || contactDetails.displayedName || '',
         type: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
         scheme: splitScheme,
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition,
         data: {
-          ...( contactDetails? contactDetails: {
-          } ),
+          ...contactDetails,
           index
         },
-        channelKey: channelKeyTemp
+        channelKey: channelKeyToUse,
       }
 
       dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
@@ -486,7 +500,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
               setShowQr( true )
               setContact( contact )
               initiateGuardianCreation( {
-                isChangeTemp: true, chosenContactTmp: contact
+                changeKeeper: true, chosenContact: contact
               } )
             }
           } )
@@ -587,7 +601,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           setShowQr( true )
           setContact( contact )
           initiateGuardianCreation( {
-            isReshare: true, chosenContactTmp: contact
+            isReshare: true, chosenContact: contact
           } )
         }
       } )
@@ -602,7 +616,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         postAssociation: ( contact ) => {
           setShowQr( true )
           initiateGuardianCreation( {
-            chosenContactTmp: contact
+            chosenContact: contact
           } )
         }
       } )
