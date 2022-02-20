@@ -283,7 +283,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       if( currentContact ){ // if trusted contact has been established(permanent channel setted up)
         if( !keeperQR ){ // prevents multiple generation as trusted-contact updates twice during init
           generateKeeperQR( currentContact )
-          initiateKeeperHealth()
+          if( isGuardianCreationClicked ) initiateKeeperHealth()
         }
       }
     }
@@ -312,25 +312,23 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const initiateKeeperHealth = () => {
-    if( isGuardianCreationClicked ) {
-      let reshareVersion = 0
-      const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
-      if( share ) reshareVersion = share.meta.reshareVersion
-      const shareHealth: LevelInfo = {
-        walletId: wallet.walletId,
-        shareId: selectedKeeper.shareId,
-        reshareVersion,
-        shareType: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
-        status: 'notAccessible',
-        name: Contact && Contact.name ? Contact.name : '',
-        updatedAt: 0
-      }
-
-      dispatch( updateMSharesHealth( shareHealth, isChange ) )
-      dispatch( setChannelAssets( {
-      }, null ) )
-      setIsGuardianCreationClicked( false )
+    let reshareVersion = 0
+    const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+    if( share ) reshareVersion = share.meta.reshareVersion
+    const shareHealth: LevelInfo = {
+      walletId: wallet.walletId,
+      shareId: selectedKeeper.shareId,
+      reshareVersion,
+      shareType: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
+      status: 'notAccessible',
+      name: Contact && Contact.name ? Contact.name : '',
+      updatedAt: 0
     }
+
+    dispatch( updateMSharesHealth( shareHealth, isChange ) )
+    dispatch( setChannelAssets( {
+    }, null ) )
+    setIsGuardianCreationClicked( false )
   }
 
   const renderSecondaryDeviceContents = useCallback( () => {
