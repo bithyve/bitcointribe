@@ -478,12 +478,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
-
           props.navigation.navigate( 'FNFToKeeper', {
             ...props.navigation.state.params,
             onPressContinue
           } )
-
+          setIsChange( true )
           setChangeModal( false )
         }}
         onPressIgnore={() => {
@@ -639,14 +638,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const currentContact: TrustedContact = trustedContacts[ channelKey ]
       if ( !currentContact || ( currentContact && currentContact.relationType != TrustedContactRelationTypes.KEEPER ) ) return
 
-      if( isGuardianCreationClicked ) initiateKeeperHealth()
-      if( shareType !== KeeperType.EXISTING_CONTACT ){
-        props.navigation.navigate( 'QrAndLink', {
-          // navigate to QRAndLink page to generate and show links/QR
-          contact: chosenContact,
-          shareType,
-          channelKey,
-        } )
+      if( isGuardianCreationClicked ){
+        initiateKeeperHealth()
+        if( shareType !== KeeperType.EXISTING_CONTACT ){
+          props.navigation.navigate( 'QrAndLink', {
+            // navigate to QRAndLink page to generate and show links/QR
+            contact: chosenContact,
+            shareType,
+            channelKey,
+          } )
+        }
       }
     }
   }, [ chosenContact, trustedContacts ] )
