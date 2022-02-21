@@ -184,7 +184,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
 
   return (
     <>
-      <TouchableOpacity activeOpacity={1} style={styles.rootContainer} onPress={()=>{setNoOfTaps( noOfTaps+1 )}}>
+      <View style={styles.rootContainer} >
         <View style={styles.headerSectionContainer}>
           <Text style={HeadingStyles.sectionSubHeadingText}>
           xPub details for this account
@@ -222,10 +222,12 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
           keyExtractor={ item => item}
         />
 
-        <View
+        <TouchableOpacity
           style={{
             marginBottom: hp( 5 )
           }}
+          activeOpacity = {1}
+          onPress={()=>{setNoOfTaps( noOfTaps+1 )}}
         >
           <BottomInfoBox
             title={'Note'}
@@ -233,8 +235,8 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
               'This xPub is for this particular account only and not for the whole wallet. Each account has its own xPub'
             }
           />
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
       <ModalContainer onBackground={closeBottomSheet} visible={debugModal} closeBottomSheet = {closeBottomSheet}>
         <View style={styles.modalContainer}>
           <RenderDebugModal/>
