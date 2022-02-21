@@ -735,6 +735,7 @@ export enum KeeperType {
   PRIMARY_KEEPER = 'primaryKeeper',
   DEVICE = 'device',
   CONTACT = 'contact',
+  EXISTING_CONTACT = 'existingContact',
   PDF = 'pdf',
   SECURITY_QUESTION = 'securityQuestion',
 }

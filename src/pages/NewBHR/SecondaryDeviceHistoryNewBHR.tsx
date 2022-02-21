@@ -10,7 +10,6 @@ import { createChannelAssets, createGuardian, ErrorSending, modifyLevelData, set
 import { updateMSharesHealth } from '../../store/actions/BHR'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
 import HistoryPageComponent from './HistoryPageComponent'
 import SecondaryDevice from './SecondaryDeviceNewBHR'
 import moment from 'moment'
@@ -23,6 +22,7 @@ import {
   KeeperInfoInterface,
   KeeperType,
   LevelData,
+  LevelInfo,
   MetaShare,
   QRCodeTypes,
   ShareSplitScheme,
@@ -162,11 +162,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           setQrBottomSheetsFlag( false )
           setQRModal( false )
         }}
-        onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"erds","channelId":"28cc7e44b3ca629fe98450412f750d29fcf93d2de5057e841a665e8e73e98cfb","streamId":"b83dea121","secondaryChannelKey":"FLPy5dqRHTFCGqhZibhW9SLH","version":"1.8.0","walletId":"23887039bd673cfaa6fdc5ab9786aa130e010e9bbbc6731890361240ed83a55a"}'
-          dispatch( setApprovalStatus( false ) )
-          dispatch( downloadSMShare( qrScannedData ) )
-        }}
+        onPressContinue={() => {}}
       />
     )
   }
@@ -204,16 +200,31 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const initiateGuardianCreation = useCallback(
-    async ( { isChangeTemp, chosenContactTmp, isReshare }: {isChangeTemp?: any, chosenContactTmp?: any, isReshare?: any} ) => {
-      const isChangeKeeper = isChange ? isChange : isChangeTemp ? isChangeTemp : false
+    async ( { changeKeeper, chosenContact, isReshare }: {changeKeeper?: boolean, chosenContact?: any, isReshare?: boolean} ) => {
+
+      const isChangeKeeper = isChange || changeKeeper
+      if( ( keeperQR || isReshare ) && !isChangeKeeper ) return
+
+      let channelKeyToUse: string
+      if( isReshare ) channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+      else {
+        if( selectedKeeper.shareType == KeeperType.EXISTING_CONTACT ) channelKeyToUse = channelKey
+        else {
+          if( isChangeKeeper ) channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+          else {
+            if( selectedKeeper.channelKey ) channelKeyToUse = selectedKeeper.channelKey
+            else channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+          }
+        }
+      }
+
+      const contactDetails = chosenContact || Contact || {
+      }
+
       setIsChange( isChangeKeeper )
-      const isReshareTemp = isReshare ? isReshare : null
-      if( ( keeperQR || isReshare ) && !isChangeKeeper && !isReshareTemp ) return
       setIsGuardianCreationClicked( true )
-      const channelKeyTemp: string = isReshareTemp ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
-      setChannelKey( channelKeyTemp )
-      const contactDetails = chosenContactTmp ? chosenContactTmp : Contact
-      setContact( contactDetails )
+      setChannelKey( channelKeyToUse )
+      if( Object.keys( contactDetails ).length ) setContact( contactDetails )
 
       let sharePosition: number
       if( currentLevel === 0 ) sharePosition = -1
@@ -227,20 +238,27 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }
       }
 
+      let splitScheme: ShareSplitScheme
+      const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+      if( share ) splitScheme = share.meta.scheme
+      else{
+        if( currentLevel == 0 ) splitScheme = ShareSplitScheme.OneOfOne
+        else splitScheme = ShareSplitScheme.TwoOfThree
+      }
+
       const keeperInfo: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
-        name: contactDetails ? ( contactDetails.name? contactDetails.name: contactDetails.displayedName ? contactDetails.displayedName: '' ): '',
+        name: contactDetails.name || contactDetails.displayedName || '',
         type: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
-        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : currentLevel == 0 ? ShareSplitScheme.OneOfOne : ShareSplitScheme.TwoOfThree,
+        scheme: splitScheme,
         currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition,
         data: {
-          ...( contactDetails? contactDetails: {
-          } ),
+          ...contactDetails,
           index
         },
-        channelKey: channelKeyTemp
+        channelKey: channelKeyToUse,
       }
 
       dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
@@ -263,7 +281,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if( Contact ){ // if contact has been associated
       const currentContact: TrustedContact = trustedContacts[ channelKey ]
       if( currentContact ){ // if trusted contact has been established(permanent channel setted up)
-        if( !keeperQR ) generateKeeperQR( currentContact )  // prevents multiple generation as trusted-contact updates twice during init
+        if( !keeperQR ){ // prevents multiple generation as trusted-contact updates twice during init
+          generateKeeperQR( currentContact )
+          if( isGuardianCreationClicked ) initiateKeeperHealth()
+        }
       }
     }
   }, [ Contact, trustedContacts ] )
@@ -288,26 +309,26 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       currentLevel
     } )
     setKeeperQR( qrData )
+  }
 
-    if( isGuardianCreationClicked ) {
-
-      let reshareVersion = 0
-      const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
-      if( share ) reshareVersion = share.meta.reshareVersion
-      const shareHealth = {
-        walletId: wallet.walletId,
-        shareId: selectedKeeper.shareId,
-        reshareVersion,
-        shareType: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
-        status: 'notAccessible',
-        name: Contact && Contact.name ? Contact.name : '',
-        updatedAt: 0
-      }
-
-      dispatch( updateMSharesHealth( shareHealth, isChange ) )
-      dispatch( setChannelAssets( {
-      }, null ) )
+  const initiateKeeperHealth = () => {
+    let reshareVersion = 0
+    const share: MetaShare = MetaShares.find( value => value.shareId === selectedKeeper.shareId ) || OldMetaShares.find( value => value.shareId === selectedKeeper.shareId )
+    if( share ) reshareVersion = share.meta.reshareVersion
+    const shareHealth: LevelInfo = {
+      walletId: wallet.walletId,
+      shareId: selectedKeeper.shareId,
+      reshareVersion,
+      shareType: isPrimaryKeeper ? KeeperType.PRIMARY_KEEPER : KeeperType.DEVICE,
+      status: 'notAccessible',
+      name: Contact && Contact.name ? Contact.name : '',
+      updatedAt: 0
     }
+
+    dispatch( updateMSharesHealth( shareHealth, isChange ) )
+    dispatch( setChannelAssets( {
+    }, null ) )
+    setIsGuardianCreationClicked( false )
   }
 
   const renderSecondaryDeviceContents = useCallback( () => {
@@ -477,7 +498,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
               setShowQr( true )
               setContact( contact )
               initiateGuardianCreation( {
-                isChangeTemp: true, chosenContactTmp: contact
+                changeKeeper: true, chosenContact: contact
               } )
             }
           } )
@@ -578,7 +599,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           setShowQr( true )
           setContact( contact )
           initiateGuardianCreation( {
-            isReshare: true, chosenContactTmp: contact
+            isReshare: true, chosenContact: contact
           } )
         }
       } )
@@ -593,7 +614,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         postAssociation: ( contact ) => {
           setShowQr( true )
           initiateGuardianCreation( {
-            chosenContactTmp: contact
+            chosenContact: contact
           } )
         }
       } )
