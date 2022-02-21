@@ -74,6 +74,12 @@ const styles = StyleSheet.create( {
     resizeMode: 'contain',
     alignSelf: 'center',
   },
+  confirmationsText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    marginTop: RFValue( 4 ),
+  },
 
 } )
 
@@ -92,6 +98,12 @@ const TransactionItem = ( {
   currencyKind = useCurrencyKind()
 }: Props ) => {
   const { getAmount } = transaction
+
+  const confirmationsText = useMemo( () => {
+    return transaction.num_confirmations > 6 ?
+      ' 6+'
+      : ` ${transaction.num_confirmations}`
+  }, [ transaction.num_confirmations ] )
 
   const transactionKindIconColor = useMemo( () => {
     if ( Number( getAmount ) >= 0 ) {
@@ -138,6 +150,9 @@ const TransactionItem = ( {
             textColor="gray"
             isTestAccount={false}
           />
+          <ListItem.Subtitle style={styles.confirmationsText}>
+            {confirmationsText}
+          </ListItem.Subtitle>
           <ListItem.Chevron size={22}/>
 
         </ListItem.Content>
