@@ -1528,7 +1528,7 @@ function* setHealthStatusWorker( ) {
             if( shareArray ){
               yield call( updateSharesHealthWorker, {
                 payload: {
-                  shares: shareArray, isNeedToUpdateCurrentLevel: true
+                  shareHealth: shareArray, isKeeperChange: true
                 }
               } )
             }
@@ -2917,7 +2917,7 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
       }
       yield call( updateSharesHealthWorker, {
         payload:{
-          shares: shareObj, isNeedToUpdateCurrentLevel:false
+          shareHealth: shareObj
         }
       } )
       const KeeperInfoTemp = [ ...keeperInfo ]
