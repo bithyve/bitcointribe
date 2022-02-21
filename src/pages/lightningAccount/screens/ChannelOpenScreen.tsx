@@ -112,7 +112,7 @@ export default class OpenChannelScreen extends Component {
             } )
           }}
           value={this.state.node_pubkey_string}
-          placeholder="Node Pubkey"
+          placeholder="Node public key"
           inputContainerStyle={[ FormStyles.textInputContainer, styles.Input ]}
           inputStyle={FormStyles.inputText}
           placeholderTextColor={FormStyles.placeholderText.color}
@@ -139,7 +139,7 @@ export default class OpenChannelScreen extends Component {
           }}
           value={this.state.local_funding_amount}
           keyboardType="numeric"
-          placeholder="Local Amount"
+          placeholder="Local amount in sats"
           inputContainerStyle={[ FormStyles.textInputContainer, styles.Input ]}
           inputStyle={FormStyles.inputText}
           placeholderTextColor={FormStyles.placeholderText.color}
@@ -167,7 +167,7 @@ export default class OpenChannelScreen extends Component {
           }}
           value={this.state.sat_per_byte}
           keyboardType="numeric"
-          placeholder="Satoshis Per Byte"
+          placeholder="Sats/Byte"
           inputContainerStyle={[ FormStyles.textInputContainer, styles.Input ]}
           inputStyle={FormStyles.inputText}
           placeholderTextColor={FormStyles.placeholderText.color}

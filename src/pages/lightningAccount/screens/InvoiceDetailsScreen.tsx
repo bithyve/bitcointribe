@@ -15,6 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
 import Invoice from '../../../models/Invoice'
 import Toast from '../../../components/Toast'
+import HeaderTitle from '../../../components/HeaderTitle'
 
 export default class TransactionDetailsScreen extends Component {
   constructor( props ) {
@@ -55,7 +56,14 @@ export default class TransactionDetailsScreen extends Component {
         overScrollMode="never"
         bounces={false}
       >
-        <Text style={styles.textHeader}>Invoice Details</Text>
+        <HeaderTitle
+          firstLineTitle={'Invoice Details'}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
 
         <View style={styles.bodySection}>
           {!!payment_request && (
@@ -89,7 +97,7 @@ export default class TransactionDetailsScreen extends Component {
                 marginBottom: 3,
               }}
             >
-              {invoice.getAmount}
+              {`${invoice.getAmount} sats`}
             </Text>
           </View>
           <View style={styles.lineItem}>
