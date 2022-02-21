@@ -33,7 +33,7 @@ export default class OpenChannelScreen extends Component {
       node: props.navigation.getParam( 'node' ),
       node_pubkey_string: '',
       local_funding_amount: '',
-      min_confs: '1',
+      min_confs: '2',
       sat_per_byte: '2',
       private: false,
       host: '',
@@ -145,7 +145,7 @@ export default class OpenChannelScreen extends Component {
           placeholderTextColor={FormStyles.placeholderText.color}
           numberOfLines={1}
         />
-        <Input
+        {/* <Input
           value={this.state.min_confs}
           onChangeText={( val ) => {
             this.setState( {
@@ -158,7 +158,7 @@ export default class OpenChannelScreen extends Component {
           inputStyle={FormStyles.inputText}
           placeholderTextColor={FormStyles.placeholderText.color}
           numberOfLines={1}
-        />
+        /> */}
         <Input
           onChangeText={( val ) => {
             this.setState( {
