@@ -19,6 +19,9 @@ import Toast from '../../../components/Toast'
 export default class TransactionDetailsScreen extends Component {
   constructor( props ) {
     super( props )
+    this.state={
+      invoice: props.navigation.getParam( 'invoice', null ),
+    }
   }
 
   writeToClipboard = ( text: string ) => {
@@ -27,7 +30,7 @@ export default class TransactionDetailsScreen extends Component {
   };
 
   render() {
-    const invoice: Invoice = this.props.navigation.getParam( 'invoice', null )
+    const { invoice }: Invoice = this.state
     const {
       fallback_addr,
       r_hash,
@@ -126,7 +129,7 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment( new Date( parseInt( invoice.settleDate ) ) ).format(
+                {moment.unix( parseInt( invoice.settleDate ) ).format(
                   'DD/MM/YY • hh:MMa'
                 )}
               </Text>
@@ -144,17 +147,17 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment( new Date( parseInt( invoice.creationDate ) ) ).format(
+                {moment.unix( parseInt( invoice.creationDate ) ).format(
                   'DD/MM/YY • hh:MMa'
                 )}
               </Text>
             </View>
           )}
 
-          {!!expirationDate && (
+          {!!invoice.expiry && (
             <View style={styles.lineItem}>
               <Text style={ListStyles.listItemTitleTransaction}>
-                Expiration Date
+                Expiry
               </Text>
               <Text
                 style={{
@@ -162,9 +165,7 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment( new Date( parseInt( expirationDate ) ) ).format(
-                  'DD/MM/YY • hh:MMa'
-                )}
+                {`${invoice.expiry} seconds`}
               </Text>
             </View>
           )}

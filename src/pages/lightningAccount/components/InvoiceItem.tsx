@@ -119,7 +119,7 @@ const InvoiceItem = ( {
             {invoice.getMemo}
           </ListItem.Title>
           <ListItem.Subtitle style={styles.subtitleText}>
-            {`${invoice.isPaid? 'Paid': 'Unpaid'} ${moment( invoice.getDate ).format( 'DD/MM/YY • hh:MMa' )}`}
+            {`${invoice.isPaid? 'Paid': 'Unpaid'} ${invoice.getDate}`}
           </ListItem.Subtitle>
         </ListItem.Content>
 
