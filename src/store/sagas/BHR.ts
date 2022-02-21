@@ -299,30 +299,30 @@ export const generateLevel2SharesWatcher = createWatcher(
   GENERATE_LEVEL2_SHARES
 )
 
-function* updateSharesHealthWorker( { payload } ) {
-  console.log( 'UPDATE SHARE started', payload )
-  // // set a timelapse for auto update and enable instantaneous manual update
+function* updateSharesHealthWorker( { payload } ) {  // // set a timelapse for auto update and enable instantaneous manual update
   try {
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
-    payload.shares
     let currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
+    const { shareHealth, isKeeperChange } : {shareHealth: LevelInfo, isKeeperChange?: boolean} = payload
+
     for ( let i = 0; i < levelHealth.length; i++ ) {
       const levelInfo = levelHealth[ i ].levelInfo
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
-        if( element.shareId === payload.shares.shareId ){
-          levelHealth[ i ].levelInfo[ j ].updatedAt = payload.shares.updatedAt ? moment( new Date() ).valueOf() : levelHealth[ i ].levelInfo[ j ].updatedAt
-          if( typeof payload.shares.name !== 'undefined' ) levelHealth[ i ].levelInfo[ j ].name = payload.shares.name
-          levelHealth[ i ].levelInfo[ j ].reshareVersion = payload.shares.reshareVersion !== undefined ? payload.shares.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
-          levelHealth[ i ].levelInfo[ j ].shareType = payload.shares.shareType !== undefined ? payload.shares.shareType : levelHealth[ i ].levelInfo[ j ].shareType ? levelHealth[ i ].levelInfo[ j ].shareType : ''
-          if( payload.shares.status ){
-            levelHealth[ i ].levelInfo[ j ].status = payload.shares.status
+        if( element.shareId === shareHealth.shareId ){
+          levelHealth[ i ].levelInfo[ j ].updatedAt = shareHealth.updatedAt ? moment( new Date() ).valueOf() : isKeeperChange? 0: levelHealth[ i ].levelInfo[ j ].updatedAt
+          if( typeof shareHealth.name !== 'undefined' ) levelHealth[ i ].levelInfo[ j ].name = shareHealth.name
+          levelHealth[ i ].levelInfo[ j ].reshareVersion = shareHealth.reshareVersion !== undefined ? shareHealth.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
+          levelHealth[ i ].levelInfo[ j ].shareType = shareHealth.shareType !== undefined ? shareHealth.shareType : levelHealth[ i ].levelInfo[ j ].shareType ? levelHealth[ i ].levelInfo[ j ].shareType : ''
+          if( shareHealth.status ){
+            levelHealth[ i ].levelInfo[ j ].status = shareHealth.status
           }
           break
         }
       }
     }
+
     const tempLevelHealth = []
     const levelHealthForCurrentLevel = []
     levelHealthForCurrentLevel[ 0 ] = levelHealth[ 0 ]
@@ -381,7 +381,6 @@ function* updateSharesHealthWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
-    console.log( 'inside UPDATE_SHARES_HEALTH', error )
   }
 }
 

@@ -189,8 +189,6 @@ export default function QrAndLink( props ) {
     )
   }, [ OTP, renderTimer ] )
 
-  console.log( 'trustedQR', trustedQR )
-
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor

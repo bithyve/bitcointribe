@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-import { BackupStreamData, cloudDataInterface, KeeperInfoInterface, LevelHealthInterface, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, cloudDataInterface, KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -170,10 +170,10 @@ export const ErrorSending = ( isFailed ) => {
   }
 }
 
-export const updateMSharesHealth = ( shares, isNeedToUpdateCurrentLevel? ) => {
+export const updateMSharesHealth = ( shareHealth: LevelInfo, isKeeperChange?: boolean ) => {
   return {
     type: UPDATE_SHARES_HEALTH, payload: {
-      shares, isNeedToUpdateCurrentLevel
+      shareHealth, isKeeperChange
     }
   }
 }

@@ -84,8 +84,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ChangeModal, setChangeModal ] = useState( false )
   const [ shareOtpWithTrustedContactModal, setShareOtpWithTrustedContactModal ] = useState( false )
   const [ keeperDeviceConfirmMessageModal, setKeeperDeviceConfirmMessageModal ] = useState( false )
-  const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
-  const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  const  selectedKeeper  = props.navigation.getParam( 'selectedKeeper' )
+  const [ oldChannelKey, setOldChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
+  const [ channelKey, setChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ reshareModal, setReshareModal ] = useState( false )
@@ -104,19 +105,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
   const [ selectedTitle, setSelectedTitle ] = useState( props.navigation.getParam( 'selectedTitle' ) )
   const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
-  const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
-    ? props.navigation.getParam( 'isChangeKeeperType' )
-    : false )
+  const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) )
   const [ chosenContact, setChosenContact ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? null :
-    props.navigation.state.params.selectedKeeper && props.navigation.state.params.selectedKeeper.data && props.navigation.state.params.selectedKeeper.data.index
-      ? props.navigation.state.params.selectedKeeper.data
+    selectedKeeper && selectedKeeper.data && selectedKeeper.data.index
+      ? selectedKeeper.data
       : null,
   )
-  const [ shareType, setShareType ] = useState( props.navigation.getParam( 'selectedKeeper' ).shareType )
+  const [ shareType, setShareType ] = useState( selectedKeeper.shareType )
   const [ showFNFList, setShowFNFList ] = useState( false )
   const createChannelAssetsStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.loading.createChannelAssetsStatus )
   const isErrorSendingFailed = useSelector( ( state: RootStateOrAny ) => state.bhr.errorSending )
@@ -139,18 +137,18 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const approvalStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.approvalStatus )
 
-  useEffect( () => {
-    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-    setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notAccessible' && props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ? true : false )
-    setIsChange(
-      props.navigation.getParam( 'isChangeKeeperType' )
-        ? props.navigation.getParam( 'isChangeKeeperType' )
-        : false
-    )
-    setOldChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
-    setShareType( props.navigation.getParam( 'selectedKeeper' ).shareType ? props.navigation.getParam( 'selectedKeeper' ).shareType : 'contact' )
-  }, [ props.navigation.state.params ] )
+  // useEffect( () => {
+  //   setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
+  //   setSelectedKeeper( selectedKeeper )
+  //   setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
+  //   setIsChange(
+  //     props.navigation.getParam( 'isChangeKeeperType' )
+  //       ? props.navigation.getParam( 'isChangeKeeperType' )
+  //       : false
+  //   )
+  //   setOldChannelKey( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
+  //   setShareType( selectedKeeper.shareType ? selectedKeeper.shareType : 'contact' )
+  // }, [ props.navigation.state.params ] )
 
   useEffect( () => {
     if ( isChange ) {
@@ -219,7 +217,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }
       setContacts( existingContactsArr )
-      if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
+      if( selectedKeeper.status === 'notSetup' ) {
         // setTrustedContactModal( true )
         props.navigation.navigate( 'FNFToKeeper', {
           ...props.navigation.state.params,
@@ -230,7 +228,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       if ( shareHistory ) updateHistory( shareHistory )
     } )()
     const trustedContactsInfo: Keepers = trustedContacts
-    const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
+    const contactName = selectedKeeper.name.toLowerCase().trim()
     const trustedData = trustedContactsInfo[ contactName ]
 
     if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
@@ -249,15 +247,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ ] )
 
   const approvalCheck = async() => {
-    if( props.navigation.getParam( 'selectedKeeper' ).channelKey ){
-      const instream = useStreamFromContact( trustedContacts[ props.navigation.getParam( 'selectedKeeper' ).channelKey ], wallet.walletId, true )
+    if( selectedKeeper.channelKey ){
+      const instream = useStreamFromContact( trustedContacts[ selectedKeeper.channelKey ], wallet.walletId, true )
       const flag = await TrustedContactsOperations.checkSecondaryUpdated(
         {
           walletId: wallet.walletId,
           options:{
             retrieveSecondaryData: true
           },
-          channelKey: props.navigation.getParam( 'selectedKeeper' ).channelKey,
+          channelKey: selectedKeeper.channelKey,
           StreamId: instream.streamId
         }
       )
@@ -769,12 +767,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
           type={'contact'}
           IsReshare={isReshare}
           data={sortedHistory( trustedContactHistory )}
-          confirmButtonText={props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
+          confirmButtonText={selectedKeeper.updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressChange={() => {
             setKeeperTypeModal( true )
           }}
           onPressConfirm={() => {
-            if( props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
+            if( selectedKeeper.updatedAt == 0 ){
               props.navigation.navigate( 'FNFToKeeper', {
                 ...props.navigation.state.params,
                 onPressContinue
@@ -787,7 +785,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setReshareModal( true )
           }}
           isVersionMismatch={isVersionMismatch}
-          isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={isChange ? false : ( selectedKeeper.updatedAt > 0 || selectedKeeper.status == 'notAccessible' ) ? true : false}
           reshareButtonText={'Reshare'}
           changeButtonText={'Change'}
         />
