@@ -7,7 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Clipboard,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import Colors from '../../../common/Colors'
@@ -16,12 +17,26 @@ import Fonts from '../../../common/Fonts'
 import HeaderTitle from '../../../components/HeaderTitle'
 import { inject, observer } from 'mobx-react'
 import Toast from '../../../components/Toast'
-
+import QRCode from '../../../components/QRCode'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 @inject(
   'NodeInfoStore',
 )
 @observer
 export default class NodeInfoScreen extends Component {
+
+
+  constructor( props ) {
+    super( props )
+
+    this.state = {
+      showQr: []
+    }
+  }
+
 
   componentDidMount() {
     this.props.NodeInfoStore.reset()
@@ -31,6 +46,17 @@ export default class NodeInfoScreen extends Component {
   writeToClipboard  ( text: string ) {
     Clipboard.setString( text )
     Toast( 'Text Copied' )
+  }
+
+  showHideQR ( uri ) {
+    if( !this.state.showQr.includes( uri ) ){
+      const { showQr } = this.state
+      showQr.push( uri )
+      console.log( showQr,  )
+      this.setState( {
+        showQr,
+      } )
+    }
   }
 
   render() {
@@ -135,22 +161,72 @@ export default class NodeInfoScreen extends Component {
           {
             uris.length > 0 && (
               uris.map( uri => (
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  onPress={()=>this.writeToClipboard( uri )}
-                  style={styles.lineItem}>
-                  <Text style={ListStyles.listItemTitleTransaction}>
+                <View style={[ styles.lineItem, {
+                  alignItems: 'center'
+                } ]}>
+                  <View>
+                    <Text style={ListStyles.listItemTitleTransaction}>
                   URI
-                  </Text>
-                  <Text
-                    style={{
-                      ...ListStyles.listItemSubtitle,
-                      marginBottom: 3,
-                    }}
-                  >
-                    {uri}
-                  </Text>
-                </TouchableOpacity>
+                    </Text>
+                    <Text
+                      style={{
+                        ...ListStyles.listItemSubtitle,
+                        marginBottom: 3,
+                      }}
+                    >
+                      {uri}
+                    </Text>
+
+                  </View>
+
+                  <View style={styles.containerBtn}>
+
+                    <TouchableOpacity
+                      style={styles.button}
+                      activeOpacity={0.6}
+                      onPress={()=> this.showHideQR( uri )}
+                    >
+                      <Image
+                        source={require( '../../../assets/images/icons/qr.png' )}
+                        style={{
+                          width: wp( '5%' ), height: wp( '5%' ), marginLeft: 'auto',
+                        }}
+                        resizeMode={'contain'}
+                      />
+                      <Text style={[ styles.buttonText, {
+                        marginLeft: 4
+                      } ]}>SHOW QR</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.button}
+                      activeOpacity={0.6}
+                      onPress={()=> this.writeToClipboard( uri )}
+                    >
+                      <Image
+                        source={require( '../../../assets/images/icons/icon-copy.png' )}
+                        style={{
+                          width: wp( '5%' ), height: wp( '5%' ), marginLeft: 'auto',
+                        }}
+                        resizeMode={'contain'}
+                      />
+                      <Text style={[ styles.buttonText, {
+                        marginLeft: 4
+                      } ]}>COPY</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {
+                    this.state.showQr.includes( uri ) && (
+                      <QRCode
+                        size={hp( '25%' )}
+                        title="Node URI"
+                        value={uri}
+                      />
+                    )
+                  }
+
+                </View>
+
               ) )
             )
           }
@@ -191,5 +267,29 @@ const styles = StyleSheet.create( {
   containerRec: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  containerBtn: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: '100%',
+    marginVertical: 10
+  },
+
+  button: {
+    height: wp( '9%' ),
+    paddingHorizontal: wp( 2 ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: Colors.lightBlue,
+    marginHorizontal: wp( 1 ),
+    flexDirection: 'row',
+  },
+
+  buttonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
   },
 } )

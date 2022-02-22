@@ -5,7 +5,8 @@ import {
   Button,
   StyleSheet,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from 'react-native'
 import RESTUtils from '../../../utils/ln/RESTUtils'
 import CoveredQRCodeScanner from '../../../components/qr-code-scanning/CoveredQRCodeScanner'
@@ -23,6 +24,7 @@ import Colors from '../../../common/Colors'
 import CheckMark from '../../../assets/images/svgs/checkmark.svg'
 import Fonts from '../../../common/Fonts'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import NodeUriUtils from '../../../utils/ln/NodeUriUtils'
 
 @inject( 'ChannelsStore' )
 @observer
@@ -72,6 +74,16 @@ export default class OpenChannelScreen extends Component {
     Toast( 'Channel Opening Initiated' )
   };
 
+  onQrScan = ( qrData: string ) => {
+    if ( NodeUriUtils.isValidNodeUri( qrData ) ) {
+      const { pubkey, host } = NodeUriUtils.processNodeUri( qrData )
+      this.setState( {
+        node_pubkey_string: pubkey,
+        host,
+      } )
+    }
+  }
+
   render() {
     const { ChannelsStore } = this.props
     const {
@@ -94,6 +106,7 @@ export default class OpenChannelScreen extends Component {
         <View
           style={{
             margin: 5,
+            flexDirection: 'row'
           }}
         >
           <HeaderTitle
@@ -104,6 +117,24 @@ export default class OpenChannelScreen extends Component {
             infoTextNormal1={''}
             step={''}
           />
+          <TouchableOpacity
+            style={styles.buttonScan}
+            activeOpacity={0.6}
+            onPress={()=> this.props.navigation.navigate( 'ScanOpenChannel', {
+              onQrScan: this.onQrScan
+            } )}
+          >
+            <Image
+              source={require( '../../../assets/images/icons/qr.png' )}
+              style={{
+                width: wp( '5%' ), height: wp( '5%' ), marginLeft: 'auto',
+              }}
+              resizeMode={'contain'}
+            />
+            <Text style={[ styles.buttonText, {
+              marginLeft: 4
+            } ]}>SCAN QR</Text>
+          </TouchableOpacity>
         </View>
         <Input
           onChangeText={( val ) => {
@@ -274,7 +305,6 @@ const styles = StyleSheet.create( {
   },
   imageView: {
     alignItems: 'center',
-    backgroundColor: 'red'
   },
   viewSectionContainer: {
     marginBottom: 16,
@@ -299,5 +329,15 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     marginHorizontal: wp( 4 ),
     marginVertical: hp( '2%' ),
+  },
+  buttonScan: {
+    height: wp( '9%' ),
+    paddingHorizontal: wp( 2 ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: Colors.lightBlue,
+    marginHorizontal: wp( 1 ),
+    flexDirection: 'row',
   },
 } )

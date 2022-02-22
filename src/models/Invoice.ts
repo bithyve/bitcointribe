@@ -123,7 +123,6 @@ export default class Invoice extends BaseModel {
     }
 
     @computed public get getDate(): string | number | Date {
-      console.log( 'expires_at', this.expires_at || this.creation_date || this.timestamp )
       return this.isPaid
         ? this.settleDate
         : moment.unix( parseInt( this.expires_at || this.creation_date || this.timestamp || 0 ) ).format(
