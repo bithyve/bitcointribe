@@ -14,6 +14,7 @@ import TestSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaS
 import useWallet from '../state-selectors/UseWallet'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import config from '../../../bitcoin/HexaConfig'
+import LightningSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
 
 const isEnabled = ( accountType: AccountType, wallet: Wallet ) => {
   switch ( accountType ) {
@@ -47,6 +48,7 @@ export default function useNewAccountChoices() {
     [ SubAccountKind.REGULAR_ACCOUNT ]: 0,
     [ SubAccountKind.TEST_ACCOUNT ]: 0,
     [ SubAccountKind.DONATION_ACCOUNT ]: 0,
+    [ SubAccountKind.LIGHTNING_ACCOUNT ]: 0,
   }
 
   accountShells.forEach( ( shell ) => {
@@ -62,6 +64,9 @@ export default function useNewAccountChoices() {
           break
         case SubAccountKind.DONATION_ACCOUNT:
           hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] += 1
+          break
+        case SubAccountKind.LIGHTNING_ACCOUNT:
+          hexaAccountCounts[ SubAccountKind.LIGHTNING_ACCOUNT ] += 1
           break
         default:
           break
@@ -101,7 +106,13 @@ export default function useNewAccountChoices() {
         visibility: isEnabled( AccountType.TEST_ACCOUNT, wallet )? AccountVisibility.DEFAULT: AccountVisibility.HIDDEN,
       } ),
     ]
-
+    if( !accountShells.some( shell => shell.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) ){
+      hexaAccounts.push( new LightningSubAccountInfo ( {
+        defaultTitle: 'Lightning Account',
+        defaultDescription: 'User Lightning Account',
+        visibility: AccountVisibility.DEFAULT,
+      } ), )
+    }
     const serviceAccounts = [
       // new ExternalServiceSubAccountInfo( {
       //   instanceNumber: 1,

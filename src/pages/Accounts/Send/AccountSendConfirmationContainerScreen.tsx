@@ -241,7 +241,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       </View>
       <SendConfirmationCurrentTotalHeader
         Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-        />
+      />
 
       <TransactionPriorityMenu
         accountShell={sourceAccountShell}
@@ -371,7 +371,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignContent: 'center',
     justifyContent: 'space-evenly',
-    marginBottom: heightPercentageToDP('2%'),
+    marginBottom: heightPercentageToDP( '2%' ),
     paddingHorizontal:10,
   },
 

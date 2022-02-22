@@ -45,9 +45,9 @@ export default class AccountUtilities {
     else return bitcoinJS.networks.bitcoin
   }
 
-  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number ): string => {
+  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number, debug?: boolean ): string => {
     const { series, upperBound } = config.ACCOUNT_INSTANCES[ accountType ]
-    if( instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
+    if( !debug && instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
     const accountNumber = series + instanceNumber
 
     if( type === NetworkType.TESTNET ) return `m/49'/1'/${accountNumber}'`
@@ -259,7 +259,7 @@ export default class AccountUtilities {
         primary: account.xpub,
         secondary: ( account as MultiSigAccount ).xpubs.secondary,
         bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-    }, 2, network, itr, false )
+      }, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -278,7 +278,7 @@ export default class AccountUtilities {
         primary: account.xpub,
         secondary: ( account as MultiSigAccount ).xpubs.secondary,
         bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-    }, 2, network, itr, true )
+      }, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -371,7 +371,7 @@ export default class AccountUtilities {
             primary: account.xpub,
             secondary: ( account as MultiSigAccount ).xpubs.secondary,
             bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-            }, 2, network, nextFreeChangeAddressIndex, true ).address
+          }, 2, network, nextFreeChangeAddressIndex, true ).address
         else
           changeAddress = AccountUtilities.getAddressByIndex(
             account.xpub,
@@ -1034,10 +1034,10 @@ export default class AccountUtilities {
     setupSuccessful: boolean;
   }> => {
 
-    const xpubs = [account.xpub]
-    if( (account as MultiSigAccount).is2FA ){
-      xpubs.push(( account as MultiSigAccount ).xpubs.secondary)
-      xpubs.push(( account as MultiSigAccount ).xpubs.bithyve)
+    const xpubs = [ account.xpub ]
+    if( ( account as MultiSigAccount ).is2FA ){
+      xpubs.push( ( account as MultiSigAccount ).xpubs.secondary )
+      xpubs.push( ( account as MultiSigAccount ).xpubs.bithyve )
     }
 
     let res: AxiosResponse

@@ -16,6 +16,7 @@ import {
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
   IS_PERMISSION_SET,
   UPDATE_LAST_SEEN,
+  SET_CONTACT_PERMISSION_ASKED
 } from '../actions/preferences'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import ip, { chain } from 'icepick'
@@ -44,7 +45,8 @@ const initialState = ip.freeze( {
   cardData: null,
   isBackupProcessing: false,
   isPermissionSet: false,
-  walletId: null
+  walletId: null,
+  contactPermissionAsked: false,
 } )
 
 export default ( state = initialState, { type, payload } ) => {
@@ -146,6 +148,11 @@ export default ( state = initialState, { type, payload } ) => {
         return {
           ...state,
           isPermissionSet: payload.isPermissionSet,
+        }
+      case SET_CONTACT_PERMISSION_ASKED:
+        return {
+          ...state,
+          contactPermissionAsked: payload,
         }
 
       case SET_WALLET_ID:

@@ -19,6 +19,8 @@ const Colors = {
   white: '#ffffff',
   offWhite: '#F5F5F5',
   red: '#FF7761',
+  darkRed: '#F67761',
+  lightRed1: '#F0C9C2',
   tomatoRed: '#FF7861',
   homepageButtonColor: '#2C85C1',
   yellow: '#F7C910',
@@ -53,6 +55,10 @@ const Colors = {
   gray6: '#2F2F2F',
   gray7: '#FCFCFC',
   gray8: '#A0A0A0',
+  gray10: '#969696',
+  gray11: '#D1D1D1',
+  lightGreen1: '#70C1B380',
+  gray9: '#D0D0D0',
 
   primaryText: '#010101',
   secondaryText: '#8B8B8B',
@@ -60,5 +66,9 @@ const Colors = {
   primaryAccent: '#006CB4',
   primaryAccentLighter1: '#61ACE1',
   primaryAccentLighter2: '#77B9EB',
+
+  // lightning account
+  orange: '#FF7761',
+  mango: '#FABA5F'
 }
 export default Colors
