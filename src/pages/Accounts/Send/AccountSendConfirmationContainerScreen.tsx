@@ -33,6 +33,7 @@ import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 import { AccountsState } from '../../../store/reducers/accounts'
+import LoaderModal from '../../../components/LoaderModal'
 
 export type NavigationParams = {
 };
@@ -154,7 +155,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
-    setHandleButton(false);
+    setHandleButton( false )
     if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
@@ -185,7 +186,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         dispatch( sendTxNotification( txid ) )
         // showSendSuccessBottomSheet()
         setSuccess( true )
-        setHandleButton(true);
+        setHandleButton( true )
       }
     },
     onFailure: ( errorMessage: string | null ) => {
@@ -193,7 +194,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         setError( errorMessage )
         setTimeout( () => {
           setFailure( true )
-          setHandleButton(true);
+          setHandleButton( true )
         }, 200 )
       }
     },
@@ -244,7 +245,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       </View>
       <SendConfirmationCurrentTotalHeader
         Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-        />
+      />
 
       <TransactionPriorityMenu
         accountShell={sourceAccountShell}
@@ -285,7 +286,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         </View>
       </>
       }
-      <View style={styles.footerSection}> 
+      <View style={styles.footerSection}>
         <TouchableOpacity
           onPress={handleConfirmationButtonPress}
           style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
@@ -309,6 +310,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           </Text>
         </TouchableOpacity>
       </View>
+      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+        <LoaderModal
+          headerText={'Sending...'}
+        />
+      </ModalContainer>
+
     </KeyboardAwareScrollView>
   )
 }
@@ -374,7 +381,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignContent: 'center',
     justifyContent: 'space-evenly',
-    marginBottom: heightPercentageToDP('2%'),
+    marginBottom: heightPercentageToDP( '2%' ),
     paddingHorizontal:10,
   },
 
