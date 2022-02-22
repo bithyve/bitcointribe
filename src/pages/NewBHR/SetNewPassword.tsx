@@ -33,6 +33,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 
 import { useDispatch, useSelector } from 'react-redux'
+import zxcvbn from 'zxcvbn'
 import LoaderModal from '../../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { changeQuestionAnswer, setupPassword } from '../../store/actions/BHR'
@@ -109,6 +110,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
   const dispatch = useDispatch()
 
+  const [ passwordScore, setpasswordScore ] = useState( 0 )
+  const [ confirmpasswordScore, setconfirmpasswordScore ] = useState( 0 )
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
   const [ tempAns, setTempAns ] = useState( '' )
@@ -495,6 +498,18 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     )
   }
 
+  const getPasswordLevel = () => {
+    if( pswd ==appGeneratedPassword ){
+      return 'Strong Password'
+    }
+    if ( passwordScore < 2 ) {
+      return 'Weak Password'
+    } else if( passwordScore < 4 ) {
+      return 'Could be stronger'
+    }
+    return 'Strong Password'
+  }
+
   const renderEncryptionPswd = () => {
     return(
       <KeyboardAwareScrollView
@@ -561,9 +576,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               editable={isEditable}
               secureTextEntry = {hideShowPswd ? true : false}
               autoCapitalize="none"
-              onSubmitEditing={() =>
-                ( confirmPswdTextInput as any ).current.focus()
-              }
+              // onSubmitEditing={() =>
+              //   ( confirmPswdTextInput as any ).current.focus()
+              // }
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
@@ -572,6 +587,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               onChangeText={( text ) => {
                 setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                setPswdError( '' )
+                setpasswordScore( zxcvbn( text ).score )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -596,7 +613,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                 handlePswdSubmit()
               }}
             />
-            {pswd ? (
+            {/* {pswd ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowPswd( !hideShowPswd )
@@ -610,6 +627,22 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   color={Colors.blue}
                   name={hideShowPswd ? 'eye-off' : 'eye'}
                 />
+              </TouchableWithoutFeedback>
+            ) : null} */}
+            {pswd ? (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setHideShowPswd( !hideShowPswd )
+                }}
+              >
+                <Text
+                  style={{
+                    color: passwordScore > 3 ? Colors.green : passwordScore > 1 ? Colors.coral: Colors.red,
+                    fontFamily: Fonts.FiraSansItalic,
+                    fontSize: RFValue( 11 ),
+                    marginLeft: 4,
+                  }}
+                >{getPasswordLevel()}</Text>
               </TouchableWithoutFeedback>
             ) : null}
           </View>
@@ -637,10 +670,10 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               editable={isEditable}
               secureTextEntry = {hideShowConfirmPswd ? true : false}
               autoCapitalize="none"
-              onSubmitEditing={() => {
-                handlePswdSubmit();
-                ( hint as any ).current.focus()
-              }}
+              // onSubmitEditing={() => {
+              //   handlePswdSubmit();
+              //   ( hint as any ).current.focus()
+              // }}
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
@@ -649,6 +682,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               onChangeText={( text ) => {
                 setTempPswd( text )
                 setConfirmPswdMasked( text )
+                setPswdError( '' )
+                setconfirmpasswordScore( zxcvbn( text ).score )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -676,7 +711,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                 handlePswdSubmit()
               }}
             />
-            {tempPswd ? (
+            {/* {tempPswd ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowConfirmPswd( !hideShowConfirmPswd )
@@ -692,7 +727,23 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   name={hideShowConfirmPswd ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
-            ) : null}
+            ) : null} */}
+            {/* {tempPswd ? (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setHideShowConfirmPswd( !hideShowConfirmPswd )
+                }}
+              >
+                <Text
+                  style={{
+                    color: confirmpasswordScore > 3 ? Colors.green : confirmpasswordScore > 1 ? Colors.coral: Colors.red,
+                    fontFamily: Fonts.FiraSansItalic,
+                    fontSize: RFValue( 11 ),
+                    marginLeft: 4,
+                  }}
+                >{getConfirmPasswordLevel()}</Text>
+              </TouchableWithoutFeedback>
+            ) : null} */}
           </View>
 
           <View
@@ -947,9 +998,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   autoCorrect={false}
                   editable={isEditable}
                   autoCapitalize="none"
-                  onSubmitEditing={() =>
-                    ( confirmAnswerTextInput as any ).current.focus()
-                  }
+                  // onSubmitEditing={() =>
+                  //   ( confirmAnswerTextInput as any ).current.focus()
+                  // }
                   keyboardType={
                     Platform.OS == 'ios'
                       ? 'ascii-capable'

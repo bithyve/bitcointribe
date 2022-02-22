@@ -133,9 +133,9 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( 
+  const [ note, setNote ] = useState(
     navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
-    'Bitcoin is a new type of money that is not controlled by any government or company' )
+      'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -654,17 +654,17 @@ const GiftDetails = ( { navigation } ) => {
                 justifyContent: 'space-around',
                 alignItems: 'center',
                 borderRadius: 8,
-                backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
+                backgroundColor: Colors.lightBlue
               }}
             >
               <View style={styles.settingIcon}>
-              <Setting/>
+                <Setting/>
               </View>
               <Text style={{
                 color: 'white'
               }}>{'Advanced'}</Text>
               <View style={styles.menuIcon}>
-              <Menu/>
+                <Menu/>
               </View>
             </TouchableOpacity>
           </View>
@@ -1089,7 +1089,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 2 ),
     alignSelf: 'center'
-    
+
   },
   timeInfo:{
     width: '87%',
