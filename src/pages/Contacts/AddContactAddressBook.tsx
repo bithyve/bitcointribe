@@ -594,15 +594,19 @@ export default function AddContactAddressBook( props ) {
               // backgroundColor: 'red'
             }}
           >
-            <AppBottomSheetTouchableWrapper
-              disabled={isTC || selectedContacts.length == 0}
-              onPress={() => onPressContinue()}
-              style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
-                backgroundColor: Colors.lightBlue
-              } ]}
-            >
-              <Text style={styles.buttonText}>{common.confirmProceed}</Text>
-            </AppBottomSheetTouchableWrapper>
+            {
+              filterContactData.length > 0 && (
+                <AppBottomSheetTouchableWrapper
+                  disabled={isTC || selectedContacts.length == 0}
+                  onPress={() => onPressContinue()}
+                  style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
+                    backgroundColor: Colors.lightBlue
+                  } ]}
+                >
+                  <Text style={styles.buttonText}>{common.confirmProceed}</Text>
+                </AppBottomSheetTouchableWrapper>
+              )
+            }
             {props.navigation.state.params?.fromScreen === 'Edit' ?
               null :
               <AppBottomSheetTouchableWrapper
