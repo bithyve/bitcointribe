@@ -2,7 +2,6 @@ import AccountShell from '../../../../common/data/models/AccountShell'
 import useAccountsState from './UseAccountsState'
 import { useMemo } from 'react'
 import AccountVisibility from '../../../../common/data/enums/AccountVisibility'
-import { AccountType } from '../../../../bitcoin/utilities/Interface'
 
 
 export default function useActiveAccountShells(): AccountShell[] {
@@ -10,7 +9,7 @@ export default function useActiveAccountShells(): AccountShell[] {
   return useMemo( () => {
     const activeAccounts = []
     accountsState.accountShells.forEach( shell => {
-      if( shell?.primarySubAccount.visibility === AccountVisibility.DEFAULT && shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT ) activeAccounts.push( shell )
+      if( shell?.primarySubAccount.visibility === AccountVisibility.DEFAULT ) activeAccounts.push( shell )
     } )
 
     return activeAccounts || []
