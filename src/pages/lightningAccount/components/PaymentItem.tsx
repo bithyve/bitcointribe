@@ -123,7 +123,7 @@ const PaymentItem = ( {
             isTestAccount={false}
           />
           <ListItem.Subtitle style={styles.subtitleText}>
-            {`${moment( parseInt( payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )}`}
+            {`${moment.unix( parseInt( payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )}`}
           </ListItem.Subtitle>
         </ListItem.Content>
 

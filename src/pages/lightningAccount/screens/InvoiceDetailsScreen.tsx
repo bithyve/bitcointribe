@@ -15,10 +15,14 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
 import Invoice from '../../../models/Invoice'
 import Toast from '../../../components/Toast'
+import HeaderTitle from '../../../components/HeaderTitle'
 
 export default class TransactionDetailsScreen extends Component {
   constructor( props ) {
     super( props )
+    this.state={
+      invoice: props.navigation.getParam( 'invoice', null ),
+    }
   }
 
   writeToClipboard = ( text: string ) => {
@@ -27,7 +31,7 @@ export default class TransactionDetailsScreen extends Component {
   };
 
   render() {
-    const invoice: Invoice = this.props.navigation.getParam( 'invoice', null )
+    const { invoice }: Invoice = this.state
     const {
       fallback_addr,
       r_hash,
@@ -52,7 +56,14 @@ export default class TransactionDetailsScreen extends Component {
         overScrollMode="never"
         bounces={false}
       >
-        <Text style={styles.textHeader}>Invoice Details</Text>
+        <HeaderTitle
+          firstLineTitle={'Invoice Details'}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
 
         <View style={styles.bodySection}>
           {!!payment_request && (
@@ -86,7 +97,7 @@ export default class TransactionDetailsScreen extends Component {
                 marginBottom: 3,
               }}
             >
-              {invoice.getAmount}
+              {`${invoice.getAmount} sats`}
             </Text>
           </View>
           <View style={styles.lineItem}>
@@ -126,7 +137,7 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment( new Date( parseInt( invoice.settleDate ) ) ).format(
+                {moment.unix( parseInt( invoice.settleDate ) ).format(
                   'DD/MM/YY • hh:MMa'
                 )}
               </Text>
@@ -144,17 +155,17 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment( new Date( parseInt( invoice.creationDate ) ) ).format(
+                {moment.unix( parseInt( invoice.creationDate ) ).format(
                   'DD/MM/YY • hh:MMa'
                 )}
               </Text>
             </View>
           )}
 
-          {!!expirationDate && (
+          {!!invoice.expiry && (
             <View style={styles.lineItem}>
               <Text style={ListStyles.listItemTitleTransaction}>
-                Expiration Date
+                Expiry
               </Text>
               <Text
                 style={{
@@ -162,9 +173,7 @@ export default class TransactionDetailsScreen extends Component {
                   marginBottom: 3,
                 }}
               >
-                {moment( new Date( parseInt( expirationDate ) ) ).format(
-                  'DD/MM/YY • hh:MMa'
-                )}
+                {`${invoice.expiry} seconds`}
               </Text>
             </View>
           )}

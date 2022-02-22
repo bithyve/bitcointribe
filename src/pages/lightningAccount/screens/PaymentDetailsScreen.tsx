@@ -86,7 +86,7 @@ export default class PaymentDetailsScreen extends Component {
                 marginBottom: 3,
               }}
             >
-              {moment( parseInt( this.state.payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )}
+              {moment.unix( parseInt( this.state.payment.creation_date ) ).format( 'DD/MM/YY • hh:MMa' )}
             </Text>
           </View>
           <View style={styles.lineItem}>

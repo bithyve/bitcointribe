@@ -214,7 +214,10 @@ export default class ChannelsStore {
     @action
     public connectPeer = ( request: OpenChannelRequest ) => {
       this.connectingToPeer = true
-
+      this.error = false
+      this.errorPeerConnect = false
+      this.errorMsgChannel = null
+      this.errorMsgPeer = null
       RESTUtils.connectPeer( {
         addr: {
           pubkey: request.node_pubkey_string,

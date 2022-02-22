@@ -122,11 +122,7 @@ const AccountDetailsCard : React.FC<Props> = inject(
                   'On-Chain bitcoin'
               }
             </Text>
-            {
-              mode === Mode.ON_CHAIN && (
-                <ChainType />
-              )
-            }
+            <ChainType />
           </View>
           <View style={{
             marginLeft: 'auto'

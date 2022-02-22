@@ -19,6 +19,7 @@ import SubAccountSettingsStack from './SubAccountSettingsStack'
 import PaymentDetailsScreen from '../../../pages/lightningAccount/screens/PaymentDetailsScreen'
 import OnChainSendScreen from '../../../pages/lightningAccount/OnChainSendScreen'
 import NodeInfoScreen from '../../../pages/lightningAccount/screens/NodeInfoScreen'
+import ScanOpenChannel from '../../../pages/lightningAccount/screens/ScanOpenChannel'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -34,6 +35,12 @@ const AccountDetailsStack = createStackNavigator(
           borderBottomWidth: 0,
         },
       }
+    },
+    ScanOpenChannel: {
+      screen: ScanOpenChannel,
+      navigationOptions: {
+        header: null,
+      },
     },
     NodeInfoScreen: {
       screen: NodeInfoScreen,

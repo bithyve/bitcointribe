@@ -1,6 +1,7 @@
 import BaseModel from './BaseModel'
 import { observable, computed } from 'mobx'
 import DateTimeUtils from './../utils/ln/DateTimeUtils'
+import moment from 'moment'
 
 interface HopHint {
     fee_proportional_millionths: number;
@@ -124,9 +125,10 @@ export default class Invoice extends BaseModel {
     @computed public get getDate(): string | number | Date {
       return this.isPaid
         ? this.settleDate
-        : DateTimeUtils.listDate(
-          this.expires_at || this.creation_date || this.timestamp || 0
+        : moment.unix( parseInt( this.expires_at || this.creation_date || this.timestamp || 0 ) ).format(
+          'DD/MM/YY • hh:MMa'
         )
+
     }
 
     @computed public get settleDate(): Date {

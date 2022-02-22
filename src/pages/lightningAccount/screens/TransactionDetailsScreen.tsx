@@ -11,11 +11,16 @@ import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
+import { inject, observer } from 'mobx-react'
+import HeaderTitle from '../../../components/HeaderTitle'
 
+@inject(
+  'NodeInfoStore',
+)
+@observer
 export default class TransactionDetailsScreen extends Component {
   constructor( props ) {
     super( props )
-    // console.log(this.props.)
     this.state = {
       transaction: this.props.navigation.getParam( 'transaction' ),
       accountShellId: this.props.navigation.getParam( 'accountShellId' ),
@@ -23,15 +28,20 @@ export default class TransactionDetailsScreen extends Component {
   }
 
   render() {
-    console.log( this.props.navigation.getParam( 'transaction' ), 'transac' )
     return (
       <ScrollView
         contentContainerStyle={styles.rootContainer}
         overScrollMode="never"
         bounces={false}
       >
-
-        <Text style={styles.textHeader}>Transaction Details</Text>
+        <HeaderTitle
+          firstLineTitle={'Transaction Details'}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
 
         <View style={styles.bodySection}>
           <View style={styles.lineItem}>
@@ -42,7 +52,7 @@ export default class TransactionDetailsScreen extends Component {
                 marginBottom: 3,
               }}
             >
-              {this.state.transaction.amount}
+              {`${this.state.transaction.amount} sats`}
             </Text>
           </View>
           <View style={styles.lineItem}>
@@ -54,10 +64,19 @@ export default class TransactionDetailsScreen extends Component {
                 ...ListStyles.listItemSubtitle,
                 marginBottom: 3,
               }}
-              onPress={() =>
-                openLink(
-                  `https://blockstream.info/testnet/tx/${this.state.transaction.tx_hash}`
-                )
+              onPress={() =>{
+                if( this.props.NodeInfoStore.nodeInfo.testnet ){
+                  openLink(
+                    `https://blockstream.info/testnet/tx/${this.state.transaction.tx_hash}`
+                  )
+                } else {
+                  openLink(
+                    `https://blockstream.info/tx/${this.state.transaction.tx_hash}`
+                  )
+                }
+
+              }
+
               }
             >
               {this.state.transaction.tx_hash}
@@ -86,7 +105,7 @@ export default class TransactionDetailsScreen extends Component {
                 marginBottom: 3,
               }}
             >
-              {this.state.transaction.total_fees}
+              {`${this.state.transaction.total_fees} sats`}
             </Text>
           </View>
           <View style={styles.lineItem}>
@@ -100,7 +119,7 @@ export default class TransactionDetailsScreen extends Component {
               }}
             >
               {this.state.transaction.num_confirmations > 6
-                ? '+6'
+                ? '6+'
                 : this.state.transaction.num_confirmations}
             </Text>
           </View>
