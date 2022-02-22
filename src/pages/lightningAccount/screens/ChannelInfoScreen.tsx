@@ -20,7 +20,7 @@ export default class ChannelInfoScreen extends Component {
     this.state = {
       channelInfo: this.props.navigation.getParam( 'channelInfo' ),
       feeForm: false,
-      feeValue: null
+      feeValue: '2',
     }
   }
 
@@ -116,7 +116,7 @@ export default class ChannelInfoScreen extends Component {
           <ListCard heading={'Remote Balance'} data={this.state.channelInfo.remote_balance}/>
           <ListCard heading={'Unsettled Balance'} data={this.state.channelInfo.unsettled_balance}/>
           <ListCard heading={'Status'} data={this.state.channelInfo.active ? 'active' : 'inactive'}/>
-          <ListCard heading={'private'} data={this.state.channelInfo.private ? 'true' : 'false'}/>
+          <ListCard heading={'Private'} data={this.state.channelInfo.private ? 'true' : 'false'}/>
         </View>
         <View style={{
           flexDirection: 'row', justifyContent:'space-evenly'
@@ -127,107 +127,10 @@ export default class ChannelInfoScreen extends Component {
               this.state.channelInfo.channel_point,
               null,
               this.state.feeValue,
-              true
+              false
             )
           }}/>
         </View>
-        {/* <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text>{this.state.channelInfo.remote_pubkey}</Text>
-          <Text>local balance: {this.state.channelInfo.local_balance}</Text>
-
-          <Text>remote balance: {this.state.channelInfo.remote_balance}</Text>
-
-          <Text>
-            unsettled balance: {this.state.channelInfo.unsettled_balance}
-          </Text>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            justifyContent: 'space-around',
-          }}
-        >
-          <Text>
-            status: {this.state.channelInfo.active ? 'active' : 'inactive'}
-          </Text>
-          <Text>
-            private: {this.state.channelInfo.private ? 'true' : 'false'}
-          </Text>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <View
-            style={{
-              margin: 10,
-            }}
-          >
-            <Button
-              title="keysend"
-              onPress={() => {}}
-            />
-          </View>
-
-
-          <View
-            style={{
-              margin: 10,
-            }}
-          >
-            <Button
-              title="set fees"
-              onPress={() => {
-                if( this.state.feeForm ) {
-                  this.setState( {
-                    feeValue: null
-                  } )
-                }
-                this.setState( {
-                  feeForm: !this.state.feeForm
-                } )
-              }}
-            />
-            {this.state.feeForm && ( <TextInput
-              placeholder = {'fees'}
-              keyboardType="numeric"
-              onChangeText={( value ) => {
-                this.setState( {
-                  feeValue: value
-                } )
-              }}
-            /> )}
-          </View>
-
-          <View
-            style={{
-              margin: 10,
-            }}
-          >
-            <Button
-              title="close channel"
-              onPress={() => {
-                this.closeChannel(
-                  this.state.channelInfo.channel_point,
-                  null,
-                  this.state.feeValue,
-                  true
-                )
-              }}
-            />
-          </View>
-        </View> */}
       </ScrollView>
     )
   }
