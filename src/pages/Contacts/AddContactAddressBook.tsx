@@ -30,7 +30,7 @@ import EvilIcons from 'react-native-vector-icons/EvilIcons'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as Permissions from 'expo-permissions'
-import { setIsPermissionGiven } from '../../store/actions/preferences'
+import { setIsPermissionGiven, setContactPermissionAsked } from '../../store/actions/preferences'
 import ModalContainer from '../../components/home/ModalContainer'
 import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { v4 as uuid } from 'uuid'
@@ -49,7 +49,7 @@ export default function AddContactAddressBook( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
-  const isPermissionSet = useSelector( state => state.preferences.isPermissionSet )
+  const isPermissionSet = useSelector( state => state.preferences.contactPermissionAsked )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
@@ -67,7 +67,6 @@ export default function AddContactAddressBook( props ) {
 
   const requestContactsPermission = async () => {
     try {
-      dispatch( setIsPermissionGiven( true ) )
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
@@ -115,6 +114,8 @@ export default function AddContactAddressBook( props ) {
 
   const getContactPermission = async () => {
     dispatch( setIsPermissionGiven( true ) )
+    dispatch( setContactPermissionAsked( true ) )
+
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
       //console.log('GRANTED', granted);
@@ -147,9 +148,7 @@ export default function AddContactAddressBook( props ) {
   const getContactsAsync = async () => {
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
-      //console.log("chckContactPermission",chckContactPermission)
       if ( !chckContactPermission ) {
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         if( !isPermissionSet ){
           setModal( true )
         }
@@ -158,7 +157,6 @@ export default function AddContactAddressBook( props ) {
       }
     } else if ( Platform.OS === 'ios' ) {
       if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setModal( true )
       }
       else {
