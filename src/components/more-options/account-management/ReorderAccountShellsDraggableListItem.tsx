@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, View } from 'react-native'
+import { Image, View, } from 'react-native'
 import AccountShell from '../../../common/data/models/AccountShell'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { ListItem } from 'react-native-elements'
@@ -8,20 +8,20 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import { RFValue } from 'react-native-responsive-fontsize'
-
 export type Props = {
   accountShell: AccountShell;
   isActive: boolean;
   onLongPress?: () => void;
   containerStyle?: Record<string, unknown>;
+  setNumberOfTabs
 };
-
 const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
   accountShell,
   isActive,
   onLongPress = () => {},
   containerStyle = {
   },
+  setNumberOfTabs
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
@@ -29,6 +29,7 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
     <ListItem
       activeOpacity={1}
       onLongPress={onLongPress}
+      onPress = {()=> setNumberOfTabs( prev => prev+1 )}
       containerStyle={{
         opacity: isActive ? 0.6 : 1,
         backgroundColor: Colors.backgroundColor,
@@ -42,8 +43,6 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
       <View style={ImageStyles.thumbnailImageLarge} >
         {getAvatarForSubAccount( primarySubAccount, false, true )}
       </View>
-
-
       <ListItem.Content>
         <ListItem.Title
           style={[ ListStyles.listItemTitle, {
@@ -53,7 +52,6 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
         >
           {primarySubAccount.customDisplayName || primarySubAccount.defaultTitle}
         </ListItem.Title>
-
         <ListItem.Subtitle
           style={[ ListStyles.listItemSubtitle, {
             fontSize: RFValue( 10 ),
@@ -63,14 +61,14 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
           {primarySubAccount.customDescription || primarySubAccount.defaultDescription}
         </ListItem.Subtitle>
       </ListItem.Content>
-
       <Image
         source={require( '../../../assets/images/icons/icon_rearrange_new.png' )}
         style={ImageStyles.reorderItemIconImage}
         resizeMode='contain'
       />
+
     </ListItem>
   )
 }
-
 export default ReorderAccountShellsDraggableListItem
+

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import Navigator from './src/navigation/Navigator'
 import { Provider } from 'react-redux'
+import { Provider as MobxProvider } from 'mobx-react'
+import Stores from './src/mobxstore'
 import makeStore from './src/store'
 import NoInternetModalContents from './src/components/NoInternetModalContents'
 import { useDispatch } from 'react-redux'
@@ -52,16 +54,32 @@ export default function AppWrapper() {
   }, [] )
 
   return (
-    <RootSiblingParent>
-      <Provider store={store} uriPrefix={URI_PREFIX}>
-        <BottomSheetModalProvider>
-          <LocalizationProvider>
-            <AppContent />
-          </LocalizationProvider>
-        </BottomSheetModalProvider>
-      </Provider>
-    </RootSiblingParent>
 
+    <MobxProvider
+      SettingsStore={Stores.settingsStore}
+      BalanceStore={Stores.walletStore}
+      TransactionsStore={Stores.transactionsStore}
+      ChannelsStore={Stores.channelsStore}
+      NodeInfoStore={Stores.nodeInfoStore}
+      InvoicesStore={Stores.invoicesStore}
+      FiatStore={Stores.fiatStore}
+      UnitsStore={Stores.unitsStore}
+      PaymentsStore={Stores.paymentsStore}
+      FeeStore={Stores.feeStore}
+      UTXOsStore={Stores.utxosStore}
+      ActivityStore={Stores.activityStore}
+    >
+      <RootSiblingParent>
+        <Provider store={store} uriPrefix={URI_PREFIX}>
+          <BottomSheetModalProvider>
+            <LocalizationProvider>
+              <AppContent />
+            </LocalizationProvider>
+          </BottomSheetModalProvider>
+        </Provider>
+      </RootSiblingParent>
+
+    </MobxProvider>
   )
 }
 
