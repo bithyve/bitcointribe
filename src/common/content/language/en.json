@@ -318,6 +318,7 @@
         "l2": "Level 2 Double Backup is complete",
         "l3": "Level 3 Multi-key Backup is complete",
         "needAttention": " needs your attention.",
+        "Backupyour": "Backup your wallet to safeguard your sats",
         "wallet": "Wallet"
     },
     "stackTitle": {

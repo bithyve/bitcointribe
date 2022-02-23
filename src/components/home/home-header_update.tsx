@@ -94,8 +94,8 @@ const HomeHeader = ( {
     ( state ) => state.preferences.currencyCode
   )
 
-  const walletNameLength = walletName?.split('').length;
-  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+  const walletNameLength = walletName?.split( '' ).length
+  const walletNameNew = walletName.split( '' )[ walletNameLength - 1 ].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
@@ -115,7 +115,7 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: isError ? Colors.red : Colors.green,
+          backgroundColor: isError ? currentLevel === 0 ? Colors.gold : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
@@ -130,11 +130,11 @@ const HomeHeader = ( {
         </View>
       }
       {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp(0.8)
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageOne}</Text>{messageTwo}</Text> : <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp(0.8)
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp( 0.8 )
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageTwo}</Text></Text>}
@@ -172,7 +172,7 @@ const HomeHeader = ( {
       }
       if( currentLevel == 0 ){
         return {
-          isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
+          isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
         }
       } else if( currentLevel === 1 ){
         return {
@@ -194,7 +194,7 @@ const HomeHeader = ( {
       }
     } else {
       return {
-        isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
       }
     }
   }
