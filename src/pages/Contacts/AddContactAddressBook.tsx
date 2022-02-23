@@ -624,7 +624,7 @@ export default function AddContactAddressBook( props ) {
                     ...styles.proceedButtonText,
                   }}
                 >
-                  {common.skip}
+                  {filterContactData.length > 0 ? common.skip : common.continue}
                 </Text>
               </AppBottomSheetTouchableWrapper>
             }

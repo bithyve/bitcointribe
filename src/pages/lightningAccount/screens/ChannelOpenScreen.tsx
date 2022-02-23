@@ -6,7 +6,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
-  Image
+  Image,
+  SafeAreaView
 } from 'react-native'
 import RESTUtils from '../../../utils/ln/RESTUtils'
 import CoveredQRCodeScanner from '../../../components/qr-code-scanning/CoveredQRCodeScanner'
@@ -25,6 +26,7 @@ import CheckMark from '../../../assets/images/svgs/checkmark.svg'
 import Fonts from '../../../common/Fonts'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import NodeUriUtils from '../../../utils/ln/NodeUriUtils'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 @inject( 'ChannelsStore' )
 @observer
@@ -96,7 +98,7 @@ export default class OpenChannelScreen extends Component {
       channelSuccess,
     } = ChannelsStore
     return (
-      <View
+      <SafeAreaView
         style={{
           margin: 5,
           backgroundColor: Colors.backgroundColor,
@@ -105,18 +107,26 @@ export default class OpenChannelScreen extends Component {
       >
         <View
           style={{
-            margin: 5,
-            flexDirection: 'row'
+            margin: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
           }}
         >
-          <HeaderTitle
-            firstLineTitle={'Open a channel'}
-            secondLineTitle={''}
-            infoTextNormal={''}
-            infoTextBold={''}
-            infoTextNormal1={''}
-            step={''}
-          />
+          <TouchableOpacity
+            onPress={()=> this.props.navigation.goBack()}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
+            }}
+          >
+
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.blue}
+              size={20}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.buttonScan}
             activeOpacity={0.6}
@@ -136,6 +146,16 @@ export default class OpenChannelScreen extends Component {
             } ]}>SCAN QR</Text>
           </TouchableOpacity>
         </View>
+        <HeaderTitle
+          firstLineTitle={'Open a channel'}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+
+
         <Input
           onChangeText={( val ) => {
             this.setState( {
@@ -288,7 +308,7 @@ export default class OpenChannelScreen extends Component {
             </Text>
           )}
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

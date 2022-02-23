@@ -178,12 +178,7 @@ const AccountDetailsStack = createStackNavigator(
     ChannelOpenScreen: {
       screen: ChannelOpenScreen,
       navigationOptions: {
-        title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
+        header: null
       }
     },
   },
