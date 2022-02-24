@@ -20,6 +20,7 @@ import PaymentDetailsScreen from '../../../pages/lightningAccount/screens/Paymen
 import OnChainSendScreen from '../../../pages/lightningAccount/OnChainSendScreen'
 import NodeInfoScreen from '../../../pages/lightningAccount/screens/NodeInfoScreen'
 import ScanOpenChannel from '../../../pages/lightningAccount/screens/ScanOpenChannel'
+import Colors from '../../../common/Colors.js'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -135,6 +136,7 @@ const AccountDetailsStack = createStackNavigator(
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 0,
+          backgroundColor:Colors.backgroundColor
         },
       }
     },
@@ -147,6 +149,7 @@ const AccountDetailsStack = createStackNavigator(
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 0,
+          backgroundColor:Colors.backgroundColor
         },
       }
     },

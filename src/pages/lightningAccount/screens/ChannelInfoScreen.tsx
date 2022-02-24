@@ -1,17 +1,48 @@
 import { inject, observer } from 'mobx-react'
-import React, { Component } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import React, { Component, ReactElement } from 'react'
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native'
 import Toast from '../../../components/Toast'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import HeaderTitle from '../../../components/HeaderTitle'
+import HeaderTitle1 from '../../../components/HeaderTitle1'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+interface HTLC {
+  hash_lock: string;
+  expiration_height: number;
+  incoming: boolean;
+  amount: string;
+}
+
+interface ChannelFrame {
+  commit_weight: string;
+  local_balance: string;
+  commit_fee: string;
+  csv_delay: number;
+  channel_point: string;
+  chan_id: string;
+  fee_per_kw: string;
+  total_satoshis_received: string;
+  pending_htlcs: Array<HTLC>;
+  num_updates: string;
+  active: boolean;
+  remote_balance: string;
+  unsettled_balance: string;
+  total_satoshis_sent: string;
+  remote_pubkey: string;
+  capacity: string;
+  private: boolean;
+  state: string;
+  msatoshi_total: string;
+  msatoshi_to_us: string;
+  channel_id?: string;
+  alias?: string;
+}
 @inject( 'ChannelsStore', 'InvoicesStore' )
 @observer
 export default class ChannelInfoScreen extends Component {
@@ -19,10 +50,12 @@ export default class ChannelInfoScreen extends Component {
     super( props )
     this.state = {
       channelInfo: this.props.navigation.getParam( 'channelInfo' ),
+      alias : this.props.navigation.getParam( 'alias' ),
       feeForm: false,
       feeValue: '2',
     }
   }
+
 
   closeChannel = (
     channelPoint: string,
@@ -68,13 +101,16 @@ export default class ChannelInfoScreen extends Component {
     const ListCard = ( { heading, data } ) => {
       return (
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitleTransaction}>
+          <Text style={{
+            ...ListStyles.listItemTitleTransaction, fontSize: RFValue( 12 )
+          }}>
             {heading}
           </Text>
           <Text
             style={{
               ...ListStyles.listItemSubtitle,
               marginBottom: 3,
+              fontSize: RFValue( 12 )
             }}
           >
             {data}
@@ -83,6 +119,107 @@ export default class ChannelInfoScreen extends Component {
       )
     }
 
+    const RenderTemplate = ( { channelInfo }: { channelInfo: ChannelFrame } ): ReactElement => {
+      const ChannelBar = ( { offline } ) => {
+        const remote_balance: number = parseInt( channelInfo.remote_balance )
+        const local_balance: number = parseInt( channelInfo.local_balance )
+        const remoteEquity: number =
+          remote_balance / ( remote_balance + local_balance )
+        const localEquity: number =
+          local_balance / ( remote_balance + local_balance )
+        return (
+          <>
+            <View
+              style={
+                offline
+                  ? [
+                    styles.grayBoxContainer,
+                    {
+                      backgroundColor: Colors.gray11,
+                      borderRadius: 20,
+                    },
+                    {
+                      flex: localEquity,
+                    },
+                  ]
+                  : [
+                    styles.skyBlueBoxContainer,
+                    {
+                      backgroundColor: Colors.primaryAccentLighter2,
+                      borderRadius: 20,
+                    },
+                    {
+                      flex: localEquity,
+                    },
+                  ]
+              }
+            >
+              <Text numberOfLines={1} style={styles.channelPrice}>
+                {local_balance}
+                <Text style={styles.channelSats}>sats</Text>
+              </Text>
+            </View>
+            <View
+              style={
+                offline
+                  ? [
+                    styles.grayBoxContainer,
+                    {
+                      backgroundColor: Colors.gray11,
+                      borderRadius: 20,
+                    },
+                    {
+                      flex: remoteEquity,
+                    },
+                  ]
+                  : [
+                    styles.blueBoxContainer,
+                    {
+                      backgroundColor: Colors.darkBlue,
+                      borderRadius: 20,
+                    },
+                    {
+                      flex: remoteEquity,
+                    },
+                  ]
+              }
+            >
+              <Text numberOfLines={1} style={styles.channelPrice}>
+                {remote_balance}
+                <Text style={styles.channelSats}>sats</Text>
+              </Text>
+            </View>
+          </>
+        )
+      }
+
+      return (
+        <View
+          style={styles.signleChannelItem}
+        >
+          <View style={styles.myPrivateChannelContainer}>
+            <View
+              style={channelInfo.active ? styles.goodContainer : styles.badContainer}
+            >
+              <Text style={channelInfo.active ? styles.goodText : styles.badText}>
+                {channelInfo.active ? 'Active' : 'Offline'}
+              </Text>
+            </View>
+            <Text style={styles.privateChannelText}>
+              {this.state.alias ||
+                channelInfo.chan_id ||
+                channelInfo.alias}
+            </Text>
+          </View>
+
+          <View style={styles.channelBoxesMaincontainer}>
+            <View style={styles.channelBoxescontainer}>
+              <ChannelBar offline={!channelInfo.active} />
+            </View>
+          </View>
+        </View>
+      )
+    }
     const ButtonComponent = ( {  onPress } ) => {
       return (
         <TouchableOpacity
@@ -100,9 +237,9 @@ export default class ChannelInfoScreen extends Component {
       <ScrollView
         style={styles.rootContainer}
       >
-        <HeaderTitle
-          firstLineTitle={'Channel Details'}
-          secondLineTitle={''}
+        <HeaderTitle1
+          firstLineTitle={'Channel'}
+          secondLineTitle={'Channel Details'}
           infoTextNormal={''}
           infoTextBold={''}
           infoTextNormal1={''}
@@ -110,6 +247,7 @@ export default class ChannelInfoScreen extends Component {
         />
 
 
+        <RenderTemplate channelInfo={this.state.channelInfo}/>
         <View style={styles.bodySection}>
           <ListCard heading={'Channel ID'} data={this.state.channelInfo.remote_pubkey}/>
           <ListCard heading={'Local Balance'} data={this.state.channelInfo.local_balance}/>
@@ -140,6 +278,8 @@ const styles = StyleSheet.create( {
   rootContainer: {
     flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
+    paddingTop:30,
+    paddingHorizontal:10
   },
   textHeader: {
     fontSize: 24,
@@ -156,7 +296,7 @@ const styles = StyleSheet.create( {
 
   lineItem: {
     marginBottom: RFValue( 16 ),
-    backgroundColor: 'white',
+    backgroundColor: Colors.backgroundColor1,
     padding: 10,
     paddingHorizontal: 10,
     elevation: 4,
@@ -242,5 +382,100 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     marginHorizontal: wp( 4 ),
     marginVertical: hp( '2%' ),
+  },
+  skyBlueBoxContainer: {
+    padding: 4,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    marginRight: 2,
+  },
+  blueBoxContainer: {
+    padding: 4,
+    borderRadius: 3,
+    marginRight: 2,
+  },
+  grayBoxContainer: {
+    padding: 4,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  channelPrice: {
+    color: Colors.backgroundColor1,
+    fontSize: RFValue( 12 ),
+    marginLeft: 7,
+  },
+  channelSats: {
+    color: Colors.backgroundColor1,
+    fontSize: RFValue( 8 ),
+  },
+  rightArrow: {
+    width: widthPercentageToDP( 4 ),
+    height: widthPercentageToDP( 4 ),
+    resizeMode: 'contain',
+  },
+  goodContainer: {
+    backgroundColor: Colors.lightGreen1,
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  badContainer: {
+    backgroundColor: Colors.lightRed1,
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  goodText: {
+    textAlign: 'center',
+    fontSize: RFValue( 10 ),
+    fontWeight: '800',
+    color: Colors.darkGreen,
+  },
+  badText: {
+    color: Colors.darkRed,
+    textAlign: 'center',
+    fontSize: RFValue( 10 ),
+    fontWeight: '800',
+  },
+  privateChannelText: {
+    color: Colors.gray4,
+    fontSize: RFValue( 12 ),
+    fontWeight: '700',
+  },
+  channelBoxesMaincontainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 13,
+  },
+  channelBoxescontainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '90%',
+  },
+  priceText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 16 ),
+    color: Colors.black,
+  },
+  sats: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 10 ),
+    color: Colors.gray10,
+  },
+  signleChannelItem: {
+    backgroundColor: Colors.backgroundColor1,
+    borderRadius: 10,
+    marginTop: 10,
+    padding: 10,
+    paddingHorizontal: 10,
+    marginHorizontal:10
+  },
+  myPrivateChannelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 } )
