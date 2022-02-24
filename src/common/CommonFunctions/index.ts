@@ -496,27 +496,16 @@ export const processDeepLink = ( deepLink: string ) => {
       return
     }
 
-    if ( splits[ 3 ].toLocaleLowerCase() === 'giftqr' ){
-      Linking.openURL( deepLink )
-        .then( ( data ) => {
-          // console.log('WhatsApp Opened');
-        } )
-        .catch( () => {
-          //
-        } )
-      return
-    }
-    console.log( splits )
     // hexa links GiftQR
-    if ( splits[ 3 ] !== config.APP_STAGE ){
-      Alert.alert(
-        'Invalid deeplink',
-        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[ 3 ].toUpperCase()
-        }`,
-      )
-      return
-    }
+    // if ( splits[ 3 ] !== config.APP_STAGE ){
+    //   Alert.alert(
+    //     'Invalid deeplink',
+    //     `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+    //       splits[ 3 ].toUpperCase()
+    //     }`,
+    //   )
+    //   return
+    // }
 
 
     const version = splits.pop().slice( 1 )
@@ -591,9 +580,15 @@ export const processDeepLink = ( deepLink: string ) => {
     }
   }
   catch ( error ) {
-    Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
-    return {
-    }
+    Linking.openURL( deepLink )
+      .then( ( ) => {
+        // console.log('WhatsApp Opened');
+      } )
+      .catch( () => {
+        //
+      } )
+    return
+
   }
 }
 
