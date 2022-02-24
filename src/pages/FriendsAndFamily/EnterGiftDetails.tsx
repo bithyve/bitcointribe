@@ -40,6 +40,7 @@ import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
 import ThemeList from './Theme'
 import { updateUserName } from '../../store/actions/storage'
 import Toast from '../../components/Toast'
+import DeviceInfo from 'react-native-device-info'
 
 import { translations } from '../../common/content/LocContext'
 
@@ -47,6 +48,7 @@ import RadioButton from '../../components/RadioButton'
 import Feather from 'react-native-vector-icons/Feather'
 import ModalContainer from '../../components/home/ModalContainer'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 enum AdvancedSetting {
   FNF_IDENTIFICATION = 'FNF_IDENTIFICATION',
@@ -73,7 +75,7 @@ const ADVANCEDSETTINGDATA = [
     id: '3',
     type: AdvancedSetting.LONG_OTP,
     title: 'Long OTP (Unguessable)',
-    subtitle: 'Improved secuirty against server access/hack',
+    subtitle: 'Improved security against server access/hack',
   },
   {
     id: '4',
@@ -136,6 +138,9 @@ const GiftDetails = ( { navigation } ) => {
   const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.OTP )
   const [ note, setNote ] = useState(
     navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+      'Bitcoin is a new type of money that is not controlled by any government or company' )
+  const [ bottomNote, setbottomNote ] = useState(
+    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
       '' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
@@ -167,7 +172,7 @@ const GiftDetails = ( { navigation } ) => {
   }, [] )
 
   useEffect( ()=>{
-    setNote( ()=>{
+    setbottomNote( ()=>{
       if( encryptionType != 'DEFAULT' ){
         return `Your friend will be prompted to enter their ${encryptionType == 'OTP' ? 'OTP' : encryptionType == 'LONG_OTP' ? 'OTP':encryptionType == 'SECRET_PHRASE' &&'secret phrase' } while accepting the gift. You can change the 2FA from advanced.`
       }else{
@@ -625,6 +630,9 @@ const GiftDetails = ( { navigation } ) => {
         height: '100%',
       }}
       keyboardShouldPersistTaps="handled"
+      style = {{
+        backgroundColor: Colors.backgroundColor
+      }}
     >
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
@@ -980,7 +988,19 @@ const GiftDetails = ( { navigation } ) => {
             <View style={styles.statusIndicatorInactiveView} />
           </View>
         </View>
+
+
       </SafeAreaView>
+      <View style={{
+        marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
+      }}>
+        <BottomInfoBox
+          title={'Note'}
+          infoText={
+            bottomNote
+          }
+        />
+      </View>
     </ScrollView>
   )
 }
