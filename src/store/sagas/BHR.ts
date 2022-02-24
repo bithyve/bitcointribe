@@ -1877,9 +1877,10 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
         const currentContact: TrustedContact = contacts[ element.channelKey ]
-        if ( currentContact ) {
+        if ( currentContact &&  [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.PRIMARY_KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( currentContact.relationType ) ) {
           const instream: StreamData = useStreamFromContact( currentContact, wallet.walletId, true )
           if( levelInfo[ j ].updatedAt == 0 && instream ){
+
             const res = yield call( TrustedContactsOperations.checkSecondaryUpdated, {
               walletId: wallet.walletId, channelKey: element.channelKey, options: {
                 retrieveSecondaryData: true,
