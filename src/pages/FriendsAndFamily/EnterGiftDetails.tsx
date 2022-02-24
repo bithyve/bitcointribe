@@ -10,7 +10,8 @@ import {
   ScrollView,
   Platform,
   FlatList,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -166,7 +167,27 @@ const GiftDetails = ( { navigation } ) => {
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
+  const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
 
+  useEffect( () => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible( true )
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible( false )
+      }
+    )
+
+    return () => {
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
+  }, [] )
   useEffect( () => {
     setDropdownBoxList( ThemeList )
   }, [] )
@@ -973,7 +994,7 @@ const GiftDetails = ( { navigation } ) => {
           </TouchableOpacity>
         </View>
 
-        <View
+        {!isKeyboardVisible && <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -987,7 +1008,7 @@ const GiftDetails = ( { navigation } ) => {
             <View style={styles.statusIndicatorActiveView} />
             <View style={styles.statusIndicatorInactiveView} />
           </View>
-        </View>
+        </View>}
 
 
       </SafeAreaView>
