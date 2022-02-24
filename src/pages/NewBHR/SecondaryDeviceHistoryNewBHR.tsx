@@ -441,7 +441,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem( 'shareHistory' ),
       )
-      if ( shareHistory[ index ].inTransit || shareHistory[ index ].accessible ) {
+      if ( shareHistory && shareHistory[ index ].inTransit || shareHistory[ index ].accessible ) {
         setIsReshare( true )
       }
       if ( shareHistory ) updateHistory( shareHistory )
