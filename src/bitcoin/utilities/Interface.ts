@@ -871,6 +871,21 @@ export interface Wallet {
   version: string,
 }
 
+export interface LNNode {
+  host?: string,
+  port?: string,
+  url?: string,
+  lndhubUrl?: string,
+  existingAccount?: boolean,
+  macaroonHex?: string,
+  accessKey?: string,
+  username?: string,
+  password?: string,
+  implementation?: string,
+  certVerification?: boolean,
+  enableTor?: boolean
+}
+
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
   isUsable: boolean,                    // true if account is usable
@@ -917,6 +932,7 @@ export interface Account {
     isNew: boolean
     type: string;
   }[]
+  node?: LNNode
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -959,7 +975,8 @@ export enum AccountType {
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
-  FNF_ACCOUNT = 'FNF_ACCOUNT'
+  FNF_ACCOUNT = 'FNF_ACCOUNT',
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
 }
 
 export interface Accounts {

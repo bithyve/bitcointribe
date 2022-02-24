@@ -836,39 +836,42 @@ function* updateWalletImageWorker( { payload } ) {
     const accounts: Accounts = yield select( state => state.accounts.accounts )
     const acc = {
     }
+
     Object.values( accounts ).forEach( account => {
-      const shouldUpdate = accountIds.includes( account.id )
-      if( shouldUpdate )  {
-        const txns = []
-        const accToEncrypt: any = {
-          ...account
-        }
-        account.transactions.forEach( tx => {
-          txns.push( {
-            receivers: tx.receivers,
-            sender: tx.sender,
-            txid: tx.txid,
-            notes: tx.notes,
-            tags: tx.tags,
-            amount: tx.amount,
-            accountType: tx.accountType,
-            address: tx.address,
-            isNew: tx.isNew,
-            type: tx.type
+      if( account.type !== AccountType.LIGHTNING_ACCOUNT ){
+        const shouldUpdate = accountIds.includes( account.id )
+        if( shouldUpdate )  {
+          const txns = []
+          const accToEncrypt: any = {
+            ...account
+          }
+          account.transactions.forEach( tx => {
+            txns.push( {
+              receivers: tx.receivers,
+              sender: tx.sender,
+              txid: tx.txid,
+              notes: tx.notes,
+              tags: tx.tags,
+              amount: tx.amount,
+              accountType: tx.accountType,
+              address: tx.address,
+              isNew: tx.isNew,
+              type: tx.type
+            } )
           } )
-        } )
-        accToEncrypt.transactions = []
-        accToEncrypt.transactionsMeta = txns
-        const transactionsNote = {
-        }
-        if( accToEncrypt.transactionsNote.length > 0 ) {
-          accToEncrypt.transactionsNote.forEach( txNote => {
-            transactionsNote[ txNote.txId ] = txNote.note
-          } )
-        }
-        accToEncrypt.transactionsNote = transactionsNote
-        acc[ account.id ] = {
-          encryptedData: BHROperations.encryptWithAnswer( JSON.stringify( accToEncrypt ), encryptionKey ).encryptedData
+          accToEncrypt.transactions = []
+          accToEncrypt.transactionsMeta = txns
+          const transactionsNote = {
+          }
+          if( accToEncrypt.transactionsNote.length > 0 ) {
+            accToEncrypt.transactionsNote.forEach( txNote => {
+              transactionsNote[ txNote.txId ] = txNote.note
+            } )
+          }
+          accToEncrypt.transactionsNote = transactionsNote
+          acc[ account.id ] = {
+            encryptedData: BHROperations.encryptWithAnswer( JSON.stringify( accToEncrypt ), encryptionKey ).encryptedData
+          }
         }
       }
     } )

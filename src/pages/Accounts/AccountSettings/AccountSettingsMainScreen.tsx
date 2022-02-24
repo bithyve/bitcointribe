@@ -74,28 +74,18 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           },
           imageSource: () => <NameNDesc />,
         },
-        // ...( !accountShell.primarySubAccount.isTFAEnabled ? [
-        //   {
-        //     title: strings.ShowxPub,
-        //     subtitle: strings.ShowxPubSub,
-        //     screenName: 'ShowXPub',
-        //     screenParams: {
-        //       primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
-        //       accountShellID: accountShell.id,
-        //     },
-        //     imageSource: () => <Xpub />,
-        //   }
-        // ] : [] ),
-        {
-          title: strings.ShowxPub,
-          subtitle: strings.ShowxPubSub,
-          screenName: 'ShowXPub',
-          screenParams: {
-            primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
-            accountShellID: accountShell.id,
-          },
-          imageSource: () => <Xpub />,
-        },
+        ...( accountShell.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT ?[
+          {
+            title: strings.ShowxPub,
+            subtitle: strings.ShowxPubSub,
+            screenName: 'ShowXPub',
+            screenParams: {
+              primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
+              accountShellID: accountShell.id,
+            },
+            imageSource: () => <Xpub />,
+          }
+        ] : [] ),
         // {
         //   title: 'Account Sync',
         //   subtitle: 'Manually scan the account',

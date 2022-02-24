@@ -50,11 +50,16 @@ export default function SendConfirmationContent( props ) {
         </Text>
       </View>
 
-      <ScrollView style={{
-        marginTop: hp( '1.5%' ), marginBottom: hp( '1%' )
-      }}>
-        {props.recipients.map( ( item ) => renderRecipientItem( item ) )}
-      </ScrollView>
+      {
+        props.recipients && (
+          <ScrollView style={{
+            marginTop: hp( '1.5%' ), marginBottom: hp( '1%' )
+          }}>
+            {props.recipients.map( ( item ) => renderRecipientItem( item ) )}
+          </ScrollView>
+        )
+      }
+
 
       {props.infoText && (
         <View

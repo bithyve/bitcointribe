@@ -35,6 +35,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import HomeBuyCard from './HomeBuyCard'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -88,10 +89,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }
-    this.props.navigation.navigate( 'AccountDetails', {
-      accountShellID: selectedAccount.id,
-      swanDeepLinkContent: this.props.swanDeepLinkContent
-    } )
+    if( selectedAccount.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
+      this.props.navigation.navigate( 'LNAccountDetails', {
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent,
+        node: selectedAccount.primarySubAccount.node
+      } )
+    } else {
+      this.props.navigation.navigate( 'AccountDetails', {
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      } )
+    }
+
     // }
   };
 
