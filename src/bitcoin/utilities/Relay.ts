@@ -208,7 +208,7 @@ export default class Relay {
       try {
         res = await BH_AXIOS.post( 'claimCampaignGift', {
           HEXA_ID,
-          campaigId: campaignId,
+          campaignId: campaignId,
           walletID,
         } )
         return res.data
