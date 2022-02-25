@@ -83,8 +83,6 @@ const CreateGift = ( { navigation } ) => {
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
   const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
-  const [ timeLock, setTimeLock ] = useState( 1 )
-  const [ limitedValidity, setLimitedValidity ] = useState( 1 )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
@@ -212,60 +210,60 @@ const CreateGift = ( { navigation } ) => {
     }
 
     return(
-      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[8,8]}>
-      <TouchableOpacity
-        disabled={isDisabled}
-        onPress={()=>{
-          switch( condn ){
-              case 'Create Gift':
+      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[ 8, 8 ]}>
+        <TouchableOpacity
+          disabled={isDisabled}
+          onPress={()=>{
+            switch( condn ){
+                case 'Create Gift':
                 // creating multiple gift instances(based on giftInstances) of the same amount
-                const giftInstances = Number( numbersOfGift )
-                const giftAmountInSats = prefersBitcoin? Number( amount ): convertFiatToSats( parseFloat( amount ) )
+                  const giftInstances = Number( numbersOfGift )
+                  const giftAmountInSats = prefersBitcoin? Number( amount ): convertFiatToSats( parseFloat( amount ) )
 
-                const giftAmountsInSats = []
-                for( let int = 0; int < giftInstances; int++ ){
-                  giftAmountsInSats.push( giftAmountInSats )
-                }
+                  const giftAmountsInSats = []
+                  for( let int = 0; int < giftInstances; int++ ){
+                    giftAmountsInSats.push( giftAmountInSats )
+                  }
 
-                if( giftAmountsInSats.length ){
-                  setInitGiftCreation( true )
-                  setShowLoader( true )
-                  dispatch( generateGifts( {
-                    amounts: giftAmountsInSats,
-                    accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
-                    includeFee: includeFees,
-                    exclusiveGifts: giftAmountsInSats.length === 1? false: isExclusive,
-                  } ) )
-                }
-                break
+                  if( giftAmountsInSats.length ){
+                    setInitGiftCreation( true )
+                    setShowLoader( true )
+                    dispatch( generateGifts( {
+                      amounts: giftAmountsInSats,
+                      accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
+                      includeFee: includeFees,
+                      exclusiveGifts: giftAmountsInSats.length === 1? false: isExclusive,
+                    } ) )
+                  }
+                  break
 
-              case 'Add F&F and Send':
-                setGiftModal( false )
-                navigation.navigate( 'AddContact', {
-                  fromScreen: 'Gift',
-                  giftId: ( createdGift as Gift ).id,
-                  setActiveTab: navigation.state.params.setActiveTab
-                } )
-                break
+                case 'Add F&F and Send':
+                  setGiftModal( false )
+                  navigation.navigate( 'AddContact', {
+                    fromScreen: 'Gift',
+                    giftId: ( createdGift as Gift ).id,
+                    setActiveTab: navigation.state.params.setActiveTab
+                  } )
+                  break
 
-              case 'Send Gift':
-                setGiftModal( false )
-                navigation.navigate( 'EnterGiftDetails', {
-                  giftId: ( createdGift as Gift ).id,
-                  setActiveTab: navigation.state.params.setActiveTab
-                } )
-                break
+                case 'Send Gift':
+                  setGiftModal( false )
+                  navigation.navigate( 'EnterGiftDetails', {
+                    giftId: ( createdGift as Gift ).id,
+                    setActiveTab: navigation.state.params.setActiveTab
+                  } )
+                  break
+            }
+          }}
+          style={isDisabled ? {
+            ...styles.disabledButtonView
+          } : {
+            ...styles.buttonView
           }
-        }}
-        style={isDisabled ? {
-          ...styles.disabledButtonView
-        } : {
-          ...styles.buttonView
-        }
-        }
-      >
-        <Text style={styles.buttonText}>{text}</Text>
-      </TouchableOpacity>
+          }
+        >
+          <Text style={styles.buttonText}>{text}</Text>
+        </TouchableOpacity>
       </Shadow>
     )
   }
@@ -427,10 +425,28 @@ const CreateGift = ( { navigation } ) => {
     </ScrollView>
   }
 
-  const AdvanceGiftOptions = ( { title , stateToUpdate, imageToShow } ) => {
+  const AdvanceGiftOptions = ( { title, stateToUpdate, imageToShow } ) => {
+    const [ timer, SetTimer ] = useState( null )
+    const [ counter, SetCounter ] = useState( numbersOfGift )
+    const [ timeLock, setTimeLock ] = useState( 1 )
+    const [ limitedValidity, setLimitedValidity ] = useState( 1 )
+
+    let flag = null
+
+    const handleTimer = () => {
+      flag ==true ? plus() : flag ==false && minus()
+      flag !== null && SetTimer( () => setTimeout( () => handleTimer( ), 500 ) )
+    }
+    const stopTimer = () => {
+      flag = null
+      SetTimer( null )
+      clearTimeout( timer )
+      setNumbersOfGift( counter )
+    }
+
     const plus = () =>{
       if( stateToUpdate == 'gift' ){
-        setNumbersOfGift( numbersOfGift + 1 )
+        SetCounter( ( prev ) => prev + 1 )
       } else if( stateToUpdate == 'timeLock' ){
         setTimeLock( timeLock + 1 )
       } else if( stateToUpdate == 'limitedValidity' ){
@@ -440,7 +456,7 @@ const CreateGift = ( { navigation } ) => {
 
     const minus = () =>{
       if( stateToUpdate == 'gift' ){
-        if( numbersOfGift > 1 )setNumbersOfGift( numbersOfGift - 1 )
+        if( counter > 1 )SetCounter( ( prev ) => prev - 1 )
       } else if( stateToUpdate == 'timeLock' ){
         if( timeLock > 1 ) setTimeLock( timeLock - 1 )
       } else if( stateToUpdate == 'limitedValidity' ){
@@ -467,15 +483,19 @@ const CreateGift = ( { navigation } ) => {
             }}>{title}</Text>
             <Text style={{
               color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
-            }}>Gift Sats created will be of the 
-            <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>same amount</Text>
-             and can be 
-             <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>sent separately</Text></Text>
+            }}>Gift Sats created will be of the
+              <Text style= {{
+                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+              }}>same amount</Text>
+             and can be
+              <Text style= {{
+                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+              }}>sent separately</Text></Text>
           </View>
           <View style={{
             flexDirection:'row', alignItems: 'center',
           }}>
-            <TouchableOpacity onPress={()=>minus()} style={{
+            <TouchableOpacity onPressIn={()=> {flag = false ; handleTimer()}} onPressOut={()=>stopTimer()} style={{
               width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginRight: wp( '4%' )
             }}>
               <AntDesign name="minus"
@@ -489,13 +509,13 @@ const CreateGift = ( { navigation } ) => {
             }}><Text style={{
                 color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
               }}>{stateToUpdate == 'gift'
-                  ? numbersOfGift :
+                  ? counter :
                   stateToUpdate == 'timeLock' ?
                     timeLock :
                     limitedValidity
                 }</Text>
             </View>
-            <TouchableOpacity onPress={()=>plus()} style={{
+            <TouchableOpacity onPressIn={()=>{flag = true ; handleTimer()}} onPressOut={()=>stopTimer()} style={{
               width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginLeft: wp( '4%' )
             }}>
               <AntDesign name="plus"
@@ -532,7 +552,9 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               fontSize: RFValue( 11 ),
             }}>
-            (Restricts the gift to <Text style={{ fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic }}>one per Hexa app</Text> )
+            (Restricts the gift to <Text style={{
+                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+              }}>one per Hexa app</Text> )
             </Text>
           </Text>
 
@@ -951,7 +973,7 @@ const CreateGift = ( { navigation } ) => {
 
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), marginBottom: wp(7)
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), marginBottom: wp( 7 )
         }}>
           {renderButton( 'Create Gift',  'Create Gift' )}
         </View>
