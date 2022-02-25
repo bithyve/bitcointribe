@@ -98,6 +98,13 @@
             <data android:scheme="https"
                 android:host="@string/host"
                 android:pathPrefix="@string/giftPrefix" />
+        <intent-filter android:label="">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https"
+                android:host="@string/host"
+                android:pathPrefix="@string/campaignPrefix" />
         </intent-filter>
         <intent-filter android:label="@string/view_gift">
             <action android:name="android.intent.action.VIEW" />
