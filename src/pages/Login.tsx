@@ -189,11 +189,14 @@ export default function Login( props ) {
         // ErrorBottomSheet.current.snapTo( 1 )
         setErrorModal( true )
         setTimeout( () => {
+          // setJailBrokenTitle(
+          //   'Your phone does not have any secure entry like Pin or Biometric',
+          // )
           setJailBrokenTitle(
-            'Your phone does not have any secure entry like Pin or Biometric',
+            'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'This may be a security risk to your funds on Hexa',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Hexa',
           )
           setElevation( 0 )
         }, 2 )
@@ -394,7 +397,7 @@ export default function Login( props ) {
         modalRef={ErrorBottomSheet}
         title={JailBrokenTitle}
         info={JailBrokenInfo}
-        proceedButtonText={'Ok'}
+        proceedButtonText={'Continue'}
         onPressProceed={() => {
           // ErrorBottomSheet.current.snapTo( 0 )
           setErrorModal( false )
