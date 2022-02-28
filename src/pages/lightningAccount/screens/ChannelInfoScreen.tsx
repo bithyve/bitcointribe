@@ -1,6 +1,6 @@
 import { inject, observer } from 'mobx-react'
 import React, { Component, ReactElement } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native'
 import Toast from '../../../components/Toast'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -12,13 +12,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+
 interface HTLC {
   hash_lock: string;
   expiration_height: number;
   incoming: boolean;
   amount: string;
 }
-
 interface ChannelFrame {
   commit_weight: string;
   local_balance: string;
@@ -55,7 +56,6 @@ export default class ChannelInfoScreen extends Component {
       feeValue: '2',
     }
   }
-
 
   closeChannel = (
     channelPoint: string,
@@ -112,6 +112,7 @@ export default class ChannelInfoScreen extends Component {
               marginBottom: 3,
               fontSize: RFValue( 12 )
             }}
+            numberOfLines = {1}
           >
             {data}
           </Text>
@@ -229,47 +230,70 @@ export default class ChannelInfoScreen extends Component {
             onPress()
           }}
         >
-          <Text style={styles.buttonText}>Close Channel</Text>
+          <View style={{
+            flexDirection:'row', alignItems:'center'
+          }} >
+            <View style={styles.modalCrossButton}>
+              <FontAwesome name="close" color={'#77B9EB'} size={12} />
+            </View>
+            <View style={{
+              paddingLeft:13
+            }} >
+              <Text style={styles.buttonText}>Close Channel</Text>
+            </View>
+          </View>
         </TouchableOpacity>
       )
     }
     return (
-      <ScrollView
-        style={styles.rootContainer}
-      >
-        <HeaderTitle1
-          firstLineTitle={'Channel'}
-          secondLineTitle={'Channel Details'}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
+      <>
+        <ScrollView
+          style={styles.rootContainer}
+        >
+          <StatusBar barStyle="dark-content"/>
+          <HeaderTitle1
+            firstLineTitle={'Channels'}
+            secondLineTitle={'Channel Details'}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
 
 
-        <RenderTemplate channelInfo={this.state.channelInfo}/>
-        <View style={styles.bodySection}>
-          <ListCard heading={'Channel ID'} data={this.state.channelInfo.remote_pubkey}/>
-          <ListCard heading={'Local Balance'} data={this.state.channelInfo.local_balance}/>
-          <ListCard heading={'Remote Balance'} data={this.state.channelInfo.remote_balance}/>
-          <ListCard heading={'Unsettled Balance'} data={this.state.channelInfo.unsettled_balance}/>
-          <ListCard heading={'Status'} data={this.state.channelInfo.active ? 'active' : 'inactive'}/>
-          <ListCard heading={'Private'} data={this.state.channelInfo.private ? 'true' : 'false'}/>
-        </View>
+          <RenderTemplate channelInfo={this.state.channelInfo}/>
+          <View style={styles.bodySection}>
+            <ListCard heading={'Channel ID'} data={this.state.channelInfo.remote_pubkey}/>
+            <ListCard heading={'Local Balance'} data={this.state.channelInfo.local_balance}/>
+            <ListCard heading={'Remote Balance'} data={this.state.channelInfo.remote_balance}/>
+            <ListCard heading={'Unsettled Balance'} data={this.state.channelInfo.unsettled_balance}/>
+            <ListCard heading={'Status'} data={this.state.channelInfo.active ? 'active' : 'inactive'}/>
+            <ListCard heading={'Private'} data={this.state.channelInfo.private ? 'true' : 'false'}/>
+          </View>
+
+        </ScrollView>
         <View style={{
           flexDirection: 'row', justifyContent:'space-evenly'
         }}>
-          {/* <ButtonComponent text={'Keysend'} onPress={() => {}}/> */}
-          <ButtonComponent text={'Close Channel'} onPress={() => {
-            this.closeChannel(
-              this.state.channelInfo.channel_point,
-              null,
-              this.state.feeValue,
-              false
-            )
-          }}/>
+          <View style={{
+            alignItems:'center'
+          }} >
+            <View style={{
+              position:'absolute', bottom:20
+            }} >
+              {/* <ButtonComponent text={'Keysend'} onPress={() => {}}/> */}
+              <ButtonComponent text={'Close Channel'} onPress={() => {
+                this.closeChannel(
+                  this.state.channelInfo.channel_point,
+                  null,
+                  this.state.feeValue,
+                  false
+                )
+              }}/>
+            </View>
+          </View>
         </View>
-      </ScrollView>
+      </>
     )
   }
 }
@@ -279,7 +303,8 @@ const styles = StyleSheet.create( {
     flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
     paddingTop:30,
-    paddingHorizontal:10
+    paddingHorizontal:10,
+    position:'relative'
   },
   textHeader: {
     fontSize: 24,
@@ -295,10 +320,10 @@ const styles = StyleSheet.create( {
   },
 
   lineItem: {
-    marginBottom: RFValue( 16 ),
+    marginBottom: RFValue( 5 ),
     backgroundColor: Colors.backgroundColor1,
-    padding: 10,
-    paddingHorizontal: 10,
+    padding: 12,
+    paddingHorizontal: 20,
     elevation: 4,
     borderRadius: 8,
   },
@@ -363,23 +388,24 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
   },
   buttonText: {
-    color: Colors.white,
-    fontSize: RFValue( 13 ),
+    color: Colors.black,
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   buttonView: {
-    height: wp( '12%' ),
+    flexDirection:'row',
+    height: wp( '14%' ),
     width: wp( '40%' ),
     paddingHorizontal: wp( 2 ),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
+    borderRadius: 10,
+    shadowColor: '#8686860D',
     shadowOpacity: 1,
     shadowOffset: {
       width: 15, height: 15
     },
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.backgroundColor1,
     marginHorizontal: wp( 4 ),
     marginVertical: hp( '2%' ),
   },
@@ -429,15 +455,15 @@ const styles = StyleSheet.create( {
   },
   goodText: {
     textAlign: 'center',
-    fontSize: RFValue( 10 ),
-    fontWeight: '800',
+    fontSize: RFValue( 9 ),
+    fontWeight: '600',
     color: Colors.darkGreen,
   },
   badText: {
     color: Colors.darkRed,
     textAlign: 'center',
-    fontSize: RFValue( 10 ),
-    fontWeight: '800',
+    fontSize: RFValue( 9 ),
+    fontWeight: '600',
   },
   privateChannelText: {
     color: Colors.gray4,
@@ -478,4 +504,13 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  modalCrossButton: {
+    width: wp( 6 ),
+    height: wp( 6 ),
+    borderRadius: wp( 7/2 ),
+    backgroundColor: '#C8E1F4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft:'auto'
+  }
 } )
