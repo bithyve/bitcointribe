@@ -1012,7 +1012,7 @@ const GiftDetails = ( { navigation } ) => {
 
 
       </SafeAreaView>
-      <View style={{
+      {!dropdownBoxOpenClose && !isKeyboardVisible && <View style={{
         marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
       }}>
         <BottomInfoBox
@@ -1021,7 +1021,7 @@ const GiftDetails = ( { navigation } ) => {
             bottomNote
           }
         />
-      </View>
+      </View>}
     </ScrollView>
   )
 }
