@@ -51,6 +51,7 @@ const AccountDetailsStack = createStackNavigator(
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 0,
+          backgroundColor:Colors.offWhite
         },
       }
     },
@@ -124,6 +125,7 @@ const AccountDetailsStack = createStackNavigator(
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 0,
+          backgroundColor:Colors.offWhite
         },
       }
     },
