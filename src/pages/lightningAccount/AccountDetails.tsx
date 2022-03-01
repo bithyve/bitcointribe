@@ -311,13 +311,13 @@ const styles = StyleSheet.create( {
 
   scrollViewContainer: {
     paddingTop: 20,
-    // height: '100%',
+    flex:1,
     paddingHorizontal: 0,
     backgroundColor: Colors.backgroundColor,
   },
 
   viewSectionContainer: {
-    marginBottom: 10,
+
   },
 
   viewAccountDetailsCard: {

@@ -170,7 +170,7 @@ const defaultStyles = StyleSheet.create( {
   rootContainer: {
     flexDirection: 'row',
     // alignItems: 'baseline',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   currencyImage: {
@@ -181,9 +181,10 @@ const defaultStyles = StyleSheet.create( {
 
   amountText: {
     fontFamily: Fonts.OpenSans,
-    fontSize: RFValue( 17 ),
-    marginRight: 3,
+    fontSize: RFValue( 14.5 ),
+    marginRight: wp( 2 ),
     // alignItems: 'baseline',
+    // width:wp( 25 )
   },
 
   unitText: {

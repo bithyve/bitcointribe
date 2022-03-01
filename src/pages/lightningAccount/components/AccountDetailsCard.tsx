@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
+  Dimensions,
   ImageSourcePropType,
   AppState,
   Animated,
@@ -32,6 +33,10 @@ import  BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import Icon from '../../../assets/images/svgs/onchain_icon.svg'
 import LightningIcon from '../../../assets/images/svgs/ligntning_icon.svg'
 
+const windowWidth = Dimensions.get( 'window' ).width
+const windowHeight = Dimensions.get( 'window' ).height
+console.log( windowHeight )
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -47,6 +52,18 @@ export type Props = {
   mode: Mode;
   background:boolean
 };
+
+const getCardHeight = () => {
+  if( windowHeight >= 850 ){
+    return 20
+  }else if( windowHeight >= 750 ){
+    return 22
+  }else if( windowHeight >= 650 ){
+    return 24
+  } else if( windowHeight >= 550 ){
+    return 26
+  }
+}
 
 function shadowColorForAccountKind( mode ): string {
   switch ( mode ) {
@@ -228,7 +245,7 @@ const AccountDetailsCard : React.FC<Props> = inject(
         }
         //onPressOut={onPressOut}
         style={{
-          height: hp( '20%' )
+          height: hp(  getCardHeight() )
         }}
         imageStyle={[ styles.cardImageContainer, {
           backgroundColor: shadowColorForAccountKind( mode )
@@ -272,7 +289,7 @@ const styles = StyleSheet.create( {
 
   cardImageContainer: {
     width: '100%',
-    height: '95%',
+    height: '100%',
     borderRadius: cardBorderRadius,
     resizeMode: 'cover',
   },
@@ -311,7 +328,7 @@ const styles = StyleSheet.create( {
 
   balanceAmountText: {
     fontFamily: Fonts.OpenSans,
-    fontSize: 21,
+    fontSize: RFValue( 20 ),
   },
 
   balanceUnitText: {
