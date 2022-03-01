@@ -8,6 +8,7 @@
 
 #import "iCloud.h"
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "HEXA-Swift.h" 
 
 @implementation iCloud
