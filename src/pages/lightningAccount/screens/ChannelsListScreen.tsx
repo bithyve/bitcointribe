@@ -7,13 +7,14 @@ import {
   ActivityIndicator,
   StyleSheet,
   Image,
+  StatusBar,
 } from 'react-native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { inject, observer } from 'mobx-react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-import IconAddLight from '../../../assets/images/svgs/icon_add_dark.svg'
+import IconAddLight from '../../../assets/images/svgs/icon_add_light.svg'
 import HeaderTitle from '../../../components/HeaderTitle'
 
 import {
@@ -63,6 +64,9 @@ export default class ChannelScreen extends Component {
     this.props.ChannelsStore.reset()
     this.props.ChannelsStore.getChannels()
   }
+  numberWithCommas = ( num ) => {
+    return num.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' )
+  }
 
   uniqueKey = ( item: any, index: number ) => index.toString();
   renderTemplate = ( { item }: { item: ChannelFrame } ): ReactElement => {
@@ -73,6 +77,7 @@ export default class ChannelScreen extends Component {
         remote_balance / ( remote_balance + local_balance )
       const localEquity: number =
         local_balance / ( remote_balance + local_balance )
+
       return (
         <>
           <View
@@ -101,7 +106,7 @@ export default class ChannelScreen extends Component {
             }
           >
             <Text numberOfLines={1} style={styles.channelPrice}>
-              {local_balance}
+              {this.numberWithCommas( local_balance ) +' '}
               <Text style={styles.channelSats}>sats</Text>
             </Text>
           </View>
@@ -131,7 +136,7 @@ export default class ChannelScreen extends Component {
             }
           >
             <Text numberOfLines={1} style={styles.channelPrice}>
-              {remote_balance}
+              {this.numberWithCommas( remote_balance ) +' '}
               <Text style={styles.channelSats}>sats</Text>
             </Text>
           </View>
@@ -145,6 +150,7 @@ export default class ChannelScreen extends Component {
         onPress={() => {
           this.props.navigation.navigate( 'ChannelInfoScreen', {
             channelInfo: item,
+            alias : this.props.ChannelsStore.aliasesById[ item.chan_id ]
           } )
         }}
       >
@@ -179,6 +185,8 @@ export default class ChannelScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar barStyle="dark-content"/>
+
         <HeaderTitle
           firstLineTitle={'Channels'}
           secondLineTitle={''}
@@ -228,7 +236,7 @@ export default class ChannelScreen extends Component {
                     <Text style={styles.totalInbound}>Total Inbound</Text>
                   </View>
                   <Text style={styles.priceText}>
-                    {this.props.ChannelsStore.totalOutbound}{' '}
+                    {this.numberWithCommas( this.props.ChannelsStore.totalOutbound ) }{' '}
                     <Text style={styles.sats}>sats</Text>
                   </Text>
                 </View>
@@ -245,7 +253,7 @@ export default class ChannelScreen extends Component {
                     <Text style={styles.totalInbound}>Total Outbound</Text>
                   </View>
                   <Text style={styles.priceText}>
-                    {this.props.ChannelsStore.totalInbound}{' '}
+                    {this.numberWithCommas( this.props.ChannelsStore.totalInbound ) }{' '}
                     <Text style={styles.sats}>sats</Text>
                   </Text>
                 </View>
@@ -262,7 +270,7 @@ export default class ChannelScreen extends Component {
                     <Text style={styles.totalInbound}>Total offline</Text>
                   </View>
                   <Text style={styles.priceText}>
-                    {this.props.ChannelsStore.totalOffline}{' '}
+                    {this.numberWithCommas ( this.props.ChannelsStore.totalOffline ) }{' '}
                     <Text style={styles.sats}>sats</Text>
                   </Text>
                 </View>
@@ -281,7 +289,7 @@ const styles = StyleSheet.create( {
   contactText: {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
-    color: Colors.blue,
+    color: Colors.darkBlue,
     marginHorizontal: wp( 2 ),
   },
 
@@ -293,6 +301,7 @@ const styles = StyleSheet.create( {
   },
   container: {
     padding: 10,
+    paddingTop: 25,
     backgroundColor: '#F5F5F5',
     flex: 1,
   },
@@ -412,6 +421,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 16 ),
     color: Colors.black,
+    alignSelf:'auto'
   },
   sats: {
     fontFamily: Fonts.FiraSansRegular,
@@ -444,15 +454,15 @@ const styles = StyleSheet.create( {
   },
   goodText: {
     textAlign: 'center',
-    fontSize: RFValue( 10 ),
-    fontWeight: '800',
+    fontSize: RFValue( 9 ),
+    fontWeight: '700',
     color: Colors.darkGreen,
   },
   badText: {
     color: Colors.darkRed,
     textAlign: 'center',
-    fontSize: RFValue( 10 ),
-    fontWeight: '800',
+    fontSize: RFValue( 9 ),
+    fontWeight: '700',
   },
   privateChannelText: {
     color: Colors.gray4,

@@ -124,6 +124,7 @@ import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import Relay from '../../bitcoin/utilities/Relay'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -264,6 +265,7 @@ interface HomePropsTypes {
   approvalContactData: ContactRecipientDescribing;
   rejectedExistingContactRequest: any;
   trustedContacts: Trusted_Contacts;
+  walletId: string;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -325,41 +327,43 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.currentNotificationId= ''
   }
 
-  navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned:  async ( qrData )=>{
-        const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
-        if( trustedContactRequest ){
-          this.setState( {
-            trustedContactRequest
-          },
-          () => {
-            if ( trustedContactRequest.isContactGift ) {
-              this.openBottomSheetOnLaunch(
-                BottomSheetKind.GIFT_REQUEST,
-                1
-              )
-            } else {
-              this.openBottomSheetOnLaunch(
-                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                1
-              )
-            }
-
-          }
+  onCodeScanned = async ( qrData ) => {
+    const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
+    if( trustedContactRequest ){
+      this.setState( {
+        trustedContactRequest
+      },
+      () => {
+        if ( trustedContactRequest.isContactGift ) {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
+            1
+          )
+        } else {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
           )
         }
-        if( giftRequest ){
-          this.setState( {
-            giftRequest
-          },  () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.GIFT_REQUEST,
-              1
-            )
-          } )
-        }
-      },
+
+      }
+      )
+    }
+    if( giftRequest ){
+      this.setState( {
+        giftRequest
+      },  () => {
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.GIFT_REQUEST,
+          1
+        )
+      } )
+    }
+  }
+
+  navigateToQRScreen = () => {
+    this.props.navigation.navigate( 'QRScanner', {
+      onCodeScanned:  this.onCodeScanned,
     } )
   };
 
@@ -690,7 +694,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
-    const { trustedContactRequest, swanRequest, giftRequest } = await processDeepLink( url )
+    const { trustedContactRequest, swanRequest, giftRequest, campaignId } = await processDeepLink( url )
     if( trustedContactRequest ){
       this.setState( {
         trustedContactRequest,
@@ -728,6 +732,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
+    }
+    else if ( campaignId ) {
+      try {
+        const response = await Relay.getCampaignGift( campaignId, this.props.walletId )
+        if( response.error || response.err ){
+          Toast( response.error || response.err )
+        } else if( response.link ){
+          this.onCodeScanned( response.link )
+        }
+      } catch ( error ) {
+        Toast( error.message )
+        console.log( error )
+      }
     }
   }
 
@@ -1738,6 +1755,8 @@ const mapStateToProps = ( state ) => {
     availableKeepers: idx( state, ( _ ) => _.bhr.availableKeepers ),
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
+    walletId:
+    idx( state, ( _ ) => _.storage.wallet.walletId )
   }
 }
 
