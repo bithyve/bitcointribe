@@ -29,12 +29,14 @@ import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../../common/content/LocContext'
 import { Mode } from '../AccountDetails'
 import  BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import Icon from '../../../assets/images/svgs/onchain_icon.svg'
+import LightningIcon from '../../../assets/images/svgs/ligntning_icon.svg'
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { inject, observer } from 'mobx-react'
-
 export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
@@ -42,7 +44,8 @@ export type Props = {
   onPressOut: () => void;
   navigation: any;
   balance: string;
-  mode: Mode
+  mode: Mode;
+  background:boolean
 };
 
 function shadowColorForAccountKind( mode ): string {
@@ -66,7 +69,8 @@ const AccountDetailsCard : React.FC<Props> = inject(
   onPressOut,
   navigation,
   balance,
-  mode
+  mode,
+  background
 } ) => {
 
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
@@ -107,27 +111,36 @@ const AccountDetailsCard : React.FC<Props> = inject(
     return (
       <View style={styles.accountKindDetailsSection}>
         <View style={{
+          marginLeft: 'auto'
+        }}>
+          <SettingsButton />
+        </View>
+        <View style={{
           flexDirection: 'row',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           marginBottom: 4,
         }}>
+          {
+            mode === Mode.LIGHTNING ?
+              <LightningIcon/>:<Icon/>
+          }
           <View style={{
-            flexDirection:'row',
-            alignItems: 'center'
+            marginLeft:12
           }}>
-            <Text style={styles.title1Text}>
-              {
-                mode === Mode.LIGHTNING ?
-                  'Lightning bitcoin':
-                  'On-Chain bitcoin'
-              }
-            </Text>
-            <ChainType />
-          </View>
-          <View style={{
-            marginLeft: 'auto'
-          }}>
-            <SettingsButton />
+            <View style={{
+              flexDirection:'row',
+              alignItems: 'center'
+            }}>
+              <Text style={styles.title1Text}>
+                {
+                  mode === Mode.LIGHTNING ?
+                    'Lightning bitcoin':
+                    'On-Chain bitcoin'
+                }
+              </Text>
+              <ChainType />
+            </View>
+            <Text style={styles.transactionsText} >For direct layer 1 transactions</Text>
           </View>
         </View>
         {/* <View style={styles.accountKindBadgeImage} >
@@ -259,7 +272,7 @@ const styles = StyleSheet.create( {
 
   cardImageContainer: {
     width: '100%',
-    height: '100%',
+    height: '95%',
     borderRadius: cardBorderRadius,
     resizeMode: 'cover',
   },
@@ -336,6 +349,13 @@ const styles = StyleSheet.create( {
     borderRadius: 6,
     paddingVertical: 3,
     paddingHorizontal: 5
+  },
+  transactionsText:{
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 11 ),
+    color: Colors.white,
+    fontWeight:'400',
+    marginTop: hp( 0.3 )
   }
 } )
 
