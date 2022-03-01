@@ -3,7 +3,7 @@ import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInter
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
-import { Alert } from 'react-native'
+import { Alert, Linking } from 'react-native'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -496,16 +496,17 @@ export const processDeepLink = ( deepLink: string ) => {
       }
       return
     }
-    // hexa links
-    if ( splits[ 3 ] !== config.APP_STAGE ){
-      Alert.alert(
-        'Invalid deeplink',
-        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[ 3 ].toUpperCase()
-        }`,
-      )
-      return
-    }
+
+    // hexa links GiftQR
+    // if ( splits[ 3 ] !== config.APP_STAGE ){
+    //   Alert.alert(
+    //     'Invalid deeplink',
+    //     `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+    //       splits[ 3 ].toUpperCase()
+    //     }`,
+    //   )
+    //   return
+    // }
 
 
     const version = splits.pop().slice( 1 )
@@ -580,9 +581,15 @@ export const processDeepLink = ( deepLink: string ) => {
     }
   }
   catch ( error ) {
-    Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
-    return {
-    }
+    Linking.openURL( deepLink )
+      .then( ( ) => {
+        // console.log('WhatsApp Opened');
+      } )
+      .catch( () => {
+        //
+      } )
+    return
+
   }
 }
 

@@ -30,7 +30,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as Permissions from 'expo-permissions'
-import { setIsPermissionGiven } from '../../store/actions/preferences'
+import { setIsPermissionGiven, setContactPermissionAsked } from '../../store/actions/preferences'
 import ModalContainer from '../../components/home/ModalContainer'
 import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { v4 as uuid } from 'uuid'
@@ -49,6 +49,7 @@ export default function AddContactAddressBook( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const isPermissionSet = useSelector( state => state.preferences.contactPermissionAsked )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
@@ -66,7 +67,6 @@ export default function AddContactAddressBook( props ) {
 
   const requestContactsPermission = async () => {
     try {
-      dispatch( setIsPermissionGiven( true ) )
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
@@ -114,6 +114,8 @@ export default function AddContactAddressBook( props ) {
 
   const getContactPermission = async () => {
     dispatch( setIsPermissionGiven( true ) )
+    dispatch( setContactPermissionAsked( true ) )
+
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
       //console.log('GRANTED', granted);
@@ -144,19 +146,17 @@ export default function AddContactAddressBook( props ) {
   }
 
   const getContactsAsync = async () => {
-    dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
-      //console.log("chckContactPermission",chckContactPermission)
       if ( !chckContactPermission ) {
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
-        setModal( true )
+        if( !isPermissionSet ){
+          setModal( true )
+        }
       } else {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
       if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setModal( true )
       }
       else {
@@ -530,6 +530,37 @@ export default function AddContactAddressBook( props ) {
                 contentInset={{
                   right: 0, top: 0, left: 0, bottom: hp( 24 )
                 }}
+                ListEmptyComponent={()=>
+                  <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: wp( '8%' ),
+                  }}>
+                    <Text
+                      style={{
+                        fontFamily: Fonts.FiraSansRegular,
+                        color: Colors.secondaryText,
+                        textAlign: 'center'
+                      }}
+                    >{strings.cannotSelect}</Text>
+                    {/* <AppBottomSheetTouchableWrapper
+                      onPress={() => getContactPermission()}
+                      style={{
+                        // height: wp( '8%' ),
+                        marginTop: hp( 1.8 ),
+                        paddingLeft: wp( '8%' ),
+                      }}
+                    >
+                      <Text
+                        style={{
+                          ...styles.proceedButtonText,
+                        }}
+                      >
+                        Grant Permission
+                      </Text>
+                    </AppBottomSheetTouchableWrapper> */}
+                  </View>
+                }
                 renderItem={( { item, index } ) => {
                   let selected = false
                   if (
@@ -607,15 +638,19 @@ export default function AddContactAddressBook( props ) {
               // backgroundColor: 'red'
             }}
           >
-            <AppBottomSheetTouchableWrapper
-              disabled={isTC || selectedContacts.length == 0}
-              onPress={() => onPressContinue()}
-              style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
-                backgroundColor: Colors.lightBlue
-              } ]}
-            >
-              <Text style={styles.buttonText}>{common.confirmProceed}</Text>
-            </AppBottomSheetTouchableWrapper>
+            {
+              filterContactData.length > 0 && (
+                <AppBottomSheetTouchableWrapper
+                  disabled={isTC || selectedContacts.length == 0}
+                  onPress={() => onPressContinue()}
+                  style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
+                    backgroundColor: Colors.lightBlue
+                  } ]}
+                >
+                  <Text style={styles.buttonText}>{common.confirmProceed}</Text>
+                </AppBottomSheetTouchableWrapper>
+              )
+            }
             {props.navigation.state.params?.fromScreen === 'Edit' ?
               null :
               <AppBottomSheetTouchableWrapper
@@ -633,7 +668,7 @@ export default function AddContactAddressBook( props ) {
                     ...styles.proceedButtonText,
                   }}
                 >
-                  {common.skip}
+                  {filterContactData.length > 0 ? common.skip : common.continue}
                 </Text>
               </AppBottomSheetTouchableWrapper>
             }
@@ -647,7 +682,7 @@ export default function AddContactAddressBook( props ) {
             }
           </View>
           {/* )} */}
-          <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
+          {/* <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
               title={strings.erroraAccessing}
               info={errorMessage}
@@ -664,7 +699,7 @@ export default function AddContactAddressBook( props ) {
               isBottomImage={true}
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
-          </ModalContainer>
+          </ModalContainer> */}
           <ModalContainer onBackground={()=>setModal( false )} visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
@@ -672,7 +707,7 @@ export default function AddContactAddressBook( props ) {
               info={strings.info}
               otherText={strings.otherText}
               proceedButtonText={common.continue}
-              isIgnoreButton={true}
+              isIgnoreButton={false}
               onPressProceed={() => {
                 getContactPermission()
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )

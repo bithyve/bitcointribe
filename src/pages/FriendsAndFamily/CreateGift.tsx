@@ -69,7 +69,7 @@ import { Shadow } from 'react-native-shadow-2'
 
 const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const activeAccounts = useActiveAccountShells()
+  const activeAccounts = useActiveAccountShells().filter( shell => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT )
   const currencyKind: CurrencyKind = useSelector( state => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN )
   const strings  = translations[ 'accounts' ]
   const prefersBitcoin = useMemo( () => {
