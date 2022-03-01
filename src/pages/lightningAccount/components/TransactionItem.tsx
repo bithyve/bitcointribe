@@ -44,7 +44,6 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginLeft: 16,
   },
   containerImg: {
     justifyContent: 'center',
@@ -123,7 +122,7 @@ const TransactionItem = ( {
   return (
     <View>
       <ListItem containerStyle={{
-        backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 2 )
+        backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 1 )
       }} pad={1}>
 
         <View style={styles.containerImg}>

@@ -8,7 +8,7 @@ import {
   ImageSourcePropType,
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
@@ -48,7 +48,8 @@ const FooterButton: React.FC<FooterButtonProps> = ( {
       onPress={onPress}
       style={{
         ...styles.buttonContainer,
-        ...style
+        ...style,
+        borderWidth:0
       }}
       delayPressIn={0}
     >
@@ -104,11 +105,12 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
     <View style={{
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignSelf: 'center'
+      alignSelf: 'center',
     }}>
       <FooterButton
         style={{
-          marginRight: 8
+          marginRight: 8,
+          height: heightPercentageToDP( 7.5 ),
         }}
         onPress={onSendPressed}
         title={common.send}
