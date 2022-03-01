@@ -7,4 +7,5 @@
     <string name="existingKeeperPrefix">/sta/EXISTING_CONTACT</string>
     <string name="giftPrefix">/sta/GIFT</string>
     <string name="contactGiftKeeperPrefix">/sta/CONTACT_GIFT</string>
+    <string name="campaignPrefix">/sta/CAMPAIGN</string>
 </resources>
