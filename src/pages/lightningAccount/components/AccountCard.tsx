@@ -147,6 +147,8 @@ const AccountCard = ( {
             }
             return !prev
           } )}
+          background ={true}
+
         />
       </Animated.View>
 
@@ -182,6 +184,7 @@ const AccountCard = ( {
           accountShell={accountShell}
           onPressOut={() => handleAnimation( 'pressOut' )}
           mode={isLightning ? Mode.LIGHTNING : Mode.ON_CHAIN}
+          background ={false}
         />
       </Animated.View>
     </View>
