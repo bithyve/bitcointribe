@@ -14,7 +14,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
-import HeaderTitle from '../../../components/HeaderTitle'
+import HeaderTitle1 from '../../../components/HeaderTitle1'
 import { inject, observer } from 'mobx-react'
 import Toast from '../../../components/Toast'
 import QRCode from '../../../components/QRCode'
@@ -79,18 +79,24 @@ export default class NodeInfoScreen extends Component {
         overScrollMode="never"
         bounces={false}
       >
-        <HeaderTitle
-          firstLineTitle={'Node Information'}
-          secondLineTitle={''}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
+        <View style={{
+          paddingTop:hp( 3.5 )
+        }}>
+          <HeaderTitle1
+            firstLineTitle={'Settings'}
+            secondLineTitle={'Node Information'}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
+        </View>
 
         <View style={styles.bodySection}>
           <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>Alias</Text>
+            <Text style={{
+              ...ListStyles.listItemTitleTransaction, fontSize:RFValue( 13 )
+            }}>Alias</Text>
             <Text
               style={{
                 ...ListStyles.listItemSubtitle,
@@ -102,7 +108,9 @@ export default class NodeInfoScreen extends Component {
             </Text>
           </View>
           <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
+            <Text style={{
+              ...ListStyles.listItemTitleTransaction, fontSize:RFValue( 13 )
+            }}>
               Implementation Version
             </Text>
             <Text
@@ -117,7 +125,9 @@ export default class NodeInfoScreen extends Component {
           </View>
 
           <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
+            <Text style={{
+              ...ListStyles.listItemTitleTransaction, fontSize:RFValue( 13 )
+            }}>
               Synced To Chain
             </Text>
             <Text
@@ -132,7 +142,9 @@ export default class NodeInfoScreen extends Component {
           </View>
 
           <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>Block Height</Text>
+            <Text style={{
+              ...ListStyles.listItemTitleTransaction, fontSize:RFValue( 13 )
+            }}>Block Height</Text>
             <Text
               style={{
                 ...ListStyles.listItemSubtitle,
@@ -144,10 +156,13 @@ export default class NodeInfoScreen extends Component {
             </Text>
           </View>
           <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
+            <Text style={{
+              ...ListStyles.listItemTitleTransaction, fontSize:RFValue( 13 )
+            }}>
               Block Hash
             </Text>
             <Text
+              numberOfLines={1}
               style={{
                 ...ListStyles.listItemSubtitle,
                 marginBottom: 3,
@@ -165,7 +180,9 @@ export default class NodeInfoScreen extends Component {
                   alignItems: 'center'
                 } ]}>
                   <View>
-                    <Text style={ListStyles.listItemTitleTransaction}>
+                    <Text style={{
+                      ...ListStyles.listItemTitleTransaction, fontSize:RFValue( 13 )
+                    }}>
                   URI
                     </Text>
                     <Text
@@ -195,7 +212,7 @@ export default class NodeInfoScreen extends Component {
                       />
                       <Text style={[ styles.buttonText, {
                         marginLeft: 4
-                      } ]}>SHOW QR</Text>
+                      } ]}>Show QR</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -206,13 +223,13 @@ export default class NodeInfoScreen extends Component {
                       <Image
                         source={require( '../../../assets/images/icons/icon-copy.png' )}
                         style={{
-                          width: wp( '5%' ), height: wp( '5%' ), marginLeft: 'auto',
+                          width: wp( '4%' ), height: wp( '4%' ), marginLeft: 'auto',
                         }}
                         resizeMode={'contain'}
                       />
                       <Text style={[ styles.buttonText, {
                         marginLeft: 4
-                      } ]}>COPY</Text>
+                      } ]}>Copy</Text>
                     </TouchableOpacity>
                   </View>
                   {
@@ -240,7 +257,8 @@ export default class NodeInfoScreen extends Component {
 const styles = StyleSheet.create( {
   rootContainer: {
     flexGrow: 1,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.offWhite,
+    paddingHorizontal: wp( 2 ),
   },
   textHeader: {
     fontSize: 24,
@@ -251,15 +269,15 @@ const styles = StyleSheet.create( {
   },
 
   bodySection: {
-    marginTop: 24,
+    marginTop: 15,
     paddingHorizontal: 10,
   },
 
   lineItem: {
-    marginBottom: RFValue( 16 ),
-    backgroundColor: 'white',
-    padding: 10,
-    paddingHorizontal: 10,
+    marginBottom: RFValue( 9 ),
+    backgroundColor: Colors.white,
+    padding: 15,
+    paddingHorizontal: 15,
     elevation: 4,
     borderRadius: 8,
   },
@@ -277,7 +295,7 @@ const styles = StyleSheet.create( {
   },
 
   button: {
-    height: wp( '9%' ),
+    height: hp( '3.5%' ),
     paddingHorizontal: wp( 2 ),
     justifyContent: 'center',
     alignItems: 'center',

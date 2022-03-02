@@ -129,9 +129,12 @@ const HomeHeader = ( {
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
-    return <View style={{
-      flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
-    }}>
+    return <TouchableOpacity
+      onPress={()=> {navigation.navigate( 'Securiy' )}}
+      activeOpacity={0.6}
+      style={{
+        flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
+      }}>
       { isInit ?
         <View style={{
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ), backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'
@@ -145,13 +148,13 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: isError ? currentLevel === 0 ? Colors.gold : Colors.red : Colors.green,
+          backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
         }}>
           <Image
-            source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+            source={isError ?currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' )  : require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
             }}
@@ -168,7 +171,7 @@ const HomeHeader = ( {
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageTwo}</Text></Text>}
-    </View>
+    </TouchableOpacity>
   }
 
   useEffect( () => {

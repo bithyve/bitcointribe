@@ -123,11 +123,13 @@ const TransactionItem = ( {
   return (
     <View>
       <ListItem containerStyle={{
-        backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 5 )
+        backgroundColor: '#f5f5f5', paddingHorizontal: widthPercentageToDP( 2 )
       }} pad={1}>
 
         <View style={styles.containerImg}>
-          <Text>@</Text>
+          <Text style={{
+            fontSize:RFValue( 15 )
+          }}>@</Text>
         </View>
         <ListItem.Content style={styles.titleSection}>
           <ListItem.Title style={styles.titleText} numberOfLines={1}>
@@ -159,7 +161,7 @@ const TransactionItem = ( {
       </ListItem>
 
       <View style={{
-        borderBottomWidth: 1, borderColor: Colors.gray1, marginHorizontal: widthPercentageToDP( 4 )
+        borderBottomWidth: 1, borderColor: Colors.lightTextColor, marginHorizontal: widthPercentageToDP( 4 ), opacity:.1,
       }} />
     </View>
   )

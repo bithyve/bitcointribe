@@ -508,12 +508,15 @@ export const processDeepLink = ( deepLink: string ) => {
     //   return
     // }
 
-
+    if( splits[ 4 ] === DeepLinkKind.CAMPAIGN ){
+      return{
+        campaignId:  splits[ 5 ]
+      }
+    }
     const version = splits.pop().slice( 1 )
     const encryptionMetaSplits = splits[ 7 ].split( '-' )
     const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
     const encryptionHint = encryptionMetaSplits[ 1 ]
-
     switch( splits[ 4 ] as DeepLinkKind ){
         case DeepLinkKind.CONTACT:
         case DeepLinkKind.KEEPER:
