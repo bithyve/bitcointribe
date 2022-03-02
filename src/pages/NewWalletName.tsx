@@ -88,7 +88,11 @@ export default function NewWalletName( props ) {
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
   const renderLoaderModalContent = useCallback( () => {
-    return <LoaderModal headerText={message} messageText={subTextMessage} subPoints={subPoints} bottomText={bottomTextMessage} />
+    return <LoaderModal
+      headerText={'Gift Sats'}
+      messageText={'Send sats as gifts to your friends and family.'}
+      showGif={false}
+    />
   }, [ message, subTextMessage, loaderModal ] )
 
   const renderBottomSheetContent = () =>{
