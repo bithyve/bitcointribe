@@ -217,41 +217,7 @@ export class AccountDetails extends Component {
           )
         },
       },
-      {
-        kind: SectionKind.SEND_AND_RECEIVE_FOOTER,
-        data: [ null ],
-        renderItem: () => {
-          return (
-            <View style={styles.viewSectionContainer}>
-              <View style={styles.footerSection}>
-                <SendAndReceiveButtonsFooter
-                  onSendPressed={() => {
-                    this.props.navigation.navigate( 'SendScreen' )
-                  }}
-                  onReceivePressed={() => {
-                    this.onReceiveButtonPress(
-                      hp( '27%' ),
-                      'lightning',
-                      this.state.node
-                    )
-                  }}
-                  isTestAccount={false}
-                  averageTxFees={''}
-                  // network={
-                  //   config.APP_STAGE === 'dev' ||
-                  //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
-                  //     ? NetworkKind.TESTNET
-                  //     : NetworkKind.MAINNET
-                  // }
-                />
 
-
-              </View>
-
-            </View>
-          )
-        },
-      },
     ]
   }
 
@@ -278,6 +244,32 @@ export class AccountDetails extends Component {
           stickySectionHeadersEnabled={false}
           keyExtractor={( index )=> String( index )}
         />
+        <View style={styles.viewSectionContainer}>
+          <View style={styles.footerSection}>
+            <SendAndReceiveButtonsFooter
+              onSendPressed={() => {
+                this.props.navigation.navigate( 'SendScreen' )
+              } }
+              onReceivePressed={() => {
+                this.onReceiveButtonPress(
+                  hp( '27%' ),
+                  'lightning',
+                  this.state.node
+                )
+              } }
+              isTestAccount={false}
+              averageTxFees={''}              // network={
+              //   config.APP_STAGE === 'dev' ||
+              //     primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+              //     ? NetworkKind.TESTNET
+              //     : NetworkKind.MAINNET
+              // }
+            />
+
+
+          </View>
+
+        </View>
       </View>
     )
   }
@@ -325,7 +317,7 @@ const styles = StyleSheet.create( {
   },
 
   footerSection: {
-    paddingVertical: 5,
+    marginBottom:hp( 2 ),
   },
 } )
 
