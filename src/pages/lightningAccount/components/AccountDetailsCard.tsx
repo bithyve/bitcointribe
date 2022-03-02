@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
+  Dimensions,
   ImageSourcePropType,
   AppState,
   Animated,
@@ -32,6 +33,8 @@ import  BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import Icon from '../../../assets/images/svgs/onchain_icon.svg'
 import LightningIcon from '../../../assets/images/svgs/ligntning_icon.svg'
 
+const windowHeight = Dimensions.get( 'window' ).height
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -47,6 +50,18 @@ export type Props = {
   mode: Mode;
   background:boolean
 };
+
+const getCardHeight = () => {
+  if( windowHeight >= 850 ){
+    return 18
+  }else if( windowHeight >= 750 ){
+    return 20
+  }else if( windowHeight >= 650 ){
+    return 22
+  } else if( windowHeight >= 550 ){
+    return 24
+  }
+}
 
 function shadowColorForAccountKind( mode ): string {
   switch ( mode ) {
@@ -111,7 +126,9 @@ const AccountDetailsCard : React.FC<Props> = inject(
     return (
       <View style={styles.accountKindDetailsSection}>
         <View style={{
-          marginLeft: 'auto'
+          marginLeft: 'auto',
+          marginTop: hp( 1 ),
+
         }}>
           <SettingsButton />
         </View>
@@ -228,7 +245,7 @@ const AccountDetailsCard : React.FC<Props> = inject(
         }
         //onPressOut={onPressOut}
         style={{
-          height: hp( '20%' )
+          height: hp(  getCardHeight() )
         }}
         imageStyle={[ styles.cardImageContainer, {
           backgroundColor: shadowColorForAccountKind( mode )
@@ -265,14 +282,13 @@ const styles = StyleSheet.create( {
     width: '100%',
     flex: 1,
     paddingHorizontal: 20,
-    paddingVertical: 14,
     overflow: 'hidden',
     justifyContent: 'space-between',
   },
 
   cardImageContainer: {
     width: '100%',
-    height: '95%',
+    height: '100%',
     borderRadius: cardBorderRadius,
     resizeMode: 'cover',
   },
@@ -311,7 +327,7 @@ const styles = StyleSheet.create( {
 
   balanceAmountText: {
     fontFamily: Fonts.OpenSans,
-    fontSize: 21,
+    fontSize: RFValue( 20 ),
   },
 
   balanceUnitText: {
