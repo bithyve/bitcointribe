@@ -198,6 +198,29 @@ export default class Relay {
     }
   };
 
+
+  public static getCampaignGift = async (
+    campaignId: string,
+    walletID: string
+  ) => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'claimCampaignGift', {
+          HEXA_ID,
+          campaignId: campaignId,
+          walletID,
+        } )
+        return res.data
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+    } catch ( err ) {
+      throw new Error( err )
+    }
+  };
+
   public static sendKeeperNotifications = async (
     receivers: string[],
     notification: INotification,
