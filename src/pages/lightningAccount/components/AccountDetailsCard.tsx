@@ -33,9 +33,7 @@ import  BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import Icon from '../../../assets/images/svgs/onchain_icon.svg'
 import LightningIcon from '../../../assets/images/svgs/ligntning_icon.svg'
 
-const windowWidth = Dimensions.get( 'window' ).width
 const windowHeight = Dimensions.get( 'window' ).height
-console.log( windowHeight )
 
 import {
   widthPercentageToDP as wp,
@@ -55,13 +53,13 @@ export type Props = {
 
 const getCardHeight = () => {
   if( windowHeight >= 850 ){
-    return 20
+    return 18
   }else if( windowHeight >= 750 ){
-    return 22
+    return 20
   }else if( windowHeight >= 650 ){
-    return 24
+    return 22
   } else if( windowHeight >= 550 ){
-    return 26
+    return 24
   }
 }
 
@@ -282,7 +280,7 @@ const styles = StyleSheet.create( {
     width: '100%',
     flex: 1,
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    // paddingVertical: 10,
     overflow: 'hidden',
     justifyContent: 'space-between',
   },
