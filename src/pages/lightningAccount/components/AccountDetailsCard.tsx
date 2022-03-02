@@ -126,7 +126,9 @@ const AccountDetailsCard : React.FC<Props> = inject(
     return (
       <View style={styles.accountKindDetailsSection}>
         <View style={{
-          marginLeft: 'auto'
+          marginLeft: 'auto',
+          marginTop: hp( 1 ),
+
         }}>
           <SettingsButton />
         </View>
@@ -280,7 +282,6 @@ const styles = StyleSheet.create( {
     width: '100%',
     flex: 1,
     paddingHorizontal: 20,
-    // paddingVertical: 10,
     overflow: 'hidden',
     justifyContent: 'space-between',
   },
