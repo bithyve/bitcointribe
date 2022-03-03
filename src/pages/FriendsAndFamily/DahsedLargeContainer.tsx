@@ -127,7 +127,9 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\n\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet'}
+              {props.type === 'Link' ? '\n\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet' :
+                props.type === 'QR' ? '\n\nScan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet':
+                  '\n\nScan the QR/ click the link and follow the steps on your Hexa wallet to claim the gift'}
             </Text>
           </View>
           {props.date &&
