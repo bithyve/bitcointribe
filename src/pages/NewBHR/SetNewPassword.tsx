@@ -305,7 +305,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
       }
     } else if ( activeIndex === 2 ){
       security = {
-        questionId: 0,
+        questionId: '0',
         question: hintText,
         answer: pswd,
       }

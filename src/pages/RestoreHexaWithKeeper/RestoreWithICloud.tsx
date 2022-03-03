@@ -497,13 +497,11 @@ class RestoreWithICloud extends Component<
       } )
     }else if ( Number( questionId ) > 0 ) {
       const question = this.getQuestion( questionId )
-      {console.log("question====>", question);
-      }
       this.setState( {
         question: question[ 0 ].question,
         encryptionType: 'question'
       } )
-    } else if ( questionId === '0' ) {
+    } else if ( questionId == '0' ) {
       this.setState( {
         question: question1,
         encryptionType: 'password'
