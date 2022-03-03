@@ -251,11 +251,27 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case NEW_ACCOUNT_SHELLS_ADDED:
+        const newAccountShells = []
+        const existingAccountShells = state.accountShells
+
+        for( const shellToAdd of action.payload.accountShells ){
+          let exists = false
+          for( const existingShell of existingAccountShells ){
+            if( existingShell.id === shellToAdd.id ){
+              existingShell.primarySubAccount = shellToAdd.primarySubAccount
+              exists = true
+              break
+            }
+          }
+          if( !exists ) newAccountShells.push( shellToAdd )
+        }
+
+
         return {
           ...state,
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: true,
-          accountShells: state.accountShells.concat( ...action.payload.accountShells ),
+          accountShells: [ ...existingAccountShells, ...newAccountShells ],
           accounts: {
             ...state.accounts,
             ...action.payload.accounts

@@ -8,7 +8,7 @@ import {
   ImageSourcePropType,
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
@@ -18,6 +18,7 @@ import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKin
 import { translations } from '../../../common/content/LocContext'
 import {  useSelector } from 'react-redux'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import { Shadow } from 'react-native-shadow-2'
 
 type FooterButtonProps = {
   style?: Record<string, unknown>;
@@ -46,20 +47,22 @@ const FooterButton: React.FC<FooterButtonProps> = ( {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={{
-        ...styles.buttonContainer,
-        ...style
-      }}
       delayPressIn={0}
     >
-      <View style={styles.buttonImageContainer}>
-        <Image source={imageSource} style={styles.buttonImage} />
-      </View>
+      <Shadow  distance={5} startColor={Colors.shadowColor}  offset={[ 7, 5 ]} viewStyle={{
+        ...styles.buttonContainer,
+        ...style,
+        borderWidth:0
+      }}>
+        <View style={styles.buttonImageContainer}>
+          <Image source={imageSource} style={styles.buttonImage} />
+        </View>
 
-      <View style={styles.buttonTextContainer}>
-        <Text style={styles.buttonTitleText}>{title}</Text>
-        {subtitle ? <Text style={styles.buttonSubtitleText}>{subtitle}</Text> : null}
-      </View>
+        <View style={styles.buttonTextContainer}>
+          <Text style={styles.buttonTitleText}>{title}</Text>
+          {subtitle ? <Text style={styles.buttonSubtitleText}>{subtitle}</Text> : null}
+        </View>
+      </Shadow>
     </TouchableOpacity>
   )
 }
@@ -104,11 +107,13 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
     <View style={{
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignSelf: 'center'
+      alignSelf: 'center',
+      marginBottom: heightPercentageToDP( 2 )
     }}>
       <FooterButton
         style={{
-          marginRight: 8
+          marginRight: 8,
+          height: heightPercentageToDP( 7.5 ),
         }}
         onPress={onSendPressed}
         title={common.send}
@@ -127,6 +132,10 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
         imageSource={require( '../../../assets/images/icons/icon_send_blue.png' )}
       />
       <FooterButton
+        style={{
+          marginRight: 8,
+          height: heightPercentageToDP( 7.5 ),
+        }}
         onPress={onReceivePressed}
         title={common.receive}
         subtitle={''}
@@ -151,7 +160,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 15,
+    borderRadius: 10,
     borderColor: '#E3E3E3',
     borderWidth: 1,
     backgroundColor: Colors.white,
