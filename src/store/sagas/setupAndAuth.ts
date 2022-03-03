@@ -279,7 +279,7 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
 
   if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
   if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
-  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
+  if( semver.lt( storedVersion, '2.0.71' ) ) yield call( restoreMultiSigTwoFAFlag )
 
   // update wallet version
   yield put( updateWallet( {
