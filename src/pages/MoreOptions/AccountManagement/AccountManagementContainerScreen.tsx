@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
-import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { Account, AccountType, MultiSigAccount } from '../../../bitcoin/utilities/Interface'
 import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import ButtonBlue from '../../../components/ButtonBlue'
@@ -24,7 +24,7 @@ import BottomSheet, { BottomSheetView, useBottomSheetModal } from '@gorhom/botto
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
-import ModalContainer from '../../../components/home/ModalContainer'
+import ModalContainer from '../../../components/home/ModalContainerScroll'
 import { resetStackToAccountDetails, resetToHomeAction } from '../../../navigation/actions/NavigationActions'
 import { NavigationActions, StackActions } from 'react-navigation'
 import { color } from 'react-native-reanimated'
@@ -32,6 +32,7 @@ import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import { translations } from '../../../common/content/LocContext'
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 
 export type Props = {
   navigation: any;
@@ -42,6 +43,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const strings = translations[ 'accManagement' ]
   const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
   const accountShells = useSelector( ( state ) => state.accounts.accountShells )
+  const accounts = useSelector( ( state ) => state.accounts.accounts )
+
   // const [ tempValue, setTempValue ] = useState( false )
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const [ orderedAccountShells, setOrderedAccountShells ] = useState( accountShells )
@@ -52,6 +55,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ selectedAccount, setSelectedAccount ] = useState( null )
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
+  const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
+  const [ debugModalVisible, setDebugModalVisible ] = useState( false )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
   } )
@@ -121,7 +126,16 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
     }
   }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
-
+  useEffect( () => {
+    if( numberOfTabs!=0 ){
+      setTimeout( () => {
+        setNumberOfTabs( 0 )
+      }, 1000 )
+    }
+    if( numberOfTabs >= 3 ){
+      setDebugModalVisible( true )
+    }
+  }, [ numberOfTabs ] )
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -167,9 +181,17 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           } )
 
           navigation.dispatch( resetAction )
-          navigation.navigate( 'AccountDetails', {
-            accountShellID: primarySubAccount.accountShellID,
-          } )
+          if( primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
+            navigation.navigate( 'LNAccountDetails', {
+              accountShellID: primarySubAccount.accountShellID,
+              node: primarySubAccount.node
+            } )
+          } else {
+            navigation.navigate( 'AccountDetails', {
+              accountShellID: primarySubAccount.accountShellID,
+            } )
+          }
+
         }
         }
         onClose={() => showSuccessModel( false )}
@@ -217,6 +239,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return (
       <ListItem
         activeOpacity={1}
+        onPress={()=>setNumberOfTabs( prev => prev+1 )}
         containerStyle={{
           marginLeft: wp( '4%' ),
           marginRight: wp( '4%' ),
@@ -283,131 +306,207 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       </ListItem>
     )
   }
+  const closeBottomSheet = () => {
+    setDebugModalVisible( false )
+  }
+
+  const getAccountDebugData = ( shell: AccountShell ) => {
+    const primarySubAcc = shell.primarySubAccount
+    const account: Account = accounts[ primarySubAcc.id ]
+
+    const debugPrimarySub: SubAccountDescribing = {
+      ...primarySubAcc,
+    }
+    // drop unnecessary properties
+    delete debugPrimarySub.transactions
+    delete debugPrimarySub.utxoCompatibilityGroup
+    delete debugPrimarySub.hasNewTxn
+
+    const debugAccount: Account = {
+      ...account,
+    }
+    // drop unnecessary and private properties
+    delete debugAccount.transactions
+    delete debugAccount.xpriv
+    delete ( debugAccount as MultiSigAccount ).xprivs
+    delete debugAccount.txIdMap
+    delete debugAccount.hasNewTxn
+    delete debugAccount.transactionsNote
+    delete debugAccount.activeAddresses
+
+    return (
+      <View style={styles.lineItem}>
+        <Text style={ListStyles.listItemTitleTransaction}>
+          Account Shell
+        </Text>
+        <Text style={{
+          fontSize: 10
+        }}>{debugPrimarySub.id}</Text>
+        <Text  style={{
+          ...ListStyles.listItemSubtitle,
+          marginBottom: 3,
+        }}>{JSON.stringify( debugPrimarySub, null, 8 )}</Text>
+        <Text style={ListStyles.listItemTitleTransaction}>
+          Account
+        </Text>
+        <Text style={{
+          fontSize: 10
+        }}>{debugAccount.id}</Text>
+        <Text  style={{
+          ...ListStyles.listItemSubtitle,
+          marginBottom: 3,
+        }}>{JSON.stringify( debugAccount, null, 8 )}</Text>
+      </View>
+    )
+  }
+
+  const RenderDebugModal = () => {
+    return (
+      <View style={styles.modalContainer}>
+        <View style={styles.crossIconContainer}>
+          <FontAwesome name="close" color={Colors.blue} size={24} onPress = {closeBottomSheet}/>
+        </View>
+        <ScrollView>
+          {accountShells.map( ( shell: AccountShell ) => {
+            return getAccountDebugData( shell )
+          } )}
+        </ScrollView>
+      </View>
+    )
+  }
 
   return (
-    <SafeAreaView style={styles.rootContainer}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
-        {showUnHideArchiveAccountBottomSheet()}
-      </ModalContainer>
-      <ModalContainer onBackground={()=>showSuccessModel( false )} visible={successModel} closeBottomSheet={() => {}} >
-        {showSuccessAccountBottomSheet()}
-      </ModalContainer>
-      <ScrollView>
-        <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
-        } ]}>
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              navigation.pop()
-            }}
-          >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          backgroundColor: Colors.backgroundColor,
-          marginRight: wp( '3%' ),
-          alignItems: 'flex-start'
-        }}>
-          <HeaderTitle
-            firstLineTitle={strings[ 'AccountManagement' ]}
-            secondLineTitle={strings.Rearrange}
-            infoTextNormal={''}
-            infoTextBold={''}
-            infoTextNormal1={''}
-            step={''}
-          />
-          <NavHeaderSettingsButton
-            onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
-            accManagement={true}
-          />
-        </View>
-
-        {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
-          accountShells={orderedAccountShells}
-          onDragEnded={handleDragEnd}
-        />}
-
-        {getnewOrderedAccountShell && <View>
+    <TouchableOpacity style={styles.rootContainer} activeOpacity={1} onPress={()=>setNumberOfTabs( prev => prev+1 )}>
+      <SafeAreaView>
+        <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+        <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
+          {showUnHideArchiveAccountBottomSheet()}
+        </ModalContainer>
+        <ModalContainer onBackground={()=>showSuccessModel( false )} visible={successModel} closeBottomSheet={() => {}} >
+          {showSuccessAccountBottomSheet()}
+        </ModalContainer>
+        <ScrollView>
+          <View style={[ CommonStyles.headerContainer, {
+            backgroundColor: Colors.backgroundColor
+          } ]}>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.pop()
+              }}
+            >
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
           <View style={{
-            marginBottom: 15, backgroundColor: Colors.backgroundColor
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            backgroundColor: Colors.backgroundColor,
+            marginRight: wp( '3%' ),
+            alignItems: 'flex-start'
+          }}>
+            <HeaderTitle
+              firstLineTitle={strings[ 'AccountManagement' ]}
+              secondLineTitle={strings.Rearrange}
+              infoTextNormal={''}
+              infoTextBold={''}
+              infoTextNormal1={''}
+              step={''}
+            />
+            <NavHeaderSettingsButton
+              onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+              accManagement={true}
+            />
+          </View>
+
+          {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
+            accountShells={orderedAccountShells}
+            onDragEnded={handleDragEnd}
+            setNumberOfTabs = {setNumberOfTabs}
+          />}
+
+          {getnewOrderedAccountShell && <View>
+            <View style={{
+              marginBottom: 15, backgroundColor: Colors.backgroundColor
+            }}>
+              <View style={{
+                height: 'auto'
+              }}>
+                {orderedAccountShells.map( ( accountShell: AccountShell ) => {
+                  return renderItem( accountShell )
+                } )
+                }
+              </View>
+            </View>
+          </View>}
+
+          {getHiddenAccountShell && hiddenAccountShells.length > 0 ? <View style={{
+            marginTop: wp( '2%' ), backgroundColor: Colors.backgroundColor
           }}>
             <View style={{
-              height: 'auto'
+              width: '100%',
+              backgroundColor: Colors.white
             }}>
-              {orderedAccountShells.map( ( accountShell: AccountShell ) => {
-                return renderItem( accountShell )
-              } )
-              }
+              <Text style={styles.pageInfoText}>
+                {strings.HiddenAccounts}
+              </Text>
             </View>
-          </View>
-        </View>}
+            <View style={{
+              marginBottom: 15
+            }}>
+              <View style={{
+                height: 'auto'
+              }}>
+                {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
+                  return renderItem( accountShell )
+                } )
+                }
+              </View>
+            </View>
+          </View> : null}
 
-        {getHiddenAccountShell && hiddenAccountShells.length > 0 ? <View style={{
-          marginTop: wp( '2%' ), backgroundColor: Colors.backgroundColor
-        }}>
-          <View style={{
-            width: '100%',
-            backgroundColor: Colors.white
+          {getArchivedAccountShells && archivedAccountShells.length > 0 ? <View style={{
+            marginTop: wp( '2%' ),
           }}>
             <Text style={styles.pageInfoText}>
-              {strings.HiddenAccounts}
+              {strings.ArchivedAccounts}
             </Text>
-          </View>
-          <View style={{
-            marginBottom: 15
-          }}>
             <View style={{
-              height: 'auto'
+              marginBottom: 15
             }}>
-              {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
-                return renderItem( accountShell )
-              } )
-              }
+              <View style={{
+                height: 'auto'
+              }}>
+                {archivedAccountShells.map( ( accountShell: AccountShell ) => {
+                  return renderItem( accountShell )
+                } )
+                }
+              </View>
             </View>
-          </View>
-        </View> : null}
+          </View> : null}
+        </ScrollView>
 
-        {getArchivedAccountShells && archivedAccountShells.length > 0 ? <View style={{
-          marginTop: wp( '2%' ),
-        }}>
-          <Text style={styles.pageInfoText}>
-            {strings.ArchivedAccounts}
-          </Text>
-          <View style={{
-            marginBottom: 15
-          }}>
-            <View style={{
-              height: 'auto'
-            }}>
-              {archivedAccountShells.map( ( accountShell: AccountShell ) => {
-                return renderItem( accountShell )
-              } )
-              }
-            </View>
+        <View style={styles.proceedButtonContainer}>
+          {canSaveOrder && (
+            <ButtonBlue
+              buttonText={strings.Save}
+              handleButtonPress={handleProceedButtonPress}
+            />
+          )}
+        </View>
+        <ModalContainer onBackground={closeBottomSheet} visible={debugModalVisible} closeBottomSheet = {closeBottomSheet}>
+          <View style={styles.modalContainer}>
+            <RenderDebugModal/>
           </View>
-        </View> : null}
-      </ScrollView>
-
-      <View style={styles.proceedButtonContainer}>
-        {canSaveOrder && (
-          <ButtonBlue
-            buttonText={strings.Save}
-            handleButtonPress={handleProceedButtonPress}
-          />
-        )}
-      </View>
-    </SafeAreaView>
+        </ModalContainer>
+      </SafeAreaView>
+    </TouchableOpacity>
   )
 }
 
@@ -435,6 +534,46 @@ const styles = StyleSheet.create( {
     paddingVertical: hp( 0.5 ),
     letterSpacing: 0.55
   },
+  textHeader: {
+    fontSize: 24,
+    color: Colors.blue,
+    marginHorizontal: 20,
+    marginVertical: 20,
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  bodySection: {
+    marginTop: 24,
+    paddingHorizontal: 10,
+  },
+  lineItem: {
+    marginVertical: hp( 0.9 ),
+    backgroundColor:Colors.white,
+    padding: 10,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 1,
+      height: 3,
+    },
+    shadowOpacity: 0.10,
+    shadowRadius: 1.84,
+    elevation: 2,
+  },
+  containerRec: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  crossIconContainer:{
+    justifyContent:'flex-end',
+    flexDirection:'row',
+    marginBottom:hp( 2 ),
+  },
+  modalContainer:{
+    backgroundColor:Colors.backgroundColor,
+    padding:5,
+    height:hp( '85%' )
+  }
 } )
 
 

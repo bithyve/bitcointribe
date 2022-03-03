@@ -33,7 +33,7 @@ const AccountCardColumn: React.FC<Props> = ( {
   return (
     <View style={styles.rootContainer} key={index}>
 
-      {(index%2 != 0 ? cardData.reverse() : cardData).map( ( accountShell ) => {
+      {( index%2 != 0 ? cardData.reverse() : cardData ).map( ( accountShell ) => {
         const disabled = false
         // if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
         return typeof accountShell === 'string' ?
@@ -73,8 +73,8 @@ const AccountCardColumn: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    marginRight: widthPercentageToDP( 4.5 ),
-    paddingTop: heightPercentageToDP( 2 )
+    marginRight: widthPercentageToDP( 3 ),
+    paddingTop: heightPercentageToDP( 2 ),
   },
 
   cardContainer: {

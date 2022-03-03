@@ -1,4 +1,4 @@
-import { call, delay, put, select } from 'redux-saga/effects'
+import { all, call, delay, put, select } from 'redux-saga/effects'
 import { createWatcher } from '../utils/utilities'
 import {
   GET_TESTCOINS,
@@ -75,6 +75,7 @@ import {
   Trusted_Contacts,
   UnecryptedStreamData,
   Wallet,
+  LNNode
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -96,6 +97,7 @@ import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/Hexa
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import LightningSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
 
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
@@ -107,6 +109,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
+import RESTUtils from '../../utils/ln/RESTUtils'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -214,7 +217,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       encryptionKey: deepLinkEncryptionKey,
       walletName: walletName,
       keysToEncrypt: encryptionKey,
-      generateShortLink,
+      generateShortLink: encryptionType !== DeepLinkEncryptionType.DEFAULT ? generateShortLink: false,
       extraData: {
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
@@ -650,6 +653,48 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
+function* refreshLNShellsWorker( { payload }: { payload: {
+  shells: AccountShell[],
+}} ){
+  const accountShells: AccountShell[] = payload.shells
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accounts: Accounts = accountState.accounts
+  yield put( accountShellRefreshStarted( accountShells ) )
+  const accountsToSync: Accounts = {
+  }
+  for( const accountShell of accountShells ){
+    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
+  }
+  const { synchedAccounts } = yield call( syncLnAccountsWorker, {
+    payload: {
+      accounts: accountsToSync,
+    }
+  } )
+  yield put( updateAccountShells( {
+    accounts: synchedAccounts
+  } ) )
+  yield put( recomputeNetBalance() )
+  yield put( accountShellRefreshCompleted( accountShells ) )
+}
+
+function* syncLnAccountsWorker( { payload }: {payload: {
+  accounts: Accounts }} ) {
+  const { accounts } = payload
+  const nodesToSync: LNNode [] = []
+  for( const account of Object.values( accounts ) ){
+    nodesToSync.push( account.node )
+  }
+  const res = yield call( RESTUtils.getNodeBalance, nodesToSync[ 0 ]  )
+  for( const account of Object.values( accounts ) ){
+    account.balances.confirmed = Number( res[ 0 ].total_balance ) + Number( res[ 1 ].balance )
+  }
+  return {
+    synchedAccounts: accounts
+  }
+}
+
 export const refreshAccountShellsWatcher = createWatcher(
   refreshAccountShellsWorker,
   REFRESH_ACCOUNT_SHELLS
@@ -664,6 +709,7 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   const shellsToSync: AccountShell[] = []
   const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
+  const lnShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
       if( !shell.primarySubAccount.isUsable ) continue
@@ -675,6 +721,10 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
 
           case AccountType.DONATION_ACCOUNT:
             donationShellsToSync.push( shell )
+            break
+
+          case AccountType.LIGHTNING_ACCOUNT:
+            lnShellsToSync.push( shell )
             break
 
           default:
@@ -698,6 +748,12 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       options: {
         hardRefresh
       }
+    }
+  } )
+
+  if( lnShellsToSync.length ) yield call( refreshLNShellsWorker, {
+    payload: {
+      shells: lnShellsToSync,
     }
   } )
 
@@ -823,6 +879,17 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           serviceAccountKind,
         } )
         break
+      case AccountType.LIGHTNING_ACCOUNT:
+        primarySubAccount = new LightningSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          node: account.node
+        } )
+        break
   }
 
   const accountShell = new AccountShell( {
@@ -940,6 +1007,21 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( accountType === AccountType.SWAN_ACCOUNT ) serviceAccount.isUsable = false
 
         return serviceAccount
+      case AccountType.LIGHTNING_ACCOUNT:
+        const { node } = accountDetails
+        const lnAccountCount = ( accounts[ accountType ] )?.length | 0
+        const lnAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: lnAccountCount,
+          accountName: accountName? accountName: defaultAccountName,
+          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
+          primarySeed,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, lnAccountCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+          node
+        } )
+        return lnAccount
   }
 }
 export interface newAccountDetails {
@@ -947,6 +1029,7 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
+  node?: LNNode
 }
 export interface newAccountsInfo {
   accountType: AccountType,

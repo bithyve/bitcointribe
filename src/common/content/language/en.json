@@ -69,6 +69,7 @@
         "existingPasscode": "existing passcode",
         "passcode": "passcode",
         "tos": "Terms of Service",
+        "NameyourWallet": "Name your Wallet",
         "ChangeEncryptionMethod": "Change Encryption Method",
         "tos_agree": "By proceeding to the next step, you agree to our ",
         "Incorrect": "Incorrect Passcode, Try Again!",
@@ -111,7 +112,7 @@
         "restoreNoteV1": "If you are trying to migrate from Hexa 1.0 to Hexa 2.0, please read how in the link below",
         "TermsService": "Terms of Service",
         "proceeding": "By proceeding to the next step, you agree to our",
-        "Step1": "Step 1 of New Wallet Creation",
+        "Step1": "New Wallet Creation",
         "Step2": "Step 2 of New Wallet Creation",
         "creation": "creation",
         "walletName": "Enter wallet name",
@@ -130,7 +131,7 @@
         "multi": "Setting up multiple accounts",
         "Answersdonotmatch":"Answers do not match",
         "Answersmust": "Answers must only contain lowercase characters (a-z) and digits (0-9)",
-        "Passworddonotmatch": "Password do not match",
+        "Passworddonotmatch": "Password mismatch",
         "Passwordmust": "Password must only contain lowercase characters (a-z) and digits (0-9)",
         "encryptionpassword": "Use your own\nencryption password",
         "Enteryourpassword": "Enter your password",
@@ -218,7 +219,7 @@
         "UserDefined": "User Defined",
         "Hexawillgenerate": "Hexa will generate a strong password for you",
         "Skipinitialcloud": "Skip initial cloud backup",
-        "HexaWalletcreated": "Hexa Wallet created a App Generated Strong Passcode",
+        "HexaWalletcreated": "Here's your App Generated Strong Passcode",
         "Makesureyou": "Make sure you have noted down the Strong Password and secured it",
         "Itmayalso": "If you lose this, you will not be able to access the wallet backup or reset the Login Passcode. It may be a good idea to secure more than one copy of the Strong Password",
         "UseStrongPasscode": "Use Strong Passcode",
@@ -308,15 +309,17 @@
         "Confirmnewwalletname": "Confirm new wallet name",
         "acrossyour": "The wallet's name will get updated automatically across your Friends & Family network",
         "ConfirmSecurityQuestion": "Confirm Security Question",
-        "ConfirmWalletPin": "Confirm Wallet Pin"
+        "ConfirmWalletPin": "Confirm Wallet Pin",
+        "ConfirmEncryptionPassword":"Confirm Encryption Password"
     },
     "header": {
         "init": "Initialising Automated Cloud Backup",
-        "incomplete": "Automated Cloud Backup incomplete, please complete Level 1",
+        "incomplete": "Your wallet is not backed up. Create a backup",
         "l1": "Level 1 Automated Cloud Backup is complete",
         "l2": "Level 2 Double Backup is complete",
         "l3": "Level 3 Multi-key Backup is complete",
         "needAttention": " needs your attention.",
+        "Backupyour": "Backup your wallet to safeguard your sats",
         "wallet": "Wallet"
     },
     "stackTitle": {
@@ -401,7 +404,7 @@
       "Weneither": "We neither store this data nor pass it to anyone else. This is for your convenience only",
       "Nocontacts": "No contacts found. Please add contacts to your Address Book and try again",
       "Ifyouwantto": "If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image",
-      "cannotSelect": "Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts"
+      "cannotSelect": "To see a list of address book contacts, you need to enable contact permission.\nGo to Settings> Hexa > Contacts to allow"
     },
     "accounts": {
       "availableToSpend": "Available to spend",
@@ -533,7 +536,7 @@
       "SecurityPrivacy": "Security & Privacy",
       "SecurityCenter": "Security Center",
       "Contactswhose": "Contacts whose wallets I can help restore",
-      "Whenyouhave": "When you have Friends & Family who you can help with wallet recovery, they will be listed here",
+      "Whenyouhave": "Contacts you have the Recovery Key for will appear here",
       "WalletBackup": "Wallet Backup",
       "WalletBackupInfo": "Manage Recovery Keys and Backup Levels",
       "needsyourattention": "needs your attention",
@@ -561,7 +564,7 @@
       "QuestionBackedUp": "Question Successfully Backed Up",
       "BackupHistory": "Cloud Backup",
       "historyofyourbackup": "The history of your backup will appear here",
-      "cloudBackupSuccessInfo":"Your have successfully backed up on the cloud.",
+      "cloudBackupSuccessInfo":"You have successfully backed up your on the cloud.",
       "cloudBackupNotSetupInfo": "You can backup on the cloud and use the Recovery Key from the cloud when restoring.",
       "cloudBackupInAccessibleInfo": "You need to confirm your cloud connection, to ensure changes to your backup scheme.",
       "historyofyourRecovery": "The history of your Recovery Key will appear here",
@@ -666,5 +669,13 @@
       "errorinuploadingdata": "Error in uploading data. Please try again later.",
       "12501": "We recommend signing in as it easily allows you to backup your wallet on your personal cloud.",
       "default": "We encountered a non-standard error. Please try again after sometime or contact us"
+    },
+    "lightningAccount": {
+      "Connectyournode": "Connect your node",
+      "SetupLightningAccount": "Scan lndconnect/ BTCPay config QR",
+      "Entermanually": "Enter manually",
+      "NoLNDnode": "No LND node",
+      "NoLNDnodeSub": "Elit culpa consectetur elit ex consectetur quis culpa veniam est consequat.",
+      "Enternode": "Enter node details"
     }
 }

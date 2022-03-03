@@ -340,7 +340,7 @@ export default function Login( props ) {
       setTimeout( () => {
         // loaderBottomSheet.current.snapTo( 0 )
         setloaderModal( false )
-      }, 2 )
+      }, 300 )
 
       return (
         <View style={{

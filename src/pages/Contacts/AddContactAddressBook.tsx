@@ -26,17 +26,17 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
 import RadioButton from '../../components/RadioButton'
 import * as ExpoContacts from 'expo-contacts'
-import EvilIcons from 'react-native-vector-icons/EvilIcons'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as Permissions from 'expo-permissions'
-import { setIsPermissionGiven } from '../../store/actions/preferences'
+import { setIsPermissionGiven, setContactPermissionAsked } from '../../store/actions/preferences'
 import ModalContainer from '../../components/home/ModalContainer'
 import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { v4 as uuid } from 'uuid'
 import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { editTrustedContact } from '../../store/actions/trustedContacts'
-import HeaderTitle from '../../components/HeaderTitle'
+import HeaderTitle1 from '../../components/HeaderTitle1'
 import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function AddContactAddressBook( props ) {
@@ -49,6 +49,7 @@ export default function AddContactAddressBook( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const isPermissionSet = useSelector( state => state.preferences.contactPermissionAsked )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
@@ -66,7 +67,6 @@ export default function AddContactAddressBook( props ) {
 
   const requestContactsPermission = async () => {
     try {
-      dispatch( setIsPermissionGiven( true ) )
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
@@ -114,6 +114,8 @@ export default function AddContactAddressBook( props ) {
 
   const getContactPermission = async () => {
     dispatch( setIsPermissionGiven( true ) )
+    dispatch( setContactPermissionAsked( true ) )
+
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
       //console.log('GRANTED', granted);
@@ -144,19 +146,17 @@ export default function AddContactAddressBook( props ) {
   }
 
   const getContactsAsync = async () => {
-    dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
-      //console.log("chckContactPermission",chckContactPermission)
       if ( !chckContactPermission ) {
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
-        setModal( true )
+        if( !isPermissionSet ){
+          setModal( true )
+        }
       } else {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
       if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
-        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setModal( true )
       }
       else {
@@ -275,6 +275,7 @@ export default function AddContactAddressBook( props ) {
   }
 
   async function onCancel( value ) {
+
     if ( filterContactData.findIndex( ( tmp ) => tmp.id == value.id ) > -1 ) {
       filterContactData[
         filterContactData.findIndex( ( tmp ) => tmp.id == value.id )
@@ -373,14 +374,29 @@ export default function AddContactAddressBook( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      <HeaderTitle
-        firstLineTitle={props.modalTitle ? props.modalTitle : strings.Associate}
-        secondLineTitle={strings.Select}
+      <HeaderTitle1
+        firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
+        secondLineTitle={strings.Associate}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
         step={''}
       />
+      <Text style={styles.addressBook}>from your address book</Text>
+
+      {selectedContacts.length !==0 &&
+      <View style={styles.selectedContactContent}>
+        <View style={styles.selectedContact}>
+          <Text style={styles.selectedContactText}><Text style={styles.firstName}>{selectedContacts[ 0 ].firstName}</Text> {selectedContacts[ 0 ].lastName}</Text>
+          <TouchableOpacity onPress={()=> {
+            setSelectedContacts( [] )
+            onContactSelect( filterContactData.findIndex( ( tmp ) => tmp.id == selectedContacts[ 0 ].id ) )
+          }}>
+            <Icon name='close' color={Colors.backgroundColor1} size={18}/>
+          </TouchableOpacity>
+        </View>
+      </View>
+      }
       {/* <View style={{
           flexDirection: 'row'
         }}>
@@ -477,14 +493,12 @@ export default function AddContactAddressBook( props ) {
           </View> */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
-              <EvilIcons
-                style={{
-                  alignSelf: 'center'
-                }}
+              <Icon
                 name="search"
                 size={20}
-                color={Colors.textColorGrey}
+                color={Colors.blue}
               />
+
             </View>
             <TextInput
               style={styles.searchBoxInput}
@@ -493,8 +507,8 @@ export default function AddContactAddressBook( props ) {
               }
               autoCorrect={false}
               autoFocus={false}
-              placeholder={common.search}
-              placeholderTextColor={Colors.textColorGrey}
+              placeholder='Search from address book'
+              placeholderTextColor={Colors.babyGray}
               onChangeText={( nameKeyword ) => {
                 nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
                 setSearchName( nameKeyword )
@@ -516,6 +530,37 @@ export default function AddContactAddressBook( props ) {
                 contentInset={{
                   right: 0, top: 0, left: 0, bottom: hp( 24 )
                 }}
+                ListEmptyComponent={()=>
+                  <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: wp( '8%' ),
+                  }}>
+                    <Text
+                      style={{
+                        fontFamily: Fonts.FiraSansRegular,
+                        color: Colors.secondaryText,
+                        textAlign: 'center'
+                      }}
+                    >{strings.cannotSelect}</Text>
+                    {/* <AppBottomSheetTouchableWrapper
+                      onPress={() => getContactPermission()}
+                      style={{
+                        // height: wp( '8%' ),
+                        marginTop: hp( 1.8 ),
+                        paddingLeft: wp( '8%' ),
+                      }}
+                    >
+                      <Text
+                        style={{
+                          ...styles.proceedButtonText,
+                        }}
+                      >
+                        Grant Permission
+                      </Text>
+                    </AppBottomSheetTouchableWrapper> */}
+                  </View>
+                }
                 renderItem={( { item, index } ) => {
                   let selected = false
                   if (
@@ -528,13 +573,17 @@ export default function AddContactAddressBook( props ) {
                   return (
                     <AppBottomSheetTouchableWrapper
                       onPress={() => onContactSelect( index )}
-                      style={styles.contactView}
+                      style={{
+                        ...styles.contactView,
+                        backgroundColor: selected ? 'rgba(119, 185, 235, 0.4)' : null,
+                      }}
                       key={index}
+                      activeOpacity={0.1}
                     >
                       <RadioButton
                         size={15}
                         color={Colors.lightBlue}
-                        borderColor={Colors.borderColor}
+                        borderColor={Colors.white}
                         isChecked={item.checked}
                         onpress={() => onContactSelect( index )}
                       />
@@ -553,7 +602,9 @@ export default function AddContactAddressBook( props ) {
                         {item.name && item.name.split( ' ' ).map( ( x, index )=> {
                           const i = item.name.split( ' ' ).length
                           return (
-                            <Text>
+                            <Text style={{
+                              color: selected ? Colors.blue : null
+                            }}>
                               {index !== i-1 ? `${x} ` :
                                 <Text style={{
                                   fontFamily: Fonts.FiraSansMedium
@@ -587,15 +638,19 @@ export default function AddContactAddressBook( props ) {
               // backgroundColor: 'red'
             }}
           >
-            <AppBottomSheetTouchableWrapper
-              disabled={isTC || selectedContacts.length == 0}
-              onPress={() => onPressContinue()}
-              style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
-                backgroundColor: Colors.lightBlue
-              } ]}
-            >
-              <Text style={styles.buttonText}>{common.confirmProceed}</Text>
-            </AppBottomSheetTouchableWrapper>
+            {
+              filterContactData.length > 0 && (
+                <AppBottomSheetTouchableWrapper
+                  disabled={isTC || selectedContacts.length == 0}
+                  onPress={() => onPressContinue()}
+                  style={ selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
+                    backgroundColor: Colors.lightBlue
+                  } ]}
+                >
+                  <Text style={styles.buttonText}>{common.confirmProceed}</Text>
+                </AppBottomSheetTouchableWrapper>
+              )
+            }
             {props.navigation.state.params?.fromScreen === 'Edit' ?
               null :
               <AppBottomSheetTouchableWrapper
@@ -613,7 +668,7 @@ export default function AddContactAddressBook( props ) {
                     ...styles.proceedButtonText,
                   }}
                 >
-                  {common.skip}
+                  {filterContactData.length > 0 ? common.skip : common.continue}
                 </Text>
               </AppBottomSheetTouchableWrapper>
             }
@@ -627,7 +682,7 @@ export default function AddContactAddressBook( props ) {
             }
           </View>
           {/* )} */}
-          <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
+          {/* <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
               title={strings.erroraAccessing}
               info={errorMessage}
@@ -644,7 +699,7 @@ export default function AddContactAddressBook( props ) {
               isBottomImage={true}
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
-          </ModalContainer>
+          </ModalContainer> */}
           <ModalContainer onBackground={()=>setModal( false )} visible={permissionModal} closeBottomSheet={() => {}}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
@@ -652,7 +707,7 @@ export default function AddContactAddressBook( props ) {
               info={strings.info}
               otherText={strings.otherText}
               proceedButtonText={common.continue}
-              isIgnoreButton={true}
+              isIgnoreButton={false}
               onPressProceed={() => {
                 getContactPermission()
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
@@ -772,10 +827,14 @@ const styles = StyleSheet.create( {
     marginRight: 20,
   },
   contactView: {
-    height: 50,
+    height:hp( 6 ),
     alignItems: 'center',
     flexDirection: 'row',
-    marginLeft: 20,
+    paddingLeft:wp( 5 ),
+    marginVertical:hp( 0.7 ),
+    width:wp( '90%' ),
+    borderTopRightRadius:10,
+    borderBottomRightRadius:10,
   },
   contactText: {
     marginLeft: 10,
@@ -784,24 +843,50 @@ const styles = StyleSheet.create( {
   },
   searchBoxContainer: {
     flexDirection: 'row',
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 0.5,
-    marginTop: wp( '5%' ),
-    marginLeft: 10,
-    marginRight: 10,
-    height: 40,
-    justifyContent: 'center',
-  },
-  searchBoxIcon: {
-    justifyContent: 'center',
-    marginBottom: -10,
+    backgroundColor:Colors.white,
+    height:hp( '5.5%' ),
+    width:wp( '85%' ),
+    alignItems:'center',
+    marginVertical:hp( 2 ),
+    borderRadius:10,
+    marginHorizontal:wp( 5 )
   },
   searchBoxInput: {
-    flex: 1,
-    fontSize: 13,
-    color: Colors.blacl,
-    borderBottomColor: Colors.borderColor,
-    alignSelf: 'center',
-    marginBottom: -10,
+    fontSize: RFValue( 12 ),
+    color: Colors.black,
+    fontFamily:Fonts.FiraSansItalic,
+    paddingLeft:wp( 1.5 )
   },
+  searchBoxIcon:{
+    paddingLeft:wp( 2 )
+  },
+  addressBook:{
+    fontSize: RFValue( 12 ),
+    marginTop: hp( -1.5 ),
+    marginLeft:wp( 5 ),
+    color:Colors.textColorGrey,
+  },
+  selectedContactContent:{
+    flexDirection:'row',
+    justifyContent:'flex-start',
+  },
+  selectedContact:{
+    padding:12,
+    backgroundColor:'#77B9EB',
+    borderRadius:10,
+    flexDirection:'row',
+    alignItems:'center',
+    marginHorizontal:wp( 5 ),
+    marginTop:hp( 1.7 ),
+  },
+  selectedContactText:{
+    fontSize: RFValue( 12 ),
+    color: Colors.backgroundColor1,
+    fontFamily:Fonts.FiraSans,
+    paddingRight:wp( 3 ),
+    fontWeight:'500'
+  },
+  firstName:{
+    fontWeight:'400'
+  }
 } )

@@ -91,6 +91,11 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 
   function handleProceedButtonPress() {
     switch ( selectedChoice.kind ) {
+        case SubAccountKind.LIGHTNING_ACCOUNT:
+          navigation.navigate( 'ScanNodeConfig', {
+            currentSubAccount: selectedChoice,
+          } )
+          break
         case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
@@ -137,7 +142,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         <ButtonBlue
           buttonText={common.proceed}
           handleButtonPress={handleProceedButtonPress}
-          buttonDisable={canProceed === false}
+          buttonDisable={selectedChoice === null}
         />
       </View>
     )
@@ -187,7 +192,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           }}
           style={{
             height: 30, width: 30, justifyContent: 'center',
-            marginLeft: wp( '5%' ),marginTop:hp('4%')
+            marginLeft: wp( '5%' ), marginTop:hp( '4%' )
           }}
         >
           <FontAwesome

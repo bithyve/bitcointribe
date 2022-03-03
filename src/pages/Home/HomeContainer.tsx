@@ -35,6 +35,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import HomeBuyCard from './HomeBuyCard'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -88,10 +89,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }
-    this.props.navigation.navigate( 'AccountDetails', {
-      accountShellID: selectedAccount.id,
-      swanDeepLinkContent: this.props.swanDeepLinkContent
-    } )
+    if( selectedAccount.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
+      this.props.navigation.navigate( 'LNAccountDetails', {
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent,
+        node: selectedAccount.primarySubAccount.node
+      } )
+    } else {
+      this.props.navigation.navigate( 'AccountDetails', {
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      } )
+    }
+
     // }
   };
 
@@ -143,35 +153,37 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onAddNewSelected={this.navigateToAddNewAccountScreen}
             onCardSelected={this.handleAccountCardSelection}
           />
-          <View style={{justifyContent:'center',flexDirection:'row'}}>
-          <HomeBuyCard
-            cardContainer={{
-              backgroundColor: 'white',
-              // marginLeft: wp( 4 ),
-              marginRight: wp( 2),
-              height: hp(Platform.OS == 'ios' ? '13%' : '15%' ),
-              width:wp('91%'),
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: hp( 3 ),
-              marginBottom: hp(Platform.OS == 'ios' ? 4 : 2 ),
-              borderRadius: wp( 2 ),
-              padding: hp( '1.4%' ),
-              flexDirection: 'row',
+          <View style={{
+            justifyContent:'center', flexDirection:'row'
+          }}>
+            <HomeBuyCard
+              cardContainer={{
+                backgroundColor: 'white',
+                // marginLeft: wp( 4 ),
+                marginRight: wp( 2 ),
+                height: hp( Platform.OS == 'ios' ? '13%' : '15%' ),
+                width:wp( '91%' ),
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: hp( 3 ),
+                marginBottom: hp( Platform.OS == 'ios' ? 4 : 2 ),
+                borderRadius: wp( 2 ),
+                padding: hp( '1.4%' ),
+                flexDirection: 'row',
               // shadowColor: Colors.shadowColor,
               // shadowOpacity: 1,
               // shadowOffset: {
               //   width: 10, height: 10
               // },
               // elevation: 6
-            }}
-            amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
-            incramount={''}
-            percentIncr={'5%'}
-            asset={'../../assets/images/HomePageIcons/graph.png'}
-            openBottomSheet={( type ) => this.props.openBottomSheet( type )}
-            currencyCode={currencyCode}
-          />
+              }}
+              amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
+              incramount={''}
+              percentIncr={'5%'}
+              asset={'../../assets/images/HomePageIcons/graph.png'}
+              openBottomSheet={( type ) => this.props.openBottomSheet( type )}
+              currencyCode={currencyCode}
+            />
           </View>
         </View>
       </View>

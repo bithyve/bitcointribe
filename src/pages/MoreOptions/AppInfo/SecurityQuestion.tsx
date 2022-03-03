@@ -130,7 +130,9 @@ function SecurityQuestion( props ) {
             <Text style={styles.modalBoldText}>Step 1</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>{` ${strings.ConfirmSecurityQuestion}`}</Text>
+            }}>
+              {` ${strings.ConfirmEncryptionPassword}`}
+            </Text>
           </View>
           <View style={{
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )

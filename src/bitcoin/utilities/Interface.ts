@@ -152,7 +152,7 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
-    scheme?: string,
+    scheme?: ShareSplitScheme,
   };
 }
 
@@ -725,11 +725,26 @@ export interface LevelInfo {
   walletId?: string
 }
 
+export enum ShareSplitScheme {
+  OneOfOne = '1of1',
+  TwoOfThree = '2of3',
+  ThreeOfFive = '3of5'
+}
+
+export enum KeeperType {
+  PRIMARY_KEEPER = 'primaryKeeper',
+  DEVICE = 'device',
+  CONTACT = 'contact',
+  EXISTING_CONTACT = 'existingContact',
+  PDF = 'pdf',
+  SECURITY_QUESTION = 'securityQuestion',
+}
+
 export interface KeeperInfoInterface {
   shareId: string;
   name: string;
-  type: string;
-  scheme: string;
+  type: KeeperType;
+  scheme: ShareSplitScheme;
   currentLevel: number;
   createdAt: number;
   sharePosition: number;
@@ -856,6 +871,21 @@ export interface Wallet {
   version: string,
 }
 
+export interface LNNode {
+  host?: string,
+  port?: string,
+  url?: string,
+  lndhubUrl?: string,
+  existingAccount?: boolean,
+  macaroonHex?: string,
+  accessKey?: string,
+  username?: string,
+  password?: string,
+  implementation?: string,
+  certVerification?: boolean,
+  enableTor?: boolean
+}
+
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
   isUsable: boolean,                    // true if account is usable
@@ -902,6 +932,7 @@ export interface Account {
     isNew: boolean
     type: string;
   }[]
+  node?: LNNode
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -944,7 +975,8 @@ export enum AccountType {
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
-  FNF_ACCOUNT = 'FNF_ACCOUNT'
+  FNF_ACCOUNT = 'FNF_ACCOUNT',
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
 }
 
 export interface Accounts {
@@ -958,7 +990,8 @@ export enum DeepLinkKind {
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
   EXISTING_CONTACT = 'EXISTING_CONTACT',
   GIFT = 'GIFT',
-  CONTACT_GIFT = 'CONTACT_GIFT'
+  CONTACT_GIFT = 'CONTACT_GIFT',
+  CAMPAIGN = 'CAMPAIGN'
 }
 
 export enum ShortLinkDomain {
