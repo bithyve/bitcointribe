@@ -292,6 +292,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       subAccountKind: primarySubAccount.kind,
     } )
   }
+  
   const sections = useMemo( () => {
     return [
       {
@@ -317,7 +318,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           return (
             <View style={styles.viewSectionContainer}>
               <TransactionsPreviewSection
-                transactions={AccountShell.getAllTransactions( accountShell ).slice( 0, 3 )}
+                transactions={AccountShell.getAllTransactions( accountShell ).sort((a, b) => a.date.localeCompare(b.date)).slice(3)}
+                // transactions={AccountShell.getAllTransactions( accountShell ).slice( 0, 3 )}
                 availableBalance={AccountShell.getSpendableBalance( accountShell )}
                 bitcoinUnit={accountShell.unit}
                 isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
