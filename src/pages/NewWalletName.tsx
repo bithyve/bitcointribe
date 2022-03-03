@@ -279,22 +279,24 @@ export default function NewWalletName( props ) {
               >
                 <TouchableOpacity
                   onPress={() => {
+                    setLoaderModal( true )
                     Keyboard.dismiss()
                     // props.navigation.navigate( 'NewWalletQuestion', {
                     //   walletName,
                     // } )
-                    setLoaderModal( true )
-                    setSignUpStarted( true )
-                    dispatch( updateCloudPermission( false ) )
-                    dispatch( setupWallet( walletName, null ) )
-                    dispatch( initNewBHRFlow( true ) )
-                    dispatch( setVersion( 'Current' ) )
-                    const current = Date.now()
-                    AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
-                    const securityQuestionHistory = {
-                      created: current,
-                    }
-                    AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
+                    setTimeout( () => {
+                      setSignUpStarted( true )
+                      dispatch( updateCloudPermission( false ) )
+                      dispatch( setupWallet( walletName, null ) )
+                      dispatch( initNewBHRFlow( true ) )
+                      dispatch( setVersion( 'Current' ) )
+                      const current = Date.now()
+                      AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
+                      const securityQuestionHistory = {
+                        created: current,
+                      }
+                      AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
+                    }, 1000 )
                   }}
                   style={styles.buttonView}
                 >
