@@ -1,4 +1,4 @@
-import { AccountType, MultiSigAccount } from '../../bitcoin/utilities/Interface'
+import { AccountType, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountSettings, updateAccountShells } from '../actions/accounts'
@@ -50,11 +50,11 @@ export function* restoreMultiSigTwoFAFlag( ) {
     ( state ) => state.accounts
   )
 
-  for( const account of Object.values(accountsState.accounts) ){
-    if([AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT].includes(account.type)){ 
-      if((account as MultiSigAccount).xpubs && (account as MultiSigAccount).xpubs.secondary){ // level-2 activated multisig account found
-        if(!(account as MultiSigAccount).is2FA){ // faulty multisig account: missing is2FA flag
-          (account as MultiSigAccount).is2FA = true 
+  for( const account of Object.values( accountsState.accounts ) ){
+    if( [ AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( account.type ) ){
+      if( ( account as MultiSigAccount ).xpubs && ( account as MultiSigAccount ).xpubs.secondary ){ // level-2 activated multisig account found
+        if( !( account as MultiSigAccount ).is2FA ){ // faulty multisig account: missing is2FA flag
+          ( account as MultiSigAccount ).is2FA = true
 
           yield put( updateAccountShells( {
             accounts: {
