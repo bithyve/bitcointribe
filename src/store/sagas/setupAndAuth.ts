@@ -12,34 +12,27 @@ import {
   credsAuthenticated,
   switchSetupLoader,
   switchReLogin,
-  INIT_RECOVERY,
   CHANGE_AUTH_CRED,
   RESET_PIN,
   credsChanged,
   pinChangedFailed,
-  initializeRecoveryCompleted,
   completedWalletSetup,
-  WALLET_SETUP_COMPLETION,
   updateApplication,
   UPDATE_APPLICATION,
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
 import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange, upgradePDF, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
-import { updateCloudData } from '../actions/cloud'
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
-import { newAccountShellCreationCompleted, updateAccountSettings } from '../actions/accounts'
+import { newAccountShellCreationCompleted } from '../actions/accounts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import AccountShell from '../../common/data/models/AccountShell'
-import semver from 'semver'
 import semverLte from 'semver/functions/lte'
 import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'

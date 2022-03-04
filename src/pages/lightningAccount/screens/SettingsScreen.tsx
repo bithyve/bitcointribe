@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {  View, StyleSheet, FlatList, Text, StatusBar } from 'react-native'
+import {  View, StyleSheet, FlatList, Text, StatusBar, Dimensions } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import { ListItem } from 'react-native-elements'
 import Node from '../../../assets/images/svgs/node.svg'
@@ -13,6 +13,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
+
+const windowHeight = Dimensions.get( 'window' ).height
 export default class SettingsScreen extends Component {
   constructor( props: any ) {
     super( props )
@@ -54,7 +56,7 @@ export default class SettingsScreen extends Component {
         <ListItem
           containerStyle={{
             borderRadius:10,
-            height:hp( 8 )
+            height:hp( windowHeight >= 850 ? 8 : windowHeight >= 750 ? 10 :windowHeight >= 650 && 11  )
           }}
           style={{
             ...styles.lineItem,

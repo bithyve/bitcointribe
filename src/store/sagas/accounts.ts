@@ -802,6 +802,9 @@ export function* setup2FADetails( wallet: Wallet ) {
 
 
 export function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
+  const accountShells: AccountShell[] = yield select(
+    ( state ) => state.accounts.accountShells
+  )
   const network = AccountUtilities.getNetworkByType( account.networkType )
   let primarySubAccount: SubAccountDescribing
 
@@ -879,6 +882,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           serviceAccountKind,
         } )
         break
+
       case AccountType.LIGHTNING_ACCOUNT:
         primarySubAccount = new LightningSubAccountInfo( {
           id: account.id,
@@ -892,23 +896,36 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         break
   }
 
-  const accountShell = new AccountShell( {
-    primarySubAccount,
-    unit: account.networkType === NetworkType.TESTNET ? BitcoinUnit.TSATS: BitcoinUnit.SATS,
-    displayOrder: 1
+  let accountShell: AccountShell
+  accountShells.forEach( shell => { // during re-creation of a some-how deleted account, if account shell already exists, then update that account shell else create new
+    if( shell.primarySubAccount.id === primarySubAccount.id ){
+      accountShell = {
+        ... shell,
+        primarySubAccount: primarySubAccount
+      }
+    }
   } )
+
+  if( !accountShell ){
+    accountShell = new AccountShell( {
+      primarySubAccount,
+      unit: account.networkType === NetworkType.TESTNET ? BitcoinUnit.TSATS: BitcoinUnit.SATS,
+      displayOrder: 1
+    } )
+  }
+
   accountShell.syncStatus = SyncStatus.COMPLETED
   return accountShell
 }
 
-export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails ) {
+export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number ) {
   const wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primarySeed, accounts } = wallet
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
   switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
-        const testInstanceCount = ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
+        const testInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
         const testAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.TEST_ACCOUNT,
@@ -922,7 +939,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return testAccount
 
       case AccountType.CHECKING_ACCOUNT:
-        const checkingInstanceCount = ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
+        const checkingInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
         const checkingAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.CHECKING_ACCOUNT,
@@ -938,7 +955,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
       case AccountType.SAVINGS_ACCOUNT:
         // if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
-        const savingsInstanceCount = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
+        const savingsInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
         const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
           walletId,
           type: AccountType.SAVINGS_ACCOUNT,
@@ -957,7 +974,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( is2FAEnabled )
           if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
-        const donationInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const donationInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber :( accounts[ accountType ] )?.length | 0
         const donationAccount: DonationAccount = yield call( generateDonationAccount, {
           walletId,
           type: accountType,
@@ -993,7 +1010,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
               break
         }
 
-        const serviceInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const serviceInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ accountType ] )?.length | 0
         const serviceAccount: Account = yield call( generateAccount, {
           walletId,
           type: accountType,
@@ -1007,9 +1024,10 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( accountType === AccountType.SWAN_ACCOUNT ) serviceAccount.isUsable = false
 
         return serviceAccount
+
       case AccountType.LIGHTNING_ACCOUNT:
         const { node } = accountDetails
-        const lnAccountCount = ( accounts[ accountType ] )?.length | 0
+        const lnAccountCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ accountType ] )?.length | 0
         const lnAccount: Account = yield call( generateAccount, {
           walletId,
           type: accountType,
@@ -1033,7 +1051,8 @@ export interface newAccountDetails {
 }
 export interface newAccountsInfo {
   accountType: AccountType,
-  accountDetails?: newAccountDetails
+  accountDetails?: newAccountDetails,
+  recreationInstanceNumber?: number,
 }
 
 export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[], } ) {
@@ -1043,12 +1062,13 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const accountIds = []
   let testcoinsToAccount
 
-  for ( const { accountType, accountDetails } of newAccountsInfo ){
+  for ( const { accountType, accountDetails, recreationInstanceNumber } of newAccountsInfo ){
     const account: Account | MultiSigAccount | DonationAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
-      }
+      },
+      recreationInstanceNumber
     )
     accountIds.push( account.id )
     const accountShell = yield call( generateShellFromAccount, account )
@@ -1061,7 +1081,9 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const wallet: Wallet = yield select( state => state.storage.wallet )
   let presentAccounts = _.cloneDeep( wallet.accounts )
   Object.values( ( accounts as Accounts ) ).forEach( account => {
-    if( presentAccounts[ account.type ] ) presentAccounts[ account.type ].push( account.id )
+    if( presentAccounts[ account.type ] ){
+      if( !presentAccounts[ account.type ].includes( account.id ) )  presentAccounts[ account.type ].push( account.id )
+    }
     else presentAccounts = {
       ...presentAccounts,
       [ account.type ]: [ account.id ]

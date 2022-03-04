@@ -117,7 +117,7 @@ const DashedLargeContainer = ( props ) => {
               letterSpacing: 0.55,
               lineHeight: RFValue( 15 ),
               fontFamily: Fonts.FiraSansRegular,
-              marginRight: wp( 9 )
+              marginRight: wp( 3 ),
             }}>
               {'You have received a bitcoin gift from '}
               <Text style={{
@@ -127,7 +127,19 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\n\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet'}
+            </Text>
+            <Text style={{
+              color: Colors.lightTextColor,
+              fontSize: RFValue( 11 ),
+              letterSpacing: 0.55,
+              lineHeight: RFValue( 15 ),
+              fontFamily: Fonts.FiraSansRegular,
+              marginRight: wp( 9 ),
+            }}>
+
+              {props.type === 'Link' ? '\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet' :
+                props.type === 'QR' ? '\nScan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet':
+                  '\nScan the QR/ click the link and follow the steps on your Hexa wallet to claim the gift'}
             </Text>
           </View>
           {props.date &&
