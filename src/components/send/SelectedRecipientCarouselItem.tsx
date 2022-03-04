@@ -36,10 +36,8 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
-  console.log('recipient',recipient)
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-  console.log('sourcePrimarySubAccount',sourcePrimarySubAccount)
   const designatedAmount = useFormattedAmountText( useAmountBeingSentToRecipient( recipient ) )
 
   const unitText = !currencyCode ? useFormattedUnitText( {
