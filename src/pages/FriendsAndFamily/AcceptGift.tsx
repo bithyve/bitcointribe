@@ -440,12 +440,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         }}>
           <Illustration/>
         </View> */}
-        {/* <TouchableOpacity
+        <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
             setGiftAcceptedModel( false )
             closeModal()
-            dispatch( giftAccepted( '' ) )
           }
           }
           style={{
@@ -456,7 +455,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19}/>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <View style={{
           marginLeft: wp( 6 ),
           marginVertical: hp( 3.5 )
@@ -476,6 +475,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           theme={getTheme()}
           version={version}
           isSend
+          isAccept
         />
         <BottomInfoBox
           containerStyle={{
@@ -484,12 +484,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }}
           infoText={''}
         />
-        {/* {renderButton( 'Add to Account' )} */}
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
         }}>
-          {renderButton( 'Add to Account', false )}
-          <TouchableOpacity
+          {/* {renderButton( 'Add to Account', false )} */}
+          {/* <TouchableOpacity
             onPress={() => {
               // onGiftRequestRejected()
               setGiftAcceptedModel( false )
@@ -509,9 +508,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 color: Colors.blue
               }}
             >
-              {'Add Later'}
+              {'OK'}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </>
     )
@@ -600,6 +599,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             image={<CheckingAcc height={60} width={60} />}
             theme={getTheme()}
             version={version}
+            isAccept
           />
           {/* <View
             style={{
