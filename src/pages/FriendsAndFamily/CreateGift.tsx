@@ -188,6 +188,16 @@ const CreateGift = ( { navigation } ) => {
     if( isSendMax ) setAmount( `${spendableBalance - sendMaxFee}` )
   }, [ sendMaxFee, isSendMax ] )
 
+  useEffect( () => {
+    if( currencyKind==CurrencyKind.BITCOIN ){
+      const newAmount = convertFiatToSats( parseFloat( amount ) ).toString()
+      setAmount( newAmount == 'NaN' ? '' : newAmount )
+    }else if( currencyKind==CurrencyKind.FIAT ){
+      const newAmount = convertSatsToFiat( parseFloat( amount ) ).toString()
+      setAmount( newAmount == 'NaN' ? '' : newAmount )
+    }
+  }, [ currencyKind ] )
+
   function handleSendMaxPress( ) {
     dispatch( calculateSendMaxFee( {
       numberOfRecipients: Number( numbersOfGift ),
@@ -736,7 +746,7 @@ const CreateGift = ( { navigation } ) => {
             }} />
             <Text style={[ styles.modalInputBox, {
               color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
-            } ]} onPress={() => setKeyboard( true )}>{UsNumberFormat( amount ) === '0' ? '' :UsNumberFormat( amount ) }
+            } ]} onPress={() => setKeyboard( true )}>{currencyKind == CurrencyKind.FIAT ? amount :  UsNumberFormat( amount ) === '0' ? '' :UsNumberFormat( amount ) }
               {( !showKeyboard && !amount ) &&
               <Text style={{
                 fontSize: RFValue( 12 ),
