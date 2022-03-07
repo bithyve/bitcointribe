@@ -45,7 +45,8 @@
       "setup": "सेट अप",
       "manage": "प्रबंधित करें",
       "backup": "बैकअप",
-      "change": "बदलें"
+      "change": "बदलें",
+      "contactCreated":"संपर्क बनाया"
   },
   "noInternet": {
       "no": "इंटरनेट नहीं है",

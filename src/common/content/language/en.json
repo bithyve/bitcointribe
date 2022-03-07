@@ -48,7 +48,8 @@
         "manage": "Manage",
         "backup": "Backup",
         "change": "Change",
-        "save": "Save"
+        "save": "Save",
+        "contactCreated":"Contact Created"
     },
     "noInternet": {
       "no": "No Internet",
