@@ -127,19 +127,7 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-            </Text>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 11 ),
-              letterSpacing: 0.55,
-              lineHeight: RFValue( 15 ),
-              fontFamily: Fonts.FiraSansRegular,
-              marginRight: wp( 9 ),
-            }}>
-
-              {props.type === 'Link' ? '\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet' :
-                props.type === 'QR' ? '\nScan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet':
-                  '\nScan the QR/ click the link and follow the steps on your Hexa wallet to claim the gift'}
+              {!props.isAccept ? '\n\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet': '\n\nYou can either add the sats to an Account or retain it to forward to your loved ones.'}
             </Text>
           </View>
           {props.date &&
