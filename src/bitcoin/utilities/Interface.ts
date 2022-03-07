@@ -622,6 +622,9 @@ export interface TrustedContact {
   deepLinkConfig?: {
     encryptionType: DeepLinkEncryptionType,
     encryptionKey: string | null,
+  },
+  timestamps: {
+    created: number,
   }
 }
 export interface Trusted_Contacts {

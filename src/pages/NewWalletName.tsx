@@ -285,6 +285,7 @@ export default function NewWalletName( props ) {
                       // props.navigation.navigate( 'NewWalletQuestion', {
                     //   walletName,
                     // } )
+                    setTimeout( () => {
                       setSignUpStarted( true )
                       dispatch( updateCloudPermission( false ) )
                       dispatch( setupWallet( walletName, null ) )
