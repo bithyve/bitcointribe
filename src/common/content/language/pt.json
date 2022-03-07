@@ -45,7 +45,8 @@
       "setup": "Configurar",
       "manage": "Gerir",
       "backup": "Cópia de segurança",
-      "change": "Mudar"
+      "change": "Mudar",
+      "contactCreated":"contato criado"
   },
   "noInternet": {
       "no": "Sem internet",
