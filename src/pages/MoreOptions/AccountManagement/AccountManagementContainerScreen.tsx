@@ -1,9 +1,8 @@
-import React, { useState, useMemo, useContext, useCallback, useEffect } from 'react'
-import { StyleSheet, View, Text, SafeAreaView, Image, TouchableOpacity, Platform, ScrollView, StatusBar } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import React, { useState, useMemo, useCallback, useEffect, useDebugValue } from 'react'
+import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, ScrollView, StatusBar, Button } from 'react-native'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import AccountShell from '../../../common/data/models/AccountShell'
-import { Account, AccountType, MultiSigAccount } from '../../../bitcoin/utilities/Interface'
+import { Account, AccountType, MultiSigAccount, Wallet } from '../../../bitcoin/utilities/Interface'
 import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import ButtonBlue from '../../../components/ButtonBlue'
@@ -19,20 +18,17 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
-import ImageStyles from '../../../common/Styles/ImageStyles'
-import BottomSheet, { BottomSheetView, useBottomSheetModal } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
+import {  useBottomSheetModal } from '@gorhom/bottom-sheet'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
 import ModalContainer from '../../../components/home/ModalContainerScroll'
-import { resetStackToAccountDetails, resetToHomeAction } from '../../../navigation/actions/NavigationActions'
 import { NavigationActions, StackActions } from 'react-navigation'
-import { color } from 'react-native-reanimated'
 import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import { translations } from '../../../common/content/LocContext'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
+import { recreateAccounts } from '../../../store/actions/upgrades'
 
 export type Props = {
   navigation: any;
@@ -41,12 +37,13 @@ export type Props = {
 const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const strings = translations[ 'accManagement' ]
-  const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
-  const accountShells = useSelector( ( state ) => state.accounts.accountShells )
-  const accounts = useSelector( ( state ) => state.accounts.accounts )
+  const hasAccountSettingsUpdateSucceeded = useSelector( ( state: RootStateOrAny ) => state.accounts.hasAccountSettingsUpdateSucceeded )
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+  const accountShells = useSelector( ( state: RootStateOrAny ) => state.accounts.accountShells )
+  const accounts = useSelector( ( state: RootStateOrAny ) => state.accounts.accounts )
 
   // const [ tempValue, setTempValue ] = useState( false )
-  const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
+  const showAllAccount = useSelector( ( state: RootStateOrAny ) => state.accounts.showAllAccount )
   const [ orderedAccountShells, setOrderedAccountShells ] = useState( accountShells )
   const [ hiddenAccountShells, setHiddenAccountShells ] = useState( [] )
   const [ archivedAccountShells, setArchivedAccountShells ] = useState( [] )
@@ -56,6 +53,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
   const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
+  const [ debugModalTaps, setDebugModalTaps ] = useState( 0 )
   const [ debugModalVisible, setDebugModalVisible ] = useState( false )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
@@ -64,7 +62,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const getnewDraggableOrderedAccountShell = useMemo( () => {
     const newDraggableOrderedAccountShell = []
     if( accountShells ){
-      accountShells.map( ( value, index ) =>{
+      accountShells.map( ( value ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newDraggableOrderedAccountShell.push( value )
         }
@@ -77,7 +75,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const getnewOrderedAccountShell = useMemo( () => {
     if( showAllAccount === true ){
       const newOrderedAccountShell = []
-      accountShells.map( ( value, index ) =>{
+      accountShells.map( ( value ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newOrderedAccountShell.push( value )
         }
@@ -90,7 +88,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const getHiddenAccountShell = useMemo( () => {
     const newHiddenAccountShell = []
     if( showAllAccount === true ){
-      accountShells.map( ( value, index ) =>{
+      accountShells.map( ( value ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
           newHiddenAccountShell.push( value )
         }
@@ -103,7 +101,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const getArchivedAccountShells = useMemo( () => {
     if( showAllAccount === true ){
       const newArchivedAccountShells = []
-      accountShells.map( ( value, index ) =>{
+      accountShells.map( ( value ) =>{
         if( value.primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
           newArchivedAccountShells.push( value )
         }
@@ -136,10 +134,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       setDebugModalVisible( true )
     }
   }, [ numberOfTabs ] )
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
 
   useEffect( () => {
     return () => {
@@ -151,8 +145,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return(
       <UnHideArchiveAccountBottomSheet
         onProceed={( accounShell )=>{
-          if( primarySubAccount && ( primarySubAccount.visibility == AccountVisibility.ARCHIVED || primarySubAccount.visibility == AccountVisibility.HIDDEN ) )
-            setAccountVisibility( primarySubAccount.visibility )
+          if( primarySubAccount && ( ( primarySubAccount as SubAccountDescribing ).visibility == AccountVisibility.ARCHIVED || ( primarySubAccount as SubAccountDescribing ).visibility == AccountVisibility.HIDDEN ) )
+            setAccountVisibility( ( primarySubAccount as SubAccountDescribing ).visibility )
           changeVisisbility( accounShell, AccountVisibility.DEFAULT )
 
           showUnHideArchiveModal( false )
@@ -181,14 +175,14 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           } )
 
           navigation.dispatch( resetAction )
-          if( primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
+          if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
             navigation.navigate( 'LNAccountDetails', {
-              accountShellID: primarySubAccount.accountShellID,
-              node: primarySubAccount.node
+              accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+              node: ( primarySubAccount as SubAccountDescribing ).node
             } )
           } else {
             navigation.navigate( 'AccountDetails', {
-              accountShellID: primarySubAccount.accountShellID,
+              accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
             } )
           }
 
@@ -310,7 +304,26 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     setDebugModalVisible( false )
   }
 
-  const getAccountDebugData = ( shell: AccountShell ) => {
+  const getWalletDebugData = ( wallet: Wallet ) => {
+    delete wallet.security
+    delete wallet.primaryMnemonic
+    delete wallet.primarySeed
+    delete wallet.secondaryXpub
+    delete wallet.details2FA
+    delete wallet.smShare
+
+    return <View style={styles.lineItem}>
+      <Text style={ListStyles.listItemTitleTransaction}>
+          Wallet Info
+      </Text>
+      <Text  style={{
+        ...ListStyles.listItemSubtitle,
+        marginBottom: 3,
+      }}>{JSON.stringify( wallet, null, 8 )}</Text>
+    </View>
+  }
+
+  const getAccountDebugData = ( shell: AccountShell, index: number ) => {
     const primarySubAcc = shell.primarySubAccount
     const account: Account = accounts[ primarySubAcc.id ]
 
@@ -337,7 +350,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return (
       <View style={styles.lineItem}>
         <Text style={ListStyles.listItemTitleTransaction}>
-          Account Shell
+          Account Shell {index + 1}
         </Text>
         <Text style={{
           fontSize: 10
@@ -367,9 +380,19 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           <FontAwesome name="close" color={Colors.blue} size={24} onPress = {closeBottomSheet}/>
         </View>
         <ScrollView>
-          {accountShells.map( ( shell: AccountShell ) => {
-            return getAccountDebugData( shell )
-          } )}
+          <TouchableOpacity style={styles.rootContainer} activeOpacity={1} onPress={()=>setDebugModalTaps( prev => prev+1 )}>
+            {getWalletDebugData( {
+              ...wallet
+            } )}
+            {accountShells.map( ( shell: AccountShell, index ) => {
+              return getAccountDebugData( shell, index )
+            } )}
+            { debugModalTaps > 4?
+              ( <Button title={'Recreate Missing Accounts'} onPress={()=> {
+                setDebugModalVisible( false )
+                dispatch( recreateAccounts() )
+              }}></Button> ): null}
+          </TouchableOpacity>
         </ScrollView>
       </View>
     )
