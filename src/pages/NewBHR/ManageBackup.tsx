@@ -482,6 +482,7 @@ export default function ManageBackup( props ) {
     }
     setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
     dispatch( onPressKeeper( value, keeperNumber ) )
+    onRefresh()
     setSelectedRecoveryKeyNumber( keeperNumber )
     setSelectedLevelId( value.id )
     setOnKeeperButtonClick( true )
