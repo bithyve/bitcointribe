@@ -6,6 +6,9 @@ import { call, put, select } from 'redux-saga/effects'
 import { AccountsState } from '../reducers/accounts'
 import dbManager from '../../storage/realm/dbManager'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
+import { createWatcher } from '../utils/utilities'
+import { RECREATE_MISSING_ACCOUNTS } from '../actions/upgrades'
+import Toast from '../../components/Toast'
 
 export function* testAccountEnabler( ) {
   const accountShells: AccountShell[] = yield select(
@@ -69,37 +72,47 @@ export function* restoreMultiSigTwoFAFlag( ) {
 }
 
 export function* recreateMissingAccounts( ) {
-  // recreates the missing account(s) struct and account-shell(s)
-  const wallet: Wallet = yield select(
-    ( state ) => state.storage.wallet
-  )
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
+  try{
+    // recreates the missing account(s) struct and account-shell(s)
+    const wallet: Wallet = yield select(
+      ( state ) => state.storage.wallet
+    )
+    const accountsState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
 
-  const accountsToRecreateInfo: newAccountsInfo[] = []
-  for( const accountType of Object.keys( wallet.accounts ) ) {
-    const createdAccountIds = wallet.accounts[ accountType ]
-    const availableAccountIds = []
-    for( const account of Object.values( accountsState.accounts ) ){
-      if( account.type === accountType ){
-        if( createdAccountIds.includes( account.id ) ) availableAccountIds.push( account.id )
+    const accountsToRecreateInfo: newAccountsInfo[] = []
+    for( const accountType of Object.keys( wallet.accounts ) ) {
+      const createdAccountIds = wallet.accounts[ accountType ]
+      const availableAccountIds = []
+      for( const account of Object.values( accountsState.accounts ) ){
+        if( account.type === accountType ){
+          if( createdAccountIds.includes( account.id ) ) availableAccountIds.push( account.id )
+        }
+      }
+
+      for( const accountId of createdAccountIds ){
+        if( !availableAccountIds.includes( accountId ) ){
+          // recreate missing account
+          const instanceNumber = createdAccountIds.indexOf( accountId )
+          accountsToRecreateInfo.push( {
+            accountType: ( accountType as AccountType ),
+            recreationInstanceNumber: instanceNumber
+          } )
+        }
       }
     }
 
-    for( const accountId of createdAccountIds ){
-      if( !availableAccountIds.includes( accountId ) ){
-        // recreate missing account
-        const instanceNumber = createdAccountIds.indexOf( accountId )
-        accountsToRecreateInfo.push( {
-          accountType: ( accountType as AccountType ),
-          recreationInstanceNumber: instanceNumber
-        } )
-      }
-    }
+    if( accountsToRecreateInfo.length )
+      yield call( addNewAccountShellsWorker, {
+        payload: accountsToRecreateInfo
+      } )
+  } catch( err ){
+    Toast( `Failed to recreate accounts: ${err}` )
   }
-
-  yield call( addNewAccountShellsWorker, {
-    payload: accountsToRecreateInfo
-  } )
 }
+
+export const recreateMissingAccountsWatcher = createWatcher(
+  recreateMissingAccounts,
+  RECREATE_MISSING_ACCOUNTS,
+)
