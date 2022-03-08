@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
-import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, ScrollView, StatusBar } from 'react-native'
+import React, { useState, useMemo, useCallback, useEffect, useDebugValue } from 'react'
+import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, ScrollView, StatusBar, Button } from 'react-native'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import AccountShell from '../../../common/data/models/AccountShell'
 import { Account, AccountType, MultiSigAccount, Wallet } from '../../../bitcoin/utilities/Interface'
@@ -28,6 +28,7 @@ import HeaderTitle from '../../../components/HeaderTitle'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import { translations } from '../../../common/content/LocContext'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
+import { recreateAccounts } from '../../../store/actions/upgrades'
 
 export type Props = {
   navigation: any;
@@ -52,6 +53,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
   const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
+  const [ debugModalTaps, setDebugModalTaps ] = useState( 0 )
   const [ debugModalVisible, setDebugModalVisible ] = useState( false )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
@@ -378,12 +380,19 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           <FontAwesome name="close" color={Colors.blue} size={24} onPress = {closeBottomSheet}/>
         </View>
         <ScrollView>
-          {getWalletDebugData( {
-            ...wallet
-          } )}
-          {accountShells.map( ( shell: AccountShell, index ) => {
-            return getAccountDebugData( shell, index )
-          } )}
+          <TouchableOpacity style={styles.rootContainer} activeOpacity={1} onPress={()=>setDebugModalTaps( prev => prev+1 )}>
+            {getWalletDebugData( {
+              ...wallet
+            } )}
+            {accountShells.map( ( shell: AccountShell, index ) => {
+              return getAccountDebugData( shell, index )
+            } )}
+            { debugModalTaps > 4?
+              ( <Button title={'Recreate Missing Accounts'} onPress={()=> {
+                setDebugModalVisible( false )
+                dispatch( recreateAccounts() )
+              }}></Button> ): null}
+          </TouchableOpacity>
         </ScrollView>
       </View>
     )
