@@ -33,7 +33,7 @@ const SetupDonationAccount: React.FC<Props> = ({ navigation }: Props) => {
                 style={styles.rootContainer}
                 behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
             >
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>navigation.pop()}>
                     <Icon name={'arrow-back-outline'} color={'#006DB4'} size={25} />
                 </TouchableOpacity>
                 <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
