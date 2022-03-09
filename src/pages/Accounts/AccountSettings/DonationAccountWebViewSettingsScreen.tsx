@@ -169,7 +169,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
             <View style={{
               flexDirection: 'row', alignItems: 'center'
             }}>
-              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} /> 
 
               <View>
                 <Text style={NavStyles.modalHeaderTitleText}>
