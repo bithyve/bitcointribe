@@ -5,6 +5,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FormStyles from '../../../../common/Styles/FormStyles'
 import Colors from '../../../../common/Colors'
 import Fonts from '../../../../common/Fonts'
+import openLink from '../../../../utils/OpenLink'
+import Loader from '../../../../components/loader'
 
 export type Props = {
     navigation: any;
@@ -19,10 +21,19 @@ const SetupDonationAccount: React.FC<Props> = ({ navigation }: Props) => {
     const [organisedBy, setOrganisedBy] = useState('')
     const [description, setDescription] = useState('')
     const [enable2FA, setEnable2FA] = useState(true)
+    const [ showLoader, setShowLoader ] = useState( false )
 
     useEffect(() => {
         nameInputRef.current?.focus()
     }, [])
+
+    async function openTermsAndConditions() {
+        await openLink( 'https://hexawallet.io/donee-terms-conditions/' )
+    }
+    function handleProceedButtonPress() {
+        setShowLoader( true )
+        setTimeout(() => {setShowLoader( false )}, 3000)
+    }
     return (
         <SafeAreaView style={{
             flex: 1,
@@ -101,14 +112,15 @@ const SetupDonationAccount: React.FC<Props> = ({ navigation }: Props) => {
                     </View>
                     <View style={{ flexDirection: 'row', marginVertical: 10 }}>
                         <Text style={styles.agreeTermsText}>By clicking proceed you agree to our</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={openTermsAndConditions}>
                             <Text style={styles.termsAndConditionText}>&nbsp;Terms and Conditions</Text>
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.proceedBtnView}>
+                    <TouchableOpacity style={styles.proceedBtnView} onPress={handleProceedButtonPress}>
                         <Text style={styles.proceedBtnText}>Proceed</Text>
                     </TouchableOpacity>
                 </ScrollView>
+                {showLoader ? <Loader isLoading={true} /> : null}
             </KeyboardAvoidingView>
         </SafeAreaView>
     )
