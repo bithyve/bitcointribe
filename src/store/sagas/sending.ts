@@ -35,6 +35,7 @@ function* processRecipients( accountShell: AccountShell ){
 
   const recipients:
     {
+      id?: string,
       address: string;
       amount: number;
       name?: string
@@ -86,6 +87,7 @@ function* processRecipients( accountShell: AccountShell ){
           if( !paymentAddress ) throw new Error( `Payment address missing for: ${recipient.displayedName}` )
 
           recipients.push( {
+            id: contact.channelKey,
             address: paymentAddress,
             amount: recipient.amount,
             name: contact.contactDetails.contactName || idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.walletName ),

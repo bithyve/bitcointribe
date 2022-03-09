@@ -12,9 +12,16 @@ import semver from 'semver'
 export function* applyUpgradeSequence( { storedVersion, newVersion }: {storedVersion: string, newVersion: string} ) {
   if( semver.lt( storedVersion, '2.0.66' ) ) yield call( testAccountEnabler )
   if( semver.lt( storedVersion, '2.0.68' ) ) yield call( accountVisibilityResetter )
-  if( semver.lt( storedVersion, '2.0.69' ) ) yield call( restoreMultiSigTwoFAFlag )
-  if( semver.lt( storedVersion, '2.0.70' ) ) yield call( restoreManageBackupDataPipeline )
+  if( semver.lt( storedVersion, '2.0.71' ) ) {
+    yield call( restoreMultiSigTwoFAFlag )
+    yield call( recreateMissingAccounts )
+  }
+  if( semver.lt( storedVersion, '2.0.75' ) ) yield call( restoreManageBackupDataPipeline )
 }
+import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
+import { createWatcher } from '../utils/utilities'
+import { RECREATE_MISSING_ACCOUNTS } from '../actions/upgrades'
+import Toast from '../../components/Toast'
 
 export function* testAccountEnabler( ) {
   const accountShells: AccountShell[] = yield select(
@@ -65,7 +72,6 @@ export function* restoreMultiSigTwoFAFlag( ) {
       if( ( account as MultiSigAccount ).xpubs && ( account as MultiSigAccount ).xpubs.secondary ){ // level-2 activated multisig account found
         if( !( account as MultiSigAccount ).is2FA ){ // faulty multisig account: missing is2FA flag
           ( account as MultiSigAccount ).is2FA = true
-
           yield put( updateAccountShells( {
             accounts: {
               [ account.id ]: account
@@ -78,6 +84,51 @@ export function* restoreMultiSigTwoFAFlag( ) {
   }
 }
 
+export function* recreateMissingAccounts( ) {
+  try{
+    // recreates the missing account(s) struct and account-shell(s)
+    const wallet: Wallet = yield select(
+      ( state ) => state.storage.wallet
+    )
+    const accountsState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
+
+    const accountsToRecreateInfo: newAccountsInfo[] = []
+    for( const accountType of Object.keys( wallet.accounts ) ) {
+      const createdAccountIds = wallet.accounts[ accountType ]
+      const availableAccountIds = []
+      for( const account of Object.values( accountsState.accounts ) ){
+        if( account.type === accountType ){
+          if( createdAccountIds.includes( account.id ) ) availableAccountIds.push( account.id )
+        }
+      }
+
+      for( const accountId of createdAccountIds ){
+        if( !availableAccountIds.includes( accountId ) ){
+          // recreate missing account
+          const instanceNumber = createdAccountIds.indexOf( accountId )
+          accountsToRecreateInfo.push( {
+            accountType: ( accountType as AccountType ),
+            recreationInstanceNumber: instanceNumber
+          } )
+        }
+      }
+    }
+
+    if( accountsToRecreateInfo.length )
+      yield call( addNewAccountShellsWorker, {
+        payload: accountsToRecreateInfo
+      } )
+  } catch( err ){
+    Toast( `Failed to recreate accounts: ${err}` )
+  }
+}
+
+export const recreateMissingAccountsWatcher = createWatcher(
+  recreateMissingAccounts,
+  RECREATE_MISSING_ACCOUNTS,
+)
 
 export function* restoreManageBackupDataPipeline( ) {
   // restores critical variables from realm database to appropriate reducers
@@ -107,3 +158,4 @@ export function* restoreManageBackupDataPipeline( ) {
     }
   }
 }
+

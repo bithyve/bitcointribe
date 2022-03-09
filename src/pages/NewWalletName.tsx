@@ -88,7 +88,11 @@ export default function NewWalletName( props ) {
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
   const renderLoaderModalContent = useCallback( () => {
-    return <LoaderModal headerText={message} messageText={subTextMessage} subPoints={subPoints} bottomText={bottomTextMessage} />
+    return <LoaderModal
+      headerText={'Gift Sats'}
+      messageText={'Send sats as gifts to your friends and family.'}
+      showGif={false}
+    />
   }, [ message, subTextMessage, loaderModal ] )
 
   const renderBottomSheetContent = () =>{
@@ -275,22 +279,25 @@ export default function NewWalletName( props ) {
               >
                 <TouchableOpacity
                   onPress={() => {
+                    setLoaderModal( true )
                     Keyboard.dismiss()
+                    //setTimeout( () => {
                     // props.navigation.navigate( 'NewWalletQuestion', {
                     //   walletName,
                     // } )
-                    setLoaderModal( true )
-                    setSignUpStarted( true )
-                    dispatch( updateCloudPermission( false ) )
-                    dispatch( setupWallet( walletName, null ) )
-                    dispatch( initNewBHRFlow( true ) )
-                    dispatch( setVersion( 'Current' ) )
-                    const current = Date.now()
-                    AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
-                    const securityQuestionHistory = {
-                      created: current,
-                    }
-                    AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
+                    setTimeout( () => {
+                      setSignUpStarted( true )
+                      dispatch( updateCloudPermission( false ) )
+                      dispatch( setupWallet( walletName, null ) )
+                      dispatch( initNewBHRFlow( true ) )
+                      dispatch( setVersion( 'Current' ) )
+                      const current = Date.now()
+                      AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
+                      const securityQuestionHistory = {
+                        created: current,
+                      }
+                      AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
+                    }, 1000 )
                   }}
                   style={styles.buttonView}
                 >

@@ -17,7 +17,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import { translations } from '../../common/content/LocContext'
-import { Shadow } from 'react-native-shadow-2';
+import { Shadow } from 'react-native-shadow-2'
 
 export type Props = {
   accountShell: AccountShell;
@@ -162,13 +162,13 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
 
   return (
-    <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[7, 7]}>
-    <View style={opacityChange ? {
-      ...styles.rootContainer, opacity:0.3
-    } : styles.rootContainer}>
-      <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
-      <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
-    </View>
+    <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[ 7, 7 ]}>
+      <View style={opacityChange ? {
+        ...styles.rootContainer, opacity:0.3
+      } : styles.rootContainer}>
+        <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
+        <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
+      </View>
     </Shadow>
   )
 }
