@@ -203,7 +203,7 @@
     "typescript": "^3.7.2"
   },
   "resolutions": {
-    "@babel/traverse": "7.16.5"
+    "@babel/traverse": "7.16.7"
   },
   "react-native": {
     "zlib": "browserify-zlib",
