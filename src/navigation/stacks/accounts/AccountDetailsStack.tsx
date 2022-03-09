@@ -11,7 +11,6 @@ import SendStack from '../send/SendStack'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
 // import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
 import { translations } from '../../../common/content/LocContext'
-import SetupDonationAccount from '../../../pages/Accounts/AddNew/DonationAccount/SetupDonationAccount'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -42,13 +41,7 @@ const AccountDetailsStack = createStackNavigator(
         header: null,
       },
     },
-    // added by akshay 09 march
-    SetupDonationAccountStack: {
-      screen: SetupDonationAccount,
-      navigationOptions: {
-        header: null,
-      },
-    },
+    
     SubAccountSettings: {
       screen: SubAccountSettingsStack,
       navigationOptions: {
