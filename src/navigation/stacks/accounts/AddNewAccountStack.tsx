@@ -13,6 +13,7 @@ import { translations } from '../../../common/content/LocContext'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
+import SetupDonationAccount from '../../../pages/Accounts/AddNew/DonationAccount/SetupDonationAccount'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -60,11 +61,18 @@ const AddNewAccountStack = createStackNavigator(
         title: 'Setup Swan Account'
       }
     },
-
+    // added by akshay 09 march
+    // SetupDonationAccountStack: {
+    //   screen: SetupDonationAccount,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
     AddNewDonationAccountDetails: {
-      screen: AddNewDonationAccountDetailsScreen,
+      screen: SetupDonationAccount,
       navigationOptions: {
-        title: 'Setup Donation Account'
+        header: null,
+        // title: 'Setup Donation Account'
       }
     },
 
