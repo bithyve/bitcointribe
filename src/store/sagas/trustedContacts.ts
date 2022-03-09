@@ -845,6 +845,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     type: AccountType.FNF_ACCOUNT,
     id: contactInfo.channelKey,
     senderInfo: {
+      id: contactInfo.channelKey,
       name: contactInfo.contactDetails.contactName
     },
   }

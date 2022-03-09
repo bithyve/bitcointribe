@@ -184,6 +184,7 @@ import {
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import { updateUserNameWatcher } from './sagas/storage'
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2'
+import { recreateMissingAccountsWatcher } from './sagas/upgrades'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -335,6 +336,9 @@ const rootSaga = function* () {
 
     // storage
     updateUserNameWatcher,
+
+    // upgrade scripts
+    recreateMissingAccountsWatcher
   ]
 
   yield all(

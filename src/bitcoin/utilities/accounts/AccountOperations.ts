@@ -36,7 +36,7 @@ export default class AccountOperations {
       primary: account.xpub,
       secondary: ( account as MultiSigAccount ).xpubs.secondary,
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-}, 2, network, account.nextFreeAddressIndex, false ).address
+    }, 2, network, account.nextFreeAddressIndex, false ).address
     else {
       const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
       receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
@@ -67,7 +67,7 @@ export default class AccountOperations {
       primary: account.xpub,
       secondary: ( account as MultiSigAccount ).xpubs.secondary,
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-}, 2, network, account.nextFreeAddressIndex + hardGapLimit - 1, false ).address
+    }, 2, network, account.nextFreeAddressIndex + hardGapLimit - 1, false ).address
     else externalAddress = AccountUtilities.getAddressByIndex( account.xpub, false,  account.nextFreeAddressIndex + hardGapLimit - 1, network, purpose )
 
 
@@ -76,7 +76,7 @@ export default class AccountOperations {
       primary: account.xpub,
       secondary: ( account as MultiSigAccount ).xpubs.secondary,
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-}, 2, network, account.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
+    }, 2, network, account.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
     else internalAddress = AccountUtilities.getAddressByIndex( account.xpub, true, account.nextFreeChangeAddressIndex + hardGapLimit - 1, network, purpose )
 
     const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], network )
@@ -196,7 +196,8 @@ export default class AccountOperations {
 
       // garner cached params for bal-tx sync
       const cachedUTXOs = hardRefresh? []: [ ...account.confirmedUTXOs, ...account.unconfirmedUTXOs ]
-      const cachedTxIdMap = hardRefresh? {}: account.txIdMap
+      const cachedTxIdMap = hardRefresh? {
+      }: account.txIdMap
       const cachedTxs = hardRefresh? []: account.transactions
 
       let shouldHardRefresh = hardRefresh
@@ -290,7 +291,7 @@ export default class AccountOperations {
         primary: account.xpub,
         secondary: ( account as MultiSigAccount ).xpubs.secondary,
         bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-    }, 2, network, account.nextFreeAddressIndex, false ).address
+      }, 2, network, account.nextFreeAddressIndex, false ).address
       else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
 
       // find tx delta(missing txs): hard vs soft refresh
@@ -331,7 +332,7 @@ export default class AccountOperations {
         primary: account.xpub,
         secondary: ( account as MultiSigAccount ).xpubs.secondary,
         bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-    }, 2, network, itr, true ).address
+      }, 2, network, itr, true ).address
       else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
       internalAddresses.push( address )
     }
@@ -367,7 +368,7 @@ export default class AccountOperations {
       primary: account.xpub,
       secondary: ( account as MultiSigAccount ).xpubs.secondary,
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-}, 2, network, account.nextFreeAddressIndex, false ).address
+    }, 2, network, account.nextFreeAddressIndex, false ).address
     else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
 
     return {
@@ -380,6 +381,7 @@ export default class AccountOperations {
     consumedUTXOs: {[txid: string]: InputUTXOs},
     txid: string,
     recipients: {
+    id?: string;
     address: string;
     amount: number;
     name?: string
@@ -392,6 +394,7 @@ export default class AccountOperations {
     const recipientInfo = {
       [ txid ]:recipients.map( recipient => {
         return {
+          id: recipient.id,
           name: recipient.name, amount: recipient.amount
         }} ),
     }
@@ -443,7 +446,7 @@ export default class AccountOperations {
             primary: account.xpub,
             secondary: ( account as MultiSigAccount ).xpubs.secondary,
             bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-            }, 2, network, itr, true ).address
+          }, 2, network, itr, true ).address
           else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
 
           if( consumedUTXO.address === address ){
@@ -480,7 +483,7 @@ export default class AccountOperations {
       primary: account.xpub,
       secondary: ( account as MultiSigAccount ).xpubs.secondary,
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-}, 2, network, account.nextFreeChangeAddressIndex, true ).address
+    }, 2, network, account.nextFreeChangeAddressIndex, true ).address
     else changeAddress = AccountUtilities.getAddressByIndex(
       account.xpub,
       true,
@@ -504,6 +507,7 @@ export default class AccountOperations {
     inputs: InputUTXOs[],
     txid: string,
     recipients: {
+    id?: string,
     address: string;
     amount: number;
     name?: string
@@ -943,6 +947,7 @@ export default class AccountOperations {
     txnPriority: TxPriority,
     network: bitcoinJS.networks.Network,
     recipients: {
+      id?: string,
       address: string;
       amount: number;
       name?: string
