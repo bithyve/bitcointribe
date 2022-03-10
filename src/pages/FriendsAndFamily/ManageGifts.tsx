@@ -285,31 +285,31 @@ const ManageGifts = ( { navigation } ) => {
           {
             Object.keys( giftsArr ?? {
             } ).map( ( item ) => {
-              return (
-                <TouchableOpacity
-                  key={item}
-                  activeOpacity={0.6}
-                  style={[ styles.buttonNavigator, {
-                    backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
-                    shadowColor: active === item ? '#77B9EB66' : Colors.backgroundColor,
-                    shadowOpacity: 0.9,
-                    shadowOffset: {
-                      width: 5, height: 6
-                    },
-                    elevation: active === item ? 10 : 0,
-                    marginBottom: hp( 2 ),
-                    marginLeft: wp( 1 )
-                  } ]}
-                  onPress={() => buttonPress( item )}
-                >
-                  <Text style={[ styles.buttonText, {
-                    color: active === item ? Colors.white : Colors.gray2
-                  } ]}>
-                    {item === GiftStatus.CREATED && 'Available'}
-                    {item === GiftStatus.EXPIRED && 'Expired'}
-                    {item === GiftStatus.SENT && 'Sent'}
-                  </Text>
-                </TouchableOpacity>
+              return (               
+                  <TouchableOpacity
+                    key={item}
+                    activeOpacity={0.6}
+                    style={[ styles.buttonNavigator, {
+                      backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
+                      shadowColor: active === item ? '#77B9EB66' : Colors.backgroundColor,
+                      shadowOpacity: 0.9,
+                      shadowOffset: {
+                        width: 5, height: 6,
+                      },
+                      elevation: active === item ? 3.5 : 0,
+                      marginBottom: hp( 2 ),
+                      marginLeft: wp( 1 )
+                    } ]}
+                    onPress={() => buttonPress( item )}
+                  >
+                    <Text style={[ styles.buttonText, {
+                      color: active === item ? Colors.white : Colors.gray2
+                    } ]}>
+                      {item === GiftStatus.CREATED && 'Available'}
+                      {item === GiftStatus.EXPIRED && 'Expired'}
+                      {item === GiftStatus.SENT && 'Sent'}
+                    </Text>
+                  </TouchableOpacity>                              
               )
             } )
           }
