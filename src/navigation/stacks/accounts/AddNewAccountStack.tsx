@@ -61,15 +61,8 @@ const AddNewAccountStack = createStackNavigator(
         title: 'Setup Swan Account'
       }
     },
-    // added by akshay 09 march
-    // SetupDonationAccountStack: {
-    //   screen: SetupDonationAccount,
-    //   navigationOptions: {
-    //     header: null,
-    //   },
-    // },
     AddNewDonationAccountDetails: {
-      screen: SetupDonationAccount,
+      screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {
         header: null,
         // title: 'Setup Donation Account'
