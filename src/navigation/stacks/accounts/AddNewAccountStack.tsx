@@ -13,7 +13,6 @@ import { translations } from '../../../common/content/LocContext'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
-import SetupDonationAccount from '../../../pages/Accounts/AddNew/DonationAccount/SetupDonationAccount'
 
 const strings  = translations[ 'stackTitle' ]
 
