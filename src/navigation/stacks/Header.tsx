@@ -478,6 +478,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.RESHARE_RESPONSE:
         case NotificationType.SM_UPLOADED_FOR_PK:
         case NotificationType.NEW_KEEPER_INFO:
+        case NotificationType.GIFT_ACCEPTED:
+        case NotificationType.GIFT_REJECTED:
           console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
@@ -1549,6 +1551,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                     case NotificationType.FNF_REQUEST_ACCEPTED:
                       this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'Contact' )
+                      break
+
+                      case NotificationType.GIFT_ACCEPTED:
+                        this.props.navigation.navigate( 'ManageGifts');
+                      break
+
+                      case NotificationType.GIFT_REJECTED:
+                        this.props.navigation.navigate( 'ManageGifts');
                       break
 
                     case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
