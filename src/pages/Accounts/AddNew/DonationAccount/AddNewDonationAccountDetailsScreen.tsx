@@ -290,7 +290,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({ navigation, }: Pr
               <Text style={styles.termsAndConditionText}>&nbsp;Terms and Conditions</Text>
 
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.tfaSelectionField}
               onPress={() =>  !AllowSecureAccount ? Toast( 'Upgrade backup to Level 2 to use this feature', -11 ) : setIsTFAEnabled( !isTFAEnabled )}
               activeOpacity={1}
@@ -311,7 +311,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({ navigation, }: Pr
                     />
                   )}
                 </View>
-              </View>
+              </View> */}
             </TouchableOpacity>
           </View>
           <View style={styles.footerSection}>
