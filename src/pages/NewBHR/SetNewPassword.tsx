@@ -33,6 +33,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 
 import { useDispatch, useSelector } from 'react-redux'
+import zxcvbn from 'zxcvbn'
 import LoaderModal from '../../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { changeQuestionAnswer, setupPassword } from '../../store/actions/BHR'
@@ -109,6 +110,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
   const dispatch = useDispatch()
 
+  const [ passwordScore, setpasswordScore ] = useState( 0 )
+  const [ confirmpasswordScore, setconfirmpasswordScore ] = useState( 0 )
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
   const [ tempAns, setTempAns ] = useState( '' )
@@ -138,7 +141,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
   const isChange = props.navigation.getParam( 'isChange' )
   const [ knowMoreIndex, setKnowMoreIndex ] = useState( 0 )
 
-  const windowHeight = Dimensions.get('window').height;
+  const windowHeight = Dimensions.get( 'window' ).height
 
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
@@ -237,7 +240,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     setConfirmPswd( tempPswd )
 
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
-      setPswdError( 'Password do not match' )
+      setPswdError( 'Password mismatch' )
     } else if (
       validateAllowedCharacters( pswd ) == false ||
       validateAllowedCharacters( tempPswd ) == false
@@ -274,7 +277,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
       setVisibleButton( false )
 
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
-        setPswdError( 'Password do not match' )
+        setPswdError( 'Password mismatch' )
       } else if (
         validateAllowedCharacters( pswd ) == false ||
         validateAllowedCharacters( confirmPswd ) == false
@@ -366,29 +369,31 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
         }}
       >
         <View style={{
-          height: hp(windowHeight >= 800 ? (Platform.OS== "ios" ? '56%' : '65%') : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%'),
+          height: hp( windowHeight >= 800 ? ( Platform.OS== 'ios' ? '56%' : '65%' ) : windowHeight >= 600 ? '66%' :  windowHeight >= 500 && '71%' ),
           marginHorizontal: wp( 4 )
         }}>
-           <View style={{paddingTop:10, paddingBottom:4}}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              setKnowMoreIndex( 1 )
-              setShowAGSPmodal( false )
-              setKnowMore( true )
-              showSecurityQue( false )
-              showEncryptionPswd( false )
-              setShowAGSPmodal( false )
-              setAnswerError( '' )
-            }}
-            style={{
-              ...styles.selectedContactsView,
-              alignSelf: 'flex-end'
-            }}
-          >
-            
-            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
-          </TouchableOpacity>
+          <View style={{
+            paddingTop:10, paddingBottom:4
+          }}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {
+                setKnowMoreIndex( 1 )
+                setShowAGSPmodal( false )
+                setKnowMore( true )
+                showSecurityQue( false )
+                showEncryptionPswd( false )
+                setShowAGSPmodal( false )
+                setAnswerError( '' )
+              }}
+              style={{
+                ...styles.selectedContactsView,
+                alignSelf: 'flex-end'
+              }}
+            >
+
+              <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
+            </TouchableOpacity>
           </View>
           <View style={{
             marginHorizontal: wp( '2%' ),
@@ -493,6 +498,18 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
     )
   }
 
+  const getPasswordLevel = () => {
+    if( pswd ==appGeneratedPassword ){
+      return 'Strong Password'
+    }
+    if ( passwordScore < 2 ) {
+      return 'Weak Password'
+    } else if( passwordScore < 4 ) {
+      return 'Could be stronger'
+    }
+    return 'Strong Password'
+  }
+
   const renderEncryptionPswd = () => {
     return(
       <KeyboardAwareScrollView
@@ -551,16 +568,17 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               style={styles.modalInputBox}
               placeholder={strings.Enteryourpassword}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowPswd ? pswdMasked : pswd}
+              value={pswd}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
               autoCorrect={false}
               editable={isEditable}
+              secureTextEntry = {hideShowPswd ? true : false}
               autoCapitalize="none"
-              onSubmitEditing={() =>
-                ( confirmPswdTextInput as any ).current.focus()
-              }
+              // onSubmitEditing={() =>
+              //   ( confirmPswdTextInput as any ).current.focus()
+              // }
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
@@ -569,6 +587,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               onChangeText={( text ) => {
                 setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                setPswdError( '' )
+                setpasswordScore( zxcvbn( text ).score )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -593,7 +613,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                 handlePswdSubmit()
               }}
             />
-            {pswd ? (
+            {/* {pswd ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowPswd( !hideShowPswd )
@@ -607,6 +627,22 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   color={Colors.blue}
                   name={hideShowPswd ? 'eye-off' : 'eye'}
                 />
+              </TouchableWithoutFeedback>
+            ) : null} */}
+            {pswd ? (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setHideShowPswd( !hideShowPswd )
+                }}
+              >
+                <Text
+                  style={{
+                    color: passwordScore > 3 ? Colors.green : passwordScore > 1 ? Colors.coral: Colors.red,
+                    fontFamily: Fonts.FiraSansItalic,
+                    fontSize: RFValue( 11 ),
+                    marginLeft: 4,
+                  }}
+                >{getPasswordLevel()}</Text>
               </TouchableWithoutFeedback>
             ) : null}
           </View>
@@ -626,17 +662,18 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               ref={confirmPswdTextInput}
               placeholder={strings.Confirmyourpassword}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowConfirmPswd ? confirmPswdMasked : tempPswd}
+              value={tempPswd}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
               autoCorrect={false}
               editable={isEditable}
+              secureTextEntry = {hideShowConfirmPswd ? true : false}
               autoCapitalize="none"
-              onSubmitEditing={() => {
-                handlePswdSubmit();
-                ( hint as any ).current.focus()
-              }}
+              // onSubmitEditing={() => {
+              //   handlePswdSubmit();
+              //   ( hint as any ).current.focus()
+              // }}
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
@@ -645,6 +682,8 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               onChangeText={( text ) => {
                 setTempPswd( text )
                 setConfirmPswdMasked( text )
+                setPswdError( '' )
+                setconfirmpasswordScore( zxcvbn( text ).score )
                 // setPswdError( '' )
               }}
               onFocus={() => {
@@ -672,7 +711,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                 handlePswdSubmit()
               }}
             />
-            {tempPswd ? (
+            {/* {tempPswd ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowConfirmPswd( !hideShowConfirmPswd )
@@ -688,7 +727,23 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   name={hideShowConfirmPswd ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
-            ) : null}
+            ) : null} */}
+            {/* {tempPswd ? (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setHideShowConfirmPswd( !hideShowConfirmPswd )
+                }}
+              >
+                <Text
+                  style={{
+                    color: confirmpasswordScore > 3 ? Colors.green : confirmpasswordScore > 1 ? Colors.coral: Colors.red,
+                    fontFamily: Fonts.FiraSansItalic,
+                    fontSize: RFValue( 11 ),
+                    marginLeft: 4,
+                  }}
+                >{getConfirmPasswordLevel()}</Text>
+              </TouchableWithoutFeedback>
+            ) : null} */}
           </View>
 
           <View
@@ -770,21 +825,17 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
               {pswdError}
             </Text>
           </View>
-          {showNote ? <View style={{
-            ...styles.bottomButtonView,
-          }}>
-            {(
-              pswd.trim() === confirmPswd.trim() &&
-            confirmPswd.trim() &&
-            pswd.trim() && pswdError.length === 0 && hintText.length > 0
-            ) && (
-              setButtonVisible()
-            ) || null}
-            {/* <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View> */}
-          </View> : null}
+          {(
+            pswd === tempPswd &&
+              pswd.length!=0 && tempPswd.length!=0 &&
+            pswdError.length === 0
+          ) ? <View style={{
+              ...styles.bottomButtonView,
+            }}>
+
+              {setButtonVisible()}
+
+            </View> : null}
           {showNote &&
         <View style={{
           marginTop: showNote ? hp( '0%' ) :hp( '2%' ),
@@ -947,9 +998,9 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
                   autoCorrect={false}
                   editable={isEditable}
                   autoCapitalize="none"
-                  onSubmitEditing={() =>
-                    ( confirmAnswerTextInput as any ).current.focus()
-                  }
+                  // onSubmitEditing={() =>
+                  //   ( confirmAnswerTextInput as any ).current.focus()
+                  // }
                   keyboardType={
                     Platform.OS == 'ios'
                       ? 'ascii-capable'

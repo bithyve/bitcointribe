@@ -127,6 +127,7 @@ interface UpgradeBackupPropsTypes {
   healthCheckInitializedKeeper: boolean;
   setCloudDataForLevel: any;
   addNewSecondarySubAccount: any;
+  metaSharesKeeperState: MetaShare[];
   trustedContacts: any;
   SHARES_TRANSFER_DETAILS: any;
   keeperProcessStatus: any;
@@ -184,9 +185,7 @@ class UpgradeBackup extends Component<
     this.storagePermissionBottomSheet
     this.QrBottomSheet
     this.ProcessInfoBottomSheet
-    const s3 = dbManager.getBHR()
-    console.log( 's3', typeof s3, s3 )
-    this.metaSharesKeeper = [ ...s3.metaSharesKeeper ]
+    this.metaSharesKeeper = [ ...this.props.metaSharesKeeperState ]
 
     this.state = {
       isCloudBackupProcessing: false,
@@ -1491,6 +1490,7 @@ const mapStateToProps = ( state ) => {
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
+    metaSharesKeeperState: idx( state, ( _ )  => state.bhr.metaSharesKeeper ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },

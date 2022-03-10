@@ -286,7 +286,8 @@
       "Confirmnewwalletname": "Confirmez le nouveau nom du portefeuille",
       "acrossyour": "Le nom du portefeuille sera mis à jour automatiquement pour votre réseau Amis & Famille",
       "ConfirmSecurityQuestion": "Confirmer la question de sécurité",
-      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille"
+      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille",
+      "ConfirmEncryptionPassword":"Confirmer le mot de passe de cryptage"
   },
   "header": {
       "init": "Initialisation de la sauvegarde cloud",
@@ -309,7 +310,7 @@
   },
   "accManagement": {
       "AccountManagement": "Gestion de compte",
-      "Rearrange": "Réorganisez, archivez et restaurez les comptes à partir d'ici",
+      "Rearrange": "Réorganiser et restaurer les comptes à partir d'ici",
       "HiddenAccounts": "Comptes cachés",
       "ArchivedAccounts": "Comptes archivés",
       "Save": "Enregistrer la disposition",
@@ -574,6 +575,8 @@
       "HealthCheckConfirmPassword": "Vérification de l'état Confirmer le mot de passe",
       "Specifythepassword": "Spécifiez le mot de passe comme vous l'avez fait au moment de la configuration du portefeuille",
       "Hint": "Indice",
+      "Backupwithcloud": "Sauvegarde avec le cloud",
+      "BackupwithcloudSub": "Sauvegarder la clé de récupération sur le cloud",
       "Backupwithcontact": "Sauvegarde avec contact",
       "BackupwithcontactSub": "Sauvegardez la clé de récupération avec un ami ou un membre de la famille",
       "Backuponadevice": "Sauvegarde sur un appareil",

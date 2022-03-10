@@ -136,10 +136,10 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.OTP )
   const [ note, setNote ] = useState(
     navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
       'Bitcoin is a new type of money that is not controlled by any government or company' )
+  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.OTP )
   const [ bottomNote, setbottomNote ] = useState(
     navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
       '' )
@@ -692,7 +692,7 @@ const GiftDetails = ( { navigation } ) => {
                 justifyContent: 'space-around',
                 alignItems: 'center',
                 borderRadius: 8,
-                backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
+                backgroundColor: Colors.lightBlue
               }}
             >
               <View style={styles.settingIcon}>
@@ -1012,7 +1012,7 @@ const GiftDetails = ( { navigation } ) => {
 
 
       </SafeAreaView>
-      <View style={{
+      {!dropdownBoxOpenClose && !isKeyboardVisible && <View style={{
         marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
       }}>
         <BottomInfoBox
@@ -1021,7 +1021,7 @@ const GiftDetails = ( { navigation } ) => {
             bottomNote
           }
         />
-      </View>
+      </View>}
     </ScrollView>
   )
 }

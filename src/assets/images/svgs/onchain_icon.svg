@@ -1,0 +1,38 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="46.875" height="49.545" viewBox="0 0 46.875 49.545">
+  <g id="onchain" transform="translate(-35.999 -264)">
+    <path id="Path_6080" data-name="Path 6080" d="M27.673,0H13.578A6.531,6.531,0,0,0,7.922,3.266L.875,15.472A6.531,6.531,0,0,0,.875,22L7.922,34.209a6.531,6.531,0,0,0,5.656,3.266H27.673a6.531,6.531,0,0,0,5.656-3.266L40.376,22a6.531,6.531,0,0,0,0-6.531L33.329,3.266A6.531,6.531,0,0,0,27.673,0Z" transform="matrix(-0.259, -0.966, 0.966, -0.259, 46.676, 313.545)" fill="#fafafa"/>
+    <g id="onchain-2" data-name="onchain" transform="translate(42.707 269.658)">
+      <g id="Group_35670" data-name="Group 35670" transform="translate(6.817 8.619)">
+        <g id="Group_35596" data-name="Group 35596" transform="translate(0 0)">
+          <g id="Group_35594" data-name="Group 35594" transform="translate(0 0)">
+            <g id="Ellipse_1867" data-name="Ellipse 1867" fill="#f5aa97" stroke="#fafafa" stroke-width="1">
+              <circle cx="7.235" cy="7.235" r="7.235" stroke="none"/>
+              <circle cx="7.235" cy="7.235" r="7.735" fill="none"/>
+            </g>
+          </g>
+        </g>
+        <g id="Group_35598" data-name="Group 35598" transform="translate(1.005 1.005)">
+          <g id="Group_35597" data-name="Group 35597">
+            <path id="Path_23186" data-name="Path 23186" d="M30.23,38.96a6.23,6.23,0,1,1,6.23-6.23A6.237,6.237,0,0,1,30.23,38.96Zm0-12.059a5.828,5.828,0,1,0,5.828,5.828A5.835,5.835,0,0,0,30.23,26.9Z" transform="translate(-24 -26.5)" fill="#fafafa"/>
+          </g>
+        </g>
+      </g>
+      <g id="Group_35669" data-name="Group 35669" transform="translate(12.172 14.722)">
+        <g id="Group_35596-2" data-name="Group 35596" transform="translate(0 0)">
+          <g id="Group_35594-2" data-name="Group 35594" transform="translate(0 0)">
+            <g id="Ellipse_1867-2" data-name="Ellipse 1867" fill="#f5aa97" stroke="#fafafa" stroke-width="1">
+              <circle cx="7.235" cy="7.235" r="7.235" stroke="none"/>
+              <circle cx="7.235" cy="7.235" r="7.735" fill="none"/>
+            </g>
+          </g>
+        </g>
+        <g id="Group_35598-2" data-name="Group 35598" transform="translate(1.005 1.005)">
+          <g id="Group_35597-2" data-name="Group 35597">
+            <path id="Path_23186-2" data-name="Path 23186" d="M30.23,38.96a6.23,6.23,0,1,1,6.23-6.23A6.237,6.237,0,0,1,30.23,38.96Zm0-12.059a5.828,5.828,0,1,0,5.828,5.828A5.835,5.835,0,0,0,30.23,26.9Z" transform="translate(-24 -26.5)" fill="#fafafa"/>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

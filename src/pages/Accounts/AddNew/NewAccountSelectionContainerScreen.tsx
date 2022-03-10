@@ -312,7 +312,7 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.06,
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 11.5 ),
     marginBottom: hp( 1 ),
 
   },
@@ -326,6 +326,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 5 ),
     paddingBottom: hp( 1 ),
     alignItems: 'flex-start',
+    marginLeft: wp(3)
   },
 } )
 

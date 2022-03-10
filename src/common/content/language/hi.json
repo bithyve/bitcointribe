@@ -286,7 +286,8 @@
       "Confirmnewwalletname": "नए वॉलेट नाम की पुष्टि करें",
       "acrossyour": "वॉलेट का नाम आपके दोस्तों और परिवार नेटवर्क पर अपने आप अपडेट हो जाएगा",
       "ConfirmSecurityQuestion": "सुरक्षा प्रश्न की पुष्टि करें",
-      "ConfirmWalletPin": "वॉलेट पिन की पुष्टि करें"
+      "ConfirmWalletPin": "वॉलेट पिन की पुष्टि करें",
+      "ConfirmEncryptionPassword":"एन्क्रिप्शन पासवर्डची पुष्टी करा"
   },
   "header": {
       "init": "क्लाउड बैकअप आरंभ किया जा रहा है",
@@ -309,7 +310,7 @@
   },
   "accManagement": {
       "AccountManagement": "खाता प्रबंधन",
-      "Rearrange": "यहां से खातों को पुनर्व्यवस्थित, संग्रहित और बहाल करें",
+      "Rearrange": "यहां से खातों को पुनर्व्यवस्थित और पुनर्स्थापित करें",
       "HiddenAccounts": "छिपे हुए खाते",
       "ArchivedAccounts": "संग्रहीत खाते",
       "Save": "नया ऑर्डर सेव करें",
@@ -574,6 +575,8 @@
       "HealthCheckConfirmPassword": "स्वास्थ्य जांच पासवर्ड की पुष्टि करें",
       "Specifythepassword": "पासवर्ड निर्दिष्ट करें जैसा आपने वॉलेट सेट करते समय किया था",
       "Hint": "संकेत",
+      "Backupwithcloud": "क्लाउड के साथ बैकअप",
+      "BackupwithcloudSub": "क्लाउड पर रिकवरी कुंजी का बैकअप लें",
       "Backupwithcontact": "संपर्क के साथ बैकअप",
       "BackupwithcontactSub": "किसी मित्र या परिवार के सदस्य के साथ पुनर्प्राप्ति कुंजी का बैकअप लें",
       "Backuponadevice": "डिवाइस पर बैकअप",

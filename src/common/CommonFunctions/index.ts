@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkImage, ShortLinkTitle, ShortLinkDescription, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkImage, ShortLinkTitle, ShortLinkDescription, Trusted_Contacts, Accounts, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -169,13 +169,14 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   }
 }
 
-export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer, accountShells,
+export const WIEncryption = async ( accounts: Accounts, encKey, contacts: Trusted_Contacts, walletDB, answer, accountShells,
   activePersonalNode,
   versionHistory,
   restoreVersions, ) => {
   const acc = {
   }
-  accounts.forEach( account => {
+
+  Object.values( accounts ).forEach( account => {
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
@@ -201,7 +202,7 @@ export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer
     details2FA: walletDB.details2FA,
   }
   const channelIds = []
-  contacts.forEach( contact => {
+  Object.values( contacts ).forEach( contact => {
     channelIds.push( contact.channelKey )
   } )
   if( channelIds.length > 0 ) {
@@ -387,7 +388,7 @@ const getLinkDescription = ( linkType: DeepLinkKind ) => {
   }
 }
 
-export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any } ) => {
+export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData, currentLevel }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any, currentLevel?: number } ) => {
 
   let encryptedChannelKeys: string
   let encryptionHint: string
@@ -430,7 +431,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
 
   let shortLink = ''
@@ -628,6 +629,7 @@ export const processRequestQR =async ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -640,7 +642,8 @@ export const processRequestQR =async ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: true
+            isExistingContact: true,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -653,7 +656,8 @@ export const processRequestQR =async ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: false
+            isExistingContact: false,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 

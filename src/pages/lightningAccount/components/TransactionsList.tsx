@@ -80,8 +80,11 @@ const TransactionsList: React.FC<Props> = ( {
             transaction,
             accountShellId
           } )
-        }}><TransactionItem
-          transaction={transaction} accountShellId={accountShellId}/>
+        }}>
+        <TransactionItem
+          transaction={transaction}
+          accountShellId={accountShellId}
+        />
 
       </TouchableOpacity>
     )

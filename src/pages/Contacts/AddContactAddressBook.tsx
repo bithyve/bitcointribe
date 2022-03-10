@@ -26,7 +26,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
 import RadioButton from '../../components/RadioButton'
 import * as ExpoContacts from 'expo-contacts'
-import EvilIcons from 'react-native-vector-icons/EvilIcons'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as Permissions from 'expo-permissions'
@@ -36,7 +36,7 @@ import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { v4 as uuid } from 'uuid'
 import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { editTrustedContact } from '../../store/actions/trustedContacts'
-import HeaderTitle from '../../components/HeaderTitle'
+import HeaderTitle1 from '../../components/HeaderTitle1'
 import { LocalizationContext } from '../../common/content/LocContext'
 
 export default function AddContactAddressBook( props ) {
@@ -188,7 +188,6 @@ export default function AddContactAddressBook( props ) {
   }, [] )
 
   const filterContacts = ( keyword ) => {
-    console.log( 'filterContacts keyword', keyword )
     if ( contactData.length > 0 ) {
       if ( !keyword.length ) {
         setFilterContactData( contactData )
@@ -197,6 +196,8 @@ export default function AddContactAddressBook( props ) {
       const isFilter = true
       const filterContactsForDisplay = []
       for ( let i = 0; i < contactData.length; i++ ) {
+        const contactWords = contactData[ i ].name.split( ' ' ).length
+        const middleName = contactData[ i ].name.split( ' ' ).slice( 1, contactWords-1 ).join( ' ' )
         if (
           ( contactData[ i ].firstName &&
             contactData[ i ].firstName
@@ -205,8 +206,16 @@ export default function AddContactAddressBook( props ) {
           ( contactData[ i ].lastName &&
             contactData[ i ].lastName
               .toLowerCase()
-              .startsWith( keyword.toLowerCase() ) )
-        ) {
+              .startsWith( keyword.toLowerCase() ) ) ||
+              ( contactData[ i ].name &&
+                contactData[ i ].name
+                  .toLowerCase()
+                  .startsWith( keyword.toLowerCase() ) ) ||
+                  ( middleName &&
+                    middleName
+                      .toLowerCase()
+                      .startsWith( keyword.toLowerCase() ) )
+        )  {
           filterContactsForDisplay.push( contactData[ i ] )
         }
       }
@@ -266,6 +275,7 @@ export default function AddContactAddressBook( props ) {
   }
 
   async function onCancel( value ) {
+
     if ( filterContactData.findIndex( ( tmp ) => tmp.id == value.id ) > -1 ) {
       filterContactData[
         filterContactData.findIndex( ( tmp ) => tmp.id == value.id )
@@ -338,6 +348,8 @@ export default function AddContactAddressBook( props ) {
       contactText:strings.adding,
       showDone:true,
       skipClicked: true,
+      senderName: props?.navigation?.state?.params?.senderName,
+      note : props?.navigation?.state?.params?.note
     } )
   }
 
@@ -364,14 +376,29 @@ export default function AddContactAddressBook( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      <HeaderTitle
-        firstLineTitle={props.modalTitle ? props.modalTitle : strings.Associate}
-        secondLineTitle={strings.Select}
+      <HeaderTitle1
+        firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
+        secondLineTitle={strings.Associate}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
         step={''}
       />
+      <Text style={styles.addressBook}>from your address book</Text>
+
+      {selectedContacts.length !==0 &&
+      <View style={styles.selectedContactContent}>
+        <View style={styles.selectedContact}>
+          <Text style={styles.selectedContactText}><Text style={styles.firstName}>{selectedContacts[ 0 ].firstName}</Text> {selectedContacts[ 0 ].lastName}</Text>
+          <TouchableOpacity onPress={()=> {
+            setSelectedContacts( [] )
+            onContactSelect( filterContactData.findIndex( ( tmp ) => tmp.id == selectedContacts[ 0 ].id ) )
+          }}>
+            <Icon name='close' color={Colors.backgroundColor1} size={18}/>
+          </TouchableOpacity>
+        </View>
+      </View>
+      }
       {/* <View style={{
           flexDirection: 'row'
         }}>
@@ -468,14 +495,12 @@ export default function AddContactAddressBook( props ) {
           </View> */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
-              <EvilIcons
-                style={{
-                  alignSelf: 'center'
-                }}
+              <Icon
                 name="search"
                 size={20}
-                color={Colors.textColorGrey}
+                color={Colors.blue}
               />
+
             </View>
             <TextInput
               style={styles.searchBoxInput}
@@ -484,8 +509,8 @@ export default function AddContactAddressBook( props ) {
               }
               autoCorrect={false}
               autoFocus={false}
-              placeholder={common.search}
-              placeholderTextColor={Colors.textColorGrey}
+              placeholder='Search from address book'
+              placeholderTextColor={Colors.babyGray}
               onChangeText={( nameKeyword ) => {
                 nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
                 setSearchName( nameKeyword )
@@ -550,18 +575,22 @@ export default function AddContactAddressBook( props ) {
                   return (
                     <AppBottomSheetTouchableWrapper
                       onPress={() => onContactSelect( index )}
-                      style={styles.contactView}
+                      style={{
+                        ...styles.contactView,
+                        backgroundColor: selected ? 'rgba(119, 185, 235, 0.4)' : null,
+                      }}
                       key={index}
+                      activeOpacity={0.1}
                     >
                       <RadioButton
                         size={15}
                         color={Colors.lightBlue}
-                        borderColor={Colors.borderColor}
+                        borderColor={Colors.white}
                         isChecked={item.checked}
                         onpress={() => onContactSelect( index )}
                       />
                       <Text style={styles.contactText}>
-                        {item.name && item.name.split( ' ' )[ 0 ]
+                        {/* {item.name && item.name.split( ' ' )[ 0 ]
                           ? item.name.split( ' ' )[ 0 ]
                           : ''}{' '}
                         <Text style={{
@@ -570,7 +599,24 @@ export default function AddContactAddressBook( props ) {
                           {item.name && item.name.split( ' ' )[ 1 ]
                             ? item.name.split( ' ' )[ 1 ]
                             : ''}
-                        </Text>
+                        </Text> */}
+
+                        {item.name && item.name.split( ' ' ).map( ( x, index )=> {
+                          const i = item.name.split( ' ' ).length
+                          return (
+                            <Text style={{
+                              color: selected ? Colors.blue : null
+                            }}>
+                              {index !== i-1 ? `${x} ` :
+                                <Text style={{
+                                  fontFamily: Fonts.FiraSansMedium
+                                }}>
+                                  {x}
+                                </Text>
+                              }
+                            </Text>
+                          )
+                        } )}
                       </Text>
                     </AppBottomSheetTouchableWrapper>
                   )
@@ -783,10 +829,14 @@ const styles = StyleSheet.create( {
     marginRight: 20,
   },
   contactView: {
-    height: 50,
+    height:hp( 6 ),
     alignItems: 'center',
     flexDirection: 'row',
-    marginLeft: 20,
+    paddingLeft:wp( 5 ),
+    marginVertical:hp( 0.7 ),
+    width:wp( '90%' ),
+    borderTopRightRadius:10,
+    borderBottomRightRadius:10,
   },
   contactText: {
     marginLeft: 10,
@@ -795,24 +845,50 @@ const styles = StyleSheet.create( {
   },
   searchBoxContainer: {
     flexDirection: 'row',
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 0.5,
-    marginTop: wp( '5%' ),
-    marginLeft: 10,
-    marginRight: 10,
-    height: 40,
-    justifyContent: 'center',
-  },
-  searchBoxIcon: {
-    justifyContent: 'center',
-    marginBottom: -10,
+    backgroundColor:Colors.white,
+    height:hp( '5.5%' ),
+    width:wp( '85%' ),
+    alignItems:'center',
+    marginVertical:hp( 2 ),
+    borderRadius:10,
+    marginHorizontal:wp( 5 )
   },
   searchBoxInput: {
-    flex: 1,
-    fontSize: 13,
-    color: Colors.blacl,
-    borderBottomColor: Colors.borderColor,
-    alignSelf: 'center',
-    marginBottom: -10,
+    fontSize: RFValue( 12 ),
+    color: Colors.black,
+    fontFamily:Fonts.FiraSansItalic,
+    paddingLeft:wp( 1.5 )
   },
+  searchBoxIcon:{
+    paddingLeft:wp( 2 )
+  },
+  addressBook:{
+    fontSize: RFValue( 12 ),
+    marginTop: hp( -1.5 ),
+    marginLeft:wp( 5 ),
+    color:Colors.textColorGrey,
+  },
+  selectedContactContent:{
+    flexDirection:'row',
+    justifyContent:'flex-start',
+  },
+  selectedContact:{
+    padding:12,
+    backgroundColor:'#77B9EB',
+    borderRadius:10,
+    flexDirection:'row',
+    alignItems:'center',
+    marginHorizontal:wp( 5 ),
+    marginTop:hp( 1.7 ),
+  },
+  selectedContactText:{
+    fontSize: RFValue( 12 ),
+    color: Colors.backgroundColor1,
+    fontFamily:Fonts.FiraSans,
+    paddingRight:wp( 3 ),
+    fontWeight:'500'
+  },
+  firstName:{
+    fontWeight:'400'
+  }
 } )

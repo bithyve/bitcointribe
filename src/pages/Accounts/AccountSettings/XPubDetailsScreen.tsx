@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import QRCode from '../../../components/QRCode'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'

@@ -278,6 +278,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({ navigation, }: Pr
               textContentType="name"
               onChangeText={setAccountDescription}
             />
+
           </View>
           <View style={styles.checkTwoFAuthView}>
             <Icon name={'checkmark-circle'} color={isTFAEnabled ? Colors.darkBlue : Colors.textColorGrey} size={25} onPress={() => setIsTFAEnabled(!isTFAEnabled)} />
@@ -287,6 +288,30 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({ navigation, }: Pr
             <Text style={styles.agreeTermsText}>By clicking proceed you agree to our</Text>
             <TouchableOpacity onPress={openTermsAndConditions}>
               <Text style={styles.termsAndConditionText}>&nbsp;Terms and Conditions</Text>
+
+
+            <TouchableOpacity
+              style={styles.tfaSelectionField}
+              onPress={() =>  !AllowSecureAccount ? Toast( 'Upgrade backup to Level 2 to use this feature', -11 ) : setIsTFAEnabled( !isTFAEnabled )}
+              activeOpacity={1}
+              // disabled={( !wallet.secondaryXpub && !wallet.details2FA )}
+            >
+              <View style={styles.tfaSelectionFieldContentContainer}>
+                <Text style={{
+                  ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
+                }}>
+              Enable 2-Factor Authentication
+                </Text>
+                <View style={styles.checkbox}>
+                  {isTFAEnabled && (
+                    <Entypo
+                      name="check"
+                      size={RFValue( 20 )}
+                      color={Colors.green}
+                    />
+                  )}
+                </View>
+              </View>
             </TouchableOpacity>
           </View>
           <View style={styles.footerSection}>

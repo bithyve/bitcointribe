@@ -33,6 +33,7 @@ import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 import { AccountsState } from '../../../store/reducers/accounts'
+import LoaderModal from '../../../components/LoaderModal'
 
 export type NavigationParams = {
 };
@@ -51,6 +52,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const common  = translations[ 'common' ]
   const [ sendSuccessModal, setSuccess ] = useState( false )
   const [ sendFailureModal, setFailure ] = useState( false )
+  const [ handleButton, setHandleButton ] = useState( true )
   const [ errorMessage, setError ] = useState( '' )
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
@@ -153,6 +155,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
+    setHandleButton( false )
     if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
@@ -179,11 +182,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null ) => {
-
       if ( txid ) {
         dispatch( sendTxNotification( txid ) )
         // showSendSuccessBottomSheet()
         setSuccess( true )
+        setHandleButton( true )
       }
     },
     onFailure: ( errorMessage: string | null ) => {
@@ -191,6 +194,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         setError( errorMessage )
         setTimeout( () => {
           setFailure( true )
+          setHandleButton( true )
         }, 200 )
       }
     },
@@ -285,7 +289,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <View style={styles.footerSection}>
         <TouchableOpacity
           onPress={handleConfirmationButtonPress}
-          style={ButtonStyles.primaryActionButton}
+          style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
         >
           <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
         </TouchableOpacity>
@@ -306,6 +310,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           </Text>
         </TouchableOpacity>
       </View>
+      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+        <LoaderModal
+          headerText={'Sending...'}
+        />
+      </ModalContainer>
+
     </KeyboardAwareScrollView>
   )
 }

@@ -13,7 +13,7 @@ import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
 import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
-import { persistStore, persistReducer } from 'redux-persist'
+import { persistStore, persistReducer, createMigrate } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
@@ -21,12 +21,16 @@ import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
 import cloudReducer from './reducers/cloud'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
-
+import reduxPersistMigrations from './redux-persist-migrations'
 
 const config = {
   key: 'root', // key is required
+  // version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders' ],
+  migrate: createMigrate( reduxPersistMigrations, {
+    debug: true
+  } )
 }
 
 import {
@@ -116,6 +120,7 @@ import {
   generateMetaSharesWatcher,
   updateHealthLevel2Watcher,
   recoverWalletFromIcloudWatcher,
+  recoverWalletWithoutIcloudWatcher,
   recoverWalletHealthWatcher,
   cloudMetaShareHealthWatcher,
   recoverMnemonicHealthWatcher,
@@ -132,7 +137,7 @@ import {
   modifyLevelDataWatcher,
   createChannelAssetsWatcher,
   downloadSMShareWatcher,
-  createOrChangeGuardianWatcher,
+  createGuardianWatcher,
   downloadBackupDataWatcher,
   setupHealthWatcher,
   updateKeeperInfoToChannelWatcher,
@@ -145,6 +150,9 @@ import {
   updateSecondaryShardWatcher,
   getApprovalFromKeeperWatcher,
   rejectedExistingContactRequestWatcher,
+  changeQuestionAnswerWatcher,
+  upgradePDFWorkerWatcher,
+  upgradeLevelOneKeeperWatcher,
   resetLevelAfterPasswordChangeWatcher,
   changeEncPasswordWatcher
 } from './sagas/BHR'
@@ -175,6 +183,8 @@ import {
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import { updateUserNameWatcher } from './sagas/storage'
+import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2'
+import { recreateMissingAccountsWatcher } from './sagas/upgrades'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -245,6 +255,7 @@ const rootSaga = function* () {
     generateMetaSharesWatcher,
     updateHealthLevel2Watcher,
     recoverWalletFromIcloudWatcher,
+    recoverWalletWithoutIcloudWatcher,
     recoverWalletHealthWatcher,
     cloudMetaShareHealthWatcher,
     updateWalletImageHealthWatcher,
@@ -261,7 +272,7 @@ const rootSaga = function* () {
     modifyLevelDataWatcher,
     createChannelAssetsWatcher,
     downloadSMShareWatcher,
-    createOrChangeGuardianWatcher,
+    createGuardianWatcher,
     downloadBackupDataWatcher,
     setupHealthWatcher,
     updateKeeperInfoToChannelWatcher,
@@ -275,6 +286,10 @@ const rootSaga = function* () {
     updateSecondaryShardWatcher,
     getApprovalFromKeeperWatcher,
     rejectedExistingContactRequestWatcher,
+    changeQuestionAnswerWatcher,
+    upgradePDFWorkerWatcher,
+    upgradeLevelOneKeeperWatcher,
+
     resetLevelAfterPasswordChangeWatcher,
     changeEncPasswordWatcher,
     // Swan Integration
@@ -321,6 +336,9 @@ const rootSaga = function* () {
 
     // storage
     updateUserNameWatcher,
+
+    // upgrade scripts
+    recreateMissingAccountsWatcher
   ]
 
   yield all(

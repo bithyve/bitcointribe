@@ -43,6 +43,7 @@ import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import HeaderTitle from '../../components/HeaderTitle'
 import Feather from 'react-native-vector-icons/Feather'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 const SecurityQuestionHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -98,9 +99,7 @@ const SecurityQuestionHistory = ( props ) => {
       name?: string;
     }[];
   }[] = useSelector( ( state ) => state.bhr.levelHealth )
-  const currentLevel: Number = useSelector(
-    ( state ) => state.bhr.currentLevel,
-  )
+
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const next = props.navigation.getParam( 'next' )
   const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
@@ -137,7 +136,13 @@ const SecurityQuestionHistory = ( props ) => {
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ).match( /.{1,6}/g ).join( '-' ) )
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
+
   const dispatch = useDispatch()
+
+  useEffect( () => {
+    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
+  }, [ props.navigation.state.params ] )
 
   const renderSecurityQuestionContent = useCallback( () => {
     return (
@@ -827,7 +832,9 @@ const SecurityQuestionHistory = ( props ) => {
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={strings.EncryptionPassword}
-        selectedTime={props.navigation.state.params.selectedTime}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'Never'}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_password.png' )}
       />
@@ -859,6 +866,8 @@ const SecurityQuestionHistory = ( props ) => {
             // setType( 'change' )
             // showQuestionModal( true )
           }}
+          changeButtonText={'Change'}
+          isChangeKeeperAllow={true}
         />
       </View>
       <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >

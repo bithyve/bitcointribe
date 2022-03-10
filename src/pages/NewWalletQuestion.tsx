@@ -14,6 +14,7 @@ import {
   Clipboard,
   Image,
   Dimensions,
+  KeyboardAvoidingView,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -40,7 +41,7 @@ import { setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ModalContainerScroll from '../components/home/ModalContainerScroll'
-
+import zxcvbn from 'zxcvbn'
 import ButtonBlue from '../components/ButtonBlue'
 import { updateCloudPermission } from '../store/actions/BHR'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
@@ -53,6 +54,7 @@ import ButtonStyles from '../common/Styles/ButtonStyles'
 import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
 import WalletInitKnowMore from '../components/know-more-sheets/WalletInitKnowMore'
 import Toast from '../components/Toast'
+import CheckMark from '../assets/images/svgs/checkmarktick.svg'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -67,7 +69,7 @@ export enum BottomSheetState {
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 let messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
-
+const windowHeight = Dimensions.get( 'window' ).height
 function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
@@ -114,6 +116,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
+  const newUser = props.navigation.getParam( 'newUser' )
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
@@ -137,9 +140,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       .match( /.{1,6}/g )
       .join( '-' )
   )
+
   const [ copied, setCopied ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
+  const [ passwordScore, setpasswordScore ] = useState( 0 )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
@@ -152,9 +157,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const bottomSheetRef = createRef<BottomSheet>()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
   const [ knowMoreIndex, setKnowMoreIndex ] = useState( 0 )
+  const [ backup, setBackup ] = useState( true )
+  const [ selectedOption, setSelectedOption ] = useState( 0 )
 
   const windowHeight = Dimensions.get( 'window' ).height
-
   const getNextMessage = () => {
     if ( messageIndex == loaderMessages.length ) messageIndex = 0
     return loaderMessages[ messageIndex++ ]
@@ -206,7 +212,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const checkCloudLogin = ( security ) => {
     requestAnimationFrame( () => {
-      dispatch( setupWallet( walletName, security ) )
+      dispatch( setupWallet( walletName, security, newUser ) )
       // dispatch( walletSetupCompletion( security ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
@@ -314,30 +320,51 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ confirmPswd ] )
 
   const onPressProceed = ( isSkip? ) => {
-    setSignUpStarted( true )
-    showLoader()
-    setShowAGSPmodal( false )
     let security = null
-    if ( activeIndex === 0 ) {
-      security = {
-        questionId: '100', //for AGSP
-        question: 'App generated password',
-        answer: appGeneratedPassword,
+    if ( selectedOption == 1 ){
+      if( passwordScore < 2 ){
+        setPswdError( 'Weak password. Try using longer passwords with a mix of lowercase, upper case, numbers and characters' )
+        return
       }
-    } else if ( activeIndex === 1 ) {
-      security = {
-        questionId: dropdownBoxValue.id,
-        question: dropdownBoxValue.question,
-        answer,
-      }
-    } else if ( activeIndex === 2 ) {
       security = {
         questionId: '0',
         question: hintText,
         answer: pswd,
       }
+    }else if( selectedOption == 2 ){
+      security = {
+        questionId: '100', //for AGSP
+        question: 'App generated password',
+        answer: appGeneratedPassword,
+      }
     }
-    if ( isSkip ) {
+    // if ( activeIndex === 0 ) {
+    //   security = {
+    //     questionId: '100', //for AGSP
+    //     question: 'App generated password',
+    //     answer: appGeneratedPassword,
+    //   }
+    // } else if ( activeIndex === 1 ) {
+    //   security = {
+    //     questionId: dropdownBoxValue.id,
+    //     question: dropdownBoxValue.question,
+    //     answer,
+    //   }
+    // } else if ( activeIndex === 2 ) {
+    //   if( passwordScore < 2 ){
+    //     setPswdError( 'Weak password. Try using longer passwords with a mix of lowercase, upper case, numbers and characters' )
+    //     return
+    //   }
+    //   security = {
+    //     questionId: '0',
+    //     question: hintText,
+    //     answer: pswd,
+    //   }
+    // }
+    setSignUpStarted( true )
+    showLoader()
+    setShowAGSPmodal( false )
+    if ( !backup ) {
       security = null
       dispatch( updateCloudPermission( false ) )
     } else dispatch( updateCloudPermission( true ) )
@@ -591,6 +618,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       </KeyboardAwareScrollView>
     )
   }
+
+  const getPasswordLevel = () => {
+    if( pswd ==appGeneratedPassword ){
+      return 'Strong Password'
+    }
+    if ( passwordScore < 2 ) {
+      return 'Weak Password'
+    } else if( passwordScore < 4 ) {
+      return 'Could be stronger'
+    }
+    return 'Strong Password'
+  }
+
   const renderEncryptionPswd = () => {
     return (
       <KeyboardAwareScrollView
@@ -651,19 +691,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               style={styles.modalInputBox}
               placeholder={strings.Enteryourpassword}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowPswd ? pswdMasked : pswd}
-              autoCompleteType="off"
-              textContentType="none"
+              value={pswd}
+              autoCompleteType="password"
+              textContentType="password"
               returnKeyType="next"
               autoCorrect={false}
               editable={isEditable}
+              secureTextEntry
               autoCapitalize="none"
               onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
-              keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+              //keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
               onChangeText={( text ) => {
                 setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
                 setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
-                // setPswdError( '' )
+                setPswdError( '' )
+                setpasswordScore( zxcvbn( text ).score )
               }}
               onFocus={() => {
                 setShowNote( false )
@@ -693,15 +735,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   setHideShowPswd( !hideShowPswd )
                 }}
               >
-                <Feather
+                <Text
                   style={{
-                    marginLeft: 'auto',
-                    padding: 10,
+                    color: passwordScore > 3 ? Colors.green : passwordScore > 1 ? Colors.coral: Colors.red,
+                    fontFamily: Fonts.FiraSansItalic,
+                    fontSize: RFValue( 11 ),
+                    marginLeft: 4,
                   }}
-                  size={15}
-                  color={Colors.blue}
-                  name={hideShowPswd ? 'eye-off' : 'eye'}
-                />
+                >{getPasswordLevel()}</Text>
               </TouchableWithoutFeedback>
             ) : null}
           </View>
@@ -782,11 +823,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               </TouchableWithoutFeedback>
             ) : null}
           </View>
-          {/* {pswdError.length == 0 && (
-            <Text style={styles.helpText}>
-              {strings.Numbersorspecial}
-            </Text>
-          )} */}
           <View
             style={{
               ...hintInputStyle,
@@ -823,24 +859,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 setHintInputStyle( styles.inputBox )
               }}
             />
-            {/* {hintText ? (
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setHideShowHint( !hideShowHint )
-
-                  // setDropdownBoxOpenClose( false )
-                }}
-              >
-                <Feather
-                  style={{
-                    marginLeft: 'auto', padding: 10
-                  }}
-                  size={15}
-                  color={Colors.blue}
-                  name={hideShowHint ? 'eye-off' : 'eye'}
-                />
-              </TouchableWithoutFeedback>
-            ) : null} */}
           </View>
 
           <View
@@ -868,10 +886,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               }}
             >
               {( pswd.trim() === confirmPswd.trim() && confirmPswd.trim() && pswd.trim() && pswdError.length === 0 && hintText.length > 0 && setButtonVisible() ) || null}
-              {/* <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View> */}
             </View>
           ) : null}
           {showNote && (
@@ -1181,38 +1195,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             </Text>
           </View>
 
-          {/* <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              marginLeft: 25,
-              marginRight: 25,
-              paddingBottom: 10,
-              paddingTop: 10,
-            }}
-            onPress={() =>
-              props.navigation.navigate( 'NewOwnQuestions', {
-                walletName,
-              } )
-            }
-          >
-            <Text
-              style={{
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: 'bold',
-                fontStyle: 'italic',
-                fontSize: RFValue( 12 ),
-                color: Colors.blue,
-              }}
-              onPress={() =>
-                props.navigation.navigate( 'NewOwnQuestions', {
-                  walletName,
-                } )
-              }
-            >
-        Or choose your own question
-            </Text>
-          </TouchableOpacity> */}
-
           {showNote ? (
             <View
               style={{
@@ -1220,10 +1202,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               }}
             >
               {( answer.trim() === confirmAnswer.trim() && confirmAnswer.trim() && answer.trim() && answerError.length === 0 && setButtonVisible() ) || null}
-              {/* <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View> */}
             </View>
           ) : null}
           {showNote && (
@@ -1296,41 +1274,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     onBottomSheetClosed()
   }
 
-  // const renderBottomSheetContent = () =>{
-
-  //   switch ( currentBottomSheetKind ) {
-  //       case BottomSheetKind.CLOUD_PERMISSION:
-  //         return (
-  //           <CloudPermissionModalContents
-  //             title={'Automated Cloud Backup'}
-  //             info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
-  //             note={''}
-  //             onPressProceed={( flag )=>{
-  //               dispatch( updateCloudPermission( flag ) )
-  //               closeBottomSheet()
-  //               console.log( 'updateCloudPermission', flag )
-  //               props.navigation.navigate( 'NewWalletQuestion', {
-  //                 walletName,
-  //               } )
-  //             }}
-  //             onPressIgnore={( flag )=> {
-  //               closeBottomSheet()
-  //               console.log( 'updateCloudPermission', flag )
-  //               dispatch( updateCloudPermission( flag ) )
-  //               props.navigation.navigate( 'NewWalletQuestion', {
-  //                 walletName,
-  //               } )
-  //             }}
-  //             isRendered={isCloudPermissionRender}
-  //             bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
-  //           />
-  //         )
-
-  //       default:
-  //         break
-  //   }
-  // }
-
   const onBackgroundOfLoader = () => {
     console.log( 'onBackground' )
     setLoaderModal( false )
@@ -1345,8 +1288,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     <View
       style={{
         flex: 1,
-        backgroundColor: Colors.backgroundColor,
-        position:'relative'
+        position:'relative',
+        backgroundColor:Colors.backgroundColor
       }}
     >
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -1355,50 +1298,47 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           flex: 0,
         }}
       />
-
-      <ScrollView>
-        <View
-          style={{
-            flex: 1,
+      <View
+        style={[
+          CommonStyles.headerContainer,
+          {
             backgroundColor: Colors.backgroundColor,
+            justifyContent: 'space-between',
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
           }}
         >
-          <View
-            style={[
-              CommonStyles.headerContainer,
-              {
-                backgroundColor: Colors.backgroundColor,
-                justifyContent: 'space-between',
-              },
-            ]}
-          >
-            <TouchableOpacity
-              style={CommonStyles.headerLeftIconContainer}
-              onPress={() => {
-                props.navigation.goBack()
-              }}
-            >
-              <View style={CommonStyles.headerLeftIconInnerContainer}>
-                <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setKnowMoreIndex( 0 )
-                setKnowMore( true )
-              }}
-              style={{
-                ...styles.selectedContactsView,
-                height: hp( 3.2 ),
-              }}
-            >
-              <Text style={{
-                ...styles.contactText,
-                fontSize: RFValue( 12 ),
-              }}>{common[ 'knowMore' ]}</Text>
-            </TouchableOpacity>
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setKnowMoreIndex( 0 )
+            setKnowMore( true )
+          }}
+          style={{
+            ...styles.selectedContactsView,
+            height: hp( 3.2 ),
+          }}
+        >
+          <Text style={{
+            ...styles.contactText,
+            fontSize: RFValue( 12 ),
+          }}>{common[ 'knowMore' ]}</Text>
+        </TouchableOpacity>
+      </View>
 
+      <KeyboardAvoidingView style={{
+        flex:1
+      }}   behavior={Platform.OS == 'ios' ? 'padding' : ''}
+      enabled >
+        <View style={styles.keyboardAvoidingContainer}>
           <TouchableOpacity
             activeOpacity={10}
             style={{
@@ -1413,131 +1353,134 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <HeaderTitle1
               firstLineTitle={strings.Step2}
               secondLineTitle={''}
-              secondLineBoldTitle={'Create initial cloud backup'}
+              secondLineBoldTitle={'Create a Password'}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
               step={''}
             />
-            <CardWithRadioBtn
-              geticon={''}
-              mainText={strings.AGSP}
-              subText={strings.Hexawillgenerate}
-              isSelected={false}
-              setActiveIndex={() => confirmAction( 0 )}
-              index={0}
-              italicText={''}
-              boldText={''}
-              changeBgColor={true}
-              tag={strings.MostSecure}
-              hideRadioBtn
-            />
+            {selectedOption == 0 ? <View style={styles.fieldsButtonContainer}>
+              <TouchableOpacity onPress={() => setSelectedOption( 1 )} style={styles.passwordButtonContainer}><Text style={styles.enterPassword}>Enter a strong password</Text></TouchableOpacity>
+              <View style={styles.orBorderContainer}>
+                <Text style={styles.enterPassword}>or</Text>
+                <View style={styles.borderContainer}></View>
+              </View>
+              <TouchableOpacity onPress={() => {setSelectedOption( 2 ), setPswd( appGeneratedPassword )}} style={styles.passwordButtonContainer}><Text style={styles.enterPassword}>Generate a strong password for me</Text></TouchableOpacity>
+            </View>:
+              <>
+                <View style={styles.fieldsButtonErrorContainer}>
+                  <TextInput
+                    style={styles.modalInputBoxError}
+                    placeholder={'Enter a Strong Password'}
+                    placeholderTextColor={Colors.borderColor}
+                    value={pswd}
+                    autoCompleteType="password"
+                    textContentType="password"
+                    returnKeyType="next"
+                    autoCorrect={false}
+                    editable={isEditable}
+                    autoCapitalize="none"
+                    // onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
+                    //keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                    onChangeText={( text ) => {
+                      setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                      setPswdMasked( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
+                      setPswdError( '' )
+                      setpasswordScore( zxcvbn( text ).score )
+                    }}
+                    onFocus={() => {
+                      setShowNote( false )
+                      setDropdownBoxOpenClose( false )
+                      setPswdInputStyle( styles.inputBoxFocused )
+                      if ( pswd.length > 0 ) {
+                        setPswd( '' )
+                        setPswdMasked( '' )
+                        setPswdError( '' )
+                      }
+                    }}
+                    onBlur={() => {
+                      setShowNote( true )
+                      setPswdInputStyle( styles.inputBox )
+                      setDropdownBoxOpenClose( false )
+                      let temp = ''
+                      for ( let i = 0; i < pswd.length; i++ ) {
+                        temp += '*'
+                      }
+                      setPswdMasked( temp )
+                      handlePswdSubmit()
+                    }}
+                  />
+                  {pswd.length !=0 && <Text style={{
+                    ...styles.guessableText, color: pswd ==appGeneratedPassword || passwordScore == 4? Colors.green : passwordScore<2 ? Colors.tomatoRed : passwordScore<4 && Colors.yellow
+                  }}>{getPasswordLevel()}</Text>}
+                </View>
+                {pswd.length !== 0 &&
+                <View style={styles.fieldsButtonContainer}>
+                  <TextInput
+                    style={styles.modalInputBox}
+                    ref={hint}
+                    placeholder={strings.Addhint}
+                    placeholderTextColor={Colors.borderColor}
+                    value={hintText}
+                    autoCompleteType="off"
+                    textContentType="none"
+                    returnKeyType="next"
+                    autoCorrect={false}
+                    editable={isEditable}
+                    autoCapitalize="none"
+                    keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                    onChangeText={( text ) => {
+                      setHint( text )
+                    }}
+                    onFocus={() => {
+                      setShowNote( false )
+                      setHintInputStyle( styles.inputBoxFocused )
+                    }}
+                    onBlur={() => {
+                      setShowNote( true )
+                      setHintInputStyle( styles.inputBox )
+                    }}
+                  />
+                </View>}
 
-            <CardWithRadioBtn
-              geticon={''}
-              mainText={strings.Useencryptionpassword}
-              subText={strings.Createapassword}
-              isSelected={false}
-              setActiveIndex={() => confirmAction( 2 )}
-              index={2}
-              italicText={''}
-              boldText={''}
-              changeBgColor={true}
-              tag={strings.UserDefined}
-              hideRadioBtn
-            />
-            {/* <CardWithRadioBtn
-              geticon={''}
-              mainText={strings.AnsweraSecurityQuestion}
-              subText={strings.Easiertoremember}
-              isSelected={false}
-              setActiveIndex={()=> confirmAction( 1 )}
-              index={1}
-              italicText={''}
-              boldText={''}
-              changeBgColor={true}
-              tag={strings.MostMemorable}
-              hideRadioBtn
-            /> */}
-            <View
-              style={{
-                marginTop: 10,
-              }}
-            >
-              <CardWithRadioBtn
-                geticon={''}
-                mainText={strings.Skipinitialcloud}
-                subText={strings.fromSecurityCenter}
-                isSelected={false}
-                setActiveIndex={() => {
-                  setIsSkipClicked( true )
-                  dispatch( updateCloudPermission( false ) )
-                  onPressProceed( true )
-                }}
-                boldText=""
-                index={2}
-                italicText={''}
-                changeBgColor={true}
-                hideRadioBtn
-              />
+              </>
+
+            }
+
+            <View style={styles.checkBoxDirectionContainer}>
+              {backup ? <TouchableOpacity activeOpacity={1} style={styles.checkBoxColorContainer} onPress={() => setBackup( !backup )}>
+                <CheckMark />
+              </TouchableOpacity> :
+                <TouchableOpacity activeOpacity={1} style={styles.checkBoxBorderContainer} onPress={() => setBackup( !backup )}>
+                  {/* <CheckMark /> */}
+                </TouchableOpacity>}
+              <View>
+                <Text style={styles.checkBoxHeading}>Create initial cloud backup</Text>
+                <Text style={styles.checkBoxParagraph}>Backup lets you recover your wallet even if you lose your phone</Text>
+              </View>
             </View>
-          </TouchableOpacity>
-        </View>
-        {showNote && !visibleButton ? (
-          <View
-            style={{
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
-              marginTop:20,
-            }}
-          >
-            <BottomInfoBox
-              title={common.note}
-              infoText={strings.Backuplets}
-              italicText={
-                ' '+bhr.SecurityCenter}
-              backgroundColor={Colors.white}
-            />
-          </View>
-        ) : null}
-        <View style={styles.statusIndicatorView}>
-          <View style={styles.statusIndicatorInactiveView} />
-          {/* <View style={styles.statusIndicatorInactiveView} /> */}
-          <View style={styles.statusIndicatorActiveView} />
-        </View>
-      </ScrollView>
 
-      {/* <View style={{
-        alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '4%' ),
-        flexDirection: 'row', marginTop: hp( 2 )
-      }}>
-        <TouchableOpacity
-          onPress={() => {confirmAction()}}
-          style={ButtonStyles.primaryActionButton}
-        >
-          <Text style={{
-            fontSize: RFValue( 13 ),
-            color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
-            alignSelf: 'center',
-          }}>{`${common.confirmProceed}`}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            setIsSkipClicked( true )
-            dispatch( updateCloudPermission( false ) )
-            onPressProceed( true )
-          }}
-        >
-          <Text style={{
-            fontSize: RFValue( 13 ),
-            color: Colors.blue,
-            fontFamily: Fonts.FiraSansMedium,
-            alignSelf: 'center',
-            marginLeft: wp( '5%' )
-          }}>{`${common.skip} Backup`}</Text>
-        </TouchableOpacity>
-      </View> */}
+          </TouchableOpacity>
+
+          <View style={styles.bottomButtonView1}>
+            {pswd.length!==0 && getPasswordLevel()!= 'Weak Password' && <TouchableOpacity
+              onPress={() => {
+                Keyboard.dismiss()
+                onPressProceed()
+              }}
+              style={styles.buttonView}
+            >
+              <Text style={styles.buttonText}>{strings.Next}</Text>
+            </TouchableOpacity>}
+            <View style={styles.statusIndicatorView}>
+              <View style={styles.statusIndicatorInactiveView} />
+              <View style={styles.statusIndicatorActiveView} />
+              {/* <View style={styles.statusIndicatorInactiveView} /> */}
+            </View>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+
 
       <ModalContainer onBackground={() => onBackgroundOfLoader()} visible={loaderModal} closeBottomSheet={null}>
         {renderLoaderModalContent()}
@@ -1648,17 +1591,19 @@ const styles = StyleSheet.create( {
     paddingRight: 30,
     paddingBottom: hp( 2 ),
     alignItems: 'center',
+
   },
   bottomButtonView1: {
     flexDirection: 'row',
-    marginTop: 5,
+    marginBottom:hp( 2.5 ),
     alignItems: 'center',
+    paddingHorizontal:27,
   },
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
     marginHorizontal: wp( '6%' ),
-    marginBottom: hp( 2 )
+    // marginBottom: hp( 2 )
   },
   statusIndicatorActiveView: {
     height: 5,
@@ -1694,12 +1639,21 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   modalInputBox: {
-    flex: 1,
-    height: 50,
+    paddingVertical:hp( 0.6 ),
+    height:30,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
+    paddingLeft: 10,
+  },
+  modalInputBoxError:{
+    paddingVertical:hp( 0.6 ),
+    height:30,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    paddingLeft: 10,
+    width:wp( '60%' )
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
@@ -1772,4 +1726,104 @@ const styles = StyleSheet.create( {
     flex: 1,
     marginLeft: 8,
   },
+  fieldsButtonErrorContainer:{
+    borderRadius: 10,
+    marginHorizontal:20,
+    marginBottom:10,
+    padding:12,
+    height: 'auto',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    elevation: 10,
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 10,
+    shadowOffset: {
+      width: 2,
+      height: 8,
+    },
+    backgroundColor: Colors.white,
+  },
+  fieldsButtonContainer:{
+    borderRadius: 10,
+    marginHorizontal:20,
+    marginBottom:10,
+    padding:12,
+    height: 'auto',
+    elevation: 10,
+    shadowColor: Colors.shadowColor,
+    shadowOpacity: 10,
+    shadowOffset: {
+      width: 2,
+      height: 8,
+    },
+    backgroundColor: Colors.white,
+  },
+  enterPassword:{
+    color:Colors.lightTextColor,
+    fontSize: RFValue( 13 ),
+    padding:4,
+  },
+  borderContainer:{
+    backgroundColor:Colors.secondaryBackgroundColor,
+    width:wp( '75%' ),
+    height:hp( 0.1 ),
+    marginLeft:wp( 2 ),
+  },
+  orBorderContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    // paddingVertical:hp( 2 ),
+  },
+  passwordButtonContainer:{
+    paddingVertical:hp( 1 )
+  },
+  checkBoxDirectionContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    paddingHorizontal:wp( 6 ),
+    paddingVertical:hp( 6 )
+  },
+  checkBoxBorderContainer:{
+    borderWidth:1,
+    borderColor:Colors.gray12,
+    width:wp( 5 ),
+    height:20,
+    borderRadius:3,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  checkBoxColorContainer:{
+    width:wp( 5 ),
+    height:20,
+    borderRadius:3,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Colors.green,
+  },
+  checkBoxHeading:{
+    color: Colors.checkBlue,
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft:wp( 4 )
+  },
+  checkBoxParagraph:{
+    color: Colors.lightTextColor,
+    fontSize: RFValue( 11 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft:wp( 4 ),
+    width:wp( '70%' ),
+    marginTop:hp( 0.6 )
+  },
+  keyboardAvoidingContainer:{
+    flex:1,
+    justifyContent:'space-between',
+  },
+  guessableText:{
+    // color:Colors.tomatoRed,
+    // color:Colors.green,
+    fontSize: RFValue( 10 ),
+    fontWeight:'600',
+    fontFamily: Fonts.FiraSansItalic
+  }
 } )

@@ -18,6 +18,7 @@ const MultiSigXprivs = 'MultiSigXprivs'
 const TxIdMap = 'TxIdMap'
 const AccountId = 'AccountId'
 const ContactDetails = 'ContactDetails'
+const PaymentAddresses = 'PaymentAddresses'
 const TrustedContact = 'TrustedContact'
 const Streams = 'Streams'
 const StreamsMetaData = 'StreamsMetaData'
@@ -481,6 +482,19 @@ export const Details2FASchema: ObjectSchema = {
   },
 }
 
+
+export const PaymentAddressesSchema: ObjectSchema = {
+  name: PaymentAddresses,
+  properties: {
+    TEST_ACCOUNT: {
+      type: 'string', optional: true
+    },
+    CHECKING_ACCOUNT: {
+      type: 'string', optional: true,
+    },
+  },
+}
+
 export const PrimaryStreamDataSchema: ObjectSchema = {
   name: PrimaryStreamData,
   primaryKey: 'walletID',
@@ -495,7 +509,7 @@ export const PrimaryStreamDataSchema: ObjectSchema = {
       type: 'string', optional: true
     },
     paymentAddresses: {
-      type: 'string?[]', optional: true
+      type: PaymentAddresses, optional: true
     },
     contactDetails: {
       type: ContactDetails, optional: true
@@ -639,7 +653,8 @@ export const UnecryptedStreamDataSchema: ObjectSchema = {
     },
     primaryData: {
       type: PrimaryStreamData, optional: true
-    }, secondaryData: {
+    },
+    secondaryData: {
       type: SecondaryStreamData, optional: true
     },
     backupData: {
@@ -787,14 +802,8 @@ export const S3MetaShareSchema: ObjectSchema = {
 export const BHRSchemaSchema: ObjectSchema = {
   name: BHR,
   properties: {
-    encryptedSecretsKeeper: {
-      type: 'string?[]', optional: true
-    },
     metaSharesKeeper: {
       type: 'list', objectType: S3MetaShare, default: []
-    },
-    encryptedSMSecretsKeeper: {
-      type: 'string?[]', optional: true
     },
     oldMetaSharesKeeper:{
       type: 'list', objectType: S3MetaShare, default: []
@@ -910,6 +919,7 @@ export default {
   Streams,
   StreamsMetaData,
   UnecryptedStreamData,
+  PaymentAddresses,
   PrimaryStreamData,
   SecondaryStreamData,
   BackupStreamData,

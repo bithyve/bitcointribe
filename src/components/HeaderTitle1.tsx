@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Text
 } from 'react-native'
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import CommonStyles from '../common/Styles/Styles'
@@ -16,7 +16,7 @@ export default function HeaderTitle1( props ) {
 
   return ( <View>
     <View style={{
-      flexDirection: 'row', alignItems: 'center',
+      flexDirection: 'row', alignItems: 'center'
     }}>
       <Text style={CommonStyles.headerTitles1} >
         {props.firstLineTitle}

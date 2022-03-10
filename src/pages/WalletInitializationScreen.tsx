@@ -21,6 +21,7 @@ import openLink from '../utils/OpenLink'
 import { LocalizationContext } from '../common/content/LocContext'
 import { useDispatch } from 'react-redux'
 import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
+import { setDownloadedBackupData } from '../store/actions/BHR'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
@@ -81,6 +82,7 @@ const WalletInitializationScreen = props => {
         </View>
         <TouchableOpacity
           onPress={async () => {
+            dispatch( setDownloadedBackupData( [] ) )
             dispatch( setCloudDataRecovery( null ) )
             dispatch( setIsFileReading( false ) )
             props.navigation.navigate( 'RestoreWithICloud' )

@@ -26,8 +26,12 @@ import {
   updatedKeeperInfo,
   updateMSharesHealth,
   createChannelAssets,
-  createOrChangeGuardian,
   setChannelAssets,
+  setApprovalStatus,
+  downloadSMShare,
+  pdfSuccessfullyCreated,
+  setPdfUpgrade,
+  createGuardian
 } from '../../store/actions/BHR'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -108,9 +112,11 @@ const PersonalCopyHistory = ( props ) => {
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.bhr.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
-  const s3 = dbManager.getBHR()
-  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
+  const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
+
+  const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
   const trustedContacts: Trusted_Contacts = useSelector(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -122,6 +128,8 @@ const PersonalCopyHistory = ( props ) => {
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const [ isConfirm, setIsConfirm ] = useState( false )
+  const pdfUpgrade = useSelector( ( state ) => state.bhr.pdfUpgrade )
+  const [ pdfUpgradeModal, setPdfUpgradeModal ] = useState( false )
 
   useEffect( () => {
     setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
@@ -142,12 +150,22 @@ const PersonalCopyHistory = ( props ) => {
   ] )
 
   useEffect( ()=>{
+    if( pdfUpgrade ){
+      setPdfUpgradeModal( true )
+    }
     const Contact = {
       id: uuid(),
       name: 'Personal Copy'
     }
-    setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+    setContact( props.navigation.getParam( 'isChangeKeeperType' ) || pdfUpgrade ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
   }, [ ] )
+
+  const sendApprovalRequestToPK = ( ) => {
+    setQrBottomSheetsFlag( true )
+    setIsConfirm( false )
+    setQRModal( true )
+    setKeeperTypeModal( false )
+  }
 
   useEffect( ()=>  {
     if( Platform.OS === 'ios' ) {
@@ -159,7 +177,7 @@ const PersonalCopyHistory = ( props ) => {
         ? setStoragePermissionModal( false )
         : setStoragePermissionModal( true )
     }
-    if( hasStoragePermission ){
+    if( hasStoragePermission && props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ){
       generatePDF()
     }
   }, [ hasStoragePermission ] )
@@ -184,7 +202,7 @@ const PersonalCopyHistory = ( props ) => {
   // };
 
   const generatePDF = async() => {
-    createGuardian( )
+    initiateGuardianCreation( )
     const shareHistory = JSON.parse(
       await AsyncStorage.getItem( 'shareHistory' )
     )
@@ -227,12 +245,14 @@ const PersonalCopyHistory = ( props ) => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
 
-      if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
-        // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
-        setPersonalCopyShareModal( true )
-        dispatch( setChannelAssets ( {
-        }, null ) )
-      }
+      // if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
+      // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+      setPersonalCopyShareModal( true )
+      dispatch( setChannelAssets ( {
+      }, null ) )
+      dispatch( pdfSuccessfullyCreated( false ) )
+      dispatch( setPdfUpgrade( false ) )
+      // }
     }
   }, [ pdfCreatedSuccessfully ] )
 
@@ -284,7 +304,7 @@ const PersonalCopyHistory = ( props ) => {
               OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId )?
                 OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion: 0,
             shareType: 'pdf',
-            status: 'notAccessible',
+            status: selectedKeeper.updatedAt > 0 ? selectedKeeper.status : 'notAccessible',
             name: 'Personal Copy'
           }
           dispatch( updateMSharesHealth( shareObj, false ) )
@@ -321,8 +341,6 @@ const PersonalCopyHistory = ( props ) => {
       />
     )
   }, [ selectedPersonalCopy, personalCopyDetails ] )
-
-
 
   const renderHelpContent = () => {
     return (
@@ -431,12 +449,12 @@ const PersonalCopyHistory = ( props ) => {
     )
   }, [] )
 
-  const createGuardian = useCallback(
+  const initiateGuardianCreation = useCallback(
     async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-      if( ( selectedKeeper.channelKey || isReshare ) && !isChangeKeeper ) return
+      if( ( selectedKeeper.channelKey || isReshare ) && !isChangeKeeper && !pdfUpgrade ) return
       setIsGuardianCreationClicked( true )
-      const channelKey: string = isChange ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKey: string = isChange || pdfUpgrade ? BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKey )
 
       const obj: KeeperInfoInterface = {
@@ -464,9 +482,8 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && !isEmpty( channelAssets ) && channelAssets.shareId == selectedKeeper.shareId ){
-      setIsGuardianCreationClicked( false )
-      dispatch( createOrChangeGuardian( {
-        channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
+      dispatch( createGuardian( {
+        channelKey, shareId: selectedKeeper.shareId, contact: Contact, isChangeKeeper: isChange, oldChannelKey
       } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
@@ -485,7 +502,8 @@ const PersonalCopyHistory = ( props ) => {
         }
       }
 
-    if ( channelKey ) {
+    if ( channelKey && isGuardianCreationClicked ) {
+      setIsGuardianCreationClicked( false )
       dispatch( getPDFData( selectedKeeper.shareId, Contact, channelKey, isChange ) )
     }
   }, [ Contact, trustedContacts ] )
@@ -522,9 +540,7 @@ const PersonalCopyHistory = ( props ) => {
       } )
     }
     if ( type == 'pdf' ) {
-      setTimeout( () => {
-        setPersonalCopyShareModal( true )
-      }, 1000 )
+      initiateGuardianCreation()
     }
   }
 
@@ -547,6 +563,9 @@ const PersonalCopyHistory = ( props ) => {
               n: isChange ? 2 : 1
             } )
             props.navigation.dispatch( popAction )
+          } else {
+            dispatch( setApprovalStatus( false ) )
+            dispatch( downloadSMShare( qrScannedData ) )
           }
         }}
         onBackPress={() => {
@@ -554,20 +573,24 @@ const PersonalCopyHistory = ( props ) => {
           // if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
           setQRModal( false )
         }}
-        onPressContinue={async() => {
-          if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Asda","channelId":"dff8eb3978c08ad72dc515ec5b71d145e5e6d9c1884f6f58739dd08d26f31b4b","streamId":"646625378","channelKey":"OewqnyQaNretrYLeUDvIGmNj","secondaryChannelKey":"3QcSSriLtO95lgYvZs1VvVkM","version":"2.0.1","walletId":"c08a0692304a8aadaef62f00796778b646f2a3190c524d78507d14b6a68c4d1e","encryptedKey":"c217fd0163cac758b8ae585653d3bdf328de633f9b4dc5f42efd7a12e786bff2ecfd1aace2b8d07add7d42d4004bac08bda0fa8c307541b7d17f200d426333a3a81ce98ec7a6d91561afd216c67f015f"}'
-            dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-            setQrBottomSheetsFlag( false )
-            const popAction = StackActions.pop( {
-              n: isChange ? 2 : 1
-            } )
-            props.navigation.dispatch( popAction )
-          }
-        }}
+        onPressContinue={() => {}}
       />
     )
   }
+
+  useEffect( ()=>{
+    if( approvalStatus && isChangeClicked ){
+      console.log( 'APPROVe' )
+      setQRModal( false )
+      onPressChangeKeeperType( 'pdf', selectedKeeperName )
+    }
+  }, [ approvalStatus ] )
+
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
 
   const deviceText = ( text ) => {
     switch ( text ) {
@@ -577,6 +600,26 @@ const PersonalCopyHistory = ( props ) => {
           return text
     }
   }
+
+  const renderPdfUpgradeModal = useCallback( () => {
+    return (
+      <ErrorModalContents
+        // modalRef={ErrorBottomSheet}
+        title={'Upgrade PDF'}
+        info={'You need to re-share your PDF as there seems to be some issue'}
+        proceedButtonText={'Proceed'}
+        onPressProceed={() => {
+          setIsChangeClicked( true )
+          dispatch( pdfSuccessfullyCreated( false ) )
+          setQRModal( true )
+          // initiateGuardianCreation( )
+          setPdfUpgradeModal( false )
+        }}
+        isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }, [ errorMessage, errorMessageHeader ] )
 
   return (
     <View style={{
@@ -642,12 +685,14 @@ const PersonalCopyHistory = ( props ) => {
       </ModalContainer>
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )} >
         <KeeperTypeModalContents
+          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            onPressChangeKeeperType( type, name )
+            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            else onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}
@@ -658,6 +703,9 @@ const PersonalCopyHistory = ( props ) => {
       </ModalContainer>
       <ModalContainer onBackground={()=>setStoragePermissionModal( false )} visible={storagePermissionModal} closeBottomSheet={()=> setStoragePermissionModal( false )} >
         {renderStoragePermissionModalContent()}
+      </ModalContainer>
+      <ModalContainer onBackground={()=>setPdfUpgradeModal( false )} visible={pdfUpgradeModal} closeBottomSheet={()=> setPdfUpgradeModal( false )} >
+        {renderPdfUpgradeModal()}
       </ModalContainer>
     </View>
   )

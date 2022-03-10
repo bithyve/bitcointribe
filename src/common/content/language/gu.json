@@ -288,7 +288,8 @@
     "Confirmnewwalletname": "નવા વletલેટ નામની પુષ્ટિ કરો",
     "acrossyour": "તમારા મિત્રો અને કૌટુંબિક નેટવર્ક પર વletલેટનું નામ આપમેળે અપડેટ થઈ જશે",
     "ConfirmSecurityQuestion": "સુરક્ષા પ્રશ્નની પુષ્ટિ કરો",
-    "ConfirmWalletPin": "વletલેટ પિનની પુષ્ટિ કરો"
+    "ConfirmWalletPin": "વletલેટ પિનની પુષ્ટિ કરો",
+    "ConfirmEncryptionPassword":"એન્ક્રિપ્શન પાસવર્ડની પુષ્ટિ કરો"
   },
   "header": {
     "init": "ક્લાઉડ બેકઅપ શરૂ કરી રહ્યું છે",
@@ -312,7 +313,7 @@
   },
   "accManagement": {
     "AccountManagement": "હિસાબી વય્વસ્થા",
-    "Rearrange": "અહીંથી એકાઉન્ટ્સને ફરીથી ગોઠવો, આર્કાઇવ કરો અને પુનstસ્થાપિત કરો",
+    "Rearrange": "અહીંથી એકાઉન્ટ પુન સંગઠિત અને પુનઃસ્થાપિત કરો",
     "HiddenAccounts": "હિડન એકાઉન્ટ્સ",
     "ArchivedAccounts": "આર્કાઇવ એકાઉન્ટ્સ",
     "Save": "નવો ઓર્ડર સાચવો",
@@ -577,6 +578,8 @@
     "HealthCheckConfirmPassword": "હેલ્થ ચેક પાસવર્ડની પુષ્ટિ કરો",
     "Specifythepassword": "પાસવર્ડ સ્પષ્ટ કરો જેમ તમે વletલેટ સેટ કરતી વખતે કર્યું હતું",
     "Hint": "ઈશારો",
+    "Backupwithcloud": "મેઘ સાથે બેકઅપ",
+    "BackupwithcloudSub": "ક્લાઉડ પર પુનઃપ્રાપ્તિ કીનો બેકઅપ લો",
     "Backupwithcontact": "સંપર્ક સાથે બેકઅપ",
     "BackupwithcontactSub": "મિત્ર અથવા કુટુંબના સભ્ય સાથે પુનoveryપ્રાપ્તિ કીનો બેકઅપ લો",
     "Backuponadevice": "ઉપકરણ પર બેકઅપ",

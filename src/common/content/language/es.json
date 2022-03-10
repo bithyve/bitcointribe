@@ -286,7 +286,8 @@
       "Confirmnewwalletname": "Confirmar nuevo nombre de billetera",
       "acrossyour": "El nombre de la billetera se actualizará automáticamente en su red de amigos y familiares",
       "ConfirmSecurityQuestion": "Confirmar pregunta de seguridad",
-      "ConfirmWalletPin": "Confirmar PIN de billetera"
+      "ConfirmWalletPin": "Confirmar PIN de billetera",
+      "ConfirmEncryptionPassword":"Confirmar contraseña de cifrado"
   },
   "header": {
       "init": "Inicialización de la copia de seguridad en la nube",
@@ -309,7 +310,7 @@
   },
   "accManagement": {
       "AccountManagement": "Administración de cuentas",
-      "Rearrange": "Reorganizar, archivar y restablecer cuentas desde aquí",
+      "Rearrange": "Reorganizar y restaurar cuentas desde aquí",
       "HiddenAccounts": "Cuentas ocultas",
       "ArchivedAccounts": "Cuentas archivadas",
       "Save": "Guardar nuevos pedidos",
@@ -574,6 +575,8 @@
       "HealthCheckConfirmPassword": "Verificación de estado Confirmar contraseña",
       "Specifythepassword": "Especifique la contraseña como lo hizo en el momento de configurar la billetera",
       "Hint": "Insinuación",
+      "Backupwithcloud": "Copia de seguridad con la nube",
+      "BackupwithcloudSub": "Haga una copia de seguridad de la clave de recuperación en la nube",
       "Backupwithcontact": "Backup con contacto",
       "BackupwithcontactSub": "Haga una copia de seguridad de la clave de recuperación con un amigo o familiar",
       "Backuponadevice": "Copia de seguridad en un dispositivo",
