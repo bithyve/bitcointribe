@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, Text, KeyboardAvoidingView, ScrollView, Platform, StatusBar, TextInput, SafeAreaView, TouchableOpacity } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FormStyles from '../../../../common/Styles/FormStyles'
 import Colors from '../../../../common/Colors'
 import Fonts from '../../../../common/Fonts'
@@ -221,7 +222,8 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({ navigation, }: Pr
         behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
       >
         <TouchableOpacity onPress={() => navigation.pop()}>
-          <Icon name={'arrow-back-outline'} color={'#006DB4'} size={25} />
+        <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          {/* <Icon name={'arrow-back-outline'} color={'#006DB4'} size={25} /> */}
         </TouchableOpacity>
         <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           <View style={styles.titleWrapperView}>
