@@ -65,6 +65,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
     }
   }, [ transaction.transactionType ] )
 
+  const date = new Date( transaction.date )
   return (
     <View style={styles.rootContainer}>
       <View style={styles.contentContainer}>
@@ -88,7 +89,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
             style={ListStyles.listItemSubtitle}
             numberOfLines={2}
           >
-            {moment( transaction.date ).format( 'DD/MM/YY • hh:MM A' )}
+            {date.toLocaleString()}
           </Text>
         </View>
         <LabeledBalanceDisplay

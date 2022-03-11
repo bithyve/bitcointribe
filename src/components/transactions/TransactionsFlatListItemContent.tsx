@@ -81,7 +81,8 @@ const TransactionListItemContent: React.FC<Props> = ( {
   }, [ transaction.transactionType ] )
 
   const formattedDateText = useMemo( () => {
-    return moment( transaction.date ).format( 'DD/MM/YY • hh:MMa' )
+    // return moment( transaction.date ).format( 'DD/MM/YY • hh:MMa' )
+    return new Date( transaction.date ).toLocaleDateString()
   }, [ transaction.transactionType ] )
 
   const getReceiversCount = useMemo( () => {
