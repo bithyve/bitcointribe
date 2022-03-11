@@ -106,7 +106,7 @@ const CreateGift = ( { navigation } ) => {
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
-  const [showErrorLoader, setShowErrorLoader] = useState(false)
+  const [ showErrorLoader, setShowErrorLoader ] = useState( false )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
@@ -166,7 +166,7 @@ const CreateGift = ( { navigation } ) => {
 
   useEffect( ()=>{
     setInitGiftCreation( false )
-    console.log(giftCreationStatus)
+    console.log( giftCreationStatus )
     setShowLoader( false )
     if( giftCreationStatus ){
       dispatch( giftCreationSuccess( null ) )
@@ -175,7 +175,7 @@ const CreateGift = ( { navigation } ) => {
       setShowLoader( false )
       setShowErrorLoader( true )
       dispatch( giftCreationSuccess( null )
-       )
+      )
     }
   }, [ giftCreationStatus ] )
 
@@ -218,60 +218,60 @@ const CreateGift = ( { navigation } ) => {
     }
 
     return(
-      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[8,8]}>
-      <TouchableOpacity
-        disabled={isDisabled}
-        onPress={()=>{
-          switch( condn ){
-              case 'Create Gift':
+      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[ 8, 8 ]}>
+        <TouchableOpacity
+          disabled={isDisabled}
+          onPress={()=>{
+            switch( condn ){
+                case 'Create Gift':
                 // creating multiple gift instances(based on giftInstances) of the same amount
-                const giftInstances = Number( numbersOfGift )
-                const giftAmountInSats = prefersBitcoin? Number( amount ): convertFiatToSats( parseFloat( amount ) )
+                  const giftInstances = Number( numbersOfGift )
+                  const giftAmountInSats = prefersBitcoin? Number( amount ): convertFiatToSats( parseFloat( amount ) )
 
-                const giftAmountsInSats = []
-                for( let int = 0; int < giftInstances; int++ ){
-                  giftAmountsInSats.push( giftAmountInSats )
-                }
+                  const giftAmountsInSats = []
+                  for( let int = 0; int < giftInstances; int++ ){
+                    giftAmountsInSats.push( giftAmountInSats )
+                  }
 
-                if( giftAmountsInSats.length ){
-                  setInitGiftCreation( true )
-                  setShowLoader( true )
-                  dispatch( generateGifts( {
-                    amounts: giftAmountsInSats,
-                    accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
-                    includeFee: includeFees,
-                    exclusiveGifts: giftAmountsInSats.length === 1? false: isExclusive,
-                  } ) )
-                }
-                break
+                  if( giftAmountsInSats.length ){
+                    setInitGiftCreation( true )
+                    setShowLoader( true )
+                    dispatch( generateGifts( {
+                      amounts: giftAmountsInSats,
+                      accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
+                      includeFee: includeFees,
+                      exclusiveGifts: giftAmountsInSats.length === 1? false: isExclusive,
+                    } ) )
+                  }
+                  break
 
-              case 'Add F&F and Send':
-                setGiftModal( false )
-                navigation.navigate( 'AddContact', {
-                  fromScreen: 'Gift',
-                  giftId: ( createdGift as Gift ).id,
-                  setActiveTab: navigation.state.params.setActiveTab
-                } )
-                break
+                case 'Add F&F and Send':
+                  setGiftModal( false )
+                  navigation.navigate( 'AddContact', {
+                    fromScreen: 'Gift',
+                    giftId: ( createdGift as Gift ).id,
+                    setActiveTab: navigation.state.params.setActiveTab
+                  } )
+                  break
 
-              case 'Send Gift':
-                setGiftModal( false )
-                navigation.navigate( 'EnterGiftDetails', {
-                  giftId: ( createdGift as Gift ).id,
-                  setActiveTab: navigation.state.params.setActiveTab
-                } )
-                break
+                case 'Send Gift':
+                  setGiftModal( false )
+                  navigation.navigate( 'EnterGiftDetails', {
+                    giftId: ( createdGift as Gift ).id,
+                    setActiveTab: navigation.state.params.setActiveTab
+                  } )
+                  break
+            }
+          }}
+          style={isDisabled ? {
+            ...styles.disabledButtonView
+          } : {
+            ...styles.buttonView
           }
-        }}
-        style={isDisabled ? {
-          ...styles.disabledButtonView
-        } : {
-          ...styles.buttonView
-        }
-        }
-      >
-        <Text style={styles.buttonText}>{text}</Text>
-      </TouchableOpacity>
+          }
+        >
+          <Text style={styles.buttonText}>{text}</Text>
+        </TouchableOpacity>
       </Shadow>
     )
   }
@@ -433,7 +433,7 @@ const CreateGift = ( { navigation } ) => {
     </ScrollView>
   }
 
-  const AdvanceGiftOptions = ( { title , stateToUpdate, imageToShow } ) => {
+  const AdvanceGiftOptions = ( { title, stateToUpdate, imageToShow } ) => {
     const plus = () =>{
       if( stateToUpdate == 'gift' ){
         setNumbersOfGift( numbersOfGift + 1 )
@@ -473,10 +473,14 @@ const CreateGift = ( { navigation } ) => {
             }}>{title}</Text>
             <Text style={{
               color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
-            }}>Gift Sats created will be of the 
-            <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>same amount</Text>
-             and can be 
-             <Text style= {{fontWeight: 'bold' , fontFamily: Fonts.FiraSansItalic}}>sent separately</Text></Text>
+            }}>Gift Sats created will be of the
+              <Text style= {{
+                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+              }}>same amount</Text>
+             and can be
+              <Text style= {{
+                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+              }}>sent separately</Text></Text>
           </View>
           <View style={{
             flexDirection:'row', alignItems: 'center',
@@ -538,7 +542,9 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               fontSize: RFValue( 11 ),
             }}>
-            (Restricts the gift to <Text style={{ fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic }}>one per Hexa app</Text> )
+            (Restricts the gift to <Text style={{
+                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+              }}>one per Hexa app</Text> )
             </Text>
           </Text>
 
@@ -613,7 +619,7 @@ const CreateGift = ( { navigation } ) => {
       }}>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {setShowErrorLoader(false)}}
+          onPress={() => {setShowErrorLoader( false )}}
           style={styles.modalCrossButton}
         >
           <FontAwesome name="close" color={Colors.white} size={19}/>
@@ -623,21 +629,21 @@ const CreateGift = ( { navigation } ) => {
       <View style={{
         flexDirection: 'column',
         justifyContent:'space-between'
-        
+
       }}>
         <Text style={{
           color: Colors.blue, fontSize: RFValue( 18 ), marginBottom: 30, fontFamily: Fonts.FiraSansRegular,
         }}>Gift Creation Unsuccessful</Text>
         <Text style={{
-          color: Colors.gray3,marginBottom: 40, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.gray3, marginBottom: 40, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
         }}>Please try again</Text>
-        <TouchableOpacity style={styles.buttonView} onPress={() => {setShowErrorLoader(false)}} >
+        <TouchableOpacity style={styles.buttonView} onPress={() => {setShowErrorLoader( false )}} >
           <Text style={styles.buttonText}>Try again</Text>
         </TouchableOpacity>
       </View>
     </View>
   }
-  
+
 
   const accountElement = ( item, onPressCallBack ) =>{
     return <TouchableOpacity
@@ -1149,22 +1155,22 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={()=>setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
         {renderAdvanceModal()}
       </ModalContainer>
-      
-      
-          <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
-            <LoaderModal
-              headerText={'Packing Your Gift'}
-              messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
-              messageText2={''}
-              source={require( '../../assets/images/gift.gif' )}
-            />
-          </ModalContainer> 
-        
-          <ModalContainer onBackground={() => setShowLoader( false )} visible={(showErrorLoader)}>
-            {renderErrorModal()}
-          </ModalContainer>
-      
-      
+
+
+      <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
+        <LoaderModal
+          headerText={'Packing Your Gift'}
+          messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
+          messageText2={''}
+          source={require( '../../assets/images/gift.gif' )}
+        />
+      </ModalContainer>
+
+      <ModalContainer onBackground={() => setShowLoader( false )} visible={( showErrorLoader )}>
+        {renderErrorModal()}
+      </ModalContainer>
+
+
     </ScrollView>
   )
 }
