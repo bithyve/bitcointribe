@@ -307,6 +307,7 @@ const PersonalCopyHistory = ( props ) => {
             status: selectedKeeper.updatedAt > 0 ? selectedKeeper.status : 'notAccessible',
             name: 'Personal Copy'
           }
+          console.log( 'share Obj', shareObj )
           dispatch( updateMSharesHealth( shareObj, false ) )
         }}
         onPressConfirm={() => {
