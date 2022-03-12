@@ -7,7 +7,7 @@ import { AccountsState } from '../reducers/accounts'
 import dbManager from '../../storage/realm/dbManager'
 import { addNewAccount, addNewAccountShellsWorker, generateShellFromAccount, newAccountsInfo, syncAccountsWorker } from './accounts'
 import { createWatcher } from '../utils/utilities'
-import { RECREATE_MISSING_ACCOUNTS } from '../actions/upgrades'
+import { RECREATE_MISSING_ACCOUNTS, SWEEP_MISSING_ACCOUNTS } from '../actions/upgrades'
 import Toast from '../../components/Toast'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 
@@ -107,18 +107,60 @@ export function* recreateMissingAccounts( ) {
     Toast( `re-creating accounts: ${[ ...accountsToRecreateInfo.map( ( { accountType, recreationInstanceNumber } ) => accountType + ':' + recreationInstanceNumber ) ]}` )
 
     if( accountsToRecreateInfo.length ){
-      // TODO: re-enable as we move to 75
-      // yield call( addNewAccountShellsWorker, {
-      //   payload: accountsToRecreateInfo
-      // } )
+      yield call( addNewAccountShellsWorker, {
+        payload: accountsToRecreateInfo
+      } )
+    }
+  } catch( err ){
+    Toast( `Failed to recreate accounts: ${err}` )
+  }
+}
 
+export const recreateMissingAccountsWatcher = createWatcher(
+  recreateMissingAccounts,
+  RECREATE_MISSING_ACCOUNTS,
+)
 
-      // TODO: remove as we move to 75
+export function* sweepMissingAccounts( ) {
+  try{
+    // recreates the missing account(s) struct and account-shell(s)
+    const wallet: Wallet = yield select(
+      ( state ) => state.storage.wallet
+    )
+    const accountsState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
+
+    const accountsToSweepInfo: newAccountsInfo[] = []
+    for( const accountType of Object.keys( wallet.accounts ) ) {
+      const createdAccountIds = wallet.accounts[ accountType ]
+      const availableAccountIds = []
+      for( const account of Object.values( accountsState.accounts ) ){
+        if( account.type === accountType ){
+          if( createdAccountIds.includes( account.id ) ) availableAccountIds.push( account.id )
+        }
+      }
+
+      for( const accountId of createdAccountIds ){
+        if( !availableAccountIds.includes( accountId ) ){
+          // recreate missing account
+          const instanceNumber = createdAccountIds.indexOf( accountId )
+          accountsToSweepInfo.push( {
+            accountType: ( accountType as AccountType ),
+            recreationInstanceNumber: instanceNumber
+          } )
+        }
+      }
+    }
+
+    Toast( `sweeping accounts: ${[ ...accountsToSweepInfo.map( ( { accountType, recreationInstanceNumber } ) => accountType + ':' + recreationInstanceNumber ) ]}` )
+
+    if( accountsToSweepInfo.length ){
       // const accountShellsToRecreate: AccountShell[] = []
-      const accountsToRecreate: Accounts = {
+      const accountsToSweep: Accounts = {
       }
       const accountIds = []
-      for ( const { accountType, accountDetails, recreationInstanceNumber } of accountsToRecreateInfo ){
+      for ( const { accountType, accountDetails, recreationInstanceNumber } of accountsToSweepInfo ){
         const account: Account | MultiSigAccount | DonationAccount = yield call(
           addNewAccount,
           accountType,
@@ -128,7 +170,7 @@ export function* recreateMissingAccounts( ) {
         )
         accountIds.push( account.id )
         if( account.type !== AccountType.SAVINGS_ACCOUNT )
-          accountsToRecreate[ account.id ] = account
+          accountsToSweep[ account.id ] = account
         // const accountShell = yield call( generateShellFromAccount, account )
         // accountShellsToRecreate.push( accountShell )
       }
@@ -138,7 +180,7 @@ export function* recreateMissingAccounts( ) {
       }
       const { synchedAccounts } = yield call( syncAccountsWorker, {
         payload: {
-          accounts: accountsToRecreate,
+          accounts: accountsToSweep,
           options,
         }
       } )
@@ -149,7 +191,7 @@ export function* recreateMissingAccounts( ) {
   }
 }
 
-export const recreateMissingAccountsWatcher = createWatcher(
-  recreateMissingAccounts,
-  RECREATE_MISSING_ACCOUNTS,
+export const sweepMissingAccountsWatcher = createWatcher(
+  sweepMissingAccounts,
+  SWEEP_MISSING_ACCOUNTS,
 )
