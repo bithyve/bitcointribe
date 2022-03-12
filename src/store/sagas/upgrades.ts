@@ -1,14 +1,15 @@
-import { AccountType, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, AccountType, DonationAccount, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountSettings, updateAccountShells } from '../actions/accounts'
 import { call, put, select } from 'redux-saga/effects'
 import { AccountsState } from '../reducers/accounts'
 import dbManager from '../../storage/realm/dbManager'
-import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
+import { addNewAccount, addNewAccountShellsWorker, generateShellFromAccount, newAccountsInfo, syncAccountsWorker } from './accounts'
 import { createWatcher } from '../utils/utilities'
 import { RECREATE_MISSING_ACCOUNTS } from '../actions/upgrades'
 import Toast from '../../components/Toast'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 
 export function* testAccountEnabler( ) {
   const accountShells: AccountShell[] = yield select(
@@ -103,10 +104,46 @@ export function* recreateMissingAccounts( ) {
       }
     }
 
-    if( accountsToRecreateInfo.length )
-      yield call( addNewAccountShellsWorker, {
-        payload: accountsToRecreateInfo
+    Toast( `re-creating accounts: ${[ ...accountsToRecreateInfo.map( ( { accountType, recreationInstanceNumber } ) => accountType + ':' + recreationInstanceNumber ) ]}` )
+
+    if( accountsToRecreateInfo.length ){
+      // TODO: re-enable as we move to 75
+      // yield call( addNewAccountShellsWorker, {
+      //   payload: accountsToRecreateInfo
+      // } )
+
+
+      // TODO: remove as we move to 75
+      // const accountShellsToRecreate: AccountShell[] = []
+      const accountsToRecreate: Accounts = {
+      }
+      const accountIds = []
+      for ( const { accountType, accountDetails, recreationInstanceNumber } of accountsToRecreateInfo ){
+        const account: Account | MultiSigAccount | DonationAccount = yield call(
+          addNewAccount,
+          accountType,
+          accountDetails || {
+          },
+          recreationInstanceNumber
+        )
+        accountIds.push( account.id )
+        if( account.type !== AccountType.SAVINGS_ACCOUNT )
+          accountsToRecreate[ account.id ] = account
+        // const accountShell = yield call( generateShellFromAccount, account )
+        // accountShellsToRecreate.push( accountShell )
+      }
+
+      const options: { hardRefresh?: boolean, syncDonationAccount?: boolean } = {
+        hardRefresh: true
+      }
+      const { synchedAccounts } = yield call( syncAccountsWorker, {
+        payload: {
+          accounts: accountsToRecreate,
+          options,
+        }
       } )
+    }
+
   } catch( err ){
     Toast( `Failed to recreate accounts: ${err}` )
   }
