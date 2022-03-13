@@ -1,4 +1,4 @@
-import { Account, Accounts, AccountType, DonationAccount, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, AccountType, DonationAccount, MultiSigAccount, TxPriority, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountSettings, updateAccountShells } from '../actions/accounts'
@@ -10,6 +10,7 @@ import { createWatcher } from '../utils/utilities'
 import { RECREATE_MISSING_ACCOUNTS, SWEEP_MISSING_ACCOUNTS } from '../actions/upgrades'
 import Toast from '../../components/Toast'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 export function* testAccountEnabler( ) {
   const accountShells: AccountShell[] = yield select(
@@ -121,7 +122,7 @@ export const recreateMissingAccountsWatcher = createWatcher(
   RECREATE_MISSING_ACCOUNTS,
 )
 
-export function* sweepMissingAccounts( ) {
+export function* sweepMissingAccounts( { payload }: {payload: {address: string, token?: number}} ) {
   try{
     // recreates the missing account(s) struct and account-shell(s)
     const wallet: Wallet = yield select(
@@ -169,7 +170,7 @@ export function* sweepMissingAccounts( ) {
           recreationInstanceNumber
         )
         accountIds.push( account.id )
-        if( account.type !== AccountType.SAVINGS_ACCOUNT )
+        if( account.type === AccountType.CHECKING_ACCOUNT || account.type === AccountType.TEST_ACCOUNT )
           accountsToSweep[ account.id ] = account
         // const accountShell = yield call( generateShellFromAccount, account )
         // accountShellsToRecreate.push( accountShell )
@@ -178,12 +179,42 @@ export function* sweepMissingAccounts( ) {
       const options: { hardRefresh?: boolean, syncDonationAccount?: boolean } = {
         hardRefresh: true
       }
-      const { synchedAccounts } = yield call( syncAccountsWorker, {
+      const { synchedAccounts }: { synchedAccounts: Accounts } = yield call( syncAccountsWorker, {
         payload: {
           accounts: accountsToSweep,
           options,
         }
       } )
+
+      for( const account of Object.values( synchedAccounts ) ){
+        if( account.balances.confirmed ) {
+          const accountsState: AccountsState = yield select(
+            ( state ) => state.accounts )
+          const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
+          const txPriority = TxPriority.MEDIUM
+          const network = AccountUtilities.getNetworkByType( account.networkType )
+          const feePerByte = averageTxFeeByNetwork[ txPriority ].feePerByte
+
+          const { fee } = AccountOperations.calculateSendMaxFee(
+            account,
+            1,
+            feePerByte,
+            network
+          )
+
+          const recipients: {
+            address: string;
+            amount: number;
+           }[] = [ {
+             address: payload.address,
+             amount: account.balances.confirmed - fee,
+           } ]
+
+          const { txPrerequisites } = yield call( AccountOperations.transferST1, account, recipients, averageTxFeeByNetwork )
+          const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txPriority, network, recipients, payload.token )
+          Toast( `Sent: ${txid} from ${account.type + ' ' + account.instanceNum}` )
+        }
+      }
     }
 
   } catch( err ){

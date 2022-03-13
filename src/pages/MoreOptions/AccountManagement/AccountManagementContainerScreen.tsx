@@ -29,6 +29,7 @@ import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSet
 import { translations } from '../../../common/content/LocContext'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import { recreateAccounts } from '../../../store/actions/upgrades'
+import { sweepMissingAccounts } from '../../../store/actions/upgrades'
 
 export type Props = {
   navigation: any;
@@ -390,6 +391,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             { debugModalTaps > 4?
               ( <Button title={'Recreate Missing Accounts'} onPress={()=> {
                 setDebugModalVisible( false )
+                // dispatch( sweepMissingAccounts( {
+                //   address: '2NECrXDMUqy3AiX6bDyzizezzV23n43HRRR'
+                // } ) )
                 dispatch( recreateAccounts() )
               }}></Button> ): null}
           </TouchableOpacity>

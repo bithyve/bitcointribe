@@ -175,7 +175,7 @@ import {
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import { updateUserNameWatcher } from './sagas/storage'
-import { recreateMissingAccountsWatcher } from './sagas/upgrades'
+import { recreateMissingAccountsWatcher, sweepMissingAccountsWatcher } from './sagas/upgrades'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -324,7 +324,8 @@ const rootSaga = function* () {
     updateUserNameWatcher,
 
     // upgrade scripts
-    recreateMissingAccountsWatcher
+    recreateMissingAccountsWatcher,
+    sweepMissingAccountsWatcher
   ]
 
   yield all(
