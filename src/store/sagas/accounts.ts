@@ -282,7 +282,7 @@ function* updatePaymentAddressesToChannels( activeAddressesWithNewTxsMap: {
     } )
 }
 
-function* syncAccountsWorker( { payload }: {payload: {
+export function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
   options: {
     hardRefresh?: boolean;

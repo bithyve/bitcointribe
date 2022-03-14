@@ -175,7 +175,8 @@ import {
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import { updateUserNameWatcher } from './sagas/storage'
-import { recreateMissingAccountsWatcher } from './sagas/upgrades'
+import { recreateMissingAccountsWatcher, sweepMissingAccountsWatcher, syncMissingAccountsWatcher } from './sagas/upgrades'
+import upgrades from './reducers/upgrades'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -324,7 +325,9 @@ const rootSaga = function* () {
     updateUserNameWatcher,
 
     // upgrade scripts
-    recreateMissingAccountsWatcher
+    recreateMissingAccountsWatcher,
+    syncMissingAccountsWatcher,
+    sweepMissingAccountsWatcher
   ]
 
   yield all(
@@ -361,6 +364,7 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
+  upgrades: upgrades
 } )
 
 export default function makeStore() {

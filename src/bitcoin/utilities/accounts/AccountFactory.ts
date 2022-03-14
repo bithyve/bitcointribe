@@ -120,7 +120,15 @@ export function generateMultiSigAccount(
   }
 
   let initialRecevingAddress = ''
-  const id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
+
+  let id
+  if( type === AccountType.SAVINGS_ACCOUNT && instanceNum === 0 ){
+    const secondary = undefined
+    const bithyve = undefined
+    id = crypto.createHash( 'sha256' ).update( primaryXpub + secondary + bithyve ).digest( 'hex' ) // recreation consistency(id) for saving's account first instance
+  }
+  else id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
+
   let isUsable = false
   if( secondaryXpub ){
     initialRecevingAddress = AccountUtilities.createMultiSig( {
