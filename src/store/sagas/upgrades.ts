@@ -7,7 +7,7 @@ import { AccountsState } from '../reducers/accounts'
 import dbManager from '../../storage/realm/dbManager'
 import { addNewAccount, addNewAccountShellsWorker, generateShellFromAccount, newAccountsInfo, syncAccountsWorker } from './accounts'
 import { createWatcher } from '../utils/utilities'
-import { RECREATE_MISSING_ACCOUNTS, SWEEP_MISSING_ACCOUNTS } from '../actions/upgrades'
+import { RECREATE_MISSING_ACCOUNTS, SWEEP_MISSING_ACCOUNTS, SYNC_MISSING_ACCOUNTS, updateSynchedMissingAccount } from '../actions/upgrades'
 import Toast from '../../components/Toast'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
@@ -122,9 +122,8 @@ export const recreateMissingAccountsWatcher = createWatcher(
   RECREATE_MISSING_ACCOUNTS,
 )
 
-export function* sweepMissingAccounts( { payload }: {payload: {address: string, token?: number}} ) {
+function* syncMissingAccounts( ) {
   try{
-    // recreates the missing account(s) struct and account-shell(s)
     const wallet: Wallet = yield select(
       ( state ) => state.storage.wallet
     )
@@ -154,7 +153,7 @@ export function* sweepMissingAccounts( { payload }: {payload: {address: string, 
       }
     }
 
-    Toast( `sweeping accounts: ${[ ...accountsToSweepInfo.map( ( { accountType, recreationInstanceNumber } ) => accountType + ':' + recreationInstanceNumber ) ]}` )
+    Toast( `synching accounts: ${[ ...accountsToSweepInfo.map( ( { accountType, recreationInstanceNumber } ) => accountType + ':' + recreationInstanceNumber ) ]}` )
 
     if( accountsToSweepInfo.length ){
       // const accountShellsToRecreate: AccountShell[] = []
@@ -170,8 +169,7 @@ export function* sweepMissingAccounts( { payload }: {payload: {address: string, 
           recreationInstanceNumber
         )
         accountIds.push( account.id )
-        if( account.type === AccountType.CHECKING_ACCOUNT || account.type === AccountType.TEST_ACCOUNT )
-          accountsToSweep[ account.id ] = account
+        accountsToSweep[ account.id ] = account
         // const accountShell = yield call( generateShellFromAccount, account )
         // accountShellsToRecreate.push( accountShell )
       }
@@ -185,24 +183,39 @@ export function* sweepMissingAccounts( { payload }: {payload: {address: string, 
           options,
         }
       } )
+      yield put( updateSynchedMissingAccount( synchedAccounts ) )
+    }
 
-      for( const account of Object.values( synchedAccounts ) ){
-        if( account.balances.confirmed ) {
-          const accountsState: AccountsState = yield select(
-            ( state ) => state.accounts )
-          const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
-          const txPriority = TxPriority.MEDIUM
-          const network = AccountUtilities.getNetworkByType( account.networkType )
-          const feePerByte = averageTxFeeByNetwork[ txPriority ].feePerByte
+  } catch( err ){
+    Toast( `Failed to sync accounts: ${err}` )
+  }
+}
 
-          const { fee } = AccountOperations.calculateSendMaxFee(
-            account,
-            1,
-            feePerByte,
-            network
-          )
+export const syncMissingAccountsWatcher = createWatcher(
+  syncMissingAccounts,
+  SYNC_MISSING_ACCOUNTS,
+)
 
-          const recipients: {
+function* sweepMissingAccounts( { payload }: {payload: {address: string, token?: number}} ) {
+  try{
+    const synchedAccounts = []
+    for( const account of Object.values( synchedAccounts ) ){
+      if( account.balances.confirmed ) {
+        const accountsState: AccountsState = yield select(
+          ( state ) => state.accounts )
+        const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
+        const txPriority = TxPriority.MEDIUM
+        const network = AccountUtilities.getNetworkByType( account.networkType )
+        const feePerByte = averageTxFeeByNetwork[ txPriority ].feePerByte
+
+        const { fee } = AccountOperations.calculateSendMaxFee(
+          account,
+          1,
+          feePerByte,
+          network
+        )
+
+        const recipients: {
             address: string;
             amount: number;
            }[] = [ {
@@ -210,15 +223,15 @@ export function* sweepMissingAccounts( { payload }: {payload: {address: string, 
              amount: account.balances.confirmed - fee,
            } ]
 
-          const { txPrerequisites } = yield call( AccountOperations.transferST1, account, recipients, averageTxFeeByNetwork )
-          const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txPriority, network, recipients, payload.token )
-          Toast( `Sent: ${txid} from ${account.type + ' ' + account.instanceNum}` )
-        }
+        AccountOperations.transferST1( account, recipients, averageTxFeeByNetwork ).then( ( { txPrerequisites } ) => {
+          AccountOperations.transferST2( account, txPrerequisites, txPriority, network, recipients, payload.token ).then( ( { txid } )=> {
+            Toast( `Sent: ${txid} from ${account.type + ' ' + account.instanceNum}` )
+          } )
+        } )
       }
     }
-
   } catch( err ){
-    Toast( `Failed to recreate accounts: ${err}` )
+    Toast( `Failed to sweep accounts: ${err}` )
   }
 }
 
