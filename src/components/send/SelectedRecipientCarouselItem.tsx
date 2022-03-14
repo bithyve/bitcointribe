@@ -19,6 +19,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 
 export type Props = {
   recipient: RecipientDescribing;
@@ -34,6 +36,8 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
+  const sourceAccountShell = useSourceAccountShellForSending()
+  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const designatedAmount = useFormattedAmountText( useAmountBeingSentToRecipient( recipient ) )
 
   const unitText = !currencyCode ? useFormattedUnitText( {
@@ -69,7 +73,8 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ( {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {recipient.displayedName}
+            {sourcePrimarySubAccount && sourcePrimarySubAccount.customDescription}
+            {/* {recipient.displayedName} */}
           </Text>
 
           <Text
