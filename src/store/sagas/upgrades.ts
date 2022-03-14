@@ -140,7 +140,6 @@ function* syncMissingAccounts( ) {
           if( createdAccountIds.includes( account.id ) ) availableAccountIds.push( account.id )
         }
       }
-
       for( const accountId of createdAccountIds ){
         if( !availableAccountIds.includes( accountId ) ){
           // recreate missing account
@@ -169,7 +168,9 @@ function* syncMissingAccounts( ) {
           recreationInstanceNumber
         )
         accountIds.push( account.id )
-        accountsToSweep[ account.id ] = account
+        if( ( account as MultiSigAccount ).is2FA ){
+          if( ( account as MultiSigAccount ).xpubs.secondary ) accountsToSweep[ account.id ] = account
+        } else accountsToSweep[ account.id ] = account
         // const accountShell = yield call( generateShellFromAccount, account )
         // accountShellsToRecreate.push( accountShell )
       }
@@ -198,7 +199,9 @@ export const syncMissingAccountsWatcher = createWatcher(
 
 function* sweepMissingAccounts( { payload }: {payload: {address: string, token?: number}} ) {
   try{
-    const synchedAccounts = []
+    const synchedAccounts: Accounts = yield select(
+      ( state ) => state.upgrades.synchedMissingAccounts
+    )
     for( const account of Object.values( synchedAccounts ) ){
       if( account.balances.confirmed ) {
         const accountsState: AccountsState = yield select(
