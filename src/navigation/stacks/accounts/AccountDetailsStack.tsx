@@ -41,6 +41,7 @@ const AccountDetailsStack = createStackNavigator(
         header: null,
       },
     },
+    
     SubAccountSettings: {
       screen: SubAccountSettingsStack,
       navigationOptions: {

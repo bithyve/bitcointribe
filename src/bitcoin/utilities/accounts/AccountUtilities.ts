@@ -673,7 +673,10 @@ export default class AccountUtilities {
           addresses.forEach( address => {
             if( activeAddresses.external[ address ] ){
               activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
-              if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.name )
+              if( tx.transactionType === TransactionType.RECEIVED ){
+                tx.sender = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.name )
+                tx.senderId = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.id )
+              }
               else if( tx.transactionType === TransactionType.SENT ) {
                 const recipientInfo = idx( activeAddresses.external[ address ], _ => _.assignee.recipientInfo )
                 if( recipientInfo ) tx.receivers =  recipientInfo[ tx.txid ]

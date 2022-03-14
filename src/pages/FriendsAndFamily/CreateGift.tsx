@@ -61,6 +61,7 @@ import { updateUserName } from '../../store/actions/storage'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import Loader from '../../components/loader'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import ErrorLoader from '../../components/ErrorLoader'
 import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
 import { calculateSendMaxFee } from '../../store/actions/sending'
@@ -103,6 +104,7 @@ const CreateGift = ( { navigation } ) => {
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
+  const [showErrorLoader, setShowErrorLoader] = useState(false)
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
@@ -154,6 +156,7 @@ const CreateGift = ( { navigation } ) => {
         setGiftModal( true )
         setInitGiftCreation( false )
         setShowLoader( false )
+        setShowErrorLoader( false )
         dispatch( giftCreationSuccess( null ) )
       }
     }
@@ -161,13 +164,16 @@ const CreateGift = ( { navigation } ) => {
 
   useEffect( ()=>{
     setInitGiftCreation( false )
+    console.log(giftCreationStatus)
     setShowLoader( false )
     if( giftCreationStatus ){
       dispatch( giftCreationSuccess( null ) )
     } else if( giftCreationStatus === false ){
       // failed to create gift
       setShowLoader( false )
-      dispatch( giftCreationSuccess( null ) )
+      setShowErrorLoader( true )
+      dispatch( giftCreationSuccess( null )
+       )
     }
   }, [ giftCreationStatus ] )
 
@@ -628,6 +634,43 @@ const CreateGift = ( { navigation } ) => {
     </View>
   }
 
+  // gift creation failure UI
+
+  const renderErrorModal = () =>{
+    return <View style={{
+      backgroundColor: Colors.bgColor, padding: wp( '5%' ),
+    }}>
+      <View style={{
+        flexDirection:'row',
+      }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {setShowErrorLoader(false)}}
+          style={styles.modalCrossButton}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19}/>
+        </TouchableOpacity>
+      </View>
+
+      <View style={{
+        flexDirection: 'column',
+        justifyContent:'space-between'
+        
+      }}>
+        <Text style={{
+          color: Colors.blue, fontSize: RFValue( 18 ), marginBottom: 30, fontFamily: Fonts.FiraSansRegular,
+        }}>Gift Creation Unsuccessful</Text>
+        <Text style={{
+          color: Colors.gray3,marginBottom: 40, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+        }}>Please try again</Text>
+        <TouchableOpacity style={styles.buttonView} onPress={() => {setShowErrorLoader(false)}} >
+          <Text style={styles.buttonText}>Try again</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  }
+  
+
   const accountElement = ( item, onPressCallBack ) =>{
     return <TouchableOpacity
       style={styles.accountSelectionView}
@@ -818,9 +861,9 @@ const CreateGift = ( { navigation } ) => {
             ...styles.inputBox,
             flexDirection: 'row',
             alignItems: 'center',
-            borderColor: Colors.white,
+            borderColor: Colors.gray9,
             marginTop: 10,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.backgroundColor,
             paddingHorizontal: wp( 3 ),
             height: 50,
             marginLeft: 0,
@@ -830,7 +873,7 @@ const CreateGift = ( { navigation } ) => {
               fontSize: RFValue( 15 ),
               color: Colors.textColorGrey,
               fontFamily: Fonts.FiraSansRegular,
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.backgroundColor,
               alignSelf: 'center',
               flex: 1,
             }, {
@@ -1138,14 +1181,22 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={()=>setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
         {renderAdvanceModal()}
       </ModalContainer>
-      <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
-        <LoaderModal
-          headerText={'Packing Your Gift'}
-          messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
-          messageText2={''}
-          source={require( '../../assets/images/gift.gif' )}
-        />
-      </ModalContainer>
+      
+      
+          <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
+            <LoaderModal
+              headerText={'Packing Your Gift'}
+              messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
+              messageText2={''}
+              source={require( '../../assets/images/gift.gif' )}
+            />
+          </ModalContainer> 
+        
+          <ModalContainer onBackground={() => setShowLoader( false )} visible={(showErrorLoader)}>
+            {renderErrorModal()}
+          </ModalContainer>
+      
+      
     </ScrollView>
   )
 }

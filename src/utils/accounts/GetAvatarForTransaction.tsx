@@ -25,6 +25,7 @@ import Watch from '../../assets/images/accIcons/view.svg'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import Gift from '../../assets/images/svgs/icon_gift.svg'
 import TransactionKind from '../../common/data/enums/TransactionKind'
+import useTrustedContacts from '../hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 
 const styles = StyleSheet.create( {
   image: {
@@ -36,8 +37,6 @@ const styles = StyleSheet.create( {
   }
 } )
 
-
-
 const getAvatarForSubAccount = (
   subAccount: SubAccountDescribing,
   active?: boolean,
@@ -45,6 +44,8 @@ const getAvatarForSubAccount = (
   isAccount?: boolean,
   transaction?: TransactionDescribing
 ) => {
+  const trustedContacts = useTrustedContacts()
+
   if( transaction.transactionType === TransactionKind.RECEIVE ) {
     if( transaction.sender ) {
       return <Image style={styles.image} source={require( '../../assets/images/icons/user.png' )}/>
@@ -57,10 +58,17 @@ const getAvatarForSubAccount = (
       return <Gift />
     } else {
       if( transaction.receivers.length > 1 ) {
-        return <Image style={styles.image} source={require( '../../assets/images/icons/user.png' )}/>
+
+        return <Image style={styles.image} source={
+          trustedContacts[ transaction?.receivers[ 0 ].id ].contactDetails.image ?
+            trustedContacts[ transaction?.receivers[ 0 ].id ].contactDetails.image :
+            require( '../../assets/images/icons/user.png' )}/>
       } else {
         if( transaction.receivers[ 0 ] && transaction.receivers[ 0 ].name ) {
-          return <Image style={styles.image} source={require( '../../assets/images/icons/user.png' )}/>
+          return <Image style={styles.image} source={
+            trustedContacts[ transaction?.receivers[ 0 ].id ].contactDetails.image ?
+              trustedContacts[ transaction?.receivers[ 0 ].id ].contactDetails.image :
+              require( '../../assets/images/icons/user.png' )}/>
         } else {
           return <Text style={styles.text}>@</Text>
         }

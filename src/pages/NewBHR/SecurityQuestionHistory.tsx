@@ -866,7 +866,7 @@ const SecurityQuestionHistory = ( props ) => {
             // setType( 'change' )
             // showQuestionModal( true )
           }}
-          changeButtonText={'Change'}
+          changeButtonText={''} // TODO: set to Change once change encryption password functionality is implemented
           isChangeKeeperAllow={true}
         />
       </View>

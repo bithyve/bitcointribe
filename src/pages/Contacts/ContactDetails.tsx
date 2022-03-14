@@ -840,6 +840,7 @@ class ContactDetails extends PureComponent<
   }
 
   renderContactDetailsModal = () => {
+    const createdDate = moment( this.props.trustedContacts[ this.contact.channelKey ].timestamps.created ).utc().local().format( 'DD MMMM YYYY HH:mm' )
     return (
       <View style={{
         backgroundColor: Colors.bgColor
@@ -905,6 +906,16 @@ class ContactDetails extends PureComponent<
             </Text>
             <Text style={styles.titleSubText}>
               {this.contact.walletId}
+            </Text>
+          </>
+          }
+          {createdDate &&
+          <>
+            <Text style={styles.titleText}>
+              {this.common[ 'contactCreated' ]}
+            </Text>
+            <Text style={styles.titleSubText}>
+              {createdDate}
             </Text>
           </>
           }
