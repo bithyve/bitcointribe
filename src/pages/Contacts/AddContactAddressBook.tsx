@@ -348,6 +348,8 @@ export default function AddContactAddressBook( props ) {
       contactText:strings.adding,
       showDone:true,
       skipClicked: true,
+      senderName: props?.navigation?.state?.params?.senderName,
+      note : props?.navigation?.state?.params?.note
     } )
   }
 

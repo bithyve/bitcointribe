@@ -48,7 +48,8 @@
         "manage": "Manage",
         "backup": "Backup",
         "change": "Change",
-        "save": "Save"
+        "save": "Save",
+        "contactCreated":"Contact Created"
     },
     "noInternet": {
       "no": "No Internet",
@@ -564,7 +565,7 @@
       "QuestionBackedUp": "Question Successfully Backed Up",
       "BackupHistory": "Cloud Backup",
       "historyofyourbackup": "The history of your backup will appear here",
-      "cloudBackupSuccessInfo":"You have successfully backed up your on the cloud.",
+      "cloudBackupSuccessInfo":"You have successfully backed up your wallet on the cloud.",
       "cloudBackupNotSetupInfo": "You can backup on the cloud and use the Recovery Key from the cloud when restoring.",
       "cloudBackupInAccessibleInfo": "You need to confirm your cloud connection, to ensure changes to your backup scheme.",
       "historyofyourRecovery": "The history of your Recovery Key will appear here",

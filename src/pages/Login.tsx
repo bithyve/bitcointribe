@@ -192,10 +192,10 @@ export default function Login( props ) {
         setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
-            'Your phone does not have any secure entry like Pin or Biometric',
+            'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'This may be a security risk to your funds on Hexa',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Hexa',
           )
           setElevation( 0 )
         }, 2 )

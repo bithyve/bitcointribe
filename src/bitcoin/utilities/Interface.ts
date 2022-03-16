@@ -103,9 +103,10 @@ export interface Transaction {
   address?: string
   type?: string
   // sender name
-  sender?: string
+  sender?: string,
+  senderId?: string,
   // receivers info
-  receivers?: {name: string, amount: number}[]
+  receivers?: { id?: string, name: string, amount: number}[]
   // txn tags
   tags?: string[]
   // txn notes
@@ -622,6 +623,9 @@ export interface TrustedContact {
   deepLinkConfig?: {
     encryptionType: DeepLinkEncryptionType,
     encryptionKey: string | null,
+  },
+  timestamps: {
+    created: number,
   }
 }
 export interface Trusted_Contacts {
@@ -824,10 +828,11 @@ export interface ActiveAddressAssignee{
     type: AccountType | ActiveAddressAssigneeType;
     id?: string;
     senderInfo?: {
+      id?: string
       name: string,
     };
     recipientInfo?: {
-      [txid: string]: {name: string, amount: number}[],
+      [txid: string]: {id?: string, name: string, amount: number}[],
     };
 }
 export interface ActiveAddresses {
@@ -990,7 +995,8 @@ export enum DeepLinkKind {
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
   EXISTING_CONTACT = 'EXISTING_CONTACT',
   GIFT = 'GIFT',
-  CONTACT_GIFT = 'CONTACT_GIFT'
+  CONTACT_GIFT = 'CONTACT_GIFT',
+  CAMPAIGN = 'CAMPAIGN'
 }
 
 export enum ShortLinkDomain {

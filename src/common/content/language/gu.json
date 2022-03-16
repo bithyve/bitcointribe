@@ -47,7 +47,8 @@
     "manage": "મેનેજ કરો",
     "backup": "બેકઅપ",
     "change": "બદલો",
-    "save": "સાચવો"
+    "save": "સાચવો",
+    "contactCreated":"સંપર્ક બનાવ્યો"
   },
   "noInternet": {
     "no": "ઇન્ટરનેટ વિના",
