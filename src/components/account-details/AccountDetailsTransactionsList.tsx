@@ -53,7 +53,8 @@ const AccountDetailsTransactionsList: React.FC<Props> = ( {
 
   return (
     <FlatList
-      data={transactions}
+      data={transactions.sort((a, b) => b.date.localeCompare(a.date))}
+      // data={transactions}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
     />
