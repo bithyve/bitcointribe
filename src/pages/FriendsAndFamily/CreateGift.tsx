@@ -104,7 +104,7 @@ const CreateGift = ( { navigation } ) => {
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
-  const [showErrorLoader, setShowErrorLoader] = useState(false)
+  const [ showErrorLoader, setShowErrorLoader ] = useState( false )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( amount )
@@ -164,7 +164,6 @@ const CreateGift = ( { navigation } ) => {
 
   useEffect( ()=>{
     setInitGiftCreation( false )
-    console.log(giftCreationStatus)
     setShowLoader( false )
     if( giftCreationStatus ){
       dispatch( giftCreationSuccess( null ) )
@@ -173,7 +172,7 @@ const CreateGift = ( { navigation } ) => {
       setShowLoader( false )
       setShowErrorLoader( true )
       dispatch( giftCreationSuccess( null )
-       )
+      )
     }
   }, [ giftCreationStatus ] )
 
@@ -645,7 +644,7 @@ const CreateGift = ( { navigation } ) => {
       }}>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {setShowErrorLoader(false)}}
+          onPress={() => {setShowErrorLoader( false )}}
           style={styles.modalCrossButton}
         >
           <FontAwesome name="close" color={Colors.white} size={19}/>
@@ -655,21 +654,19 @@ const CreateGift = ( { navigation } ) => {
       <View style={{
         flexDirection: 'column',
         justifyContent:'space-between'
-        
       }}>
         <Text style={{
           color: Colors.blue, fontSize: RFValue( 18 ), marginBottom: 30, fontFamily: Fonts.FiraSansRegular,
         }}>Gift Creation Unsuccessful</Text>
         <Text style={{
-          color: Colors.gray3,marginBottom: 40, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.gray3, marginBottom: 40, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
         }}>Please try again</Text>
-        <TouchableOpacity style={styles.buttonView} onPress={() => {setShowErrorLoader(false)}} >
+        <TouchableOpacity style={styles.buttonView} onPress={() => {setShowErrorLoader( false )}} >
           <Text style={styles.buttonText}>Try again</Text>
         </TouchableOpacity>
       </View>
     </View>
   }
-  
 
   const accountElement = ( item, onPressCallBack ) =>{
     return <TouchableOpacity
@@ -1181,22 +1178,20 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={()=>setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
         {renderAdvanceModal()}
       </ModalContainer>
-      
-      
-          <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
-            <LoaderModal
-              headerText={'Packing Your Gift'}
-              messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
-              messageText2={''}
-              source={require( '../../assets/images/gift.gif' )}
-            />
-          </ModalContainer> 
-        
-          <ModalContainer onBackground={() => setShowLoader( false )} visible={(showErrorLoader)}>
-            {renderErrorModal()}
-          </ModalContainer>
-      
-      
+
+      <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
+        <LoaderModal
+          headerText={'Packing Your Gift'}
+          messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
+          messageText2={''}
+          source={require( '../../assets/images/gift.gif' )}
+        />
+      </ModalContainer>
+
+      <ModalContainer onBackground={() => setShowLoader( false )} visible={( showErrorLoader )}>
+        {renderErrorModal()}
+      </ModalContainer>
+
     </ScrollView>
   )
 }
