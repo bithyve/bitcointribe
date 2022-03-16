@@ -568,7 +568,14 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => { setAcceptGiftModal( false ); closeModal(); dispatch( giftAccepted( '' ) )} }
+          onPress={() => { 
+            setAcceptGiftModal( false ); 
+            closeModal(); 
+            dispatch( giftAccepted( '' ) );
+            navigation.navigate( 'ManageGifts' );
+          } 
+
+          }
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
