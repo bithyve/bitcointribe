@@ -542,7 +542,7 @@ const GiftDetails = ( { navigation } ) => {
         {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ? (
           bottomButton( () => {
             dispatch( reclaimGift( gift.id ) )
-            navigation.goBack()
+            navigation.navigate( 'ManageGifts' )
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
