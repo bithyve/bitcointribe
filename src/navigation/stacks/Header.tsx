@@ -1357,7 +1357,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // const primarySubAccount = usePrimarySubAccountForShell( accountShellInfo )
 
     // alert(JSON.stringify(primarySubAccount));
-    const accountShell = this.props.accountShells[0];
+    const accountShell = this.props.accountShells[1];
     let transaction = accountShell.primarySubAccount.transactions.find(tx => tx.txid === notificationAdditionalInfo.txid);
     console.log("primarySubAccountShell "+ JSON.stringify(transaction));
     // alert(JSON.stringify(accountShell.primarySubAccount));
@@ -1366,7 +1366,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // console.log("reddy " +JSON.stringify(this.props.accountsState))
     this.props.navigation.navigate( 'TransactionDetails', {
       transaction,
-      // accountShellID: accountShell.id,
+      accountShellID: accountShell.id,
     } )
   }
 

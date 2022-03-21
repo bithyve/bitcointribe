@@ -52,6 +52,7 @@ import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScr
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 import QRStack from '../home/QRStack'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import LnAccountStack from '../accounts/LnAccountStack'
 import Home from '../../../pages/Home/Home'
 import Header from '../Header'
@@ -133,6 +134,12 @@ const HomeStack = createStackNavigator(
       navigationOptions: {
         title: 'Buy with Ramp'
       }
+    },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
+      navigationOptions: {
+        title: 'TransactionDetails',
+      },
     },
     // AllTransactions: {
     //   screen: AllTransactionsStack,
