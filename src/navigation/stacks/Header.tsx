@@ -54,6 +54,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import Toast from '../../components/Toast'
 import { resetToHomeAction } from '../actions/NavigationActions'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import PushNotification from 'react-native-push-notification'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
@@ -389,6 +390,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   notificationCheck = () =>{
     const { messages } = this.props
+    console.log("notificationCheck "+JSON.stringify(messages));
     if( messages && messages.length ){
       this.updateBadgeCounter()
       messages.sort( function ( left, right ) {
@@ -470,7 +472,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.FNF_REQUEST_REJECTED:
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
         case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
-        case NotificationType.CONTACT:
+        case 'contact':
         case NotificationType.SECURE_XPUB:
         case NotificationType.APPROVE_KEEPER:
         case NotificationType.UPLOAD_SEC_SHARE:
@@ -1350,6 +1352,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // } )
   }
 
+  moveToTransacation = ( notificationAdditionalInfo ) => {
+
+    // const primarySubAccount = usePrimarySubAccountForShell( accountShellInfo )
+
+    // alert(JSON.stringify(primarySubAccount));
+    const accountShell = this.props.accountShells[0];
+    let transaction = accountShell.primarySubAccount.transactions.find(tx => tx.txid === notificationAdditionalInfo.txid);
+    console.log("primarySubAccountShell "+ JSON.stringify(transaction));
+    // alert(JSON.stringify(accountShell.primarySubAccount));
+
+    // console.log("bhumika " +JSON.stringify(this.props.accountShells))
+    // console.log("reddy " +JSON.stringify(this.props.accountsState))
+    this.props.navigation.navigate( 'TransactionDetails', {
+      transaction,
+      // accountShellID: accountShell.id,
+    } )
+  }
+
   renderBottomSheetContent() {
     const { navigation } = this.props
     const { notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
@@ -1545,6 +1565,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }
                 switch ( this.state.notificationType ) {
                     case 'contact':
+                      this.moveToTransacation( notificationAdditionalInfo )
                     case NotificationType.FNF_TRANSACTION:
                       this.moveToAccount( notificationAdditionalInfo.txid )
                       break
