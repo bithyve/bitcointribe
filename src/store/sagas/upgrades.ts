@@ -8,9 +8,9 @@ import dbManager from '../../storage/realm/dbManager'
 import { addNewAccount, addNewAccountShellsWorker, generateShellFromAccount, newAccountsInfo, syncAccountsWorker } from './accounts'
 import { createWatcher } from '../utils/utilities'
 import { RECREATE_MISSING_ACCOUNTS, SWEEP_MISSING_ACCOUNTS, SYNC_MISSING_ACCOUNTS, updateSynchedMissingAccount } from '../actions/upgrades'
-import Toast from '../../components/Toast'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import Toast from '../../components/Toast'
 
 export function* testAccountEnabler( ) {
   const accountShells: AccountShell[] = yield select(
@@ -123,6 +123,7 @@ export const recreateMissingAccountsWatcher = createWatcher(
 )
 
 function* syncMissingAccounts( ) {
+  Toast( 'Syncing Missing Accounts' )
   try{
     const wallet: Wallet = yield select(
       ( state ) => state.storage.wallet
@@ -158,7 +159,7 @@ function* syncMissingAccounts( ) {
       // const accountShellsToRecreate: AccountShell[] = []
       const accountsToSweep: Accounts = {
       }
-      const accountIds = []
+
       for ( const { accountType, accountDetails, recreationInstanceNumber } of accountsToSweepInfo ){
         const account: Account | MultiSigAccount | DonationAccount = yield call(
           addNewAccount,
@@ -167,12 +168,15 @@ function* syncMissingAccounts( ) {
           },
           recreationInstanceNumber
         )
-        accountIds.push( account.id )
-        if( ( account as MultiSigAccount ).is2FA ){
-          if( ( account as MultiSigAccount ).xpubs.secondary ) accountsToSweep[ account.id ] = account
-        } else accountsToSweep[ account.id ] = account
-        // const accountShell = yield call( generateShellFromAccount, account )
-        // accountShellsToRecreate.push( accountShell )
+
+        if( account.type !== AccountType.TEST_ACCOUNT )
+        {
+          if( ( account as MultiSigAccount ).is2FA ){
+            if( ( account as MultiSigAccount ).xpubs.secondary ) accountsToSweep[ account.id ] = account
+          } else accountsToSweep[ account.id ] = account
+          // const accountShell = yield call( generateShellFromAccount, account )
+          // accountShellsToRecreate.push( accountShell )
+        }
       }
 
       const options: { hardRefresh?: boolean, syncDonationAccount?: boolean } = {
@@ -198,6 +202,7 @@ export const syncMissingAccountsWatcher = createWatcher(
 )
 
 function* sweepMissingAccounts( { payload }: {payload: {address: string, token?: number}} ) {
+  Toast( 'Sweeping missing accounts' )
   try{
     const synchedAccounts: Accounts = yield select(
       ( state ) => state.upgrades.synchedMissingAccounts
