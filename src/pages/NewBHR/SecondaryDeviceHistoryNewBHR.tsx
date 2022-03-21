@@ -44,6 +44,7 @@ import dbManager from '../../storage/realm/dbManager'
 import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
 import { translations } from '../../common/content/LocContext'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import Toast from '../../components/Toast'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -554,8 +555,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           confirmButtonText={isChange ? 'Share Now' : props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressConfirm={() => {
             if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
-              setShowQr( true )
-              createGuardian()
+              // setShowQr( true )
+              // createGuardian()
+              Toast( 'Something went wrong' )
             } else {
               setSecondaryDeviceMessageModal( true )
             }
