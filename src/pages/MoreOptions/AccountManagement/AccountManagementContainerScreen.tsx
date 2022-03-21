@@ -57,6 +57,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
   const [ debugModalVisible, setDebugModalVisible ] = useState( false )
 
+  const synchedDebugMissingAccounts = useSelector( ( state: RootStateOrAny ) => state.upgrades.synchedMissingAccounts )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
   } )
@@ -311,20 +312,34 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
   const getWalletDebugData = ( wallet: Wallet ) => {
     delete wallet.security
-    delete wallet.primaryMnemonic
-    delete wallet.primarySeed
-    delete wallet.secondaryXpub
-    delete wallet.details2FA
+    // delete wallet.primaryMnemonic
+    // delete wallet.primarySeed
+    // delete wallet.secondaryXpub
+    // delete wallet.details2FA
     delete wallet.smShare
 
     return <View style={styles.lineItem}>
       <Text style={ListStyles.listItemTitleTransaction}>
           Wallet Info
       </Text>
-      <Text  style={{
-        ...ListStyles.listItemSubtitle,
-        marginBottom: 3,
-      }}>{JSON.stringify( wallet, null, 8 )}</Text>
+
+      {Object.keys( wallet ).map( key => {
+        return (
+          <>
+            <Text  style={{
+              ...ListStyles.listItemSubtitle,
+              marginBottom: 3,
+              fontWeight: 'bold',
+            }} >{key.toUpperCase()}</Text>
+            <Text  style={{
+              ...ListStyles.listItemSubtitle,
+              marginBottom: 3,
+            }} selectable={true}>{JSON.stringify( wallet[ key ], null, 8 )}</Text>
+          </>
+        )
+      } )}
+
+
     </View>
   }
 
@@ -382,7 +397,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     const [ debugModalTaps, setDebugModalTaps ] = useState( 0 )
     const [ debugSweepAddress, setDebugSweepAddress ] = useState( '' )
     const [ debugSweepToken, setDebugSweepToken ] = useState( '' )
-    const synchedDebugMissingAccounts = useSelector( ( state: RootStateOrAny ) => state.upgrades.synchedMissingAccounts )
 
     return (
       <View style={styles.modalContainer}>
@@ -459,6 +473,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
                       } ) )
                     // dispatch( recreateAccounts() )
                   } else {
+                    setDebugModalVisible( false )
                     dispatch( syncMissingAccounts() )
                   }
                 }}></Button>
