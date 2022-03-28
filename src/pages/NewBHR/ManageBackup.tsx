@@ -683,7 +683,23 @@ export default function ManageBackup( props ) {
                 ) {
                   dispatch( generateMetaShare( selectedLevelId ) )
                 } else if( type == 'pdf' ){
-                  sendApprovalRequestToPK( )
+                  if ( currentLevel == 0 ) {
+                    const obj = {
+                      selectedKeeper: {
+                        shareType: type,
+                        name: name,
+                        reshareVersion: 0,
+                        status: 'notSetup',
+                        updatedAt: 0,
+                        shareId: selectedKeeper.shareId,
+                        data: {
+                        },
+                      },
+                    }
+                    goToHistory( obj, 'TYPE' )
+                  } else {
+                    sendApprovalRequestToPK()
+                  }
                 } else {
                   const obj = {
                     selectedKeeper: {
