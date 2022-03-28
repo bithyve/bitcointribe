@@ -83,7 +83,6 @@ function SecurityQuestion( props ) {
             </View>
             <View style={{
             }}>
-              {console.log("test securityQuestion====>", securityQuestion)}
               <TextInput
                 style={{
                   ...styles.inputBox,

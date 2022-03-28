@@ -812,7 +812,6 @@ class RestoreWithICloud extends Component<
   renderContent = () => {
     const { selectedBackup, hideShow, strings, common } = this.state
     const { navigation } = this.props
-    {console.log("walletData====>", this.state.walletsArray)}
     return (
 
       <RestoreFromICloud
@@ -846,10 +845,8 @@ class RestoreWithICloud extends Component<
           // navigation.navigate( 'WalletInitialization' )
         }}
         hideShow={this.state.hideShow}
-        
         walletsArray={this.state.walletsArray}
         onPressSelectValue={( value )=>{
-          console.log("teststts", value )
           this.setState( {
             hideShow: false
           } )
