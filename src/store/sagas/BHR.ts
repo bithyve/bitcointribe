@@ -1010,6 +1010,7 @@ function* getPDFDataWorker( { payload } ) {
       const pdfData = {
         qrData: qrData,
       }
+      console.log("Scan pdf data", pdfData)
       pdfPath = yield call(
         generatePDFKeeper,
         pdfData,

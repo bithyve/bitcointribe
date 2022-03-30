@@ -301,9 +301,9 @@ export default function ManageBackup( props ) {
       setErrorInfo( errorInfoProp )
       setShowLoader( false )
       dispatch( setLevelCompletionError( null, null, LevelStatus.PENDING ) )
-      // setTimeout( () => {
-      //   setErrorModal( true )
-      // }, 600 )
+      setTimeout( () => {
+        setErrorModal( true )
+      }, 600 )
     }
   }, [ status ] )
 
@@ -473,15 +473,21 @@ export default function ManageBackup( props ) {
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
 
-    if( ( keeperNumber==1 )&&( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) props.navigation.navigate( 'SetNewPassword', {
-      isFromManageBackup: true,
-    } )
+    if( ( keeperNumber==1 )&&( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+      if ( value.id == 1 ) {
+        props.navigation.navigate( 'SetNewPassword', {
+          isFromManageBackup: true,
+        } )
+        return
+      }
+    }
     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return
     }
     setSelectedKeeper( keeperNumber == 1 ? value.keeper1 : value.keeper2 )
     dispatch( onPressKeeper( value, keeperNumber ) )
+    onRefresh()
     setSelectedRecoveryKeyNumber( keeperNumber )
     setSelectedLevelId( value.id )
     setOnKeeperButtonClick( true )
@@ -677,7 +683,23 @@ export default function ManageBackup( props ) {
                 ) {
                   dispatch( generateMetaShare( selectedLevelId ) )
                 } else if( type == 'pdf' ){
-                  sendApprovalRequestToPK( )
+                  if ( currentLevel == 0 ) {
+                    const obj = {
+                      selectedKeeper: {
+                        shareType: type,
+                        name: name,
+                        reshareVersion: 0,
+                        status: 'notSetup',
+                        updatedAt: 0,
+                        shareId: selectedKeeper.shareId,
+                        data: {
+                        },
+                      },
+                    }
+                    goToHistory( obj, 'TYPE' )
+                  } else {
+                    sendApprovalRequestToPK()
+                  }
                 } else {
                   const obj = {
                     selectedKeeper: {

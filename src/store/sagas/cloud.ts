@@ -107,7 +107,7 @@ function* cloudWorker( { payload } ) {
         seed: shares ? '' : encryptedData,
         walletName: wallet.walletName,
         questionId: wallet.security.questionId,
-        question: wallet.security.questionId === '0' ? wallet.security.question: '',
+        question: wallet.security.questionId == '0' ? wallet.security.question: '',
         keeperData: JSON.stringify( keeperInfo ),
         bhXpub,
       }
