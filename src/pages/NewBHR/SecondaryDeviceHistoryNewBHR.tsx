@@ -47,6 +47,7 @@ import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/ac
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import QRModal from '../Accounts/QRModal'
+import Toast from '../../components/Toast'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -651,7 +652,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
           confirmButtonText={isChange ? 'Share Now' : selectedKeeper.updatedAt > 0 ? 'Confirm' : 'Share Now' }
-          onPressConfirm={initiateBackupWithDeviceFlow}
+          onPressConfirm={() => {
+            if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
+              // setShowQr( true )
+              // createGuardian()
+              Toast( 'Something went wrong' )
+            } else {
+              initiateBackupWithDeviceFlow()
+            }
+          }}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             setReshareModal( true )
