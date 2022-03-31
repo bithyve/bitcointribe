@@ -11,7 +11,13 @@ export default function useActiveAccountShells(): AccountShell[] {
     const activeAccounts = []
     accountsState.accountShells.forEach( shell => {
       if( shell?.primarySubAccount.visibility === AccountVisibility.DEFAULT ) {
-        activeAccounts.push( shell )
+        if( shell?.primarySubAccount.type === AccountType.SAVINGS_ACCOUNT ){
+          if( shell?.primarySubAccount.isUsable ){
+            activeAccounts.push( shell )
+          }
+        } else{
+          activeAccounts.push( shell )
+        }
       }
     } )
 
