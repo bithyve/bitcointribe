@@ -637,7 +637,8 @@
       "SelectContact": "Select Contact",
       "Selectcontactto": "Select contact to send a Wallet Recovery request link",
       "Sendrecoveryrequestlink": "Send a recovery request link",
-      "Requestingforrecovery": "Requesting for recovery:"
+      "Requestingforrecovery": "Requesting for recovery:",
+      "Upgrade": "Upgrade"
     },
     "iCloudErrors": {
       "36": "iCloud account is temporarily unavailable, please try after sometime.",
