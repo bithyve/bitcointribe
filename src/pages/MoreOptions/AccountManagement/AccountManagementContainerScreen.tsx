@@ -28,7 +28,9 @@ import HeaderTitle from '../../../components/HeaderTitle'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import { translations } from '../../../common/content/LocContext'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
-import { recreateAccounts } from '../../../store/actions/upgrades'
+import { recreateAccounts, syncMissingAccounts, updateSynchedMissingAccount } from '../../../store/actions/upgrades'
+import { sweepMissingAccounts } from '../../../store/actions/upgrades'
+import { TextInput } from 'react-native-paper'
 
 export type Props = {
   navigation: any;
@@ -53,8 +55,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
   const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
-  const [ debugModalTaps, setDebugModalTaps ] = useState( 0 )
   const [ debugModalVisible, setDebugModalVisible ] = useState( false )
+
+  const synchedDebugMissingAccounts = useSelector( ( state: RootStateOrAny ) => state.upgrades.synchedMissingAccounts )
 
   const [ primarySubAccount, showPrimarySubAccount ] = useState( {
   } )
@@ -131,6 +134,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       }, 1000 )
     }
     if( numberOfTabs >= 3 ){
+      // clear previous session on mount
+      dispatch( updateSynchedMissingAccount( {
+      } ) )
       setDebugModalVisible( true )
     }
   }, [ numberOfTabs ] )
@@ -306,20 +312,34 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
   const getWalletDebugData = ( wallet: Wallet ) => {
     delete wallet.security
-    delete wallet.primaryMnemonic
-    delete wallet.primarySeed
-    delete wallet.secondaryXpub
-    delete wallet.details2FA
+    // delete wallet.primaryMnemonic
+    // delete wallet.primarySeed
+    // delete wallet.secondaryXpub
+    // delete wallet.details2FA
     delete wallet.smShare
 
     return <View style={styles.lineItem}>
       <Text style={ListStyles.listItemTitleTransaction}>
           Wallet Info
       </Text>
-      <Text  style={{
-        ...ListStyles.listItemSubtitle,
-        marginBottom: 3,
-      }}>{JSON.stringify( wallet, null, 8 )}</Text>
+
+      {Object.keys( wallet ).map( key => {
+        return (
+          <>
+            <Text  style={{
+              ...ListStyles.listItemSubtitle,
+              marginBottom: 3,
+              fontWeight: 'bold',
+            }} >{key.toUpperCase()}</Text>
+            <Text  style={{
+              ...ListStyles.listItemSubtitle,
+              marginBottom: 3,
+            }} selectable={true}>{JSON.stringify( wallet[ key ], null, 8 )}</Text>
+          </>
+        )
+      } )}
+
+
     </View>
   }
 
@@ -374,6 +394,10 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }
 
   const RenderDebugModal = () => {
+    const [ debugModalTaps, setDebugModalTaps ] = useState( 0 )
+    const [ debugSweepAddress, setDebugSweepAddress ] = useState( '' )
+    const [ debugSweepToken, setDebugSweepToken ] = useState( '' )
+
     return (
       <View style={styles.modalContainer}>
         <View style={styles.crossIconContainer}>
@@ -387,12 +411,75 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             {accountShells.map( ( shell: AccountShell, index ) => {
               return getAccountDebugData( shell, index )
             } )}
-            { debugModalTaps > 4?
-              ( <Button title={'Recreate Missing Accounts'} onPress={()=> {
-                setDebugModalVisible( false )
-                dispatch( recreateAccounts() )
-              }}></Button> ): null}
           </TouchableOpacity>
+
+          { debugModalTaps > 4?
+            (
+              <>
+                {Object.keys( synchedDebugMissingAccounts ).length? (
+                  <>
+                    <TextInput
+                      style={{
+                        height: 50,
+                        // margin: 20,
+                        paddingHorizontal: 15,
+                        fontSize: RFValue( 13 ),
+                        letterSpacing: 0.26,
+                        fontFamily: Fonts.FiraSansRegular,
+                      }}
+                      placeholder={'Enter Address'}
+                      placeholderTextColor={Colors.borderColor}
+                      value={debugSweepAddress}
+                      textContentType='none'
+                      autoCompleteType='off'
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      onChangeText={( text ) => {
+                        setDebugSweepAddress( text )
+                      }}
+                    />
+
+                    <TextInput
+                      style={{
+                        height: 50,
+                        // margin: 20,
+                        paddingHorizontal: 15,
+                        fontSize: RFValue( 13 ),
+                        letterSpacing: 0.26,
+                        fontFamily: Fonts.FiraSansRegular,
+                      }}
+                      placeholder={'Enter Token'}
+                      placeholderTextColor={Colors.borderColor}
+                      value={debugSweepToken}
+                      textContentType='none'
+                      autoCompleteType='off'
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      onChangeText={( text ) => {
+                        setDebugSweepToken( text )
+                      }}
+                    />
+                  </>
+                ): null}
+                <Button title={Object.keys( synchedDebugMissingAccounts ).length? 'Sweep Missing Accounts': 'Sync Missing Accounts'} onPress={()=> {
+
+                  if( Object.keys( synchedDebugMissingAccounts ).length ){
+                    // sweep already synched accounts
+                    setDebugModalVisible( false )
+                    if( debugSweepAddress )
+                      dispatch( sweepMissingAccounts( {
+                        address: debugSweepAddress,
+                        token: parseInt( debugSweepToken )
+                      } ) )
+                    // dispatch( recreateAccounts() )
+                  } else {
+                    setDebugModalVisible( false )
+                    dispatch( syncMissingAccounts() )
+                  }
+                }}></Button>
+              </>
+            ): null}
+
         </ScrollView>
       </View>
     )
