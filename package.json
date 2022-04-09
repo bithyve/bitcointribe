@@ -91,7 +91,7 @@
     "lodash.debounce": "^4.0.8",
     "mobx": "5.15.3",
     "mobx-react": "6.1.4",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "otplib": "^12.0.1",
     "path-browserify": "0.0.0",
     "pkce-utils": "https://github.com/bithyve/pkce-utils.git",
