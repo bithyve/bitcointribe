@@ -694,6 +694,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
     if ( type == 'contact' ) {
       setChangeModal( true )
     }
+    if( type == 'cloud' ){
+      props.navigation.navigate( 'CloudBackupHistory', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
     if ( type == 'device' ) {
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
