@@ -10,7 +10,8 @@ import {
   ScrollView,
   Platform,
   FlatList,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -40,6 +41,7 @@ import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
 import ThemeList from './Theme'
 import { updateUserName } from '../../store/actions/storage'
 import Toast from '../../components/Toast'
+import DeviceInfo from 'react-native-device-info'
 
 import { translations } from '../../common/content/LocContext'
 
@@ -47,6 +49,7 @@ import RadioButton from '../../components/RadioButton'
 import Feather from 'react-native-vector-icons/Feather'
 import ModalContainer from '../../components/home/ModalContainer'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 enum AdvancedSetting {
   FNF_IDENTIFICATION = 'FNF_IDENTIFICATION',
@@ -73,7 +76,7 @@ const ADVANCEDSETTINGDATA = [
     id: '3',
     type: AdvancedSetting.LONG_OTP,
     title: 'Long OTP (Unguessable)',
-    subtitle: 'Improved secuirty against server access/hack',
+    subtitle: 'Improved security against server access/hack',
   },
   {
     id: '4',
@@ -133,15 +136,19 @@ const GiftDetails = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
-  const [ note, setNote ] = useState( 
+  const [ note, setNote ] = useState(
     navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
-    'Bitcoin is a new type of money that is not controlled by any government or company' )
+      'Bitcoin is a new type of money that is not controlled by any government or company' )
+  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.OTP )
+  const [ bottomNote, setbottomNote ] = useState(
+    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+      '' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
   const [ dropdownBoxList, setDropdownBoxList ] = useState( [] )
   const [ advanceSettingsModal, setAdvanceSettingsModal ] = useState( false )
-  const [ selectedAdvancedOption, setSelectedAdvancedOption ] = useState( AdvancedSetting.NO_2FA )
+  const [ selectedAdvancedOption, setSelectedAdvancedOption ] = useState( AdvancedSetting.SIMPLE_OTP )
   const [ FnFIdentificationModal, setFnFIdentificationModal ] = useState( false )
   const [ selectedFAndF, setSelectedFAndF ] = useState( FNF_IDENTIFICATION_TYPE.PHONE_NUMBER )
 
@@ -152,7 +159,6 @@ const GiftDetails = ( { navigation } ) => {
   const [ confirmSecretPhrase, setConfirmSecretPhrase ] = useState( '' )
   const [ confirmSecretPhraseVisibility, setconfirmSecretPhraseVisibility ] = useState( true )
   const [ secretPhraseHint, setSecretPhraseHint ] = useState( '' )
-  const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.DEFAULT )
 
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
@@ -161,11 +167,40 @@ const GiftDetails = ( { navigation } ) => {
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
+  const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
 
+  useEffect( () => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible( true )
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible( false )
+      }
+    )
+
+    return () => {
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
+  }, [] )
   useEffect( () => {
     setDropdownBoxList( ThemeList )
   }, [] )
 
+  useEffect( ()=>{
+    setbottomNote( ()=>{
+      if( encryptionType != 'DEFAULT' ){
+        return `Your friend will be prompted to enter their ${encryptionType == 'OTP' ? 'OTP' : encryptionType == 'LONG_OTP' ? 'OTP':encryptionType == 'SECRET_PHRASE' &&'secret phrase' } while accepting the gift. You can change the 2FA from advanced.`
+      }else{
+        return 'No second factor has been used. You can change the 2FA settings from Advanced.'
+      }
+    } )
+  }, [ encryptionType ] )
   useEffect( () => {
     setName( wallet.userName? wallet.userName: wallet.walletName )
   }, [ wallet.walletName, wallet.userName ] )
@@ -224,7 +259,7 @@ const GiftDetails = ( { navigation } ) => {
           break
 
         default:
-          setEncryptionType( DeepLinkEncryptionType.DEFAULT )
+          setEncryptionType( DeepLinkEncryptionType.OTP )
     }
   }
 
@@ -616,6 +651,9 @@ const GiftDetails = ( { navigation } ) => {
         height: '100%',
       }}
       keyboardShouldPersistTaps="handled"
+      style = {{
+        backgroundColor: Colors.backgroundColor
+      }}
     >
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
@@ -654,17 +692,17 @@ const GiftDetails = ( { navigation } ) => {
                 justifyContent: 'space-around',
                 alignItems: 'center',
                 borderRadius: 8,
-                backgroundColor: addfNf? Colors.lightBlue: Colors.blue,
+                backgroundColor: Colors.lightBlue
               }}
             >
               <View style={styles.settingIcon}>
-              <Setting/>
+                <Setting/>
               </View>
               <Text style={{
                 color: 'white'
               }}>{'Advanced'}</Text>
               <View style={styles.menuIcon}>
-              <Menu/>
+                <Menu/>
               </View>
             </TouchableOpacity>
           </View>
@@ -956,7 +994,7 @@ const GiftDetails = ( { navigation } ) => {
           </TouchableOpacity>
         </View>
 
-        <View
+        {!isKeyboardVisible && <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -970,8 +1008,20 @@ const GiftDetails = ( { navigation } ) => {
             <View style={styles.statusIndicatorActiveView} />
             <View style={styles.statusIndicatorInactiveView} />
           </View>
-        </View>
+        </View>}
+
+
       </SafeAreaView>
+      {!dropdownBoxOpenClose && !isKeyboardVisible && <View style={{
+        marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
+      }}>
+        <BottomInfoBox
+          title={'Note'}
+          infoText={
+            bottomNote
+          }
+        />
+      </View>}
     </ScrollView>
   )
 }
@@ -1089,7 +1139,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightTextColor,
     marginHorizontal: wp( 2 ),
     alignSelf: 'center'
-    
+
   },
   timeInfo:{
     width: '87%',

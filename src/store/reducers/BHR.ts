@@ -90,7 +90,7 @@ const initialState: {
   metaSharesKeeper: MetaShare[];
   oldMetaSharesKeeper: MetaShare[];
   errorReceiving: Boolean;
-  secondaryShareDownloaded: any;
+  secondaryShareDownloaded: MetaShare; // secondary share
   pdfInfo: {
     filePath: string;
     shareId: string;

@@ -64,6 +64,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { translations } from '../../common/content/LocContext'
+import { log } from 'console'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -500,7 +501,7 @@ class RestoreWithICloud extends Component<
         question: question[ 0 ].question,
         encryptionType: 'question'
       } )
-    } else if ( questionId === '0' ) {
+    } else if ( questionId == '0' ) {
       this.setState( {
         question: question1,
         encryptionType: 'password'
@@ -812,6 +813,7 @@ class RestoreWithICloud extends Component<
     const { selectedBackup, hideShow, strings, common } = this.state
     const { navigation } = this.props
     return (
+
       <RestoreFromICloud
         title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText={
@@ -845,7 +847,6 @@ class RestoreWithICloud extends Component<
         hideShow={this.state.hideShow}
         walletsArray={this.state.walletsArray}
         onPressSelectValue={( value )=>{
-          console.log( value )
           this.setState( {
             hideShow: false
           } )
@@ -1223,6 +1224,7 @@ class RestoreWithICloud extends Component<
         } )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
           securityQuestionModal: false
         } ) }} >
+          {console.log("teste Restore screen", this.state.question)}
           <SecurityQuestion
             question={this.state.question}
             encryptionType={this.state.encryptionType}

@@ -287,7 +287,8 @@
       "Confirmnewwalletname": "Confirmez le nouveau nom du portefeuille",
       "acrossyour": "Le nom du portefeuille sera mis à jour automatiquement pour votre réseau Amis & Famille",
       "ConfirmSecurityQuestion": "Confirmer la question de sécurité",
-      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille"
+      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille",
+      "ConfirmEncryptionPassword":"Confirmer le mot de passe de cryptage"
   },
   "header": {
       "init": "Initialisation de la sauvegarde cloud",

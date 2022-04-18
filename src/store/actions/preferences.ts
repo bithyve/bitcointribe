@@ -22,6 +22,7 @@ export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS'
 export const IS_PERMISSION_SET = 'IS_PERMISSION_SET'
 export const SET_WALLET_ID = 'SET_WALLET_ID'
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
+export const SET_CONTACT_PERMISSION_ASKED = 'SET_CONTACT_PERMISSION_ASKED'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -35,6 +36,13 @@ export const setCurrencyCode = ( data ) => {
 export interface CurrencyKindSetAction extends Action {
   type: typeof CURRENCY_KIND_SET;
   payload: CurrencyKind,
+}
+
+export const setContactPermissionAsked = ( kind: boolean ) => {
+  return {
+    type: SET_CONTACT_PERMISSION_ASKED,
+    payload: kind,
+  }
 }
 
 export const currencyKindSet = ( kind: CurrencyKind ) => {

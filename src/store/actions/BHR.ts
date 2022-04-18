@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-import { BackupStreamData, cloudDataInterface, LevelHealthInterface, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, cloudDataInterface, KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -62,7 +62,7 @@ export const SET_CHANNEL_ASSETS = 'SET_CHANNEL_ASSETS'
 export const CREATE_CHANNEL_ASSETS = 'CREATE_CHANNEL_ASSETS'
 export const APPROVAL_STATUS = 'APPROVAL_STATUS'
 export const DOWNLOAD_SM_SHARE = 'DOWNLOAD_SM_SHARE'
-export const CREATE_OR_CHANGE_GUARDIAN = 'CREATE_OR_CHANGE_GUARDIAN'
+export const CREATE_GUARDIAN = 'CREATE_GUARDIAN'
 export const DOWNLOADED_BACKUP_DATA = 'DOWNLOADED_BACKUP_DATA'
 export const DOWNLOAD_BACKUP_DATA = 'DOWNLOAD_BACKUP_DATA'
 export const SETUP_HEALTH_FOR_RESTORE = 'SETUP_HEALTH_FOR_RESTORE'
@@ -170,10 +170,10 @@ export const ErrorSending = ( isFailed ) => {
   }
 }
 
-export const updateMSharesHealth = ( shares, isNeedToUpdateCurrentLevel? ) => {
+export const updateMSharesHealth = ( shareHealth: LevelInfo, isKeeperChange?: boolean ) => {
   return {
     type: UPDATE_SHARES_HEALTH, payload: {
-      shares, isNeedToUpdateCurrentLevel
+      shareHealth, isKeeperChange
     }
   }
 }
@@ -254,7 +254,7 @@ export const isLevel3InitializedStatus = () => {
   }
 }
 
-export const updatedKeeperInfo = ( keeperData ) =>{
+export const updatedKeeperInfo = ( keeperData: KeeperInfoInterface ) =>{
   return {
     type: KEEPER_INFO, payload: {
       keeperData
@@ -262,7 +262,7 @@ export const updatedKeeperInfo = ( keeperData ) =>{
   }
 }
 
-export const putKeeperInfo = ( info ) =>{
+export const putKeeperInfo = ( info: KeeperInfoInterface[] ) =>{
   return {
     type: PUT_KEEPER_INFO, payload: {
       info
@@ -573,9 +573,9 @@ export const downloadSMShare = ( scannedData ) => {
   }
 }
 
-export const createOrChangeGuardian = ( payload: {channelKey: string, shareId: string, contact: any, index: number, isChange?: boolean, oldChannelKey?: string, existingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
+export const createGuardian = ( payload: {channelKey: string, shareId: string, contact: any, isChangeKeeper?: boolean, oldChannelKey?: string, isExistingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
   return {
-    type: CREATE_OR_CHANGE_GUARDIAN, payload: payload
+    type: CREATE_GUARDIAN, payload: payload
   }
 }
 

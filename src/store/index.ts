@@ -137,7 +137,7 @@ import {
   modifyLevelDataWatcher,
   createChannelAssetsWatcher,
   downloadSMShareWatcher,
-  createOrChangeGuardianWatcher,
+  createGuardianWatcher,
   downloadBackupDataWatcher,
   setupHealthWatcher,
   updateKeeperInfoToChannelWatcher,
@@ -184,6 +184,8 @@ import {
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import { updateUserNameWatcher } from './sagas/storage'
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2'
+import { recreateMissingAccountsWatcher, sweepMissingAccountsWatcher, syncMissingAccountsWatcher } from './sagas/upgrades'
+import upgrades from './reducers/upgrades'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -271,7 +273,7 @@ const rootSaga = function* () {
     modifyLevelDataWatcher,
     createChannelAssetsWatcher,
     downloadSMShareWatcher,
-    createOrChangeGuardianWatcher,
+    createGuardianWatcher,
     downloadBackupDataWatcher,
     setupHealthWatcher,
     updateKeeperInfoToChannelWatcher,
@@ -335,6 +337,11 @@ const rootSaga = function* () {
 
     // storage
     updateUserNameWatcher,
+
+    // upgrade scripts
+    recreateMissingAccountsWatcher,
+    syncMissingAccountsWatcher,
+    sweepMissingAccountsWatcher
   ]
 
   yield all(
@@ -371,6 +378,7 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
+  upgrades: upgrades
 } )
 
 export default function makeStore() {

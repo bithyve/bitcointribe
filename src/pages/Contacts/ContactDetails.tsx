@@ -919,6 +919,16 @@ class ContactDetails extends PureComponent<
               </Text>
             </>
           }
+          {createdDate &&
+          <>
+            <Text style={styles.titleText}>
+              {this.common[ 'contactCreated' ]}
+            </Text>
+            <Text style={styles.titleSubText}>
+              {createdDate}
+            </Text>
+          </>
+          }
         </View>
         <View style={styles.CTAView}>
           {this.contact.lastSeenActive &&

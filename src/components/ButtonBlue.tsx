@@ -17,7 +17,10 @@ const ButtonBlue: React.FC<Props> = ( {
   buttonDisable
 }: Props ) => {
   return (
-    <TouchableOpacity onPress={()=>handleButtonPress()} style={buttonDisable ? styles.disabledPrimaryActionButton : styles.primaryActionButton}>
+    <TouchableOpacity
+      onPress={()=>handleButtonPress()}
+      disabled={buttonDisable}
+      style={buttonDisable ? styles.disabledPrimaryActionButton : styles.primaryActionButton}>
       <Text style={ButtonStyles.actionButtonText}>{buttonText}</Text>
     </TouchableOpacity>
   )

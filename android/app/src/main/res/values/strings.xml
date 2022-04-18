@@ -8,6 +8,7 @@
     <string name="reciprocalKeeperPrefix">/app/RECIPROCAL_KEEPER</string>
     <string name="existingKeeperPrefix">/app/EXISTING_CONTACT</string>
     <string name="giftPrefix">/app/GIFT</string>
+    <string name="campaignPrefix">/app/CAMPAIGN</string>
     <string name="contactGiftKeeperPrefix">/app/CONTACT_GIFT</string>
     <string name="view_contact_request">View contact request</string>
     <string name="view_keeper_request">View keeper request</string>

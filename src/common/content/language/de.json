@@ -287,7 +287,8 @@
       "Confirmnewwalletname": "Neuen Wallet-Namen bestätigen",
       "acrossyour": "Der Name der Wallet wird automatisch in deinem Freundes- und Familiennetzwerk aktualisiert",
       "ConfirmSecurityQuestion": "Sicherheitsfrage bestätigen",
-      "ConfirmWalletPin": "Wallet-PIN bestätigen"
+      "ConfirmWalletPin": "Wallet-PIN bestätigen",
+      "ConfirmEncryptionPassword":"Bestätigen Sie das Verschlüsselungskennwort"
   },
   "header": {
       "init": "Cloud-Backup initialisieren",

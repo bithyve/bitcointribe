@@ -289,7 +289,8 @@
     "Confirmnewwalletname": "નવા વletલેટ નામની પુષ્ટિ કરો",
     "acrossyour": "તમારા મિત્રો અને કૌટુંબિક નેટવર્ક પર વletલેટનું નામ આપમેળે અપડેટ થઈ જશે",
     "ConfirmSecurityQuestion": "સુરક્ષા પ્રશ્નની પુષ્ટિ કરો",
-    "ConfirmWalletPin": "વletલેટ પિનની પુષ્ટિ કરો"
+    "ConfirmWalletPin": "વletલેટ પિનની પુષ્ટિ કરો",
+    "ConfirmEncryptionPassword":"એન્ક્રિપ્શન પાસવર્ડની પુષ્ટિ કરો"
   },
   "header": {
     "init": "ક્લાઉડ બેકઅપ શરૂ કરી રહ્યું છે",

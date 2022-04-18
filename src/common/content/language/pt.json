@@ -287,7 +287,8 @@
       "Confirmnewwalletname": "Confirme o novo nome da carteira",
       "acrossyour": "O nome da carteira será atualizado automaticamente em sua rede de amigos e família",
       "ConfirmSecurityQuestion": "Confirme a pergunta de segurança",
-      "ConfirmWalletPin": "Confirme o PIN da carteira"
+      "ConfirmWalletPin": "Confirme o PIN da carteira",
+      "ConfirmEncryptionPassword":"Confirmar senha de criptografia"
   },
   "header": {
       "init": "Inicializando o backup na nuvem",
