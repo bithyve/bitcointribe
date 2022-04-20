@@ -573,6 +573,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             isChangeKeeperType: true,
           } )
           break
+
+        case KeeperType.CLOUD:
+          props.navigation.navigate( 'CloudBackupHistory', {
+            ...navigationParams,
+            isChangeKeeperType: true,
+          } )
+          break
     }
   }
 

@@ -1244,6 +1244,7 @@ export const confirmPDFSharedWatcher = createWatcher(
 )
 
 function* updatedKeeperInfoWorker( { payload } ) {
+  // console.log('skk inside updatekeeperinfo', JSON.stringify(payload))
   try {
     const keeperDataToUpdate: KeeperInfoInterface  = payload.keeperData
     const storedKeeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
@@ -1269,6 +1270,8 @@ function* updatedKeeperInfoWorker( { payload } ) {
       }
     }
 
+    // console.log('skk updatedExistingKeeperInfo', JSON.stringify(updatedExistingKeeperInfo))
+    // console.log('skk keeperInfo', JSON.stringify(keeperInfo))
     if ( !updatedExistingKeeperInfo ) keeperInfo.push( keeperDataToUpdate )
     yield put( putKeeperInfo( keeperInfo ) )  // updates keeperInfo variable @bhr-reducer
   } catch ( error ) {
@@ -1556,6 +1559,7 @@ export const setHealthStatusWatcher = createWatcher(
  * @param  {} {shareId} id of the share corresponding to which channel assets needs to be generated
  */
 function* createChannelAssetsWorker( { payload } ) {
+  // console.log('skk inside createchannelassets')
   try {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     const { shareId } = payload
@@ -1693,6 +1697,10 @@ function* createGuardianWorker( { payload } ) {
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const { channelKey, shareId, contact, isChangeKeeper, oldChannelKey, isExistingContact, isPrimaryKeeper } = payload
 
+    // console.log('skk isExistingContact', JSON.stringify(isExistingContact))
+    // console.log('skk contacts', JSON.stringify(contacts))
+    // console.log('skk channelKey', JSON.stringify(channelKey))
+    // console.log('skk payload', JSON.stringify(payload))
     if( !isExistingContact ) {
       // case: creating a new F&F + Keeper
       yield call( initializeTrustedContactWorker,  {
@@ -1917,6 +1925,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
       else if( levelHealthVar[ 0 ].levelInfo.length == 4 ) currentLevel = 2
       else currentLevel = 1
     }
+    // console.log('skk keeper info', JSON.stringify(keeperInfo))
     for ( let i = 0; i < keeperInfo.length; i++ ) {
       if( keeperInfo[ i ].scheme == ShareSplitScheme.OneOfOne ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
       else if( keeperInfo[ i ].scheme == ShareSplitScheme.TwoOfThree ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
@@ -1924,7 +1933,8 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     }
     yield put( putKeeperInfo( keeperInfo ) )
     yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
-    const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState )
+    // console.log( 'skk levelData saga', levelData )
+    const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState, keeperInfo )
     yield put ( updateLevelData( levelDataUpdated, isError ) )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
   } catch ( error ) {

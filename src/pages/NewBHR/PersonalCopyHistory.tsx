@@ -528,6 +528,12 @@ const PersonalCopyHistory = ( props ) => {
       },
       index: changeIndex,
     }
+    if( type == 'cloud' ){
+      props.navigation.navigate( 'CloudBackupHistory', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,

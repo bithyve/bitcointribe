@@ -187,7 +187,7 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
   return levelHealthVar
 }
 
-export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
+export const getLevelInfoStatus = ( levelDataTemp, currentLevel, keeperInfo ) => {
   const levelData: LevelData[] = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
@@ -206,6 +206,11 @@ export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
     const displayName2 = element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.displayedName ? element.keeper2.data.displayedName : ''
     levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name ? element.keeper1.name : i == 0 && !element.keeper1.name ? 'Set Password' : ''
     levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : element.keeper2.name ? element.keeper2.name : i == 0 && !element.keeper2.name ? Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive' : ''
+
+    if( i == 0 && keeperInfo && keeperInfo.length >= 2 && keeperInfo[ 1 ].type != null && keeperInfo[ 1 ].type != '' &&
+      keeperInfo[ 1 ].type != element.keeper2.shareType ){
+      levelData[ i ].keeper2.shareType = keeperInfo[ 1 ].type
+    }
   }
   return levelData
 }
@@ -219,6 +224,7 @@ export const arrayChunks = ( arr, size ) => {
 }
 
 export const getIndex = ( levelData, type, selectedKeeper, keeperInfo ) => {
+  // console.log( 'skk 13 inside' )
   let index = 1
   let count = 0
   if ( type == 'primaryKeeper' || type == 'device' || type == 'contact' || type == 'existingContact' ) {
@@ -238,6 +244,8 @@ export const getIndex = ( levelData, type, selectedKeeper, keeperInfo ) => {
       else if ( count == 0 ) index = 1
       else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
     }
+    // console.log( 'skk 13 count', count )
+    // console.log( 'skk 13 selectedKeeper', selectedKeeper )
     if( type == 'device' || type == 'primaryKeeper' ) {
       if ( count == 0 ) index = 0
       else if ( count == 1 ) index = 3
@@ -246,5 +254,6 @@ export const getIndex = ( levelData, type, selectedKeeper, keeperInfo ) => {
     }
     if( type == 'primaryKeeper' ) index = 0
   }
+  // console.log( 'skk 13 index', index )
   return index
 }

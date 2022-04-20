@@ -7,7 +7,7 @@ import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_C
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { Accounts, KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { Accounts, KeeperInfoInterface, KeeperType, LevelHealthInterface, LevelInfo, MetaShare, ShareSplitScheme, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -123,9 +123,10 @@ function* cloudWorker( { payload } ) {
       console.log( 'response', response )
       console.log( 'timeout', timeout )
       if ( !timeout ){
-        const isCloudBackupCompleted = response
+        const isCloudBackupCompleted = response?.status
 
         if( typeof isCloudBackupCompleted === 'boolean' ) {
+          // console.log( ' skk inside ' )
           const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
           const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
           yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
@@ -154,6 +155,7 @@ function* cloudWorker( { payload } ) {
             yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
           }
         } else {
+          // console.log( ' skk inside12 ' )
           if( isCloudBackupCompleted.status ) {
             const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
@@ -176,6 +178,7 @@ function* cloudWorker( { payload } ) {
           }
         }
       } else{
+        // console.log( ' skk inside 2' )
         const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
         const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
@@ -227,7 +230,9 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 
 
 function* updateHealthForCloudWorker( { payload } ) {
+  // console.log( 'skk updateHealthForCloudWorker inside' )
   try {
+    const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const { share } = payload
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -252,8 +257,26 @@ function* updateHealthForCloudWorker( { payload } ) {
       updatedAt: moment( new Date() ).valueOf(),
       status: 'accessible',
       shareType: 'cloud',
-      name: levelHealthVar.name
+      name: levelHealthVar.name,
+      data: {
+      }
     }
+    // console.log( 'skk levelHealthVar', JSON.stringify( levelHealthVar ) )
+    // console.log( 'skk shareobj', JSON.stringify( shareObj ) )
+    const keeperInfo: KeeperInfoInterface = {
+      shareId: levelHealthVar.shareId,
+      name: levelHealthVar.name,
+      type: KeeperType.CLOUD,
+      scheme: ShareSplitScheme.TwoOfThree,
+      currentLevel: currentLevel == 0 ? 1 : currentLevel,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: null,
+      data: {
+      },
+      // channelKey: channelKeyToUse
+    }
+
+    yield put( updatedKeeperInfo( keeperInfo ) )
     yield put( updateMSharesHealth( shareObj ) )
   }
   catch ( error ) {
