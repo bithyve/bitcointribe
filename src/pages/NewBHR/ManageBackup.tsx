@@ -217,7 +217,7 @@ export default function ManageBackup( props ) {
         levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' &&
         levelHealth[ 0 ].levelInfo[ 1 ].updatedAt == 0
       ) {
-        dispatch( setCloudData() )
+        // dispatch( setCloudData() )
       }
     }
 
@@ -441,6 +441,7 @@ export default function ManageBackup( props ) {
   }
 
   const autoCloudUpload = () =>{
+    // console.log( 'skk autocloud inside' )
     if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
       if( levelHealth[ 1 ].levelInfo.length == 4 &&
         levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&

@@ -153,6 +153,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   useEffect( () => {
     if ( isChange ) {
       // setTrustedContactModal( true )
+      // console.log('skk props', JSON.stringify(props.navigation.state.params))
       props.navigation.navigate( 'FNFToKeeper', {
         ...props.navigation.state.params,
         onPressContinue
@@ -561,6 +562,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   ) => {
     const isChangeKeeper = isChange || changeKeeper
     if( shareType != KeeperType.EXISTING_CONTACT && isReshare && !isChangeKeeper && !recreateChannel ) return
+    // console.log('skk updatekeeperinfo inside')
 
     const contactDetails = chosenContact || {
     }
@@ -602,6 +604,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
       else splitScheme = ShareSplitScheme.TwoOfThree
     }
 
+    // console.log('skk channelKeyToUse', JSON.stringify(channelKeyToUse))
+    // console.log('skk shareType', JSON.stringify(shareType))
+    // console.log('skk contactDetails', JSON.stringify(contactDetails))
+
     const keeperInfo: KeeperInfoInterface = {
       shareId: selectedKeeper.shareId,
       name: contactDetails.name || contactDetails.displayedName || '',
@@ -617,6 +623,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       channelKey: channelKeyToUse
     }
 
+    // console.log('skk keeperInfo12', JSON.stringify(keeperInfo))
     dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
     dispatch( createChannelAssets( selectedKeeper.shareId ) )
   }
@@ -672,6 +679,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const onPressChangeKeeperType = ( type, name ) => {
+    // console.log('skk 12 inside')
+    // console.log('skk 12 type12', type)
+    // console.log('skk 12 name', name)
+    // console.log('skk 12 name', levelData)
+    // console.log('skk 12 name', selectedKeeper)
+    // console.log('skk 12 name', keeperInfo)
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setIsChangeClicked( false )
     setKeeperTypeModal( false )
@@ -723,6 +736,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
     setShareType( shareType )
     setTimeout( () => {
+      // console.log('skk contactinfo', JSON.stringify(getContacts(selectedContacts)))
+      // console.log('skk shareType', JSON.stringify(shareType))
       initiateGuardianCreation( {
         chosenContact: getContacts( selectedContacts ), shareType, recreateChannel
       } )
