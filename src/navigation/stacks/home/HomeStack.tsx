@@ -58,6 +58,8 @@ import Home from '../../../pages/Home/Home'
 import Header from '../Header'
 import Login from '../../../pages/Login'
 import { translations } from '../../../common/content/LocContext'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -138,7 +140,7 @@ const HomeStack = createStackNavigator(
     TransactionDetails: {
       screen: TransactionDetailsContainerScreen,
       navigationOptions: {
-        title: 'TransactionDetails',
+        title: 'Transaction Details',
       },
     },
     // AllTransactions: {
@@ -233,8 +235,13 @@ const HomeStack = createStackNavigator(
   {
     // mode: 'modal',
     initialRouteName: 'Home',
-    defaultNavigationOptions: {
-      header: null
+    defaultNavigationOptions: ( { navigation } ) => {
+      return {
+        ...defaultStackScreenNavigationOptions,
+        headerLeft: () => {
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+        },
+      }
     },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
