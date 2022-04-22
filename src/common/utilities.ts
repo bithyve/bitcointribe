@@ -224,7 +224,6 @@ export const arrayChunks = ( arr, size ) => {
 }
 
 export const getIndex = ( levelData, type, selectedKeeper, keeperInfo ) => {
-  // console.log( 'skk 13 inside' )
   let index = 1
   let count = 0
   if ( type == 'primaryKeeper' || type == 'device' || type == 'contact' || type == 'existingContact' ) {
@@ -244,8 +243,6 @@ export const getIndex = ( levelData, type, selectedKeeper, keeperInfo ) => {
       else if ( count == 0 ) index = 1
       else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
     }
-    // console.log( 'skk 13 count', count )
-    // console.log( 'skk 13 selectedKeeper', selectedKeeper )
     if( type == 'device' || type == 'primaryKeeper' ) {
       if ( count == 0 ) index = 0
       else if ( count == 1 ) index = 3
@@ -254,6 +251,5 @@ export const getIndex = ( levelData, type, selectedKeeper, keeperInfo ) => {
     }
     if( type == 'primaryKeeper' ) index = 0
   }
-  // console.log( 'skk 13 index', index )
   return index
 }

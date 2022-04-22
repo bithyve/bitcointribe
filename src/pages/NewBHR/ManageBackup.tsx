@@ -447,7 +447,6 @@ export default function ManageBackup( props ) {
   }
 
   const autoCloudUpload = () =>{
-    // console.log( 'skk autocloud inside' )
     if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
       if( levelHealth[ 1 ].levelInfo.length == 4 &&
         levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&

@@ -217,12 +217,6 @@ const CloudBackupHistory = ( props ) => {
   }, [] )
 
   const onPressChangeKeeperType = ( type, name ) => {
-    // console.log('skk 12 inside')
-    // console.log('skk 12 type12', type)
-    // console.log('skk 12 name', name)
-    // console.log('skk 12 name', levelData)
-    // console.log('skk 12 name', selectedKeeper)
-    // console.log('skk 12 name', keeperInfo)
     selectedKeeper.shareType = type
     selectedKeeper.name = name
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )

@@ -126,7 +126,6 @@ function* cloudWorker( { payload } ) {
         const isCloudBackupCompleted = response?.status
 
         if( typeof isCloudBackupCompleted === 'boolean' ) {
-          // console.log( ' skk inside ' )
           const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
           const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
           yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
@@ -155,7 +154,6 @@ function* cloudWorker( { payload } ) {
             yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
           }
         } else {
-          // console.log( ' skk inside12 ' )
           if( isCloudBackupCompleted.status ) {
             const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
@@ -178,7 +176,6 @@ function* cloudWorker( { payload } ) {
           }
         }
       } else{
-        // console.log( ' skk inside 2' )
         const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'Google Drive backup failed'
         const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
@@ -230,7 +227,6 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 
 
 function* updateHealthForCloudWorker( { payload } ) {
-  // console.log( 'skk updateHealthForCloudWorker inside' )
   try {
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const { share } = payload
@@ -261,8 +257,6 @@ function* updateHealthForCloudWorker( { payload } ) {
       data: {
       }
     }
-    // console.log( 'skk levelHealthVar', JSON.stringify( levelHealthVar ) )
-    // console.log( 'skk shareobj', JSON.stringify( shareObj ) )
     const keeperInfo: KeeperInfoInterface = {
       shareId: levelHealthVar.shareId,
       name: levelHealthVar.name,
