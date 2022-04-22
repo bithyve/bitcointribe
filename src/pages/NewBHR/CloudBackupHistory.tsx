@@ -223,8 +223,8 @@ const CloudBackupHistory = ( props ) => {
     // console.log('skk 12 name', levelData)
     // console.log('skk 12 name', selectedKeeper)
     // console.log('skk 12 name', keeperInfo)
-    // selectedKeeper.shareType = type
-    // selectedKeeper.name = name
+    selectedKeeper.shareType = type
+    selectedKeeper.name = name
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setKeeperTypeModal( false )
     const navigationParams = {

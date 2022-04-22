@@ -546,6 +546,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
+        channelKey: selectedKeeper.channelKey
       },
       index: changeIndex,
     }
@@ -660,20 +661,23 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           data={sortedHistory( secondaryDeviceHistory )}
           confirmButtonText={isChange ? 'Share Now' : selectedKeeper.updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressConfirm={() => {
-            if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
-              // setShowQr( true )
-              // createGuardian()
-              Toast( 'Something went wrong' )
-            } else {
-              initiateBackupWithDeviceFlow()
-            }
+          // Note change Flow comment out due to Change flow start on level one
+          //   if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
+          //     // setShowQr( true )
+          //     // createGuardian()
+          //     Toast( 'Something went wrong' )
+          //   } else {
+          //     initiateBackupWithDeviceFlow()
+          //   }
+            initiateBackupWithDeviceFlow()
           }}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             setReshareModal( true )
           }}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={isChange ? false : selectedKeeper.status != 'notSetup' && ( ( selectedKeeper.updatedAt == 0 && isPrimaryKeeper ) || ( selectedKeeper.updatedAt > 0 && !isPrimaryKeeper ) ) ? true : false}
+          // isChangeKeeperAllow={isChange ? false : selectedKeeper.status != 'notSetup' && ( ( selectedKeeper.updatedAt == 0 && isPrimaryKeeper ) || ( selectedKeeper.updatedAt > 0 && !isPrimaryKeeper ) ) ? true : false}
+          isChangeKeeperAllow={true}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => {
             if( isPrimaryKeeper ){
@@ -753,8 +757,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+            // note remove PDF flow for level 2 & 3
+            // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            // else 
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
         />

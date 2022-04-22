@@ -700,6 +700,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
+        channelKey: selectedKeeper.channelKey
       },
       index: changeIndex,
     }
@@ -953,8 +954,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+            // note remove PDF flow for level 2 & 3
+            // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            // else
+             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}

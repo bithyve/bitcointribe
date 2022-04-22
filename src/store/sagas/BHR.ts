@@ -1010,7 +1010,7 @@ function* getPDFDataWorker( { payload } ) {
       const pdfData = {
         qrData: qrData,
       }
-      console.log("Scan pdf data", pdfData)
+      console.log( 'Scan pdf data', pdfData )
       pdfPath = yield call(
         generatePDFKeeper,
         pdfData,
@@ -1697,11 +1697,12 @@ function* createGuardianWorker( { payload } ) {
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const { channelKey, shareId, contact, isChangeKeeper, oldChannelKey, isExistingContact, isPrimaryKeeper } = payload
 
-    // console.log('skk isExistingContact', JSON.stringify(isExistingContact))
-    // console.log('skk contacts', JSON.stringify(contacts))
-    // console.log('skk channelKey', JSON.stringify(channelKey))
-    // console.log('skk payload', JSON.stringify(payload))
+    console.log( 'skk isExistingContact', JSON.stringify( isExistingContact ) )
+    console.log( 'skk contacts', JSON.stringify( contacts ) )
+    console.log( 'skk channelKey', JSON.stringify( channelKey ) )
+    console.log( 'skk payload', JSON.stringify( payload ) )
     if( !isExistingContact ) {
+      console.log( 'skk isExistingContact', JSON.stringify( isExistingContact ) )
       // case: creating a new F&F + Keeper
       yield call( initializeTrustedContactWorker,  {
         payload: {
@@ -1813,6 +1814,7 @@ function* createGuardianWorker( { payload } ) {
     // remove details from the permanent channel w/ the previous keeper
     // and downgrade it to a vanilla F&F in case of changing keeper
     if( isChangeKeeper ) {
+      console.log( 'skk oldchannelkey', oldChannelKey )
       const contactInfo = {
         channelKey: oldChannelKey,
       }

@@ -838,6 +838,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     if( channelAssets.shareId == shareId ) delete channelAssets[ 'shareId' ]
     contactInfo.isKeeper = isKeeper
     contactInfo.channelAssets = channelAssets
+    console.log( 'skk channelAssets', JSON.stringify( channelAssets ) )
   }
 
   let testReceivingAddress, checkingReceivingAddress
@@ -850,16 +851,19 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     },
   }
 
+  console.log( 'skk contact info', JSON.stringify( contactInfo ) )
   for( const shell of accountsState.accountShells ){
     const { primarySubAccount } = shell
     if( primarySubAccount.instanceNumber === 0 ){
       const account = accounts[ primarySubAccount.id ]
       switch( primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
+            console.log( 'skk 1111' )
             testReceivingAddress = yield call( getNextFreeAddressWorker, account, assigneeInfo )
             break
 
           case AccountType.CHECKING_ACCOUNT:
+            console.log( 'skk 2222' )
             checkingReceivingAddress = yield call( getNextFreeAddressWorker, account, assigneeInfo )
             break
       }
@@ -879,6 +883,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     if( isPrimaryKeeper || isKeeper ) relationType = TrustedContactRelationTypes.WARD
   }
 
+  console.log( 'skk 3333' )
   // prepare gift data
   let giftDeepLink
   if( giftId && flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT ){
@@ -902,6 +907,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     } ) )
     giftDeepLink = deepLink
   }
+  console.log( 'skk 4444' )
 
   // prepare primary data
   const primaryData: PrimaryStreamData = {
@@ -930,7 +936,9 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
   let backupData: BackupStreamData
   let updateWI_2FA: boolean
   const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
+  console.log( 'skk secondarydata outside' )
   if( flowKind === InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT && contactInfo.isKeeper && channelAssets ){
+    console.log( 'skk secondarydata', JSON.stringify( secondaryData ) )
     const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard } = channelAssets
     backupData = {
       primaryMnemonicShard,
@@ -973,6 +981,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
   const channelUpdate =  {
     contactInfo, streamUpdates
   }
+  console.log( 'skk syncPermanentChannelsWorker' )
   yield call( syncPermanentChannelsWorker, {
     payload: {
       permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
@@ -983,6 +992,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     }
   } )
 
+  console.log( 'skk APPROVE_TRUSTED_CONTACT' )
   if( flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
     yield delay( 1000 ) // delaying to make sure the primary ward's instream is updated in the reducer
     const contacts: Trusted_Contacts = yield select(
@@ -992,6 +1002,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     const instreamId = approvedContact.streamId
     const instream: UnecryptedStreamData = idx( approvedContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
 
+    console.log( 'skk giftDeepLink' )
     if( instream.primaryData?.giftDeepLink ){
       // process incoming gift
       console.log( 'link', instream.primaryData.giftDeepLink )
@@ -1011,6 +1022,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
       yield put( fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey ) )
     }
 
+    console.log( 'skk last' )
     if( isPrimaryKeeper && contactsSecondaryChannelKey ){
       // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
       const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )

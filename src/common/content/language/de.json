@@ -296,7 +296,9 @@
       "l1": "Cloud-Backup der Stufe 1 ist abgeschlossen",
       "l2": "Level 2 Double Backup ist abgeschlossen",
       "l3": "Level 3 Multi-Key-Backup ist abgeschlossen",
-      "wallet": "Wallet"
+      "wallet": "Wallet",
+      "backupIsCompleted":"back-up is voltooid",
+      "Level 1": "Level 1"
   },
   "stackTitle": {
       "AccountSettings": "Kontoeinstellungen",

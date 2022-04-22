@@ -296,7 +296,9 @@
       "l1": "La copia de seguridad en la nube de nivel 1 está completa",
       "l2": "La copia de seguridad doble de nivel 2 está completa",
       "l3": "La copia de seguridad multin clave de nivel 3 está completa",
-      "wallet": "Billetera"
+      "wallet": "Billetera",
+      "backupIsCompleted": "sekurkopio estas finita",
+      "Level 1": "Nivel 1"
   },
   "stackTitle": {
       "AccountSettings": "Configuraciones de la cuenta",

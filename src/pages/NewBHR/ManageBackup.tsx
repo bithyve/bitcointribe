@@ -160,7 +160,7 @@ export default function ManageBackup( props ) {
 
   const init = async () => {
     await onRefresh()
-    dispatch( modifyLevelData() )
+    // dispatch( modifyLevelData() )
   }
 
   const updateAddressBook = async () => {
@@ -442,8 +442,8 @@ export default function ManageBackup( props ) {
       } )
     }
     dispatch( modifyLevelData() )
-    dispatch( setHealthStatus() )
-    autoCloudUpload()
+    // dispatch( setHealthStatus() )
+    // autoCloudUpload()
   }
 
   const autoCloudUpload = () =>{
@@ -604,7 +604,7 @@ export default function ManageBackup( props ) {
         case 'primaryKeeper' :
           if ( status == 'accessible' )
             return require( '../../assets/images/icons/icon_ipad_blue.png' )
-          else return Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
+          else return Platform.OS == 'ios' ? require( '../../assets/images/icons/icon_secondarydevice.png' ) : require( '../../assets/images/icons/icon_secondarydevice.png' )
         case 'contact' :
         case 'existingContact' :
           if ( updatedAt != 0 ) {
@@ -614,13 +614,13 @@ export default function ManageBackup( props ) {
               }
             } else return require( '../../assets/images/icons/icon_user.png' )
           }
-          return Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
+          return Platform.OS == 'ios' ? require( '../../assets/images/icons/icon_contact.png' ) : require( '../../assets/images/icons/icon_contact.png' )
         case 'pdf' :
           if ( status == 'accessible' )
             if ( valueStatus == 'notSetup' )
               return require( '../../assets/images/icons/doc-blue.png' )
             else return require( '../../assets/images/icons/doc.png' )
-          else Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
+          else Platform.OS == 'ios' ? require( '../../assets/images/icons/files-and-folders-2.png' ) : require( '../../assets/images/icons/files-and-folders-2.png' )
         default:
           if ( index == 0 )
             return require( '../../assets/images/icons/icon_password.png' )
