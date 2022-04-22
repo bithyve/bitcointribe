@@ -94,7 +94,7 @@ const CloudBackupHistory = ( props ) => {
   }, [] )
 
   useEffect( () =>{
-    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) props.navigation.goBack()
+    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) props.navigation.popToTop()
   }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
@@ -217,6 +217,8 @@ const CloudBackupHistory = ( props ) => {
   }, [] )
 
   const onPressChangeKeeperType = ( type, name ) => {
+    selectedKeeper.shareType = type
+    selectedKeeper.name = name
     const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
     setKeeperTypeModal( false )
     const navigationParams = {
@@ -231,10 +233,12 @@ const CloudBackupHistory = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
+        channelKey: selectedKeeper.channelKey
       },
       index: changeIndex,
     }
     if ( type == 'contact' ) {
+      props.navigation.goBack()
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         isChangeKeeperType: true,

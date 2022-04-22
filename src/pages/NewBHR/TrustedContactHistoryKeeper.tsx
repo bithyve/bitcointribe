@@ -561,7 +561,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   ) => {
     const isChangeKeeper = isChange || changeKeeper
     if( shareType != KeeperType.EXISTING_CONTACT && isReshare && !isChangeKeeper && !recreateChannel ) return
-
     const contactDetails = chosenContact || {
     }
     setChosenContact( contactDetails )
@@ -601,7 +600,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       if( currentLevel == 0 ) splitScheme = ShareSplitScheme.OneOfOne
       else splitScheme = ShareSplitScheme.TwoOfThree
     }
-
     const keeperInfo: KeeperInfoInterface = {
       shareId: selectedKeeper.shareId,
       name: contactDetails.name || contactDetails.displayedName || '',
@@ -616,7 +614,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       },
       channelKey: channelKeyToUse
     }
-
     dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
     dispatch( createChannelAssets( selectedKeeper.shareId ) )
   }
@@ -687,12 +684,19 @@ const TrustedContactHistoryKeeper = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
+        channelKey: selectedKeeper.channelKey
       },
       index: changeIndex,
     }
 
     if ( type == 'contact' ) {
       setChangeModal( true )
+    }
+    if( type == 'cloud' ){
+      props.navigation.navigate( 'CloudBackupHistory', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
     }
     if ( type == 'device' ) {
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
@@ -932,8 +936,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+            // note remove PDF flow for level 2 & 3
+            // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            // else
+             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}

@@ -902,7 +902,6 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     } ) )
     giftDeepLink = deepLink
   }
-
   // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
@@ -991,7 +990,6 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     const approvedContact = contacts[ channelKey ]
     const instreamId = approvedContact.streamId
     const instream: UnecryptedStreamData = idx( approvedContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
-
     if( instream.primaryData?.giftDeepLink ){
       // process incoming gift
       console.log( 'link', instream.primaryData.giftDeepLink )
@@ -1010,7 +1008,6 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
 
       yield put( fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey ) )
     }
-
     if( isPrimaryKeeper && contactsSecondaryChannelKey ){
       // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
       const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )

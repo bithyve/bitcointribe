@@ -1010,7 +1010,7 @@ function* getPDFDataWorker( { payload } ) {
       const pdfData = {
         qrData: qrData,
       }
-      console.log("Scan pdf data", pdfData)
+      console.log( 'Scan pdf data', pdfData )
       pdfPath = yield call(
         generatePDFKeeper,
         pdfData,
@@ -1268,7 +1268,6 @@ function* updatedKeeperInfoWorker( { payload } ) {
         break
       }
     }
-
     if ( !updatedExistingKeeperInfo ) keeperInfo.push( keeperDataToUpdate )
     yield put( putKeeperInfo( keeperInfo ) )  // updates keeperInfo variable @bhr-reducer
   } catch ( error ) {
@@ -1692,7 +1691,6 @@ function* createGuardianWorker( { payload } ) {
     const channelAssets: ChannelAssets = yield select( ( state ) => state.bhr.channelAssets )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const { channelKey, shareId, contact, isChangeKeeper, oldChannelKey, isExistingContact, isPrimaryKeeper } = payload
-
     if( !isExistingContact ) {
       // case: creating a new F&F + Keeper
       yield call( initializeTrustedContactWorker,  {
@@ -1924,7 +1922,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     }
     yield put( putKeeperInfo( keeperInfo ) )
     yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
-    const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState )
+    const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState, keeperInfo )
     yield put ( updateLevelData( levelDataUpdated, isError ) )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
   } catch ( error ) {

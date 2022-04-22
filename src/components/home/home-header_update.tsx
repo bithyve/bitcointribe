@@ -190,6 +190,8 @@ const HomeHeader = ( {
       }
     }
     if( levelData ){
+      console.log( 'leveldata', JSON.stringify( levelData ) )
+      let messageOneName = ''
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
         if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
@@ -202,12 +204,20 @@ const HomeHeader = ( {
             isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: strings.needAttention, isError: true
           }
         }
+        if( element.keeper2.status == 'accessible' ){
+          messageOneName = element.keeper2.name
+        }
       }
       if( currentLevel == 0 ){
         return {
           isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
         }
       } else if( currentLevel === 1 ){
+        if( messageOneName ) {
+          return {
+            isFirstMessageBold: false, messageOne: strings.Level1+` ${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
+          }
+        }
         return {
           isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
         }

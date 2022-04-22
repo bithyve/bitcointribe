@@ -296,7 +296,9 @@
       "l1": "La sauvegarde cloud de niveau 1 est terminée",
       "l2": "La double sauvegarde de niveau 2 est terminée",
       "l3": "La sauvegarde multi-clés de niveau 3 est terminée",
-      "wallet": "Portefeuille"
+      "wallet": "Portefeuille",
+      "backupIsCompleted": "la sauvegarde est terminée",
+      "Level 1": "Niveau 1"
   },
   "stackTitle": {
       "AccountSettings": "Paramètres du compte",
