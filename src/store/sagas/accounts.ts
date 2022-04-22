@@ -1047,6 +1047,8 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
+  youtubeURL: string,
+  imageURL: any,
   node?: LNNode
 }
 export interface newAccountsInfo {
