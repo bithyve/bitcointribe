@@ -350,6 +350,8 @@ PODS:
     - React-Core
   - react-native-image-picker (4.7.3):
     - React-Core
+  - react-native-image-picker (4.7.3):
+    - React-Core
   - react-native-in-app-utils (6.1.0):
     - React
   - react-native-mail (6.1.1):
@@ -439,6 +441,7 @@ PODS:
   - rn-fetch-blob (0.12.0):
     - React-Core
   - RNCAsyncStorage (1.16.1):
+  - RNCAsyncStorage (1.15.9):
     - React-Core
   - RNCClipboard (1.8.5):
     - React-Core
@@ -906,6 +909,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 80653f25c55d9e6d79d6a0a65589fa213feaee11
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
 
-PODFILE CHECKSUM: c98886d7e364f1f4a7318f4d6fdc05272f2195e2
+PODFILE CHECKSUM: 5f0d9fcdc8824a21e2c22482263b7bad68ebd692
 
 COCOAPODS: 1.11.2
