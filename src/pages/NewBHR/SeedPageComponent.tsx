@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import { useSelector, RootStateOrAny } from 'react-redux'
 import {
   View,
   Text,
@@ -15,44 +16,21 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 const SeedPageComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
-
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const SelectOption = ( Id ) => {
   }
 
-  const seedData = [
-    {
-      id: 1,
-      name:'longing'
-    },
-    {
-      id: 1,
-      name:'rusted'
-    },
-    {
-      id: 1,
-      name:'seventeen'
-    },
-    {
-      id: 1,
-      name:'daybreak'
-    },
-    {
-      id: 1,
-      name:'furnance'
-    },
-    {
-      id: 1,
-      name:'nine'
-    },
-    {
-      id: 1,
-      name:'longing'
-    },
-  ]
+  const seed = wallet.primaryMnemonic.split( ' ' )
+  const seedData = seed.map( ( word, index ) => {
+    return {
+      word, index
+    }
+  } )
 
   const getFormattedNumber =  ( number ) => {
     if( number < 10 ) return '0'+number
@@ -84,7 +62,7 @@ const SeedPageComponent = ( props ) => {
                       <Text style={styles.numberText}>{getFormattedNumber( index + 1 )}</Text>
                     </View>
                   </View>
-                  <Text style={styles.nameText}>{value.name}</Text>
+                  <Text style={styles.nameText}>{value.word}</Text>
                 </TouchableOpacity>
               )
             } )}

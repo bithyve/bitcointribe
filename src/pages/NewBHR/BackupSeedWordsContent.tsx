@@ -11,10 +11,16 @@ import SeedHeaderComponent from './SeedHeaderComponent'
 import SeedPageComponent from './SeedPageComponent'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import { useDispatch } from 'react-redux'
+import { KeeperInfoInterface, KeeperType, ShareSplitScheme } from '../../bitcoin/utilities/Interface'
+import { generateRandomString } from '../../common/CommonFunctions'
+import moment from 'moment'
+import { updatedKeeperInfo } from '../../store/actions/BHR'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const dispatch = useDispatch()
 
   return (
     <View style={{
@@ -29,7 +35,7 @@ const BackupSeedWordsContent = ( props ) => {
       <SeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={'Backup Seed Words'}
-        moreInfo={'Note down the words 1 to 6'}
+        moreInfo={'Note down the words 1 to 24'}
       />
       <View style={{
         flex: 1
@@ -59,6 +65,19 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             setConfirmSeedWordModal( false )
             setSeedWordModal( true )
+
+            const keeperInfo: KeeperInfoInterface = {
+              shareId: generateRandomString( 8 ),
+              name: 'Seed',
+              type: KeeperType.SEED,
+              scheme: ShareSplitScheme.OneOfOne,
+              currentLevel: 0,
+              createdAt: moment( new Date() ).valueOf(),
+              sharePosition: null,
+              data: {
+              }
+            }
+            dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
           }}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}
