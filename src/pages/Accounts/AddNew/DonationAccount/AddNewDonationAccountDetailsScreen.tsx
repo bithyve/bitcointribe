@@ -246,7 +246,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
               onChangeText={setAccountDescription}
             />
           </View>
-          <View style={styles.checkTwoFAuthView}>
+          {/* <View style={styles.checkTwoFAuthView}>
             <Icon
               name={"checkmark-circle"}
               color={isTFAEnabled ? Colors.darkBlue : Colors.textColorGrey}
@@ -256,7 +256,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
             <Text style={styles.checkTwoFAuthText}>
               Enable two factor authentication
             </Text>
-          </View>
+          </View> */}
           <View style={{ flexDirection: "row", marginVertical: 10 }}>
             <Text style={styles.agreeTermsText}>
               By clicking proceed you agree to our
