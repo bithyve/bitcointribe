@@ -2350,13 +2350,13 @@ export const setupPasswordWatcher = createWatcher(
 )
 
 
-function* updateSeedHealthWorker( { payload } ) {
+function* updateSeedHealthWorker( ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-  const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
 
   const currentTS = moment( new Date() ).valueOf()
+  const randomIdForSeed = generateRandomString( 8 )
   const keeperInfo: KeeperInfoInterface = {
-    shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
+    shareId: randomIdForSeed,
     name: 'Seed',
     type: KeeperType.SEED,
     scheme: ShareSplitScheme.OneOfOne,
@@ -2370,8 +2370,8 @@ function* updateSeedHealthWorker( { payload } ) {
 
   const shareObj = {
     walletId: wallet.walletId,
-    shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
-    reshareVersion: levelHealth[ 0 ].levelInfo[ 0 ].reshareVersion,
+    shareId: randomIdForSeed,
+    reshareVersion: 0,
     updatedAt: currentTS,
     status: 'accessible',
     shareType: KeeperType.SEED,
@@ -2379,6 +2379,11 @@ function* updateSeedHealthWorker( { payload } ) {
   }
   yield put( updateMSharesHealth( shareObj, true ) )
 
+  const levelInfo = [ shareObj ]
+  yield put( updateHealth( [ {
+    level: 1,
+    levelInfo: levelInfo,
+  } ], 0, '' ) )
 }
 
 export const updateSeedHealthWatcher = createWatcher(
