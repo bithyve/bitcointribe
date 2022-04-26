@@ -241,12 +241,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
       setPswdError( 'Password mismatch' )
-    } else if (
-      validateAllowedCharacters( pswd ) == false ||
-      validateAllowedCharacters( tempPswd ) == false
-    ) {
-      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
-    } else {
+    }else {
       // setTimeout( () => {
       //   setPswdError( '' )
       // }, 2 )
@@ -278,11 +273,6 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
 
       if ( pswd && confirmPswd && confirmPswd != pswd ) {
         setPswdError( 'Password mismatch' )
-      } else if (
-        validateAllowedCharacters( pswd ) == false ||
-        validateAllowedCharacters( confirmPswd ) == false
-      ) {
-        setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
       }
     }
   }, [ confirmPswd ] )
@@ -827,8 +817,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           </View>
           {(
             pswd === tempPswd &&
-              pswd.length!=0 && tempPswd.length!=0 &&
-            pswdError.length === 0
+            passwordScore >= 2
           ) ? <View style={{
               ...styles.bottomButtonView,
             }}>

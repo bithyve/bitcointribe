@@ -861,7 +861,6 @@ export interface Wallet {
   walletName: string,
   userName?: string,
   security: { questionId: string, question: string, answer: string },
-  newBie:boolean,
   primaryMnemonic: string,
   primarySeed: string,
   secondaryXpub?: string,
