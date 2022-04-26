@@ -12,10 +12,7 @@ import SeedPageComponent from './SeedPageComponent'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import { useDispatch } from 'react-redux'
-import { KeeperInfoInterface, KeeperType, ShareSplitScheme } from '../../bitcoin/utilities/Interface'
-import { generateRandomString } from '../../common/CommonFunctions'
-import moment from 'moment'
-import { updatedKeeperInfo } from '../../store/actions/BHR'
+import { updateSeedHealth } from '../../store/actions/BHR'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -65,19 +62,8 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             setConfirmSeedWordModal( false )
             setSeedWordModal( true )
+            dispatch( updateSeedHealth() )
 
-            const keeperInfo: KeeperInfoInterface = {
-              shareId: generateRandomString( 8 ),
-              name: 'Seed',
-              type: KeeperType.SEED,
-              scheme: ShareSplitScheme.OneOfOne,
-              currentLevel: 0,
-              createdAt: moment( new Date() ).valueOf(),
-              sharePosition: null,
-              data: {
-              }
-            }
-            dispatch( updatedKeeperInfo( keeperInfo ) ) // updates keeper-info in the reducer
           }}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}

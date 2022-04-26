@@ -190,7 +190,6 @@ const HomeHeader = ( {
       }
     }
     if( levelData ){
-      console.log( 'leveldata', JSON.stringify( levelData ) )
       let messageOneName = ''
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
