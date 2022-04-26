@@ -154,7 +154,8 @@ import {
   upgradePDFWorkerWatcher,
   upgradeLevelOneKeeperWatcher,
   resetLevelAfterPasswordChangeWatcher,
-  changeEncPasswordWatcher
+  changeEncPasswordWatcher,
+  updateSeedHealthWatcher
 } from './sagas/BHR'
 
 import {
@@ -290,6 +291,7 @@ const rootSaga = function* () {
     changeQuestionAnswerWatcher,
     upgradePDFWorkerWatcher,
     upgradeLevelOneKeeperWatcher,
+    updateSeedHealthWatcher,
 
     resetLevelAfterPasswordChangeWatcher,
     changeEncPasswordWatcher,

@@ -742,7 +742,8 @@ export enum KeeperType {
   EXISTING_CONTACT = 'existingContact',
   PDF = 'pdf',
   SECURITY_QUESTION = 'securityQuestion',
-  CLOUD = 'cloud'
+  CLOUD = 'cloud',
+  SEED = 'seed',
 }
 
 export interface KeeperInfoInterface {

@@ -39,14 +39,15 @@ function* cloudWorker( { payload } ) {
       const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
-      console.log( 'CLOUD CALL PAYLOAD', payload )
+
       const index: number = MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== null || MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== undefined ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
       const RK: MetaShare = index != null && MetaShares.length ? MetaShares[ index ] : null
+
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
-        type: share ? share.shareType : 'cloud',
-        scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : '1of1',
+        type: share ? ( share.shareType as KeeperType ) : KeeperType.CLOUD,
+        scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : ShareSplitScheme.OneOfOne,
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: index != null ? index : -1,
@@ -77,7 +78,6 @@ function* cloudWorker( { payload } ) {
       const restoreVersions = yield select(
         ( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) ) )
 
-      // Create Updated Wallet Image
       const shares = RK ? JSON.stringify( RK ) : ''
       let encryptedCloudDataJson
 
@@ -98,13 +98,17 @@ function* cloudWorker( { payload } ) {
       )
       // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-      const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+      let encryptedSeed = ''
+      if( !shares ){
+        const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+        encryptedSeed = encryptedData
+      }
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
         secondaryShare: wallet.smShare ? wallet.smShare : '',
         encryptedCloudDataJson: encryptedCloudDataJson,
-        seed: shares ? '' : encryptedData,
+        seed: encryptedSeed,
         walletName: wallet.walletName,
         questionId: wallet.security.questionId,
         question: wallet.security.questionId == '0' ? wallet.security.question: '',
@@ -330,7 +334,6 @@ function* checkCloudBackupWorker ( { payload } ) {
     const { data, share } = payload
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      console.log( 'backedJson checkCloudBackupWorker', backedJson )
       const json = backedJson ? JSON.parse( backedJson ) : null
       if( backedJson && json && json.status ){
         return json
@@ -363,7 +366,6 @@ function* checkCloudBackupWorker ( { payload } ) {
           share, data
         }
       } )
-      console.log( 'isDataBackedUp', isDataBackedUp )
       if( isDataBackedUp === 'successFullyUpdate' || isDataBackedUp === 'successFullyUpload' ){
         return true
       } else{
