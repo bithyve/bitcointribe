@@ -13,6 +13,7 @@ import { translations } from '../../../common/content/LocContext'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -73,6 +74,13 @@ const AddNewAccountStack = createStackNavigator(
       navigationOptions: {
         header: null
       }
+    },
+
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
+      navigationOptions: {
+        title: 'TransactionDetails',
+      },
     },
 
     ScanNodeConfig: {

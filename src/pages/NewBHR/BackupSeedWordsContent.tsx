@@ -11,10 +11,13 @@ import SeedHeaderComponent from './SeedHeaderComponent'
 import SeedPageComponent from './SeedPageComponent'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import { useDispatch } from 'react-redux'
+import { updateSeedHealth } from '../../store/actions/BHR'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const dispatch = useDispatch()
 
   return (
     <View style={{
@@ -29,7 +32,7 @@ const BackupSeedWordsContent = ( props ) => {
       <SeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={'Backup Seed Words'}
-        moreInfo={'Note down the words 1 to 6'}
+        moreInfo={'Note down the words 1 to 24'}
       />
       <View style={{
         flex: 1
@@ -59,6 +62,8 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             setConfirmSeedWordModal( false )
             setSeedWordModal( true )
+            dispatch( updateSeedHealth() )
+
           }}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}

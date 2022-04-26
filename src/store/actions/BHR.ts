@@ -70,6 +70,7 @@ export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
 export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
 export const SETUP_PASSWORD = 'SETUP_PASSWORD'
+export const UPDATE_SEED_HEALTH =  'UPDATE_SEED_HEALTH'
 export const SETUP_LEVEL_HEALTH = 'SETUP_LEVEL_HEALTH'
 export const GENERATE_LEVEL1_SHARES = 'GENERATE_LEVEL1_SHARES'
 export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
@@ -631,6 +632,12 @@ export const setupPassword = ( security ) => {
     type: SETUP_PASSWORD, payload:{
       security
     }
+  }
+}
+
+export const updateSeedHealth = ( ) => {
+  return {
+    type: UPDATE_SEED_HEALTH
   }
 }
 

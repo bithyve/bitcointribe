@@ -17,8 +17,8 @@ export default function BackupTypeModalContent( props ) {
   const [ selectedBackupType, setSelectedBackupType ] = useState( 0 )
   const backupData = [
     {
-      name: 'Security Question',
-      info: 'Lorem Ipsum text asdf asdf',
+      name: 'Google Drive/iCloud',
+      info: 'Backup the Recovery Key on cloud',
       image: require( '../../assets/images/icons/icon_password.png' ),
     },
     {

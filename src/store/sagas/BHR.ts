@@ -79,6 +79,7 @@ import {
   UPGRADE_LEVEL1_KEEPER,
   RESET_LEVEL_AFTER_PASSWORD_CHANGE,
   CHANGE_ENC_PASSWORD,
+  UPDATE_SEED_HEALTH,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -2346,6 +2347,48 @@ function* setupPasswordWorker( { payload } ) {
 export const setupPasswordWatcher = createWatcher(
   setupPasswordWorker,
   SETUP_PASSWORD
+)
+
+
+function* updateSeedHealthWorker( ) {
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+
+  const currentTS = moment( new Date() ).valueOf()
+  const randomIdForSeed = generateRandomString( 8 )
+  const keeperInfo: KeeperInfoInterface = {
+    shareId: randomIdForSeed,
+    name: 'Seed',
+    type: KeeperType.SEED,
+    scheme: ShareSplitScheme.OneOfOne,
+    currentLevel: 0,
+    createdAt: currentTS,
+    sharePosition: null,
+    data: {
+    }
+  }
+  yield put( updatedKeeperInfo( keeperInfo ) )
+
+  const shareObj = {
+    walletId: wallet.walletId,
+    shareId: randomIdForSeed,
+    reshareVersion: 0,
+    updatedAt: currentTS,
+    status: 'accessible',
+    shareType: KeeperType.SEED,
+    name: 'Seed'
+  }
+  yield put( updateMSharesHealth( shareObj, true ) )
+
+  const levelInfo = [ shareObj ]
+  yield put( updateHealth( [ {
+    level: 1,
+    levelInfo: levelInfo,
+  } ], 0, '' ) )
+}
+
+export const updateSeedHealthWatcher = createWatcher(
+  updateSeedHealthWorker,
+  UPDATE_SEED_HEALTH
 )
 
 function* setupLevelHealthWorker( { payload } ) {
