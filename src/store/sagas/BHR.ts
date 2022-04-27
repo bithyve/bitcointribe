@@ -80,6 +80,8 @@ import {
   RESET_LEVEL_AFTER_PASSWORD_CHANGE,
   CHANGE_ENC_PASSWORD,
   UPDATE_SEED_HEALTH,
+  RECOVER_WALLET_WITH_SEED,
+  RECOVER_WALLET_WITH_MNEMONIC,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -536,6 +538,35 @@ export const recoverWalletWithoutIcloudWatcher = createWatcher(
   RECOVER_WALLET_WITHOUT_ICLOUD
 )
 
+function* recoverWalletWithMnemonicWorker( { payload } ) {
+  try {
+    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    const { primaryMnemonic }: { primaryMnemonic: string } = payload
+    // const isValidMnemonic = bip39.validateMnemonic( primaryMnemonic )
+    // if( !isValidMnemonic ) throw new Error( 'Invalid mnemonic' )
+
+    yield call( recoverWalletWorker, {
+      payload: {
+        primaryMnemonic, isWithoutCloud: true
+      }
+    } )
+    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+  } catch ( err ) {
+    yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    console.log( {
+      err: err.message
+    } )
+    yield put( walletRecoveryFailed( true ) )
+    // Alert.alert('Wallet recovery failed!', err.message);
+  }
+  yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+}
+
+export const recoverWalletWithMnemonicWatcher = createWatcher(
+  recoverWalletWithMnemonicWorker,
+  RECOVER_WALLET_WITH_MNEMONIC
+)
+
 function* recoverWalletWorker( { payload } ) {
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   let { level, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics, shares, isWithoutCloud }: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
@@ -544,29 +575,39 @@ function* recoverWalletWorker( { payload } ) {
     secondaryData?: SecondaryStreamData;
   }[], isWithoutCloud?: boolean } = payload
   try {
-    if( shares && !isWithoutCloud ){
-      const pmShares = []
-      const smShares = []
-      for ( let i = 0; i < shares.length; i++ ) {
-        const element = shares[ i ]
-        pmShares.push( element.backupData.primaryMnemonicShard.encryptedShare.pmShare )
-        if( element.secondaryData && element.secondaryData.secondaryMnemonicShard ) smShares.push( element.secondaryData.secondaryMnemonicShard )
-      }
-      secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
-      primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
-    }
+
     if( !isWithoutCloud ) {
-      const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
-      if( getWI.status == 200 ) {
-        image = getWI.data.walletImage
+      if( shares ){
+        const pmShares = []
+        const smShares = []
+        for ( let i = 0; i < shares.length; i++ ) {
+          const element = shares[ i ]
+          pmShares.push( element.backupData.primaryMnemonicShard.encryptedShare.pmShare )
+          if( element.secondaryData && element.secondaryData.secondaryMnemonicShard ) smShares.push( element.secondaryData.secondaryMnemonicShard )
+        }
+        secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
+        primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
+      }
+
+      if( !primaryMnemonic ) throw new Error( 'Failed to generate primary mnemonic' )
+
+      if( !image ){
+        const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+        if( getWI.status == 200 ) {
+          image = idx( getWI, _ => _.data.walletImage )
+          if( !image ) throw new Error( 'External mnemonic, wallet image not found' )
+        }
       }
     }
+
+
     const accounts = image.accounts
     const acc: Account[] = []
     const accountData = {
     }
 
-    const decryptionKey = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
+    const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
+    const decryptionKey = primarySeed
     Object.keys( accounts ).forEach( ( key ) => {
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
       const account: Account | MultiSigAccount = JSON.parse( decryptedData )
@@ -612,7 +653,7 @@ function* recoverWalletWorker( { payload } ) {
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: appVersion,
-      primarySeed: bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
+      primarySeed,
       secondaryXpub,
       details2FA,
       smShare
