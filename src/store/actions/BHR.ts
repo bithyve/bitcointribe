@@ -791,7 +791,7 @@ export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
   }
 }
 
-export const rescoverWalletWithMnemonic = ( primaryMnemonic: string ) => {
+export const recoverWalletUsingMnemonic = ( primaryMnemonic: string ) => {
   return {
     type: RECOVER_WALLET_WITH_MNEMONIC,
     payload: {

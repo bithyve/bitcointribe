@@ -542,8 +542,6 @@ function* recoverWalletWithMnemonicWorker( { payload } ) {
   try {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     const { primaryMnemonic }: { primaryMnemonic: string } = payload
-    // const isValidMnemonic = bip39.validateMnemonic( primaryMnemonic )
-    // if( !isValidMnemonic ) throw new Error( 'Invalid mnemonic' )
 
     yield call( recoverWalletWorker, {
       payload: {
