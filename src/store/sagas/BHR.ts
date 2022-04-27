@@ -80,7 +80,6 @@ import {
   RESET_LEVEL_AFTER_PASSWORD_CHANGE,
   CHANGE_ENC_PASSWORD,
   UPDATE_SEED_HEALTH,
-  RECOVER_WALLET_WITH_SEED,
   RECOVER_WALLET_WITH_MNEMONIC,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
@@ -574,7 +573,8 @@ function* recoverWalletWorker( { payload } ) {
   }[], isWithoutCloud?: boolean } = payload
   try {
 
-    if( !isWithoutCloud ) {
+    let primarySeed, walletId
+    if( isWithoutCloud ) {
       if( shares ){
         const pmShares = []
         const smShares = []
@@ -589,8 +589,11 @@ function* recoverWalletWorker( { payload } ) {
 
       if( !primaryMnemonic ) throw new Error( 'Failed to generate primary mnemonic' )
 
+      primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+      walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
+
       if( !image ){
-        const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+        const getWI = yield call( BHROperations.fetchWalletImage, walletId )
         if( getWI.status == 200 ) {
           image = idx( getWI, _ => _.data.walletImage )
           if( !image ) throw new Error( 'External mnemonic, wallet image not found' )
@@ -604,7 +607,7 @@ function* recoverWalletWorker( { payload } ) {
     const accountData = {
     }
 
-    const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
+    if( !primarySeed ) primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
     const decryptionKey = primarySeed
     Object.keys( accounts ).forEach( ( key ) => {
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
