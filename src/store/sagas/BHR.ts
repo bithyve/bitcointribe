@@ -596,11 +596,11 @@ function* recoverWalletWorker( { payload } ) {
         const getWI = yield call( BHROperations.fetchWalletImage, walletId )
         if( getWI.status == 200 ) {
           image = idx( getWI, _ => _.data.walletImage )
-          if( !image ) throw new Error( 'External mnemonic, wallet image not found' )
         }
+
+        if( !image ) throw new Error( 'External mnemonic, wallet image not found' )
       }
     }
-
 
     const accounts = image.accounts
     const acc: Account[] = []
@@ -608,7 +608,7 @@ function* recoverWalletWorker( { payload } ) {
     }
 
     if( !primarySeed ) primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
-    const decryptionKey = primarySeed
+    const decryptionKey = primarySeed.toString( 'hex' )
     Object.keys( accounts ).forEach( ( key ) => {
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
       const account: Account | MultiSigAccount = JSON.parse( decryptedData )
@@ -646,15 +646,15 @@ function* recoverWalletWorker( { payload } ) {
       walletId: image.walletId,
       walletName: image.name,
       security: {
-        question: selectedBackup.question,
-        questionId: selectedBackup.questionId,
+        question: selectedBackup?.question,
+        questionId: selectedBackup?.questionId,
         answer: answer
       },
       userName: image.userName ? image.userName: '',
       primaryMnemonic: primaryMnemonic,
       accounts: accountData,
       version: appVersion,
-      primarySeed,
+      primarySeed: primarySeed.toString( 'hex' ),
       secondaryXpub,
       details2FA,
       smShare
@@ -690,7 +690,7 @@ function* recoverWalletWorker( { payload } ) {
     // RESTORE: Health
     yield call( setupLevelHealthWorker, {
       payload: {
-        level: level, keeperInfo: JSON.parse( selectedBackup.keeperData )
+        level: level, keeperInfo: selectedBackup?.keeperData? JSON.parse( selectedBackup.keeperData ): null
       }
     } )
 
