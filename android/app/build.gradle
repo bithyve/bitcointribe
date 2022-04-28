@@ -1,6 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
+// apply plugin: 'com.google.firebase.crashlytics'
 import com.android.build.OutputFile
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
@@ -199,7 +199,7 @@ dependencies {
     implementation 'com.facebook.fresco:webpsupport:1.10.0'
     // For WebP support, without animations
     implementation 'com.facebook.fresco:webpsupport:1.10.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
+    // implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
     implementation 'com.google.firebase:firebase-analytics:18.0.0'
     implementation 'com.google.firebase:firebase-messaging:21.1.0'
     
