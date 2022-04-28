@@ -109,6 +109,18 @@ const RestoreSeedPageComponent = ( props ) => {
       id: 1,
       name:''
     },
+    {
+      id: 1,
+      name:''
+    },
+    {
+      id: 1,
+      name:''
+    },
+    {
+      id: 1,
+      name:''
+    },
   ] )
 
   const getFormattedNumber =  ( number ) => {

@@ -89,7 +89,7 @@ import {
   GENERATE_META_SHARE,
   setPasswordResetState,
 } from '../actions/BHR'
-import { NativeModules, Platform } from 'react-native'
+import { Alert, NativeModules, Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -594,11 +594,8 @@ function* recoverWalletWorker( { payload } ) {
 
       if( !image ){
         const getWI = yield call( BHROperations.fetchWalletImage, walletId )
-        if( getWI.status == 200 ) {
-          image = idx( getWI, _ => _.data.walletImage )
-        }
-
-        if( !image ) throw new Error( 'External mnemonic, wallet image not found' )
+        if( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
+        if( !image ) Alert.alert( 'External mnemonic, wallet image not found' )
       }
     }
 

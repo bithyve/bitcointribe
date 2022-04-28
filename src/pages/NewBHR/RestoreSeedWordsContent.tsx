@@ -14,13 +14,27 @@ import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import RestoreSeedPageComponent from './RestoreSeedPageComponent'
 import * as bip39 from 'bip39'
-import { useDispatch } from 'react-redux'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { recoverWalletUsingMnemonic } from '../../store/actions/BHR'
+import { completedWalletSetup } from '../../store/actions/setupAndAuth'
+import { setVersion } from '../../store/actions/versionHistory'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const dispatch = useDispatch()
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+
+  useEffect( () => {
+    if( wallet ){
+      dispatch( completedWalletSetup() )
+      AsyncStorage.setItem( 'walletRecovered', 'true' )
+      dispatch( setVersion( 'Restored' ) )
+      props.navigation.navigate( 'HomeNav' )
+    }
+  }, [ wallet ] )
 
   const recoverWalletViaSeed = ( mnemonic: string ) => {
     const isValidMnemonic = bip39.validateMnemonic( mnemonic )
