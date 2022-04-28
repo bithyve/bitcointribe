@@ -11,7 +11,7 @@ import { getVersion, getBuildId, getBuildNumber } from 'react-native-device-info
 import { setApiHeaders } from './src/services/api'
 import firebase from '@react-native-firebase/app'
 import analytics from '@react-native-firebase/analytics'
-import crashlytics from '@react-native-firebase/crashlytics'
+// import crashlytics from '@react-native-firebase/crashlytics'
 import { updatePreference } from './src/store/actions/preferences'
 import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState'
 import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sheet'
@@ -45,13 +45,13 @@ export default function AppWrapper() {
 
   }
 
-  useEffect( () => {
+  /*useEffect( () => {
     ( async () => {
       configureAPIHeaders()
       await firebase.analytics().setAnalyticsCollectionEnabled( true )
       await crashlytics().setCrashlyticsCollectionEnabled( true )
     } )()
-  }, [] )
+  }, [] )*/
 
   return (
 
