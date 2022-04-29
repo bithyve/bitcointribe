@@ -81,6 +81,7 @@ import {
   CHANGE_ENC_PASSWORD,
   UPDATE_SEED_HEALTH,
   RECOVER_WALLET_WITH_MNEMONIC,
+  updateSeedHealth,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -547,16 +548,12 @@ function* recoverWalletWithMnemonicWorker( { payload } ) {
         primaryMnemonic, isWithoutCloud: true
       }
     } )
+    yield put( updateSeedHealth() )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-    console.log( {
-      err: err.message
-    } )
     yield put( walletRecoveryFailed( true ) )
-    // Alert.alert('Wallet recovery failed!', err.message);
   }
-  yield put( switchS3LoadingStatus( 'restoreWallet' ) )
 }
 
 export const recoverWalletWithMnemonicWatcher = createWatcher(
@@ -2394,6 +2391,7 @@ function* updateSeedHealthWorker( ) {
 
   const currentTS = moment( new Date() ).valueOf()
   const randomIdForSeed = generateRandomString( 8 )
+
   const keeperInfo: KeeperInfoInterface = {
     shareId: randomIdForSeed,
     name: 'Seed',
@@ -2407,7 +2405,7 @@ function* updateSeedHealthWorker( ) {
   }
   yield put( updatedKeeperInfo( keeperInfo ) )
 
-  const shareObj = {
+  const seedLevelInfo = {
     walletId: wallet.walletId,
     shareId: randomIdForSeed,
     reshareVersion: 0,
@@ -2416,13 +2414,22 @@ function* updateSeedHealthWorker( ) {
     shareType: KeeperType.SEED,
     name: 'Seed'
   }
-  yield put( updateMSharesHealth( shareObj, true ) )
 
-  const levelInfo = [ shareObj ]
+  const dummyCloudLevelInfo = {  // TODO: remove it once the data structure is more dynamic
+    shareType: '',
+    updatedAt: 0,
+    status: 'notSetup',
+    shareId: generateRandomString( 8 ),
+    reshareVersion: 0,
+  }
+
+  const levelInfo = [ seedLevelInfo, dummyCloudLevelInfo ]
   yield put( updateHealth( [ {
     level: 1,
     levelInfo: levelInfo,
   } ], 0, '' ) )
+
+  yield put( updateMSharesHealth( seedLevelInfo, true ) )
 }
 
 export const updateSeedHealthWatcher = createWatcher(
