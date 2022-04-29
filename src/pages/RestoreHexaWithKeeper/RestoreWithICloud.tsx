@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useContext } from 'react'
 import {
   View,
   Text,
@@ -65,6 +65,7 @@ import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { translations } from '../../common/content/LocContext'
 import { log } from 'console'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -810,13 +811,15 @@ class RestoreWithICloud extends Component<
   }
 
   renderContent = () => {
-    const { selectedBackup, hideShow, strings, common } = this.state
+    const { selectedBackup, hideShow, common } = this.state
     const { navigation } = this.props
+    const { translations, formatString } = useContext( LocalizationContext )
+    const strings = translations[ 'bhr' ]
     return (
 
       <RestoreFromICloud
         title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
-        subText={`${strings[ 'Clickingon' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
+        subText={ formatString( `${strings[ 'Clickingon' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}` )}
         cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
         levelStatus={
