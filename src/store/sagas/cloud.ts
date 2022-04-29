@@ -158,7 +158,7 @@ function* cloudWorker( { payload } ) {
             yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
           }
         } else {
-          if( isCloudBackupCompleted.status ) {
+          if( isCloudBackupCompleted ) {
             const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
             yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
