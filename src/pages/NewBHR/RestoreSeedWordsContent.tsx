@@ -12,6 +12,7 @@ import SeedPageComponent from './SeedPageComponent'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import RestoreSeedPageComponent from './RestoreSeedPageComponent'
+import RestoreSeedHeaderComponent from './RestoreSeedHeaderComponent'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -19,15 +20,15 @@ const RestoreSeedWordsContent = ( props ) => {
 
   return (
     <View style={{
-      flex: 1, backgroundColor: Colors.white
+      flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <SafeAreaView
         style={{
-          flex: 0, backgroundColor: Colors.white
+          flex: 0, backgroundColor: Colors.backgroundColor
         }}
       />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <SeedHeaderComponent
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      <RestoreSeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={'Enter Seed Words'}
         moreInfo={''}
@@ -43,12 +44,14 @@ const RestoreSeedWordsContent = ( props ) => {
           }}
           data={[]}
           confirmButtonText={'Next'}
+          proceedButtonText={'Proceed'}
           disableChange={false}
           onPressReshare={() => {
           }}
           onPressChange={() => props.navigation.goBack()}
           showButton={true}
           changeButtonText={'Back'}
+          previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
         />
       </View>
