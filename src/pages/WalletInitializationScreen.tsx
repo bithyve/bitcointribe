@@ -53,7 +53,7 @@ const WalletInitializationScreen = props => {
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
-              {`${strings.Createanew} Wallet`}
+              {`${strings.Createanew} wallet`}
             </Text>
           </View>
           <View style={styles.arrowIconView}>
