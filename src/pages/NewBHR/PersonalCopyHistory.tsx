@@ -525,8 +525,15 @@ const PersonalCopyHistory = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
+        channelKey: selectedKeeper.channelKey
       },
       index: changeIndex,
+    }
+    if( type == 'cloud' ){
+      props.navigation.navigate( 'CloudBackupHistory', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
     }
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
@@ -541,7 +548,11 @@ const PersonalCopyHistory = ( props ) => {
       } )
     }
     if ( type == 'pdf' ) {
-      initiateGuardianCreation()
+      props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+      // initiateGuardianCreation()
     }
   }
 
@@ -692,8 +703,10 @@ const PersonalCopyHistory = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-            if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            else onPressChangeKeeperType( type, name )
+             // note remove PDF flow for level 2 & 3
+            // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
+            // else
+             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}

@@ -1381,6 +1381,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     editable={isEditable}
                     autoCapitalize="none"
                     // onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
+                    onSubmitEditing={() => ( confirmPswdTextInput as any ).current.focus()}
                     //keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                     onChangeText={( text ) => {
                       setPswd( text.replace( /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '' ) )
@@ -1410,6 +1411,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                       handlePswdSubmit()
                     }}
                   />
+
                   {pswd.length !=0 && <Text style={{
                     ...styles.guessableText, color: pswd ==appGeneratedPassword || passwordScore == 4? Colors.green : passwordScore<2 ? Colors.tomatoRed : passwordScore<4 && Colors.yellow
                   }}>{getPasswordLevel()}</Text>}
@@ -1820,7 +1822,7 @@ const styles = StyleSheet.create( {
     justifyContent:'space-between',
   },
   guessableText:{
-    // color:Colors.tomatoRed,
+    color:Colors.tomatoRed,
     // color:Colors.green,
     fontSize: RFValue( 10 ),
     fontWeight:'600',

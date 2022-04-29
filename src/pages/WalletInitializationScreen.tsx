@@ -109,6 +109,32 @@ const WalletInitializationScreen = props => {
             />
           </View>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            props.navigation.navigate( 'RestoreSeedWordsContent' )
+          }}
+          style={{
+            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
+          }}
+        >
+          <Image
+            style={styles.iconImage}
+            source={require( '../assets/images/icons/seedwords.png' )}
+          />
+          <View style={styles.textView}>
+            <Text style={styles.touchableText}>Using Seed Words</Text>
+          </View>
+          <View style={styles.arrowIconView}>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              color={Colors.borderColor}
+              size={15}
+              style={{
+                alignSelf: 'center'
+              }}
+            />
+          </View>
+        </TouchableOpacity>
         <View style={{
           marginLeft: wp( '3%' ), marginRight: wp( '3%' )
         }}>

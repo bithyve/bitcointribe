@@ -296,7 +296,10 @@
       "l1": "O backup na nuvem de nível 1 está completo",
       "l2": "O backup duplo de nível 2 está completo",
       "l3": "O Backup Multi-key de nível 3 está completo",
-      "wallet": "Carteira"
+      "wallet": "Carteira",
+      "backupIsCompleted":"o backup foi concluído",
+      "Level 1": "Nível 1"
+
   },
   "stackTitle": {
       "AccountSettings": "Configurações da conta",

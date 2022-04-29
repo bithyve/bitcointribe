@@ -70,6 +70,7 @@ export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
 export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
 export const SETUP_PASSWORD = 'SETUP_PASSWORD'
+export const UPDATE_SEED_HEALTH =  'UPDATE_SEED_HEALTH'
 export const SETUP_LEVEL_HEALTH = 'SETUP_LEVEL_HEALTH'
 export const GENERATE_LEVEL1_SHARES = 'GENERATE_LEVEL1_SHARES'
 export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
@@ -77,6 +78,7 @@ export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
 export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
+export const RECOVER_WALLET_WITH_MNEMONIC = 'RECOVER_WALLET_WITH_MNEMONIC'
 export const PDF_UPGRADE = 'PDF_UPGRADE'
 export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
 
@@ -634,6 +636,12 @@ export const setupPassword = ( security ) => {
   }
 }
 
+export const updateSeedHealth = ( ) => {
+  return {
+    type: UPDATE_SEED_HEALTH
+  }
+}
+
 export const generateLevel1Shares = ( security ) => {
   return {
     type: GENERATE_LEVEL1_SHARES, payload:{
@@ -779,6 +787,15 @@ export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
   return {
     type: RECOVER_WALLET_WITHOUT_ICLOUD, payload: {
       backupData, answer
+    }
+  }
+}
+
+export const recoverWalletUsingMnemonic = ( primaryMnemonic: string ) => {
+  return {
+    type: RECOVER_WALLET_WITH_MNEMONIC,
+    payload: {
+      primaryMnemonic
     }
   }
 }

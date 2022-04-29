@@ -281,7 +281,6 @@ export default function NewWalletName( props ) {
                   onPress={() => {
                     setLoaderModal( true )
                     Keyboard.dismiss()
-                    //setTimeout( () => {
                     // props.navigation.navigate( 'NewWalletQuestion', {
                     //   walletName,
                     // } )

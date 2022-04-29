@@ -230,7 +230,7 @@
     "UserDefined": "User Defined",
     "Hexawillgenerate": "Hexa will generate a strong password for you",
     "Skipinitialcloud": "Skip initial cloud backup",
-    "HexaWalletcreated": "Here's your App Generated Strong Passcode",
+    "HexaWalletcreated": "Here's your App Generated Strong Password",
     "Makesureyou": "Make sure you have noted down the Strong Password and secured it",
     "Itmayalso": "If you lose this, you will not be able to access the wallet backup or reset the Login Passcode. It may be a good idea to secure more than one copy of the Strong Password",
     "UseStrongPasscode": "Use Strong Passcode",
@@ -332,7 +332,9 @@
     "l3": "Level 3 Multi-key Backup is complete",
     "needAttention": " needs your attention.",
     "Backupyour": "Backup your wallet to safeguard your sats",
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "backupIsCompleted": "backup is completed",
+    "Level1": "Level 1"
   },
   "stackTitle": {
     "AccountSettings": "Account Settings",

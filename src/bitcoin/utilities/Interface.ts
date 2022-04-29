@@ -742,6 +742,8 @@ export enum KeeperType {
   EXISTING_CONTACT = 'existingContact',
   PDF = 'pdf',
   SECURITY_QUESTION = 'securityQuestion',
+  CLOUD = 'cloud',
+  SEED = 'seed',
 }
 
 export interface KeeperInfoInterface {
@@ -860,7 +862,6 @@ export interface Wallet {
   walletName: string,
   userName?: string,
   security: { questionId: string, question: string, answer: string },
-  newBie:boolean,
   primaryMnemonic: string,
   primarySeed: string,
   secondaryXpub?: string,

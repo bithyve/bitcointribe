@@ -26,6 +26,7 @@ import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import ReLogin from '../../../pages/ReLogin'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import Intermediate from '../../../pages/Intermediate'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
@@ -91,6 +92,12 @@ const FriendsAndFamily = createStackNavigator(
       navigationOptions: {
         header: null,
         // tabBarVisibl
+      },
+    },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
+      navigationOptions: {
+        title: 'TransactionDetails',
       },
     },
     QRScanner: {
