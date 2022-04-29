@@ -377,7 +377,7 @@ export default function AddContactAddressBook( props ) {
         </TouchableOpacity>
       </View>
       <HeaderTitle1
-        firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
+        // firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
         secondLineTitle={strings.Associate}
         infoTextNormal={''}
         infoTextBold={''}
