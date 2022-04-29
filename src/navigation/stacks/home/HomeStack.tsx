@@ -46,17 +46,22 @@ import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestio
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
+import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
+import RestoreSeedWordsContent from '../../../pages/NewBHR/RestoreSeedWordsContent'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
 import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 import QRStack from '../home/QRStack'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import LnAccountStack from '../accounts/LnAccountStack'
 import Home from '../../../pages/Home/Home'
 import Header from '../Header'
 import Login from '../../../pages/Login'
 import { translations } from '../../../common/content/LocContext'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -134,6 +139,12 @@ const HomeStack = createStackNavigator(
         title: 'Buy with Ramp'
       }
     },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
+      navigationOptions: {
+        title: 'Transaction Details',
+      },
+    },
     // AllTransactions: {
     //   screen: AllTransactionsStack,
     //   navigationOptions: {
@@ -204,6 +215,8 @@ const HomeStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
+    BackupSeedWordsContent,
+    RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {
@@ -226,8 +239,13 @@ const HomeStack = createStackNavigator(
   {
     // mode: 'modal',
     initialRouteName: 'Home',
-    defaultNavigationOptions: {
-      header: null
+    defaultNavigationOptions: ( { navigation } ) => {
+      return {
+        ...defaultStackScreenNavigationOptions,
+        headerLeft: () => {
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+        },
+      }
     },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false

@@ -45,7 +45,8 @@
       "setup": "Configurar",
       "manage": "Gerir",
       "backup": "Cópia de segurança",
-      "change": "Mudar"
+      "change": "Mudar",
+      "contactCreated":"contato criado"
   },
   "noInternet": {
       "no": "Sem internet",
@@ -286,7 +287,8 @@
       "Confirmnewwalletname": "Confirme o novo nome da carteira",
       "acrossyour": "O nome da carteira será atualizado automaticamente em sua rede de amigos e família",
       "ConfirmSecurityQuestion": "Confirme a pergunta de segurança",
-      "ConfirmWalletPin": "Confirme o PIN da carteira"
+      "ConfirmWalletPin": "Confirme o PIN da carteira",
+      "ConfirmEncryptionPassword":"Confirmar senha de criptografia"
   },
   "header": {
       "init": "Inicializando o backup na nuvem",
@@ -294,7 +296,10 @@
       "l1": "O backup na nuvem de nível 1 está completo",
       "l2": "O backup duplo de nível 2 está completo",
       "l3": "O Backup Multi-key de nível 3 está completo",
-      "wallet": "Carteira"
+      "wallet": "Carteira",
+      "backupIsCompleted":"o backup foi concluído",
+      "Level 1": "Nível 1"
+
   },
   "stackTitle": {
       "AccountSettings": "Configurações da conta",
@@ -309,7 +314,7 @@
   },
   "accManagement": {
       "AccountManagement": "Gestão de Contas",
-      "Rearrange": "Reorganize, arquive e restabeleça contas a partir daqui",
+      "Rearrange": "Reorganize e restabeleça contas a partir daqui",
       "HiddenAccounts": "Contas ocultas",
       "ArchivedAccounts": "Contas Arquivadas",
       "Save": "Salvar novo pedido",
@@ -574,6 +579,8 @@
       "HealthCheckConfirmPassword": "Senha de confirmação de verificação de saúde",
       "Specifythepassword": "Especifique a senha como você fez no momento de configurar a carteira",
       "Hint": "Dica",
+      "Backupwithcloud": "Backup com nuvem",
+      "BackupwithcloudSub": "Faça backup da chave de recuperação na nuvem",
       "Backupwithcontact": "Backup com contato",
       "BackupwithcontactSub": "Faça backup da chave de recuperação com um amigo ou familiar",
       "Backuponadevice": "Backup em um dispositivo",

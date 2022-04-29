@@ -28,6 +28,7 @@ export type SendingState = {
     carryOver: {
       txPrerequisites: TransactionPrerequisite,
       recipients: {
+      id?: string;
       address: string;
       amount: number;
       name?: string

@@ -114,7 +114,14 @@ export default function PasscodeConfirm( props ) {
                   style={ [
                     passcode.length == 0 && passcodeFlag == true
                       ? styles.textBoxActive
-                      : styles.textBoxStyles
+                      : {
+                        ...styles.textBoxStyles,
+                        borderColor:
+                          passcode != confirmPasscode &&
+                            confirmPasscode.length == 4
+                            ? Colors.red
+                            : Colors.borderColor
+                      }
                   ] }
                 >
                   <Text
@@ -150,7 +157,14 @@ export default function PasscodeConfirm( props ) {
                   style={ [
                     passcode.length == 1
                       ? styles.textBoxActive
-                      : styles.textBoxStyles
+                      : {
+                        ...styles.textBoxStyles,
+                        borderColor:
+                          passcode != confirmPasscode &&
+                            confirmPasscode.length == 4
+                            ? Colors.red
+                            : Colors.borderColor
+                      }
                   ] }
                 >
                   <Text
@@ -181,7 +195,14 @@ export default function PasscodeConfirm( props ) {
                   style={ [
                     passcode.length == 2
                       ? styles.textBoxActive
-                      : styles.textBoxStyles
+                      : {
+                        ...styles.textBoxStyles,
+                        borderColor:
+                          passcode != confirmPasscode &&
+                            confirmPasscode.length == 4
+                            ? Colors.red
+                            : Colors.borderColor
+                      }
                   ] }
                 >
                   <Text
@@ -212,7 +233,14 @@ export default function PasscodeConfirm( props ) {
                   style={ [
                     passcode.length == 3
                       ? styles.textBoxActive
-                      : styles.textBoxStyles
+                      : {
+                        ...styles.textBoxStyles,
+                        borderColor:
+                          passcode != confirmPasscode &&
+                            confirmPasscode.length == 4
+                            ? Colors.red
+                            : Colors.borderColor
+                      }
                   ] }
                 >
                   <Text
@@ -256,7 +284,7 @@ export default function PasscodeConfirm( props ) {
               </Text>
               <View>
                 <View style={ {
-                  flexDirection: 'row', marginTop: hp( '4.5%' ),
+                  flexDirection: 'row', marginTop: hp( '3%' ),
                 } }>
                   <View
                     style={ [
@@ -443,7 +471,12 @@ export default function PasscodeConfirm( props ) {
                       ) }
                     </Text>
                   </View>
+
                 </View>
+                {passcode != confirmPasscode &&
+                    confirmPasscode.length == 4 &&
+                    <Text style={styles.mismatchError}>Passcode mismatch!</Text>
+                }
               </View>
               <TouchableOpacity
                 disabled={ passcode == confirmPasscode ? false : true }
@@ -460,7 +493,7 @@ export default function PasscodeConfirm( props ) {
           ) : null }
         </View>
         <View style={ {
-          marginTop: 'auto'
+          marginTop: 'auto',
         } }>
           <View style={ styles.keyPadRow }>
             <TouchableOpacity
@@ -609,22 +642,22 @@ const styles = StyleSheet.create( {
     width: wp( '13%' ),
     borderRadius: 7,
     marginLeft: 20,
-    borderColor: Colors.borderColor,
+    borderColor: Colors.backgroundColor1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.white
+    backgroundColor: Colors.backgroundColor1
   },
   textBoxActive: {
     height: wp( '13%' ),
     width: wp( '13%' ),
     borderRadius: 7,
     marginLeft: 20,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 0, height: 3
-    },
+    // elevation: 10,
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 0, height: 3
+    // },
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
@@ -705,12 +738,21 @@ const styles = StyleSheet.create( {
   },
   passcodeTextInputText: {
     color: Colors.blue,
-    fontWeight: '100',
+    fontWeight: '400',
     fontSize: RFValue( 34 )
   },
   passcodeTextInputView: {
     flexDirection: 'row',
     marginTop: hp( '4.5%' ),
     marginBottom: hp( '4.5%' )
+  },
+  mismatchError:{
+    color:'#FF7861',
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansItalic,
+    fontWeight:'500',
+    width: wp( '72%' ),
+    textAlign:'right',
+    marginTop: hp( '1.5%' ),
   }
 } )

@@ -45,7 +45,8 @@
       "setup": "Einrichten",
       "manage": "Verwalten",
       "backup": "Backup",
-      "change": "Ändern"
+      "change": "Ändern",
+      "contactCreated":"Kontakt erstellt"
   },
   "noInternet": {
       "no": "Keine Internetverbindung",
@@ -286,7 +287,8 @@
       "Confirmnewwalletname": "Neuen Wallet-Namen bestätigen",
       "acrossyour": "Der Name der Wallet wird automatisch in deinem Freundes- und Familiennetzwerk aktualisiert",
       "ConfirmSecurityQuestion": "Sicherheitsfrage bestätigen",
-      "ConfirmWalletPin": "Wallet-PIN bestätigen"
+      "ConfirmWalletPin": "Wallet-PIN bestätigen",
+      "ConfirmEncryptionPassword":"Bestätigen Sie das Verschlüsselungskennwort"
   },
   "header": {
       "init": "Cloud-Backup initialisieren",
@@ -294,7 +296,9 @@
       "l1": "Cloud-Backup der Stufe 1 ist abgeschlossen",
       "l2": "Level 2 Double Backup ist abgeschlossen",
       "l3": "Level 3 Multi-Key-Backup ist abgeschlossen",
-      "wallet": "Wallet"
+      "wallet": "Wallet",
+      "backupIsCompleted":"back-up is voltooid",
+      "Level 1": "Level 1"
   },
   "stackTitle": {
       "AccountSettings": "Kontoeinstellungen",
@@ -309,7 +313,7 @@
   },
   "accManagement": {
       "AccountManagement": "Kontoverwaltung",
-      "Rearrange": "Konten neu anordnen, archivieren und wiederherstellen",
+      "Rearrange": "Konten von hier aus neu anordnen und wiederherstellen",
       "HiddenAccounts": "Versteckte Konten",
       "ArchivedAccounts": "Archivierte Konten",
       "Save": "Neue Sortierung speichern",
@@ -574,6 +578,8 @@
       "HealthCheckConfirmPassword": "Systemdiagnose Passwort bestätigen",
       "Specifythepassword": "Geben Sie das Passwort wie beim Einrichten der Wallet an",
       "Hint": "Hinweis",
+      "Backupwithcloud": "Backup mit Cloud",
+      "BackupwithcloudSub": "Sichern Sie den Wiederherstellungsschlüssel in der Cloud",
       "Backupwithcontact": "Backup mit Kontakt",
       "BackupwithcontactSub": "Sichern Sie den Wiederherstellungsschlüssel mit einem Freund oder Familienmitglied",
       "Backuponadevice": "Backup auf einem Gerät",

@@ -153,6 +153,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       </View>
 
       <Text
+        numberOfLines={1}
         style={{
           ...defaultStyles.amountText,
           color: textColor,

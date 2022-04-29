@@ -292,6 +292,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       subAccountKind: primarySubAccount.kind,
     } )
   }
+
   const sections = useMemo( () => {
     return [
       {
@@ -314,10 +315,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         kind: SectionKind.TRANSACTIONS_LIST_PREVIEW,
         data: [ null ],
         renderItem: () => {
+
           return (
             <View style={styles.viewSectionContainer}>
               <TransactionsPreviewSection
-                transactions={AccountShell.getAllTransactions( accountShell ).slice( 0, 3 )}
+                transactions={AccountShell.getAllTransactions( accountShell ) }
+                // transactions={AccountShell.getAllTransactions( accountShell ).slice( 0, 3 )}
                 availableBalance={AccountShell.getSpendableBalance( accountShell )}
                 bitcoinUnit={accountShell.unit}
                 isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
@@ -420,7 +423,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
             onBackground={()=>{
               setSecureAccountAlert( false )
               setTimeout( () => {
-                setSecureAccountAlert( true )
+                !AllowSecureAccount && primarySubAccount.type == AccountType.SAVINGS_ACCOUNT && setSecureAccountAlert( true )
               }, 200 )
             }}
             visible={secureAccountAlert} closeBottomSheet={() => {

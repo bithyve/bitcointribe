@@ -32,7 +32,7 @@ const AccountDetailsStack = createStackNavigator(
     TransactionDetails: {
       screen: TransactionDetailsContainerScreen,
       navigationOptions: {
-        title: '',
+        title: 'TransactionDetails' ,
       },
     },
     DonationAccountWebViewSettings: {
@@ -41,6 +41,7 @@ const AccountDetailsStack = createStackNavigator(
         header: null,
       },
     },
+    
     SubAccountSettings: {
       screen: SubAccountSettingsStack,
       navigationOptions: {

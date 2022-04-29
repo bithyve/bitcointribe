@@ -45,7 +45,8 @@
       "setup": "Configurer",
       "manage": "Gérer",
       "backup": "Sauvegarde",
-      "change": "Changer"
+      "change": "Changer",
+      "contactCreated":"contact créé"
   },
   "noInternet": {
       "no": "Aucune connexion",
@@ -286,7 +287,8 @@
       "Confirmnewwalletname": "Confirmez le nouveau nom du portefeuille",
       "acrossyour": "Le nom du portefeuille sera mis à jour automatiquement pour votre réseau Amis & Famille",
       "ConfirmSecurityQuestion": "Confirmer la question de sécurité",
-      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille"
+      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille",
+      "ConfirmEncryptionPassword":"Confirmer le mot de passe de cryptage"
   },
   "header": {
       "init": "Initialisation de la sauvegarde cloud",
@@ -294,7 +296,9 @@
       "l1": "La sauvegarde cloud de niveau 1 est terminée",
       "l2": "La double sauvegarde de niveau 2 est terminée",
       "l3": "La sauvegarde multi-clés de niveau 3 est terminée",
-      "wallet": "Portefeuille"
+      "wallet": "Portefeuille",
+      "backupIsCompleted": "la sauvegarde est terminée",
+      "Level 1": "Niveau 1"
   },
   "stackTitle": {
       "AccountSettings": "Paramètres du compte",
@@ -309,7 +313,7 @@
   },
   "accManagement": {
       "AccountManagement": "Gestion de compte",
-      "Rearrange": "Réorganisez, archivez et restaurez les comptes à partir d'ici",
+      "Rearrange": "Réorganiser et restaurer les comptes à partir d'ici",
       "HiddenAccounts": "Comptes cachés",
       "ArchivedAccounts": "Comptes archivés",
       "Save": "Enregistrer la disposition",
@@ -574,6 +578,8 @@
       "HealthCheckConfirmPassword": "Vérification de l'état Confirmer le mot de passe",
       "Specifythepassword": "Spécifiez le mot de passe comme vous l'avez fait au moment de la configuration du portefeuille",
       "Hint": "Indice",
+      "Backupwithcloud": "Sauvegarde avec le cloud",
+      "BackupwithcloudSub": "Sauvegarder la clé de récupération sur le cloud",
       "Backupwithcontact": "Sauvegarde avec contact",
       "BackupwithcontactSub": "Sauvegardez la clé de récupération avec un ami ou un membre de la famille",
       "Backuponadevice": "Sauvegarde sur un appareil",

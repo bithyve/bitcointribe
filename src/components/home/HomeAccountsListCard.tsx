@@ -162,12 +162,14 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
 
   return (
-    <View style={opacityChange ? {
-      ...styles.rootContainer, opacity:0.3
-    } : styles.rootContainer}>
-      <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
-      <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
-    </View>
+    <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[ 7, 7 ]}>
+      <View style={opacityChange ? {
+        ...styles.rootContainer, opacity:0.3
+      } : styles.rootContainer}>
+        <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
+        <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
+      </View>
+    </Shadow>
   )
 }
 
@@ -181,19 +183,19 @@ const styles = StyleSheet.create( {
   rootContainer: {
     borderRadius: 10,
     width: widthPercentageToDP( 43 ),
-    height: heightPercentageToDP( 23 ),
+    height: heightPercentageToDP( 20 ),
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: widthPercentageToDP( 4.5 ),
     backgroundColor: Colors.white,
     justifyContent: 'space-between',
-    shadowColor: Colors.shadowColor,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 10, height: 10
-    },
-    elevation: 6
+    // shadowColor: 'red',
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // elevation: 6,
   },
 
   headerSectionContainer: {

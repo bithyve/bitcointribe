@@ -27,6 +27,9 @@ import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { translations } from '../../common/content/LocContext'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import KeeperTypeModalContents from './KeeperTypeModalContent'
+import { getIndex } from '../../common/utilities'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -57,12 +60,18 @@ const CloudBackupHistory = ( props ) => {
   const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const [ errorMsg, setErrorMsg ] = useState( '' )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus || CloudBackupStatus.PENDING, )
+  const [ cloudBackupInitiated, setCloudBackupInitiated ] = useState( false )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const dispatch = useDispatch()
   const [ backupInfo, setBackupInfo ] = useState( '' )
   const [ buttonText, setButtonText ] = useState( common.backup )
   const [ showButton, setShowButton ] = useState( false )
+  const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
+  const levelData = useSelector( ( state ) => state.bhr.levelData )
+  const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
+  const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
+  const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
   const sortedHistory = ( history ) => {
     if( !history ) return
     const currentHistory = history.filter( ( element ) => {
@@ -83,6 +92,10 @@ const CloudBackupHistory = ( props ) => {
   useEffect( ()=>{
     setInfoOnBackup()
   }, [] )
+
+  useEffect( () =>{
+    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) props.navigation.popToTop()
+  }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
     if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
@@ -156,40 +169,22 @@ const CloudBackupHistory = ( props ) => {
       title={strings.AutomatedCloudBackup}
       info={strings.Thisisthefirstlevel}
       note={''}
-      onPressProceed={( flag )=>{
-        // if ( ( bottomSheetRef as any ).current )
-        //   ( bottomSheetRef as any ).current.snapTo( 0 )
+      onPressProceed={( flag )=> {
         setConfirmationModal( false )
-        console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
         dispatch( updateCloudData() )
+        setCloudBackupInitiated( true )
       }}
       onPressIgnore={( flag )=> {
-        // if ( ( bottomSheetRef as any ).current )
-        //   ( bottomSheetRef as any ).current.snapTo( 0 )
         setConfirmationModal( false )
-        console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
       }}
       autoClose={()=>{
-        // if ( ( bottomSheetRef as any ).current )
-        //   ( bottomSheetRef as any ).current.snapTo( 0 )
         setConfirmationModal( false )
-        console.log( 'updateCloudPermission', true )
         dispatch( updateCloudPermission( true ) )
       }}
       bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
     /> )
-  }, [] )
-
-  const renderCloudPermissionHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
   }, [] )
 
   const renderHealthCheckSuccessModalContent = useCallback( () => {
@@ -221,6 +216,48 @@ const CloudBackupHistory = ( props ) => {
     )
   }, [] )
 
+  const onPressChangeKeeperType = ( type, name ) => {
+    selectedKeeper.shareType = type
+    selectedKeeper.name = name
+    const changeIndex = getIndex( levelData, type, selectedKeeper, keeperInfo )
+    setKeeperTypeModal( false )
+    const navigationParams = {
+      selectedTitle: name,
+      SelectedRecoveryKeyNumber: SelectedRecoveryKeyNumber,
+      selectedKeeper: {
+        shareType: type,
+        name: name,
+        reshareVersion: 0,
+        status: 'notSetup',
+        updatedAt: 0,
+        shareId: selectedKeeper.shareId,
+        data: {
+        },
+        channelKey: selectedKeeper.channelKey
+      },
+      index: changeIndex,
+    }
+    if ( type == 'contact' ) {
+      props.navigation.goBack()
+      props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
+    if ( type == 'device' ) {
+      props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
+    if ( type == 'pdf' ) {
+      props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
+  }
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -233,8 +270,10 @@ const CloudBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={Platform.OS == 'ios' ? 'iCloud backup' : 'Google Drive backup'}
-        selectedTime={props.navigation.state.params.selectedTime}
+        selectedTitle={Platform.OS == 'ios' ? 'iCloud Backup' : 'Google Drive Backup'}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'Never'}
         moreInfo={''}
         tintColor={Colors.deepBlue}
         headerImage={require( '../../assets/images/icons/ico_cloud_backup.png' )}
@@ -252,14 +291,14 @@ const CloudBackupHistory = ( props ) => {
           }}
           data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
           confirmButtonText={buttonText}
-          disableChange={true}
+          disableChange={false}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
           }}
-          onPressChange={() => {
-            props.navigation.navigate( 'NewOwnQuestions' )
-          }}
+          onPressChange={() => setKeeperTypeModal( true )}
           showButton={showButton}
+          changeButtonText={'Change'}
+          isChangeKeeperAllow={true}
         />
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
@@ -286,6 +325,19 @@ const CloudBackupHistory = ( props ) => {
         renderContent={renderHealthCheckSuccessModalContent}
         renderHeader={renderHealthCheckSuccessModalHeader}
       />
+      <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
+        <KeeperTypeModalContents
+          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
+          headerText={'Change backup method'}
+          subHeader={'Share your Recovery Key with a new contact or a different device or Cloud'}
+          onPressSetup={async ( type, name ) => {
+            onPressChangeKeeperType( type, name )
+          }}
+          onPressBack={() => setKeeperTypeModal( false )}
+          keeper={selectedKeeper}
+          isCloud={true}
+        />
+      </ModalContainer>
 
     </View>
   )

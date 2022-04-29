@@ -49,6 +49,7 @@ import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHis
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
 import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import Header from '../Header'
@@ -56,6 +57,9 @@ import QRStack from '../home/QRStack'
 import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
 import  FNFToKeeper from '../../../pages/NewBHR/FNFToKeeper'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
+import { translations } from '../../../common/content/LocContext'
+
+const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
@@ -87,6 +91,9 @@ const SecurityStack = createStackNavigator(
     Intermediate,
     AccountDetails: {
       screen: AccountDetailsStack,
+    },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
     },
     QRScanner: {
       screen: QRStack,
@@ -149,18 +156,21 @@ const SecurityStack = createStackNavigator(
       screen: TwoFASetup,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null
       },
     },
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null
       },
     },
     WyreIntegrationScreen: {
       screen: WyreIntegrationScreen,
       navigationOptions: {
-        title: 'Wyre Home'
+        title: 'Wyre Home',
+        header: null
       }
     },
     RequestKeyFromContact,

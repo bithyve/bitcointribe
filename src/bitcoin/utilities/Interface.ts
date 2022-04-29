@@ -103,9 +103,10 @@ export interface Transaction {
   address?: string
   type?: string
   // sender name
-  sender?: string
+  sender?: string,
+  senderId?: string,
   // receivers info
-  receivers?: {name: string, amount: number}[]
+  receivers?: { id?: string, name: string, amount: number}[]
   // txn tags
   tags?: string[]
   // txn notes
@@ -152,7 +153,7 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
-    scheme?: string,
+    scheme?: ShareSplitScheme,
   };
 }
 
@@ -622,6 +623,9 @@ export interface TrustedContact {
   deepLinkConfig?: {
     encryptionType: DeepLinkEncryptionType,
     encryptionKey: string | null,
+  },
+  timestamps: {
+    created: number,
   }
 }
 export interface Trusted_Contacts {
@@ -725,11 +729,28 @@ export interface LevelInfo {
   walletId?: string
 }
 
+export enum ShareSplitScheme {
+  OneOfOne = '1of1',
+  TwoOfThree = '2of3',
+  ThreeOfFive = '3of5'
+}
+
+export enum KeeperType {
+  PRIMARY_KEEPER = 'primaryKeeper',
+  DEVICE = 'device',
+  CONTACT = 'contact',
+  EXISTING_CONTACT = 'existingContact',
+  PDF = 'pdf',
+  SECURITY_QUESTION = 'securityQuestion',
+  CLOUD = 'cloud',
+  SEED = 'seed',
+}
+
 export interface KeeperInfoInterface {
   shareId: string;
   name: string;
-  type: string;
-  scheme: string;
+  type: KeeperType;
+  scheme: ShareSplitScheme;
   currentLevel: number;
   createdAt: number;
   sharePosition: number;
@@ -809,10 +830,11 @@ export interface ActiveAddressAssignee{
     type: AccountType | ActiveAddressAssigneeType;
     id?: string;
     senderInfo?: {
+      id?: string
       name: string,
     };
     recipientInfo?: {
-      [txid: string]: {name: string, amount: number}[],
+      [txid: string]: {id?: string, name: string, amount: number}[],
     };
 }
 export interface ActiveAddresses {
@@ -904,6 +926,18 @@ export interface Account {
       privateKey: string
     }
   },
+  transactionsMeta?: {
+    receivers: {name: string, amount: number}[];
+    sender: string;
+    txid: string;
+    notes: string;
+    tags: string[]
+    amount: number;
+    accountType: string;
+    address: string;
+    isNew: boolean
+    type: string;
+  }[]
   node?: LNNode
 }
 export interface MultiSigAccount extends Account {
@@ -1002,6 +1036,7 @@ export enum GiftStatus {
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
   RECLAIMED = 'RECLAIMED',
+  ASSOCIATED = 'ASSOCIATED',
   EXPIRED = 'EXPIRED',
 }
 
@@ -1038,6 +1073,7 @@ export interface Gift {
     sent?: number,
     accepted?: number,
     reclaimed?: number,
+    associated?: number,
     rejected?: number,
   },
   validitySpan?: number,
@@ -1075,12 +1111,12 @@ export interface GiftMetaData {
 }
 
 export interface cloudDataInterface {
-  levelStatus: number;
-  encryptedCloudDataJson: string;
-  walletName: string;
-  questionId: string;
-  question: string;
-  keeperData: string;
+  levelStatus?: number;
+  encryptedCloudDataJson?: string;
+  walletName?: string;
+  questionId?: string;
+  question?: string;
+  keeperData?: string;
   bhXpub?: string;
   shares?: any;
   secondaryShare?: string;

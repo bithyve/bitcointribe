@@ -21,6 +21,7 @@ import openLink from '../utils/OpenLink'
 import { LocalizationContext } from '../common/content/LocContext'
 import { useDispatch } from 'react-redux'
 import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
+import { setDownloadedBackupData } from '../store/actions/BHR'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
@@ -81,6 +82,7 @@ const WalletInitializationScreen = props => {
         </View>
         <TouchableOpacity
           onPress={async () => {
+            dispatch( setDownloadedBackupData( [] ) )
             dispatch( setCloudDataRecovery( null ) )
             dispatch( setIsFileReading( false ) )
             props.navigation.navigate( 'RestoreWithICloud' )
@@ -95,6 +97,32 @@ const WalletInitializationScreen = props => {
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>Using Recovery Keys</Text>
+          </View>
+          <View style={styles.arrowIconView}>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              color={Colors.borderColor}
+              size={15}
+              style={{
+                alignSelf: 'center'
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            props.navigation.navigate( 'RestoreSeedWordsContent' )
+          }}
+          style={{
+            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
+          }}
+        >
+          <Image
+            style={styles.iconImage}
+            source={require( '../assets/images/icons/seedwords.png' )}
+          />
+          <View style={styles.textView}>
+            <Text style={styles.touchableText}>Using Seed Words</Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons

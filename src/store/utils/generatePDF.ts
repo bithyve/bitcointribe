@@ -1,5 +1,5 @@
-import { Platform, NativeModules, Alert } from 'react-native';
-import { getFormattedString } from '../../common/CommonFunctions';
+import { Platform, NativeModules, Alert } from 'react-native'
+import { getFormattedString } from '../../common/CommonFunctions'
 
 const chunkArray = ( arr: any, n: any ) => {
   const chunkLength = Math.max( arr.length / n, 1 )
@@ -12,15 +12,15 @@ const chunkArray = ( arr: any, n: any ) => {
 }
 
 
-export default async (pdfData, fileName, title, password) => {
-  const { qrData, secondaryMnemonic, secondaryXpub, bhXpub } = pdfData;
-  const qrcode: string[] = [];
-  const qrCodeString: string[][] = [];
-  qrData.forEach((qrString) => {
-    qrcode.push(getFormattedString(qrString));
-    qrCodeString.push(qrString);
-  });
-  let pdfDatas = {
+export default async ( pdfData, fileName, title, password ) => {
+  const { qrData, secondaryMnemonic, secondaryXpub, bhXpub } = pdfData
+  const qrcode: string[] = []
+  const qrCodeString: string[][] = []
+  qrData.forEach( ( qrString ) => {
+    qrcode.push( getFormattedString( qrString ) )
+    qrCodeString.push( qrString )
+  } )
+  const pdfDatas = {
     title,
     fileName,
     qrcode,

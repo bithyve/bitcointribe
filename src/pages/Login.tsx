@@ -42,6 +42,7 @@ import Relay from '../bitcoin/utilities/Relay'
 import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { setCloudBackupStatus } from '../store/actions/cloud'
+import { setOpenToApproval } from '../store/actions/BHR'
 import SecurityQuestion from './NewBHR/SecurityQuestion'
 import Toast from '../components/Toast'
 
@@ -129,6 +130,7 @@ export default function Login( props ) {
 
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    dispatch( setOpenToApproval( false, [], null ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
@@ -190,10 +192,10 @@ export default function Login( props ) {
         setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
-            'Your phone does not have any secure entry like Pin or Biometric',
+            'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'This may be a security risk to your funds on Hexa',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Hexa',
           )
           setElevation( 0 )
         }, 2 )
@@ -338,7 +340,7 @@ export default function Login( props ) {
       setTimeout( () => {
         // loaderBottomSheet.current.snapTo( 0 )
         setloaderModal( false )
-      }, 2 )
+      }, 300 )
 
       return (
         <View style={{
