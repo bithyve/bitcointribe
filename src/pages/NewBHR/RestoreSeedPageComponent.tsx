@@ -1,11 +1,11 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput,
+  TextInput, FlatList, Animated, Dimensions
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import {
@@ -16,9 +16,12 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
+import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
+
+const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
 const RestoreSeedPageComponent = ( props ) => {
-  const strings  = translations[ 'bhr' ]
+  const strings = translations[ 'bhr' ]
 
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const SelectOption = ( Id ) => {
@@ -26,205 +29,266 @@ const RestoreSeedPageComponent = ( props ) => {
 
   const [ seedData, setSeedData ] = useState( [
     {
-      id: 1,
-      name:''
+      id: 1, name: ''
     },
     {
-      id: 1,
-      name:''
+      id: 1, name: ''
     },
     {
-      id: 1,
-      name:''
+      id: 1, name: ''
     },
     {
-      id: 1,
-      name:''
+      id: 1, name: ''
     },
     {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 1, name: ''
+    }, {
+      id: 23, name: ''
+    }, {
+      id: 24, name: ''
+    }, {
+      id: 25, name: ''
+    }
   ] )
 
-  const getFormattedNumber =  ( number ) => {
-    if( number < 10 ) return '0'+number
+  const [ total, setTotal ] = useState( 0 )
+  const [ partialSeedData, setPartialSeedData ] = useState( [] )
+  const [ currentPosition, setCurrentPosition ] = useState( 0 )
+
+  const width = Dimensions.get( 'window' ).width
+  const ref = React.useRef<PagerView>( null )
+  const scrollOffsetAnimatedValue = React.useRef( new Animated.Value( 0 ) ).current
+  const positionAnimatedValue = React.useRef( new Animated.Value( 0 ) ).current
+  const onPageSelectedPosition = useRef( new Animated.Value( 0 ) ).current
+  const inputRange = [ 0, partialSeedData.length ]
+  const scrollX = Animated.add(
+    scrollOffsetAnimatedValue,
+    positionAnimatedValue
+  ).interpolate( {
+    inputRange,
+    outputRange: [ 0, partialSeedData.length * width ],
+  } )
+
+  useEffect( () => {
+    // return()=>{
+    // Code for componentWillMount here
+    // This code is called only one time before intial render
+    const tempData = []
+    let innerTempData = []
+    let initPosition = 0
+    let lastPosition = 6
+    const totalLength = seedData.length
+    seedData.map( ( item, index )=>{
+      if( index != 0 && index % 6 == 0 ){
+        initPosition = initPosition + 6
+        lastPosition = ( lastPosition + 6 > totalLength )?totalLength:lastPosition
+        tempData.push( innerTempData )
+        innerTempData = []
+      }
+      innerTempData.push( item )
+    } )
+    if( innerTempData.length > 0 ){
+      tempData.push( innerTempData )
+    }
+    setPartialSeedData( tempData )
+    setTotal( totalLength )
+    // setCurrentPosition( 0 )
+    // }
+    // setMounted( true )
+  }, [] )
+
+  const onNextClick = () => {
+    // const tempData = []
+    // const initPosition = ( currentPosition * 6 ) + 6
+    // const lastPosition = ( ( currentPosition + 2 ) * 6 ) > total ? total : ( currentPosition + 2 ) * 6
+    // for ( let i = initPosition; i < lastPosition; i++ ) {
+    // tempData.push( seedData[ i ] )
+    // }
+    // setPartialSeedData( [] )
+    // setPartialSeedData( [ ...tempData ] )
+    const nextPosition = currentPosition+1
+    setCurrentPosition( nextPosition )
+    ref.current?.setPage( nextPosition )
+  }
+
+  const onPreviousClick = () => {
+    const nextPosition = currentPosition-1
+    setCurrentPosition( nextPosition )
+    ref.current?.setPage( nextPosition )
+  }
+
+  const getFormattedNumber = ( number ) => {
+    if ( number < 10 ) return '0' + number
     else return number + ''
   }
 
   const getPlaceholder = ( index ) => {
-    if( index == 1 ) return index + 'st'
-    else if( index == 2 ) return index + 'nd'
-    else if( index == 3 ) return index + 'rd'
+    if ( index == 1 ) return index + 'st'
+    else if ( index == 2 ) return index + 'nd'
+    else if ( index == 3 ) return index + 'rd'
     else return index + 'th'
   }
+
+  const onPageScroll = useMemo(
+    () =>
+      Animated.event<PagerViewOnPageScrollEventData>(
+        [
+          {
+            nativeEvent: {
+              offset: scrollOffsetAnimatedValue,
+              position: positionAnimatedValue,
+            },
+          },
+        ],
+        {
+          useNativeDriver: false,
+        }
+      ),
+    []
+  )
+
+  const onPageSelected = useMemo(
+    () =>
+      Animated.event<PagerViewOnPageSelectedEventData>(
+        [ {
+          nativeEvent: {
+            position: onPageSelectedPosition
+          }
+        } ],
+        {
+          listener: ( { nativeEvent: { position } } ) => {
+            setCurrentPosition( position )
+          },
+          useNativeDriver: true,
+        }
+      ),
+    []
+  )
 
   return (
     <View style={{
       flex: 1
     }} >
-      {seedData && seedData.length ? (
-        <View style={{
-          flex: 1, marginTop: 10
-        }} >
-          <ScrollView>
-            {seedData.map( ( value, index ) => {
-              return (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => SelectOption( value?.id )}
-                  style={styles.historyCard}
-                >
-                  <View style={styles.numberContainer}>
-                    <View style={styles.numberInnerContainer}>
-                      <Text style={styles.numberText}>{getFormattedNumber( index + 1 )}</Text>
-                    </View>
-                  </View>
-                  <TextInput
-                    style={styles.modalInputBox}
-                    placeholder={`Enter ${getPlaceholder( index+1 )} word`}
-                    placeholderTextColor={Colors.borderColor}
-                    value={value.name}
-                    autoCompleteType="off"
-                    textContentType="none"
-                    returnKeyType="next"
-                    autoCorrect={false}
-                    // editable={isEditable}
-                    autoCapitalize="none"
-                    // onSubmitEditing={() =>
-                    // }
-                    onChangeText={( text ) => {
-                      const data = [ ...seedData ]
-                      data[ index ].name = text
-                      setSeedData( data )
-                    }}
-                  />
-                </TouchableOpacity>
-              )
-            } )}
-          </ScrollView>
-          <BottomInfoBox
-            backgroundColor={Colors.white}
-            title={props.infoBoxTitle}
-            infoText={props.infoBoxInfo}
-          />
-        </View>
-      ) : (
-        <View style={{
-          flex: 1
-        }}>
-          <View style={{
-            backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
-          }}>
-            <BottomInfoBox
-              backgroundColor={Colors.white}
-              title={props.infoBoxInfoTitle}
-              infoText={props.infoBoxInfo}
-            />
-          </View>
-        </View>
-      )}
-      {props.showButton ? <View>
-        {props.onConfirm ?
-          <TouchableOpacity
+      {partialSeedData && partialSeedData.length > 0 && partialSeedData[ currentPosition ] != undefined &&
+      partialSeedData[ currentPosition ] ? (
+          <AnimatedPagerView
+            initialPage={0}
+            ref={ref}
             style={{
-              marginLeft: wp( '8%' ),
-              marginBottom: -wp( '5%' ),
-              height: wp( '7%' ),
-              width: 'auto',
-              justifyContent:'center'
+              flex:1
             }}
-            delayPressIn={0}
-            onPress={() => props.onConfirm()}
+            onPageScroll={onPageScroll}
+            onPageSelected={onPageSelected}
           >
-            <Text
-              style={{
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
-                color: Colors.textColorGrey,
-              }}
-            >
-            Click here To{' '}
-              <Text
-                style={{
-                  color: Colors.blue,
-                }}
-              >
-              confirm
-              </Text>{' '}
-            share
-            </Text>
-          </TouchableOpacity>
-          : null}
-        <View style={styles.bottomButtonView}>
+            {partialSeedData.map( ( seedItem, seedIndex ) => (
+              <View  key={seedIndex} style={{
+                flex: 1, marginTop: 10
+              }} >
+                <FlatList
+                  keyExtractor={( item, index ) => index.toString()}
+                  data={seedItem}
+                  extraData={seedItem}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={2}
+                  contentContainerStyle={{
+                    marginStart:15
+                  }}
+                  renderItem={( { value, index } ) => {
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => SelectOption( value?.id )}
+                        style={styles.historyCard}
+                      >
+                        <Text style={styles.numberText}>{getFormattedNumber( index + 1 + ( seedIndex * 6 ) )}</Text>
+                        <TextInput
+                          style={[ styles.modalInputBox,
+                            // partialSeedData[ index ]?.name.length > 0 ? styles.selectedInput : null,
+                            value?.name.length > 0 ? styles.selectedInput : null,
+                          ]}
+                          placeholder={`Enter ${getPlaceholder( index + 1 + ( seedIndex * 6 ) )} word`}
+                          placeholderTextColor={Colors.borderColor}
+                          value={value?.name}
+                          autoCompleteType="off"
+                          textContentType="none"
+                          returnKeyType="next"
+                          autoCorrect={false}
+                          // editable={isEditable}
+                          autoCapitalize="none"
+                          // onSubmitEditing={() =>
+                          // }
+                          onChangeText={( text ) => {
+                            // const data = [ ...partialSeedData ]
+                            // data[ index ].name = text
+                            // setPartialSeedData( data )
+                          }}
+                        />
+                      </TouchableOpacity>
+                    )
+                  }}
+                />
+                <BottomInfoBox
+                  backgroundColor={Colors.white}
+                  title={props.infoBoxTitle}
+                  infoText={props.infoBoxInfo}
+                />
+              </View>
+            ) )}
+          </AnimatedPagerView>
+        ): (
+          <View style={{
+            flex: 1
+          }}>
+            <View style={{
+              backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
+            }}>
+              <BottomInfoBox
+                backgroundColor={Colors.white}
+                title={props.infoBoxTitle}
+                infoText={props.infoBoxInfo}
+              />
+            </View>
+          </View>
+        )}
+      {props.showButton ? <View>
+        <View style={[ styles.bottomButtonView ]}>
           {props.confirmButtonText ? (
             <TouchableOpacity
-              onPress={() => {props.onPressConfirm()
-              }}
+              onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm() }}
               style={{
                 ...styles.successModalButtonView,
                 backgroundColor: props.confirmDisable
@@ -240,20 +304,18 @@ const RestoreSeedPageComponent = ( props ) => {
                   color: Colors.white,
                 }}
               >
-                {props.IsReshare
-                  ? props.reshareButtonText
-                  : props.confirmButtonText}
+                {( currentPosition + 1 ) * 6 < total ? props.confirmButtonText : props.proceedButtonText}
               </Text>
             </TouchableOpacity>
           ) : null}
           {props.isChangeKeeperAllow ? (
             <TouchableOpacity
               disabled={props.disableChange ? props.disableChange : false}
-              onPress={() => props.onPressChange()}
+              onPress={() => { ( currentPosition  * 6 )!=0 ? onPreviousClick() : props.onPressChange() }}
               style={{
                 marginLeft: 10,
                 height: wp( '13%' ),
-                width: wp( '40%' ),
+                width: wp( '25%' ),
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -265,10 +327,21 @@ const RestoreSeedPageComponent = ( props ) => {
                   color: props.disableChange ? Colors.lightBlue : Colors.blue,
                 }}
               >
-                {props.changeButtonText}
+                {(  currentPosition  * 6 )!=0 ? props.previousButtonText : props.changeButtonText}
               </Text>
             </TouchableOpacity>
           ) : null}
+          <View style={{
+            flexDirection: 'row'
+          }}>
+            {
+              partialSeedData.map( ( item, index )=>{
+                return(
+                  <View key={( index )} style={currentPosition==index ? styles.selectedDot:styles.unSelectedDot} />
+                )
+              } )
+            }
+          </View>
         </View>
       </View> : null
       }
@@ -314,17 +387,19 @@ const styles = StyleSheet.create( {
     alignItems: 'center'
   },
   historyCard: {
-    margin: wp( '3%' ),
+    marginEnd: 15,
     // backgroundColor: Colors.gray7,
     borderRadius: 10,
-    height: wp( '15%' ),
-    width: wp( '90%' ),
+    flex: 1 / 2,
+    // height: wp( '15%' ),
+    // width: wp( '90%' ),
     // justifyContent: 'center',
-    paddingLeft: wp( '3%' ),
-    paddingRight: wp( '3%' ),
+    // paddingLeft: wp( '3%' ),
+    // paddingRight: wp( '3%' ),
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 20
   },
   historyCardTitleText: {
     color: Colors.textColorGrey,
@@ -345,7 +420,7 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '8%' ),
     marginRight: wp( '8%' ),
   },
-  numberContainer:{
+  numberContainer: {
     margin: 10,
     height: RFValue( 50 ),
     width: RFValue( 50 ),
@@ -360,21 +435,22 @@ const styles = StyleSheet.create( {
       height: 15,
     },
   },
-  numberInnerContainer:{
+  numberInnerContainer: {
     backgroundColor: Colors.numberBg,
-    borderRadius: RFValue ( 23 ),
+    borderRadius: RFValue( 23 ),
     height: RFValue( 46 ),
-    width:RFValue( 46 ),
-    margin:RFValue( 4 ),
-    justifyContent:'center',
-    alignItems:'center'
+    width: RFValue( 46 ),
+    margin: RFValue( 4 ),
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  numberText:{
+  numberText: {
     color: Colors.numberFont,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
+    marginEnd: 10
   },
-  nameText:{
+  nameText: {
     color: Colors.greyTextColor,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
@@ -388,7 +464,33 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
     borderRadius: 10,
-    borderColor: '#E3E3E3',
-    borderWidth: 1
+    // borderColor: '#E3E3E3',
+    // borderWidth: 1
+    backgroundColor: Colors.backgroundColor1
   },
+  selectedInput: {
+    backgroundColor: Colors.white,
+    // backgroundColor: 'red',
+    elevation: 5,
+    shadowColor: Colors.shadowBlack,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15,
+      height: 15,
+    },
+  },
+  selectedDot:{
+    width:25,
+    height:5,
+    borderRadius:5,
+    backgroundColor:Colors.blue,
+    marginEnd:5
+  },
+  unSelectedDot:{
+    width:6,
+    height:5,
+    borderRadius:5,
+    backgroundColor:Colors.primaryAccentLighter2,
+    marginEnd:5
+  }
 } )
