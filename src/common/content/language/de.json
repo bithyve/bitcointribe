@@ -598,7 +598,7 @@
       "errorwhilereceiving": "Beim Empfang Ihres Wiederherstellungsschlüssels ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut",
       "RestoringWalletfrom": "Wiederherstellung der Brieftasche von",
       "Recoverfrom": "Sich erholen von",
-      "Clickingon": "Wenn Sie auf Wiederherstellen klicken, wird Ihr Wiederherstellungsschlüssel von iCloud bezogen",
+      "Clickingon": "Wenn Sie auf Wiederherstellen klicken, wird Ihr Wiederherstellungsschlüssel von {0} bezogen",
       "Recover": "Genesen",
       "Recoverusingkeys": "Wiederherstellen mit Schlüsseln",
       "statusofyourRecovery": "Der Status Ihrer Wiederherstellungsschlüsselanforderung ist unten sichtbar",

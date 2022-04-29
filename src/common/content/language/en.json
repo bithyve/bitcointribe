@@ -638,7 +638,7 @@
     "errorwhilereceiving": "There was an error while receiving your Recovery Key, please try again",
     "RestoringWalletfrom": "Restoring Wallet from",
     "Recoverfrom": "Recover from",
-    "Clickingon": "Clicking on Recover would source your Recovery Key from iCloud",
+    "Clickingon": "Clicking on Recover would source your Recovery Key from {0}",
     "Recover": "Recover",
     "Recoverusingkeys": "Recover using keys",
     "statusofyourRecovery": "The status of your Recovery Key request is visible below",
