@@ -78,6 +78,7 @@ export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
 export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
+export const RECOVER_WALLET_WITH_MNEMONIC = 'RECOVER_WALLET_WITH_MNEMONIC'
 export const PDF_UPGRADE = 'PDF_UPGRADE'
 export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
 
@@ -786,6 +787,15 @@ export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
   return {
     type: RECOVER_WALLET_WITHOUT_ICLOUD, payload: {
       backupData, answer
+    }
+  }
+}
+
+export const recoverWalletUsingMnemonic = ( primaryMnemonic: string ) => {
+  return {
+    type: RECOVER_WALLET_WITH_MNEMONIC,
+    payload: {
+      primaryMnemonic
     }
   }
 }

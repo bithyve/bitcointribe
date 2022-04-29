@@ -79,7 +79,7 @@ import { processDeepLink } from '../../common/CommonFunctions'
 import { generateTrustedContact } from '../../bitcoin/utilities/TrustedContactFactory'
 
 function* generateSecondaryAssets(){
-  const secondaryMnemonic = bip39.generateMnemonic( 256 )
+  const secondaryMnemonic = bip39.generateMnemonic( )
   const derivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
   const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, derivationPath )

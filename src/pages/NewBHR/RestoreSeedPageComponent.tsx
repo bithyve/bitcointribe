@@ -288,7 +288,16 @@ const RestoreSeedPageComponent = ( props ) => {
         <View style={[ styles.bottomButtonView ]}>
           {props.confirmButtonText ? (
             <TouchableOpacity
-              onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm() }}
+              // onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm() }}
+              onPress={() => {
+                let seed = ''
+                seedData.forEach( ( { name } ) => {
+                  if( !seed ) seed = name
+                  else seed = seed + ' ' + name
+                } )
+
+                (currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm( seed )
+              }}
               style={{
                 ...styles.successModalButtonView,
                 backgroundColor: props.confirmDisable
