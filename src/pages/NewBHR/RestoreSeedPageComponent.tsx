@@ -30,97 +30,49 @@ const RestoreSeedPageComponent = ( props ) => {
       name:''
     },
     {
-      id: 1,
+      id: 2,
       name:''
     },
     {
-      id: 1,
+      id: 3,
       name:''
     },
     {
-      id: 1,
+      id: 4,
       name:''
     },
     {
-      id: 1,
+      id: 5,
       name:''
     },
     {
-      id: 1,
+      id: 6,
       name:''
     },
     {
-      id: 1,
+      id: 7,
       name:''
     },
     {
-      id: 1,
+      id: 8,
       name:''
     },
     {
-      id: 1,
+      id: 9,
       name:''
     },
     {
-      id: 1,
+      id: 10,
       name:''
     },
     {
-      id: 1,
+      id: 11,
       name:''
     },
     {
-      id: 1,
+      id: 12,
       name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
-    {
-      id: 1,
-      name:''
-    },
+    }
   ] )
 
   const getFormattedNumber =  ( number ) => {
