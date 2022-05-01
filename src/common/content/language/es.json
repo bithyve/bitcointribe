@@ -598,7 +598,7 @@
       "errorwhilereceiving": "Hubo un error al recibir su clave de recuperación, intente nuevamente",
       "RestoringWalletfrom": "Restaurando Wallet desde",
       "Recoverfrom": "Recuperarse de",
-      "Clickingon": "Al hacer clic en Recuperar obtendría su clave de recuperación de iCloud",
+      "Clickingon": "Al hacer clic en Recuperar obtendría su clave de recuperación de {0}",
       "Recover": "Recuperar",
       "Recoverusingkeys": "Recuperar usando claves",
       "statusofyourRecovery": "El estado de su solicitud de clave de recuperación es visible a continuación",
