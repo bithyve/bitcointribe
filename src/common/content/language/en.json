@@ -645,6 +645,7 @@
     "KeyReceived": "Key Received",
     "WaitingforKey": "Waiting for Key",
     "UseSendRequest": "Use Send Request to share a link with a contact. If the person you wish to backup your Recovery Key with, is with you in person, use Scan Key. Or they could also send you a screenshot of the QR for you to scan",
+    "UseScaneKey":"Scan Recovery Key to restore your wallet",
     "SendRequest": "Send Request",
     "ScanKey": "Scan Key",
     "SelectContact": "Select Contact",

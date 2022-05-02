@@ -605,6 +605,7 @@
       "KeyReceived": "Clé reçue",
       "WaitingforKey": "En attente de la clé",
       "UseSendRequest": "Utilisez Envoyer une demande pour partager un lien avec un contact. Si la personne avec laquelle vous souhaitez sauvegarder votre clé de récupération est avec vous en personne, utilisez Scan Key. Ou ils pourraient également vous envoyer une capture d'écran du QR pour que vous puissiez numériser",
+      "UseScaneKey":"Scannez la clé de récupération pour restaurer votre portefeuille",
       "SendRequest": "Envoyer une demande",
       "ScanKey": "Clé de numérisation",
       "SelectContact": "Sélectionnez Contact",
