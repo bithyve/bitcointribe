@@ -20,6 +20,7 @@ import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -61,11 +62,11 @@ const RestoreSeedWordsContent = ( props ) => {
         moreInfo={''}
       />
       <View style={{
-        flex: 1
+        flex: 1,
       }}>
         <RestoreSeedPageComponent
-          infoBoxTitle={'Note'}
-          infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
+          // infoBoxTitle={'Note'}
+          // infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
           onPressConfirm={recoverWalletViaSeed}
           data={[]}
           confirmButtonText={'Next'}
