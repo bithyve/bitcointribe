@@ -10,15 +10,15 @@ export type Props = {
   containerStyle?: Record<string, unknown>;
 }
 
-const AddNewAccountCard: React.FC<Props> = ({
+const AddNewAccountCard: React.FC<Props> = ( {
   onPress,
   containerStyle = {
   },
-}: Props) => {
-  const { translations } = useContext(LocalizationContext)
-  const add_new = translations['home'].add_new
+}: Props ) => {
+  const { translations } = useContext( LocalizationContext )
+  const add_new = translations[ 'home' ].add_new
   return (
-    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={containerStyle} disabled>
+    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={containerStyle}>
       <View style={styles.cardContainer}>
         <View
           style={{
@@ -31,16 +31,16 @@ const AddNewAccountCard: React.FC<Props> = ({
             style={{
               width: 42, height: 42
             }}
-            source={require('../../assets/images/icons/icon_add.png')}
+            source={require( '../../assets/images/icons/icon_add.png' )}
           />
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontSize: RFValue(12),
+              fontSize: RFValue( 12 ),
               fontWeight: '500',
             }}
           >
-            {add_new}
+            Add Lightning Wallet
           </Text>
         </View>
       </View>
@@ -49,11 +49,11 @@ const AddNewAccountCard: React.FC<Props> = ({
 }
 
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   cardContainer: {
     backgroundColor: Colors.white,
-    width: widthPercentageToDP(43),
-    height: heightPercentageToDP(20),
+    width: widthPercentageToDP( 43 ),
+    height: heightPercentageToDP( 20 ),
     // borderColor: Colors.borderColor,
     borderRadius: 10,
     shadowColor: Colors.shadowColor,
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
     },
     elevation: 6
   },
-})
+} )
 
 export default AddNewAccountCard

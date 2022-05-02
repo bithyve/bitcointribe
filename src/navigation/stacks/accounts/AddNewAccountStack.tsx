@@ -69,12 +69,12 @@ const AddNewAccountStack = createStackNavigator(
       }
     },
 
-    EnterNodeConfig: {
-      screen: EnterNodeConfig,
-      navigationOptions: {
-        header: null
-      }
-    },
+    // EnterNodeConfig: {
+    //   screen: EnterNodeConfig,
+    //   navigationOptions: {
+    //     header: null
+    //   }
+    // },
 
     TransactionDetails: {
       screen: TransactionDetailsContainerScreen,
@@ -83,12 +83,12 @@ const AddNewAccountStack = createStackNavigator(
       },
     },
 
-    ScanNodeConfig: {
-      screen: ScanNodeConfig,
-      navigationOptions: {
-        header: null
-      }
-    },
+    // ScanNodeConfig: {
+    //   screen: ScanNodeConfig,
+    //   navigationOptions: {
+    //     header: null
+    //   }
+    // },
   },
   {
     initialRouteName: 'AccountSelectionList',
