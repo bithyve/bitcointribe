@@ -48,7 +48,7 @@ import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHis
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
 import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
-import RestoreSeedWordsContent from '../../../pages/NewBHR/RestoreSeedWordsContent'
+import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
 import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
@@ -228,7 +228,12 @@ const HomeStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
-    BackupSeedWordsContent,
+    BackupSeedWordsContent: {
+      screen: BackupSeedWordsContent,
+      navigationOptions: {
+        header: null,
+      },
+    },
     RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,

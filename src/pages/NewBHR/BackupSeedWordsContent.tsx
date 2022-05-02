@@ -31,26 +31,25 @@ const BackupSeedWordsContent = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Backup Seed Words'}
-        moreInfo={'Note down the words 1 to 24'}
+        selectedTitle={'Enter Seed Words'}
       />
       <View style={{
         flex: 1
       }}>
         <SeedPageComponent
-          infoBoxTitle={''}
-          infoBoxInfo={'You will be asked to confirm some of these, to ensure you have all the seed words written'}
-          onPressConfirm={() => {
-            setConfirmSeedWordModal( true )
-          }}
+          infoBoxTitle={'Note'}
+          infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
+          onPressConfirm={()=>setConfirmSeedWordModal( true )}
           data={[]}
           confirmButtonText={'Next'}
+          proceedButtonText={'Proceed'}
           disableChange={false}
           onPressReshare={() => {
           }}
           onPressChange={() => props.navigation.goBack()}
           showButton={true}
           changeButtonText={'Back'}
+          previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
         />
       </View>

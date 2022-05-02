@@ -273,7 +273,7 @@ class RestoreWithICloud extends Component<
 
   componentDidMount = () => {
     this.props.setDownloadedBackupData( [] )
-    this.cloudData()
+    // this.cloudData()
   };
 
   cloudData = () => {
@@ -1050,7 +1050,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <Text style={styles.modalHeaderInfoText}>
-            {strings[ 'UseSendRequest' ]}
+            {strings[ 'UseScaneKey' ]}
           </Text>
         </View>
         <View
@@ -1070,9 +1070,10 @@ class RestoreWithICloud extends Component<
             shadowOffset: {
               width: 15, height: 15
             },
+            width: wp( '40%' )
           }}
         >
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               // alert("test");
               // ( this.ContactListForRestore as any ).current.snapTo( 1 )
@@ -1089,12 +1090,12 @@ class RestoreWithICloud extends Component<
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>{strings[ 'SendRequest' ]}</Text>
-          </TouchableOpacity>
-          <View
+          </TouchableOpacity> */}
+          {/* <View
             style={{
               width: 1, height: 30, backgroundColor: Colors.white
             }}
-          />
+          /> */}
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
@@ -1113,8 +1114,7 @@ class RestoreWithICloud extends Component<
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
-
-        <ModalContainer onBackground={()=>{this.setState( {
+        {/* <ModalContainer onBackground={()=>{this.setState( {
           restoreModal:false
         } )}} visible={restoreModal} closeBottomSheet={() => {
           this.setState( {
@@ -1122,7 +1122,7 @@ class RestoreWithICloud extends Component<
           } )
         }} >
           {this.renderContent()}
-        </ModalContainer>
+        </ModalContainer> */}
         <ModalContainer onBackground={()=>{this.setState( {
           contactListModal:false
         } )}} visible={contactListModal} closeBottomSheet={() => { }} >

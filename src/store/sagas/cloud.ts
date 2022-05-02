@@ -124,8 +124,8 @@ function* cloudWorker( { payload } ) {
         } ),
         timeout: delay( 60000 )
       } )
-      console.log( 'response', response )
-      console.log( 'timeout', timeout )
+      // console.log( 'skk isCloudBackupCompleted response', response )
+      // console.log( 'skk timeout', timeout )
       if ( !timeout ){
         const isCloudBackupCompleted = response?.status
 

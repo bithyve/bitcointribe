@@ -605,6 +605,7 @@
       "KeyReceived": "Schlüssel erhalten",
       "WaitingforKey": "Warten auf Schlüssel",
       "UseSendRequest": "Verwenden Sie Anfrage senden, um einen Link mit einem Kontakt zu teilen. Wenn die Person, mit der Sie Ihren Wiederherstellungsschlüssel sichern möchten, persönlich bei Ihnen ist, verwenden Sie Schlüssel scannen. Oder sie könnten Ihnen auch einen Screenshot des QR-Codes zum Scannen senden",
+      "UseScaneKey":"Herstelsleutel scannen om uw portemonnee te herstellen",
       "SendRequest": "Anfrage senden",
       "ScanKey": "Scan-Schlüssel",
       "SelectContact": "Wählen Sie Kontakt",

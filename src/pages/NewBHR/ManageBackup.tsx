@@ -599,6 +599,12 @@ export default function ManageBackup( props ) {
     const updatedAt = index % 2 == 0 ? item.keeper1.updatedAt : item.keeper2.updatedAt
     const chosenContact = index % 2 == 0 ? item.keeper1.data : item.keeper2.data
     switch ( shareType ) {
+        case 'seed':
+          if ( status == 'notSetup' ) {
+            return require( '../../assets/images/icons/seedwords.png' )
+          } else {
+            return require( '../../assets/images/icons/seedwords.png' )
+          }
         case 'securityQuestion' :
           if ( status == 'notSetup' ) {
             return require( '../../assets/images/icons/icon_password.png' )
@@ -621,13 +627,13 @@ export default function ManageBackup( props ) {
               }
             } else return require( '../../assets/images/icons/icon_user.png' )
           }
-          return Platform.OS == 'ios' ? require( '../../assets/images/icons/icon_contact.png' ) : require( '../../assets/images/icons/icon_contact.png' )
+          return require( '../../assets/images/icons/icon_contact.png' )
         case 'pdf' :
           if ( status == 'accessible' )
             if ( valueStatus == 'notSetup' )
-              return require( '../../assets/images/icons/doc-blue.png' )
-            else return require( '../../assets/images/icons/doc.png' )
-          else Platform.OS == 'ios' ? require( '../../assets/images/icons/files-and-folders-2.png' ) : require( '../../assets/images/icons/files-and-folders-2.png' )
+              return require( '../../assets/images/icons/files-and-folders-2.png' )
+            else return require( '../../assets/images/icons/files-and-folders-2.png' )
+          else require( '../../assets/images/icons/files-and-folders-2.png' )
         default:
           if ( index == 0 )
             return require( '../../assets/images/icons/icon_password.png' )

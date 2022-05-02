@@ -56,7 +56,7 @@ import Header from './stacks/Header'
 import IconWithBadge from './stacks/security/IconWithBadge'
 import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
-import RestoreSeedWordsContent from './../pages/NewBHR/RestoreSeedWordsContent'
+import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 
 const SetupNavigator = createStackNavigator(
   {

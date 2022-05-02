@@ -145,7 +145,7 @@ export default function KeeperTypeModalContents( props ) {
       }}> */}
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerText}>{props.headerText}</Text>
-        <Text
+        {/* <Text
           style={{
             ...styles.modalInfoText,
             marginTop: wp( '1.5%' ),
@@ -153,7 +153,7 @@ export default function KeeperTypeModalContents( props ) {
           }}
         >
           {props.subHeader}
-        </Text>
+        </Text> */}
       </View>
       <View
         style={{

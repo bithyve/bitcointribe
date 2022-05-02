@@ -1,16 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSelector, RootStateOrAny } from 'react-redux'
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
-  Animated,
-  Alert,
-  FlatList,
-  TextInput,
+  TextInput, FlatList, Animated, Dimensions, Alert
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import {
@@ -21,33 +16,57 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
-import { Wallet } from '../../bitcoin/utilities/Interface'
 import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
-const SeedPageComponent = ( props ) => {
-  const strings  = translations[ 'bhr' ]
-  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+const RestoreSeedPageComponent = ( props ) => {
+  const strings = translations[ 'bhr' ]
+
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const SelectOption = ( Id ) => {
   }
 
-  const seed = wallet.primaryMnemonic.split( ' ' )
-  const seedData = seed.map( ( word, index ) => {
-    return {
-      name: word, id: ( index+1 )
+  const [ seedData, setSeedData ] = useState( [
+    {
+      id: 1, name: ''
+    },
+    {
+      id: 2, name: ''
+    },
+    {
+      id: 3, name: ''
+    },
+    {
+      id: 4, name: ''
+    },
+    {
+      id: 5, name: ''
+    }, {
+      id: 6, name: ''
+    }, {
+      id: 7, name: ''
+    }, {
+      id: 8, name: ''
+    }, {
+      id: 9, name: ''
+    }, {
+      id: 10, name: ''
+    }, {
+      id: 11, name: ''
+    }, {
+      id: 12, name: ''
     }
-  } )
+  ] )
 
   const [ total, setTotal ] = useState( 0 )
   const [ partialSeedData, setPartialSeedData ] = useState( [] )
   const [ currentPosition, setCurrentPosition ] = useState( 0 )
 
   const width = Dimensions.get( 'window' ).width
-  const ref = useRef<PagerView>( null )
-  const scrollOffsetAnimatedValue = useRef( new Animated.Value( 0 ) ).current
-  const positionAnimatedValue = useRef( new Animated.Value( 0 ) ).current
+  const ref = React.useRef<PagerView>( null )
+  const scrollOffsetAnimatedValue = React.useRef( new Animated.Value( 0 ) ).current
+  const positionAnimatedValue = React.useRef( new Animated.Value( 0 ) ).current
   const onPageSelectedPosition = useRef( new Animated.Value( 0 ) ).current
   const inputRange = [ 0, partialSeedData.length ]
   const scrollX = Animated.add(
@@ -64,7 +83,6 @@ const SeedPageComponent = ( props ) => {
     let initPosition = 0
     let lastPosition = 6
     const totalLength = seedData.length
-    console.log( 'skk seeddata', seedData )
     seedData.map( ( item, index )=>{
       if( index != 0 && index % 6 == 0 ){
         initPosition = initPosition + 6
@@ -77,8 +95,6 @@ const SeedPageComponent = ( props ) => {
     if( innerTempData.length > 0 ){
       tempData.push( innerTempData )
     }
-    console.log( 'skk tempData', tempData )
-
     setPartialSeedData( tempData )
     setTotal( totalLength )
   }, [] )
@@ -204,12 +220,12 @@ const SeedPageComponent = ( props ) => {
                           ]}
                           placeholder={`Enter ${getPlaceholder( index + 1 + ( seedIndex * 6 ) )} word`}
                           placeholderTextColor={Colors.borderColor}
-                          value={partialSeedData[ currentPosition ][ index ]?.name}
+                          value={value?.name}
                           autoCompleteType="off"
                           textContentType="none"
                           returnKeyType="next"
                           autoCorrect={false}
-                          editable={false}
+                          // editable={isEditable}
                           autoCapitalize="none"
                           // onSubmitEditing={() =>
                           // }
@@ -311,7 +327,7 @@ const SeedPageComponent = ( props ) => {
   )
 }
 
-export default SeedPageComponent
+export default RestoreSeedPageComponent
 
 const styles = StyleSheet.create( {
   successModalButtonView: {

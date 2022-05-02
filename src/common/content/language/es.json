@@ -605,6 +605,7 @@
       "KeyReceived": "Clave recibida",
       "WaitingforKey": "Esperando llave",
       "UseSendRequest": "Utilice Enviar solicitud para compartir un enlace con un contacto. Si la persona con la que desea hacer una copia de seguridad de su clave de recuperación está con usted en persona, use Scan Key. O también podrían enviarle una captura de pantalla del QR para que la escanee.",
+      "UseScaneKey":"Skanu Reakiran Ŝlosilon por restarigi vian monujon",
       "SendRequest": "Enviar petición",
       "ScanKey": "Escanear clave",
       "SelectContact": "Seleccione un contacto",

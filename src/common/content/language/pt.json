@@ -606,6 +606,7 @@
       "KeyReceived": "Chave Recebida",
       "WaitingforKey": "Esperando pela Chave",
       "UseSendRequest": "Use Enviar solicitação para compartilhar um link com um contato. Se a pessoa com quem você deseja fazer o backup da sua chave de recuperação estiver com você pessoalmente, use a chave de varredura. Ou eles também podem enviar uma captura de tela do QR para você digitalizar",
+      "UseScaneKey":"Digitalize a chave de recuperação para restaurar sua carteira",
       "SendRequest": "Enviar pedido",
       "ScanKey": "Chave de digitalização",
       "SelectContact": "Selecione o contato",
