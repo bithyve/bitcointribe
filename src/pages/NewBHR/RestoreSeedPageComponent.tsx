@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput, FlatList, Animated, Dimensions
+  TextInput, FlatList, Animated, Dimensions, Alert
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import {
@@ -32,56 +32,30 @@ const RestoreSeedPageComponent = ( props ) => {
       id: 1, name: ''
     },
     {
-      id: 1, name: ''
+      id: 2, name: ''
     },
     {
-      id: 1, name: ''
+      id: 3, name: ''
     },
     {
-      id: 1, name: ''
+      id: 4, name: ''
     },
     {
-      id: 1, name: ''
+      id: 5, name: ''
     }, {
-      id: 1, name: ''
+      id: 6, name: ''
     }, {
-      id: 1, name: ''
+      id: 7, name: ''
     }, {
-      id: 1, name: ''
+      id: 8, name: ''
     }, {
-      id: 1, name: ''
+      id: 9, name: ''
     }, {
-      id: 1, name: ''
+      id: 10, name: ''
     }, {
-      id: 1, name: ''
+      id: 11, name: ''
     }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 1, name: ''
-    }, {
-      id: 23, name: ''
-    }, {
-      id: 24, name: ''
-    }, {
-      id: 25, name: ''
+      id: 12, name: ''
     }
   ] )
 
@@ -143,6 +117,24 @@ const RestoreSeedPageComponent = ( props ) => {
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+  }
+
+  const onProceedClick = () =>{
+    let seed = ''
+    let showValidation = false
+    seedData.forEach( ( { name } ) => {
+      if( name == null || name == '' ) {
+        showValidation = true
+        return
+      }
+      if( !seed ) seed = name
+      else seed = seed + ' ' + name
+    } )
+    if( showValidation ){
+      Alert.alert( 'Please fill all seed details' )
+    } else {
+      props.onPressConfirm( seed )
+    }
   }
 
   const onPreviousClick = () => {
@@ -237,8 +229,8 @@ const RestoreSeedPageComponent = ( props ) => {
                         <Text style={styles.numberText}>{getFormattedNumber( index + 1 + ( seedIndex * 6 ) )}</Text>
                         <TextInput
                           style={[ styles.modalInputBox,
-                            // partialSeedData[ index ]?.name.length > 0 ? styles.selectedInput : null,
-                            value?.name.length > 0 ? styles.selectedInput : null,
+                            partialSeedData[ currentPosition ][ index ]?.name.length > 0 ? styles.selectedInput : null,
+                            // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
                           placeholder={`Enter ${getPlaceholder( index + 1 + ( seedIndex * 6 ) )} word`}
                           placeholderTextColor={Colors.borderColor}
@@ -252,9 +244,9 @@ const RestoreSeedPageComponent = ( props ) => {
                           // onSubmitEditing={() =>
                           // }
                           onChangeText={( text ) => {
-                            // const data = [ ...partialSeedData ]
-                            // data[ index ].name = text
-                            // setPartialSeedData( data )
+                            const data = [ ...partialSeedData ]
+                            data[ currentPosition ][ index ].name = text
+                            setPartialSeedData( data )
                           }}
                         />
                       </TouchableOpacity>
@@ -288,16 +280,15 @@ const RestoreSeedPageComponent = ( props ) => {
         <View style={[ styles.bottomButtonView ]}>
           {props.confirmButtonText ? (
             <TouchableOpacity
-              // onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm() }}
-              onPress={() => {
-                let seed = ''
-                seedData.forEach( ( { name } ) => {
-                  if( !seed ) seed = name
-                  else seed = seed + ' ' + name
-                } )
-
-                (currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm( seed )
-              }}
+              onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : onProceedClick() }}
+              // onPress={() => {
+              // let seed = ''
+              // seedData.forEach( ( { name } ) => {
+              //   if( !seed ) seed = name
+              //   else seed = seed + ' ' + name
+              // } )
+              // (currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm( seed )
+              // }}
               style={{
                 ...styles.successModalButtonView,
                 backgroundColor: props.confirmDisable
