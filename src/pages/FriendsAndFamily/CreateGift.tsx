@@ -639,7 +639,7 @@ const CreateGift = ( { navigation } ) => {
 
   const renderErrorModal = () => {
     return <View style={{
-      backgroundColor: Colors.bgColor,
+      backgroundColor: Colors.white,
       padding: wp( '8' )
     }}>
       <View style={{
@@ -1373,7 +1373,6 @@ const styles = StyleSheet.create( {
   },
   accountSelectionView: {
     width: '90%',
-    backgroundColor: Colors.gray7,
     shadowOpacity: 0.06,
     shadowOffset: {
       width: 10, height: 10
