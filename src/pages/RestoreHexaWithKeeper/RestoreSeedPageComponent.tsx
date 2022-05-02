@@ -78,9 +78,6 @@ const RestoreSeedPageComponent = ( props ) => {
   } )
 
   useEffect( () => {
-    // return()=>{
-    // Code for componentWillMount here
-    // This code is called only one time before intial render
     const tempData = []
     let innerTempData = []
     let initPosition = 0
@@ -100,20 +97,9 @@ const RestoreSeedPageComponent = ( props ) => {
     }
     setPartialSeedData( tempData )
     setTotal( totalLength )
-    // setCurrentPosition( 0 )
-    // }
-    // setMounted( true )
   }, [] )
 
   const onNextClick = () => {
-    // const tempData = []
-    // const initPosition = ( currentPosition * 6 ) + 6
-    // const lastPosition = ( ( currentPosition + 2 ) * 6 ) > total ? total : ( currentPosition + 2 ) * 6
-    // for ( let i = initPosition; i < lastPosition; i++ ) {
-    // tempData.push( seedData[ i ] )
-    // }
-    // setPartialSeedData( [] )
-    // setPartialSeedData( [ ...tempData ] )
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
@@ -281,14 +267,6 @@ const RestoreSeedPageComponent = ( props ) => {
           {props.confirmButtonText ? (
             <TouchableOpacity
               onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : onProceedClick() }}
-              // onPress={() => {
-              // let seed = ''
-              // seedData.forEach( ( { name } ) => {
-              //   if( !seed ) seed = name
-              //   else seed = seed + ' ' + name
-              // } )
-              // (currentPosition + 1 ) * 6 < total ? onNextClick() : props.onPressConfirm( seed )
-              // }}
               style={{
                 ...styles.successModalButtonView,
                 backgroundColor: props.confirmDisable

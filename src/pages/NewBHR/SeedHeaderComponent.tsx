@@ -9,52 +9,37 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { translations } from '../../common/content/LocContext'
 
-const SeedHeaderComponent = ( props ) => {
+const RestoreSeedHeaderComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
 
   return (
     <View style={styles.modalHeaderTitleView}>
-      <View style={{
-        flex: 1, flexDirection: 'row', alignItems: 'center'
-      }}>
-        <TouchableOpacity
-          onPress={() => props.onPressBack()}
+      <TouchableOpacity
+        onPress={() => props.onPressBack()}
+        style={{
+          height: wp( '10%' ), width: wp( '10%' ), alignItems: 'center'
+        }}
+      >
+        <Image
+          source={require( '../../assets/images/icons/icon_back.png' )}
           style={{
-            height: wp( '10%' ), width: wp( '10%' ), alignItems: 'center'
+            width: wp( '5%' ), height: wp( '2%' )
           }}
-        >
-          <Image
-            source={require( '../../assets/images/icons/icon_back.png' )}
-            style={{
-              width: wp( '5%' ), height: wp( '2%' )
-            }}
-          />
-        </TouchableOpacity>
-        <View style={styles.headerInfoView}>
-          <View style={{
-            flex: 1, justifyContent: 'center'
-          }}>
-            <Text style={styles.titleText}>{props.selectedTitle}</Text>
-            <Text style={{
-              ...styles.infoText, fontSize: RFValue( 10 )
-            }}>
-              {props.moreInfo}
-            </Text>
-          </View>
-        </View>
-      </View>
+        />
+      </TouchableOpacity>
+      <Text style={styles.titleText}>{props.selectedTitle}</Text>
     </View>
   )
 }
 
-export default SeedHeaderComponent
+export default RestoreSeedHeaderComponent
 
 const styles = StyleSheet.create( {
   modalHeaderTitleView: {
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-    alignItems: 'center',
-    flexDirection: 'row',
+    // alignItems: 'center',
+    // flexDirection: 'row',
     paddingBottom: hp( '2%' ),
     marginTop: 20,
     marginBottom: 15,
@@ -67,6 +52,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
   },
   titleText: {
+    marginLeft: wp( '4%' ),
     color: Colors.blue,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
