@@ -74,7 +74,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   navigateToAddNewAccountScreen = () => {
-    this.props.navigation.navigate( 'AddNewAccount' )
+    // this.props.navigation.navigate( 'AddNewAccount' )
+    this.props.navigation.navigate( 'ScanNodeConfig', {
+      currentSubAccount: null,
+    } )
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
