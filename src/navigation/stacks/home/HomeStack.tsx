@@ -203,7 +203,13 @@ const HomeStack = createStackNavigator(
     AddContactSendRequest,
     QrAndLink,
     ContactDetails,
-    Receive,
+    Receive: {
+      screen: Receive,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
     PairNewWallet,
     // ManageBackupKeeper,
     ManageBackupNewBHR,

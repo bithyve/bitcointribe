@@ -4,6 +4,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   onPress: () => void;
@@ -17,8 +19,13 @@ const AddNewAccountCard: React.FC<Props> = ( {
 }: Props ) => {
   const { translations } = useContext( LocalizationContext )
   const add_new = translations[ 'home' ].add_new
+  const lnAccount = useActiveAccountShells().filter( account => account.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT )
+
   return (
-    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={containerStyle}>
+    <TouchableOpacity activeOpacity={0.85}
+      onPress={onPress}
+      style={containerStyle}
+      disabled={lnAccount.length !==0}    >
       <View style={styles.cardContainer}>
         <View
           style={{
