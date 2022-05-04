@@ -36,6 +36,7 @@ import ManageBackupCard from './ManageBackupCard'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import ModalContainer from '../../components/home/ModalContainer'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
+import BackupTypeModalContent from './BackupTypeModalContent'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import QRModal from '../Accounts/QRModal'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
@@ -51,6 +52,7 @@ import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
+import SeedBacupModalContents from './SeedBacupModalContents'
 
 export default function ManageBackup( props ) {
   const dispatch = useDispatch()
@@ -122,6 +124,8 @@ export default function ManageBackup( props ) {
   const [ knowMoreType, setKnowMoreType ] = useState( 'manageBackup' )
   const [ keeping, setKeeping ] = useState( [] )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
+  const [ backupTypeModal, setBackupTypeModal ] = useState( false )
+  const [ seedBackupModal, setSeedBackupModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
   const [ isLevel3Started, setIsLevel3Started ] = useState( false )
 
@@ -160,7 +164,7 @@ export default function ManageBackup( props ) {
 
   const init = async () => {
     await onRefresh()
-    dispatch( modifyLevelData() )
+    // dispatch( modifyLevelData() )
   }
 
   const updateAddressBook = async () => {
@@ -223,7 +227,7 @@ export default function ManageBackup( props ) {
         levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' &&
         levelHealth[ 0 ].levelInfo[ 1 ].updatedAt == 0
       ) {
-        dispatch( setCloudData() )
+        // dispatch( setCloudData() )
       }
     }
 
@@ -442,13 +446,13 @@ export default function ManageBackup( props ) {
       } )
     }
     dispatch( modifyLevelData() )
-    dispatch( setHealthStatus() )
-    autoCloudUpload()
+    // dispatch( setHealthStatus() )
+    // autoCloudUpload()
   }
 
-  const autoCloudUpload = () => {
-    if ( levelHealth[ 0 ] && levelHealth[ 1 ] ) {
-      if ( levelHealth[ 1 ].levelInfo.length == 4 &&
+  const autoCloudUpload = () =>{
+    if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
+      if( levelHealth[ 1 ].levelInfo.length == 4 &&
         levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
@@ -478,6 +482,10 @@ export default function ManageBackup( props ) {
   }
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
+    if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+      setBackupTypeModal( true )
+      return
+    }
     if ( ( keeperNumber == 1 ) && ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       if ( value.id == 1 ) {
         props.navigation.navigate( 'SetNewPassword', {
@@ -591,6 +599,12 @@ export default function ManageBackup( props ) {
     const updatedAt = index % 2 == 0 ? item.keeper1.updatedAt : item.keeper2.updatedAt
     const chosenContact = index % 2 == 0 ? item.keeper1.data : item.keeper2.data
     switch ( shareType ) {
+        case 'seed':
+          if ( status == 'notSetup' ) {
+            return require( '../../assets/images/icons/seedwords.png' )
+          } else {
+            return require( '../../assets/images/icons/seedwords.png' )
+          }
         case 'securityQuestion' :
           if ( status == 'notSetup' ) {
             return require( '../../assets/images/icons/icon_password.png' )
@@ -603,7 +617,7 @@ export default function ManageBackup( props ) {
         case 'primaryKeeper' :
           if ( status == 'accessible' )
             return require( '../../assets/images/icons/icon_ipad_blue.png' )
-          else return Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
+          else return Platform.OS == 'ios' ? require( '../../assets/images/icons/icon_secondarydevice.png' ) : require( '../../assets/images/icons/icon_secondarydevice.png' )
         case 'contact' :
         case 'existingContact' :
           if ( updatedAt != 0 ) {
@@ -613,13 +627,13 @@ export default function ManageBackup( props ) {
               }
             } else return require( '../../assets/images/icons/icon_user.png' )
           }
-          return Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
+          return require( '../../assets/images/icons/icon_contact.png' )
         case 'pdf' :
           if ( status == 'accessible' )
             if ( valueStatus == 'notSetup' )
-              return require( '../../assets/images/icons/doc-blue.png' )
-            else return require( '../../assets/images/icons/doc.png' )
-          else Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
+              return require( '../../assets/images/icons/files-and-folders-2.png' )
+            else return require( '../../assets/images/icons/files-and-folders-2.png' )
+          else require( '../../assets/images/icons/files-and-folders-2.png' )
         default:
           if ( index == 0 )
             return require( '../../assets/images/icons/icon_password.png' )
@@ -880,6 +894,41 @@ export default function ManageBackup( props ) {
               dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
               setKeeperTypeModal( false )
             }}
+          />
+        </ModalContainer>
+
+        <ModalContainer onBackground={() => setBackupTypeModal( false )} visible={backupTypeModal}
+          closeBottomSheet={() => setBackupTypeModal( false )}>
+          <BackupTypeModalContent
+            headerText={'Please select backup type'}
+            onPressBackupType={async ( onPressBackupType ) => {
+              setBackupTypeModal( false )
+              if ( onPressBackupType == 1 ) {
+                props.navigation.navigate( 'SetNewPassword', {
+                  isFromManageBackup: true,
+                } )
+              } else if( onPressBackupType == 2 ) {
+                setSeedBackupModal( true )
+              }
+            }}
+            onPressBack={() => {
+              setBackupTypeModal( false )
+            }}
+          />
+        </ModalContainer>
+        <ModalContainer onBackground={() => setSeedBackupModal( false )} visible={seedBackupModal}
+          closeBottomSheet={() => setSeedBackupModal( false )}>
+          <SeedBacupModalContents
+            title={'Backup using \nSeed Words'}
+            info={'Once you confirm your backup using seed words, the cloud backup will be deleted\n\nYou will also have to store a Recovery Kit (PDF) to use Seed Words backup'}
+            proceedButtonText={'Proceed'}
+            cancelButtonText={'Back'}
+            onPressProceed={() => {
+              setSeedBackupModal( false )
+              props.navigation.navigate( 'BackupSeedWordsContent' )
+            }}
+            onPressIgnore={() => setSeedBackupModal( false )}
+            isIgnoreButton={true}
           />
         </ModalContainer>
         <ModalContainer onBackground={() => setErrorModal( false )} visible={errorModal} closeBottomSheet={() => setErrorModal( false )}>

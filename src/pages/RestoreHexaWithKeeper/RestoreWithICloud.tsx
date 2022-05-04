@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useContext } from 'react'
 import {
   View,
   Text,
@@ -65,6 +65,7 @@ import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { translations } from '../../common/content/LocContext'
 import { log } from 'console'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -272,7 +273,7 @@ class RestoreWithICloud extends Component<
 
   componentDidMount = () => {
     this.props.setDownloadedBackupData( [] )
-    this.cloudData()
+    // this.cloudData()
   };
 
   cloudData = () => {
@@ -810,14 +811,16 @@ class RestoreWithICloud extends Component<
   }
 
   renderContent = () => {
-    const { selectedBackup, hideShow, strings, common } = this.state
+    const { selectedBackup, hideShow, common } = this.state
     const { navigation } = this.props
+    const { translations, formatString } = useContext( LocalizationContext )
+    const strings = translations[ 'bhr' ]
     return (
 
       <RestoreFromICloud
         title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
-        subText={
-          strings[ 'Clickingon' ]
+        subText= {
+          formatString( 'Clickingon', Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
         }
         cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
@@ -1047,7 +1050,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <Text style={styles.modalHeaderInfoText}>
-            {strings[ 'UseSendRequest' ]}
+            {strings[ 'UseScaneKey' ]}
           </Text>
         </View>
         <View
@@ -1067,9 +1070,10 @@ class RestoreWithICloud extends Component<
             shadowOffset: {
               width: 15, height: 15
             },
+            width: wp( '40%' )
           }}
         >
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               // alert("test");
               // ( this.ContactListForRestore as any ).current.snapTo( 1 )
@@ -1086,12 +1090,12 @@ class RestoreWithICloud extends Component<
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>{strings[ 'SendRequest' ]}</Text>
-          </TouchableOpacity>
-          <View
+          </TouchableOpacity> */}
+          {/* <View
             style={{
               width: 1, height: 30, backgroundColor: Colors.white
             }}
-          />
+          /> */}
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
@@ -1110,8 +1114,7 @@ class RestoreWithICloud extends Component<
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
-
-        <ModalContainer onBackground={()=>{this.setState( {
+        {/* <ModalContainer onBackground={()=>{this.setState( {
           restoreModal:false
         } )}} visible={restoreModal} closeBottomSheet={() => {
           this.setState( {
@@ -1119,7 +1122,7 @@ class RestoreWithICloud extends Component<
           } )
         }} >
           {this.renderContent()}
-        </ModalContainer>
+        </ModalContainer> */}
         <ModalContainer onBackground={()=>{this.setState( {
           contactListModal:false
         } )}} visible={contactListModal} closeBottomSheet={() => { }} >

@@ -72,14 +72,14 @@ const CreateGift = ( { navigation } ) => {
   const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells().filter( shell => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT )
   const currencyKind: CurrencyKind = useSelector( state => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN )
-  const strings  = translations[ 'accounts' ]
+  const strings = translations[ 'accounts' ]
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
   const fiatCurrencyCode = useCurrencyCode()
   const accountsState: AccountsState = useSelector( state => state.accounts )
-  const currencyCode =  useSelector( state => state.preferences.currencyCode )
-  const exchangeRates =  useSelector( state => state.accounts.exchangeRates )
+  const currencyCode = useSelector( state => state.preferences.currencyCode )
+  const exchangeRates = useSelector( state => state.accounts.exchangeRates )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
@@ -87,7 +87,7 @@ const CreateGift = ( { navigation } ) => {
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
   const [ addfNf, setAddfNf ] = useState( false )
-  const [ giftModal, setGiftModal ] =useState( false )
+  const [ giftModal, setGiftModal ] = useState( false )
   const [ createdGift, setCreatedGift ] = useState( null )
   const accountState: AccountsState = useSelector( ( state ) => idx( state, ( _ ) => _.accounts ) )
   const giftCreationStatus = useSelector( state => state.accounts.giftCreationStatus )
@@ -112,12 +112,12 @@ const CreateGift = ( { navigation } ) => {
 
   useEffect( () => {
     let minimumGiftVal = 1000
-    if( includeFees ) minimumGiftVal += averageLowTxFee
+    if ( includeFees ) minimumGiftVal += averageLowTxFee
     setMinimumGiftValue( minimumGiftVal )
   }, [ includeFees ] )
 
   useEffect( () => {
-    if( numbersOfGift ) setFees( false )
+    if ( numbersOfGift ) setFees( false )
   }, [ numbersOfGift ] )
 
   function convertFiatToSats( fiatAmount: number ) {
@@ -136,9 +136,9 @@ const CreateGift = ( { navigation } ) => {
 
   const isAmountInvalid = useMemo( () => {
     let giftAmount = currentSatsAmountFormValue
-    const numberOfGifts = numbersOfGift? Number( numbersOfGift ): 1
-    if( prefersBitcoin ){
-      if( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
+    const numberOfGifts = numbersOfGift ? Number( numbersOfGift ) : 1
+    if ( prefersBitcoin ) {
+      if ( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
       return giftAmount * numberOfGifts > spendableBalance
     } else {
       const giftAmountInFiat = giftAmount
@@ -149,9 +149,9 @@ const CreateGift = ( { navigation } ) => {
   }, [ currentSatsAmountFormValue, averageLowTxFee, spendableBalance, includeFees, prefersBitcoin, numbersOfGift ] )
 
   useEffect( () => {
-    if( accountsState.selectedGiftId && initGiftCreation && giftCreationStatus ) {
-      const createdGift = accountsState.gifts? accountsState.gifts[ accountsState.selectedGiftId ]: null
-      if( createdGift ){
+    if ( accountsState.selectedGiftId && initGiftCreation && giftCreationStatus ) {
+      const createdGift = accountsState.gifts ? accountsState.gifts[ accountsState.selectedGiftId ] : null
+      if ( createdGift ) {
         setCreatedGift( createdGift )
         setGiftModal( true )
         setInitGiftCreation( false )
@@ -162,12 +162,12 @@ const CreateGift = ( { navigation } ) => {
     }
   }, [ accountsState.selectedGiftId, initGiftCreation, giftCreationStatus ] )
 
-  useEffect( ()=>{
+  useEffect( () => {
     setInitGiftCreation( false )
     setShowLoader( false )
-    if( giftCreationStatus ){
+    if ( giftCreationStatus ) {
       dispatch( giftCreationSuccess( null ) )
-    } else if( giftCreationStatus === false ){
+    } else if ( giftCreationStatus === false ) {
       // failed to create gift
       setShowLoader( false )
       setShowErrorLoader( true )
@@ -177,13 +177,13 @@ const CreateGift = ( { navigation } ) => {
   }, [ giftCreationStatus ] )
 
   useEffect( () => {
-    if( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
-    else if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
+    if ( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
+    else if ( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
   }, [ account, accountState.averageTxFees, isSendMax, sendMaxFee ] )
 
   useEffect( () => {
-    if( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
-    else if( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
+    if ( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
+    else if ( account && accountState.averageTxFees ) setAverageLowTxFee( accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ].averageTxFee )
   }, [ account, accountState.averageTxFees, isSendMax, sendMaxFee ] )
 
   const numberWithCommas = ( x ) => {
@@ -191,20 +191,20 @@ const CreateGift = ( { navigation } ) => {
   }
 
   useEffect( () => {
-    if( isSendMax ) setAmount( `${spendableBalance - sendMaxFee}` )
+    if ( isSendMax ) setAmount( `${spendableBalance - sendMaxFee}` )
   }, [ sendMaxFee, isSendMax ] )
 
   useEffect( () => {
-    if( currencyKind==CurrencyKind.BITCOIN ){
+    if ( currencyKind == CurrencyKind.BITCOIN ) {
       const newAmount = convertFiatToSats( parseFloat( amount ) ).toString()
       setAmount( newAmount == 'NaN' ? '' : newAmount )
-    }else if( currencyKind==CurrencyKind.FIAT ){
+    } else if ( currencyKind == CurrencyKind.FIAT ) {
       const newAmount = convertSatsToFiat( parseFloat( amount ) ).toString()
       setAmount( newAmount == 'NaN' ? '' : newAmount )
     }
   }, [ currencyKind ] )
 
-  function handleSendMaxPress( ) {
+  function handleSendMaxPress() {
     dispatch( calculateSendMaxFee( {
       numberOfRecipients: Number( numbersOfGift ),
       accountShell: selectedAccount,
@@ -216,38 +216,38 @@ const CreateGift = ( { navigation } ) => {
     const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
 
     let isDisabled = isAmountInvalid
-    if( !isDisabled ){
-      if( prefersBitcoin ){
+    if ( !isDisabled ) {
+      if ( prefersBitcoin ) {
         isDisabled = currentSatsAmountFormValue < minimumGiftValue
       } else {
         isDisabled = currentSatsAmountFormValue < parseFloat( convertSatsToFiat( minimumGiftValue ) )
       }
     }
 
-    return(
+    return (
       <Shadow distance={2} startColor={Colors.shadowBlue} offset={[ 8, 8 ]}>
         <TouchableOpacity
           disabled={isDisabled}
-          onPress={()=>{
-            switch( condn ){
+          onPress={() => {
+            switch ( condn ) {
                 case 'Create Gift':
                 // creating multiple gift instances(based on giftInstances) of the same amount
                   const giftInstances = Number( numbersOfGift )
-                  const giftAmountInSats = prefersBitcoin? Number( amount ): convertFiatToSats( parseFloat( amount ) )
+                  const giftAmountInSats = prefersBitcoin ? Number( amount ) : convertFiatToSats( parseFloat( amount ) )
 
                   const giftAmountsInSats = []
-                  for( let int = 0; int < giftInstances; int++ ){
+                  for ( let int = 0; int < giftInstances; int++ ) {
                     giftAmountsInSats.push( giftAmountInSats )
                   }
 
-                  if( giftAmountsInSats.length ){
+                  if ( giftAmountsInSats.length ) {
                     setInitGiftCreation( true )
                     setShowLoader( true )
                     dispatch( generateGifts( {
                       amounts: giftAmountsInSats,
                       accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
                       includeFee: includeFees,
-                      exclusiveGifts: giftAmountsInSats.length === 1? false: isExclusive,
+                      exclusiveGifts: giftAmountsInSats.length === 1 ? false : isExclusive,
                     } ) )
                   }
                   break
@@ -292,12 +292,12 @@ const CreateGift = ( { navigation } ) => {
     if ( amount && text == 'x' ) {
       setAmount( amount.slice( 0, -1 ) )
     }
-    if( isSendMax ) setIsSendMax( false )
+    if ( isSendMax ) setIsSendMax( false )
   }
 
 
-  const renderCreateGiftModal =()=>{
-    return(
+  const renderCreateGiftModal = () => {
+    return (
       <View style={styles.modalContentContainer}>
         <View style={{
           marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
@@ -311,14 +311,14 @@ const CreateGift = ( { navigation } ) => {
             navigation.goBack()
           }}
           style={{
-            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
             marginTop: wp( 3 ), marginRight: wp( 3 )
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
-          // marginTop: hp( 0.5 )
+            // marginTop: hp( 0.5 )
           }} />
         </TouchableOpacity>
         <View>
@@ -333,10 +333,10 @@ const CreateGift = ( { navigation } ) => {
           <DashedContainer
             titleText={'Available Gift'}
             subText={'Someone\'s about to feel extra special'}
-            amt={prefersBitcoin? numberWithCommas( createdGift.amount ): convertSatsToFiat( createdGift.amount )}
+            amt={prefersBitcoin ? numberWithCommas( createdGift.amount ) : convertSatsToFiat( createdGift.amount )}
             date={new Date()}
             image={<GiftCard />}
-            currencyCode={prefersBitcoin? '': currencyCode}
+            currencyCode={prefersBitcoin ? '' : currencyCode}
           />
 
 
@@ -422,18 +422,20 @@ const CreateGift = ( { navigation } ) => {
     }
   }
 
-  const renderAccountList = () =>{
+  const renderAccountList = () => {
     return <ScrollView style={{
       height: 'auto'
     }}>
-      { activeAccounts.map( ( item, index ) => {
+      {activeAccounts.map( ( item, index ) => {
         if ( [ AccountType.TEST_ACCOUNT, AccountType.SWAN_ACCOUNT ].includes( item.primarySubAccount.type ) || !item.primarySubAccount.isUsable || item.primarySubAccount.isTFAEnabled ) return
-        return(
+        return (
           <View key={index} style={{
             backgroundColor: Colors.white
           }}>
-            {accountElement( item, ()=>{ setSelectedAccount( item )
-              setAccountListModal( false )} )}
+            {accountElement( item, () => {
+              setSelectedAccount( item )
+              setAccountListModal( false )
+            } )}
           </View>
         )
       } )}
@@ -449,8 +451,8 @@ const CreateGift = ( { navigation } ) => {
     let flag = null
 
     const handleTimer = () => {
-      flag ==true ? plus() : flag ==false && minus()
-      flag !== null && SetTimer( () => setTimeout( () => handleTimer( ), 500 ) )
+      flag == true ? plus() : flag == false && minus()
+      flag !== null && SetTimer( () => setTimeout( () => handleTimer(), 500 ) )
     }
     const stopTimer = () => {
       flag = null
@@ -459,23 +461,23 @@ const CreateGift = ( { navigation } ) => {
       setNumbersOfGift( counter )
     }
 
-    const plus = () =>{
-      if( stateToUpdate == 'gift' ){
+    const plus = () => {
+      if ( stateToUpdate == 'gift' ) {
         SetCounter( ( prev ) => prev + 1 )
-      } else if( stateToUpdate == 'timeLock' ){
+      } else if ( stateToUpdate == 'timeLock' ) {
         setTimeLock( timeLock + 1 )
-      } else if( stateToUpdate == 'limitedValidity' ){
+      } else if ( stateToUpdate == 'limitedValidity' ) {
         setLimitedValidity( limitedValidity + 1 )
       }
     }
 
-    const minus = () =>{
-      if( stateToUpdate == 'gift' ){
-        if( counter > 1 )SetCounter( ( prev ) => prev - 1 )
-      } else if( stateToUpdate == 'timeLock' ){
-        if( timeLock > 1 ) setTimeLock( timeLock - 1 )
-      } else if( stateToUpdate == 'limitedValidity' ){
-        if( limitedValidity > 1 ) setLimitedValidity( limitedValidity - 1 )
+    const minus = () => {
+      if ( stateToUpdate == 'gift' ) {
+        if ( counter > 1 ) SetCounter( ( prev ) => prev - 1 )
+      } else if ( stateToUpdate == 'timeLock' ) {
+        if ( timeLock > 1 ) setTimeLock( timeLock - 1 )
+      } else if ( stateToUpdate == 'limitedValidity' ) {
+        if ( limitedValidity > 1 ) setLimitedValidity( limitedValidity - 1 )
       }
     }
 
@@ -483,11 +485,11 @@ const CreateGift = ( { navigation } ) => {
       <View>
         <View style={{
           flexDirection: 'row',
-          marginTop: wp( '5%' ), marginBottom: wp( '5%' ), justifyContent:'center',
+          marginTop: wp( '5%' ), marginBottom: wp( '5%' ), justifyContent: 'center',
         }}>
           <Image source={imageToShow} style={{
-            width: wp( '10%' ), height: wp( '6%' ), resizeMode: 'contain', alignSelf:'center',
-          }}/>
+            width: wp( '10%' ), height: wp( '6%' ), resizeMode: 'contain', alignSelf: 'center',
+          }} />
           <View style={{
             marginLeft: wp( '4%' ),
             flex: 1,
@@ -499,26 +501,26 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
             }}>Gift Sats created will be of the
-              <Text style= {{
+              <Text style={{
                 fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
               }}>same amount</Text>
-             and can be
-              <Text style= {{
+              and can be
+              <Text style={{
                 fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
               }}>sent separately</Text></Text>
           </View>
           <View style={{
-            flexDirection:'row', alignItems: 'center',
+            flexDirection: 'row', alignItems: 'center',
           }}>
-            <TouchableOpacity onPressIn={()=> {flag = false ; handleTimer()}} onPressOut={()=>stopTimer()} style={{
-              width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginRight: wp( '4%' )
+            <TouchableOpacity onPressIn={() => { flag = false; handleTimer() }} onPressOut={() => stopTimer()} style={{
+              width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' ) / 2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems: 'center', marginRight: wp( '4%' )
             }}>
               <AntDesign name="minus"
-                size={ 12}
-                color={Colors.white}/>
+                size={12}
+                color={Colors.white} />
             </TouchableOpacity>
             <View style={{
-              height: wp( '12%' ), width: wp( '12%' ), borderRadius: 10, backgroundColor: Colors.white, justifyContent: 'center', alignItems:'center', shadowColor: Colors.borderColor, shadowOpacity: 0.6, shadowOffset: {
+              height: wp( '12%' ), width: wp( '12%' ), borderRadius: 10, backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center', shadowColor: Colors.borderColor, shadowOpacity: 0.6, shadowOffset: {
                 width: 7, height: 7
               }, shadowRadius: 5, elevation: 5
             }}><Text style={{
@@ -530,12 +532,12 @@ const CreateGift = ( { navigation } ) => {
                     limitedValidity
                 }</Text>
             </View>
-            <TouchableOpacity onPressIn={()=>{flag = true ; handleTimer()}} onPressOut={()=>stopTimer()} style={{
-              width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' )/2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems:'center', marginLeft: wp( '4%' )
+            <TouchableOpacity onPressIn={() => { flag = true; handleTimer() }} onPressOut={() => stopTimer()} style={{
+              width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '5%' ) / 2, backgroundColor: Colors.lightBlue, justifyContent: 'center', alignItems: 'center', marginLeft: wp( '4%' )
             }}>
               <AntDesign name="plus"
-                size={ 12}
-                color={Colors.white}/>
+                size={12}
+                color={Colors.white} />
             </TouchableOpacity>
           </View>
         </View>
@@ -552,7 +554,7 @@ const CreateGift = ( { navigation } ) => {
               <CheckMark style={{
                 marginLeft: 6,
                 marginTop: 6
-              }}/>
+              }} />
             }
           </View>
           <Text style={{
@@ -567,7 +569,7 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               fontSize: RFValue( 11 ),
             }}>
-            (Restricts the gift to <Text style={{
+              (Restricts the gift to <Text style={{
                 fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
               }}>one per Hexa app</Text> )
             </Text>
@@ -578,24 +580,24 @@ const CreateGift = ( { navigation } ) => {
     )
   }
 
-  const renderAdvanceModal = () =>{
+  const renderAdvanceModal = () => {
     return <View style={{
       backgroundColor: Colors.bgColor, padding: wp( '5%' ),
     }}>
       <View style={{
-        flexDirection:'row',
+        flexDirection: 'row',
       }}>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={()=>setAdvanceModal( false )}
+          onPress={() => setAdvanceModal( false )}
           style={styles.modalCrossButton}
         >
-          <FontAwesome name="close" color={Colors.white} size={19}/>
+          <FontAwesome name="close" color={Colors.white} size={19} />
         </TouchableOpacity>
       </View>
 
       <View style={{
-        flexDirection:'column'
+        flexDirection: 'column'
       }}>
         <Text style={{
           color: Colors.blue, fontSize: RFValue( 20 ), fontFamily: Fonts.FiraSansRegular
@@ -635,43 +637,67 @@ const CreateGift = ( { navigation } ) => {
 
   // gift creation failure UI
 
-  const renderErrorModal = () =>{
+  const renderErrorModal = () => {
     return <View style={{
-      backgroundColor: Colors.bgColor, padding: wp( '5%' ),
+      backgroundColor: Colors.white,
+      padding: wp( '8' )
     }}>
       <View style={{
-        flexDirection:'row',
+        flexDirection: 'row',
       }}>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {setShowErrorLoader( false )}}
+          onPress={() => { setShowErrorLoader( false ) }}
           style={styles.modalCrossButton}
         >
-          <FontAwesome name="close" color={Colors.white} size={19}/>
+          <FontAwesome name="close" color={Colors.white} size={19} />
         </TouchableOpacity>
       </View>
 
       <View style={{
         flexDirection: 'column',
-        justifyContent:'space-between'
+        justifyContent: 'space-between'
       }}>
         <Text style={{
-          color: Colors.blue, fontSize: RFValue( 18 ), marginBottom: 30, fontFamily: Fonts.FiraSansRegular,
+          color: Colors.blue, fontSize: RFValue( 18 ), width: '60%', fontWeight: '200', marginBottom: 30, fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.54
         }}>Gift Creation Unsuccessful</Text>
         <Text style={{
-          color: Colors.gray3, marginBottom: 40, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.gray3, marginBottom: 10, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
         }}>Please try again</Text>
-        <TouchableOpacity style={styles.buttonView} onPress={() => {setShowErrorLoader( false )}} >
-          <Text style={styles.buttonText}>Try again</Text>
-        </TouchableOpacity>
+
+        <View style={{
+          justifyContent: 'flex-start', marginStart: wp( -4 )
+        }}>
+          {accountElement( selectedAccount, () => { }, 1, '90%', 'Bitcoin not deducted' )}
+        </View>
+
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'
+        }}>
+          <TouchableOpacity style={styles.buttonView} onPress={() => { setShowErrorLoader( false ) }} >
+            <Text style={styles.buttonText}>Try again</Text>
+          </TouchableOpacity>
+          <Image source={require( '../../assets/images/loader.gif' )} style={{
+            width: wp( '40%' ), height: wp( '35%' ), resizeMode: 'stretch', marginBottom: wp( -8 ), marginRight: wp( -8 ),
+          }} />
+        </View>
       </View>
     </View>
   }
 
-  const accountElement = ( item, onPressCallBack ) =>{
+  const accountElement = (
+    item,
+    onPressCallBack,
+    activeOpacity = 0,
+    width = '90%',
+    message = 'Sats would be deducted from',
+  ) => {
     return <TouchableOpacity
-      style={styles.accountSelectionView}
-      onPress={()=>onPressCallBack()}
+      style={{
+        ...styles.accountSelectionView, width: width
+      }}
+      onPress={() => onPressCallBack()}
+      activeOpacity={activeOpacity}
     >
       <View style={{
         width: wp( 13 ),
@@ -689,7 +715,7 @@ const CreateGift = ( { navigation } ) => {
           fontSize: RFValue( 10 ),
           fontFamily: Fonts.FiraSansRegular,
         }}>
-            Sats would be deducted from
+          {message}
         </Text>
         <Text
           style={{
@@ -708,7 +734,7 @@ const CreateGift = ( { navigation } ) => {
               : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
                 ? (
                   ( item.primarySubAccount?.balances?.confirmed / SATOSHIS_IN_BTC ) *
-                      accountsState.exchangeRates[ currencyCode ].last
+                  accountsState.exchangeRates[ currencyCode ].last
                 ).toFixed( 2 )
                 : 0}
           </Text>
@@ -717,14 +743,14 @@ const CreateGift = ( { navigation } ) => {
           </Text>
         </Text>
       </View>
-      <MaterialCommunityIcons
+      {activeOpacity === 0 && <MaterialCommunityIcons
         name="dots-vertical"
         size={24}
         color="gray"
         style={{
           alignSelf: 'center'
         }}
-      />
+      />}
     </TouchableOpacity>
   }
 
@@ -738,7 +764,7 @@ const CreateGift = ( { navigation } ) => {
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
         {giftModal &&
-          <ModalContainer onBackground={()=>setGiftModal( false )} visible={giftModal} closeBottomSheet={() => {}} >
+          <ModalContainer onBackground={() => setGiftModal( false )} visible={giftModal} closeBottomSheet={() => { }} >
             {renderCreateGiftModal()}
           </ModalContainer>
         }
@@ -781,10 +807,10 @@ const CreateGift = ( { navigation } ) => {
                 {'Create Gift'}
               </Text>
               <TouchableOpacity style={{
-                marginLeft:'auto',
-              }} onPress={()=>setAdvanceModal( true )}>
+                marginLeft: 'auto',
+              }} onPress={() => setAdvanceModal( true )}>
                 <Image style={{
-                  width: wp( '5%' ), height: wp( '5%' ), resizeMode: 'contain',  marginRight: wp( '5%' )
+                  width: wp( '5%' ), height: wp( '5%' ), resizeMode: 'contain', marginRight: wp( '5%' )
                 }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
               </TouchableOpacity>
             </View>
@@ -792,7 +818,7 @@ const CreateGift = ( { navigation } ) => {
 
           </View>
         </View>
-        {accountElement( selectedAccount, ()=> setAccountListModal( !accountListModal ) )}
+        {accountElement( selectedAccount, () => setAccountListModal( !accountListModal ) )}
         <View style={{
           flexDirection: 'row'
         }}>
@@ -816,13 +842,13 @@ const CreateGift = ( { navigation } ) => {
             }} />
             <Text style={[ styles.modalInputBox, {
               color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
-            } ]} onPress={() => setKeyboard( true )}>{currencyKind == CurrencyKind.FIAT ? amount :  UsNumberFormat( amount ) === '0' ? '' :UsNumberFormat( amount ) }
+            } ]} onPress={() => setKeyboard( true )}>{currencyKind == CurrencyKind.FIAT ? amount : UsNumberFormat( amount ) === '0' ? '' : UsNumberFormat( amount )}
               {( !showKeyboard && !amount ) &&
-              <Text style={{
-                fontSize: RFValue( 12 ),
-              }}>
-                {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
-              </Text>
+                <Text style={{
+                  fontSize: RFValue( 12 ),
+                }}>
+                  {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
+                </Text>
               }
               {( showKeyboard ) && <Text style={{
                 color: Colors.lightBlue, fontSize: RFValue( 18 ),
@@ -881,12 +907,12 @@ const CreateGift = ( { navigation } ) => {
               }}>x   </Text>{numbersOfGift}
             </Text>
             <Text style={{
-              color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),  marginLeft: 'auto', marginTop: hp( '0.5%' )
+              color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ), marginLeft: 'auto', marginTop: hp( '0.5%' )
             }}>gifts</Text>
-          </View> : null }
+          </View> : null}
         </View>
         {numbersOfGift > 1 ? <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: wp( '5%' ),  marginRight: wp( '5%' ), marginTop: wp( '3%' )
+          flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: wp( '5%' ), marginRight: wp( '5%' ), marginTop: wp( '3%' )
         }}>
           <Text style={{
             color: Colors.greyTextColor, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansMedium
@@ -912,7 +938,7 @@ const CreateGift = ( { navigation } ) => {
                 color={Colors.white}
                 size={RFValue( 16 )}
                 style={{
-                  marginRight: wp( 1 ), marginLeft:  [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode  ) ? 0 : -wp( 1 )
+                  marginRight: wp( 1 ), marginLeft: [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode ) ? 0 : -wp( 1 )
                 }}
               />
             ) : (
@@ -925,10 +951,10 @@ const CreateGift = ( { navigation } ) => {
             )}
             <Text style={styles.homeHeaderAmountText}>
               {prefersBitcoin
-                ? UsNumberFormat( parseInt( amount )* numbersOfGift )
+                ? UsNumberFormat( parseInt( amount ) * numbersOfGift )
                 : exchangeRates && exchangeRates[ currencyCode ]
                   ? (
-                    ( parseInt( amount )* numbersOfGift / SATOSHIS_IN_BTC ) *
+                    ( parseInt( amount ) * numbersOfGift / SATOSHIS_IN_BTC ) *
                     exchangeRates[ currencyCode ].last
                   ).toFixed( 2 )
                   : ''}
@@ -937,7 +963,7 @@ const CreateGift = ( { navigation } ) => {
               {prefersBitcoin ? 'sats' : fiatCurrencyCode}
             </Text>
           </View>
-        </View> :null}
+        </View> : null}
         <View style={{
           marginLeft: wp( '3%' ),
           marginTop: wp( '1.5%' )
@@ -952,7 +978,7 @@ const CreateGift = ( { navigation } ) => {
             <Text style={{
               fontWeight: 'bold',
               fontFamily: Fonts.FiraSansItalic
-            }}>{prefersBitcoin? minimumGiftValue: convertSatsToFiat( minimumGiftValue )} {prefersBitcoin? 'sats': currencyCode}</Text>
+            }}>{prefersBitcoin ? minimumGiftValue : convertSatsToFiat( minimumGiftValue )} {prefersBitcoin ? 'sats' : currencyCode}</Text>
           </Text>
         </View>
         <View style={{
@@ -970,17 +996,17 @@ const CreateGift = ( { navigation } ) => {
             }}>
               <TouchableOpacity
                 onPress={() => setFees( !includeFees )}
-                disabled={numbersOfGift? Number( numbersOfGift )> 1: false}
+                disabled={numbersOfGift ? Number( numbersOfGift ) > 1 : false}
                 style={{
                   flexDirection: 'row'
                 }}
               >
                 <View style={styles.imageView}>
                   {includeFees &&
-                  <CheckMark style={{
-                    marginLeft: 6,
-                    marginTop: 6
-                  }}/>
+                    <CheckMark style={{
+                      marginLeft: 6,
+                      marginTop: 6
+                    }} />
                   }
                 </View>
                 <Text style={{
@@ -989,7 +1015,7 @@ const CreateGift = ( { navigation } ) => {
                   fontFamily: Fonts.FiraSansRegular,
                   marginHorizontal: wp( 3 )
                 }}>
-              Include fee in amount
+                  Include fee in amount
                 </Text>
               </TouchableOpacity>
             </View>
@@ -1017,7 +1043,7 @@ const CreateGift = ( { navigation } ) => {
               color: Colors.textColorGrey,
               fontSize: RFValue( 11 ),
               fontFamily: Fonts.FiraSansRegular,
-            }}>{prefersBitcoin? ' sats': ` ${currencyCode}`}</Text>
+            }}>{prefersBitcoin ? ' sats' : ` ${currencyCode}`}</Text>
 
           </Text>
 
@@ -1025,157 +1051,157 @@ const CreateGift = ( { navigation } ) => {
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), marginBottom: wp( 7 )
         }}>
-          {renderButton( 'Create Gift',  'Create Gift' )}
+          {renderButton( 'Create Gift', 'Create Gift' )}
         </View>
         {showKeyboard &&
-        <View style={{
-          marginTop:'auto'
-        }}>
-          <View style={styles.keyPadRow}>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '1' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+          <View style={{
+            marginTop: 'auto'
+          }}>
+            <View style={styles.keyPadRow}>
+              <TouchableOpacity
                 onPress={() => onPressNumber( '1' )}
+                style={styles.keyPadElementTouchable}
               >
-              1
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '2' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '1' )}
+                >
+                  1
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => onPressNumber( '2' )}
+                style={styles.keyPadElementTouchable}
               >
-              2
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '3' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '2' )}
+                >
+                  2
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => onPressNumber( '3' )}
+                style={styles.keyPadElementTouchable}
               >
-              3
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keyPadRow}>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '4' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber( '4' )}
-              >
-              4
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '5' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber( '5' )}
-              >
-              5
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '6' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber( '6' )}
-              >
-              6
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keyPadRow}>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '7' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber( '7' )}
-              >
-              7
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '8' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber( '8' )}
-              >
-              8
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '9' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
-                onPress={() => onPressNumber( '9' )}
-              >
-              9
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keyPadRow}>
-            <View style={styles.keyPadElementTouchable}>
-              <Text style={{
-                flex: 1, padding: 15
-              }}></Text>
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '3' )}
+                >
+                  3
+                </Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={() => onPressNumber( '0' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+            <View style={styles.keyPadRow}>
+              <TouchableOpacity
+                onPress={() => onPressNumber( '4' )}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '4' )}
+                >
+                  4
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber( '5' )}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '5' )}
+                >
+                  5
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber( '6' )}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '6' )}
+                >
+                  6
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.keyPadRow}>
+              <TouchableOpacity
+                onPress={() => onPressNumber( '7' )}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '7' )}
+                >
+                  7
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber( '8' )}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '8' )}
+                >
+                  8
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => onPressNumber( '9' )}
+                style={styles.keyPadElementTouchable}
+              >
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '9' )}
+                >
+                  9
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.keyPadRow}>
+              <View style={styles.keyPadElementTouchable}>
+                <Text style={{
+                  flex: 1, padding: 15
+                }}></Text>
+              </View>
+              <TouchableOpacity
                 onPress={() => onPressNumber( '0' )}
+                style={styles.keyPadElementTouchable}
               >
-              0
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressNumber( 'x' )}
-              style={styles.keyPadElementTouchable}
-            >
-              <Text
-                style={styles.keyPadElementText}
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( '0' )}
+                >
+                  0
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => onPressNumber( 'x' )}
+                style={styles.keyPadElementTouchable}
               >
-                <Ionicons
-                  name="ios-backspace"
-                  size={30}
-                  color={Colors.blue}
-                />
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={styles.keyPadElementText}
+                  onPress={() => onPressNumber( 'x' )}
+                >
+                  <Ionicons
+                    name="ios-backspace"
+                    size={30}
+                    color={Colors.blue}
+                  />
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         }
       </SafeAreaView>
-      <ModalContainer onBackground={()=>setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
+      <ModalContainer onBackground={() => setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
         {renderAccountList()}
       </ModalContainer>
-      <ModalContainer onBackground={()=>setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
+      <ModalContainer onBackground={() => setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
         {renderAdvanceModal()}
       </ModalContainer>
 
@@ -1312,7 +1338,7 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.white,
   },
-  accImage:{
+  accImage: {
     marginRight: wp( 4 )
   },
   availableToSpendText: {
@@ -1336,7 +1362,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: Colors.blue,
-    borderRadius: wp ( 2 ),
+    borderRadius: wp( 2 ),
     height: hp( 4 ),
     paddingHorizontal: wp( 2 )
   },
@@ -1347,7 +1373,6 @@ const styles = StyleSheet.create( {
   },
   accountSelectionView: {
     width: '90%',
-    backgroundColor: Colors.gray7,
     shadowOpacity: 0.06,
     shadowOffset: {
       width: 10, height: 10
@@ -1365,11 +1390,11 @@ const styles = StyleSheet.create( {
   modalCrossButton: {
     width: wp( 7 ),
     height: wp( 7 ),
-    borderRadius: wp( 7/2 ),
+    borderRadius: wp( 7 / 2 ),
     backgroundColor: Colors.lightBlue,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft:'auto'
+    marginLeft: 'auto'
   },
   homeHeaderAmountText: {
     fontFamily: Fonts.FiraSansRegular,

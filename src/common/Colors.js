@@ -73,6 +73,10 @@ const Colors = {
 
   // lightning account
   orange: '#FF7761',
-  mango: '#FABA5F'
+  mango: '#FABA5F',
+
+  shadowBlack: '#1F000000',
+  numberBg: '#F4F4F4',
+  numberFont: '#989898'
 }
 export default Colors
