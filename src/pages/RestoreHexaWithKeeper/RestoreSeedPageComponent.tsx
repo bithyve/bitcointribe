@@ -239,11 +239,11 @@ const RestoreSeedPageComponent = ( props ) => {
                     )
                   }}
                 />
-                <BottomInfoBox
+                {/* <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={props.infoBoxTitle}
                   infoText={props.infoBoxInfo}
-                />
+                /> */}
               </View>
             ) )}
           </AnimatedPagerView>

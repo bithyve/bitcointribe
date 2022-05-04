@@ -135,7 +135,7 @@ const WalletInitializationScreen = props => {
             />
           </View>
         </TouchableOpacity>
-        <View style={{
+        {/* <View style={{
           marginLeft: wp( '3%' ), marginRight: wp( '3%' )
         }}>
           <Text
@@ -147,7 +147,7 @@ const WalletInitializationScreen = props => {
               color: Colors.blue
               , textDecorationLine:'underline'
             }}>{'\nhttps://hexawallet.io/faq/'}</Text></Text>
-        </View>
+        </View> */}
         {/* <TouchableOpacity
           onPress={async () => {
             // props.navigation.navigate( 'RestoreWithICloud' )
