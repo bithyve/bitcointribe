@@ -273,11 +273,11 @@ class RestoreWithICloud extends Component<
 
   componentDidMount = () => {
     this.props.setDownloadedBackupData( [] )
-    // this.cloudData()
+    this.cloudData()
   };
 
   cloudData = () => {
-    //console.log("INSIDE cloudData componentDidMount");
+    // console.log( 'INSIDE cloudData componentDidMount' )
     this.setState( {
       showLoader: true
     } )
@@ -810,17 +810,19 @@ class RestoreWithICloud extends Component<
     return loaderMessages[ messageIndex++ ]
   }
 
+  static contextType = LocalizationContext
   renderContent = () => {
     const { selectedBackup, hideShow, common } = this.state
     const { navigation } = this.props
-    const { translations, formatString } = useContext( LocalizationContext )
+    const { translations, formatString } =  this.context
     const strings = translations[ 'bhr' ]
     return (
 
       <RestoreFromICloud
         title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText= {
-          formatString( 'Clickingon', Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
+          // formatString( 'Clickingon', Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
+          'Clickingon'+ Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'
         }
         cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
@@ -1114,7 +1116,7 @@ class RestoreWithICloud extends Component<
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
-        {/* <ModalContainer onBackground={()=>{this.setState( {
+        <ModalContainer onBackground={()=>{this.setState( {
           restoreModal:false
         } )}} visible={restoreModal} closeBottomSheet={() => {
           this.setState( {
@@ -1122,7 +1124,7 @@ class RestoreWithICloud extends Component<
           } )
         }} >
           {this.renderContent()}
-        </ModalContainer> */}
+        </ModalContainer>
         <ModalContainer onBackground={()=>{this.setState( {
           contactListModal:false
         } )}} visible={contactListModal} closeBottomSheet={() => { }} >
@@ -1227,7 +1229,7 @@ class RestoreWithICloud extends Component<
         } )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
           securityQuestionModal: false
         } ) }} >
-          {console.log("teste Restore screen", this.state.question)}
+          {/* {console.log( 'teste Restore screen', this.state.question )} */}
           <SecurityQuestion
             question={this.state.question}
             encryptionType={this.state.encryptionType}
