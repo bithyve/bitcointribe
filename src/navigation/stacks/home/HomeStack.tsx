@@ -47,7 +47,7 @@ import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestio
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
-import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
+// import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
 import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
@@ -223,12 +223,12 @@ const HomeStack = createStackNavigator(
     // PersonalCopyHistoryKeeper,
     PersonalCopyHistoryNewBHR,
     CloudBackupHistory,
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
+    // SeedBackupHistory: {
+    //   screen: SeedBackupHistory,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,
