@@ -386,7 +386,7 @@ export default function AddContactAddressBook( props ) {
         infoTextNormal1={''}
         step={''}
       />
-      <Text style={styles.addressBook}>from your address book</Text>
+      {/* <Text style={styles.addressBook}>from your address book</Text> */}
 
       {selectedContacts.length !==0 &&
       <View style={styles.selectedContactContent}>

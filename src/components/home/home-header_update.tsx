@@ -218,7 +218,7 @@ const HomeHeader = ( {
           }
         }
         return {
-          isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
+          isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? strings.l1 : strings.l1Drive, messageTwo: '', isError: false
         }
       } else if( currentLevel === 2 ){
         return {
@@ -232,7 +232,7 @@ const HomeHeader = ( {
     }
     if( currentLevel === 1 ){
       return {
-        isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
+        isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? strings.l1 : strings.l1Drive, messageTwo: '', isError: false
       }
     } else {
       return {
@@ -369,7 +369,7 @@ const HomeHeader = ( {
 
       <ModalContainer onBackground={()=>setCloudErrorModal( false )} visible={cloudErrorModal} closeBottomSheet={() => setCloudErrorModal( false ) }>
         <ErrorModalContents
-          title={stringsBhr[ 'CloudBackupError' ]}
+          title={Platform.OS == 'ios' ? stringsBhr[ 'CloudBackupError' ] : stringsBhr[ 'driveBackupError' ]}
           //info={cloudErrorMessage}
           note={errorMsg}
           onPressProceed={()=>{

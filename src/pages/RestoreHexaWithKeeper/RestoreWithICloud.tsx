@@ -266,7 +266,7 @@ class RestoreWithICloud extends Component<
     this.bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
     this.subPoints = [
       translations[ 'bhr' ].Settingupmultipleaccounts,
-      translations[ 'bhr' ].Automaticallycreatingbackup,
+      Platform.OS == 'ios' ? translations[ 'bhr' ].Automaticallycreatingbackup : translations[ 'bhr' ].AutomaticallycreatingbackupDrive,
       translations[ 'bhr' ].Preloading,
     ]
   }
@@ -531,7 +531,7 @@ class RestoreWithICloud extends Component<
       setTimeout( () => {
         this.setState( {
           errorModal: true,
-          errorModalTitle: this.state.strings[ 'CloudRestorefailed' ],
+          errorModalTitle: Platform.OS == 'ios' ? this.state.strings[ 'CloudRestorefailed' ] : this.state.strings[ 'DriveRestorefailed' ],
           errorModalInfo: Platform.select( {
             ios: translations.iCloudErrors[ this.props.cloudErrorMessage ],
             android: translations.driveErrors[ this.props.cloudErrorMessage ],

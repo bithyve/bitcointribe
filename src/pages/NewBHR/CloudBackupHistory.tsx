@@ -101,15 +101,15 @@ const CloudBackupHistory = ( props ) => {
     if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
       setButtonText( common.backup )
       setShowButton( true )
-      setBackupInfo( strings.cloudBackupSuccessInfo )
+      setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupSuccessInfo : strings.driveBackupSuccessInfo )
     } else if( currentLevel == 0 ) {
       setButtonText( common.backup )
       setShowButton( true )
-      setBackupInfo( strings.cloudBackupNotSetupInfo )
+      setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupNotSetupInfo : strings.driveBackupNotSetupInfo )
     } else if( currentLevel > 0 && levelHealth[ 0 ].levelInfo[ 1 ].status == 'notAccessible' ) {
       setButtonText( common.confirm )
       setShowButton( true )
-      setBackupInfo( strings.cloudBackupInAccessibleInfo )
+      setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupInAccessibleInfo : strings.driveBackupInAccessibleInfo )
     }
   }
 
@@ -166,7 +166,7 @@ const CloudBackupHistory = ( props ) => {
   const renderCloudPermissionContent = useCallback( () => {
     return ( <CloudPermissionModalContents
       modalRef={bottomSheetRef}
-      title={strings.AutomatedCloudBackup}
+      title={Platform.OS == 'ios' ? strings.AutomatedCloudBackup : strings.AutomatedDriveBackup}
       info={strings.Thisisthefirstlevel}
       note={''}
       onPressProceed={( flag )=> {
@@ -282,7 +282,7 @@ const CloudBackupHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={strings.BackupHistory}
+          infoBoxTitle={Platform.OS == 'ios' ? strings.BackupHistory : strings.BackupHistorydrive}
           infoBoxInfo={backupInfo}
           type={'security'}
           onPressConfirm={() => {
@@ -298,8 +298,8 @@ const CloudBackupHistory = ( props ) => {
           onPressChange={() => setKeeperTypeModal( true )}
           showButton={showButton}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={true}
-        />
+          // isChangeKeeperAllow={true}
+          isChangeKeeperAllow={false}/>
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
         {renderCloudPermissionContent()}
