@@ -20,6 +20,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { storeCreds } from '../store/actions/setupAndAuth'
 import { LocalizationContext } from '../common/content/LocContext'
+import BottomInfoBox from '../components/BottomInfoBox'
 
 export default function PasscodeConfirm( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -478,19 +479,30 @@ export default function PasscodeConfirm( props ) {
                     <Text style={styles.mismatchError}>Passcode mismatch!</Text>
                 }
               </View>
-              <TouchableOpacity
-                disabled={ passcode == confirmPasscode ? false : true }
-                onPress={ () => dispatch( storeCreds( passcode ) ) }
-                style={ {
-                  ...styles.proceedButtonView,
-                  backgroundColor:
-                    passcode == confirmPasscode ? Colors.blue : Colors.lightBlue
-                } }
-              >
-                <Text style={ styles.proceedButtonText }>{common.proceed}</Text>
-              </TouchableOpacity>
             </View>
-          ) : null }
+          ) : null}
+
+          <View style={{ marginTop: 20 }}>
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={'Make sure you remember the passcode and backup your wallet. If you forget your passcode, you can access your wallet only by restoring it'}
+            />
+          </View>
+          {passcode.length == 4 ? (
+            <TouchableOpacity
+              disabled={passcode == confirmPasscode ? false : true}
+              onPress={() => dispatch( storeCreds( passcode ) ) }
+              style={{
+                ...styles.proceedButtonView,
+                backgroundColor:
+                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
+              }}
+            >
+              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+            </TouchableOpacity>
+          ) : null}
+
         </View>
         <View style={ {
           marginTop: 'auto',
@@ -693,7 +705,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp( '4%' ),
+    marginTop: hp( '1%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
@@ -721,7 +733,7 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 28 ),
     marginLeft: 20,
-    marginTop: hp( '10%' ),
+    marginTop: hp( '3%' ),
     fontFamily: Fonts.FiraSansRegular
   },
   headerInfoText: {
@@ -743,8 +755,8 @@ const styles = StyleSheet.create( {
   },
   passcodeTextInputView: {
     flexDirection: 'row',
-    marginTop: hp( '4.5%' ),
-    marginBottom: hp( '4.5%' )
+    marginTop: hp( '3%' ),
+    marginBottom: hp( '3%' )
   },
   mismatchError:{
     color:'#FF7861',

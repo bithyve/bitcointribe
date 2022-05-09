@@ -141,7 +141,7 @@ export default function ConfirmSeedWordsModal( props ) {
               : Colors.shadowBlue }
             offset={[ 42, 14 ]}>
               <AppBottomSheetTouchableWrapper
-                onPress={() => props.onPressProceed()}
+                onPress={() => props.onPressProceed( word )}
                 style={{
                 // ...styles.successModalButtonView,
                   shadowColor: props.buttonShadowColor

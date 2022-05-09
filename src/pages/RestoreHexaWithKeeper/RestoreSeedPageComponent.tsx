@@ -117,7 +117,7 @@ const RestoreSeedPageComponent = ( props ) => {
       else seed = seed + ' ' + name
     } )
     if( showValidation ){
-      Alert.alert( 'Please fill all seed details' )
+      Alert.alert( 'Please fill all seed words' )
     } else {
       props.onPressConfirm( seed )
     }

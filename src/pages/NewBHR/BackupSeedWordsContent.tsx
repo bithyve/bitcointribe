@@ -3,6 +3,7 @@ import {
   View,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import _ from 'underscore'
@@ -17,6 +18,7 @@ import { updateSeedHealth } from '../../store/actions/BHR'
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ seedSecondName, setSeedSecondName ] = useState( '' )
   const dispatch = useDispatch()
 
   return (
@@ -39,7 +41,10 @@ const BackupSeedWordsContent = ( props ) => {
         <SeedPageComponent
           infoBoxTitle={'Note'}
           infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
-          onPressConfirm={()=>setConfirmSeedWordModal( true )}
+          onPressConfirm={( seed, seedSecondName )=>{
+            setConfirmSeedWordModal( true )
+            setSeedSecondName( seedSecondName )
+          }}
           data={[]}
           confirmButtonText={'Next'}
           proceedButtonText={'Proceed'}
@@ -58,11 +63,20 @@ const BackupSeedWordsContent = ( props ) => {
         closeBottomSheet={() => setConfirmSeedWordModal( false )}>
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
-          onPressProceed={() => {
+          onPressProceed={( word ) => {
             setConfirmSeedWordModal( false )
-            setSeedWordModal( true )
-            dispatch( updateSeedHealth() )
-
+            if( word == '' ){
+              setTimeout( () => {
+                Alert.alert( 'Please enter second seed name' )
+              }, 500 )
+            } else if( word != seedSecondName ){
+              setTimeout( () => {
+                Alert.alert( 'Please enter valid second seed name' )
+              }, 500 )
+            } else {
+              setSeedWordModal( true )
+              dispatch( updateSeedHealth() )
+            }
           }}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}

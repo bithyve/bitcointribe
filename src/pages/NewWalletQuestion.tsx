@@ -84,7 +84,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ subTextMessage, setSubTextMessage ] = useState( strings.Thismay )
   const [ bottomTextMessage ] = useState( strings.Hexaencrypts )
-  const subPoints = [ strings.multi, strings.creatingbackup, strings.preloading ]
+  const subPoints = [ strings.multi, Platform.OS == 'ios' ? strings.creatingbackup : strings.creatingbackupDrive, strings.preloading ]
   const [ Elevation, setElevation ] = useState( 10 )
   // const [ height, setHeight ] = useState( 72 )
   // const [ isLoaderStart, setIsLoaderStart ] = useState( false )
