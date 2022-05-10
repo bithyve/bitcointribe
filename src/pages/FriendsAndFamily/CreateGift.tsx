@@ -505,11 +505,11 @@ const CreateGift = ({ navigation }) => {
             }}>Gift Sats created will be of the
               <Text style={{
                 fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
-              }}>same amount</Text>
-              and can be
+              }}>{' '}same amount</Text>
+              {' '}and can be
               <Text style={{
                 fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
-              }}>sent separately</Text></Text>
+              }}>{' '}sent separately</Text></Text>
           </View>
           <View style={{
             flexDirection: 'row', alignItems: 'center',
