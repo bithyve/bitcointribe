@@ -45,6 +45,7 @@ import { setCloudBackupStatus } from '../store/actions/cloud'
 import { setOpenToApproval } from '../store/actions/BHR'
 import SecurityQuestion from './NewBHR/SecurityQuestion'
 import Toast from '../components/Toast'
+import SecuritySeedWord from './NewBHR/SecuritySeedWord'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -76,6 +77,10 @@ export default function Login( props ) {
   const [
     questionModal,
     showQuestionModal,
+  ] = useState( false )
+  const [
+    secuiritySeedWordModal,
+    showSecuiritySeedWordModal,
   ] = useState( false )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
@@ -379,6 +384,28 @@ export default function Login( props ) {
     )
   }, [ questionModal ] )
 
+  const renderSeedWordContent = useCallback( () => {
+    return (
+      <SecuritySeedWord
+        onClose={() => showSecuiritySeedWordModal( false )}
+        onPressConfirm={async () => {
+          Keyboard.dismiss()
+          showSecuiritySeedWordModal( false )
+          props.navigation.navigate( 'SettingGetNewPin', {
+            oldPasscode: '',
+            onPasscodeReset:onPasscodeReset
+          } )
+        }}
+        title="Enter your Seed Word Details"
+        title1="Forgot Passcode"
+        note="You will be prompted to change your passcode"
+        onPasscodeVerify={()=>{ showSecuiritySeedWordModal( true )  }}
+        showAnswer={false}
+      />
+    )
+  }, [ questionModal ] )
+
+
   useEffect( () => {
     if ( authenticationFailed && passcode ) {
       setCheckAuth( true )
@@ -599,7 +626,7 @@ export default function Login( props ) {
             </TouchableOpacity>
 
             {
-              attempts >= 3&&(
+              attempts >= 3&& ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType != 'seed' ) && (
                 <TouchableOpacity
                   style={{
                     ...styles.proceedButtonView,
@@ -607,13 +634,20 @@ export default function Login( props ) {
                     marginHorizontal: 15,
                   }}
                   onPress={()=> {
+                    console.log( 'skk currentLevel' + JSON.stringify( currentLevel ) )
+                    console.log( 'skk levelHealth' + JSON.stringify( levelHealth ) )
+
                     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
                       setJailBrokenTitle( strings.EncryptionKeyNotSet )
                       setJailBrokenInfo( strings.Youcanreset )
                       setErrorModal( true )
                       return
                     }
+                    // if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
+                    //   showSecuiritySeedWordModal( true )
+                    // }else {
                     showQuestionModal( true )
+                    // }
                   }}>
                   <Text style={{
                     color: Colors.blue,
@@ -623,6 +657,14 @@ export default function Login( props ) {
               )
             }
           </View>
+          { attempts >= 3 && ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) &&
+            <Text style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansMedium,
+              padding: wp( '5%' ),
+              marginTop: wp( '3%' )
+            }}>{'In case you have forgotten passcode, please setup the wallet again and restore it'}</Text>
+          }
         </View>
 
         <View style={{
@@ -783,6 +825,9 @@ export default function Login( props ) {
       </ModalContainer>
       <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
         {renderSecurityQuestionContent()}
+      </ModalContainer>
+      <ModalContainer onBackground={()=>showSecuiritySeedWordModal( false )} visible={secuiritySeedWordModal} closeBottomSheet={() => {showSecuiritySeedWordModal( false )}} >
+        {renderSeedWordContent()}
       </ModalContainer>
       {/* <BottomSheet
         onCloseEnd={() => {
