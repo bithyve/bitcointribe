@@ -635,9 +635,6 @@ export default function Login( props ) {
                     marginHorizontal: 15,
                   }}
                   onPress={()=> {
-                    console.log( 'skk currentLevel' + JSON.stringify( currentLevel ) )
-                    console.log( 'skk levelHealth' + JSON.stringify( levelHealth ) )
-
                     if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
                       setJailBrokenTitle( strings.EncryptionKeyNotSet )
                       setJailBrokenInfo( strings.Youcanreset )

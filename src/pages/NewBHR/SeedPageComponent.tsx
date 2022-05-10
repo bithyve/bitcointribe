@@ -64,7 +64,6 @@ const SeedPageComponent = ( props ) => {
     let initPosition = 0
     let lastPosition = 6
     const totalLength = seedData.length
-    console.log( 'skk seeddata', seedData )
     seedData.map( ( item, index )=>{
       if( index != 0 && index % 6 == 0 ){
         initPosition = initPosition + 6
@@ -77,8 +76,6 @@ const SeedPageComponent = ( props ) => {
     if( innerTempData.length > 0 ){
       tempData.push( innerTempData )
     }
-    console.log( 'skk tempData', tempData )
-
     setPartialSeedData( tempData )
     setTotal( totalLength )
   }, [] )
