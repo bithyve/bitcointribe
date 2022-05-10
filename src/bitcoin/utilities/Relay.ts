@@ -20,10 +20,14 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'checkCompatibility', {
-        HEXA_ID,
-        method,
-        version,
+      res = await BH_AXIOS( {
+        method: 'post',
+        url: 'checkCompatibility',
+        data: {
+          HEXA_ID,
+          method,
+          version,
+        },
       } )
     } catch ( err ) {
       if ( err.response ) console.log( err.response.data.err )
@@ -42,9 +46,13 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'fetchReleases', {
-        HEXA_ID,
-        build,
+      res = await BH_AXIOS( {
+        method: 'post',
+        url: 'fetchReleases',
+        data: {
+          HEXA_ID,
+          build,
+        },
       } )
     } catch ( err ) {
       if ( err.response ) console.log( err.response.data.err )
@@ -66,10 +74,14 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateFCMTokens', {
-          HEXA_ID,
-          walletID,
-          FCMs,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'updateFCMTokens',
+          data: {
+            HEXA_ID,
+            walletID,
+            FCMs,
+          },
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
@@ -89,9 +101,13 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'fetchNotifications', {
-        HEXA_ID,
-        walletID,
+      res = await BH_AXIOS( {
+        method: 'post',
+        url: 'fetchNotifications',
+        data: {
+          HEXA_ID,
+          walletID,
+        },
       } )
     } catch ( err ) {
       console.log( {
@@ -120,10 +136,14 @@ export default class Relay {
         throw new Error( 'Failed to deliver notification: receivers missing' )
 
       try {
-        res = await BH_AXIOS.post( 'sendNotifications', {
-          HEXA_ID,
-          receivers,
-          notification,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'sendNotifications',
+          data: {
+            HEXA_ID,
+            receivers,
+            notification,
+          },
         } )
         console.log( 'sendNotifications', {
           res
@@ -155,10 +175,14 @@ export default class Relay {
       if ( !txNote || !txNote.txId || !txNote.note )
         throw new Error( 'Failed to send donation note: txid|note missing' )
 
-      const res: AxiosResponse = await BH_AXIOS.post( 'addDonationTxNote', {
-        HEXA_ID,
-        donationId,
-        txNote,
+      const res = await BH_AXIOS( {
+        method: 'post',
+        url: 'addDonationTxNote',
+        data: {
+          HEXA_ID,
+          donationId,
+          txNote,
+        },
       } )
 
       const { added } = res.data
@@ -179,9 +203,13 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'fetchFeeAndExchangeRates', {
-          HEXA_ID,
-          currencyCode
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'fetchFeeAndExchangeRates',
+          data: {
+            HEXA_ID,
+            currencyCode
+          },
         } )
       } catch ( err ) {
         // console.log({ err });
@@ -206,10 +234,14 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'claimCampaignGift', {
-          HEXA_ID,
-          campaignId: campaignId,
-          walletID,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'claimCampaignGift',
+          data: {
+            HEXA_ID,
+            campaignId: campaignId,
+            walletID,
+          },
         } )
         return res.data
       } catch ( err ) {
@@ -233,10 +265,14 @@ export default class Relay {
         notification,
       }
       try {
-        res = await BH_AXIOS.post( 'sendKeeperNotifications', {
-          HEXA_ID,
-          receivers,
-          notification,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'sendKeeperNotifications',
+          data: {
+            HEXA_ID,
+            receivers,
+            notification,
+          },
         } )
         const { sent } = res.data
         if ( !sent ) throw new Error()
@@ -261,11 +297,19 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'getMessages', {
-        HEXA_ID,
-        walletID,
-        timeStamp
+      res = await BH_AXIOS( {
+        method: 'post',
+        url: 'getMessages',
+        data: {
+          HEXA_ID,
+          walletID,
+          timeStamp
+        },
       } )
+      const { messages } = res.data
+      return {
+        messages
+      }
     } catch ( err ) {
       console.log( {
         err
@@ -274,10 +318,7 @@ export default class Relay {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { messages } = res.data
-    return {
-      messages
-    }
+
   };
 
   public static updateMessageStatus = async (
@@ -289,10 +330,14 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateMessages', {
-          HEXA_ID,
-          walletID,
-          data,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'updateMessages',
+          data: {
+            HEXA_ID,
+            walletID,
+            data,
+          },
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
@@ -313,10 +358,14 @@ export default class Relay {
     exchangeRates: { [currency: string]: number };
     averageTxFees: any;
   }> => {
-    const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
-      HEXA_ID,
-      ...currencyCode && {
-        currencyCode
+    const res = await BH_AXIOS( {
+      method: 'post',
+      url: 'v2/walletCheckIn',
+      data: {
+        HEXA_ID,
+        ...currencyCode && {
+          currencyCode
+        },
       },
     } )
 
@@ -343,10 +392,14 @@ export default class Relay {
       message?: undefined;
     }  > => {
     try {
-      const res: AxiosResponse = await BH_AXIOS.post( 'v2/updateWalletImage', {
-        HEXA_ID,
-        walletID: walletImage.walletId,
-        walletImage,
+      const res = await BH_AXIOS( {
+        method: 'post',
+        url: 'v2/updateWalletImage',
+        data: {
+          HEXA_ID,
+          walletID: walletImage.walletId,
+          walletImage,
+        },
       } )
       const { updated } = res.data
       return {
@@ -364,9 +417,13 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'v2/fetchWalletImage', {
-          HEXA_ID,
-          walletID: walletId,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'v2/fetchWalletImage',
+          data: {
+            HEXA_ID,
+            walletID: walletId,
+          },
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
@@ -389,12 +446,16 @@ export default class Relay {
       const encryptedGift = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( gift ), encryptionKey )
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateGiftChannel', {
-          HEXA_ID,
-          channelAddress: gift.channelAddress,
-          encryptedGift,
-          metaData,
-          previousChannelAddress,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'updateGiftChannel',
+          data: {
+            HEXA_ID,
+            channelAddress: gift.channelAddress,
+            encryptedGift,
+            metaData,
+            previousChannelAddress,
+          },
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
@@ -417,9 +478,13 @@ export default class Relay {
 
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'fetchGiftChannel', {
-          HEXA_ID,
-          channelAddress,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'fetchGiftChannel',
+          data: {
+            HEXA_ID,
+            channelAddress,
+          },
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
@@ -455,9 +520,13 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'syncGiftChannelsMetaData', {
-          HEXA_ID,
-          giftChannelsToSync,
+        res = await BH_AXIOS( {
+          method: 'post',
+          url: 'syncGiftChannelsMetaData',
+          data: {
+            HEXA_ID,
+            giftChannelsToSync,
+          },
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
