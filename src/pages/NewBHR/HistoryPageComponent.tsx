@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import {
@@ -83,7 +84,7 @@ const HistoryPageComponent = ( props ) => {
               )
             } )}
           </ScrollView>
-          {props.data.length <= 1 || props.infoBoxTitle == strings.BackupHistory && (
+          {props.data.length <= 1 || props.infoBoxTitle == ( Platform.OS == 'ios' ? strings.BackupHistory : strings.BackupHistorydrive ) && (
             <BottomInfoBox
               backgroundColor={Colors.white}
               title={

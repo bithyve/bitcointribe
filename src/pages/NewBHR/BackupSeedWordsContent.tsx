@@ -3,6 +3,7 @@ import {
   View,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import _ from 'underscore'
@@ -17,6 +18,7 @@ import { updateSeedHealth } from '../../store/actions/BHR'
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ seedSecondName, setSeedSecondName ] = useState( '' )
   const dispatch = useDispatch()
 
   return (
@@ -31,26 +33,28 @@ const BackupSeedWordsContent = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Backup Seed Words'}
-        moreInfo={'Note down the words 1 to 24'}
+        selectedTitle={'Enter Seed Words'}
       />
       <View style={{
         flex: 1
       }}>
         <SeedPageComponent
-          infoBoxTitle={''}
-          infoBoxInfo={'You will be asked to confirm some of these, to ensure you have all the seed words written'}
-          onPressConfirm={() => {
+          infoBoxTitle={'Note'}
+          infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
+          onPressConfirm={( seed, seedSecondName )=>{
             setConfirmSeedWordModal( true )
+            setSeedSecondName( seedSecondName )
           }}
           data={[]}
           confirmButtonText={'Next'}
+          proceedButtonText={'Proceed'}
           disableChange={false}
           onPressReshare={() => {
           }}
           onPressChange={() => props.navigation.goBack()}
           showButton={true}
           changeButtonText={'Back'}
+          previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
         />
       </View>
@@ -59,11 +63,20 @@ const BackupSeedWordsContent = ( props ) => {
         closeBottomSheet={() => setConfirmSeedWordModal( false )}>
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
-          onPressProceed={() => {
+          onPressProceed={( word ) => {
             setConfirmSeedWordModal( false )
-            setSeedWordModal( true )
-            dispatch( updateSeedHealth() )
-
+            if( word == '' ){
+              setTimeout( () => {
+                Alert.alert( 'Please enter second seed name' )
+              }, 500 )
+            } else if( word != seedSecondName ){
+              setTimeout( () => {
+                Alert.alert( 'Please enter valid second seed name' )
+              }, 500 )
+            } else {
+              setSeedWordModal( true )
+              dispatch( updateSeedHealth() )
+            }
           }}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}

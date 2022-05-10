@@ -1,3 +1,5 @@
+import { Platform } from "react-native"
+
 export const getiCloudErrorMessage = ( errorCode ) => {
   switch ( `${errorCode}` ) {
       case '36': //An error that occurs when the user's iCloud account is temporarily unavailable.
@@ -69,7 +71,7 @@ export const getGoogleDriveErrorMessage = ( errorCode ) => {
       case '34': //ERROR_IN_READING_DATA
         return 'Error in reading data. Please re-try again.'
       case '12501':
-        return '12501'
+        return Platform.OS == 'ios' ? '12501' : '12502'
       default:
         return 'default'
   }

@@ -30,7 +30,8 @@ import NewOwnQuestions from '../../../pages/NewOwnQuestions'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
 import Launch from '../../../pages/Launch'
-
+import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
+import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
 import SettingsContents from '../../../pages/SettingsContents'
@@ -46,8 +47,9 @@ import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestio
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
+// import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
-import RestoreSeedWordsContent from '../../../pages/NewBHR/RestoreSeedWordsContent'
+import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
 import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
@@ -100,6 +102,18 @@ const HomeStack = createStackNavigator(
         header: null,
         // tabBarVisibl
       },
+    },
+    ScanNodeConfig: {
+      screen: ScanNodeConfig,
+      navigationOptions: {
+        header: null
+      }
+    },
+    EnterNodeConfig: {
+      screen: EnterNodeConfig,
+      navigationOptions: {
+        header: null
+      }
     },
     AccountDetails: {
       screen: AccountDetailsStack,
@@ -190,7 +204,13 @@ const HomeStack = createStackNavigator(
     AddContactSendRequest,
     QrAndLink,
     ContactDetails,
-    Receive,
+    Receive: {
+      screen: Receive,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
     PairNewWallet,
     // ManageBackupKeeper,
     ManageBackupNewBHR,
@@ -203,6 +223,12 @@ const HomeStack = createStackNavigator(
     // PersonalCopyHistoryKeeper,
     PersonalCopyHistoryNewBHR,
     CloudBackupHistory,
+    // SeedBackupHistory: {
+    //   screen: SeedBackupHistory,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,
@@ -215,7 +241,12 @@ const HomeStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
-    BackupSeedWordsContent,
+    BackupSeedWordsContent: {
+      screen: BackupSeedWordsContent,
+      navigationOptions: {
+        header: null,
+      },
+    },
     RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,

@@ -46,6 +46,9 @@ PODS:
   - Firebase/Messaging (8.8.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 8.8.0)
+  - Firebase/Storage (8.8.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 8.8.0)
   - FirebaseAnalytics (8.8.0):
     - FirebaseAnalytics/AdIdSupport (= 8.8.0)
     - FirebaseCore (~> 8.0)
@@ -68,7 +71,7 @@ PODS:
     - FirebaseCoreDiagnostics (~> 8.0)
     - GoogleUtilities/Environment (~> 7.4)
     - GoogleUtilities/Logger (~> 7.4)
-  - FirebaseCoreDiagnostics (8.12.0):
+  - FirebaseCoreDiagnostics (8.15.0):
     - GoogleDataTransport (~> 9.1)
     - GoogleUtilities/Environment (~> 7.7)
     - GoogleUtilities/Logger (~> 7.7)
@@ -82,7 +85,7 @@ PODS:
     - PromisesObjC (< 3.0, >= 1.2)
   - FirebaseDynamicLinks (8.8.0):
     - FirebaseCore (~> 8.0)
-  - FirebaseInstallations (8.12.0):
+  - FirebaseInstallations (8.15.0):
     - FirebaseCore (~> 8.0)
     - GoogleUtilities/Environment (~> 7.7)
     - GoogleUtilities/UserDefaults (~> 7.7)
@@ -96,6 +99,9 @@ PODS:
     - GoogleUtilities/Reachability (~> 7.4)
     - GoogleUtilities/UserDefaults (~> 7.4)
     - nanopb (~> 2.30908.0)
+  - FirebaseStorage (8.8.0):
+    - FirebaseCore (~> 8.0)
+    - GTMSessionFetcher/Core (~> 1.5)
   - Folly (2020.01.13.00):
     - boost-for-react-native
     - DoubleConversion
@@ -152,6 +158,7 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (7.7.0):
     - GoogleUtilities/Logger
+  - GTMSessionFetcher/Core (1.7.1)
   - jail-monkey (2.6.0):
     - React-Core
   - nanopb (2.30908.0):
@@ -162,7 +169,7 @@ PODS:
   - PDFGenerator (3.1.0)
   - pkce-utils (0.1.0):
     - React-Core
-  - PromisesObjC (2.0.0)
+  - PromisesObjC (2.1.0)
   - QRCoder (1.1.0)
   - RCTRequired (0.63.3)
   - RCTTypeSafety (0.63.3):
@@ -350,8 +357,6 @@ PODS:
     - React-Core
   - react-native-image-picker (4.7.3):
     - React-Core
-  - react-native-image-picker (4.7.3):
-    - React-Core
   - react-native-in-app-utils (6.1.0):
     - React
   - react-native-mail (6.1.1):
@@ -435,13 +440,12 @@ PODS:
     - React-Core (= 0.63.3)
     - React-cxxreact (= 0.63.3)
     - React-jsi (= 0.63.3)
-  - RealmJS (10.13.0):
+  - RealmJS (10.16.0):
     - GCDWebServer
     - React
   - rn-fetch-blob (0.12.0):
     - React-Core
-  - RNCAsyncStorage (1.16.1):
-  - RNCAsyncStorage (1.15.9):
+  - RNCAsyncStorage (1.17.3):
     - React-Core
   - RNCClipboard (1.8.5):
     - React-Core
@@ -469,6 +473,10 @@ PODS:
     - RNFBApp
   - RNFBMessaging (12.9.3):
     - Firebase/Messaging (= 8.8.0)
+    - React-Core
+    - RNFBApp
+  - RNFBStorage (14.8.0):
+    - Firebase/Storage (= 8.8.0)
     - React-Core
     - RNFBApp
   - RNFS (2.19.0):
@@ -581,6 +589,7 @@ DEPENDENCIES:
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBDynamicLinks (from `../node_modules/@react-native-firebase/dynamic-links`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
+  - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../node_modules/react-native-localize`)
@@ -618,10 +627,12 @@ SPEC REPOS:
     - FirebaseDynamicLinks
     - FirebaseInstallations
     - FirebaseMessaging
+    - FirebaseStorage
     - GCDWebServer
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleUtilities
+    - GTMSessionFetcher
     - nanopb
     - PDFGenerator
     - PromisesObjC
@@ -752,6 +763,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/dynamic-links"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
+  RNFBStorage:
+    :path: "../node_modules/@react-native-firebase/storage"
   RNFS:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
@@ -818,22 +831,24 @@ SPEC CHECKSUMS:
   Firebase: 629510f1a9ddb235f3a7c5c8ceb23ba887f0f814
   FirebaseAnalytics: 5506ea8b867d8423485a84b4cd612d279f7b0b8a
   FirebaseCore: 98b29e3828f0a53651c363937a7f7d92a19f1ba2
-  FirebaseCoreDiagnostics: 3b40dfadef5b90433a60ae01f01e90fe87aa76aa
+  FirebaseCoreDiagnostics: 92e07a649aeb66352b319d43bdd2ee3942af84cb
   FirebaseCrashlytics: 3660c045c8e45cc4276110562a0ef44cf43c8157
   FirebaseDynamicLinks: cf76a46274569da2d4491548a39ef35f3c1a992d
-  FirebaseInstallations: 25764cf322e77f99449395870a65b2bef88e1545
+  FirebaseInstallations: 40bd9054049b2eae9a2c38ef1c3dd213df3605cd
   FirebaseMessaging: 419b5c9d84f294a753c6501d8cfb9ced1ce37304
+  FirebaseStorage: 54ff752ecbd27f1c354c3f5e8c55f6ad5783699b
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   GoogleAppMeasurement: 5ba1164e3c844ba84272555e916d0a6d3d977e91
   GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
+  GTMSessionFetcher: 4577a4cc914a5a07c40a8a0ad0acc22080418c2d
   jail-monkey: 07b83767601a373db876e939b8dbf3f5eb15f073
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
   pkce-utils: 436648edb29e323ce0ad0d9043499fb90c3574ce
-  PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
+  PromisesObjC: 99b6f43f9e1044bd87a95a60beff28c2c44ddb72
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   RCTRequired: 48884c74035a0b5b76dbb7a998bd93bcfc5f2047
   RCTTypeSafety: edf4b618033c2f1c5b7bc3d90d8e085ed95ba2ab
@@ -871,9 +886,9 @@ SPEC CHECKSUMS:
   React-RCTText: 65a6de06a7389098ce24340d1d3556015c38f746
   React-RCTVibration: 8e9fb25724a0805107fc1acc9075e26f814df454
   ReactCommon: 4167844018c9ed375cc01a843e9ee564399e53c3
-  RealmJS: 9ca55cce37eedc14f6f3db233ba3d3ad52838c6f
+  RealmJS: 8a3478957315c29cdc0b3f958f2e370d22330b2d
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
-  RNCAsyncStorage: b49b4e38a1548d03b74b30e558a1d18465b94be7
+  RNCAsyncStorage: 005c0e2f09575360f142d0d1f1f15e4ec575b1af
   RNCClipboard: cc054ad1e8a33d2a74cd13e565588b4ca928d8fd
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNCPushNotificationIOS: 87b8d16d3ede4532745e05b03c42cff33a36cc45
@@ -883,6 +898,7 @@ SPEC CHECKSUMS:
   RNFBCrashlytics: 2061ca863e8e2fa1aae9b12477d7dfa8e88ca0f9
   RNFBDynamicLinks: 4cb7df93b3bea086d743ecb78127c3d11b38510d
   RNFBMessaging: 8415ec196e5c1196caa26ec0742cdb48ed4d0f97
+  RNFBStorage: 4ceb3d68301fe9f65fd70a9babe3ea18ca75e49d
   RNFS: fc610f78fdf8bfc89a9e5cc2f898519f4dba1002
   RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08
   RNLocalize: 7c7aeda16c01db7a0918981c14875c0a53be9b79

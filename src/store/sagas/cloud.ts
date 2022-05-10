@@ -115,7 +115,6 @@ function* cloudWorker( { payload } ) {
         keeperData: JSON.stringify( keeperInfo ),
         bhXpub,
       }
-
       const { response, timeout } = yield race( {
         response: call( checkCloudBackupWorker, {
           payload: {
@@ -124,11 +123,11 @@ function* cloudWorker( { payload } ) {
         } ),
         timeout: delay( 60000 )
       } )
-      console.log( 'response', response )
-      console.log( 'timeout', timeout )
+      // console.log( 'skk isCloudBackupCompleted response', response )
+      // console.log( 'skk timeout', timeout )
+      // console.log( 'skk response?.status', response?.status )
       if ( !timeout ){
-        const isCloudBackupCompleted = response?.status
-
+        const isCloudBackupCompleted =  Platform.OS == 'ios' ? response?.status : response
         if( typeof isCloudBackupCompleted === 'boolean' ) {
           const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
           const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
@@ -158,7 +157,7 @@ function* cloudWorker( { payload } ) {
             yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
           }
         } else {
-          if( isCloudBackupCompleted.status ) {
+          if( isCloudBackupCompleted ) {
             const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
             yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
@@ -397,6 +396,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
       if( googleLoginResult ){
         const result = googleLoginResult
         if ( !googlePermissionCall ){
+          console.log( 'eventName', result )
+
           if ( result.eventName == 'onLogin' ) {
             yield put( setGoogleCloudLoginSuccess( true ) )
             const fileAvailabelStatus =  yield call( checkFileIsAvailableWorker, {
@@ -406,6 +407,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
                 data
               }
             } )
+            console.log( 'fileAvailabelStatus', fileAvailabelStatus )
+
             return fileAvailabelStatus
           } else{
             const message = getGoogleDriveErrorMessage( result.code )

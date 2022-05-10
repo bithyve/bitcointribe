@@ -196,10 +196,11 @@ export default function AddContactAddressBook( props ) {
       const isFilter = true
       const filterContactsForDisplay = []
       for ( let i = 0; i < contactData.length; i++ ) {
-        const contactWords = contactData[ i ].name.split( ' ' ).length
-        const middleName = contactData[ i ].name.split( ' ' ).slice( 1, contactWords-1 ).join( ' ' )
-        if (
-          ( contactData[ i ].firstName &&
+        if( contactData[ i ].name != undefined && contactData[ i ].name != null && contactData[ i ].name!='' ) {
+          const contactWords = contactData[ i ].name.split( ' ' ).length
+          const middleName = contactData[ i ].name.split( ' ' ).slice( 1, contactWords-1 ).join( ' ' )
+          if (
+            ( contactData[ i ].firstName &&
             contactData[ i ].firstName
               .toLowerCase()
               .startsWith( keyword.toLowerCase() ) ) ||
@@ -215,8 +216,9 @@ export default function AddContactAddressBook( props ) {
                     middleName
                       .toLowerCase()
                       .startsWith( keyword.toLowerCase() ) )
-        )  {
-          filterContactsForDisplay.push( contactData[ i ] )
+          )  {
+            filterContactsForDisplay.push( contactData[ i ] )
+          }
         }
       }
       setFilterContactData( filterContactsForDisplay )
@@ -384,7 +386,7 @@ export default function AddContactAddressBook( props ) {
         infoTextNormal1={''}
         step={''}
       />
-      <Text style={styles.addressBook}>from your address book</Text>
+      {/* <Text style={styles.addressBook}>from your address book</Text> */}
 
       {selectedContacts.length !==0 &&
       <View style={styles.selectedContactContent}>
