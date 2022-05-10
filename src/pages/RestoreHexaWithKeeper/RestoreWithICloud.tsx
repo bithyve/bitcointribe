@@ -266,7 +266,7 @@ class RestoreWithICloud extends Component<
     this.bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
     this.subPoints = [
       translations[ 'bhr' ].Settingupmultipleaccounts,
-      translations[ 'bhr' ].Automaticallycreatingbackup,
+      Platform.OS == 'ios' ? translations[ 'bhr' ].Automaticallycreatingbackup : translations[ 'bhr' ].AutomaticallycreatingbackupDrive,
       translations[ 'bhr' ].Preloading,
     ]
   }
@@ -277,7 +277,7 @@ class RestoreWithICloud extends Component<
   };
 
   cloudData = () => {
-    //console.log("INSIDE cloudData componentDidMount");
+    // console.log( 'INSIDE cloudData componentDidMount' )
     this.setState( {
       showLoader: true
     } )
@@ -531,7 +531,7 @@ class RestoreWithICloud extends Component<
       setTimeout( () => {
         this.setState( {
           errorModal: true,
-          errorModalTitle: this.state.strings[ 'CloudRestorefailed' ],
+          errorModalTitle: Platform.OS == 'ios' ? this.state.strings[ 'CloudRestorefailed' ] : this.state.strings[ 'DriveRestorefailed' ],
           errorModalInfo: Platform.select( {
             ios: translations.iCloudErrors[ this.props.cloudErrorMessage ],
             android: translations.driveErrors[ this.props.cloudErrorMessage ],
@@ -810,17 +810,18 @@ class RestoreWithICloud extends Component<
     return loaderMessages[ messageIndex++ ]
   }
 
+  static contextType = LocalizationContext
   renderContent = () => {
     const { selectedBackup, hideShow, common } = this.state
     const { navigation } = this.props
-    const { translations, formatString } = useContext( LocalizationContext )
+    const { translations, formatString } =  this.context
     const strings = translations[ 'bhr' ]
     return (
 
       <RestoreFromICloud
         title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText= {
-          formatString( 'Clickingon', Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
+          formatString( strings.Clickingon,  Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
         }
         cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
@@ -1050,7 +1051,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <Text style={styles.modalHeaderInfoText}>
-            {strings[ 'UseSendRequest' ]}
+            {strings[ 'UseScaneKey' ]}
           </Text>
         </View>
         <View
@@ -1070,9 +1071,10 @@ class RestoreWithICloud extends Component<
             shadowOffset: {
               width: 15, height: 15
             },
+            width: wp( '40%' )
           }}
         >
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               // alert("test");
               // ( this.ContactListForRestore as any ).current.snapTo( 1 )
@@ -1089,12 +1091,12 @@ class RestoreWithICloud extends Component<
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>{strings[ 'SendRequest' ]}</Text>
-          </TouchableOpacity>
-          <View
+          </TouchableOpacity> */}
+          {/* <View
             style={{
               width: 1, height: 30, backgroundColor: Colors.white
             }}
-          />
+          /> */}
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
@@ -1113,7 +1115,6 @@ class RestoreWithICloud extends Component<
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
-
         <ModalContainer onBackground={()=>{this.setState( {
           restoreModal:false
         } )}} visible={restoreModal} closeBottomSheet={() => {
@@ -1227,7 +1228,7 @@ class RestoreWithICloud extends Component<
         } )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
           securityQuestionModal: false
         } ) }} >
-          {console.log("teste Restore screen", this.state.question)}
+          {/* {console.log( 'teste Restore screen', this.state.question )} */}
           <SecurityQuestion
             question={this.state.question}
             encryptionType={this.state.encryptionType}
