@@ -13,7 +13,7 @@ import SeedPageComponent from './SeedPageComponent'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import { useDispatch } from 'react-redux'
-import { updateSeedHealth } from '../../store/actions/BHR'
+import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -76,6 +76,7 @@ const BackupSeedWordsContent = ( props ) => {
             } else {
               setSeedWordModal( true )
               dispatch( updateSeedHealth() )
+              // dispatch(setSeedBackupHistory())
             }
           }}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
@@ -96,7 +97,7 @@ const BackupSeedWordsContent = ( props ) => {
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
           isBottomImage={true}
-          bottomImage={require( '../../assets/images/icons/noInternet.png' )}
+          bottomImage={require( '../../assets/images/icons/success.png' )}
         />
       </ModalContainer>
     </View>

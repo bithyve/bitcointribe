@@ -81,6 +81,7 @@ export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
 export const RECOVER_WALLET_WITH_MNEMONIC = 'RECOVER_WALLET_WITH_MNEMONIC'
 export const PDF_UPGRADE = 'PDF_UPGRADE'
 export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
+export const SEED_BACKUP_HISTORY = 'SEED_BACKUP_HISTORY'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -639,6 +640,15 @@ export const setupPassword = ( security ) => {
 export const updateSeedHealth = ( ) => {
   return {
     type: UPDATE_SEED_HEALTH
+  }
+}
+
+export const setSeedBackupHistory = ( seedBackupHistory ) => {
+  return {
+    type: SEED_BACKUP_HISTORY,
+    payload: {
+      seedBackupHistory
+    },
   }
 }
 

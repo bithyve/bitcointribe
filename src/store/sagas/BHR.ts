@@ -82,6 +82,7 @@ import {
   UPDATE_SEED_HEALTH,
   RECOVER_WALLET_WITH_MNEMONIC,
   updateSeedHealth,
+  setSeedBackupHistory,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -1905,6 +1906,11 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     const levelHealthState: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const currentLevelState: number = yield select( ( state ) => state.bhr.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
+    // console.log( 'skk keeperinfo previous', JSON.stringify( keeperInfo ) )
+    // console.log( 'skk payload previous', JSON.stringify( ss ) )
+    // console.log( 'skk payload previous', JSON.stringify( currentLevelState ) )
+    // console.log( 'skk abc previous', JSON.stringify( ss && ss.payload.levelHealth ? ss.payload.levelHealth : levelHealthState ) )
+    // return
     let levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -1957,6 +1963,7 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
       else if( keeperInfo[ i ].scheme == ShareSplitScheme.TwoOfThree ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
       else if( keeperInfo[ i ].scheme == ShareSplitScheme.ThreeOfFive ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
     }
+    // console.log( 'skk keeperinfo', JSON.stringify( keeperInfo ) )
     yield put( putKeeperInfo( keeperInfo ) )
     yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
     const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState, keeperInfo )
@@ -2386,11 +2393,25 @@ export const setupPasswordWatcher = createWatcher(
 )
 
 
+const saveConfirmationHistory = async ( title: string, seedBackupHistory: any[] ) => {
+
+  const obj = {
+    title,
+    confirmed: Date.now(),
+    date: Date.now(),
+  }
+  const updatedSeedBackupHistory = [ ...seedBackupHistory ]
+  updatedSeedBackupHistory.push( obj )
+  return updatedSeedBackupHistory
+}
+
 function* updateSeedHealthWorker( ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
 
   const currentTS = moment( new Date() ).valueOf()
   const randomIdForSeed = generateRandomString( 8 )
+
+  let channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
 
   const keeperInfo: KeeperInfoInterface = {
     shareId: randomIdForSeed,
@@ -2401,7 +2422,8 @@ function* updateSeedHealthWorker( ) {
     createdAt: currentTS,
     sharePosition: null,
     data: {
-    }
+    },
+    channelKey:channelKeyToUse
   }
   yield put( updatedKeeperInfo( keeperInfo ) )
 
@@ -2430,6 +2452,11 @@ function* updateSeedHealthWorker( ) {
   } ], 0, '' ) )
 
   yield put( updateMSharesHealth( seedLevelInfo, true ) )
+
+  const seedBackupHistory = yield select( ( state ) => state.bhr.seedBackupHistory )
+  const title = 'Seed backup confirm'
+  const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, seedBackupHistory )
+  yield put( setSeedBackupHistory( updatedCloudBackupHistory ) )
 }
 
 export const updateSeedHealthWatcher = createWatcher(

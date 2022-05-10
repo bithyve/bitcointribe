@@ -310,15 +310,18 @@ function* getCloudBackupRecoveryWorker () {
         }
       }
     } else {
+      // console.log( 'skk getcloud backup inside1' )
       const checkDataIsBackedup = true
       yield call ( GoogleDriveLoginWorker, {
         payload: {
           checkDataIsBackedup
         }
       } )
+      // console.log( 'skk getcloud backup inside12' )
     }
   } catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    // console.log( 'skk getcloud backup inside13' )
     throw new Error( error )
   }
 }

@@ -64,7 +64,6 @@ const SeedPageComponent = ( props ) => {
     let initPosition = 0
     let lastPosition = 6
     const totalLength = seedData.length
-    console.log( 'skk seeddata', seedData )
     seedData.map( ( item, index )=>{
       if( index != 0 && index % 6 == 0 ){
         initPosition = initPosition + 6
@@ -77,8 +76,6 @@ const SeedPageComponent = ( props ) => {
     if( innerTempData.length > 0 ){
       tempData.push( innerTempData )
     }
-    console.log( 'skk tempData', tempData )
-
     setPartialSeedData( tempData )
     setTotal( totalLength )
   }, [] )
@@ -223,11 +220,11 @@ const SeedPageComponent = ( props ) => {
                     )
                   }}
                 />
-                <BottomInfoBox
+                {/* <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={props.infoBoxTitle}
                   infoText={props.infoBoxInfo}
-                />
+                /> */}
               </View>
             ) )}
           </AnimatedPagerView>
@@ -235,7 +232,7 @@ const SeedPageComponent = ( props ) => {
           <View style={{
             flex: 1
           }}>
-            <View style={{
+            {/* <View style={{
               backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
             }}>
               <BottomInfoBox
@@ -243,7 +240,7 @@ const SeedPageComponent = ( props ) => {
                 title={props.infoBoxTitle}
                 infoText={props.infoBoxInfo}
               />
-            </View>
+            </View> */}
           </View>
         )}
       {props.showButton ? <View>
