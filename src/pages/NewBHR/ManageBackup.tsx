@@ -482,18 +482,20 @@ export default function ManageBackup( props ) {
   }
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
-    if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-      setBackupTypeModal( true )
-      return
-    }
+    // if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+    //   setBackupTypeModal( true )
+    //   return
+    // }
     if ( ( keeperNumber == 1 ) && ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       if ( value.id == 1 ) {
-        props.navigation.navigate( 'SetNewPassword', {
-          isFromManageBackup: true,
-        } )
+        // props.navigation.navigate( 'SetNewPassword', {
+        //   isFromManageBackup: true,
+        // } )
+        setSeedBackupModal( true )
         return
       }
     }
+    // console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
     if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return
@@ -516,6 +518,7 @@ export default function ManageBackup( props ) {
       selectedKeeper,
       selectedLevelId
     }
+    // console.log( 'skk gotohistory', navigationParams )
     let index = 1
     let count = 0
     if ( selectedKeeper.shareType == 'primaryKeeper' || selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
@@ -560,6 +563,9 @@ export default function ManageBackup( props ) {
     } else if ( selectedKeeper.shareType == 'pdf' ) props.navigation.navigate( 'PersonalCopyHistoryNewBHR', navigationParams )
     else if ( selectedKeeper.shareType == 'securityQuestion' ) props.navigation.navigate( 'SecurityQuestionHistoryNewBHR', navigationParams )
     else if ( selectedKeeper.shareType == 'cloud' ) props.navigation.navigate( 'CloudBackupHistory', navigationParams )
+    else if ( selectedKeeper.shareType == 'seed' ) {
+      props.navigation.navigate( 'SeedBackupHistory', navigationParams )
+    }
     setOnKeeperButtonClick( false )
   }
 
@@ -567,6 +573,10 @@ export default function ManageBackup( props ) {
     const tempData = []
     levelData.map( ( item, index ) => {
       if ( item.keeper1.status != 'notSetup' || index == 0 ) {
+        if ( item.keeper1.shareType == 'seed' ) {
+          tempData.push( item )
+          return
+        }
         tempData.push( item )
         tempData.push( item )
       }
@@ -636,7 +646,7 @@ export default function ManageBackup( props ) {
           else require( '../../assets/images/icons/files-and-folders-2.png' )
         default:
           if ( index == 0 )
-            return require( '../../assets/images/icons/icon_password.png' )
+            return require( '../../assets/images/icons/seedwords.png' )
           else if ( index == 1 )
             return Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
           else if ( index == 2 )

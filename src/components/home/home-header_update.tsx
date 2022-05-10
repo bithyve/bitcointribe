@@ -203,11 +203,14 @@ const HomeHeader = ( {
             isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: strings.needAttention, isError: true
           }
         }
+        if( element.keeper1.status == 'accessible'  && element.keeper1.shareType == 'seed' ){
+          messageOneName = strings.Level1+ ' seed ' +strings.backupIsCompleted
+        }
         if( element.keeper2.status == 'accessible' ){
           messageOneName = element.keeper2.name
         }
       }
-      if( currentLevel == 0 ){
+      if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType != 'seed' ){
         return {
           isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
         }
@@ -234,7 +237,11 @@ const HomeHeader = ( {
       return {
         isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? strings.l1 : strings.l1Drive, messageTwo: '', isError: false
       }
-    } else {
+    } else if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType == 'seed' ) {
+      return {
+        isFirstMessageBold: false, messageOne: strings.Level1+ ' seed ' +strings.backupIsCompleted, messageTwo: '', isError: true
+      }
+    }else {
       return {
         isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
       }

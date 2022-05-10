@@ -164,7 +164,12 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
   }, [])
 
   useEffect(() => {
-    if (!isChange && !setupPasswordStatus && levelHealth.length && levelHealth[0].levelInfo.length && levelHealth[0].levelInfo[0].status !== 'notSetup') {
+    // console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
+    // console.log( 'skk setupPasswordStatus', JSON.stringify( setupPasswordStatus ) )
+    // console.log( 'skk ischange', JSON.stringify( isChange ) )
+    // console.log( 'skk true', JSON.stringify( isChange ) )
+    // if ( !isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].shareType == 'securityQuestion' ) {
+    if (!isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !== 'notSetup' ) {
       setLoaderModal(false)
       props.navigation.goBack()
     }
@@ -517,7 +522,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
           paddingHorizontal: 8,
           paddingTop: 8
         }}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             activeOpacity={1}
             onPress={() => {
               setKnowMoreIndex(2)
@@ -536,9 +541,10 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
           >
             <Text style={styles.contactText}>{common['knowMore']}</Text>
 
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text style={{
             // marginBottom: wp( '%' ),
+            marginTop: wp('5%'),
             color: Colors.blue,
             fontSize: RFValue(18),
             fontFamily: Fonts.FiraSansRegular,
@@ -817,7 +823,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             </Text>
           </View>
           {(
-            pswd === tempPswd &&
+            pswd === tempPswd && pswd != '' &&
             passwordScore >= 2
           ) ? <View style={{
             ...styles.bottomButtonView,
@@ -826,21 +832,23 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             {setButtonVisible()}
 
           </View> : null}
-          {showNote &&
-            <View style={{
-              marginTop: showNote ? hp('0%') : hp('2%'),
-              marginBottom: hp(1)
-            }}>
-              {pswd.length === 0 && confirmPswd.length === 0 &&
-                <BottomInfoBox
-                  title={common.note}
-                  infoText={strings.Youcanuse}
-                  italicText={''}
-                  backgroundColor={Colors.white}
-                />
-              }
-            </View>
-          }
+          {/* {showNote && */}
+          <View style={{
+            marginTop: showNote ? hp('0%') : hp('2%'),
+            paddingLeft: hp('1%'),
+            marginBottom: hp(1)
+          }}>
+            {/* {pswd.length === 0 && confirmPswd.length === 0 && */}
+            <BottomInfoBox
+              title={common.note}
+              // infoText={strings.Youcanuse}
+              infoText={'Use a strong password (combination of lower/upper case alphabets, numerals, etc.) to proceed. Make sure to note it down for safe-keeping'}
+              italicText={''}
+              backgroundColor={Colors.white}
+            />
+            {/* // } */}
+          </View>
+          {/* } */}
         </View>
       </KeyboardAwareScrollView>
     )

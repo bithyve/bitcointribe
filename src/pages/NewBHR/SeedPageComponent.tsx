@@ -223,11 +223,11 @@ const SeedPageComponent = ( props ) => {
                     )
                   }}
                 />
-                <BottomInfoBox
+                {/* <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={props.infoBoxTitle}
                   infoText={props.infoBoxInfo}
-                />
+                /> */}
               </View>
             ) )}
           </AnimatedPagerView>
@@ -235,7 +235,7 @@ const SeedPageComponent = ( props ) => {
           <View style={{
             flex: 1
           }}>
-            <View style={{
+            {/* <View style={{
               backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
             }}>
               <BottomInfoBox
@@ -243,7 +243,7 @@ const SeedPageComponent = ( props ) => {
                 title={props.infoBoxTitle}
                 infoText={props.infoBoxInfo}
               />
-            </View>
+            </View> */}
           </View>
         )}
       {props.showButton ? <View>

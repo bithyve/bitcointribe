@@ -8,7 +8,8 @@ import {
   Platform,
   BackHandler,
   Linking,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -626,7 +627,7 @@ export default function Login( props ) {
             </TouchableOpacity>
 
             {
-              attempts >= 3&& ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType != 'seed' ) && (
+              attempts >= 3&&(
                 <TouchableOpacity
                   style={{
                     ...styles.proceedButtonView,
@@ -643,11 +644,12 @@ export default function Login( props ) {
                       setErrorModal( true )
                       return
                     }
-                    // if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
-                    //   showSecuiritySeedWordModal( true )
-                    // }else {
-                    showQuestionModal( true )
-                    // }
+                    if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
+                      // showSecuiritySeedWordModal( true )
+                      Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
+                    }else {
+                      showQuestionModal( true )
+                    }
                   }}>
                   <Text style={{
                     color: Colors.blue,
@@ -657,14 +659,6 @@ export default function Login( props ) {
               )
             }
           </View>
-          { attempts >= 3 && ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) &&
-            <Text style={{
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansMedium,
-              padding: wp( '5%' ),
-              marginTop: wp( '3%' )
-            }}>{'In case you have forgotten passcode, please setup the wallet again and restore it'}</Text>
-          }
         </View>
 
         <View style={{
@@ -826,9 +820,9 @@ export default function Login( props ) {
       <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
         {renderSecurityQuestionContent()}
       </ModalContainer>
-      <ModalContainer onBackground={()=>showSecuiritySeedWordModal( false )} visible={secuiritySeedWordModal} closeBottomSheet={() => {showSecuiritySeedWordModal( false )}} >
+      {/* <ModalContainer onBackground={()=>showSecuiritySeedWordModal( false )} visible={secuiritySeedWordModal} closeBottomSheet={() => {showSecuiritySeedWordModal( false )}} >
         {renderSeedWordContent()}
-      </ModalContainer>
+      </ModalContainer> */}
       {/* <BottomSheet
         onCloseEnd={() => {
           setElevation( 10 )

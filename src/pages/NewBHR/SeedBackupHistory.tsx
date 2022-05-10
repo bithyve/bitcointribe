@@ -41,13 +41,13 @@ export enum BottomSheetState {
   Open,
 }
 
-const CloudBackupHistory = ( props ) => {
+const SeedBackupHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
   const iCloudErrors  = translations[ 'iCloudErrors' ]
   const driveErrors  = translations[ 'driveErrors' ]
 
-  const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
+  const [ seedBackupHistory, setSeedBackupHistory ] = useState( [] )
   const [ confirmationModal, setConfirmationModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
   const [
@@ -55,7 +55,7 @@ const CloudBackupHistory = ( props ) => {
     setBottomSheetRef,
   ] = useState( React.createRef() )
   const HealthCheckSuccessBottomSheet = createRef<BottomSheet>()
-  const cloudBackupHistoryArray = useSelector( ( state ) => state.cloud.cloudBackupHistory )
+  const seedBackupHistoryArray = useSelector( ( state ) => state.bhr.seedBackupHistory )
 
   const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const [ errorMsg, setErrorMsg ] = useState( '' )
@@ -109,7 +109,7 @@ const CloudBackupHistory = ( props ) => {
     } else if( currentLevel > 0 && levelHealth[ 0 ].levelInfo[ 1 ].status == 'notAccessible' ) {
       setButtonText( common.confirm )
       setShowButton( true )
-      setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupInAccessibleInfo : strings.driveBackupInAccessibleInfo )
+      setBackupInfo( strings.cloudBackupInAccessibleInfo )
     }
   }
 
@@ -118,9 +118,9 @@ const CloudBackupHistory = ( props ) => {
   }, [ levelHealth ] )
 
   useEffect( () => {
-    console.log( cloudBackupHistoryArray )
-    if ( cloudBackupHistoryArray ) setCloudBackupHistory( cloudBackupHistoryArray )
-  }, [ cloudBackupHistoryArray ] )
+    console.log( seedBackupHistoryArray )
+    if ( seedBackupHistoryArray ) setSeedBackupHistory( seedBackupHistoryArray )
+  }, [ seedBackupHistoryArray ] )
 
   useEffect( () => {
     if ( cloudErrorMessage !== '' ) {
@@ -258,10 +258,6 @@ const CloudBackupHistory = ( props ) => {
     }
   }
 
-  const onEncryptionPasswordClick = () =>{
-    props.navigation.navigate( 'SetNewPassword' )
-  }
-
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -274,26 +270,27 @@ const CloudBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={Platform.OS == 'ios' ? 'iCloud Backup' : 'Google Drive Backup'}
+        selectedTitle={'Seed word Backup'}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
           : 'Never'}
         moreInfo={''}
         tintColor={Colors.deepBlue}
-        headerImage={require( '../../assets/images/icons/ico_cloud_backup.png' )}
+        headerImage={require( '../../assets/images/icons/seedwords.png' )}
       />
       <View style={{
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={Platform.OS == 'ios' ? strings.BackupHistory : strings.BackupHistorydrive}
+          infoBoxTitle={strings.BackupHistory}
           infoBoxInfo={backupInfo}
           type={'security'}
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
-            setConfirmationModal( true )
+            // setConfirmationModal( true )
+            props.navigation.navigate( 'BackupSeedWordsContent' )
           }}
-          data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
+          data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
           confirmButtonText={buttonText}
           disableChange={false}
           onPressReshare={() => {
@@ -302,10 +299,8 @@ const CloudBackupHistory = ( props ) => {
           onPressChange={() => setKeeperTypeModal( true )}
           showButton={showButton}
           changeButtonText={'Change'}
+          showSeedHistoryNote={true}
           // isChangeKeeperAllow={true}
-          // showSecurityPassword={true}
-          showSecurityPassword={false}
-          onEncryptionPasswordClick={onEncryptionPasswordClick}
           isChangeKeeperAllow={false}/>
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
@@ -349,6 +344,6 @@ const CloudBackupHistory = ( props ) => {
     </View>
   )
 }
-export default CloudBackupHistory
+export default SeedBackupHistory
 
 
