@@ -124,14 +124,17 @@ const HomeHeader = ( {
   }, [ cloudErrorMessage, cloudBackupStatus ] )
 
 
-  const walletNameLength = walletName?.split('').length;
-  const walletNameNew = walletName.split('')[walletNameLength - 1].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`;
+  const walletNameLength = walletName?.split( '' ).length
+  const walletNameNew = walletName.split( '' )[ walletNameLength - 1 ].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
-    return <View style={{
-      flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
-    }}>
+    return <TouchableOpacity
+      onPress={()=> {navigation.navigate( 'Securiy' )}}
+      activeOpacity={0.6}
+      style={{
+        flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
+      }}>
       { isInit ?
         <View style={{
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ), backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'
@@ -145,13 +148,13 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: isError ? Colors.red : Colors.green,
+          backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
         }}>
           <Image
-            source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+            source={isError ?currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' )  : require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
             }}
@@ -160,15 +163,15 @@ const HomeHeader = ( {
         </View>
       }
       {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp(0.8)
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageOne}</Text>{messageTwo}</Text> : <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp(0.8)
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp( 0.8 )
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageTwo}</Text></Text>}
-    </View>
+    </TouchableOpacity>
   }
 
   useEffect( () => {
@@ -187,6 +190,7 @@ const HomeHeader = ( {
       }
     }
     if( levelData ){
+      let messageOneName = ''
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
         if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
@@ -199,14 +203,22 @@ const HomeHeader = ( {
             isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: strings.needAttention, isError: true
           }
         }
+        if( element.keeper2.status == 'accessible' ){
+          messageOneName = element.keeper2.name
+        }
       }
       if( currentLevel == 0 ){
         return {
-          isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
+          isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
         }
       } else if( currentLevel === 1 ){
+        if( messageOneName ) {
+          return {
+            isFirstMessageBold: false, messageOne: strings.Level1+` ${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
+          }
+        }
         return {
-          isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
+          isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? strings.l1 : strings.l1Drive, messageTwo: '', isError: false
         }
       } else if( currentLevel === 2 ){
         return {
@@ -220,11 +232,11 @@ const HomeHeader = ( {
     }
     if( currentLevel === 1 ){
       return {
-        isFirstMessageBold: false, messageOne: strings.l1, messageTwo: '', isError: false
+        isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? strings.l1 : strings.l1Drive, messageTwo: '', isError: false
       }
     } else {
       return {
-        isFirstMessageBold: false, messageOne: strings.incomplete, messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
       }
     }
   }
@@ -357,7 +369,7 @@ const HomeHeader = ( {
 
       <ModalContainer onBackground={()=>setCloudErrorModal( false )} visible={cloudErrorModal} closeBottomSheet={() => setCloudErrorModal( false ) }>
         <ErrorModalContents
-          title={stringsBhr[ 'CloudBackupError' ]}
+          title={Platform.OS == 'ios' ? stringsBhr[ 'CloudBackupError' ] : stringsBhr[ 'driveBackupError' ]}
           //info={cloudErrorMessage}
           note={errorMsg}
           onPressProceed={()=>{

@@ -12,42 +12,35 @@ import {
   credsAuthenticated,
   switchSetupLoader,
   switchReLogin,
-  INIT_RECOVERY,
   CHANGE_AUTH_CRED,
   RESET_PIN,
   credsChanged,
   pinChangedFailed,
-  initializeRecoveryCompleted,
   completedWalletSetup,
-  WALLET_SETUP_COMPLETION,
   updateApplication,
   UPDATE_APPLICATION,
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
 import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange, upgradePDF, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
-import { updateCloudData } from '../actions/cloud'
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
-import { newAccountShellCreationCompleted, updateAccountSettings } from '../actions/accounts'
+import { newAccountShellCreationCompleted } from '../actions/accounts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import AccountShell from '../../common/data/models/AccountShell'
-import semver from 'semver'
 import semverLte from 'semver/functions/lte'
 import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security, newBie }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean } = payload
-  const primaryMnemonic = bip39.generateMnemonic( 256 )
+  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean } = payload
+  const primaryMnemonic = bip39.generateMnemonic( )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 
@@ -56,7 +49,6 @@ function* setupWalletWorker( { payload } ) {
     walletName,
     userName: walletName,
     security,
-    newBie,
     primaryMnemonic,
     primarySeed: primarySeed.toString( 'hex' ),
     accounts: {
@@ -68,10 +60,12 @@ function* setupWalletWorker( { payload } ) {
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
   yield call( dbManager.createWallet, wallet )
   // prepare default accounts for the wallet
+
   const accountsInfo: newAccountsInfo[] = []
   const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ]
-  !newBie && accountArray.splice( 0, 1 )
+  // !newBie && accountArray.splice( 0, 1 )
   accountArray.forEach( ( accountType ) => {
+
     const accountInfo: newAccountsInfo = {
       accountType
     }

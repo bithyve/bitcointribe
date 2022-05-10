@@ -45,7 +45,8 @@
       "setup": "Configuración",
       "manage": "Administrar",
       "backup": "Respaldo",
-      "change": "Cambio"
+      "change": "Cambio",
+      "contactCreated":"contacto creado"
   },
   "noInternet": {
       "no": "Sin Internet",
@@ -98,7 +99,7 @@
       "to": "para",
       "verifylogin": "verificar e iniciar sesión",
       "appcreates": "La aplicación crea una nueva billetera para usted con cuentas que puede comenzar a usar de inmediato",
-      "previously": "Si anteriormente tenía Hexa 2.0, puede recuperarse utilizando las claves de recuperación con esta opción.",
+      "previously": "Si anteriormente tenía Hexa, puede recuperarse utilizando las claves de recuperación con esta opción.",
       "restoreNoteV1":"Si anteriormente tenía Hexa 2.0, puede recuperarse utilizando las claves de recuperación con esta opción.",
       "TermsService": "Términos de servicio",
       "proceeding": "Al continuar con el siguiente paso, acepta nuestra",
@@ -193,7 +194,7 @@
       ],
       "new": "Nuevo",
       "Createanew": "Crear un nuevo",
-      "Existing": "Existente",
+      "Existing": "Recuperar Existente",
       "Toviewallaccounts": "Para ver todas las cuentas",
       "confirmpin": "confirmar PIN",
       "Incorrectpasscode": "Código de acceso incorrecto, inténtelo de nuevo.",
@@ -286,7 +287,8 @@
       "Confirmnewwalletname": "Confirmar nuevo nombre de billetera",
       "acrossyour": "El nombre de la billetera se actualizará automáticamente en su red de amigos y familiares",
       "ConfirmSecurityQuestion": "Confirmar pregunta de seguridad",
-      "ConfirmWalletPin": "Confirmar PIN de billetera"
+      "ConfirmWalletPin": "Confirmar PIN de billetera",
+      "ConfirmEncryptionPassword":"Confirmar contraseña de cifrado"
   },
   "header": {
       "init": "Inicialización de la copia de seguridad en la nube",
@@ -294,7 +296,9 @@
       "l1": "La copia de seguridad en la nube de nivel 1 está completa",
       "l2": "La copia de seguridad doble de nivel 2 está completa",
       "l3": "La copia de seguridad multin clave de nivel 3 está completa",
-      "wallet": "Billetera"
+      "wallet": "Billetera",
+      "backupIsCompleted": "sekurkopio estas finita",
+      "Level 1": "Nivel 1"
   },
   "stackTitle": {
       "AccountSettings": "Configuraciones de la cuenta",
@@ -594,13 +598,14 @@
       "errorwhilereceiving": "Hubo un error al recibir su clave de recuperación, intente nuevamente",
       "RestoringWalletfrom": "Restaurando Wallet desde",
       "Recoverfrom": "Recuperarse de",
-      "Clickingon": "Al hacer clic en Recuperar obtendría su clave de recuperación de iCloud",
+      "Clickingon": "Al hacer clic en Recuperar obtendría su clave de recuperación de {0}",
       "Recover": "Recuperar",
       "Recoverusingkeys": "Recuperar usando claves",
       "statusofyourRecovery": "El estado de su solicitud de clave de recuperación es visible a continuación",
       "KeyReceived": "Clave recibida",
       "WaitingforKey": "Esperando llave",
       "UseSendRequest": "Utilice Enviar solicitud para compartir un enlace con un contacto. Si la persona con la que desea hacer una copia de seguridad de su clave de recuperación está con usted en persona, use Scan Key. O también podrían enviarle una captura de pantalla del QR para que la escanee.",
+      "UseScaneKey":"Skanu Reakiran Ŝlosilon por restarigi vian monujon",
       "SendRequest": "Enviar petición",
       "ScanKey": "Escanear clave",
       "SelectContact": "Seleccione un contacto",

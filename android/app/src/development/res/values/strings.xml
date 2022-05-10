@@ -6,5 +6,6 @@
     <string name="reciprocalKeeperPrefix">/dev/RECIPROCAL_KEEPER</string>
     <string name="existingKeeperPrefix">/dev/EXISTING_CONTACT</string>
     <string name="giftPrefix">/dev/GIFT</string>
+    <string name="campaignPrefix">/dev/CAMPAIGN</string>
     <string name="contactGiftKeeperPrefix">/dev/CONTACT_GIFT</string>
 </resources>

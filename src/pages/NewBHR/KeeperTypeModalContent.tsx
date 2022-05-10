@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { View, Image, Text, StyleSheet } from 'react-native'
+import { View, Image, Text, StyleSheet, Platform } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -20,28 +20,28 @@ export default function KeeperTypeModalContents( props ) {
   const [ keeperTypesData, setKeeperTypesData ] = useState( [
     {
       type: 'cloud',
-      name: strings.Backupwithcloud,
-      info: strings.BackupwithcloudSub,
-      image: require( '../../assets/images/icons/icon_cloud.png' ),
+      name: Platform.OS == 'ios' ? strings.Backupwithcloud : strings.Backupwithdrive,
+      info: Platform.OS == 'ios' ? strings.BackupwithcloudSub : strings.BackupwithdriveSub,
+      image: Platform.OS == 'ios' ? require( '../../assets/images/icons/icon_cloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' ),
     },
-    {
-      type: 'contact',
-      name: strings.Backupwithcontact,
-      info: strings.BackupwithcontactSub,
-      image: require( '../../assets/images/icons/icon_contact.png' ),
-    },
-    {
-      type: 'device',
-      name: strings.Backuponadevice,
-      info: strings.BackuponadeviceSub,
-      image: require( '../../assets/images/icons/icon_secondarydevice.png' ),
-    },
-    {
-      type: 'pdf',
-      name: strings.BackupusingPDF,
-      info: strings.BackupusingPDFSub,
-      image: require( '../../assets/images/icons/files-and-folders-2.png' ),
-    },
+    // {
+    //   type: 'contact',
+    //   name: strings.Backupwithcontact,
+    //   info: strings.BackupwithcontactSub,
+    //   image: require( '../../assets/images/icons/icon_contact.png' ),
+    // },
+    // {
+    //   type: 'device',
+    //   name: strings.Backuponadevice,
+    //   info: strings.BackuponadeviceSub,
+    //   image: require( '../../assets/images/icons/icon_secondarydevice.png' ),
+    // },
+    // {
+    //   type: 'pdf',
+    //   name: strings.BackupusingPDF,
+    //   info: strings.BackupusingPDFSub,
+    //   image: require( '../../assets/images/icons/files-and-folders-2.png' ),
+    // },
   ] )
   const [ SelectedKeeperType, setSelectedKeeperType ] = useState( {
     type: '',
@@ -145,7 +145,7 @@ export default function KeeperTypeModalContents( props ) {
       }}> */}
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerText}>{props.headerText}</Text>
-        <Text
+        {/* <Text
           style={{
             ...styles.modalInfoText,
             marginTop: wp( '1.5%' ),
@@ -153,7 +153,7 @@ export default function KeeperTypeModalContents( props ) {
           }}
         >
           {props.subHeader}
-        </Text>
+        </Text> */}
       </View>
       <View
         style={{
@@ -163,7 +163,8 @@ export default function KeeperTypeModalContents( props ) {
       >
         {keeperTypesData.map( ( value, index ) => {
           if ( value.type === 'cloud' && props.selectedLevelId != 1 && currentLevel != 0 ) return
-          if ( ( value.type === 'pdf' && completedKeeperType.findIndex( ( value ) => value == 'pdf' ) > -1 ) || ( value.type === 'pdf' && currentLevel == 0 ) ) return
+          if ( ( value.type === 'pdf' && completedKeeperType.findIndex( ( value ) => value == 'pdf' ) > -1 ) ) return
+          // || ( value.type === 'pdf' && currentLevel == 0 )
           if ( value.type === 'contact' && completedKeeperType.findIndex( ( value ) => value == 'contact' ) > -1 ) return
           if ( value.type === 'device' && completedKeeperType.findIndex( ( value ) => value == 'device' ) > -1 ) return
           return (

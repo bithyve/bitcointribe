@@ -34,10 +34,11 @@ export const credsAuth = ( passcode, reLogin? ) => {
 }
 
 
-export const setupWallet = ( walletName: string, security: { questionId: string, question: string, answer: string }, newBie: boolean ) => {
+export const setupWallet = ( walletName: string, security: { questionId: string, question: string, answer: string } ) => {
+
   return {
     type: SETUP_WALLET, payload: {
-      walletName, security, newBie
+      walletName, security
     }
   }
 }

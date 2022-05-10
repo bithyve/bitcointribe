@@ -24,6 +24,7 @@ import AppInfo from '../../../pages/MoreOptions/AppInfo/Appinfo'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -51,6 +52,9 @@ const MoreOptionsStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
     },
     PasscodeChangeSuccessPage: {
       screen: PasscodeChangeSuccessPage,

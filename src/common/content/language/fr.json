@@ -45,7 +45,8 @@
       "setup": "Configurer",
       "manage": "Gérer",
       "backup": "Sauvegarde",
-      "change": "Changer"
+      "change": "Changer",
+      "contactCreated":"contact créé"
   },
   "noInternet": {
       "no": "Aucune connexion",
@@ -98,7 +99,7 @@
       "to": "à",
       "verifylogin": "vérifier pour se connecter",
       "appcreates": "L’application crée un nouveau portefeuille pour vous, avec des comptes que vous pouvez utiliser immédiatement",
-      "previously": "Si vous aviez précédemment Hexa 2.0, vous pouvez récupérer en utilisant les clés de récupération avec cette option.",
+      "previously": "Si vous aviez précédemment Hexa, vous pouvez récupérer en utilisant les clés de récupération avec cette option.",
       "restoreNoteV1":"Si vous aviez précédemment Hexa 2.0, vous pouvez récupérer en utilisant les clés de récupération avec cette option.",
       "TermsService": "Conditions d'utilisation",
       "proceeding": "En passant à l'étape suivante, vous acceptez nos",
@@ -193,7 +194,7 @@
       ],
       "new": "Nouveau",
       "Createanew": "Créer un nouveau",
-      "Existing": "Existant",
+      "Existing": "Récupérer Existant",
       "Toviewallaccounts": "Pour afficher tous les comptes",
       "confirmpin": "confirmer le code PIN",
       "Incorrectpasscode": "Code d'accès incorrect, réessayez !",
@@ -286,7 +287,8 @@
       "Confirmnewwalletname": "Confirmez le nouveau nom du portefeuille",
       "acrossyour": "Le nom du portefeuille sera mis à jour automatiquement pour votre réseau Amis & Famille",
       "ConfirmSecurityQuestion": "Confirmer la question de sécurité",
-      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille"
+      "ConfirmWalletPin": "Confirmer le code PIN du portefeuille",
+      "ConfirmEncryptionPassword":"Confirmer le mot de passe de cryptage"
   },
   "header": {
       "init": "Initialisation de la sauvegarde cloud",
@@ -294,7 +296,9 @@
       "l1": "La sauvegarde cloud de niveau 1 est terminée",
       "l2": "La double sauvegarde de niveau 2 est terminée",
       "l3": "La sauvegarde multi-clés de niveau 3 est terminée",
-      "wallet": "Portefeuille"
+      "wallet": "Portefeuille",
+      "backupIsCompleted": "la sauvegarde est terminée",
+      "Level 1": "Niveau 1"
   },
   "stackTitle": {
       "AccountSettings": "Paramètres du compte",
@@ -594,13 +598,14 @@
       "errorwhilereceiving": "Une erreur s'est produite lors de la réception de votre clé de récupération, veuillez réessayer",
       "RestoringWalletfrom": "Restauration du portefeuille à partir de",
       "Recoverfrom": "Récupérer de",
-      "Clickingon": "En cliquant sur Récupérer, vous obtiendrez votre clé de récupération à partir d'iCloud",
+      "Clickingon": "En cliquant sur Récupérer, vous obtiendrez votre clé de récupération à partir de {0}",
       "Recover": "Se remettre",
       "Recoverusingkeys": "Récupérer à l'aide des clés",
       "statusofyourRecovery": "Le statut de votre demande de clé de récupération est visible ci-dessous",
       "KeyReceived": "Clé reçue",
       "WaitingforKey": "En attente de la clé",
       "UseSendRequest": "Utilisez Envoyer une demande pour partager un lien avec un contact. Si la personne avec laquelle vous souhaitez sauvegarder votre clé de récupération est avec vous en personne, utilisez Scan Key. Ou ils pourraient également vous envoyer une capture d'écran du QR pour que vous puissiez numériser",
+      "UseScaneKey":"Scannez la clé de récupération pour restaurer votre portefeuille",
       "SendRequest": "Envoyer une demande",
       "ScanKey": "Clé de numérisation",
       "SelectContact": "Sélectionnez Contact",

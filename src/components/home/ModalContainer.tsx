@@ -4,44 +4,44 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { ScreenCornerRadius } from 'react-native-screen-corner-radius'
 
-const ModalContainer = ( {
+const ModalContainer = ({
   visible,
   closeBottomSheet,
   background = 'rgba(0,0,0,0.5)',
   children,
   onBackground
-}:{
+}: {
   visible?: boolean;
   closeBottomSheet?: any
   background?: string;
   children?: any;
   onBackground?: any;
-} ) => {
-  const [ height, setHeight ] = useState( 6 )
-  const  onAppStateChange = ( state ) => {
+}) => {
+  const [height, setHeight] = useState(6)
+  const onAppStateChange = (state) => {
     // if ( state === 'background' || state === 'inactive' ){
-      onBackground ? onBackground() : closeBottomSheet()
+    onBackground ? onBackground() : closeBottomSheet()
     // }
   }
 
-  useEffect( () => {
+  useEffect(() => {
     AppState.addEventListener(
       'change',
       onAppStateChange
     )
-    return () => AppState.removeEventListener( 'change', onAppStateChange )
-  }, [] )
-  useEffect( ()=>{
+    return () => AppState.removeEventListener('change', onAppStateChange)
+  }, [])
+  useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        setHeight( 0 )
+        setHeight(0)
       }
     )
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setHeight( 6 )
+        setHeight(6)
       }
     )
 
@@ -49,11 +49,11 @@ const ModalContainer = ( {
       keyboardDidHideListener.remove()
       keyboardDidShowListener.remove()
     }
-  }, [] )
-  return(
+  }, [])
+  return (
     <Modal
       visible={visible}
-      onRequestClose={() => { closeBottomSheet ? closeBottomSheet(): null }}
+      onRequestClose={() => { closeBottomSheet ? closeBottomSheet() : null }}
       transparent={true}
       style={{
         flex: 1,
@@ -72,8 +72,8 @@ const ModalContainer = ( {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           // alignItems: 'center',
-          paddingBottom: Platform.OS === 'ios' ? hp( '6%' ) : hp( `${height}%` ),
-          paddingHorizontal: wp( '2%' ),
+          paddingBottom: Platform.OS === 'ios' ? hp('6%') : 2,
+          paddingHorizontal: wp('2%'),
           // borderRadius: 20
         }}
         resetScrollToCoords={{
@@ -86,7 +86,7 @@ const ModalContainer = ( {
             closeBottomSheet()
           }}
           style={{
-            flex:1,
+            flex: 1,
             justifyContent: 'flex-end'
           }}
         >
@@ -94,7 +94,7 @@ const ModalContainer = ( {
 
             <View style={{
               width: '100%',
-              borderRadius: wp( '4%' ),
+              borderRadius: wp('4%'),
               overflow: 'hidden',
               // marginBottom: hp( 0.5 )
             }}>

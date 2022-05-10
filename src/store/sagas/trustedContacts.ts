@@ -79,7 +79,7 @@ import { processDeepLink } from '../../common/CommonFunctions'
 import { generateTrustedContact } from '../../bitcoin/utilities/TrustedContactFactory'
 
 function* generateSecondaryAssets(){
-  const secondaryMnemonic = bip39.generateMnemonic( 256 )
+  const secondaryMnemonic = bip39.generateMnemonic( )
   const derivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, 0 )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
   const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, derivationPath )
@@ -845,6 +845,7 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     type: AccountType.FNF_ACCOUNT,
     id: contactInfo.channelKey,
     senderInfo: {
+      id: contactInfo.channelKey,
       name: contactInfo.contactDetails.contactName
     },
   }
@@ -901,7 +902,6 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     } ) )
     giftDeepLink = deepLink
   }
-
   // prepare primary data
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
@@ -990,7 +990,6 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     const approvedContact = contacts[ channelKey ]
     const instreamId = approvedContact.streamId
     const instream: UnecryptedStreamData = idx( approvedContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
-
     if( instream.primaryData?.giftDeepLink ){
       // process incoming gift
       console.log( 'link', instream.primaryData.giftDeepLink )
@@ -1009,7 +1008,6 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
 
       yield put( fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey ) )
     }
-
     if( isPrimaryKeeper && contactsSecondaryChannelKey ){
       // re-upload secondary shard & bhxpub to primary ward's secondaryStream(instream update)
       const bhXpub = idx( instream, ( _ ) => _.primaryData.bhXpub )

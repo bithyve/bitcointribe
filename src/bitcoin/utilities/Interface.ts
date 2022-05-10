@@ -103,9 +103,10 @@ export interface Transaction {
   address?: string
   type?: string
   // sender name
-  sender?: string
+  sender?: string,
+  senderId?: string,
   // receivers info
-  receivers?: {name: string, amount: number}[]
+  receivers?: { id?: string, name: string, amount: number}[]
   // txn tags
   tags?: string[]
   // txn notes
@@ -152,7 +153,7 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
-    scheme?: string,
+    scheme?: ShareSplitScheme,
   };
 }
 
@@ -622,6 +623,9 @@ export interface TrustedContact {
   deepLinkConfig?: {
     encryptionType: DeepLinkEncryptionType,
     encryptionKey: string | null,
+  },
+  timestamps: {
+    created: number,
   }
 }
 export interface Trusted_Contacts {
@@ -725,11 +729,28 @@ export interface LevelInfo {
   walletId?: string
 }
 
+export enum ShareSplitScheme {
+  OneOfOne = '1of1',
+  TwoOfThree = '2of3',
+  ThreeOfFive = '3of5'
+}
+
+export enum KeeperType {
+  PRIMARY_KEEPER = 'primaryKeeper',
+  DEVICE = 'device',
+  CONTACT = 'contact',
+  EXISTING_CONTACT = 'existingContact',
+  PDF = 'pdf',
+  SECURITY_QUESTION = 'securityQuestion',
+  CLOUD = 'cloud',
+  SEED = 'seed',
+}
+
 export interface KeeperInfoInterface {
   shareId: string;
   name: string;
-  type: string;
-  scheme: string;
+  type: KeeperType;
+  scheme: ShareSplitScheme;
   currentLevel: number;
   createdAt: number;
   sharePosition: number;
@@ -809,10 +830,11 @@ export interface ActiveAddressAssignee{
     type: AccountType | ActiveAddressAssigneeType;
     id?: string;
     senderInfo?: {
+      id?: string
       name: string,
     };
     recipientInfo?: {
-      [txid: string]: {name: string, amount: number}[],
+      [txid: string]: {id?: string, name: string, amount: number}[],
     };
 }
 export interface ActiveAddresses {
@@ -840,7 +862,6 @@ export interface Wallet {
   walletName: string,
   userName?: string,
   security: { questionId: string, question: string, answer: string },
-  newBie:boolean,
   primaryMnemonic: string,
   primarySeed: string,
   secondaryXpub?: string,
@@ -854,6 +875,21 @@ export interface Wallet {
     [accountType: string]: string[] // array of accountIds
   },
   version: string,
+}
+
+export interface LNNode {
+  host?: string,
+  port?: string,
+  url?: string,
+  lndhubUrl?: string,
+  existingAccount?: boolean,
+  macaroonHex?: string,
+  accessKey?: string,
+  username?: string,
+  password?: string,
+  implementation?: string,
+  certVerification?: boolean,
+  enableTor?: boolean
 }
 
 export interface Account {
@@ -902,6 +938,7 @@ export interface Account {
     isNew: boolean
     type: string;
   }[]
+  node?: LNNode
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -944,7 +981,8 @@ export enum AccountType {
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
-  FNF_ACCOUNT = 'FNF_ACCOUNT'
+  FNF_ACCOUNT = 'FNF_ACCOUNT',
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
 }
 
 export interface Accounts {
@@ -958,7 +996,8 @@ export enum DeepLinkKind {
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
   EXISTING_CONTACT = 'EXISTING_CONTACT',
   GIFT = 'GIFT',
-  CONTACT_GIFT = 'CONTACT_GIFT'
+  CONTACT_GIFT = 'CONTACT_GIFT',
+  CAMPAIGN = 'CAMPAIGN'
 }
 
 export enum ShortLinkDomain {

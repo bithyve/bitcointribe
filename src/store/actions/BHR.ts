@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-import { BackupStreamData, cloudDataInterface, LevelHealthInterface, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, cloudDataInterface, KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, NewWalletImage, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP'
 export const HEALTH_UPDATE = 'HEALTH_UPDATE'
@@ -62,7 +62,7 @@ export const SET_CHANNEL_ASSETS = 'SET_CHANNEL_ASSETS'
 export const CREATE_CHANNEL_ASSETS = 'CREATE_CHANNEL_ASSETS'
 export const APPROVAL_STATUS = 'APPROVAL_STATUS'
 export const DOWNLOAD_SM_SHARE = 'DOWNLOAD_SM_SHARE'
-export const CREATE_OR_CHANGE_GUARDIAN = 'CREATE_OR_CHANGE_GUARDIAN'
+export const CREATE_GUARDIAN = 'CREATE_GUARDIAN'
 export const DOWNLOADED_BACKUP_DATA = 'DOWNLOADED_BACKUP_DATA'
 export const DOWNLOAD_BACKUP_DATA = 'DOWNLOAD_BACKUP_DATA'
 export const SETUP_HEALTH_FOR_RESTORE = 'SETUP_HEALTH_FOR_RESTORE'
@@ -70,6 +70,7 @@ export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
 export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
 export const SETUP_PASSWORD = 'SETUP_PASSWORD'
+export const UPDATE_SEED_HEALTH =  'UPDATE_SEED_HEALTH'
 export const SETUP_LEVEL_HEALTH = 'SETUP_LEVEL_HEALTH'
 export const GENERATE_LEVEL1_SHARES = 'GENERATE_LEVEL1_SHARES'
 export const GENERATE_LEVEL2_SHARES = 'GENERATE_LEVEL2_SHARES'
@@ -77,6 +78,7 @@ export const RETRIEVE_METASHRES = 'RETRIEVE_METASHRES'
 export const SET_SECONDARY_DATA_INFO_STATUS = 'SET_SECONDARY_DATA_INFO_STATUS'
 export const REJECTED_EC_REQUEST = 'REJECTED_EC_REQUEST'
 export const RECOVER_WALLET_WITHOUT_ICLOUD = 'RECOVER_WALLET_WITHOUT_ICLOUD'
+export const RECOVER_WALLET_WITH_MNEMONIC = 'RECOVER_WALLET_WITH_MNEMONIC'
 export const PDF_UPGRADE = 'PDF_UPGRADE'
 export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
 
@@ -170,10 +172,10 @@ export const ErrorSending = ( isFailed ) => {
   }
 }
 
-export const updateMSharesHealth = ( shares, isNeedToUpdateCurrentLevel? ) => {
+export const updateMSharesHealth = ( shareHealth: LevelInfo, isKeeperChange?: boolean ) => {
   return {
     type: UPDATE_SHARES_HEALTH, payload: {
-      shares, isNeedToUpdateCurrentLevel
+      shareHealth, isKeeperChange
     }
   }
 }
@@ -254,7 +256,7 @@ export const isLevel3InitializedStatus = () => {
   }
 }
 
-export const updatedKeeperInfo = ( keeperData ) =>{
+export const updatedKeeperInfo = ( keeperData: KeeperInfoInterface ) =>{
   return {
     type: KEEPER_INFO, payload: {
       keeperData
@@ -262,7 +264,7 @@ export const updatedKeeperInfo = ( keeperData ) =>{
   }
 }
 
-export const putKeeperInfo = ( info ) =>{
+export const putKeeperInfo = ( info: KeeperInfoInterface[] ) =>{
   return {
     type: PUT_KEEPER_INFO, payload: {
       info
@@ -573,9 +575,9 @@ export const downloadSMShare = ( scannedData ) => {
   }
 }
 
-export const createOrChangeGuardian = ( payload: {channelKey: string, shareId: string, contact: any, index: number, isChange?: boolean, oldChannelKey?: string, existingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
+export const createGuardian = ( payload: {channelKey: string, shareId: string, contact: any, isChangeKeeper?: boolean, oldChannelKey?: string, isExistingContact?: boolean, isPrimaryKeeper?: boolean} ) => {
   return {
-    type: CREATE_OR_CHANGE_GUARDIAN, payload: payload
+    type: CREATE_GUARDIAN, payload: payload
   }
 }
 
@@ -631,6 +633,12 @@ export const setupPassword = ( security ) => {
     type: SETUP_PASSWORD, payload:{
       security
     }
+  }
+}
+
+export const updateSeedHealth = ( ) => {
+  return {
+    type: UPDATE_SEED_HEALTH
   }
 }
 
@@ -779,6 +787,15 @@ export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
   return {
     type: RECOVER_WALLET_WITHOUT_ICLOUD, payload: {
       backupData, answer
+    }
+  }
+}
+
+export const recoverWalletUsingMnemonic = ( primaryMnemonic: string ) => {
+  return {
+    type: RECOVER_WALLET_WITH_MNEMONIC,
+    payload: {
+      primaryMnemonic
     }
   }
 }

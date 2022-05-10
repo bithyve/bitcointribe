@@ -45,7 +45,8 @@
       "setup": "Configurar",
       "manage": "Gerir",
       "backup": "Cópia de segurança",
-      "change": "Mudar"
+      "change": "Mudar",
+      "contactCreated":"contato criado"
   },
   "noInternet": {
       "no": "Sem internet",
@@ -98,7 +99,7 @@
       "to": "para",
       "verifylogin": "verificar e fazer login",
       "appcreates": "O aplicativo cria uma nova carteira para você com contas que você pode começar a usar imediatamente",
-      "previously": "Se você já tinha o Hexa 2.0, pode recuperar usando as Chaves de Recuperação com esta opção",
+      "previously": "Se você já tinha o Hexa, pode recuperar usando as Chaves de Recuperação com esta opção",
       "restoreNoteV1":"Se você já tinha o Hexa 2.0, pode fazer a recuperação usando as Chaves de Recuperação com esta opção.",
       "TermsService": "Termos de serviço",
       "proceeding": "Ao prosseguir para a próxima etapa, você concorda com nossos",
@@ -193,7 +194,7 @@
       ],
       "new": "Novo",
       "Createanew": "Crie um novo",
-      "Existing": "Existente",
+      "Existing": "Recuperar Existente",
       "Toviewallaccounts": "Para ver todas as contas",
       "confirmpin": "confirme o pin",
       "Incorrectpasscode": "Senha incorreta, tente novamente!",
@@ -286,7 +287,8 @@
       "Confirmnewwalletname": "Confirme o novo nome da carteira",
       "acrossyour": "O nome da carteira será atualizado automaticamente em sua rede de amigos e família",
       "ConfirmSecurityQuestion": "Confirme a pergunta de segurança",
-      "ConfirmWalletPin": "Confirme o PIN da carteira"
+      "ConfirmWalletPin": "Confirme o PIN da carteira",
+      "ConfirmEncryptionPassword":"Confirmar senha de criptografia"
   },
   "header": {
       "init": "Inicializando o backup na nuvem",
@@ -294,7 +296,10 @@
       "l1": "O backup na nuvem de nível 1 está completo",
       "l2": "O backup duplo de nível 2 está completo",
       "l3": "O Backup Multi-key de nível 3 está completo",
-      "wallet": "Carteira"
+      "wallet": "Carteira",
+      "backupIsCompleted":"o backup foi concluído",
+      "Level 1": "Nível 1"
+
   },
   "stackTitle": {
       "AccountSettings": "Configurações da conta",
@@ -594,13 +599,14 @@
       "errorwhilereceiving": "Ocorreu um erro ao receber sua chave de recuperação, tente novamente",
       "RestoringWalletfrom": "Restaurando a Carteira de",
       "Recoverfrom": "Recuperar de",
-      "Clickingon": "Clicar em Recuperar forneceria sua chave de recuperação do iCloud",
+      "Clickingon": "Clicar em Recuperar forneceria sua chave de recuperação do {0}",
       "Recover": "Recuperar",
       "Recoverusingkeys": "Recuperar usando chaves",
       "statusofyourRecovery": "O status da sua solicitação de chave de recuperação é visível abaixo",
       "KeyReceived": "Chave Recebida",
       "WaitingforKey": "Esperando pela Chave",
       "UseSendRequest": "Use Enviar solicitação para compartilhar um link com um contato. Se a pessoa com quem você deseja fazer o backup da sua chave de recuperação estiver com você pessoalmente, use a chave de varredura. Ou eles também podem enviar uma captura de tela do QR para você digitalizar",
+      "UseScaneKey":"Digitalize a chave de recuperação para restaurar sua carteira",
       "SendRequest": "Enviar pedido",
       "ScanKey": "Chave de digitalização",
       "SelectContact": "Selecione o contato",
