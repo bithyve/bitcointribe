@@ -91,7 +91,8 @@ function* cloudWorker( { payload } ) {
       const accounts: Accounts = yield select( state => state.accounts.accounts )
 
       const encKey = BHROperations.getDerivedKey(
-        bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
+        walletObj.primarySeed
+        // bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
       )
 
       encryptedCloudDataJson = yield call( WIEncryption, accounts, encKey, trustedContacts, wallet,

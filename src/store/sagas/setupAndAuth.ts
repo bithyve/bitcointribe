@@ -71,8 +71,8 @@ function* setupWalletWorker( { payload } ) {
     walletName,
     userName: walletName,
     security,
-    primaryMnemonic: '',
-    primarySeed: '',
+    // primaryMnemonic: '',
+    // primarySeed: '',
     accounts: {
     },
     version: DeviceInfo.getVersion()

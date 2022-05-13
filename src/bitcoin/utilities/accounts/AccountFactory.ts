@@ -20,7 +20,7 @@ export function generateAccount(
     instanceNum: number,
     accountName: string,
     accountDescription: string,
-    primarySeed?: string,
+    primarySeed: string,
     derivationPath: string,
     networkType: NetworkType,
     node?: LNNode
