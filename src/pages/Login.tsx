@@ -47,6 +47,7 @@ import { setOpenToApproval } from '../store/actions/BHR'
 import SecurityQuestion from './NewBHR/SecurityQuestion'
 import Toast from '../components/Toast'
 import SecuritySeedWord from './NewBHR/SecuritySeedWord'
+import AlertModalContents from '../components/AlertModalContents'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -99,6 +100,7 @@ export default function Login( props ) {
   // )
   const [ loaderModal, setloaderModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
+  const [ showAlertModal, setShowAlertModal ]=useState( false )
 
   const [ ErrorBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
@@ -643,7 +645,8 @@ export default function Login( props ) {
                     }
                     if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
                       // showSecuiritySeedWordModal( true )
-                      Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
+                      // Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
+                      setShowAlertModal( true )
                     }else {
                       showQuestionModal( true )
                     }
@@ -836,6 +839,19 @@ export default function Login( props ) {
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       /> */}
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={'In case you have forgotten passcode, please setup the wallet again and restore it'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

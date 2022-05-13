@@ -14,12 +14,15 @@ import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import { useDispatch } from 'react-redux'
 import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
+import AlertModalContents from '../../components/AlertModalContents'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ seedSecondName, setSeedSecondName ] = useState( '' )
   const dispatch = useDispatch()
+  const [ info, setInfo ] = useState( '' )
 
   return (
     <View style={{
@@ -66,13 +69,17 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={( word ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
-              setTimeout( () => {
-                Alert.alert( 'Please enter second seed name' )
-              }, 500 )
+              // setTimeout( () => {
+              // Alert.alert( 'Please enter second seed name' )
+              setInfo( 'Please enter second seed name' )
+              setShowAlertModal( true )
+              // }, 500 )
             } else if( word != seedSecondName ){
-              setTimeout( () => {
-                Alert.alert( 'Please enter valid second seed name' )
-              }, 500 )
+              // setTimeout( () => {
+              // Alert.alert( 'Please enter valid second seed name' )
+              setInfo( 'Please enter valid second seed name' )
+              setShowAlertModal( true )
+              // }, 500 )
             } else {
               setSeedWordModal( true )
               dispatch( updateSeedHealth() )
@@ -98,6 +105,19 @@ const BackupSeedWordsContent = ( props ) => {
           isIgnoreButton={false}
           isBottomImage={true}
           bottomImage={require( '../../assets/images/icons/success.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={info}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
     </View>

@@ -26,12 +26,14 @@ import { Wallet } from '../../bitcoin/utilities/Interface'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import LoaderModal from '../../components/LoaderModal'
 import { translations } from '../../common/content/LocContext'
+import AlertModalContents from '../../components/AlertModalContents'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const [ showLoader, setShowLoader ] = useState( false )
   const [ loaderModal, setLoaderModal ] = useState( false )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ seedRecovered, setSeedRecovered ] = useState( false )
   const loaderMessage = {
     heading: translations[ 'bhr' ].Creatingyourwallet,
@@ -62,7 +64,8 @@ const RestoreSeedWordsContent = ( props ) => {
       const isValidMnemonic = bip39.validateMnemonic( mnemonic )
       if( !isValidMnemonic ){
         setShowLoader( false )
-        Alert.alert( 'Invalid mnemonic, try again!' )
+        // Alert.alert( 'Invalid mnemonic, try again!' )
+        setShowAlertModal( true )
         return
       }
       setShowLoader( false )
@@ -136,6 +139,19 @@ const RestoreSeedWordsContent = ( props ) => {
           messageText={loaderMessage.text}
           subPoints={subPoints}
           bottomText={bottomTextMessage} />
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={'Invalid mnemonic, try again!'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
       </ModalContainer>
     </View>
   )
