@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useContext } from 'react'
 import {
   View,
   Text,
@@ -44,7 +44,8 @@ import {
   downloadBackupData,
   putKeeperInfo,
   setupHealth,
-  setDownloadedBackupData
+  setDownloadedBackupData,
+  restoreWithoutUsingIcloud
 } from '../../store/actions/BHR'
 import { initNewBHRFlow } from '../../store/actions/BHR'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -63,6 +64,8 @@ import ModalContainer from '../../components/home/ModalContainer'
 import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { translations } from '../../common/content/LocContext'
+import { log } from 'console'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -140,7 +143,8 @@ interface RestoreWithICloudStateTypes {
   errorModalInfo: string,
   strings: object;
   common: object;
-  restoreStarted: boolean
+  restoreStarted: boolean;
+  isWithoutCloud: boolean;
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -176,6 +180,7 @@ interface RestoreWithICloudPropsTypes {
   cloudErrorMessage: string;
   setCloudErrorMessage: any;
   setDownloadedBackupData: any;
+  restoreWithoutUsingIcloud: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -255,12 +260,13 @@ class RestoreWithICloud extends Component<
       errorModalInfo: '',
       strings: translations [ 'bhr' ],
       common: translations [ 'common' ],
-      restoreStarted: false
+      restoreStarted: false,
+      isWithoutCloud: false
     }
     this.bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
     this.subPoints = [
       translations[ 'bhr' ].Settingupmultipleaccounts,
-      translations[ 'bhr' ].Automaticallycreatingbackup,
+      Platform.OS == 'ios' ? translations[ 'bhr' ].Automaticallycreatingbackup : translations[ 'bhr' ].AutomaticallycreatingbackupDrive,
       translations[ 'bhr' ].Preloading,
     ]
   }
@@ -271,7 +277,7 @@ class RestoreWithICloud extends Component<
   };
 
   cloudData = () => {
-    //console.log("INSIDE cloudData componentDidMount");
+    // console.log( 'INSIDE cloudData componentDidMount' )
     this.setState( {
       showLoader: true
     } )
@@ -322,7 +328,8 @@ class RestoreWithICloud extends Component<
       this.props.navigation.navigate( 'HomeNav' )
     }
 
-    if ( JSON.stringify( prevProps.downloadedBackupData ) != JSON.stringify( this.props.downloadedBackupData ) ) {
+    // if ( JSON.stringify( prevProps.downloadedBackupData ) != JSON.stringify( this.props.downloadedBackupData ) ) {
+    if ( prevProps.downloadedBackupData != this.props.downloadedBackupData ) {
       if ( this.props.downloadedBackupData.length ) {
         this.updateList()
       }
@@ -352,9 +359,9 @@ class RestoreWithICloud extends Component<
     }
 
     if ( prevProps.downloadedBackupData.length == 0 && prevProps.downloadedBackupData != this.props.downloadedBackupData && this.props.downloadedBackupData.length == 1 ) {
-      if ( this.props.keeperInfo.length == 0 ) {
-        this.setKeeperInfoList( 0, this.props.downloadedBackupData[ 0 ].backupData.keeperInfo )
-      }
+      if ( this.props.downloadedBackupData[ 0 ].backupData.keeperInfo[ this.props.downloadedBackupData[ 0 ].backupData.keeperInfo.length - 1 ].scheme == '1of1' ) {
+        this.updateList(); console.log( 'this.updateList();' )
+      } else this.setKeeperInfoList( 0, this.props.downloadedBackupData[ 0 ].backupData.keeperInfo )
     }
 
     // if ( prevProps.s3Service != this.props.s3Service && this.props.s3Service.levelhealth ) {
@@ -367,14 +374,24 @@ class RestoreWithICloud extends Component<
   }
 
   updateList = () => {
-    const { listData, selectedBackup } = this.state
-    const { downloadedBackupData } = this.props
+    const { listData, selectedBackup, answer } = this.state
+    const { downloadedBackupData, keeperInfo } = this.props
     let updatedListData = []
     const shares: {
       primaryData?: PrimaryStreamData;
       backupData?: BackupStreamData;
       secondaryData?: SecondaryStreamData;
     }[] = []
+
+    if( downloadedBackupData.length == 1 ){
+      if( downloadedBackupData[ 0 ].backupData.keeperInfo[ 1 ].currentLevel == 1 ){
+        this.setState( {
+          isWithoutCloud: true,
+          securityQuestionModal: true,
+          question: downloadedBackupData[ 0 ].backupData.primaryMnemonicShard.meta.question
+        } )
+      }
+    }
     updatedListData = [ ...listData ]
     for ( let i = 0; i < updatedListData.length; i++ ) {
       if ( downloadedBackupData.find( value => value.backupData.primaryMnemonicShard.shareId == updatedListData[ i ].shareId ) ) {
@@ -418,6 +435,7 @@ class RestoreWithICloud extends Component<
       const newArray = []
       try {
         arr = JSON.parse( result )
+        arr = arr.reverse()
       } catch ( error ) {
         //console.log('ERROR', error);
       }
@@ -484,7 +502,7 @@ class RestoreWithICloud extends Component<
         question: question[ 0 ].question,
         encryptionType: 'question'
       } )
-    } else if ( questionId === '0' ) {
+    } else if ( questionId == '0' ) {
       this.setState( {
         question: question1,
         encryptionType: 'password'
@@ -513,7 +531,7 @@ class RestoreWithICloud extends Component<
       setTimeout( () => {
         this.setState( {
           errorModal: true,
-          errorModalTitle: this.state.strings[ 'CloudRestorefailed' ],
+          errorModalTitle: Platform.OS == 'ios' ? this.state.strings[ 'CloudRestorefailed' ] : this.state.strings[ 'DriveRestorefailed' ],
           errorModalInfo: Platform.select( {
             ios: translations.iCloudErrors[ this.props.cloudErrorMessage ],
             android: translations.driveErrors[ this.props.cloudErrorMessage ],
@@ -571,7 +589,6 @@ class RestoreWithICloud extends Component<
         this.showLoaderModal()
         recoverWalletUsingIcloud( decryptedCloudDataJson, answer, selectedBackup )
       } else {
-        // ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
         this.setState( {
           errorModal: true,
           errorModalTitle: this.state.strings[ 'ErrorreceivingRecoveryKey' ],
@@ -601,32 +618,39 @@ class RestoreWithICloud extends Component<
     let obj
     const list = []
     for ( let i = 0; i < KeeperData.length; i++ ) {
-      obj = {
-        type: KeeperData[ i ].type,
-        title: KeeperData[ i ].data && Object.keys( KeeperData[ i ].data ).length && KeeperData[ i ].data.name ? KeeperData[ i ].data.name : KeeperData[ i ].name,
-        info: '',
-        time: time ? timeFormatter(
-          moment( new Date() ),
-          moment( time ).valueOf()
-        ) : '',
-        status: 'waiting',
-        image: null,
-        shareId: KeeperData[ i ].shareId,
-        data: KeeperData[ i ].data,
+      if( KeeperData[ i ].type != 'securityQuestion' ){
+        obj = {
+          type: KeeperData[ i ].type,
+          title: KeeperData[ i ].data && Object.keys( KeeperData[ i ].data ).length && KeeperData[ i ].data.name ? KeeperData[ i ].data.name : KeeperData[ i ].name,
+          info: '',
+          time: time ? timeFormatter(
+            moment( new Date() ),
+            moment( time ).valueOf()
+          ) : '',
+          status: 'waiting',
+          image: null,
+          shareId: KeeperData[ i ].shareId,
+          data: KeeperData[ i ].data,
+        }
+        console.log( 'obj', obj )
+        if ( KeeperData[ i ].type == 'contact' ) {
+          list.push( KeeperData[ i ] )
+        }
+        listDataArray.push( obj )
       }
-      if ( KeeperData[ i ].type == 'contact' ) {
-        list.push( KeeperData[ i ] )
-      }
-      listDataArray.push( obj )
     }
+    console.log( 'listDataArray', listDataArray )
     this.setState( {
       contactList: list,
       listData: listDataArray
+    }, ()=>{
+      this.updateList()
     } )
     this.props.putKeeperInfo( KeeperInfo )
   }
 
   handleScannedData = async ( scannedData ) => {
+    console.log( 'scannedData', scannedData )
     const { downloadedBackupData } = this.props
     this.props.downloadBackupData( {
       scannedData: scannedData
@@ -773,45 +797,6 @@ class RestoreWithICloud extends Component<
     // this.downloadSecret()
   };
 
-  // setLoaderMessages = () => {
-  //   setTimeout( () => {
-  //     const newMessage = this.getNextMessage()
-  //     this.setState( {
-  //       loaderMessage: newMessage
-  //     } )
-  //     setTimeout( () => {
-  //       const newMessage = this.getNextMessage()
-  //       this.setState( {
-  //         loaderMessage: newMessage
-  //       } )
-  //       setTimeout( () => {
-  //         const newMessage = this.getNextMessage()
-  //         this.setState( {
-  //           loaderMessage: newMessage
-  //         } )
-  //         setTimeout( () => {
-  //           const newMessage = this.getNextMessage()
-  //           this.setState( {
-  //             loaderMessage: newMessage
-  //           } )
-  //           setTimeout( () => {
-  //             const newMessage = this.getNextMessage()
-  //             this.setState( {
-  //               loaderMessage: newMessage
-  //             } )
-  //             setTimeout( () => {
-  //               const newMessage = this.getNextMessage()
-  //               this.setState( {
-  //                 loaderMessage: newMessage
-  //               } )
-  //             }, LOADER_MESSAGE_TIME )
-  //           }, LOADER_MESSAGE_TIME )
-  //         }, LOADER_MESSAGE_TIME )
-  //       }, LOADER_MESSAGE_TIME )
-  //     }, LOADER_MESSAGE_TIME )
-  //   }, LOADER_MESSAGE_TIME )
-  // }
-
   showLoaderModal = () => {
     // this.loaderBottomSheet.current.snapTo( 1 )
     this.setState( {
@@ -825,14 +810,18 @@ class RestoreWithICloud extends Component<
     return loaderMessages[ messageIndex++ ]
   }
 
+  static contextType = LocalizationContext
   renderContent = () => {
-    const { selectedBackup, hideShow, strings, common } = this.state
+    const { selectedBackup, hideShow, common } = this.state
     const { navigation } = this.props
+    const { translations, formatString } =  this.context
+    const strings = translations[ 'bhr' ]
     return (
+
       <RestoreFromICloud
         title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
-        subText={
-          strings[ 'Clickingon' ]
+        subText= {
+          formatString( strings.Clickingon,  Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
         }
         cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}
@@ -857,13 +846,11 @@ class RestoreWithICloud extends Component<
           this.setState( {
             restoreModal: false
           } )
-          navigation.navigate( 'WalletInitialization' )
-
+          // navigation.navigate( 'WalletInitialization' )
         }}
         hideShow={this.state.hideShow}
         walletsArray={this.state.walletsArray}
         onPressSelectValue={( value )=>{
-          console.log( value )
           this.setState( {
             hideShow: false
           } )
@@ -1064,7 +1051,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <Text style={styles.modalHeaderInfoText}>
-            {strings[ 'UseSendRequest' ]}
+            {strings[ 'UseScaneKey' ]}
           </Text>
         </View>
         <View
@@ -1084,9 +1071,10 @@ class RestoreWithICloud extends Component<
             shadowOffset: {
               width: 15, height: 15
             },
+            width: wp( '40%' )
           }}
         >
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               // alert("test");
               // ( this.ContactListForRestore as any ).current.snapTo( 1 )
@@ -1103,12 +1091,12 @@ class RestoreWithICloud extends Component<
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>{strings[ 'SendRequest' ]}</Text>
-          </TouchableOpacity>
-          <View
+          </TouchableOpacity> */}
+          {/* <View
             style={{
               width: 1, height: 30, backgroundColor: Colors.white
             }}
-          />
+          /> */}
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
@@ -1127,7 +1115,6 @@ class RestoreWithICloud extends Component<
           </TouchableOpacity>
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
-
         <ModalContainer onBackground={()=>{this.setState( {
           restoreModal:false
         } )}} visible={restoreModal} closeBottomSheet={() => {
@@ -1241,6 +1228,7 @@ class RestoreWithICloud extends Component<
         } )}} visible={securityQuestionModal} closeBottomSheet={() => { this.setState( {
           securityQuestionModal: false
         } ) }} >
+          {/* {console.log( 'teste Restore screen', this.state.question )} */}
           <SecurityQuestion
             question={this.state.question}
             encryptionType={this.state.encryptionType}
@@ -1264,7 +1252,11 @@ class RestoreWithICloud extends Component<
               this.setState( ( state ) => ( {
                 answer: answer
               } ) )
-              this.decryptCloudJson()
+              if( this.state.isWithoutCloud ) {
+                this.showLoaderModal()
+                this.props.restoreWithoutUsingIcloud( this.props.downloadedBackupData[ 0 ].backupData, this.state.answer )
+              }
+              else this.decryptCloudJson()
             }}
           />
           {/* )
@@ -1404,6 +1396,7 @@ export default withNavigationFocus(
     setupHealth,
     setCloudErrorMessage,
     setDownloadedBackupData,
+    restoreWithoutUsingIcloud,
   } )( RestoreWithICloud )
 )
 

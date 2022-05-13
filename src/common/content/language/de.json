@@ -45,7 +45,8 @@
       "setup": "Einrichten",
       "manage": "Verwalten",
       "backup": "Backup",
-      "change": "Ändern"
+      "change": "Ändern",
+      "contactCreated":"Kontakt erstellt"
   },
   "noInternet": {
       "no": "Keine Internetverbindung",
@@ -98,7 +99,7 @@
       "to": "zu",
       "verifylogin": "verifizieren und einloggen",
       "appcreates": "Die App erstellt für dich eine neue Wallet mit Konten, die du sofort nutzen kannst",
-      "previously": "Wenn Sie zuvor Hexa 2.0 hatten, können Sie mit dieser Option die Wiederherstellungsschlüssel verwenden.",
+      "previously": "Wenn Sie zuvor Hexa hatten, können Sie mit dieser Option die Wiederherstellungsschlüssel verwenden.",
       "restoreNoteV1": "Wenn Sie zuvor Hexa 2.0 hatten, können Sie mit dieser Option die Wiederherstellungsschlüssel verwenden.",
       "TermsService": "Nutzungsbedingungen",
       "proceeding": "Indem du mit dem nächsten Schritt fortfährst, stimmst du unserem",
@@ -193,7 +194,7 @@
       ],
       "new": "Neu",
       "Createanew": "Wallet erstellen",
-      "Existing": "Vorhandene",
+      "Existing": "Herstellen Vorhandene",
       "Toviewallaccounts": "Um alle Konten anzuzeigen",
       "confirmpin": "bestätige die PIN",
       "Incorrectpasscode": "Falsches Passwort, versuchen Sie es erneut!",
@@ -286,7 +287,8 @@
       "Confirmnewwalletname": "Neuen Wallet-Namen bestätigen",
       "acrossyour": "Der Name der Wallet wird automatisch in deinem Freundes- und Familiennetzwerk aktualisiert",
       "ConfirmSecurityQuestion": "Sicherheitsfrage bestätigen",
-      "ConfirmWalletPin": "Wallet-PIN bestätigen"
+      "ConfirmWalletPin": "Wallet-PIN bestätigen",
+      "ConfirmEncryptionPassword":"Bestätigen Sie das Verschlüsselungskennwort"
   },
   "header": {
       "init": "Cloud-Backup initialisieren",
@@ -294,7 +296,9 @@
       "l1": "Cloud-Backup der Stufe 1 ist abgeschlossen",
       "l2": "Level 2 Double Backup ist abgeschlossen",
       "l3": "Level 3 Multi-Key-Backup ist abgeschlossen",
-      "wallet": "Wallet"
+      "wallet": "Wallet",
+      "backupIsCompleted":"back-up is voltooid",
+      "Level 1": "Level 1"
   },
   "stackTitle": {
       "AccountSettings": "Kontoeinstellungen",
@@ -309,7 +313,7 @@
   },
   "accManagement": {
       "AccountManagement": "Kontoverwaltung",
-      "Rearrange": "Konten neu anordnen, archivieren und wiederherstellen",
+      "Rearrange": "Konten von hier aus neu anordnen und wiederherstellen",
       "HiddenAccounts": "Versteckte Konten",
       "ArchivedAccounts": "Archivierte Konten",
       "Save": "Neue Sortierung speichern",
@@ -574,6 +578,8 @@
       "HealthCheckConfirmPassword": "Systemdiagnose Passwort bestätigen",
       "Specifythepassword": "Geben Sie das Passwort wie beim Einrichten der Wallet an",
       "Hint": "Hinweis",
+      "Backupwithcloud": "Backup mit Cloud",
+      "BackupwithcloudSub": "Sichern Sie den Wiederherstellungsschlüssel in der Cloud",
       "Backupwithcontact": "Backup mit Kontakt",
       "BackupwithcontactSub": "Sichern Sie den Wiederherstellungsschlüssel mit einem Freund oder Familienmitglied",
       "Backuponadevice": "Backup auf einem Gerät",
@@ -592,13 +598,14 @@
       "errorwhilereceiving": "Beim Empfang Ihres Wiederherstellungsschlüssels ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut",
       "RestoringWalletfrom": "Wiederherstellung der Brieftasche von",
       "Recoverfrom": "Sich erholen von",
-      "Clickingon": "Wenn Sie auf Wiederherstellen klicken, wird Ihr Wiederherstellungsschlüssel von iCloud bezogen",
+      "Clickingon": "Wenn Sie auf Wiederherstellen klicken, wird Ihr Wiederherstellungsschlüssel von {0} bezogen",
       "Recover": "Genesen",
       "Recoverusingkeys": "Wiederherstellen mit Schlüsseln",
       "statusofyourRecovery": "Der Status Ihrer Wiederherstellungsschlüsselanforderung ist unten sichtbar",
       "KeyReceived": "Schlüssel erhalten",
       "WaitingforKey": "Warten auf Schlüssel",
       "UseSendRequest": "Verwenden Sie Anfrage senden, um einen Link mit einem Kontakt zu teilen. Wenn die Person, mit der Sie Ihren Wiederherstellungsschlüssel sichern möchten, persönlich bei Ihnen ist, verwenden Sie Schlüssel scannen. Oder sie könnten Ihnen auch einen Screenshot des QR-Codes zum Scannen senden",
+      "UseScaneKey":"Herstelsleutel scannen om uw portemonnee te herstellen",
       "SendRequest": "Anfrage senden",
       "ScanKey": "Scan-Schlüssel",
       "SelectContact": "Wählen Sie Kontakt",

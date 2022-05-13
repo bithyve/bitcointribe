@@ -295,7 +295,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           >
             <Telegram />
             <View style={{
-              marginLeft: 10
+              marginLeft: 10,
+              flex: 1
             }}>
               <Text style={styles.addModalTitleText}>
                 {strings.hexaCommunity}

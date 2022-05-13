@@ -12,7 +12,7 @@ cp ./rnPatchFiles/RNLocalize.podspec ./node_modules/react-native-localize/RNLoca
 cp ./rnPatchFiles/react-native-netinfo.podspec ./node_modules/@react-native-community/netinfo/react-native-netinfo.podspec
 
 # ios dependency installation
-cd ios && pod deintegrate && pod install
+cd ios && pod deintegrate && rm -f Podfile.lock && pod install
 
 # android SDK location configuration
 cd ../android && touch local.properties && echo "sdk.dir = /Users/$(whoami)/Library/Android/sdk" >local.properties

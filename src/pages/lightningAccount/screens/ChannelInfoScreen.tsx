@@ -1,6 +1,6 @@
 import { inject, observer } from 'mobx-react'
 import React, { Component, ReactElement } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Image, StatusBar, Clipboard } from 'react-native'
 import Toast from '../../../components/Toast'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -13,7 +13,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-
+import ModalContainer from '../../../components/home/ModalContainer'
 interface HTLC {
   hash_lock: string;
   expiration_height: number;
@@ -54,9 +54,17 @@ export default class ChannelInfoScreen extends Component {
       alias : this.props.navigation.getParam( 'alias' ),
       feeForm: false,
       feeValue: '2',
+      closeChannelState: false,
     }
   }
 
+  closeModal =() => {
+    this.setState( ( prev )=>{
+      return {
+        ...prev, closeChannelState: false
+      }
+    } )
+  }
   closeChannel = (
     channelPoint: string,
     channelId: string,
@@ -106,16 +114,36 @@ export default class ChannelInfoScreen extends Component {
           }}>
             {heading}
           </Text>
-          <Text
-            style={{
-              ...ListStyles.listItemSubtitle,
-              marginBottom: 3,
-              fontSize: RFValue( 12 )
-            }}
-            numberOfLines = {1}
-          >
-            {data}
-          </Text>
+          <View style={{
+            flexDirection:'row'
+          }}>
+            <Text
+              style={{
+                ...ListStyles.listItemSubtitle,
+                marginBottom: 3,
+                fontSize: RFValue( 12 ),
+                width: '90%'
+              }}
+              numberOfLines = {1}
+            >
+              {data}
+            </Text>
+            {heading == 'Channel ID' &&
+            <TouchableOpacity
+              onPress={()=>{
+                Clipboard.setString( data )
+                Toast( 'Copied to clipboard' )
+              }}
+            >
+              <Image
+                style={{
+                  width: 18, height: 20, marginLeft:widthPercentageToDP( 3 )
+                }}
+                source={require( '../../../assets/images/icons/icon-copy.png' )}
+              />
+            </TouchableOpacity>
+            }
+          </View>
         </View>
       )
     }
@@ -245,6 +273,38 @@ export default class ChannelInfoScreen extends Component {
         </TouchableOpacity>
       )
     }
+    const CloseChannelModal =() => {
+      return (
+        <View style={styles.modalContainer}>
+          <View style={styles.crossIconContainer}>
+            <FontAwesome name="close" color={Colors.blue} size={20} onPress={()=>this.closeModal()}/>
+          </View>
+          <View style={{
+            flexDirection:'column',
+            alignItems:'center',
+            marginTop:hp( 1 )
+          }}>
+            <Text style={{
+              fontSize:RFValue( 17 ),
+              fontFamily:Fonts.FiraSansRegular,
+              color:Colors.blue,
+              marginBottom: 17
+            }}>
+                Do you want to close this Channel
+            </Text>
+            <ButtonComponent text={'Close Channel'} onPress={() => {
+              this.closeChannel(
+                this.state.channelInfo.channel_point,
+                null,
+                this.state.feeValue,
+                false
+              )
+            }}/>
+          </View>
+
+        </View>
+      )
+    }
     return (
       <>
         <ScrollView
@@ -252,7 +312,7 @@ export default class ChannelInfoScreen extends Component {
         >
           <StatusBar barStyle="dark-content"/>
           <HeaderTitle1
-            firstLineTitle={'Channels'}
+            firstLineTitle={''}
             secondLineTitle={'Channel Details'}
             infoTextNormal={''}
             infoTextBold={''}
@@ -267,8 +327,8 @@ export default class ChannelInfoScreen extends Component {
             <ListCard heading={'Local Balance'} data={this.state.channelInfo.local_balance}/>
             <ListCard heading={'Remote Balance'} data={this.state.channelInfo.remote_balance}/>
             <ListCard heading={'Unsettled Balance'} data={this.state.channelInfo.unsettled_balance}/>
-            <ListCard heading={'Status'} data={this.state.channelInfo.active ? 'active' : 'inactive'}/>
-            <ListCard heading={'Private'} data={this.state.channelInfo.private ? 'true' : 'false'}/>
+            <ListCard heading={'Status'} data={this.state.channelInfo.active ? 'Active' : 'Inactive'}/>
+            <ListCard heading={'Private'} data={this.state.channelInfo.private ? 'True' : 'False'}/>
           </View>
 
         </ScrollView>
@@ -283,15 +343,23 @@ export default class ChannelInfoScreen extends Component {
             }} >
               {/* <ButtonComponent text={'Keysend'} onPress={() => {}}/> */}
               <ButtonComponent text={'Close Channel'} onPress={() => {
-                this.closeChannel(
-                  this.state.channelInfo.channel_point,
-                  null,
-                  this.state.feeValue,
-                  false
-                )
+                // this.closeChannel(
+                //   this.state.channelInfo.channel_point,
+                //   null,
+                //   this.state.feeValue,
+                //   false
+                // )
+                this.setState( ( prev )=>{
+                  return {
+                    ...prev, closeChannelState: true
+                  }
+                } )
               }}/>
             </View>
           </View>
+          <ModalContainer visible={this.state.closeChannelState} closeBottomSheet={this.closeModal}>
+            {CloseChannelModal()}
+          </ModalContainer>
         </View>
       </>
     )
@@ -302,7 +370,7 @@ const styles = StyleSheet.create( {
   rootContainer: {
     flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
-    paddingTop:30,
+    paddingTop:20,
     paddingHorizontal:10,
     position:'relative'
   },
@@ -512,5 +580,14 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft:'auto'
-  }
+  },
+  modalContainer:{
+    backgroundColor:Colors.backgroundColor,
+    height:hp( '25%' ),
+  },
+  crossIconContainer:{
+    justifyContent:'flex-end',
+    flexDirection:'row',
+    margin:10,
+  },
 } )

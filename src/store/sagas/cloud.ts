@@ -3,11 +3,11 @@ import { NativeModules, Platform } from 'react-native'
 import { call, delay, put, select, race } from 'redux-saga/effects'
 import { WIEncryption, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
+import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP, setGoogleLoginCancelled } from '../actions/cloud'
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
+import { Accounts, KeeperInfoInterface, KeeperType, LevelHealthInterface, LevelInfo, MetaShare, ShareSplitScheme, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -35,20 +35,19 @@ function* cloudWorker( { payload } ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     if( levelHealth.length == 0 ) return
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) {
-
-      const s3 = yield call( dbManager.getBHR )
-      const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
+      const metaSharesKeeper = yield select( ( state ) => state.bhr.metaSharesKeeper )
+      const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
-      console.log( 'CLOUD CALL PAYLOAD', payload )
+
       const index: number = MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== null || MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== undefined ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
       const RK: MetaShare = index != null && MetaShares.length ? MetaShares[ index ] : null
 
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
-        type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
-        scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : '1of1',
+        type: share ? ( share.shareType as KeeperType ) : KeeperType.CLOUD,
+        scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : ShareSplitScheme.OneOfOne,
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: index != null ? index : -1,
@@ -69,6 +68,10 @@ function* cloudWorker( { payload } ) {
       const wallet: Wallet = yield select(
         ( state ) => state.storage.wallet
       )
+
+      const dbWallet =  dbManager.getWallet()
+      const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+      const primaryMnemonic = walletObj.primaryMnemonic
       const accountShells = yield select( ( state ) => state.accounts.accountShells )
       // const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
       const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
@@ -79,18 +82,20 @@ function* cloudWorker( { payload } ) {
       const restoreVersions = yield select(
         ( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) ) )
 
-      // Create Updated Wallet Image
       const shares = RK ? JSON.stringify( RK ) : ''
       let encryptedCloudDataJson
 
-      const walletDB = yield call( dbManager.getWallet )
-      const contacts = yield call( dbManager.getTrustedContacts )
-      const accounts = yield call( dbManager.getAccounts )
+      const trustedContacts: Trusted_Contacts = yield select(
+        ( state ) => state.trustedContacts.contacts,
+      )
+      const accounts: Accounts = yield select( state => state.accounts.accounts )
+
       const encKey = BHROperations.getDerivedKey(
-        bip39.mnemonicToSeedSync( walletDB.primaryMnemonic ).toString( 'hex' ),
+        walletObj.primarySeed
+        // bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
       )
 
-      encryptedCloudDataJson = yield call( WIEncryption, accounts, encKey, contacts, walletDB,
+      encryptedCloudDataJson = yield call( WIEncryption, accounts, encKey, trustedContacts, wallet,
         wallet.security.answer, accountShells,
         activePersonalNode,
         versionHistory,
@@ -98,33 +103,34 @@ function* cloudWorker( { payload } ) {
       )
       // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
-      const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+      let encryptedSeed = ''
+      if( !shares ){
+        const { encryptedData } = BHROperations.encryptWithAnswer( primaryMnemonic, wallet.security.answer )
+        encryptedSeed = encryptedData
+      }
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
-        secondaryShare: walletDB.smShare ? walletDB.smShare : '',
+        secondaryShare: wallet.smShare ? wallet.smShare : '',
         encryptedCloudDataJson: encryptedCloudDataJson,
-        seed: shares ? '' : encryptedData,
+        seed: encryptedSeed,
         walletName: wallet.walletName,
         questionId: wallet.security.questionId,
-        question: wallet.security.questionId === '0' ? wallet.security.question: '',
+        question: wallet.security.questionId == '0' ? wallet.security.question: '',
         keeperData: JSON.stringify( keeperInfo ),
         bhXpub,
       }
-
       const { response, timeout } = yield race( {
         response: call( checkCloudBackupWorker, {
           payload: {
             data, share
           }
         } ),
-        timeout: delay( 40000 )
+        timeout: delay( 60000 )
       } )
-      console.log( 'response', response )
-      console.log( 'timeout', timeout )
+      // console.log( 'skk response?.status', response?.status )
       if ( !timeout ){
-        const isCloudBackupCompleted = response
-
+        const isCloudBackupCompleted =  Platform.OS == 'ios' ? response?.status : response
         if( typeof isCloudBackupCompleted === 'boolean' ) {
           const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
           const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
@@ -154,7 +160,7 @@ function* cloudWorker( { payload } ) {
             yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
           }
         } else {
-          if( isCloudBackupCompleted.status ) {
+          if( isCloudBackupCompleted ) {
             const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'Google Drive backup confirmed'
             const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
             yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
@@ -228,6 +234,7 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 
 function* updateHealthForCloudWorker( { payload } ) {
   try {
+    const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const { share } = payload
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -252,8 +259,24 @@ function* updateHealthForCloudWorker( { payload } ) {
       updatedAt: moment( new Date() ).valueOf(),
       status: 'accessible',
       shareType: 'cloud',
-      name: levelHealthVar.name
+      name: levelHealthVar.name,
+      data: {
+      }
     }
+    const keeperInfo: KeeperInfoInterface = {
+      shareId: levelHealthVar.shareId,
+      name: levelHealthVar.name,
+      type: KeeperType.CLOUD,
+      scheme: ShareSplitScheme.TwoOfThree,
+      currentLevel: currentLevel == 0 ? 1 : currentLevel,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: null,
+      data: {
+      },
+      // channelKey: channelKeyToUse
+    }
+
+    yield put( updatedKeeperInfo( keeperInfo ) )
     yield put( updateMSharesHealth( shareObj ) )
   }
   catch ( error ) {
@@ -313,7 +336,6 @@ function* checkCloudBackupWorker ( { payload } ) {
     const { data, share } = payload
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      console.log( 'backedJson checkCloudBackupWorker', backedJson )
       const json = backedJson ? JSON.parse( backedJson ) : null
       if( backedJson && json && json.status ){
         return json
@@ -346,7 +368,6 @@ function* checkCloudBackupWorker ( { payload } ) {
           share, data
         }
       } )
-      console.log( 'isDataBackedUp', isDataBackedUp )
       if( isDataBackedUp === 'successFullyUpdate' || isDataBackedUp === 'successFullyUpload' ){
         return true
       } else{
@@ -378,6 +399,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
       if( googleLoginResult ){
         const result = googleLoginResult
         if ( !googlePermissionCall ){
+          console.log( 'eventName', result )
+
           if ( result.eventName == 'onLogin' ) {
             yield put( setGoogleCloudLoginSuccess( true ) )
             const fileAvailabelStatus =  yield call( checkFileIsAvailableWorker, {
@@ -387,10 +410,13 @@ function* GoogleDriveLoginWorker ( { payload } ) {
                 data
               }
             } )
+            console.log( 'fileAvailabelStatus', fileAvailabelStatus )
+
             return fileAvailabelStatus
           } else{
             const message = getGoogleDriveErrorMessage( result.code )
             yield put( setCloudErrorMessage( message ) )
+            yield put( setGoogleLoginCancelled( true ) )
             console.log( 'GOOGLE SetupFail else', result )
             yield put( setGoogleCloudLoginFailure( true ) )
             throw new Error( 'Google LoginFail' )

@@ -67,7 +67,7 @@ const FNFToKeeper = ( props ) => {
       const contact = contacts[ channelKey ]
       if ( ( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) && contact.contactDetails.contactName ) {
         const instream: StreamData = useStreamFromContact( contact, wallet.walletId, true )
-        if( instream ) c.push( {
+        if( instream && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) c.push( {
           ...contact, channelKey
         } )
       }
@@ -579,7 +579,7 @@ const FNFToKeeper = ( props ) => {
           </View>
           <View style={{
             position: 'relative',
-            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '47%' ) : DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '65%' ),
+            height: contacts.length ? DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '47%' ) : DeviceInfo.hasNotch() ? hp( '70%' ) : hp( '70%' ),
           }}>
             {filterContactData ? (
               <FlatList
@@ -589,7 +589,7 @@ const FNFToKeeper = ( props ) => {
                   right: 0, top: 0, left: 0, bottom: hp( 24 )
                 }}
                 keyExtractor={( item, index ) => item.id}
-                data={filterContactData}
+                data={[ ...filterContactData, ...filterContactData ]}
                 extraData={radioOnOff}
                 showsVerticalScrollIndicator={false}
                 renderItem={( { item, index } ) => {

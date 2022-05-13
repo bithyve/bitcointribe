@@ -117,6 +117,7 @@ interface ContactDetailsPropTypes {
   updateSecondaryShardStatus: boolean;
   getSecondaryDataInfoStatus: boolean;
   setSecondaryDataInfoStatus: any;
+  IsCurrentLevel0: boolean;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -148,7 +149,7 @@ interface ContactDetailsStateTypes {
 class ContactDetails extends PureComponent<
   ContactDetailsPropTypes,
   ContactDetailsStateTypes
-  > {
+> {
   ReshareBottomSheet: any;
   shareBottomSheet: any;
   SendViaLinkBottomSheet: any;
@@ -245,7 +246,7 @@ class ContactDetails extends PureComponent<
     this.setState( {
       showQRClicked: true
     } )
-    if( this.props.navigation.state.params.contactsType == 'I am the Keeper of' ) this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
+    if ( this.props.navigation.state.params.contactsType == 'I am the Keeper of' ) this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
     this.setIsSendDisabledListener = this.props.navigation.addListener(
       'didFocus',
       () => {
@@ -290,16 +291,16 @@ class ContactDetails extends PureComponent<
       this.props.ErrorSending( null )
     }
     console.log( 'openApproval', this.props.openApproval )
-    if( prevProps.availableKeepers != this.props.availableKeepers && this.contactsType == 'I am the Keeper of' ) {
-      if( availableKeepers.length ) {
-        const availableKeepersName = ( ()=>{
-          if( availableKeepers.length > 3 ) {
-            return availableKeepers.slice( 2, availableKeepers.length-1 ).map( ( value )=> {
-              if( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' '+value.name
+    if ( prevProps.availableKeepers != this.props.availableKeepers && this.contactsType == 'I am the Keeper of' ) {
+      if ( availableKeepers.length ) {
+        const availableKeepersName = ( () => {
+          if ( availableKeepers.length > 3 ) {
+            return availableKeepers.slice( 2, availableKeepers.length - 1 ).map( ( value ) => {
+              if ( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' ' + value.name
             } ).join()
-          } else if( availableKeepers.length == 3 ) {
-            return availableKeepers.slice( 2, availableKeepers.length ).map( ( value )=> {
-              if( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' '+value.name
+          } else if ( availableKeepers.length == 3 ) {
+            return availableKeepers.slice( 2, availableKeepers.length ).map( ( value ) => {
+              if ( value.name != 'iCloud' && value.name != 'Encryption Password' ) return ' ' + value.name
             } ).join()
           } else return ''
         } )()
@@ -314,8 +315,8 @@ class ContactDetails extends PureComponent<
 
     console.log( 'this.props.getSecondaryDataInfoStatus', this.props.getSecondaryDataInfoStatus )
     console.log( 'this.props.openApproval', this.props.openApproval )
-    if( prevProps.getSecondaryDataInfoStatus != this.props.getSecondaryDataInfoStatus ){
-      if( this.props.getSecondaryDataInfoStatus ) this.setState( {
+    if ( prevProps.getSecondaryDataInfoStatus != this.props.getSecondaryDataInfoStatus ) {
+      if ( this.props.getSecondaryDataInfoStatus ) this.setState( {
         showLoader: true
       } )
       else {
@@ -325,8 +326,8 @@ class ContactDetails extends PureComponent<
       }
     }
 
-    if( prevProps.openApproval != this.props.openApproval || prevState.showQRClicked != this.state.showQRClicked ){
-      if( this.props.openApproval && this.state.showQRClicked ) this.setState( {
+    if ( prevProps.openApproval != this.props.openApproval || prevState.showQRClicked != this.state.showQRClicked ) {
+      if ( this.props.openApproval && this.state.showQRClicked ) this.setState( {
         showQRScanner: true
       } )
       else this.setState( {
@@ -575,7 +576,7 @@ class ContactDetails extends PureComponent<
       )
       return
     }
-    let qrString = '', qrTitle= '', qrSubTitleText=''
+    let qrString = '', qrTitle = '', qrSubTitleText = ''
     if ( type == 'recovery' ) {
       qrTitle = 'Recovery Key'
       qrSubTitleText = 'help restore'
@@ -839,6 +840,7 @@ class ContactDetails extends PureComponent<
   }
 
   renderContactDetailsModal = () => {
+    const createdDate = moment( this?.props?.trustedContacts[ this?.contact?.channelKey ]?.timestamps?.created ).utc().local().format( 'DD MMMM YYYY HH:mm' )
     return (
       <View style={{
         backgroundColor: Colors.bgColor
@@ -879,7 +881,7 @@ class ContactDetails extends PureComponent<
             {this.common[ 'status' ]}
           </Text>
           <Text style={styles.titleSubText}>
-            {!this.contact.isActive && !this.contact.streamId ? 'Rejected' : this.contact.streamId ? 'Approved' :  'Pending'}
+            {!this.contact.isActive && !this.contact.streamId ? 'Rejected' : this.contact.streamId ? 'Approved' : 'Pending'}
           </Text>
           {/* <Text style={styles.titleText}>
             Contact Created
@@ -888,53 +890,73 @@ class ContactDetails extends PureComponent<
             18 June ‘21
             </Text> */}
           {this.contact.walletName &&
-          <>
-            <Text style={styles.titleText}>
-              {this.common[ 'walletName' ]}
-            </Text>
-            <Text style={styles.titleSubText}>
-              {this.contact.walletName}
-            </Text>
-          </>
+            <>
+              <Text style={styles.titleText}>
+                {this.common[ 'walletName' ]}
+              </Text>
+              <Text style={styles.titleSubText}>
+                {this.contact.walletName}
+              </Text>
+            </>
           }
           {this.contact.walletId &&
+            <>
+              <Text style={styles.titleText}>
+                {this.common[ 'walletID' ]}
+              </Text>
+              <Text style={styles.titleSubText}>
+                {this.contact.walletId}
+              </Text>
+            </>
+          }
+          {createdDate &&
+            <>
+              <Text style={styles.titleText}>
+                {this.common[ 'contactCreated' ]}
+              </Text>
+              <Text style={styles.titleSubText}>
+                {createdDate}
+              </Text>
+            </>
+          }
+          {createdDate &&
           <>
             <Text style={styles.titleText}>
-              {this.common[ 'walletID' ]}
+              {this.common[ 'contactCreated' ]}
             </Text>
             <Text style={styles.titleSubText}>
-              {this.contact.walletId}
+              {createdDate}
             </Text>
           </>
           }
         </View>
         <View style={styles.CTAView}>
           {this.contact.lastSeenActive &&
-          <CardWithArrow
-            onPress={() => this.setState( {
-              showContactDetails: false,
-              edit: true
-            } )}
-            icon={'Edit'}
-            mainText={this.strings[ 'editName' ]}
-            subText={this.strings[ 'editNameSub' ]}
-          />
+            <CardWithArrow
+              onPress={() => this.setState( {
+                showContactDetails: false,
+                edit: true
+              } )}
+              icon={'Edit'}
+              mainText={this.strings[ 'editName' ]}
+              subText={this.strings[ 'editNameSub' ]}
+            />
           }
           {this.contact.lastSeenActive &&
-          <CardWithArrow
-            onPress={() => {
-              this.setState( {
-                showContactDetails: false,
-              } )
-              this.props.navigation.navigate( 'AddContact', {
-                fromScreen: 'Edit', contactToEdit: this.contact
-              } )
-            }
-            }
-            icon={'Associate'}
-            mainText={this.strings[ 'Associateanother' ]}
-            subText={this.strings[ 'AssociateanotherSub' ]}
-          />
+            <CardWithArrow
+              onPress={() => {
+                this.setState( {
+                  showContactDetails: false,
+                } )
+                this.props.navigation.navigate( 'AddContact', {
+                  fromScreen: 'Edit', contactToEdit: this.contact
+                } )
+              }
+              }
+              icon={'Associate'}
+              mainText={this.strings[ 'Associateanother' ]}
+              subText={this.strings[ 'AssociateanotherSub' ]}
+            />
           }
           {
             this.contact.trustKind !== ContactTrustKind.OTHER && this.contact.lastSeenActive ? null : (
@@ -1034,8 +1056,8 @@ class ContactDetails extends PureComponent<
         </View>
 
         {showContactDetails &&
-          <ModalContainer onBackground={()=>this.setState( {
-            showContactDetails:false
+          <ModalContainer onBackground={() => this.setState( {
+            showContactDetails: false
           } )} visible={showContactDetails} closeBottomSheet={() => {
             this.setState( {
               showContactDetails: false
@@ -1224,45 +1246,40 @@ class ContactDetails extends PureComponent<
             )}
           </View>
         )}
-        {this.contactsType == 'I am the Keeper of' && this.props.openApproval != null && this.props.availableKeepers.length == 0 && (
+        {this.contactsType == 'I am the Keeper of' && (
           <View style={styles.keeperViewStyle}>
-            {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
+            <TouchableOpacity
               disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING )}
               style={{
                 ...styles.bottomButton,
                 opacity: this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING ? 1 : 0.5,
               }}
-              onPress={() => {
-                this.generateQR( 'recovery' )
-              }
-              }
+              onPress={() => this.generateQR( 'recovery' )}
             >
-              {/* <Image
-                source={require( '../../assets/images/icons/icon_restore.png' )}
-                style={styles.buttonImage}
-              /> */}
               <Text style={styles.buttonText}>Show Recovery Key</Text>
               <Text style={styles.buttonSubText}>During wallet recovery process</Text>
-            </TouchableOpacity>}
-            {!this.props.openApproval && this.props.availableKeepers.length == 0 && <TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-                // justifyContent: 'space-around',
+            </TouchableOpacity>
+            {this.props.openApproval && this.props.openApproval != null && this.props.availableKeepers.length && !this.props.IsCurrentLevel0 ? <TouchableOpacity
+              style={styles.bottomButton}
+              onPress={() => {
+                this.setState( {
+                  showQRClicked: true
+                } )
+                this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
               }}
+            >
+              <Text style={styles.buttonText}>Scan Approval Key</Text>
+              <Text style={styles.buttonSubText}>Get Approval from other Keepers</Text>
+            </TouchableOpacity> : <TouchableOpacity
+              style={styles.bottomButton}
               onPress={() => {
                 this.generateQR( 'approval' )
               }}
             >
-              {/* <Image
-                source={require( '../../assets/images/icons/icon_restore.png' )}
-                style={styles.buttonImage}
-              /> */}
-              <Text style={[ styles.buttonText, {
-
-              } ]}>Show Approval Key</Text>
+              <Text style={styles.buttonText}>Show Approval Key</Text>
               <Text style={styles.buttonSubText}>Approve changes for the contact</Text>
-            </TouchableOpacity> }
-            {encryptedExitKey ? (
+            </TouchableOpacity>}
+            {!this.props.openApproval && this.props.openApproval != null && encryptedExitKey ? (
               <TouchableOpacity
                 style={{
                   ...styles.bottomButton,
@@ -1277,10 +1294,6 @@ class ContactDetails extends PureComponent<
                   }
                 }}
               >
-                {/* <Image
-                  source={require( '../../assets/images/icons/icon_request.png' )}
-                  style={styles.buttonImage}
-                /> */}
                 <View>
                   <Text style={styles.buttonText} numberOfLines={1}>
                     {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
@@ -1295,24 +1308,6 @@ class ContactDetails extends PureComponent<
             ) : null}
           </View>
         )}
-        {this.props.openApproval && this.props.openApproval != null && this.props.availableKeepers.length && <View style={{
-          ...styles.keeperViewStyle, justifyContent: 'flex-start', paddingLeft: wp( 5 )
-        }}><TouchableOpacity
-            style={{
-              ...styles.bottomButton,
-            }}
-            onPress={() => {
-              this.setState( {
-                showQRClicked: true
-              } )
-              this.props.getApprovalFromKeepers( true, this.props.trustedContacts[ this.contact.channelKey ] )
-            }}
-          >
-            <Text style={[ styles.buttonText, {
-            } ]}>Scan Approval Key</Text>
-            <Text style={styles.buttonSubText}>Get Approval from other Keepers</Text>
-          </TouchableOpacity></View> }
-
         {/* </View> */}
         <BottomSheet
           enabledInnerScrolling={true}
@@ -1327,17 +1322,17 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderSendViaLinkContents}
           renderHeader={this.renderSendViaLinkHeader}
         />
-        <ModalContainer onBackground={()=>this.setState( {
+        <ModalContainer onBackground={() => this.setState( {
           sendViaQRModel: false
         } )} visible={sendViaQRModel} closeBottomSheet={() => { }}>
           {this.renderSendViaQRContents()}
         </ModalContainer>
-        <ModalContainer onBackground={()=>this.setState( {
+        <ModalContainer onBackground={() => this.setState( {
           exitKeyModel: false
         } )} visible={exitKeyModel} closeBottomSheet={() => { }}>
           {this.renderExitKeyQRContents()}
         </ModalContainer>
-        <ModalContainer onBackground={()=>this.setState( {
+        <ModalContainer onBackground={() => this.setState( {
           edit: false
         } )} visible={edit} closeBottomSheet={() => this.setState( {
           edit: false
@@ -1352,7 +1347,7 @@ class ContactDetails extends PureComponent<
             } )
           }} />
         </ModalContainer>
-        <ModalContainer onBackground={()=>this.setState( {
+        <ModalContainer onBackground={() => this.setState( {
           reshareModal: false
         } )} visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
@@ -1406,14 +1401,14 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderErrorModalContent}
           renderHeader={this.renderErrorModalHeader}
         />
-        <ModalContainer onBackground={()=>this.setState( {
+        <ModalContainer onBackground={() => this.setState( {
           showQRCode: false
         } )} visible={this.state.showQRCode} closeBottomSheet={() => this.setState( {
           showQRCode: false
         } )}>
           {this.SendShareModalFunction}
         </ModalContainer>
-        <ModalContainer onBackground={()=>this.setState( {
+        <ModalContainer onBackground={() => this.setState( {
           showQRScanner: false
         } )} visible={this.state.showQRScanner} closeBottomSheet={() => this.setState( {
           showQRScanner: false, showQRClicked: false
@@ -1423,10 +1418,10 @@ class ContactDetails extends PureComponent<
             QRModalHeader={'QR scanner'}
             title={'Note'}
             infoText={
-              this.state.availableKeepersName ? 'To proceed please scan the Approval Key stored on your '+ this.state.availableKeepersName : 'Please approve this request by scanning the Approval Key stored with any of the other backups'
+              this.state.availableKeepersName ? 'To proceed please scan the Approval Key stored on your ' + this.state.availableKeepersName : 'Please approve this request by scanning the Approval Key stored with any of the other backups'
             }
             isOpenedFlag={this.state.showQRScanner}
-            onQrScan={async( qrScannedData ) => {
+            onQrScan={async ( qrScannedData ) => {
               this.props.updateSecondaryShard( qrScannedData )
             }}
             onBackPress={() => {
@@ -1434,8 +1429,8 @@ class ContactDetails extends PureComponent<
                 showQRScanner: false, showQRClicked: false
               } )
             }}
-            onPressContinue={async() => {
-              const qrScannedData = '{"type":"APPROVE_KEEPER","walletName":"Test","channelId":"b6fda5fccdcd52d4bf7791f629d5de30d9f559ad6733ff9a0e7d2429745f4ccc","streamId":"765087d33","secondaryChannelKey":"TGfS9qqRHcaQOzOQ6WR1Plhc","version":"2.0.0","walletId":"5999171c4129eca5a12a0221712a708c66a8507ff81c139a33812f3383982766"}'
+            onPressContinue={async () => {
+              const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"ShivaniNew","channelId":"016eb4ac3b68d312ac8301e5cedeececdc4b8e42a56e49fd849048ff3642da86","streamId":"65bf22a7c","channelKey":"0BvnLFWTJfNP3hFy43qYk136","secondaryChannelKey":"upToEzzuNHJ75QYqyRz9Q6Lc","version":"2.0.7","walletId":"2ca1d6a049f75ec5c693d76a896745e12438941d97921dfabfa6c3a4a1ac258d"}'
               this.props.updateSecondaryShard( qrScannedData )
             }}
           />
@@ -1485,6 +1480,7 @@ const mapStateToProps = ( state ) => {
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
     updateSecondaryShardStatus: idx( state, ( _ ) => _.bhr.loading.updateSecondaryShardStatus ),
     getSecondaryDataInfoStatus: idx( state, ( _ ) => _.bhr.loading.getSecondaryDataInfoStatus ),
+    IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
   }
 }
 export default connect( mapStateToProps, {

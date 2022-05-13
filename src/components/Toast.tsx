@@ -2,10 +2,10 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 import Toast from 'react-native-root-toast'
 import Colors from '../common/Colors'
 
-export default ( message ) => {
+export default ( message, toastPosition=-15 ) => {
   return Toast.show( message, {
     duration: Toast.durations.LONG,
-    position: heightPercentageToDP( -15 ),
+    position: heightPercentageToDP( toastPosition ),
     shadow: true,
     animation: true,
     hideOnPress: true,

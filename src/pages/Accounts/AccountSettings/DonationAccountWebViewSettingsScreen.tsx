@@ -169,7 +169,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
             <View style={{
               flexDirection: 'row', alignItems: 'center'
             }}>
-              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} /> 
 
               <View>
                 <Text style={NavStyles.modalHeaderTitleText}>
@@ -321,7 +321,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
             }}>
               <Image
                 style={styles.imageStyle}
-                source={require( '../../../assets/images/icons/icon_donation_total.png' )}
+                source={require( '../../../assets/images/icons/icon_donation_transactions.png' )}
               />
               <View style={styles.textContainer}>
                 <Text style={styles.titleTextStyle}>Transactions</Text>
@@ -401,7 +401,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                   style={{
                     ...styles.imageStyle, height: wp( '7%' ), width: wp( '7%' )
                   }}
-                  source={require( '../../../assets/images/icons/icon_donation_white.png' )}
+                  source={require( '../../../assets/images/icons/icon_pause_donation.png' )}
                 />
               </View>
               <View style={styles.textContainer}>

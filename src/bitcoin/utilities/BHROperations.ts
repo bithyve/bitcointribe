@@ -785,7 +785,7 @@ export default class BHROperations {
     }
   };
 
-  public static getMnemonics = ( secretsArray: string[], answer: string, isPrimary?: boolean ) => {
+  public static getMnemonics = ( secretsArray: string[], answer?: string, isPrimary?: boolean ) => {
     const shareArr = isPrimary ? [] : secretsArray
     if( isPrimary ){
       const { decryptedSecrets } = BHROperations.decryptSecrets( secretsArray, answer )
@@ -836,7 +836,6 @@ export default class BHROperations {
 
   public static encryptMetaSharesWithNewAnswer = async ( metaShares, oldMetaShares, oldAnswer, newAnswer, security ) => {
     try {
-      console.log( 'ss', security )
       const { questionId, question, answer } = security
       const updatedMetaShares: MetaShare[] = [ ]
       const updatedOldMetaShares: MetaShare[] = [ ]
@@ -888,7 +887,6 @@ export default class BHROperations {
         updatedMetaShares, updatedOldMetaShares
       }
     } catch ( err ) {
-      console.log( 'encryptMetaSharesWithNewAnswer', err )
       return {
         updatedMetaShares:metaShares, updatedOldMetaShares: oldMetaShares
       }
