@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Image, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
+import { View, Image, Text, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -23,19 +23,19 @@ export default function TestAccountKnowMoreSheetContents( props ) {
     {
       title: strings.AGSP,
       text1:  strings.AGSP1,
-      text2:  strings.AGSP2,
+      text2: Platform.OS == 'ios' ? strings.AGSP2 : strings.AGSP2drive,
       image: require( '../../assets/images/icons/walletinit-2.png' )
     },
     // {
     //   title: strings.SecurityQuestion,
     //   text1: strings.SecurityQuestion1,
-    //   text2: strings.SecurityQuestion2,
+    //   text2: Platform.OS == 'ios' ? strings.SecurityQuestion2 : strings.SecurityQuestion2drive,
     //   image: require( '../../assets/images/icons/walletinit-3.png' )
     // },
     {
       title: strings.UserDefinedPassphrase,
       text1: strings.UserDefinedPassphrase1,
-      text2: strings.UserDefinedPassphrase2,
+      text2:  Platform.OS == 'ios' ? strings.UserDefinedPassphrase2 :  strings.UserDefinedPassphrase2drive,
       image: require( '../../assets/images/icons/walletinit-4.png' )
     }
   ]

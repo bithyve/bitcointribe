@@ -54,6 +54,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import Toast from '../../components/Toast'
 import { resetToHomeAction } from '../actions/NavigationActions'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import PushNotification from 'react-native-push-notification'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
@@ -143,7 +144,8 @@ export enum BottomSheetKind {
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
-  GIFT_REQUEST
+  GIFT_REQUEST,
+  APPROVAL_MODAL
 }
 
 interface HomeStateTypes {
@@ -157,6 +159,7 @@ interface HomeStateTypes {
   currencyCode: string;
   notificationDataChange: boolean;
   trustedContactRequest: any;
+  isCurrentLevel0: boolean;
   giftRequest: any;
   recoveryRequest: any;
   isLoadContacts: boolean;
@@ -265,6 +268,7 @@ interface HomePropsTypes {
   approvalContactData: ContactRecipientDescribing;
   rejectedExistingContactRequest: any;
   trustedContacts: Trusted_Contacts;
+  IsCurrentLevel0: boolean;
   walletId: string;
 }
 
@@ -295,6 +299,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currencyCode: 'USD',
       notificationDataChange: false,
       trustedContactRequest: null,
+      isCurrentLevel0: false,
       giftRequest: null,
       recoveryRequest: null,
       isLoadContacts: false,
@@ -385,6 +390,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   notificationCheck = () =>{
     const { messages } = this.props
+    console.log("notificationCheck "+JSON.stringify(messages));
     if( messages && messages.length ){
       this.updateBadgeCounter()
       messages.sort( function ( left, right ) {
@@ -466,7 +472,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.FNF_REQUEST_REJECTED:
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
         case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
-        case NotificationType.CONTACT:
+        case 'contact':
         case NotificationType.SECURE_XPUB:
         case NotificationType.APPROVE_KEEPER:
         case NotificationType.UPLOAD_SEC_SHARE:
@@ -474,6 +480,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.RESHARE_RESPONSE:
         case NotificationType.SM_UPLOADED_FOR_PK:
         case NotificationType.NEW_KEEPER_INFO:
+        case NotificationType.GIFT_ACCEPTED:
+        case NotificationType.GIFT_REJECTED:
           console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
@@ -545,7 +553,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
             if( nextAppState === 'background' ) {
-              this.closeBottomSheet()
+              // this.closeBottomSheet()
             }
             // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
@@ -884,13 +892,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       this.updateBadgeCounter()
     }
-    if( prevProps.openApproval != this.props.openApproval ){
+    if( prevProps.openApproval != this.props.openApproval && !this.props.IsCurrentLevel0 ){
       if( this.props.openApproval ){
-        this.props.navigation.navigate( 'ContactDetails', {
-          contact: this.props.approvalContactData,
-          contactsType: 'I am the Keeper of',
-          isFromApproval: true
-        } )
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.APPROVAL_MODAL,
+          1
+        )
       }
     }
 
@@ -1073,7 +1080,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       this.closeBottomSheet()
       const { navigation } = this.props
-      const { trustedContactRequest } = this.state
+      const { trustedContactRequest, isCurrentLevel0 } = this.state
 
       let channelKeys: string[]
       try{
@@ -1098,7 +1105,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
 
       if( trustedContactRequest.isExistingContact ){
-        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
+        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey, isCurrentLevel0 )
       } else {
         navigation.navigate( 'ContactsListForAssociateContact', {
           postAssociation: ( contact ) => {
@@ -1108,7 +1115,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               channelKey: trustedContactRequest.channelKey,
               contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
               isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
-              isKeeper: trustedContactRequest.isKeeper
+              isKeeper: trustedContactRequest.isKeeper,
+              isCurrentLevel0
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
@@ -1344,6 +1352,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // } )
   }
 
+  moveToTransacation = ( notificationAdditionalInfo ) => {
+
+    // const primarySubAccount = usePrimarySubAccountForShell( accountShellInfo )
+
+    // alert(JSON.stringify(primarySubAccount));
+    const accountShell = this.props.accountShells[1];
+    let transaction = accountShell.primarySubAccount.transactions.find(tx => tx.txid === notificationAdditionalInfo.txid);
+    console.log("primarySubAccountShell "+ JSON.stringify(transaction));
+    // alert(JSON.stringify(accountShell.primarySubAccount));
+
+    // console.log("bhumika " +JSON.stringify(this.props.accountShells))
+    // console.log("reddy " +JSON.stringify(this.props.accountsState))
+    this.props.navigation.navigate( 'TransactionDetails', {
+      transaction,
+      accountShellID: accountShell.id,
+    } )
+  }
+
   renderBottomSheetContent() {
     const { navigation } = this.props
     const { notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
@@ -1506,7 +1532,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               // }
               // ]}
               onPressProceed={()=>{
-                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.cloudPermissionGranted ){
                   this.props.setCloudData()
                 }
                 this.closeBottomSheet()
@@ -1539,12 +1565,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }
                 switch ( this.state.notificationType ) {
                     case 'contact':
+                      this.moveToTransacation( notificationAdditionalInfo )
                     case NotificationType.FNF_TRANSACTION:
                       this.moveToAccount( notificationAdditionalInfo.txid )
                       break
 
                     case NotificationType.FNF_REQUEST_ACCEPTED:
                       this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'Contact' )
+                      break
+
+                      case NotificationType.GIFT_ACCEPTED:
+                        this.props.navigation.navigate( 'ManageGifts');
+                      break
+
+                      case NotificationType.GIFT_REJECTED:
+                        this.props.navigation.navigate( 'ManageGifts');
                       break
 
                     case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
@@ -1591,6 +1626,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+        case BottomSheetKind.APPROVAL_MODAL:
+          return (
+            <ErrorModalContents
+              title={'Approve Request'}
+              info={'You have been successfully added as a Keeper. Now Please Approve keeper by scanning QR from Primary Keeper'}
+              onPressProceed={()=>{
+                if( this.props.approvalContactData ){
+                  this.closeBottomSheet()
+                  this.props.navigation.navigate( 'ContactDetails', {
+                    contact: this.props.approvalContactData,
+                    contactsType: 'I am the Keeper of',
+                    isFromApproval: true
+                  } )
+                }
+              }}
+              proceedButtonText={'Proceed'}
+              isIgnoreButton={false}
+              isBottomImage={false}
+            />
+          )
+
         default:
           break
     }
@@ -1631,7 +1687,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // >
       <View
         style={{
-          height: heightPercentageToDP( '21.9%' ),
+          height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
           backgroundColor: Colors.blue,
           paddingTop:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch
@@ -1667,9 +1723,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // overallHealth={overallHealth}
           />
           <ModalContainer
-            onBackground={()=>this.setState( {
-              currentBottomSheetKind: null
-            } )}
+            onBackground={()=>{
+              const perviousState = this.state.currentBottomSheetKind
+              this.setState( {
+                currentBottomSheetKind: null
+              } )
+              setTimeout( () => {
+                this.setState( {
+                  currentBottomSheetKind: perviousState
+                }
+                )
+              }, 200 )
+            }}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
           >
@@ -1755,6 +1820,7 @@ const mapStateToProps = ( state ) => {
     availableKeepers: idx( state, ( _ ) => _.bhr.availableKeepers ),
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
+    IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
     walletId:
     idx( state, ( _ ) => _.storage.wallet.walletId )
   }

@@ -52,7 +52,11 @@ const disabledPrimaryActionButton = {
   backgroundColor: Colors.lightBlue,
 
 }
+const disabledNewPrimaryActionButton = {
+  ...actionButton,
+  backgroundColor: '#cee6f8',
 
+}
 const actionButtonText = {
   color: Colors.white,
   fontSize: RFValue( 13 ),
@@ -65,6 +69,7 @@ const ButtonStyles = StyleSheet.create( {
   miniNavButton,
   primaryActionButton,
   disabledPrimaryActionButton,
+  disabledNewPrimaryActionButton,
   primaryActionButtonShadow,
   floatingActionButton: {
     ...primaryActionButton,

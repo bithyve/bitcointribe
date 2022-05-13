@@ -220,7 +220,7 @@ import QRCoder
     //page 5
      let v5 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
     
-    /*txtTitle = UILabel();
+    txtTitle = UILabel();
     txtTitle.text = "Exit/Regenerate 2FA Key:"
     txtTitle.lineBreakMode = .byWordWrapping
     txtTitle.numberOfLines = 0
@@ -246,7 +246,7 @@ import QRCoder
     qrCodeImage.image = generator.createImage(value: secondaryMnemonic as String,size: CGSize(width: imageSize, height: imageSize - 10))
     qrCodeImage.frame = CGRect(x: 10, y: ( txtTitle.frame.origin.y + txtTitle.frame.height + txtPart.frame.height + 15) , width: imageSize, height: imageSize)
      v5.addSubview(qrCodeImage)
-    */
+
     let page1 = PDFPage.view(v1);
     let page2 = PDFPage.view(v2);
     let page3 = PDFPage.view(v3);
@@ -322,7 +322,7 @@ import QRCoder
   
     let v2 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
     // part 2
-    /* txtTitle = UILabel();
+    txtTitle = UILabel();
     txtTitle.text = "Exit/Regenerate 2FA Key:"
     txtTitle.lineBreakMode = .byWordWrapping
     txtTitle.numberOfLines = 0
@@ -349,7 +349,7 @@ import QRCoder
     qrCodeImage.image = generator.createImage(value: qrcode[1] as! String,size: CGSize(width: imageSize, height: imageSize))
     qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: imageSize, height: imageSize)
     v2.addSubview(qrCodeImage);
-      */
+    
     let page1 = PDFPage.view(v1);
     let page2 = PDFPage.view(v2);
    

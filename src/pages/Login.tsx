@@ -8,7 +8,8 @@ import {
   Platform,
   BackHandler,
   Linking,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -42,8 +43,10 @@ import Relay from '../bitcoin/utilities/Relay'
 import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { setCloudBackupStatus } from '../store/actions/cloud'
+import { setOpenToApproval } from '../store/actions/BHR'
 import SecurityQuestion from './NewBHR/SecurityQuestion'
 import Toast from '../components/Toast'
+import SecuritySeedWord from './NewBHR/SecuritySeedWord'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -75,6 +78,10 @@ export default function Login( props ) {
   const [
     questionModal,
     showQuestionModal,
+  ] = useState( false )
+  const [
+    secuiritySeedWordModal,
+    showSecuiritySeedWordModal,
   ] = useState( false )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
@@ -129,6 +136,7 @@ export default function Login( props ) {
 
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    dispatch( setOpenToApproval( false, [], null ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
@@ -190,10 +198,10 @@ export default function Login( props ) {
         setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
-            'Your phone does not have any secure entry like Pin or Biometric',
+            'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'This may be a security risk to your funds on Hexa',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Hexa',
           )
           setElevation( 0 )
         }, 2 )
@@ -338,7 +346,7 @@ export default function Login( props ) {
       setTimeout( () => {
         // loaderBottomSheet.current.snapTo( 0 )
         setloaderModal( false )
-      }, 2 )
+      }, 300 )
 
       return (
         <View style={{
@@ -376,6 +384,28 @@ export default function Login( props ) {
       />
     )
   }, [ questionModal ] )
+
+  const renderSeedWordContent = useCallback( () => {
+    return (
+      <SecuritySeedWord
+        onClose={() => showSecuiritySeedWordModal( false )}
+        onPressConfirm={async () => {
+          Keyboard.dismiss()
+          showSecuiritySeedWordModal( false )
+          props.navigation.navigate( 'SettingGetNewPin', {
+            oldPasscode: '',
+            onPasscodeReset:onPasscodeReset
+          } )
+        }}
+        title="Enter your Seed Word Details"
+        title1="Forgot Passcode"
+        note="You will be prompted to change your passcode"
+        onPasscodeVerify={()=>{ showSecuiritySeedWordModal( true )  }}
+        showAnswer={false}
+      />
+    )
+  }, [ questionModal ] )
+
 
   useEffect( () => {
     if ( authenticationFailed && passcode ) {
@@ -611,7 +641,12 @@ export default function Login( props ) {
                       setErrorModal( true )
                       return
                     }
-                    showQuestionModal( true )
+                    if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
+                      // showSecuiritySeedWordModal( true )
+                      Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
+                    }else {
+                      showQuestionModal( true )
+                    }
                   }}>
                   <Text style={{
                     color: Colors.blue,
@@ -782,6 +817,9 @@ export default function Login( props ) {
       <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
         {renderSecurityQuestionContent()}
       </ModalContainer>
+      {/* <ModalContainer onBackground={()=>showSecuiritySeedWordModal( false )} visible={secuiritySeedWordModal} closeBottomSheet={() => {showSecuiritySeedWordModal( false )}} >
+        {renderSeedWordContent()}
+      </ModalContainer> */}
       {/* <BottomSheet
         onCloseEnd={() => {
           setElevation( 10 )

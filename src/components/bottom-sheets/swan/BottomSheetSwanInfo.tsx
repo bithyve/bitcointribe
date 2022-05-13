@@ -22,6 +22,7 @@ import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCre
 import { ListItem } from 'react-native-elements'
 import BottomInfoBox from '../../BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
+import Close from '../../../assets/images/svgs/close.svg';
 
 const swanAccountCount = 0
 
@@ -141,14 +142,16 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
             marginTop: wp( 3 ), marginRight: wp( 3 )
           }}
-        >
+          >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
             // marginTop: hp( 0.5 )
           }} />
         </TouchableOpacity> */}
         <View style={styles.successModalHeaderView}>
-
-          <Text style={styles.modalTitleText}>{swanTitle}</Text>
+            <TouchableOpacity style={{marginLeft: wp('86%')}} >
+              <Close  />
+            </TouchableOpacity>
+            <Text style={styles.modalTitleText}>{swanTitle}</Text>
 
           <Text style={{
             ...styles.modalInfoText,
@@ -214,6 +217,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     return ( <View style={{
       flexDirection: 'row', marginTop: 'auto', alignItems: 'flex-start'
     }} >
+     
       <AppBottomSheetTouchableWrapper
         disabled={hasButtonBeenPressed? true : false}
         onPress={()=> {

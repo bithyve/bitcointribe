@@ -58,6 +58,7 @@ export default function PersonalCopyShareModal( props ) {
   const dispatch = useDispatch()
 
   const onShare = async ( shareOption, isEmailOtherOptions ) => {
+    console.log( 'SHARE', shareOption, isEmailOtherOptions )
     dispatch( sharePDF( shareOption.type, isEmailOtherOptions ) )
     props.onPressShare()
   }
@@ -152,13 +153,13 @@ export default function PersonalCopyShareModal( props ) {
                 onPress={() => {
                   if( Platform.OS == 'ios' ) {
                     //( mailOptionsBottomSheet as any ).current.snapTo( 1 )
-                    if(item.type === 'Email'){              
+                    if( item.type === 'Email' ){
                       onShare( personalCopyShareOptions[ 0 ], false )
                       setIsShared( true )
-                    }else if(item.type === 'Other'){
+                    }else if( item.type === 'Other' ){
                       onShare( personalCopyShareOptions[ 0 ], true )
                       setIsShared( true )
-                    }else if(item.type === 'Print' ){
+                    }else if( item.type === 'Print' ){
                       onShare( item, false )
                       setIsShared( true )
                     }

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert } from 'react-native'
-import {  useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,7 +18,7 @@ import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountSelection from './AccountSelection'
 import { associateGift } from '../../store/actions/trustedContacts'
-import { resetStackToAccountDetails,  } from '../../navigation/actions/NavigationActions'
+import { resetStackToAccountDetails, } from '../../navigation/actions/NavigationActions'
 import AccountSelected from './AccountSelected'
 import GiftAddedModal from './GiftAddedModal'
 import { giftAccepted, refreshAccountShells } from '../../store/actions/accounts'
@@ -73,12 +73,12 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
       <TouchableOpacity
         onPress={() => {
 
-          if ( text === 'Confirm' ){
+          if ( text === 'Confirm' ) {
             // closeModal()
             setConfirmAccount( false )
             setGiftAddedModel( true )
             dispatch( associateGift( giftId, accId ) )
-          } else if( text === 'View Account' ) {
+          } else if ( text === 'View Account' ) {
             setGiftAddedModel( false )
             dispatch( giftAccepted( '' ) )
             closeModal()
@@ -111,7 +111,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
       {showAccounts &&
         <View style={styles.modalContentContainer}>
           <AccountSelection
-            onClose={(  ) => {
+            onClose={() => {
               setShowAccounts( false )
               onCancel()
             }}
@@ -130,7 +130,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
         <View style={styles.modalContentContainer}>
           <AccountSelected
             getTheme={getTheme}
-            onAccountChange={() => { setConfirmAccount( false ); setShowAccounts( true )}}
+            onAccountChange={() => { setConfirmAccount( false ); setShowAccounts( true ) }}
             sourcePrimarySubAccount={sourcePrimarySubAccount}
             sourceAccountHeadlineText={sourceAccountHeadlineText}
             spendableBalance={spendableBalance}
@@ -142,17 +142,18 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
         </View>
       }
       {giftAddedModal &&
-      <View style={styles.modalContentContainer}>
-        <GiftAddedModal
-          getTheme={getTheme}
-          sourcePrimarySubAccount={sourcePrimarySubAccount}
-          sourceAccountHeadlineText={sourceAccountHeadlineText}
-          renderButton={renderButton}
-          formattedUnitText={formattedUnitText}
-          spendableBalance={spendableBalance}
-          onCancel={onCancel}
-        />
-      </View>
+        <View style={styles.modalContentContainer}>
+          <GiftAddedModal
+            getTheme={getTheme}
+            sourcePrimarySubAccount={sourcePrimarySubAccount}
+            sourceAccountHeadlineText={sourceAccountHeadlineText}
+            renderButton={renderButton}
+            formattedUnitText={formattedUnitText}
+            spendableBalance={spendableBalance}
+            onCancel={onCancel}
+            navigation={navigation}
+          />
+        </View>
       }
     </>
   )
