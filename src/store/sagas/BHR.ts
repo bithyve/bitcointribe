@@ -592,16 +592,9 @@ function* recoverWalletWorker( { payload } ) {
         secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
         primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
       }
-
-      // console.log( 'skk primaryMnemonic frist', primaryMnemonic )
       if( !primaryMnemonic ) throw new Error( 'Failed to generate primary mnemonic' )
-
-      // console.log( 'skk primaryMnemonic', primaryMnemonic )
       primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
-      // console.log( 'skk primarySeed', primarySeed )
       walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
-      // console.log( 'skk walletId', walletId )
-
       if( !image ){
         const getWI = yield call( BHROperations.fetchWalletImage, walletId )
         if( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
@@ -609,23 +602,17 @@ function* recoverWalletWorker( { payload } ) {
       }
     }
 
-    // console.log( 'skk inlllll', image )
     const accounts = image.accounts
     const acc: Account[] = []
     const accountData = {
     }
 
     if( !primarySeed ) primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
-    // console.log( 'skk primarySeed12', primarySeed )
     const decryptionKey = primarySeed.toString( 'hex' )
-    // console.log( 'skk decryptionKey', decryptionKey )
     Object.keys( accounts ).forEach( ( key ) => {
-      // console.log( 'skk key', key )
       // console.log( 'skk accounts', accounts )
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
-      // console.log( 'skk decryptedData', decryptedData )
       const account: Account | MultiSigAccount = JSON.parse( decryptedData )
-      // console.log( 'skk account', account )
       accountData[ account.type ] = account.id
       // console.log( 'skk accountData', accountData )
 
@@ -636,18 +623,13 @@ function* recoverWalletWorker( { payload } ) {
           }
         }
       }
-      // console.log( 'skk last' )
-
       acc.push( account )
     } )
 
-    // console.log( 'skk inlllll12' )
     let secondaryXpub, details2FA
     if( image.details2FA ){
       const decryptedData = BHROperations.decryptWithAnswer( image.details2FA, decryptionKey ).decryptedData
-      // console.log( 'skk inlllll133', decryptedData )
       const decrypted2FADetails = JSON.parse( decryptedData )
-      // console.log( 'skk inlllll1344' )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
       if( details2FA && details2FA.twoFAValidated ) yield put( twoFAValid( true ) )
@@ -659,8 +641,6 @@ function* recoverWalletWorker( { payload } ) {
     }
 
     const appVersion = DeviceInfo.getVersion()
-
-    // console.log( 'skk primary seed', primarySeed )
     // RESTORE: Wallet
     const wallet: Wallet = {
       walletId: image.walletId,
@@ -1941,10 +1921,6 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     const levelHealthState: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const currentLevelState: number = yield select( ( state ) => state.bhr.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.bhr.keeperInfo ) ]
-    // console.log( 'skk keeperinfo previous', JSON.stringify( keeperInfo ) )
-    // console.log( 'skk payload previous', JSON.stringify( ss ) )
-    // console.log( 'skk payload previous', JSON.stringify( currentLevelState ) )
-    // console.log( 'skk abc previous', JSON.stringify( ss && ss.payload.levelHealth ? ss.payload.levelHealth : levelHealthState ) )
     // return
     let levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
@@ -1998,7 +1974,6 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
       else if( keeperInfo[ i ].scheme == ShareSplitScheme.TwoOfThree ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
       else if( keeperInfo[ i ].scheme == ShareSplitScheme.ThreeOfFive ) keeperInfo[ i ].currentLevel = currentLevel ? currentLevel : currentLevelState
     }
-    // console.log( 'skk keeperinfo', JSON.stringify( keeperInfo ) )
     yield put( putKeeperInfo( keeperInfo ) )
     yield put( updateHealth( levelHealthVar, currentLevel ? currentLevel : currentLevelState, 'modifyLevelDataWatcher' ) )
     const levelDataUpdated = getLevelInfoStatus( levelData, ss && ss.payload.currentLevel ? ss.payload.currentLevel : currentLevelState, keeperInfo )

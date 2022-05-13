@@ -127,8 +127,6 @@ function* cloudWorker( { payload } ) {
         } ),
         timeout: delay( 60000 )
       } )
-      // console.log( 'skk isCloudBackupCompleted response', response )
-      // console.log( 'skk timeout', timeout )
       // console.log( 'skk response?.status', response?.status )
       if ( !timeout ){
         const isCloudBackupCompleted =  Platform.OS == 'ios' ? response?.status : response
@@ -314,18 +312,15 @@ function* getCloudBackupRecoveryWorker () {
         }
       }
     } else {
-      // console.log( 'skk getcloud backup inside1' )
       const checkDataIsBackedup = true
       yield call ( GoogleDriveLoginWorker, {
         payload: {
           checkDataIsBackedup
         }
       } )
-      // console.log( 'skk getcloud backup inside12' )
     }
   } catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-    // console.log( 'skk getcloud backup inside13' )
     throw new Error( error )
   }
 }

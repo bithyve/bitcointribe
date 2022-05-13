@@ -164,10 +164,6 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
   }, [])
 
   useEffect(() => {
-    // console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
-    // console.log( 'skk setupPasswordStatus', JSON.stringify( setupPasswordStatus ) )
-    // console.log( 'skk ischange', JSON.stringify( isChange ) )
-    // console.log( 'skk true', JSON.stringify( isChange ) )
     // if ( !isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].shareType == 'securityQuestion' ) {
     if (!isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !== 'notSetup' ) {
       setLoaderModal(false)
