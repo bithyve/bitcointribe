@@ -238,7 +238,12 @@ function* generateLevel1SharesWorker( { payload } ){
   const { level, version } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const existingMetaShares: MetaShare[] = yield select( ( state ) => state.storage.wallet )
-  const { shares } = BHROperations.generateLevel1Shares( wallet.primaryMnemonic )
+
+  const dbWallet =  dbManager.getWallet()
+  const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+  const primaryMnemonic = walletObj.primaryMnemonic
+  const { shares } = BHROperations.generateLevel1Shares( primaryMnemonic )
+
   const { encryptedPrimarySecrets } = BHROperations.encryptShares( shares, wallet.security.answer )
   const { metaShares } = BHROperations.createMetaSharesKeeper( wallet.walletId, encryptedPrimarySecrets, existingMetaShares, wallet.walletName, wallet.security.questionId, version, wallet.security.question, level )
   if ( metaShares ) {
@@ -482,6 +487,7 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedData
     const secondaryMnemonics = selectedBackup.secondaryShare ? BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedData : ''
     const image: NewWalletImage = icloudData
+    // console.log( 'skk wallet====>' +  image )
     yield call( recoverWalletWorker, {
       payload: {
         level: selectedBackup.levelStatus, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics
@@ -515,8 +521,10 @@ function* recoverWalletWithoutIcloudWorker( { payload } ) {
       keeperData: JSON.stringify( backupData.keeperInfo ),
     }
     const primaryMnemonic = backupData.primaryMnemonicShard.encryptedShare.pmShare
+
     const secondaryMnemonics = ''
     const image = yield call( BHROperations.fetchWalletImage, backupData.primaryMnemonicShard.meta.walletId )
+    console.log( image )
     yield call( recoverWalletWorker, {
       payload: {
         level: selectedBackup.levelStatus, answer, selectedBackup, image: image.data.walletImage, primaryMnemonic, secondaryMnemonics, isWithoutCloud: true
@@ -585,10 +593,14 @@ function* recoverWalletWorker( { payload } ) {
         primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
       }
 
+      // console.log( 'skk primaryMnemonic frist', primaryMnemonic )
       if( !primaryMnemonic ) throw new Error( 'Failed to generate primary mnemonic' )
 
+      // console.log( 'skk primaryMnemonic', primaryMnemonic )
       primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+      // console.log( 'skk primarySeed', primarySeed )
       walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
+      // console.log( 'skk walletId', walletId )
 
       if( !image ){
         const getWI = yield call( BHROperations.fetchWalletImage, walletId )
@@ -597,17 +609,25 @@ function* recoverWalletWorker( { payload } ) {
       }
     }
 
+    // console.log( 'skk inlllll', image )
     const accounts = image.accounts
     const acc: Account[] = []
     const accountData = {
     }
 
     if( !primarySeed ) primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+    // console.log( 'skk primarySeed12', primarySeed )
     const decryptionKey = primarySeed.toString( 'hex' )
+    // console.log( 'skk decryptionKey', decryptionKey )
     Object.keys( accounts ).forEach( ( key ) => {
+      // console.log( 'skk key', key )
+      // console.log( 'skk accounts', accounts )
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
+      // console.log( 'skk decryptedData', decryptedData )
       const account: Account | MultiSigAccount = JSON.parse( decryptedData )
+      // console.log( 'skk account', account )
       accountData[ account.type ] = account.id
+      // console.log( 'skk accountData', accountData )
 
       if( [ AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( account.type ) ){ // patch: fixes multisig account restore, being restored from a missing 2FA-flag backup(version < 2.0.69)
         if( ( account as MultiSigAccount ).xpubs && ( account as MultiSigAccount ).xpubs.secondary ){ // level-2 activated multisig account found
@@ -616,14 +636,18 @@ function* recoverWalletWorker( { payload } ) {
           }
         }
       }
+      // console.log( 'skk last' )
 
       acc.push( account )
     } )
 
+    // console.log( 'skk inlllll12' )
     let secondaryXpub, details2FA
     if( image.details2FA ){
       const decryptedData = BHROperations.decryptWithAnswer( image.details2FA, decryptionKey ).decryptedData
+      // console.log( 'skk inlllll133', decryptedData )
       const decrypted2FADetails = JSON.parse( decryptedData )
+      // console.log( 'skk inlllll1344' )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
       if( details2FA && details2FA.twoFAValidated ) yield put( twoFAValid( true ) )
@@ -636,6 +660,7 @@ function* recoverWalletWorker( { payload } ) {
 
     const appVersion = DeviceInfo.getVersion()
 
+    // console.log( 'skk primary seed', primarySeed )
     // RESTORE: Wallet
     const wallet: Wallet = {
       walletId: image.walletId,
@@ -728,7 +753,7 @@ function* recoverWalletWorker( { payload } ) {
         storedVersion: backupVersion, newVersion: appVersion
       } )
   } catch ( err ) {
-    console.log( err )
+    console.log( 'Error', err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )
   }
@@ -859,7 +884,12 @@ function* updateWalletImageWorker( { payload } ) {
     userName: wallet.userName ? wallet.userName : '',
     version: wallet.version,
   }
-  const encryptionKey = bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' )
+
+  const dbWallet =  dbManager.getWallet()
+  const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+  const primaryMnemonic = walletObj.primaryMnemonic
+  const encryptionKey = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
+
   if( updateSmShare ) {
     walletImage.SM_share = BHROperations.encryptWithAnswer( wallet.smShare, encryptionKey ).encryptedData
   }
@@ -1597,6 +1627,11 @@ function* createChannelAssetsWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     const { shareId } = payload
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+
+    const dbWallet =  dbManager.getWallet()
+    const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+    const primaryMnemonic = walletObj.primaryMnemonic
+
     const {
       metaSharesKeeper,
       oldMetaSharesKeeper,
@@ -1639,7 +1674,7 @@ function* createChannelAssetsWorker( { payload } ) {
           scheme: ShareSplitScheme.OneOfOne,
         },
         encryptedShare: {
-          pmShare: wallet.primaryMnemonic
+          pmShare: primaryMnemonic
         }
       }
     } else {
@@ -2411,7 +2446,7 @@ function* updateSeedHealthWorker( ) {
   const currentTS = moment( new Date() ).valueOf()
   const randomIdForSeed = generateRandomString( 8 )
 
-  let channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
+  const channelKeyToUse = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
 
   const keeperInfo: KeeperInfoInterface = {
     shareId: randomIdForSeed,
