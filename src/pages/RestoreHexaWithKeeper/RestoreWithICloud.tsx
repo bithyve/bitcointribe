@@ -821,8 +821,7 @@ class RestoreWithICloud extends Component<
       <RestoreFromICloud
         title={`${strings[ 'Recoverfrom' ]} ${Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'}`}
         subText= {
-          // formatString( 'Clickingon', Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
-          'Clickingon'+ Platform.OS == 'ios'  ? 'iCloud' : 'GDrive'
+          formatString( strings.Clickingon,  Platform.OS == 'ios'  ? 'iCloud' : 'GDrive' )
         }
         cardInfo={strings[ 'RestoringWalletfrom' ]}
         cardTitle={selectedBackup && selectedBackup.walletName ? selectedBackup.walletName : ''}

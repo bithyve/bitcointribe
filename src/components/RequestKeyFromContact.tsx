@@ -354,7 +354,7 @@ function RequestKeyFromContact( props ) {
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
               <QRCode
-                title={props.isGift ? 'Bitcoin Address' : props.isKeeper ? 'Keeper request' : 'F&F request'}
+                title={props.isGift ? 'Bitcoin Address' : props.isKeeper ? 'Keeper request' : 'Bitcoin Address'}
                 value={props.link}
                 size={hp( '27%' )} />
             )}
