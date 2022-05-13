@@ -495,7 +495,6 @@ export default function ManageBackup( props ) {
         return
       }
     }
-    // console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
     if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       dispatch( setLevelCompletionError( strings[ 'PleaseSetPasswordTitle' ], strings[ 'PleaseSetPasswordInfo' ], LevelStatus.FAILED ) )
       return

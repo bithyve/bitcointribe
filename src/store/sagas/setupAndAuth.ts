@@ -26,7 +26,7 @@ import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswor
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet, WalletDB } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
@@ -44,7 +44,18 @@ function* setupWalletWorker( { payload } ) {
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 
-  const wallet: Wallet = {
+  // const wallet: Wallet = {
+  //   walletId,
+  //   walletName,
+  //   userName: walletName,
+  //   security,
+  //   primaryMnemonic,
+  //   primarySeed: primarySeed.toString( 'hex' ),
+  //   accounts: {
+  //   },
+  //   version: DeviceInfo.getVersion()
+  // }
+  const walletDB: Wallet = {
     walletId,
     walletName,
     userName: walletName,
@@ -55,10 +66,20 @@ function* setupWalletWorker( { payload } ) {
     },
     version: DeviceInfo.getVersion()
   }
-
+  const wallet: Wallet = {
+    walletId,
+    walletName,
+    userName: walletName,
+    security,
+    // primaryMnemonic: '',
+    // primarySeed: '',
+    accounts: {
+    },
+    version: DeviceInfo.getVersion()
+  }
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
-  yield call( dbManager.createWallet, wallet )
+  yield call( dbManager.createWallet, walletDB )
   // prepare default accounts for the wallet
 
   const accountsInfo: newAccountsInfo[] = []

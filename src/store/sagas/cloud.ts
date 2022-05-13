@@ -68,6 +68,10 @@ function* cloudWorker( { payload } ) {
       const wallet: Wallet = yield select(
         ( state ) => state.storage.wallet
       )
+
+      const dbWallet =  dbManager.getWallet()
+      const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+      const primaryMnemonic = walletObj.primaryMnemonic
       const accountShells = yield select( ( state ) => state.accounts.accountShells )
       // const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
       const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
@@ -87,7 +91,8 @@ function* cloudWorker( { payload } ) {
       const accounts: Accounts = yield select( state => state.accounts.accounts )
 
       const encKey = BHROperations.getDerivedKey(
-        bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' ),
+        walletObj.primarySeed
+        // bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' ),
       )
 
       encryptedCloudDataJson = yield call( WIEncryption, accounts, encKey, trustedContacts, wallet,
@@ -100,7 +105,7 @@ function* cloudWorker( { payload } ) {
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
       let encryptedSeed = ''
       if( !shares ){
-        const { encryptedData } = BHROperations.encryptWithAnswer( wallet.primaryMnemonic, wallet.security.answer )
+        const { encryptedData } = BHROperations.encryptWithAnswer( primaryMnemonic, wallet.security.answer )
         encryptedSeed = encryptedData
       }
       const data = {
@@ -123,8 +128,6 @@ function* cloudWorker( { payload } ) {
         } ),
         timeout: delay( 60000 )
       } )
-      // console.log( 'skk isCloudBackupCompleted response', response )
-      // console.log( 'skk timeout', timeout )
       // console.log( 'skk response?.status', response?.status )
       if ( !timeout ){
         const isCloudBackupCompleted =  Platform.OS == 'ios' ? response?.status : response
@@ -310,18 +313,15 @@ function* getCloudBackupRecoveryWorker () {
         }
       }
     } else {
-      // console.log( 'skk getcloud backup inside1' )
       const checkDataIsBackedup = true
       yield call ( GoogleDriveLoginWorker, {
         payload: {
           checkDataIsBackedup
         }
       } )
-      // console.log( 'skk getcloud backup inside12' )
     }
   } catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-    // console.log( 'skk getcloud backup inside13' )
     throw new Error( error )
   }
 }

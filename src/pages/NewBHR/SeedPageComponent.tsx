@@ -23,6 +23,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
+import dbManager from '../../storage/realm/dbManager'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -33,7 +34,10 @@ const SeedPageComponent = ( props ) => {
   const SelectOption = ( Id ) => {
   }
 
-  const seed = wallet.primaryMnemonic.split( ' ' )
+  const dbWallet =  dbManager.getWallet()
+  const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+  const primaryMnemonic = walletObj.primaryMnemonic
+  const seed = primaryMnemonic.split( ' ' )
   const seedData = seed.map( ( word, index ) => {
     return {
       name: word, id: ( index+1 )
