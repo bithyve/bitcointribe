@@ -254,9 +254,13 @@ const AppInfo = ( props ) => {
               <View style={{
                 justifyContent: 'center', marginLeft: 10
               }}>
-                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
-                <TouchableOpacity style={{padding:5,zIndex:1}}><Options/></TouchableOpacity>
+                <View style={{
+                  flexDirection:'row', alignItems:'center', justifyContent:'space-between'
+                }}>
+                  <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
+                  <TouchableOpacity style={{
+                    padding:5, zIndex:1
+                  }}><Options/></TouchableOpacity>
                 </View>
                 <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
               </View>

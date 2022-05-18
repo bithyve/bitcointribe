@@ -13,6 +13,7 @@ import { translations } from '../../../common/content/LocContext'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -60,27 +61,34 @@ const AddNewAccountStack = createStackNavigator(
         title: 'Setup Swan Account'
       }
     },
-
     AddNewDonationAccountDetails: {
       screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {
-        title: 'Setup Donation Account'
+        header: null,
+        // title: 'Setup Donation Account'
       }
     },
 
-    EnterNodeConfig: {
-      screen: EnterNodeConfig,
+    // EnterNodeConfig: {
+    //   screen: EnterNodeConfig,
+    //   navigationOptions: {
+    //     header: null
+    //   }
+    // },
+
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
       navigationOptions: {
-        header: null
-      }
+        title: 'TransactionDetails',
+      },
     },
 
-    ScanNodeConfig: {
-      screen: ScanNodeConfig,
-      navigationOptions: {
-        header: null
-      }
-    },
+    // ScanNodeConfig: {
+    //   screen: ScanNodeConfig,
+    //   navigationOptions: {
+    //     header: null
+    //   }
+    // },
   },
   {
     initialRouteName: 'AccountSelectionList',

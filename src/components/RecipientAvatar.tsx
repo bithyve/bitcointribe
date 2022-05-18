@@ -50,7 +50,7 @@ const RecipientAvatar: React.FC<Props> = ( {
           }}
         >
           {nameToInitials(
-            recipient.kind == RecipientKind.ADDRESS ? '@' : ( recipient.displayedName ? recipient.displayedName : recipient.contactName || '' )
+            recipient.kind == RecipientKind.ADDRESS ? 'External Address' : ( recipient.displayedName ? recipient.displayedName : recipient.contactName || '' )
           )}
         </Text>
       </View>

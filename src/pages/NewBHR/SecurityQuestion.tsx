@@ -68,7 +68,7 @@ function SecurityQuestion( props ) {
         }
         return
       }
-      setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
+      setErrorText( security && security.questionId == '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
     } else {
       setErrorText( '' )
     }
@@ -273,7 +273,7 @@ function SecurityQuestion( props ) {
                 //   setErrorText( stringsLogin.Answersmust )
                 // }
               } else {
-                setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
+                setErrorText( security && security.questionId == '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
               }
               setIsDisabled( false )
             }}

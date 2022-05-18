@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import {  useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -17,28 +17,32 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 
 
 export type Props = {
-    sourcePrimarySubAccount: any;
+  sourcePrimarySubAccount: any;
   sourceAccountHeadlineText: any;
   renderButton: ( text ) => void;
   getTheme: () => void;
   spendableBalance: number;
   formattedUnitText: string;
   onCancel: () => void;
+  navigation: any
 };
 
 
-export default function GiftAddedModal( { onCancel, formattedUnitText, renderButton, spendableBalance, sourcePrimarySubAccount, sourceAccountHeadlineText }: Props ) {
+export default function GiftAddedModal( { onCancel, formattedUnitText, renderButton, spendableBalance, sourcePrimarySubAccount, sourceAccountHeadlineText, navigation }: Props ) {
 
-  return(
+  return (
     <>
       <View style={{
         marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
       }}>
-        <Illustration/>
+        <Illustration />
       </View>
       <TouchableOpacity
         activeOpacity={1}
-        onPress={() => {onCancel() }}
+        onPress={() => {
+          onCancel()
+          navigation.goBack()
+        }}
         style={{
           width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
           alignSelf: 'flex-end',
@@ -46,7 +50,7 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
           marginTop: wp( 3 ), marginRight: wp( 3 )
         }}
       >
-        <FontAwesome name="close" color={Colors.white} size={19}/>
+        <FontAwesome name="close" color={Colors.white} size={19} />
       </TouchableOpacity>
       {/* <View> */}
       <View style={{
@@ -87,7 +91,7 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
             fontSize: RFValue( 10 ),
             fontFamily: Fonts.FiraSansRegular,
           }}>
-              Bitcoin will be transferred to
+            Bitcoin will be transferred to
           </Text>
           <Text
             style={{
@@ -100,7 +104,7 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
             {sourceAccountHeadlineText}
           </Text>
           <Text style={styles.availableToSpendText}>
-              Balance
+            Balance
             <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
           </Text>
         </View>

@@ -32,6 +32,9 @@ export function generateTrustedContact(
     contactsSecondaryChannelKey,
     isActive: true,
     hasNewData: true,
+    timestamps: {
+      created: Date.now(),
+    }
   }
 
   return newContact

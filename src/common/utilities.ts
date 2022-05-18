@@ -1,3 +1,4 @@
+import idx from 'idx'
 import { Platform } from 'react-native'
 import { KeeperInfoInterface, LevelData, LevelDataObj, LevelHealthInterface, LevelInfo, Trusted_Contacts } from '../bitcoin/utilities/Interface'
 import { makeContactRecipientDescription } from '../utils/sending/RecipientFactories'
@@ -102,14 +103,22 @@ export const checkLevelHealth = (
           const element0 = elements0[ j ] ? elements0[ j ] : null
           const element1 = elements1[ j ]
           levelData[ j ].keeper1 = element0 && element0[ 0 ] ? element0[ 0 ] : levelData[ j ].keeper1
-          if( j == 0 && ( elements1.length == 2 && elements1[ 1 ][ 0 ].updatedAt > 0 && elements1[ 1 ][ 1 ].updatedAt > 0 ) || ( elements1.length == 3 && elements1[ 1 ][ 0 ].updatedAt > 0 && elements1[ 1 ][ 1 ].updatedAt > 0 && elements1[ 2 ][ 0 ].updatedAt > 0 && levelInfo1[ 2 ][ 1 ].updatedAt > 0 ) ) {
+          const element1_10 = idx( elements1, ( _ ) => _[ 1 ][ 0 ] )
+          const element1_11 = idx( elements1, ( _ ) => _[ 1 ][ 1 ] )
+          const element1_20 = idx( elements1, ( _ ) => _[ 2 ][ 0 ] )
+          const levelInfo1_21 = idx( levelInfo1, ( _ ) => _[ 2 ][ 1 ] )
+
+          if( j == 0 && ( elements1.length == 2 && element1_10?.updatedAt > 0 && element1_11?.updatedAt > 0 ) || ( elements1.length == 3 && element1_10?.updatedAt > 0 && element1_11?.updatedAt > 0 && element1_20?.updatedAt > 0 && levelInfo1_21?.updatedAt > 0 ) ) {
+            const element1_01 = idx( elements1, ( _ ) => _[ 0 ][ 1 ] )
+            const element0_01 = idx( elements0, ( _ ) => _[ 0 ][ 1 ] )
+
             const object: LevelDataObj = {
-              shareId: elements1[ 0 ][ 1 ].shareId,
-              name: elements1[ 0 ][ 1 ].name,
-              updatedAt: elements0[ 0 ][ 1 ].updatedAt,
+              shareId: element1_01?.shareId,
+              name: element1_01?.name,
+              updatedAt: element0_01?.updatedAt,
               status: 'notAccessible',
-              shareType: elements1[ 0 ][ 1 ].shareType,
-              reshareVersion: elements1[ 0 ][ 1 ].reshareVersion
+              shareType: element1_01?.shareType,
+              reshareVersion: element1_01?.reshareVersion
             }
             levelData[ 0 ].keeper2 = levelInfo1[ 1 ] ? object : levelData[ j ].keeper2
           } else {
@@ -178,7 +187,7 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
   return levelHealthVar
 }
 
-export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
+export const getLevelInfoStatus = ( levelDataTemp, currentLevel, keeperInfo ) => {
   const levelData: LevelData[] = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
@@ -195,8 +204,14 @@ export const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
 
     const displayName1 = element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.displayedName ? element.keeper1.data.displayedName : ''
     const displayName2 = element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.displayedName ? element.keeper2.data.displayedName : ''
-    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name ? element.keeper1.name : i == 0 && !element.keeper1.name ? 'Set Password' : ''
+    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name ? element.keeper1.name : i == 0 && !element.keeper1.name ? 'Seed word' : ''
+    // levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name ? element.keeper1.name : i == 0 && !element.keeper1.name ? 'Set Password' : ''
     levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : element.keeper2.name ? element.keeper2.name : i == 0 && !element.keeper2.name ? Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive' : ''
+
+    if( i == 0 && keeperInfo && keeperInfo.length >= 2 && keeperInfo[ 1 ].type != null && keeperInfo[ 1 ].type != '' &&
+      keeperInfo[ 1 ].type != element.keeper2.shareType ){
+      levelData[ i ].keeper2.shareType = keeperInfo[ 1 ].type
+    }
   }
   return levelData
 }

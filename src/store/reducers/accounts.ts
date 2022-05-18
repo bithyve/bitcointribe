@@ -104,7 +104,7 @@ export type AccountsState = {
   resetTwoFALoader: boolean;
 };
 
-const initialState: AccountsState = {
+export const initialState: AccountsState = {
   accountsSynched: false,
   exchangeRates: null,
 
