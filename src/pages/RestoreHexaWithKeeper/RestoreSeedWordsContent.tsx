@@ -26,10 +26,13 @@ import { Wallet } from '../../bitcoin/utilities/Interface'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import LoaderModal from '../../components/LoaderModal'
 import { translations } from '../../common/content/LocContext'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import { NavigationContext } from 'react-navigation'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ showSeedError, setShowSeedError ]= useState(false)
   const [ showLoader, setShowLoader ] = useState( false )
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ seedRecovered, setSeedRecovered ] = useState( false )
@@ -56,13 +59,25 @@ const RestoreSeedWordsContent = ( props ) => {
     }
   }, [ wallet ] )
 
+  const renderSeedErrorModal = () =>{
+    return(
+      <ErrorModalContents
+        title='Invalid Seed'
+        info='Please recheck your seeds and try again'
+        proceedButtonText={'Go back'}
+        onPressProceed={() =>  props.navigation.goBack()}
+      />
+    )
+  }
+
   const recoverWalletViaSeed = ( mnemonic: string ) => {
     setShowLoader( true )
     setTimeout( () => {
       const isValidMnemonic = bip39.validateMnemonic( mnemonic )
       if( !isValidMnemonic ){
         setShowLoader( false )
-        Alert.alert( 'Invalid mnemonic, try again!' )
+        setShowSeedError( true )
+        // Alert.alert( 'Invalid mnemonic, try again!' )
         return
       }
       setShowLoader( false )
@@ -129,6 +144,9 @@ const RestoreSeedWordsContent = ( props ) => {
           previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
         />
+        <ModalContainer visible={(showSeedError)} onBackground={()=> setShowSeedError}>
+          {renderSeedErrorModal()}
+        </ModalContainer>
       </View>
       <ModalContainer onBackground={onBackgroundOfLoader} visible={loaderModal} closeBottomSheet={() => {}} >
         <LoaderModal
