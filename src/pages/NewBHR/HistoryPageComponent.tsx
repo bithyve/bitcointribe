@@ -84,7 +84,7 @@ const HistoryPageComponent = ( props ) => {
               )
             } )}
           </ScrollView>
-          {props.data.length <= 1 || props.infoBoxTitle == ( Platform.OS == 'ios' ? strings.BackupHistory : strings.BackupHistorydrive ) && (
+          {props.data.length <= 1 || props.infoBoxTitle == ( Platform.OS == 'ios' ? strings.BackupHistory : strings.BackupHistorydrive ) && !props.showSeedHistoryNote && (
             <BottomInfoBox
               backgroundColor={Colors.white}
               title={
@@ -114,6 +114,7 @@ const HistoryPageComponent = ( props ) => {
               )
             } )}
           </ScrollView> */}
+          { !props.showSeedHistoryNote &&
           <View style={{
             backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
           }}>
@@ -127,8 +128,29 @@ const HistoryPageComponent = ( props ) => {
               }
             />
           </View>
-        </View>
-      )}
+          }
+        </View> )}
+      {props.showSecurityPassword ?
+        <TouchableOpacity
+          style={[ styles.successModalButtonView, {
+            marginLeft: wp( '8%' ),
+            marginBottom: -wp( '5%' ),
+            alignSelf:'flex-start',
+          } ]}
+          delayPressIn={0}
+          onPress={() => props.onEncryptionPasswordClick()}
+        >
+          <Text
+            style={[ styles.proceedButtonText, {
+              fontSize: RFValue( 12 ),
+              // fontFamily: Fonts.FiraSansRegular,
+              color: Colors.white,
+            } ]}
+          >
+            Encryption Password
+          </Text>
+        </TouchableOpacity>
+        : null}
       {props.showButton ? <View>
         {props.onConfirm ?
           <TouchableOpacity

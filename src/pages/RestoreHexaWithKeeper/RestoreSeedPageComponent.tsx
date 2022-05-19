@@ -231,7 +231,7 @@ const RestoreSeedPageComponent = ( props ) => {
                           // }
                           onChangeText={( text ) => {
                             const data = [ ...partialSeedData ]
-                            data[ currentPosition ][ index ].name = text
+                            data[ currentPosition ][ index ].name = text.trim()
                             setPartialSeedData( data )
                           }}
                         />
@@ -251,7 +251,7 @@ const RestoreSeedPageComponent = ( props ) => {
           <View style={{
             flex: 1
           }}>
-            <View style={{
+            {/* <View style={{
               backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
             }}>
               <BottomInfoBox
@@ -259,7 +259,7 @@ const RestoreSeedPageComponent = ( props ) => {
                 title={props.infoBoxTitle}
                 infoText={props.infoBoxInfo}
               />
-            </View>
+            </View> */}
           </View>
         )}
       {props.showButton ? <View>

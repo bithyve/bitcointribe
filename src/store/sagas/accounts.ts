@@ -920,7 +920,10 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
 
 export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number ) {
   const wallet: Wallet = yield select( state => state.storage.wallet )
-  const { walletId, primarySeed, accounts } = wallet
+  const { walletId, accounts } = wallet
+  const dbWallet =  dbManager.getWallet()
+  const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+  const primarySeed = walletObj.primarySeed
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
   switch ( accountType ) {

@@ -485,7 +485,7 @@ export default function PasscodeConfirm( props ) {
           <View style={{ marginTop: 20 }}>
             <BottomInfoBox
               backgroundColor={Colors.white}
-              title={'Note'}
+              title={''}
               infoText={'Make sure you remember the passcode and backup your wallet. If you forget your passcode, you can access your wallet only by restoring it'}
             />
           </View>

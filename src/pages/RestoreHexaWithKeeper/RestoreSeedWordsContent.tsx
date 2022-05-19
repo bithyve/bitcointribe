@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, createRef } from 'react'
 import {
   View,
@@ -23,6 +24,8 @@ import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import LoaderModal from '../../components/LoaderModal'
+import { translations } from '../../common/content/LocContext'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { NavigationContext } from 'react-navigation'
 
@@ -31,10 +34,23 @@ const RestoreSeedWordsContent = ( props ) => {
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const [ showSeedError, setShowSeedError ]= useState(false)
   const [ showLoader, setShowLoader ] = useState( false )
+  const [ loaderModal, setLoaderModal ] = useState( false )
+  const [ seedRecovered, setSeedRecovered ] = useState( false )
+  const loaderMessage = {
+    heading: translations[ 'bhr' ].Creatingyourwallet,
+    text: translations[ 'bhr' ].Thismaytake
+  }
+  const subPoints = [
+    translations[ 'bhr' ].Settingupmultipleaccounts,
+    translations[ 'bhr' ].Preloading,
+  ]
+  const  bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
+
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
 
   useEffect( () => {
+    setLoaderModal( false )
     if( wallet ){
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
@@ -56,18 +72,29 @@ const RestoreSeedWordsContent = ( props ) => {
 
   const recoverWalletViaSeed = ( mnemonic: string ) => {
     setShowLoader( true )
-    const isValidMnemonic = bip39.validateMnemonic( mnemonic )
-    if( !isValidMnemonic ){
+    setTimeout( () => {
+      const isValidMnemonic = bip39.validateMnemonic( mnemonic )
+      if( !isValidMnemonic ){
+        setShowLoader( false )
+        setShowSeedError( true )
+        // Alert.alert( 'Invalid mnemonic, try again!' )
+        return
+      }
       setShowLoader( false )
-      setShowSeedError( true )
-      // Alert.alert( 'Invalid mnemonic, try again!' )
-
-      return
-    }
-    dispatch( recoverWalletUsingMnemonic( mnemonic ) )
-    setShowLoader( false )
+      setLoaderModal ( true )
+      setTimeout( () => {
+        dispatch( recoverWalletUsingMnemonic( mnemonic ) )
+      }, 500 )
+    }, 1000 )
   }
-
+  const onBackgroundOfLoader = () => {
+    setLoaderModal( false )
+    if ( seedRecovered )
+      setTimeout( () => {
+        console.log( 'TIMEOUT' )
+        setLoaderModal( true )
+      }, 1000 )
+  }
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -121,6 +148,13 @@ const RestoreSeedWordsContent = ( props ) => {
           {renderSeedErrorModal()}
         </ModalContainer>
       </View>
+      <ModalContainer onBackground={onBackgroundOfLoader} visible={loaderModal} closeBottomSheet={() => {}} >
+        <LoaderModal
+          headerText={loaderMessage.heading}
+          messageText={loaderMessage.text}
+          subPoints={subPoints}
+          bottomText={bottomTextMessage} />
+      </ModalContainer>
     </View>
   )
 }

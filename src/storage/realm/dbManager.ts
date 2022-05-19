@@ -355,6 +355,19 @@ const getSecondaryMnemonicShare = () => {
   return ( wallets[ 0 ] as any ).smShare
 }
 
+const getWallet = () => {
+  try {
+    // deprecated(to be only used by upgrade script)
+    const walletsRef = db.objects( schema.Wallet )
+    // console.log( 'walletsRef', walletsRef )
+    const wallets = Array.from( walletsRef )
+    // console.log( 'wallets', wallets )
+    return ( wallets[ 0 ] as any )
+  } catch ( error ) {
+    console.log( 'err', error )
+  }
+}
+
 export default {
   initDb,
   createWallet,
@@ -372,4 +385,5 @@ export default {
   updateGift,
   getMetaShares,
   getSecondaryMnemonicShare,
+  getWallet
 }
