@@ -236,6 +236,7 @@ const CloudBackupHistory = ( props ) => {
         channelKey: selectedKeeper.channelKey
       },
       index: changeIndex,
+      selectedLevelId: props.navigation.getParam( 'selectedLevelId' )
     }
     if ( type == 'contact' ) {
       props.navigation.goBack()
@@ -252,6 +253,12 @@ const CloudBackupHistory = ( props ) => {
     }
     if ( type == 'pdf' ) {
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
+    if ( type == 'seed' ) {
+      props.navigation.navigate( 'SeedBackupHistory', {
         ...navigationParams,
         isChangeKeeperType: true,
       } )
@@ -302,11 +309,12 @@ const CloudBackupHistory = ( props ) => {
           onPressChange={() => setKeeperTypeModal( true )}
           showButton={showButton}
           changeButtonText={'Change'}
-          // isChangeKeeperAllow={true}
+          isChangeKeeperAllow={true}
           // showSecurityPassword={true}
           showSecurityPassword={false}
           onEncryptionPasswordClick={onEncryptionPasswordClick}
-          isChangeKeeperAllow={false}/>
+          // isChangeKeeperAllow={false}
+        />
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
         {renderCloudPermissionContent()}

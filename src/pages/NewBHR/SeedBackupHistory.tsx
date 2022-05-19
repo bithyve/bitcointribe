@@ -233,8 +233,9 @@ const SeedBackupHistory = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
-        channelKey: selectedKeeper.channelKey
+        channelKey: selectedKeeper.channelKey,
       },
+      selectedLevelId: props.navigation.getParam( 'selectedLevelId' ),
       index: changeIndex,
     }
     if ( type == 'contact' ) {
@@ -252,6 +253,12 @@ const SeedBackupHistory = ( props ) => {
     }
     if ( type == 'pdf' ) {
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
+    if( type == 'cloud' ){
+      props.navigation.navigate( 'CloudBackupHistory', {
         ...navigationParams,
         isChangeKeeperType: true,
       } )
@@ -300,8 +307,8 @@ const SeedBackupHistory = ( props ) => {
           showButton={showButton}
           changeButtonText={'Change'}
           showSeedHistoryNote={true}
-          // isChangeKeeperAllow={true}
-          isChangeKeeperAllow={false}/>
+          isChangeKeeperAllow={true}
+        />
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
         {renderCloudPermissionContent()}
