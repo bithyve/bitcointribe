@@ -643,7 +643,10 @@ function* recoverWalletWorker( { payload } ) {
       const decrypted2FADetails = JSON.parse( decryptedData )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
-      if( details2FA && details2FA.twoFAValidated ) yield put( twoFAValid( true ) )
+      if ( details2FA && details2FA.twoFAValidated ) {
+        yield put( twoFAValid( true ) )
+        yield put( setAllowSecureAccount( true ) )
+      }
     }
 
     let smShare
