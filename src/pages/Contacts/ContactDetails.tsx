@@ -59,6 +59,7 @@ import More from '../../assets/images/svgs/icon_more.svg'
 import { translations } from '../../common/content/LocContext'
 import QRModal from '../Accounts/QRModal'
 import Loader from '../../components/loader'
+import AlertModalContents from '../../components/AlertModalContents'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -144,6 +145,7 @@ interface ContactDetailsStateTypes {
   showQRScanner: boolean;
   showQRClicked: boolean;
   showLoader: boolean;
+  showAlertModal: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -227,6 +229,7 @@ class ContactDetails extends PureComponent<
       showQRScanner: false,
       showQRClicked: false,
       showLoader: false,
+      showAlertModal: false,
     }
 
     this.contact = this.props.navigation.state.params.contact
@@ -962,32 +965,35 @@ class ContactDetails extends PureComponent<
             this.contact.trustKind !== ContactTrustKind.OTHER && this.contact.lastSeenActive ? null : (
               <CardWithArrow
                 onPress={() => {
-                  Alert.alert(
-                    this.strings[ 'RemoveContact' ],
-                    this.strings[ 'sure' ],
-                    [
-                      {
-                        text: this.common[ 'yes' ],
-                        onPress: () => {
-                          this.props.removeTrustedContact( {
-                            channelKey: this.contact.channelKey
-                          } )
-                          this.setState( {
-                            showContactDetails: false
-                          } )
-                          this.props.navigation.goBack()
-                        },
-                      },
-                      {
-                        text: this.common[ 'cancel' ],
-                        onPress: () => { },
-                        style: 'cancel',
-                      },
-                    ],
-                    {
-                      cancelable: false
-                    }
-                  )
+                  // Alert.alert(
+                  //   this.strings[ 'RemoveContact' ],
+                  //   this.strings[ 'sure' ],
+                  //   [
+                  //     {
+                  //       text: this.common[ 'yes' ],
+                  //       onPress: () => {
+                  //         this.props.removeTrustedContact( {
+                  //           channelKey: this.contact.channelKey
+                  //         } )
+                  //         this.setState( {
+                  //           showContactDetails: false
+                  //         } )
+                  //         this.props.navigation.goBack()
+                  //       },
+                  //     },
+                  //     {
+                  //       text: this.common[ 'cancel' ],
+                  //       onPress: () => { },
+                  //       style: 'cancel',
+                  //     },
+                  //   ],
+                  //   {
+                  //     cancelable: false
+                  //   }
+                  // )
+                  this.setState( {
+                    showAlertModal:true
+                  } )
                 }}
                 icon={'Remove'}
                 mainText={this.strings[ 'RemoveContact' ]}
@@ -996,6 +1002,35 @@ class ContactDetails extends PureComponent<
             )}
         </View>
 
+        <ModalContainer onBackground={()=>{this.setState( {
+          showAlertModal: false
+        } )}} visible={this.state.showAlertModal} closeBottomSheet={() => { }}>
+          <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+            title={this.strings[ 'RemoveContact' ]}
+            info={this.strings[ 'sure' ]}
+            cancelButtonText={this.common[ 'cancel' ]}
+            proceedButtonText={this.common[ 'yes' ]}
+            onPressProceed={() => {
+              this.props.removeTrustedContact( {
+                channelKey: this.contact.channelKey
+              } )
+              this.setState( {
+                showAlertModal: false,
+                showContactDetails: false
+              } )
+              this.props.navigation.goBack()
+            }}
+            isBottomImage={false}
+            isIgnoreButton={true}
+            onPressIgnore={()=>{
+              this.setState( {
+                showAlertModal:false
+              } )
+            }}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+          />
+        </ModalContainer>
       </View>
     )
   }
