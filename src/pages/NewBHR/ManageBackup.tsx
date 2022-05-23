@@ -699,7 +699,7 @@ export default function ManageBackup( props ) {
                 fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular
               }}>{strings[ 'WalletBackup' ]}</Text>
-              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo' ]}</Text>
+              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo1' ]}</Text>
             </View>
             <ImageBackground
               source={require( '../../assets/images/icons/keeper_sheild.png' )}
