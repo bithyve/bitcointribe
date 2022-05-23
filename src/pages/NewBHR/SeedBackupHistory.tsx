@@ -288,7 +288,9 @@ const SeedBackupHistory = ( props ) => {
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
             // setConfirmationModal( true )
-            props.navigation.navigate( 'BackupSeedWordsContent' )
+            props.navigation.navigate( 'BackupSeedWordsContent', {
+              fromHistory: true
+            } )
           }}
           data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
           confirmButtonText={'Confirm'}
