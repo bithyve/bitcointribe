@@ -48,6 +48,7 @@ import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestio
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
+import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import Launch from '../../../pages/Launch'
@@ -139,7 +140,7 @@ const SecurityStack = createStackNavigator(
       },
     },
     PersonalCopyHistoryNewBHR,
-    CloudBackupHistory,
+    // CloudBackupHistory,
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,
@@ -175,7 +176,19 @@ const SecurityStack = createStackNavigator(
     },
     RequestKeyFromContact,
     TrustedContactNewBHR,
-    SetNewPassword
+    SetNewPassword,
+    CloudBackupHistory: {
+      screen: CloudBackupHistory,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    SeedBackupHistory: {
+      screen: SeedBackupHistory,
+      navigationOptions: {
+        header: null,
+      },
+    },
   },
   {
     headerLayoutPreset: 'center',

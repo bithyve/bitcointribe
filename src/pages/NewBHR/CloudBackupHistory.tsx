@@ -26,7 +26,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { translations } from '../../common/content/LocContext'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getIndex } from '../../common/utilities'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
@@ -50,6 +50,7 @@ const CloudBackupHistory = ( props ) => {
   const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
   const [ confirmationModal, setConfirmationModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
+  const [ passwordModal, setPasswordModal ] = useState( false )
   const [
     bottomSheetRef,
     setBottomSheetRef,
@@ -280,7 +281,10 @@ const CloudBackupHistory = ( props ) => {
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
-        onPressBack={() => props.navigation.goBack()}
+        onPressBack={() => {
+          // props.navigation.goBack()
+          props.navigation.popToTop()
+        }}
         selectedTitle={Platform.OS == 'ios' ? 'iCloud Backup' : 'Google Drive Backup'}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
@@ -298,7 +302,11 @@ const CloudBackupHistory = ( props ) => {
           type={'security'}
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
-            setConfirmationModal( true )
+            if( levelData.length > 0 && levelData[ 0 ].keeper1.shareType == KeeperType.SECURITY_QUESTION ){
+              setConfirmationModal( true )
+            } else {
+              setPasswordModal( true )
+            }
           }}
           data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
           confirmButtonText={buttonText}
@@ -310,8 +318,8 @@ const CloudBackupHistory = ( props ) => {
           showButton={showButton}
           changeButtonText={'Change'}
           isChangeKeeperAllow={true}
-          // showSecurityPassword={true}
-          showSecurityPassword={false}
+          showSecurityPassword={true}
+          // showSecurityPassword={false}
           onEncryptionPasswordClick={onEncryptionPasswordClick}
           // isChangeKeeperAllow={false}
         />
@@ -353,7 +361,22 @@ const CloudBackupHistory = ( props ) => {
           isCloud={true}
         />
       </ModalContainer>
-
+      <ModalContainer onBackground={() => setPasswordModal( false )} visible={passwordModal} closeBottomSheet={() => setPasswordModal( false )}>
+        <ErrorModalContents
+          title={strings[ 'PleaseSetPasswordTitle' ]}
+          info={strings[ 'PleaseSetPasswordInfo' ]}
+          proceedButtonText={'Proceed To Password'}
+          cancelButtonText={'Got it'}
+          isIgnoreButton={true}
+          onPressProceed={() => {
+            setPasswordModal( false )
+            onEncryptionPasswordClick()
+          }}
+          onPressIgnore={() => setPasswordModal( false )}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

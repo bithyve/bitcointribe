@@ -222,13 +222,18 @@ const HomeStack = createStackNavigator(
     // KeeperDeviceHistory,
     // PersonalCopyHistoryKeeper,
     PersonalCopyHistoryNewBHR,
-    CloudBackupHistory,
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
+    // CloudBackupHistory: {
+    //   screen: CloudBackupHistory,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
+    // SeedBackupHistory: {
+    //   screen: SeedBackupHistory,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,

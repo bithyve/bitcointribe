@@ -98,7 +98,10 @@ const SeedBackupHistory = ( props ) => {
   }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
-    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
+    console.log( 'skk levelhealth', levelHealth )
+    console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
+    // if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
+    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ){
       setButtonText( common.backup )
       setShowButton( true )
       setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupSuccessInfo : strings.driveBackupSuccessInfo )
@@ -276,7 +279,10 @@ const SeedBackupHistory = ( props ) => {
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
-        onPressBack={() => props.navigation.goBack()}
+        onPressBack={() => {
+          // props.navigation.goBack()
+          props.navigation.popToTop()
+        }}
         selectedTitle={'Seed word Backup'}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
