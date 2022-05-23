@@ -291,7 +291,7 @@ const SeedBackupHistory = ( props ) => {
             props.navigation.navigate( 'BackupSeedWordsContent' )
           }}
           data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
-          confirmButtonText={buttonText}
+          confirmButtonText={'Confirm'}
           disableChange={false}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
