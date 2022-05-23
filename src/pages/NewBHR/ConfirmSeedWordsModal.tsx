@@ -71,7 +71,7 @@ export default function ConfirmSeedWordsModal( props ) {
           }}>{'Enter the '}
             <Text style={{
               fontFamily: Fonts.FiraSansMedium
-            }}>{'Second (02) word'}</Text></Text>
+            }}>{'second (02) word'}</Text></Text>
           <View
             style={{
               flexDirection: 'row',
