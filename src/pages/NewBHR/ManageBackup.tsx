@@ -929,7 +929,7 @@ export default function ManageBackup( props ) {
           closeBottomSheet={() => setSeedBackupModal( false )}>
           <SeedBacupModalContents
             title={'Backup using \nSeed Words'}
-            info={'Once you confirm your backup using seed words, the cloud backup will be deleted\n\nYou will also have to store a Recovery Kit (PDF) to use Seed Words backup'}
+            info={'You will be shown 12 english words that you need to write down privately.\n\nMake sure you keep them safe'}
             proceedButtonText={'Proceed'}
             cancelButtonText={'Back'}
             onPressProceed={() => {
