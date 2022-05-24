@@ -18,8 +18,12 @@ import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
-  const [ seedSecondName, setSeedSecondName ] = useState( '' )
+  const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
+  const [ seedData, setSeedData ] = useState( [] )
+  const [ seedPosition, setSeedPosition ] = useState( 0 )
+  const [ headerTitle, setHeaderTitle ]=useState( 'First 6 seed words' )
   const dispatch = useDispatch()
+  const fromHistory = props.navigation.getParam( 'fromHistory' )
 
   return (
     <View style={{
@@ -33,7 +37,7 @@ const BackupSeedWordsContent = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Enter Seed Words'}
+        selectedTitle={headerTitle}
       />
       <View style={{
         flex: 1
@@ -41,9 +45,22 @@ const BackupSeedWordsContent = ( props ) => {
         <SeedPageComponent
           infoBoxTitle={'Note'}
           infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
-          onPressConfirm={( seed, seedSecondName )=>{
-            setConfirmSeedWordModal( true )
-            setSeedSecondName( seedSecondName )
+          onPressConfirm={( seed, seedData )=>{
+            const i = 12, ranNums = []
+            setSeedPosition( 0 )
+            setSeedData( seedData )
+
+            for( let j=0; j<2; j++ ){
+              const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+              if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
+                ranNums.push( tempNumber )
+              } else j--
+            }
+            setSeedRandomNumber( ranNums )
+
+            setTimeout( () => {
+              setConfirmSeedWordModal( true )
+            }, 500 )
           }}
           data={[]}
           confirmButtonText={'Next'}
@@ -56,6 +73,7 @@ const BackupSeedWordsContent = ( props ) => {
           changeButtonText={'Back'}
           previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
+          setHeaderMessage={( message )=>setHeaderTitle( message )}
         />
       </View>
 
@@ -63,17 +81,24 @@ const BackupSeedWordsContent = ( props ) => {
         closeBottomSheet={() => setConfirmSeedWordModal( false )}>
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
+          seedNumber={seedRandomNumber ? seedRandomNumber[ seedPosition ] : 0}
           onPressProceed={( word ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                Alert.alert( 'Please enter second seed name' )
+                Alert.alert( 'Please enter seed name' )
               }, 500 )
-            } else if( word != seedSecondName ){
+            } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
               setTimeout( () => {
-                Alert.alert( 'Please enter valid second seed name' )
+                Alert.alert( 'Please enter valid seed name' )
               }, 500 )
-            } else {
+            } else if( !fromHistory && seedPosition == 0 ){
+              setConfirmSeedWordModal( false )
+              setSeedPosition( 1 )
+              setTimeout( () => {
+                setConfirmSeedWordModal( true )
+              }, 500 )
+            }else {
               setSeedWordModal( true )
               dispatch( updateSeedHealth() )
               // dispatch(setSeedBackupHistory())
