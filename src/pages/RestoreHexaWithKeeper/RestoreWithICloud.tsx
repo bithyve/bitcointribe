@@ -650,6 +650,9 @@ class RestoreWithICloud extends Component<
   }
 
   handleScannedData = async (scannedData) => {
+    this.setState( {
+      showLoader: true
+    } )
     console.log('scannedData', scannedData)
     const { downloadedBackupData } = this.props
     this.props.downloadBackupData({
@@ -800,6 +803,7 @@ class RestoreWithICloud extends Component<
   showLoaderModal = () => {
     // this.loaderBottomSheet.current.snapTo( 1 )
     this.setState({
+      showLoader: false,
       loaderModal: true,
       restoreStarted: true
     })
