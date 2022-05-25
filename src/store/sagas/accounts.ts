@@ -110,6 +110,7 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
 import RESTUtils from '../../utils/ln/RESTUtils'
+import { Alert } from 'react-native'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -1262,6 +1263,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     }
   } catch ( error ) {
     yield put( setResetTwoFALoader( false ) )
+    Alert.alert( 'Invalid Wallet 2FA' )
     console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }
