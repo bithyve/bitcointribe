@@ -88,6 +88,7 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+    props.setHeaderMessage( 'Last 6 seed words' )
   }
 
   const onProceedClick = () =>{
@@ -104,7 +105,7 @@ const SeedPageComponent = ( props ) => {
     if( showValidation ){
       Alert.alert( 'Please fill all seed words' )
     } else {
-      props.onPressConfirm( seed, seedData[ 1 ].name )
+      props.onPressConfirm( seed, seedData )
     }
   }
 
@@ -112,6 +113,7 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition-1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+    props.setHeaderMessage( 'First 6 seed words' )
   }
 
   const getFormattedNumber = ( number ) => {
@@ -155,6 +157,9 @@ const SeedPageComponent = ( props ) => {
         {
           listener: ( { nativeEvent: { position } } ) => {
             setCurrentPosition( position )
+            if( position == 0 )
+              props.setHeaderMessage( 'First 6 seed words' )
+            else props.setHeaderMessage( 'Last 6 seed words' )
           },
           useNativeDriver: true,
         }
