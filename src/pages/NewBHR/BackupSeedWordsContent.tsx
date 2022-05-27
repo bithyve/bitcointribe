@@ -99,7 +99,9 @@ const BackupSeedWordsContent = ( props ) => {
           proceedButtonText={'View Health'}
           onPressProceed={() => {
             setSeedWordModal( false )
-            props.navigation.goBack()
+            // props.navigation.goBack()
+            setInfo("please delete icloud backup")
+            setShowAlertModal(true)
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
@@ -115,6 +117,10 @@ const BackupSeedWordsContent = ( props ) => {
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )
+            if (info == "please delete icloud backup") {
+
+              props.navigation.popToTop()
+            }
           }}
           isBottomImage={false}
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}

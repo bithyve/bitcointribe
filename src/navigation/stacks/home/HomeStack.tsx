@@ -246,13 +246,13 @@ const HomeStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
-    BackupSeedWordsContent: {
-      screen: BackupSeedWordsContent,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    RestoreSeedWordsContent,
+    // BackupSeedWordsContent: {
+    //   screen: BackupSeedWordsContent,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
+    // RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {

@@ -30,6 +30,7 @@ import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interf
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getIndex } from '../../common/utilities'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import AlertModalContents from '../../components/AlertModalContents'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -69,6 +70,7 @@ const CloudBackupHistory = ( props ) => {
   const [ buttonText, setButtonText ] = useState( common.backup )
   const [ showButton, setShowButton ] = useState( false )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
+  const [ showAlertModal, setShowAlertModal ]=useState( false )
   const levelData = useSelector( ( state ) => state.bhr.levelData )
   const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
@@ -95,7 +97,7 @@ const CloudBackupHistory = ( props ) => {
   }, [] )
 
   useEffect( () =>{
-    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) props.navigation.popToTop()
+    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) setShowAlertModal( true )
   }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
@@ -267,7 +269,17 @@ const CloudBackupHistory = ( props ) => {
   }
 
   const onEncryptionPasswordClick = () =>{
-    props.navigation.navigate( 'SetNewPassword' )
+    if( levelData.length > 0 && levelData[ 0 ].keeper1.shareType == KeeperType.SECURITY_QUESTION ){
+      const navigationParams = {
+        selectedTitle: selectedKeeper.name,
+        SelectedRecoveryKeyNumber,
+        selectedKeeper,
+        selectedLevelId: 1
+      }
+      props.navigation.navigate( 'SecurityQuestionHistoryNewBHR', navigationParams )
+    } else {
+      props.navigation.navigate( 'SetNewPassword' )
+    }
   }
 
   return (
@@ -375,6 +387,20 @@ const CloudBackupHistory = ( props ) => {
           onPressIgnore={() => setPasswordModal( false )}
           isBottomImage={true}
           bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={'Cloud backup is completed you can delete Seed words'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+            props.navigation.popToTop()
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
     </View>

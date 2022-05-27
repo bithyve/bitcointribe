@@ -50,6 +50,8 @@ import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
 import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
+import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
+import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
@@ -153,6 +155,13 @@ const SecurityStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
+    BackupSeedWordsContent: {
+      screen: BackupSeedWordsContent,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {
