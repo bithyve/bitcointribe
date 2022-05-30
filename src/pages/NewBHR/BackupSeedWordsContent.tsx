@@ -53,7 +53,9 @@ const BackupSeedWordsContent = ( props ) => {
             for( let j=0; j<2; j++ ){
               const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
               if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
-                ranNums.push( tempNumber )
+                if( tempNumber == undefined )
+                  ranNums.push( 1 )
+                else ranNums.push( tempNumber )
               } else j--
             }
             setSeedRandomNumber( ranNums )
@@ -78,7 +80,7 @@ const BackupSeedWordsContent = ( props ) => {
       </View>
 
       <ModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
-        closeBottomSheet={() => setConfirmSeedWordModal( false )}>
+        closeBottomSheet={() => setConfirmSeedWordModal( false )}  showBlurView={true}>
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
           seedNumber={seedRandomNumber ? seedRandomNumber[ seedPosition ] : 0}
