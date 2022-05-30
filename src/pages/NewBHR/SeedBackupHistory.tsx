@@ -323,7 +323,7 @@ const SeedBackupHistory = ( props ) => {
             for( let j=0; j<2; j++ ){
               const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
               if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
-                if( tempNumber == undefined )
+                if( tempNumber == undefined || tempNumber == 0 )
                   ranNums.push( 1 )
                 else ranNums.push( tempNumber )
               } else j--
