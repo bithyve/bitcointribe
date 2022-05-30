@@ -684,8 +684,9 @@ export default function ManageBackup( props ) {
               onRefresh={() => onRefresh() }
             />
           }
-          style={{
-            flex: 1
+          contentContainerStyle={{
+            // backgroundColor:'red',
+            flex:1
           }}
         >
           <View style={{
@@ -802,16 +803,19 @@ export default function ManageBackup( props ) {
             })}
           </View> */}
           <View style={{
-            marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor, height: '100%',
+            flex:1
+          }} />
+          <View style={{
+            marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor,
             paddingLeft: wp( '6%' ),
-            paddingBottom: hp( 3 )
+            paddingBottom: hp( 3 ),
           }}>
-            <Text style={styles.pageTitle}>{strings.IamtheKeeper}</Text>
+            <Text style={styles.pageTitle}>{strings.IhavetheRecoveryKeyfor}</Text>
             <Text style={styles.pageInfoText}>
               {strings[ 'Contactswhose' ]}
             </Text>
             <View style={{
-              marginBottom: 15
+              marginBottom: 15,
             }}>
               {keeping.length > 0 ?
                 <ScrollView
@@ -1229,7 +1233,7 @@ const styles = StyleSheet.create( {
     paddingBottom: wp( '7%' ),
   },
   body: {
-    flex: 1,
+    // flex: 1,
     alignItems: 'center',
     position: 'relative',
     flexDirection: 'row',

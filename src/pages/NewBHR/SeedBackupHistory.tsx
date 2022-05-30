@@ -4,6 +4,7 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  Alert,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -15,7 +16,7 @@ import moment from 'moment'
 import _ from 'underscore'
 import HistoryPageComponent from './HistoryPageComponent'
 import ModalHeader from '../../components/ModalHeader'
-import { updateCloudPermission } from '../../store/actions/BHR'
+import { updateCloudPermission, updateSeedHealth } from '../../store/actions/BHR'
 import DeviceInfo from 'react-native-device-info'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
@@ -30,6 +31,9 @@ import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getIndex } from '../../common/utilities'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import SeedBacupModalContents from './SeedBacupModalContents'
+import dbManager from '../../storage/realm/dbManager'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -72,6 +76,11 @@ const SeedBackupHistory = ( props ) => {
   const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
   const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
+  const [ seedWordModal, setSeedWordModal ] = useState( false )
+  const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
+  const [ seedData, setSeedData ] = useState( [] )
+  const [ seedPosition, setSeedPosition ] = useState( 0 )
   const sortedHistory = ( history ) => {
     if( !history ) return
     const currentHistory = history.filter( ( element ) => {
@@ -288,9 +297,42 @@ const SeedBackupHistory = ( props ) => {
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
             // setConfirmationModal( true )
-            props.navigation.navigate( 'BackupSeedWordsContent', {
-              fromHistory: true
+            // props.navigation.navigate( 'BackupSeedWordsContent', {
+            // fromHistory: true
+            // } )
+            const dbWallet =  dbManager.getWallet()
+            const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+            const primaryMnemonic = walletObj.primaryMnemonic
+            const seed = primaryMnemonic.split( ' ' )
+            const seedData = seed.map( ( word, index ) => {
+              return {
+                name: word, id: ( index+1 )
+              }
             } )
+
+            // let seed = ''
+            // seedData.forEach( ( { name } ) => {
+            //   if( !seed ) seed = name
+            //   else seed = seed + ' ' + name
+            // } )
+
+            const i = 12, ranNums = []
+            setSeedPosition( 0 )
+            setSeedData( seedData )
+
+            for( let j=0; j<2; j++ ){
+              const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+              if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
+                if( tempNumber == undefined )
+                  ranNums.push( 1 )
+                else ranNums.push( tempNumber )
+              } else j--
+            }
+            setSeedRandomNumber( ranNums )
+
+            setTimeout( () => {
+              setConfirmSeedWordModal( true )
+            }, 500 )
           }}
           data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
           confirmButtonText={'Confirm'}
@@ -342,7 +384,48 @@ const SeedBackupHistory = ( props ) => {
           isCloud={true}
         />
       </ModalContainer>
-
+      <ModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
+        closeBottomSheet={() => setConfirmSeedWordModal( false )} >
+        <ConfirmSeedWordsModal
+          proceedButtonText={'Next'}
+          seedNumber={seedRandomNumber ? seedRandomNumber[ seedPosition ] : 0}
+          onPressProceed={( word ) => {
+            setConfirmSeedWordModal( false )
+            if( word == '' ){
+              setTimeout( () => {
+                Alert.alert( 'Please enter seed name' )
+              }, 500 )
+            } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
+              setTimeout( () => {
+                Alert.alert( 'Please enter valid seed name' )
+              }, 500 )
+            } else {
+              setSeedWordModal( true )
+              dispatch( updateSeedHealth() )
+              // dispatch(setSeedBackupHistory())
+            }
+          }}
+          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          isIgnoreButton={true}
+          cancelButtonText={'Start Over'}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
+        closeBottomSheet={() => setSeedWordModal( false )}>
+        <SeedBacupModalContents
+          title={'Seed Words\nBackup Successful'}
+          info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
+          proceedButtonText={'View Health'}
+          onPressProceed={() => {
+            setSeedWordModal( false )
+            // props.navigation.goBack()
+          }}
+          onPressIgnore={() => setSeedWordModal( false )}
+          isIgnoreButton={false}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/success.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }
