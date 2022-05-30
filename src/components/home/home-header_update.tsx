@@ -153,13 +153,22 @@ const HomeHeader = ( {
           alignItems:'center',
           justifyContent: 'center'
         }}>
-          <Image
-            source={isError ?currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' )  : require( '../../assets/images/icons/check_white.png' )}
+          { levelData[ 0 ].keeper1.status == 'accessible' && levelData[ 0 ].keeper1.shareType == 'seed' ? <Image
+            source={ require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
+              tintColor: 'green'
             }}
             resizeMode={'contain'}
-          />
+          /> :
+            <Image
+              source={isError ? currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+              style={{
+                width: wp( '2.7%' ), height: wp( '2.7%' ),
+              }}
+              resizeMode={'contain'}
+            />
+          }
         </View>
       }
       {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
