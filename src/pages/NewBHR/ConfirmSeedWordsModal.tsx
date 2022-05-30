@@ -132,7 +132,7 @@ export default function ConfirmSeedWordsModal( props ) {
               // onSubmitEditing={() =>
               // }
               onChangeText={( text ) => {
-                setWord( text )
+                setWord( text.trim() )
               }}
               // onFocus={() => {
               //   if ( word.length > 0 ) {

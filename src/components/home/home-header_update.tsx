@@ -213,7 +213,7 @@ const HomeHeader = ( {
           }
         }
         if( element.keeper1.status == 'accessible'  && element.keeper1.shareType == 'seed' ){
-          messageOneName = strings.Level1+ ' seed ' +strings.backupIsCompleted
+          messageOneName = 'Seed ' +strings.backupIsCompleted
         }
         if( element.keeper2.status == 'accessible' ){
           messageOneName = element.keeper2.name
@@ -226,7 +226,7 @@ const HomeHeader = ( {
       } else if( currentLevel === 1 ){
         if( messageOneName ) {
           return {
-            isFirstMessageBold: false, messageOne: strings.Level1+` ${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
+            isFirstMessageBold: false, messageOne: `${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
           }
         }
         return {
@@ -248,7 +248,7 @@ const HomeHeader = ( {
       }
     } else if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType == 'seed' ) {
       return {
-        isFirstMessageBold: false, messageOne: strings.Level1+ ' seed ' +strings.backupIsCompleted, messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: 'Seed ' +strings.backupIsCompleted, messageTwo: '', isError: true
       }
     }else {
       return {
