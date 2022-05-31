@@ -14,6 +14,7 @@ import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import { useDispatch } from 'react-redux'
 import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
+import RNPreventScreenshot from 'react-native-screenshot-prevent';
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -25,6 +26,9 @@ const BackupSeedWordsContent = ( props ) => {
   const dispatch = useDispatch()
   const fromHistory = props.navigation.getParam( 'fromHistory' )
 
+  useEffect( ()=>{
+    RNPreventScreenshot.enabled( true )
+  }, [] )
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -36,7 +40,10 @@ const BackupSeedWordsContent = ( props ) => {
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SeedHeaderComponent
-        onPressBack={() => props.navigation.goBack()}
+        onPressBack={() => {
+          RNPreventScreenshot.enabled( false )
+          props.navigation.goBack()
+        }}
         selectedTitle={headerTitle}
       />
       <View style={{
@@ -53,9 +60,12 @@ const BackupSeedWordsContent = ( props ) => {
             for( let j=0; j<2; j++ ){
               const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
               if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
-                if( tempNumber == undefined )
+                if ( tempNumber == undefined || tempNumber == 0 ) {
                   ranNums.push( 1 )
-                else ranNums.push( tempNumber )
+                }
+                else {
+                  ranNums.push( tempNumber )
+                }
               } else j--
             }
             setSeedRandomNumber( ranNums )
@@ -70,7 +80,10 @@ const BackupSeedWordsContent = ( props ) => {
           disableChange={false}
           onPressReshare={() => {
           }}
-          onPressChange={() => props.navigation.goBack()}
+          onPressChange={() => {
+            RNPreventScreenshot.enabled( false )
+            props.navigation.goBack()
+          }}
           showButton={true}
           changeButtonText={'Back'}
           previousButtonText={'Previous'}
@@ -118,6 +131,7 @@ const BackupSeedWordsContent = ( props ) => {
           info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
           proceedButtonText={'View Health'}
           onPressProceed={() => {
+            RNPreventScreenshot.enabled( false )
             setSeedWordModal( false )
             props.navigation.goBack()
           }}

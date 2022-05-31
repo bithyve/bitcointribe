@@ -933,7 +933,7 @@ export default function ManageBackup( props ) {
           closeBottomSheet={() => setSeedBackupModal( false )}>
           <SeedBacupModalContents
             title={'Backup using \nSeed Words'}
-            info={'You will be shown 12 english words that you need to write down privately.\n\nMake sure you keep them safe'}
+            info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
             proceedButtonText={'Proceed'}
             cancelButtonText={'Back'}
             onPressProceed={() => {
