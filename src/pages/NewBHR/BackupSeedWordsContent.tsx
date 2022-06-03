@@ -14,11 +14,15 @@ import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import { useDispatch } from 'react-redux'
 import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
+import AlertModalContents from '../../components/AlertModalContents'
 import RNPreventScreenshot from 'react-native-screenshot-prevent';
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ seedSecondName, setSeedSecondName ] = useState( '' )
+  const [ info, setInfo ] = useState( '' )
   const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
   const [ seedData, setSeedData ] = useState( [] )
   const [ seedPosition, setSeedPosition ] = useState( 0 )
@@ -133,12 +137,31 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             RNPreventScreenshot.enabled( false )
             setSeedWordModal( false )
-            props.navigation.goBack()
+            // props.navigation.goBack()
+            setInfo("please delete icloud backup")
+            setShowAlertModal(true)
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
           isBottomImage={true}
           bottomImage={require( '../../assets/images/icons/success.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={info}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+            if (info == "please delete icloud backup") {
+
+              props.navigation.popToTop()
+            }
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
     </View>

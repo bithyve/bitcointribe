@@ -17,6 +17,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
 import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
+import ModalContainer from '../../components/home/ModalContainer'
+import AlertModalContents from '../../components/AlertModalContents'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -62,6 +64,7 @@ const RestoreSeedPageComponent = ( props ) => {
   const [ total, setTotal ] = useState( 0 )
   const [ partialSeedData, setPartialSeedData ] = useState( [] )
   const [ currentPosition, setCurrentPosition ] = useState( 0 )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
 
   const width = Dimensions.get( 'window' ).width
   const ref = React.useRef<PagerView>( null )
@@ -117,7 +120,8 @@ const RestoreSeedPageComponent = ( props ) => {
       else seed = seed + ' ' + name
     } )
     if( showValidation ){
-      Alert.alert( 'Please fill all seed words' )
+      // Alert.alert( 'Please fill all seed words' )
+      setShowAlertModal( true )
     } else {
       props.onPressConfirm( seed )
     }
@@ -359,6 +363,19 @@ const RestoreSeedPageComponent = ( props ) => {
         </View>
       </View> : null
       }
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={'Please fill all seed words'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

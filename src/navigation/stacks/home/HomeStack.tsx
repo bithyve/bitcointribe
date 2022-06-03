@@ -222,13 +222,18 @@ const HomeStack = createStackNavigator(
     // KeeperDeviceHistory,
     // PersonalCopyHistoryKeeper,
     PersonalCopyHistoryNewBHR,
-    CloudBackupHistory,
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
+    // CloudBackupHistory: {
+    //   screen: CloudBackupHistory,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
+    // SeedBackupHistory: {
+    //   screen: SeedBackupHistory,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,
@@ -241,13 +246,13 @@ const HomeStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
-    BackupSeedWordsContent: {
-      screen: BackupSeedWordsContent,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    RestoreSeedWordsContent,
+    // BackupSeedWordsContent: {
+    //   screen: BackupSeedWordsContent,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
+    // RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {

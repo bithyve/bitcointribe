@@ -725,33 +725,37 @@ export default function ManageBackup( props ) {
                 height: 30
               }} />}
               renderItem={( { item, index } ) => {
-                return (
-                  <View style={{
-                    flex: localLevelData.length > 2 ? 1 / 3 : 1, alignItems: 'center'
-                  }}>
-                    <TouchableOpacity style={{
-                      width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.white : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-                        width: 15, height: 15
-                      }
-                    }}
-                    onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
-                    >
-                      <View style={{
-                        position: 'absolute', right: -4, height: 12, width: 12, borderRadius: 6, backgroundColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.green : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
-                      }}>
-                        <FontAwesome name={index % 2 == 0 ? item.keeper1.status == 'accessible' ? 'check' : 'exclamation' : item.keeper2.status == 'accessible' ? 'check' : 'exclamation'} color={Colors.white} size={7} />
-                      </View>
-                      <Image style={{
-                        height: 20, width: 20
-                      }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
-                    </TouchableOpacity>
-                    <Text style={{
-                      fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.black, marginTop: 5, textAlign: 'center'
+                if ( index == 0 && item.keeper1ButtonText == 'Encryption Password' ){
+                  return null
+                } else {
+                  return (
+                    <View style={{
+                      flex: localLevelData.length > 2 ? 1 / 3 : 1, alignItems: 'center'
                     }}>
-                      {index % 2 == 0 ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
-                    </Text>
-                  </View>
-                )
+                      <TouchableOpacity style={{
+                        width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.white : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+                          width: 15, height: 15
+                        }
+                      }}
+                      onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
+                      >
+                        <View style={{
+                          position: 'absolute', right: -4, height: 12, width: 12, borderRadius: 6, backgroundColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.green : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
+                        }}>
+                          <FontAwesome name={index % 2 == 0 ? item.keeper1.status == 'accessible' ? 'check' : 'exclamation' : item.keeper2.status == 'accessible' ? 'check' : 'exclamation'} color={Colors.white} size={7} />
+                        </View>
+                        <Image style={{
+                          height: 20, width: 20
+                        }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
+                      </TouchableOpacity>
+                      <Text style={{
+                        fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.black, marginTop: 5, textAlign: 'center'
+                      }}>
+                        {index % 2 == 0 ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                      </Text>
+                    </View>
+                  )
+                }
               }}
               ListFooterComponent={() => {
                 return (
