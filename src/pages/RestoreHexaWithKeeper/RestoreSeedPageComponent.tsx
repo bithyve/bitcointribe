@@ -145,6 +145,41 @@ const RestoreSeedPageComponent = ( props ) => {
     else return index + 'th'
   }
 
+  const getIndex = ( index, seedIndex )=>{
+    let newIndex = index + 1 + ( seedIndex * 6 )
+    let isAdd = false
+    if( index % 2 == 0 ) isAdd = true
+
+    let tempNumber = 0
+    if( index == 0 || index == 5 ) tempNumber = 0
+    else if( index == 1 || index == 4 ) tempNumber = 2
+    else tempNumber = 1
+
+    if( isAdd )
+      newIndex -= tempNumber
+    else newIndex += tempNumber
+
+    return newIndex
+  }
+
+  const getTextIndex = ( index )=>{
+    let newIndex = index
+    let isAdd = false
+    if( index % 2 == 0 ) isAdd = true
+
+    let tempNumber = 0
+    if( index == 0 || index == 5 ) tempNumber = 0
+    else if( index == 1 || index == 4 ) tempNumber = 2
+    else tempNumber = 1
+
+    if( isAdd )
+      newIndex -= tempNumber
+    else newIndex += tempNumber
+
+    return newIndex
+  }
+
+
   const onPageScroll = useMemo(
     () =>
       Animated.event<PagerViewOnPageScrollEventData>(
@@ -216,14 +251,15 @@ const RestoreSeedPageComponent = ( props ) => {
                         onPress={() => SelectOption( value?.id )}
                         style={styles.historyCard}
                       >
-                        <Text style={styles.numberText}>{getFormattedNumber( index + 1 + ( seedIndex * 6 ) )}</Text>
+                        <Text style={styles.numberText}>{getFormattedNumber( getIndex( index, seedIndex ) )}</Text>
                         <TextInput
                           style={[ styles.modalInputBox,
-                            partialSeedData[ currentPosition ][ index ]?.name.length > 0 ? styles.selectedInput : null,
+                            partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                             // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
-                          placeholder={`Enter ${getPlaceholder( index + 1 + ( seedIndex * 6 ) )} word`}
+                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
                           placeholderTextColor={Colors.borderColor}
+                          // value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           value={value?.name}
                           autoCompleteType="off"
                           textContentType="none"
@@ -235,7 +271,7 @@ const RestoreSeedPageComponent = ( props ) => {
                           // }
                           onChangeText={( text ) => {
                             const data = [ ...partialSeedData ]
-                            data[ currentPosition ][ index ].name = text.trim()
+                            data[ currentPosition ][ getTextIndex( index ) ].name = text.trim()
                             setPartialSeedData( data )
                           }}
                         />

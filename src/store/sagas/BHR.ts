@@ -600,8 +600,22 @@ function* recoverWalletWorker( { payload } ) {
         if( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
         if( !image ) Alert.alert( 'External mnemonic, wallet image not found' )
       }
-    }
+    } else {
+      if ( shares ) {
+        const pmShares = []
+        const smShares = []
+        for ( let i = 0; i < shares.length; i++ ) {
+          const element = shares[ i ]
+          pmShares.push( element.backupData.primaryMnemonicShard.encryptedShare.pmShare )
+          if ( element.secondaryData && element.secondaryData.secondaryMnemonicShard ) smShares.push( element.secondaryData.secondaryMnemonicShard )
+        }
+        secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
+        primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
+      }
 
+      const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+      if ( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
+    }
     const accounts = image.accounts
     const acc: Account[] = []
     const accountData = {
@@ -610,12 +624,9 @@ function* recoverWalletWorker( { payload } ) {
     if( !primarySeed ) primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
     const decryptionKey = primarySeed.toString( 'hex' )
     Object.keys( accounts ).forEach( ( key ) => {
-      // console.log( 'skk accounts', accounts )
       const decryptedData = BHROperations.decryptWithAnswer( accounts[ key ].encryptedData, decryptionKey ).decryptedData
       const account: Account | MultiSigAccount = JSON.parse( decryptedData )
       accountData[ account.type ] = account.id
-      // console.log( 'skk accountData', accountData )
-
       if( [ AccountType.SAVINGS_ACCOUNT, AccountType.DONATION_ACCOUNT ].includes( account.type ) ){ // patch: fixes multisig account restore, being restored from a missing 2FA-flag backup(version < 2.0.69)
         if( ( account as MultiSigAccount ).xpubs && ( account as MultiSigAccount ).xpubs.secondary ){ // level-2 activated multisig account found
           if( !( account as MultiSigAccount ).is2FA ){ // faulty backup found
@@ -632,7 +643,10 @@ function* recoverWalletWorker( { payload } ) {
       const decrypted2FADetails = JSON.parse( decryptedData )
       secondaryXpub = decrypted2FADetails.secondaryXpub
       details2FA = decrypted2FADetails.details2FA
-      if( details2FA && details2FA.twoFAValidated ) yield put( twoFAValid( true ) )
+      if ( details2FA && details2FA.twoFAValidated ) {
+        yield put( twoFAValid( true ) )
+        yield put( setAllowSecureAccount( true ) )
+      }
     }
 
     let smShare
@@ -2464,7 +2478,7 @@ function* updateSeedHealthWorker( ) {
   yield put( updateMSharesHealth( seedLevelInfo, true ) )
 
   const seedBackupHistory = yield select( ( state ) => state.bhr.seedBackupHistory )
-  const title = 'Seed backup confirm'
+  const title = 'Seed backup confirmed'
   const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, seedBackupHistory )
   yield put( setSeedBackupHistory( updatedCloudBackupHistory ) )
 }

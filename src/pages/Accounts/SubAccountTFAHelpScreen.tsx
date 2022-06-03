@@ -147,7 +147,10 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
     if( qrData && qrData.includes( '{' ) && JSON.parse( qrData ).type == QRCodeTypes.APPROVE_KEEPER ){
       dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType? actionType: 'Sweep Funds', sourceAccountShell ) )
-    } else { Toast( 'You have scanned wrong QR' ) }
+    } else {
+      setShowLoader( false )
+      dispatch( setResetTwoFALoader( false ) )
+      Toast( 'You have scanned wrong QR' ) }
   }
 
   const renderQrContent = useCallback( () => {

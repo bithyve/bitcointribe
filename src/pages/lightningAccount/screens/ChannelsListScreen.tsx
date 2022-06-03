@@ -90,7 +90,7 @@ export default class ChannelScreen extends Component {
                     borderRadius: 20,
                   },
                   {
-                    flex: localEquity,
+                    flex: localEquity > remoteEquity ? 1 : 0,
                   },
                 ]
                 : [
@@ -100,7 +100,7 @@ export default class ChannelScreen extends Component {
                     borderRadius: 20,
                   },
                   {
-                    flex: localEquity,
+                    flex: localEquity > remoteEquity ? 1 : 0,
                   },
                 ]
             }
@@ -120,7 +120,7 @@ export default class ChannelScreen extends Component {
                     borderRadius: 20,
                   },
                   {
-                    flex: remoteEquity,
+                    flex: localEquity < remoteEquity ? 1 : 0,
                   },
                 ]
                 : [
@@ -130,7 +130,7 @@ export default class ChannelScreen extends Component {
                     borderRadius: 20,
                   },
                   {
-                    flex: remoteEquity,
+                    flex: localEquity < remoteEquity ? 1 : 0,
                   },
                 ]
             }
@@ -501,6 +501,7 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 12 ),
     marginLeft: 7,
+    minWidth: wp('5%')
   },
   channelSats: {
     color: Colors.backgroundColor1,

@@ -684,8 +684,9 @@ export default function ManageBackup( props ) {
               onRefresh={() => onRefresh() }
             />
           }
-          style={{
-            flex: 1
+          contentContainerStyle={{
+            // backgroundColor:'red',
+            flex:1
           }}
         >
           <View style={{
@@ -699,7 +700,7 @@ export default function ManageBackup( props ) {
                 fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular
               }}>{strings[ 'WalletBackup' ]}</Text>
-              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo' ]}</Text>
+              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo1' ]}</Text>
             </View>
             <ImageBackground
               source={require( '../../assets/images/icons/keeper_sheild.png' )}
@@ -806,16 +807,19 @@ export default function ManageBackup( props ) {
             })}
           </View> */}
           <View style={{
-            marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor, height: '100%',
+            flex:1
+          }} />
+          <View style={{
+            marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor,
             paddingLeft: wp( '6%' ),
-            paddingBottom: hp( 3 )
+            paddingBottom: hp( 3 ),
           }}>
-            <Text style={styles.pageTitle}>{strings.IamtheKeeper}</Text>
+            <Text style={styles.pageTitle}>{strings.IhavetheRecoveryKeyfor}</Text>
             <Text style={styles.pageInfoText}>
               {strings[ 'Contactswhose' ]}
             </Text>
             <View style={{
-              marginBottom: 15
+              marginBottom: 15,
             }}>
               {keeping.length > 0 ?
                 <ScrollView
@@ -933,7 +937,7 @@ export default function ManageBackup( props ) {
           closeBottomSheet={() => setSeedBackupModal( false )}>
           <SeedBacupModalContents
             title={'Backup using \nSeed Words'}
-            info={'Once you confirm your backup using seed words, the cloud backup will be deleted\n\nYou will also have to store a Recovery Kit (PDF) to use Seed Words backup'}
+            info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
             proceedButtonText={'Proceed'}
             cancelButtonText={'Back'}
             onPressProceed={() => {
@@ -1233,7 +1237,7 @@ const styles = StyleSheet.create( {
     paddingBottom: wp( '7%' ),
   },
   body: {
-    flex: 1,
+    // flex: 1,
     alignItems: 'center',
     position: 'relative',
     flexDirection: 'row',

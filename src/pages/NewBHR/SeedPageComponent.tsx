@@ -88,6 +88,7 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+    props.setHeaderMessage( 'Last 6 seed words' )
   }
 
   const onProceedClick = () =>{
@@ -104,7 +105,7 @@ const SeedPageComponent = ( props ) => {
     if( showValidation ){
       Alert.alert( 'Please fill all seed words' )
     } else {
-      props.onPressConfirm( seed, seedData[ 1 ].name )
+      props.onPressConfirm( seed, seedData )
     }
   }
 
@@ -112,6 +113,7 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition-1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+    props.setHeaderMessage( 'First 6 seed words' )
   }
 
   const getFormattedNumber = ( number ) => {
@@ -124,6 +126,40 @@ const SeedPageComponent = ( props ) => {
     else if ( index == 2 ) return index + 'nd'
     else if ( index == 3 ) return index + 'rd'
     else return index + 'th'
+  }
+
+  const getIndex = ( index, seedIndex )=>{
+    let newIndex = index + 1 + ( seedIndex * 6 )
+    let isAdd = false
+    if( index % 2 == 0 ) isAdd = true
+
+    let tempNumber = 0
+    if( index == 0 || index == 5 ) tempNumber = 0
+    else if( index == 1 || index == 4 ) tempNumber = 2
+    else tempNumber = 1
+
+    if( isAdd )
+      newIndex -= tempNumber
+    else newIndex += tempNumber
+
+    return newIndex
+  }
+
+  const getTextIndex = ( index )=>{
+    let newIndex = index
+    let isAdd = false
+    if( index % 2 == 0 ) isAdd = true
+
+    let tempNumber = 0
+    if( index == 0 || index == 5 ) tempNumber = 0
+    else if( index == 1 || index == 4 ) tempNumber = 2
+    else tempNumber = 1
+
+    if( isAdd )
+      newIndex -= tempNumber
+    else newIndex += tempNumber
+
+    return newIndex
   }
 
   const onPageScroll = useMemo(
@@ -155,6 +191,9 @@ const SeedPageComponent = ( props ) => {
         {
           listener: ( { nativeEvent: { position } } ) => {
             setCurrentPosition( position )
+            if( position == 0 )
+              props.setHeaderMessage( 'First 6 seed words' )
+            else props.setHeaderMessage( 'Last 6 seed words' )
           },
           useNativeDriver: true,
         }
@@ -197,15 +236,17 @@ const SeedPageComponent = ( props ) => {
                         onPress={() => SelectOption( value?.id )}
                         style={styles.historyCard}
                       >
-                        <Text style={styles.numberText}>{getFormattedNumber( index + 1 + ( seedIndex * 6 ) )}</Text>
+                        <Text style={styles.numberText}>{
+                          getFormattedNumber( getIndex( index, seedIndex ) )
+                        }</Text>
                         <TextInput
                           style={[ styles.modalInputBox,
-                            partialSeedData[ currentPosition ][ index ]?.name.length > 0 ? styles.selectedInput : null,
+                            partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                             // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
-                          placeholder={`Enter ${getPlaceholder( index + 1 + ( seedIndex * 6 ) )} word`}
+                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
                           placeholderTextColor={Colors.borderColor}
-                          value={partialSeedData[ currentPosition ][ index ]?.name}
+                          value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           autoCompleteType="off"
                           textContentType="none"
                           returnKeyType="next"
@@ -216,7 +257,7 @@ const SeedPageComponent = ( props ) => {
                           // }
                           onChangeText={( text ) => {
                             const data = [ ...partialSeedData ]
-                            data[ currentPosition ][ index ].name = text
+                            data[ currentPosition ][ getTextIndex( index ) ].name = text
                             setPartialSeedData( data )
                           }}
                         />
