@@ -332,8 +332,8 @@
   "header": {
     "init": "Initialising Automated Cloud Backup",
     "incomplete": "Your wallet is not backed up. Create a backup",
-    "l1": "Level 1 Automated Cloud Backup is complete",
-    "l1Drive": "Level 1 Automated Drive Backup is complete",
+    "l1": "iCloud Backup is complete",
+    "l1Drive": "Drive Backup is complete",
     "l2": "Level 2 Double Backup is complete",
     "l3": "Level 3 Multi-key Backup is complete",
     "needAttention": " needs your attention.",
@@ -616,6 +616,7 @@
     "OpentheQRscanner": "Open the QR scanner at the top right of the home screen on another Personal Device running Hexa app and scan this QR",
     "Ihavescanned": "Done scanning QR",
     "IamtheKeeper": "I am the Keeper of",
+    "IhavetheRecoveryKeyfor":"I have the Recovery Key for",
     "Level 1": "Level 1",
     "Set Password": "Set Password",
     "Backup on iCloud": "Backup on iCloud",

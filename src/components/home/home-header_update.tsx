@@ -153,13 +153,22 @@ const HomeHeader = ( {
           alignItems:'center',
           justifyContent: 'center'
         }}>
-          <Image
-            source={isError ?currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' )  : require( '../../assets/images/icons/check_white.png' )}
+          { levelData[ 0 ].keeper1.status == 'accessible' && levelData[ 0 ].keeper1.shareType == 'seed' ? <Image
+            source={ require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
+              tintColor: 'green'
             }}
             resizeMode={'contain'}
-          />
+          /> :
+            <Image
+              source={isError ? currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+              style={{
+                width: wp( '2.7%' ), height: wp( '2.7%' ),
+              }}
+              resizeMode={'contain'}
+            />
+          }
         </View>
       }
       {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
@@ -204,7 +213,7 @@ const HomeHeader = ( {
           }
         }
         if( element.keeper1.status == 'accessible'  && element.keeper1.shareType == 'seed' ){
-          messageOneName = strings.Level1+ ' seed ' +strings.backupIsCompleted
+          messageOneName = 'Seed ' +strings.backupIsCompleted
         }
         if( element.keeper2.status == 'accessible' ){
           messageOneName = element.keeper2.name
@@ -217,7 +226,7 @@ const HomeHeader = ( {
       } else if( currentLevel === 1 ){
         if( messageOneName ) {
           return {
-            isFirstMessageBold: false, messageOne: strings.Level1+` ${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
+            isFirstMessageBold: false, messageOne: `${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
           }
         }
         return {
@@ -239,7 +248,7 @@ const HomeHeader = ( {
       }
     } else if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType == 'seed' ) {
       return {
-        isFirstMessageBold: false, messageOne: strings.Level1+ ' seed ' +strings.backupIsCompleted, messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: 'Seed ' +strings.backupIsCompleted, messageTwo: '', isError: true
       }
     }else {
       return {
