@@ -105,11 +105,13 @@ const BackupSeedWordsContent = ( props ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                Alert.alert( 'Please enter seed name' )
+                setInfo( 'Please enter seed word' )
+                setShowAlertModal( true )
               }, 500 )
             } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
               setTimeout( () => {
-                Alert.alert( 'Please enter valid seed name' )
+                setInfo( 'Please enter valid seed word' )
+                setShowAlertModal( true )
               }, 500 )
             } else if( !fromHistory && seedPosition == 0 ){
               setConfirmSeedWordModal( false )
