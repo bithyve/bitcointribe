@@ -40,7 +40,9 @@ export default function AlertModalContents( props ) {
         <View style={[ styles.successModalHeaderView, {
           marginTop: props.closeModal ? wp( '1%' ) : wp( '8%' )
         } ]}>
-          {/* <Text
+          {
+            props.title &&
+          <Text
             style={{
               color: props.headerTextColor
                 ? props.headerTextColor
@@ -53,7 +55,8 @@ export default function AlertModalContents( props ) {
           >
             {props.title}
             {props.titleNextLine ? '\n' + props.titleNextLine : null}
-          </Text> */}
+          </Text>
+          }
           {props.info ? (
             <Text
               style={{
