@@ -123,9 +123,9 @@ export default function ConfirmSeedWordsModal( props ) {
               placeholder={`Enter ${getHint( props.seedNumber )} word`}
               placeholderTextColor={Colors.borderColor}
               value={word}
-              autoCompleteType="off"
+              // autoCompleteType="off"
               textContentType="none"
-              returnKeyType="next"
+              returnKeyType='done'
               autoCorrect={false}
               // editable={isEditable}
               autoCapitalize="none"
