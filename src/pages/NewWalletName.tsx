@@ -89,8 +89,10 @@ export default function NewWalletName( props ) {
 
   const renderLoaderModalContent = useCallback( () => {
     return <LoaderModal
-      headerText={'Gift Sats'}
-      messageText={'Send sats as gifts to your friends and family.'}
+      // headerText={'Gift Sats'}
+      // messageText={'Send sats as gifts to your friends and family.'}
+      headerText={'Seed Backup'}
+      messageText={'New backup method: Now use Seed Words to backup your wallet'}
       showGif={false}
     />
   }, [ message, subTextMessage, loaderModal ] )
