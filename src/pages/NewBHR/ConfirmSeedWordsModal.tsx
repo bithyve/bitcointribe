@@ -64,7 +64,7 @@ export default function ConfirmSeedWordsModal( props ) {
       // flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
-      <KeyboardAwareScrollView
+      {/* <KeyboardAwareScrollView
         resetScrollToCoords={{
           x: 0, y: 0
         }}
@@ -74,7 +74,7 @@ export default function ConfirmSeedWordsModal( props ) {
           backgroundColor: Colors.backgroundColor,
           height: 'auto'
         }}
-      >
+      > */}
         <View style={{
           // height: hp( '72%' ),
           paddingHorizontal:8,
@@ -225,7 +225,7 @@ export default function ConfirmSeedWordsModal( props ) {
             )}
           </View>
         </View>
-      </KeyboardAwareScrollView>
+      {/* </KeyboardAwareScrollView> */}
     </View>
   )
 }

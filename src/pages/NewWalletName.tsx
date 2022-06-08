@@ -104,7 +104,8 @@ export default function NewWalletName( props ) {
           return (
             <CloudPermissionModalContents
               title={'Automated Cloud Backup'}
-              info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              // info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              info={'Backup the wallet to easily restore it in case your phone gets damaged or lost'}
               note={''}
               onPressProceed={( flag )=>{
                 closeBottomSheet()
