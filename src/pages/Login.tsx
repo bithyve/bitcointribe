@@ -71,8 +71,10 @@ export default function Login( props ) {
     //return strings.loaderMessages[ randomIndex ]
     // added static message for 2.0.5 #4833
     return {
-      heading: 'Gift Sats',
-      text: 'Send sats as gifts to your friends and family.',
+      // heading: 'Gift Sats',
+      // text: 'Send sats as gifts to your friends and family.',
+      heading: 'Seed Backup',
+      text: 'New backup method: Now use Seed Words to backup your wallet',
       subText: ''
     }
   }

@@ -537,6 +537,7 @@
       "CloudBackupError": "Erro de backup na nuvem",
       "AutomatedCloudBackup": "Backup automatizado na nuvem",
       "Thisisthefirstlevel": "Este é o primeiro nível de segurança da sua carteira e encorajamos você a prosseguir com esta etapa ao configurar a carteira",
+      "Backupthewalletto": "Faça backup da carteira para restaurá-la facilmente caso seu telefone seja danificado ou perdido",
       "QuestionBackedUp": "Pergunta com backup feito com sucesso",
       "BackupHistory": "Cláudio Backup",
       "historyofyourbackup": "O histórico do seu backup aparecerá aqui",

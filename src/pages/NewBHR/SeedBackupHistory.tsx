@@ -182,7 +182,8 @@ const SeedBackupHistory = ( props ) => {
     return ( <CloudPermissionModalContents
       modalRef={bottomSheetRef}
       title={Platform.OS == 'ios' ? strings.AutomatedCloudBackup : strings.AutomatedDriveBackup}
-      info={strings.Thisisthefirstlevel}
+      // info={strings.Thisisthefirstlevel}
+      info={strings.Backupthewalletto}
       note={''}
       onPressProceed={( flag )=> {
         setConfirmationModal( false )
@@ -389,6 +390,7 @@ const SeedBackupHistory = ( props ) => {
       />
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
+          selectedType={'seed'}
           selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device or Cloud'}
@@ -437,6 +439,8 @@ const SeedBackupHistory = ( props ) => {
           onPressProceed={() => {
             setSeedWordModal( false )
             // props.navigation.goBack()
+            setInfo( 'please delete icloud backup' )
+            setShowAlertModal( true )
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}

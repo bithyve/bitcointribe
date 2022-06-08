@@ -536,6 +536,7 @@
       "CloudBackupError": "Cloud Backup Fehler",
       "AutomatedCloudBackup": "Automatisiertes Cloud-Backup",
       "Thisisthefirstlevel": "Dies ist die erste Sicherheitsstufe deiner Wallet und wir empfehlen dir, mit diesem Schritt fortzufahren, während du die Wallet einrichtest",
+      "Backupthewalletto": "Sikkerhedskopier tegnebogen for nemt at gendanne den, hvis din telefon bliver beskadiget eller tabt",
       "QuestionBackedUp": "Frage erfolgreich gesichert",
       "BackupHistory": "Cloud Backup",
       "historyofyourbackup": "Backup-Verlauf wird hier angezeigt",
