@@ -18,12 +18,14 @@ export default function KeeperTypeModalContents( props ) {
   const common = translations[ 'common' ]
   const strings = translations[ 'bhr' ]
   const [ keeperTypesData, setKeeperTypesData ] = useState( [
+    // props.selectedType == 'seed' &&
     {
       type: 'cloud',
       name: Platform.OS == 'ios' ? strings.Backupwithcloud : strings.Backupwithdrive,
       info: Platform.OS == 'ios' ? strings.BackupwithcloudSub : strings.BackupwithdriveSub,
       image: Platform.OS == 'ios' ? require( '../../assets/images/icons/icon_cloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' ),
     },
+    // props.selectedType == 'cloud' &&
     {
       type: 'seed',
       name: 'Backup with seed',
@@ -170,6 +172,7 @@ export default function KeeperTypeModalContents( props ) {
           // || ( value.type === 'pdf' && currentLevel == 0 )
           if ( value.type === 'contact' && completedKeeperType.findIndex( ( value ) => value == 'contact' ) > -1 ) return
           if ( value.type === 'device' && completedKeeperType.findIndex( ( value ) => value == 'device' ) > -1 ) return
+          if ( value.type === props.selectedType ) return
           return (
             <AppBottomSheetTouchableWrapper
               activeOpacity={10}
@@ -177,7 +180,7 @@ export default function KeeperTypeModalContents( props ) {
               style={styles.keeperTypeElementView}
               key={index}
             >
-              <View style={styles.typeRadioButtonView}>
+              {/* <View style={styles.typeRadioButtonView}>
                 <RadioButton
                   size={15}
                   color={Colors.lightBlue}
@@ -185,7 +188,7 @@ export default function KeeperTypeModalContents( props ) {
                   isChecked={value.type == SelectedKeeperType.type}
                   onpress={() => onKeeperSelect( value )}
                 />
-              </View>
+              </View> */}
               <Image
                 style={{
                   width: wp( '9%' ),
@@ -220,17 +223,24 @@ export default function KeeperTypeModalContents( props ) {
         </View>*/}
       <View style={styles.bottomButtonView}>
         <AppBottomSheetTouchableWrapper
-          disabled={!SelectedKeeperType.name}
+          // disabled={!SelectedKeeperType.name}
           onPress={() => {
+            // console.log( 'skk keeperTypesData' + JSON.stringify( keeperTypesData ) )
+            const position = props.selectedType == 'seed' ? 0 : 1
+            // onKeeperSelect( keeperTypesData[ position ] )
+            // setTimeout( () => {
             props.onPressSetup(
-              SelectedKeeperType.type,
-              SelectedKeeperType.name
+              keeperTypesData[ position ].type,
+              keeperTypesData[ position ].name
             )
+            // }, 1000 )
           }}
           style={{
             ...styles.successModalButtonView,
             shadowColor: Colors.shadowBlue,
-            backgroundColor: !SelectedKeeperType.name ? Colors.lightBlue : Colors.blue,
+            // backgroundColor: !SelectedKeeperType.name ? Colors.lightBlue : Colors.blue,
+            backgroundColor: Colors.blue,
+
           }}
         >
           <Text
