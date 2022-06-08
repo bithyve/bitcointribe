@@ -8,6 +8,8 @@ import {
 import Colors from '../../common/Colors'
 import _ from 'underscore'
 import ModalContainer from '../../components/home/ModalContainer'
+import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
+
 import SeedHeaderComponent from './SeedHeaderComponent'
 import SeedPageComponent from './SeedPageComponent'
 import SeedBacupModalContents from './SeedBacupModalContents'
@@ -96,7 +98,7 @@ const BackupSeedWordsContent = ( props ) => {
         />
       </View>
 
-      <ModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
+      <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
         closeBottomSheet={() => setConfirmSeedWordModal( false )}  showBlurView={true}>
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
@@ -129,7 +131,7 @@ const BackupSeedWordsContent = ( props ) => {
           isIgnoreButton={true}
           cancelButtonText={'Start Over'}
         />
-      </ModalContainer>
+      </BottomInputModalContainer>
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
@@ -139,9 +141,7 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             RNPreventScreenshot.enabled( false )
             setSeedWordModal( false )
-            // props.navigation.goBack()
-            setInfo("please delete icloud backup")
-            setShowAlertModal(true)
+            props.navigation.goBack()
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
