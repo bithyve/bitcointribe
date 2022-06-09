@@ -36,6 +36,8 @@ import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountIn
 import HomeBuyCard from './HomeBuyCard'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountType } from '../../bitcoin/utilities/Interface'
+import dbManager from '../../storage/realm/dbManager'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -72,7 +74,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       strings: this.context.translations [ 'home' ],
     }
   }
-
+  componentDidMount() {
+    const dbWallet =  dbManager.getWallet()
+    if( dbWallet!=undefined && dbWallet!=null ){
+      const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+      const primaryMnemonic = walletObj.primaryMnemonic
+      const seed = primaryMnemonic.split( ' ' )
+      const seedData = seed.map( ( word, index ) => {
+        return {
+          name: word, id: ( index+1 )
+        }
+      } )
+      const i = 12
+      let ranNums = 1
+      const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+      if( tempNumber == undefined || tempNumber == 0 )
+        ranNums = 1
+      else ranNums = tempNumber
+      const asyncSeedData=seedData[ ranNums ]
+      AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
+    }
+  }
   navigateToAddNewAccountScreen = () => {
     // this.props.navigation.navigate( 'AddNewAccount' )
     this.props.navigation.navigate( 'ScanNodeConfig', {

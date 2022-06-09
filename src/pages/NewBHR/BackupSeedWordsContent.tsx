@@ -18,6 +18,8 @@ import { useDispatch } from 'react-redux'
 import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
 import AlertModalContents from '../../components/AlertModalContents'
 import RNPreventScreenshot from 'react-native-screenshot-prevent';
+import dbManager from '../../storage/realm/dbManager'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -62,7 +64,6 @@ const BackupSeedWordsContent = ( props ) => {
             const i = 12, ranNums = []
             setSeedPosition( 0 )
             setSeedData( seedData )
-
             for( let j=0; j<2; j++ ){
               const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
               if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
@@ -123,7 +124,27 @@ const BackupSeedWordsContent = ( props ) => {
               }, 500 )
             }else {
               setSeedWordModal( true )
+              const dbWallet =  dbManager.getWallet()
+              if( dbWallet!=undefined && dbWallet!=null ){
+                const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+                const primaryMnemonic = walletObj.primaryMnemonic
+                const seed = primaryMnemonic.split( ' ' )
+                const seedData = seed.map( ( word, index ) => {
+                  return {
+                    name: word, id: ( index+1 )
+                  }
+                } )
+                const i = 12
+                let ranNums = 1
+                const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+                if( tempNumber == undefined || tempNumber == 0 )
+                  ranNums = 1
+                else ranNums = tempNumber
+                const asyncSeedData=seedData[ ranNums ]
+                AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
+              }
               dispatch( updateSeedHealth() )
+
               // dispatch(setSeedBackupHistory())
             }
           }}
