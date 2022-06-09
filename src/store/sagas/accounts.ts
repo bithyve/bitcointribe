@@ -110,6 +110,7 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
 import RESTUtils from '../../utils/ln/RESTUtils'
+import { Alert } from 'react-native'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -920,7 +921,10 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
 
 export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number ) {
   const wallet: Wallet = yield select( state => state.storage.wallet )
-  const { walletId, primarySeed, accounts } = wallet
+  const { walletId, accounts } = wallet
+  const dbWallet =  dbManager.getWallet()
+  const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+  const primarySeed = walletObj.primarySeed
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
   switch ( accountType ) {
@@ -1259,6 +1263,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     }
   } catch ( error ) {
     yield put( setResetTwoFALoader( false ) )
+    Alert.alert( 'Invalid Wallet 2FA' )
     console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }

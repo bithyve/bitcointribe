@@ -89,8 +89,10 @@ export default function NewWalletName( props ) {
 
   const renderLoaderModalContent = useCallback( () => {
     return <LoaderModal
-      headerText={'Gift Sats'}
-      messageText={'Send sats as gifts to your friends and family.'}
+      // headerText={'Gift Sats'}
+      // messageText={'Send sats as gifts to your friends and family.'}
+      headerText={'Seed Backup'}
+      messageText={'New backup method: Now use Seed Words to backup your wallet'}
       showGif={false}
     />
   }, [ message, subTextMessage, loaderModal ] )
@@ -102,7 +104,8 @@ export default function NewWalletName( props ) {
           return (
             <CloudPermissionModalContents
               title={'Automated Cloud Backup'}
-              info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              // info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              info={'Backup the wallet to easily restore it in case your phone gets damaged or lost'}
               note={''}
               onPressProceed={( flag )=>{
                 closeBottomSheet()

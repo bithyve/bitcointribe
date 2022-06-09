@@ -46,7 +46,14 @@ import {
   SET_IS_CURRENT_LEVEL0,
   PDF_UPGRADE,
   SET_PASSWORD_RESET_STATE,
+  SEED_BACKUP_HISTORY,
 } from '../actions/BHR'
+
+interface historyObj {
+  title: string,
+  confirmed: number,
+  date: number,
+}
 
 const initialState: {
   mnemonic: string;
@@ -126,8 +133,10 @@ const initialState: {
   approvalContactData: ContactRecipientDescribing;
   IsCurrentLevel0: boolean;
   pdfUpgrade: boolean;
-  passwordResetState: string
+  passwordResetState: string;
+  seedBackupHistory: historyObj[];
 } = {
+  seedBackupHistory: [],
   mnemonic: '',
   loading: {
     levelHealthCheck: false,
@@ -493,10 +502,16 @@ export default ( state = initialState, action ) => {
           pdfUpgrade: action.payload.flag,
         }
 
-      case UPDATE_OLD_META_SHARES_KEEPER:
+        case UPDATE_OLD_META_SHARES_KEEPER:
+      return {
+        ...state,
+        oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
+      }
+
+      case SEED_BACKUP_HISTORY:
         return {
           ...state,
-          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
+          seedBackupHistory: action.payload.seedBackupHistory,
         }
   }
   return state

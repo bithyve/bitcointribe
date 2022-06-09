@@ -862,8 +862,8 @@ export interface Wallet {
   walletName: string,
   userName?: string,
   security: { questionId: string, question: string, answer: string },
-  primaryMnemonic: string,
-  primarySeed: string,
+  primaryMnemonic?: string,
+  primarySeed?: string,
   secondaryXpub?: string,
   details2FA? : {
     bithyveXpub?: string,

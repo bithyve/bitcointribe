@@ -47,7 +47,7 @@ import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestio
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
-// import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
+import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
 import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
@@ -222,7 +222,12 @@ const HomeStack = createStackNavigator(
     // KeeperDeviceHistory,
     // PersonalCopyHistoryKeeper,
     PersonalCopyHistoryNewBHR,
-    CloudBackupHistory,
+    // CloudBackupHistory: {
+    //   screen: CloudBackupHistory,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
     // SeedBackupHistory: {
     //   screen: SeedBackupHistory,
     //   navigationOptions: {
@@ -241,13 +246,13 @@ const HomeStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
-    BackupSeedWordsContent: {
-      screen: BackupSeedWordsContent,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    RestoreSeedWordsContent,
+    // BackupSeedWordsContent: {
+    //   screen: BackupSeedWordsContent,
+    //   navigationOptions: {
+    //     header: null,
+    //   },
+    // },
+    // RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {

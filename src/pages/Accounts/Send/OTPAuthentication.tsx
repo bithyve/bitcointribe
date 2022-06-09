@@ -28,6 +28,8 @@ import { resetStackToAccountDetails } from '../../../navigation/actions/Navigati
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
+import ModalContainer from '../../../components/home/ModalContainer'
+import LoaderModal from '../../../components/LoaderModal'
 
 
 export default function OTPAuthenticationScreen( { navigation } ) {
@@ -44,7 +46,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
-
+  const [ handleButton, setHandleButton ] = useState( true )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
   function onPressNumber( text ) {
@@ -383,8 +385,10 @@ export default function OTPAuthenticationScreen( { navigation } ) {
               {( !isConfirmDisabled && sendingState.sendST2.inProgress ) ||
               ( isConfirmDisabled && sendingState.sendST2.inProgress ) ? (
                   <ActivityIndicator color={Colors.white} size="small" />
+              // setHandleButton(false)
                 ) : (
                   <Text style={styles.confirmButtonText}>Confirm</Text>
+              // setHandleButton(true)
                 )}
             </TouchableOpacity>
 
@@ -415,6 +419,11 @@ export default function OTPAuthenticationScreen( { navigation } ) {
             </TouchableOpacity>
           </View>
         </View>
+        <ModalContainer visible={( !isConfirmDisabled && sendingState.sendST2.inProgress ) || ( isConfirmDisabled && sendingState.sendST2.inProgress )} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+          <LoaderModal
+            headerText={'Sending...'}
+          />
+        </ModalContainer>
       </View>
     </SafeAreaView>
   )

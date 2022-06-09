@@ -47,6 +47,10 @@ export const isEmpty = ( obj ) => {
   return Object.keys( obj ).every( ( k ) => !Object.keys( obj[ k ] ).length )
 }
 export const  buildVersionExists = ( versionData ) =>{
+  if( typeof versionData == 'string' ){
+    versionData = JSON.parse( versionData )
+  }
+
   return (
     ( versionData.filter( version => version.buildNumber == DeviceInfo.getBuildNumber() ).length > 0 )
     &&

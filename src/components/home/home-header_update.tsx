@@ -153,13 +153,22 @@ const HomeHeader = ( {
           alignItems:'center',
           justifyContent: 'center'
         }}>
-          <Image
-            source={isError ?currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' )  : require( '../../assets/images/icons/check_white.png' )}
+          { levelData[ 0 ].keeper1.status == 'accessible' && levelData[ 0 ].keeper1.shareType == 'seed' ? <Image
+            source={ require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
+              tintColor: 'green'
             }}
             resizeMode={'contain'}
-          />
+          /> :
+            <Image
+              source={isError ? currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+              style={{
+                width: wp( '2.7%' ), height: wp( '2.7%' ),
+              }}
+              resizeMode={'contain'}
+            />
+          }
         </View>
       }
       {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
@@ -203,18 +212,21 @@ const HomeHeader = ( {
             isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: strings.needAttention, isError: true
           }
         }
+        if( element.keeper1.status == 'accessible'  && element.keeper1.shareType == 'seed' ){
+          messageOneName = 'Seed ' +strings.backupIsCompleted
+        }
         if( element.keeper2.status == 'accessible' ){
           messageOneName = element.keeper2.name
         }
       }
-      if( currentLevel == 0 ){
+      if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType != 'seed' ){
         return {
           isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
         }
       } else if( currentLevel === 1 ){
         if( messageOneName ) {
           return {
-            isFirstMessageBold: false, messageOne: strings.Level1+` ${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
+            isFirstMessageBold: false, messageOne: `${messageOneName} `+strings.backupIsCompleted, messageTwo: '', isError: false
           }
         }
         return {
@@ -234,7 +246,11 @@ const HomeHeader = ( {
       return {
         isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? strings.l1 : strings.l1Drive, messageTwo: '', isError: false
       }
-    } else {
+    } else if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType == 'seed' ) {
+      return {
+        isFirstMessageBold: false, messageOne: 'Seed ' +strings.backupIsCompleted, messageTwo: '', isError: true
+      }
+    }else {
       return {
         isFirstMessageBold: false, messageOne: strings.Backupyour, messageTwo: '', isError: true
       }

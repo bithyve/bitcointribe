@@ -482,15 +482,16 @@ export default function ManageBackup( props ) {
   }
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
-    if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-      setBackupTypeModal( true )
-      return
-    }
+    // if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+    //   setBackupTypeModal( true )
+    //   return
+    // }
     if ( ( keeperNumber == 1 ) && ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
       if ( value.id == 1 ) {
-        props.navigation.navigate( 'SetNewPassword', {
-          isFromManageBackup: true,
-        } )
+        // props.navigation.navigate( 'SetNewPassword', {
+        //   isFromManageBackup: true,
+        // } )
+        setSeedBackupModal( true )
         return
       }
     }
@@ -516,6 +517,7 @@ export default function ManageBackup( props ) {
       selectedKeeper,
       selectedLevelId
     }
+    // console.log( 'skk gotohistory', navigationParams )
     let index = 1
     let count = 0
     if ( selectedKeeper.shareType == 'primaryKeeper' || selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
@@ -560,6 +562,9 @@ export default function ManageBackup( props ) {
     } else if ( selectedKeeper.shareType == 'pdf' ) props.navigation.navigate( 'PersonalCopyHistoryNewBHR', navigationParams )
     else if ( selectedKeeper.shareType == 'securityQuestion' ) props.navigation.navigate( 'SecurityQuestionHistoryNewBHR', navigationParams )
     else if ( selectedKeeper.shareType == 'cloud' ) props.navigation.navigate( 'CloudBackupHistory', navigationParams )
+    else if ( selectedKeeper.shareType == 'seed' ) {
+      props.navigation.navigate( 'SeedBackupHistory', navigationParams )
+    }
     setOnKeeperButtonClick( false )
   }
 
@@ -567,6 +572,10 @@ export default function ManageBackup( props ) {
     const tempData = []
     levelData.map( ( item, index ) => {
       if ( item.keeper1.status != 'notSetup' || index == 0 ) {
+        if ( item.keeper1.shareType == 'seed' ) {
+          tempData.push( item )
+          return
+        }
         tempData.push( item )
         tempData.push( item )
       }
@@ -636,7 +645,7 @@ export default function ManageBackup( props ) {
           else require( '../../assets/images/icons/files-and-folders-2.png' )
         default:
           if ( index == 0 )
-            return require( '../../assets/images/icons/icon_password.png' )
+            return require( '../../assets/images/icons/seedwords.png' )
           else if ( index == 1 )
             return Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
           else if ( index == 2 )
@@ -675,8 +684,9 @@ export default function ManageBackup( props ) {
               onRefresh={() => onRefresh() }
             />
           }
-          style={{
-            flex: 1
+          contentContainerStyle={{
+            // backgroundColor:'red',
+            flex:1
           }}
         >
           <View style={{
@@ -690,7 +700,7 @@ export default function ManageBackup( props ) {
                 fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular
               }}>{strings[ 'WalletBackup' ]}</Text>
-              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo' ]}</Text>
+              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo1' ]}</Text>
             </View>
             <ImageBackground
               source={require( '../../assets/images/icons/keeper_sheild.png' )}
@@ -715,33 +725,37 @@ export default function ManageBackup( props ) {
                 height: 30
               }} />}
               renderItem={( { item, index } ) => {
-                return (
-                  <View style={{
-                    flex: localLevelData.length > 2 ? 1 / 3 : 1, alignItems: 'center'
-                  }}>
-                    <TouchableOpacity style={{
-                      width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.white : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-                        width: 15, height: 15
-                      }
-                    }}
-                    onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
-                    >
-                      <View style={{
-                        position: 'absolute', right: -4, height: 12, width: 12, borderRadius: 6, backgroundColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.green : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
-                      }}>
-                        <FontAwesome name={index % 2 == 0 ? item.keeper1.status == 'accessible' ? 'check' : 'exclamation' : item.keeper2.status == 'accessible' ? 'check' : 'exclamation'} color={Colors.white} size={7} />
-                      </View>
-                      <Image style={{
-                        height: 20, width: 20
-                      }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
-                    </TouchableOpacity>
-                    <Text style={{
-                      fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.black, marginTop: 5, textAlign: 'center'
+                if ( index == 0 && item.keeper1ButtonText == 'Encryption Password' ){
+                  return null
+                } else {
+                  return (
+                    <View style={{
+                      flex: localLevelData.length > 2 ? 1 / 3 : 1, alignItems: 'center'
                     }}>
-                      {index % 2 == 0 ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
-                    </Text>
-                  </View>
-                )
+                      <TouchableOpacity style={{
+                        width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.white : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+                          width: 15, height: 15
+                        }
+                      }}
+                      onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
+                      >
+                        <View style={{
+                          position: 'absolute', right: -4, height: 12, width: 12, borderRadius: 6, backgroundColor: index % 2 == 0 ? item.keeper1.status == 'accessible' ? Colors.green : Colors.yellow : item.keeper2.status == 'accessible' ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
+                        }}>
+                          <FontAwesome name={index % 2 == 0 ? item.keeper1.status == 'accessible' ? 'check' : 'exclamation' : item.keeper2.status == 'accessible' ? 'check' : 'exclamation'} color={Colors.white} size={7} />
+                        </View>
+                        <Image style={{
+                          height: 20, width: 20
+                        }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
+                      </TouchableOpacity>
+                      <Text style={{
+                        fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.black, marginTop: 5, textAlign: 'center'
+                      }}>
+                        {index % 2 == 0 ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                      </Text>
+                    </View>
+                  )
+                }
               }}
               ListFooterComponent={() => {
                 return (
@@ -793,16 +807,19 @@ export default function ManageBackup( props ) {
             })}
           </View> */}
           <View style={{
-            marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor, height: '100%',
+            flex:1
+          }} />
+          <View style={{
+            marginTop: wp( '5%' ), backgroundColor: Colors.backgroundColor,
             paddingLeft: wp( '6%' ),
-            paddingBottom: hp( 3 )
+            paddingBottom: hp( 3 ),
           }}>
-            <Text style={styles.pageTitle}>{strings.IamtheKeeper}</Text>
+            <Text style={styles.pageTitle}>{strings.IhavetheRecoveryKeyfor}</Text>
             <Text style={styles.pageInfoText}>
               {strings[ 'Contactswhose' ]}
             </Text>
             <View style={{
-              marginBottom: 15
+              marginBottom: 15,
             }}>
               {keeping.length > 0 ?
                 <ScrollView
@@ -920,7 +937,7 @@ export default function ManageBackup( props ) {
           closeBottomSheet={() => setSeedBackupModal( false )}>
           <SeedBacupModalContents
             title={'Backup using \nSeed Words'}
-            info={'Once you confirm your backup using seed words, the cloud backup will be deleted\n\nYou will also have to store a Recovery Kit (PDF) to use Seed Words backup'}
+            info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
             proceedButtonText={'Proceed'}
             cancelButtonText={'Back'}
             onPressProceed={() => {
@@ -1220,7 +1237,7 @@ const styles = StyleSheet.create( {
     paddingBottom: wp( '7%' ),
   },
   body: {
-    flex: 1,
+    // flex: 1,
     alignItems: 'center',
     position: 'relative',
     flexDirection: 'row',

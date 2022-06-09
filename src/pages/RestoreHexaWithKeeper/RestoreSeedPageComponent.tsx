@@ -17,6 +17,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
 import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
+import ModalContainer from '../../components/home/ModalContainer'
+import AlertModalContents from '../../components/AlertModalContents'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -62,6 +64,7 @@ const RestoreSeedPageComponent = ( props ) => {
   const [ total, setTotal ] = useState( 0 )
   const [ partialSeedData, setPartialSeedData ] = useState( [] )
   const [ currentPosition, setCurrentPosition ] = useState( 0 )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
 
   const width = Dimensions.get( 'window' ).width
   const ref = React.useRef<PagerView>( null )
@@ -117,7 +120,8 @@ const RestoreSeedPageComponent = ( props ) => {
       else seed = seed + ' ' + name
     } )
     if( showValidation ){
-      Alert.alert( 'Please fill all seed words' )
+      // Alert.alert( 'Please fill all seed words' )
+      setShowAlertModal( true )
     } else {
       props.onPressConfirm( seed )
     }
@@ -140,6 +144,41 @@ const RestoreSeedPageComponent = ( props ) => {
     else if ( index == 3 ) return index + 'rd'
     else return index + 'th'
   }
+
+  const getIndex = ( index, seedIndex )=>{
+    let newIndex = index + 1 + ( seedIndex * 6 )
+    let isAdd = false
+    if( index % 2 == 0 ) isAdd = true
+
+    let tempNumber = 0
+    if( index == 0 || index == 5 ) tempNumber = 0
+    else if( index == 1 || index == 4 ) tempNumber = 2
+    else tempNumber = 1
+
+    if( isAdd )
+      newIndex -= tempNumber
+    else newIndex += tempNumber
+
+    return newIndex
+  }
+
+  const getTextIndex = ( index )=>{
+    let newIndex = index
+    let isAdd = false
+    if( index % 2 == 0 ) isAdd = true
+
+    let tempNumber = 0
+    if( index == 0 || index == 5 ) tempNumber = 0
+    else if( index == 1 || index == 4 ) tempNumber = 2
+    else tempNumber = 1
+
+    if( isAdd )
+      newIndex -= tempNumber
+    else newIndex += tempNumber
+
+    return newIndex
+  }
+
 
   const onPageScroll = useMemo(
     () =>
@@ -212,14 +251,15 @@ const RestoreSeedPageComponent = ( props ) => {
                         onPress={() => SelectOption( value?.id )}
                         style={styles.historyCard}
                       >
-                        <Text style={styles.numberText}>{getFormattedNumber( index + 1 + ( seedIndex * 6 ) )}</Text>
+                        <Text style={styles.numberText}>{getFormattedNumber( getIndex( index, seedIndex ) )}</Text>
                         <TextInput
                           style={[ styles.modalInputBox,
-                            partialSeedData[ currentPosition ][ index ]?.name.length > 0 ? styles.selectedInput : null,
+                            partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                             // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
-                          placeholder={`Enter ${getPlaceholder( index + 1 + ( seedIndex * 6 ) )} word`}
+                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
                           placeholderTextColor={Colors.borderColor}
+                          // value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           value={value?.name}
                           autoCompleteType="off"
                           textContentType="none"
@@ -231,7 +271,7 @@ const RestoreSeedPageComponent = ( props ) => {
                           // }
                           onChangeText={( text ) => {
                             const data = [ ...partialSeedData ]
-                            data[ currentPosition ][ index ].name = text
+                            data[ currentPosition ][ getTextIndex( index ) ].name = text.trim()
                             setPartialSeedData( data )
                           }}
                         />
@@ -251,7 +291,7 @@ const RestoreSeedPageComponent = ( props ) => {
           <View style={{
             flex: 1
           }}>
-            <View style={{
+            {/* <View style={{
               backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
             }}>
               <BottomInfoBox
@@ -259,7 +299,7 @@ const RestoreSeedPageComponent = ( props ) => {
                 title={props.infoBoxTitle}
                 infoText={props.infoBoxInfo}
               />
-            </View>
+            </View> */}
           </View>
         )}
       {props.showButton ? <View>
@@ -323,6 +363,19 @@ const RestoreSeedPageComponent = ( props ) => {
         </View>
       </View> : null
       }
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={'Please fill all seed words'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

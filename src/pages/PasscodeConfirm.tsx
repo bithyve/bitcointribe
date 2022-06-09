@@ -481,14 +481,15 @@ export default function PasscodeConfirm( props ) {
               </View>
             </View>
           ) : null}
-
-          <View style={{ marginTop: 20 }}>
-            <BottomInfoBox
-              backgroundColor={Colors.white}
-              title={'Note'}
-              infoText={'Make sure you remember the passcode and backup your wallet. If you forget your passcode, you can access your wallet only by restoring it'}
-            />
-          </View>
+          {passcode.length != 4 &&
+            <View style={ { marginTop: 20 } }>
+              <BottomInfoBox
+                backgroundColor={Colors.white}
+                title={''}
+                infoText={'Make sure you remember your passcode. If you forget your passcode, you will have to restore from backup to regain access to the wallet'}
+              />
+            </View>
+          }
           {passcode.length == 4 ? (
             <TouchableOpacity
               disabled={passcode == confirmPasscode ? false : true}
@@ -705,7 +706,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp( '1%' ),
+    marginTop: hp( '3%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',

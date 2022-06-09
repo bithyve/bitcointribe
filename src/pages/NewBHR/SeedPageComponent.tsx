@@ -23,6 +23,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
+import dbManager from '../../storage/realm/dbManager'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -33,7 +34,10 @@ const SeedPageComponent = ( props ) => {
   const SelectOption = ( Id ) => {
   }
 
-  const seed = wallet.primaryMnemonic.split( ' ' )
+  const dbWallet =  dbManager.getWallet()
+  const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+  const primaryMnemonic = walletObj.primaryMnemonic
+  const seed = primaryMnemonic.split( ' ' )
   const seedData = seed.map( ( word, index ) => {
     return {
       name: word, id: ( index+1 )
@@ -64,7 +68,6 @@ const SeedPageComponent = ( props ) => {
     let initPosition = 0
     let lastPosition = 6
     const totalLength = seedData.length
-    console.log( 'skk seeddata', seedData )
     seedData.map( ( item, index )=>{
       if( index != 0 && index % 6 == 0 ){
         initPosition = initPosition + 6
@@ -77,8 +80,6 @@ const SeedPageComponent = ( props ) => {
     if( innerTempData.length > 0 ){
       tempData.push( innerTempData )
     }
-    console.log( 'skk tempData', tempData )
-
     setPartialSeedData( tempData )
     setTotal( totalLength )
   }, [] )
@@ -87,6 +88,7 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+    props.setHeaderMessage( 'Last 6 seed words' )
   }
 
   const onProceedClick = () =>{
@@ -103,7 +105,7 @@ const SeedPageComponent = ( props ) => {
     if( showValidation ){
       Alert.alert( 'Please fill all seed words' )
     } else {
-      props.onPressConfirm( seed, seedData[ 1 ].name )
+      props.onPressConfirm( seed, seedData )
     }
   }
 
@@ -111,6 +113,7 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition-1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+    props.setHeaderMessage( 'First 6 seed words' )
   }
 
   const getFormattedNumber = ( number ) => {
@@ -123,6 +126,40 @@ const SeedPageComponent = ( props ) => {
     else if ( index == 2 ) return index + 'nd'
     else if ( index == 3 ) return index + 'rd'
     else return index + 'th'
+  }
+
+  const getIndex = ( index, seedIndex )=>{
+    const newIndex = index + 1 + ( seedIndex * 6 )
+    // let isAdd = false
+    // if( index % 2 == 0 ) isAdd = true
+
+    // let tempNumber = 0
+    // if( index == 0 || index == 5 ) tempNumber = 0
+    // else if( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
+
+    // if( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
+
+    return newIndex
+  }
+
+  const getTextIndex = ( index )=>{
+    const newIndex = index
+    // let isAdd = false
+    // if( index % 2 == 0 ) isAdd = true
+
+    // let tempNumber = 0
+    // if( index == 0 || index == 5 ) tempNumber = 0
+    // else if( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
+
+    // if( isAdd )
+    // newIndex -= tempNumber
+    // else newIndex += tempNumber
+
+    return newIndex
   }
 
   const onPageScroll = useMemo(
@@ -154,6 +191,9 @@ const SeedPageComponent = ( props ) => {
         {
           listener: ( { nativeEvent: { position } } ) => {
             setCurrentPosition( position )
+            if( position == 0 )
+              props.setHeaderMessage( 'First 6 seed words' )
+            else props.setHeaderMessage( 'Last 6 seed words' )
           },
           useNativeDriver: true,
         }
@@ -185,7 +225,7 @@ const SeedPageComponent = ( props ) => {
                   data={seedItem}
                   extraData={seedItem}
                   showsVerticalScrollIndicator={false}
-                  numColumns={2}
+                  // numColumns={2}
                   contentContainerStyle={{
                     marginStart:15
                   }}
@@ -196,15 +236,21 @@ const SeedPageComponent = ( props ) => {
                         onPress={() => SelectOption( value?.id )}
                         style={styles.historyCard}
                       >
-                        <Text style={styles.numberText}>{getFormattedNumber( index + 1 + ( seedIndex * 6 ) )}</Text>
+                        <View style={styles.numberContainer}>
+                          <View style={styles.numberInnerContainer}>
+                            <Text style={styles.numberText}>{
+                              getFormattedNumber( getIndex( index, seedIndex ) )
+                            }</Text>
+                          </View>
+                        </View>
                         <TextInput
                           style={[ styles.modalInputBox,
-                            partialSeedData[ currentPosition ][ index ]?.name.length > 0 ? styles.selectedInput : null,
+                            partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                             // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
-                          placeholder={`Enter ${getPlaceholder( index + 1 + ( seedIndex * 6 ) )} word`}
+                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
                           placeholderTextColor={Colors.borderColor}
-                          value={partialSeedData[ currentPosition ][ index ]?.name}
+                          value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           autoCompleteType="off"
                           textContentType="none"
                           returnKeyType="next"
@@ -215,7 +261,7 @@ const SeedPageComponent = ( props ) => {
                           // }
                           onChangeText={( text ) => {
                             const data = [ ...partialSeedData ]
-                            data[ currentPosition ][ index ].name = text
+                            data[ currentPosition ][ getTextIndex( index ) ].name = text
                             setPartialSeedData( data )
                           }}
                         />
@@ -223,11 +269,11 @@ const SeedPageComponent = ( props ) => {
                     )
                   }}
                 />
-                <BottomInfoBox
+                {/* <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={props.infoBoxTitle}
                   infoText={props.infoBoxInfo}
-                />
+                /> */}
               </View>
             ) )}
           </AnimatedPagerView>
@@ -235,7 +281,7 @@ const SeedPageComponent = ( props ) => {
           <View style={{
             flex: 1
           }}>
-            <View style={{
+            {/* <View style={{
               backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
             }}>
               <BottomInfoBox
@@ -243,7 +289,7 @@ const SeedPageComponent = ( props ) => {
                 title={props.infoBoxTitle}
                 infoText={props.infoBoxInfo}
               />
-            </View>
+            </View> */}
           </View>
         )}
       {props.showButton ? <View>
@@ -351,7 +397,6 @@ const styles = StyleSheet.create( {
   historyCard: {
     marginEnd: 15,
     // backgroundColor: Colors.gray7,
-    borderRadius: 10,
     flex: 1 / 2,
     // height: wp( '15%' ),
     // width: wp( '90%' ),
@@ -361,7 +406,11 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20
+    marginBottom: 20,
+    borderRadius: 10,
+    // borderColor: '#E3E3E3',
+    // borderWidth: 1
+    backgroundColor: Colors.backgroundColor1
   },
   historyCardTitleText: {
     color: Colors.textColorGrey,
@@ -383,10 +432,10 @@ const styles = StyleSheet.create( {
     marginRight: wp( '8%' ),
   },
   numberContainer: {
-    margin: 10,
-    height: RFValue( 50 ),
-    width: RFValue( 50 ),
-    borderRadius: RFValue( 25 ),
+    margin: 5,
+    height: ( 50 ),
+    width: ( 50 ),
+    borderRadius: ( 25 ),
     backgroundColor: Colors.white,
     shadowColor: Colors.shadowBlack,
     elevation: 10,
@@ -396,13 +445,15 @@ const styles = StyleSheet.create( {
       width: 15,
       height: 15,
     },
+    justifyContent: 'center',
+    alignItems: "center"
   },
   numberInnerContainer: {
     backgroundColor: Colors.numberBg,
-    borderRadius: RFValue( 23 ),
-    height: RFValue( 46 ),
-    width: RFValue( 46 ),
-    margin: RFValue( 4 ),
+    borderRadius: ( 23 ),
+    height: ( 46 ),
+    width: ( 46 ),
+    margin: ( 4 ),
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -410,7 +461,7 @@ const styles = StyleSheet.create( {
     color: Colors.numberFont,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginEnd: 10
+    // marginEnd: 10
   },
   nameText: {
     color: Colors.greyTextColor,
@@ -419,19 +470,20 @@ const styles = StyleSheet.create( {
     marginStart: 25
   },
   modalInputBox: {
-    flex: 1,
+    // flex: 1,
+    width:'70%',
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
-    borderRadius: 10,
+    // borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
-    backgroundColor: Colors.backgroundColor1
+    // backgroundColor: Colors.backgroundColor1
   },
   selectedInput: {
-    backgroundColor: Colors.white,
+    // backgroundColor: Colors.white,
     // backgroundColor: 'red',
     elevation: 5,
     shadowColor: Colors.shadowBlack,

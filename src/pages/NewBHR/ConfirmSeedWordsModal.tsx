@@ -26,12 +26,45 @@ export default function ConfirmSeedWordsModal( props ) {
   const windowHeight = Dimensions.get( 'window' ).height
 
   const [ word, setWord ]=useState( '' )
+  const getSeedNumber = ( seedNumber )=>{
+    switch( seedNumber ){
+        case 1: return 'first (01)'
+        case 2: return 'second (02)'
+        case 3: return 'third (03)'
+        case 4: return 'fourth (04)'
+        case 5: return 'fifth (05)'
+        case 6: return 'sixth (06)'
+        case 7: return 'seventh (07)'
+        case 8: return 'eighth (08)'
+        case 9: return 'ninth (09)'
+        case 10: return 'tenth (10)'
+        case 11: return 'eleventh (11)'
+        case 12: return 'twelfth (12)'
+    }
+  }
+  const getHint = ( seedNumber )=>{
+    switch( seedNumber ){
+        case 1: return 'first'
+        case 2: return 'second'
+        case 3: return 'third'
+        case 4: return 'fourth'
+        case 5: return 'fifth'
+        case 6: return 'sixth'
+        case 7: return 'seventh'
+        case 8: return 'eighth'
+        case 9: return 'ninth'
+        case 10: return 'tenth'
+        case 11: return 'eleventh'
+        case 12: return 'twelfth'
+    }
+  }
+
   return (
     <View style={{
       // flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
-      <KeyboardAwareScrollView
+      {/* <KeyboardAwareScrollView
         resetScrollToCoords={{
           x: 0, y: 0
         }}
@@ -41,7 +74,7 @@ export default function ConfirmSeedWordsModal( props ) {
           backgroundColor: Colors.backgroundColor,
           height: 'auto'
         }}
-      >
+      > */}
         <View style={{
           // height: hp( '72%' ),
           paddingHorizontal:8,
@@ -71,7 +104,7 @@ export default function ConfirmSeedWordsModal( props ) {
           }}>{'Enter the '}
             <Text style={{
               fontFamily: Fonts.FiraSansMedium
-            }}>{'Second (02) word'}</Text></Text>
+            }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
           <View
             style={{
               flexDirection: 'row',
@@ -87,19 +120,19 @@ export default function ConfirmSeedWordsModal( props ) {
           >
             <TextInput
               style={styles.modalInputBox}
-              placeholder={'Enter second word'}
+              placeholder={`Enter ${getHint( props.seedNumber )} word`}
               placeholderTextColor={Colors.borderColor}
               value={word}
-              autoCompleteType="off"
+              // autoCompleteType="off"
               textContentType="none"
-              returnKeyType="next"
+              returnKeyType='done'
               autoCorrect={false}
               // editable={isEditable}
               autoCapitalize="none"
               // onSubmitEditing={() =>
               // }
               onChangeText={( text ) => {
-                setWord( text )
+                setWord( text.trim() )
               }}
               // onFocus={() => {
               //   if ( word.length > 0 ) {
@@ -192,7 +225,7 @@ export default function ConfirmSeedWordsModal( props ) {
             )}
           </View>
         </View>
-      </KeyboardAwareScrollView>
+      {/* </KeyboardAwareScrollView> */}
     </View>
   )
 }

@@ -155,18 +155,19 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
-    setHandleButton( false )
     if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
         note
       } )
-    else
+    else {
+      setHandleButton( false )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: transactionPriority,
         note
       } ) )
+    }
   }
 
   function handleBackButtonPress() {
@@ -315,7 +316,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           headerText={'Sending...'}
         />
       </ModalContainer>
-
     </KeyboardAwareScrollView>
   )
 }

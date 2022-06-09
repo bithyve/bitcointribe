@@ -1,11 +1,11 @@
 import { BlurView } from '@react-native-community/blur'
 import React, { useEffect, useState } from 'react'
-import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard, Platform, AppState } from 'react-native'
+import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard, Platform, AppState, KeyboardAvoidingView, ScrollView } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { ScreenCornerRadius } from 'react-native-screen-corner-radius'
 
-const ModalContainer = ( {
+const BottomInputModalContainer = ( {
   visible,
   closeBottomSheet,
   background = 'rgba(0,0,0,0.5)',
@@ -59,7 +59,7 @@ const ModalContainer = ( {
       onRequestClose={() => { closeBottomSheet ? closeBottomSheet() : null }}
       transparent={true}
       style={{
-        flex: 1,
+        // flex: 1,
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
@@ -108,17 +108,17 @@ const ModalContainer = ( {
           }}
         >
           <TouchableWithoutFeedback>
+            <KeyboardAvoidingView behavior='padding'>
+              <View style={{
+                width: '100%',
+                borderRadius: wp( '4%' ),
+                overflow: 'hidden',
+                // marginBottom: hp( 0.5 )
+              }}>
 
-            <View style={{
-              width: '100%',
-              borderRadius: wp( '4%' ),
-              overflow: 'hidden',
-              // marginBottom: hp( 0.5 )
-            }}>
-
-              {children}
-            </View>
-
+                {children}
+              </View>
+            </KeyboardAvoidingView>
           </TouchableWithoutFeedback>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
@@ -126,4 +126,4 @@ const ModalContainer = ( {
   )
 }
 
-export default ModalContainer
+export default BottomInputModalContainer

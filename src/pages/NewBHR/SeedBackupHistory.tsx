@@ -4,6 +4,7 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  Alert,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -15,7 +16,7 @@ import moment from 'moment'
 import _ from 'underscore'
 import HistoryPageComponent from './HistoryPageComponent'
 import ModalHeader from '../../components/ModalHeader'
-import { updateCloudPermission } from '../../store/actions/BHR'
+import { updateCloudPermission, updateSeedHealth } from '../../store/actions/BHR'
 import DeviceInfo from 'react-native-device-info'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
@@ -26,10 +27,13 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { translations } from '../../common/content/LocContext'
-import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getIndex } from '../../common/utilities'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import SeedBacupModalContents from './SeedBacupModalContents'
+import dbManager from '../../storage/realm/dbManager'
 import AlertModalContents from '../../components/AlertModalContents'
 
 export enum BottomSheetKind {
@@ -42,22 +46,21 @@ export enum BottomSheetState {
   Open,
 }
 
-const CloudBackupHistory = ( props ) => {
+const SeedBackupHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
   const iCloudErrors  = translations[ 'iCloudErrors' ]
   const driveErrors  = translations[ 'driveErrors' ]
 
-  const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
+  const [ seedBackupHistory, setSeedBackupHistory ] = useState( [] )
   const [ confirmationModal, setConfirmationModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
-  const [ passwordModal, setPasswordModal ] = useState( false )
   const [
     bottomSheetRef,
     setBottomSheetRef,
   ] = useState( React.createRef() )
   const HealthCheckSuccessBottomSheet = createRef<BottomSheet>()
-  const cloudBackupHistoryArray = useSelector( ( state ) => state.cloud.cloudBackupHistory )
+  const seedBackupHistoryArray = useSelector( ( state ) => state.bhr.seedBackupHistory )
 
   const cloudErrorMessage = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const [ errorMsg, setErrorMsg ] = useState( '' )
@@ -70,11 +73,17 @@ const CloudBackupHistory = ( props ) => {
   const [ buttonText, setButtonText ] = useState( common.backup )
   const [ showButton, setShowButton ] = useState( false )
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
-  const [ showAlertModal, setShowAlertModal ]=useState( false )
   const levelData = useSelector( ( state ) => state.bhr.levelData )
   const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
   const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
+  const [ seedWordModal, setSeedWordModal ] = useState( false )
+  const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
+  const [ seedData, setSeedData ] = useState( [] )
+  const [ seedPosition, setSeedPosition ] = useState( 0 )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ info, setInfo ] = useState( '' )
   const sortedHistory = ( history ) => {
     if( !history ) return
     const currentHistory = history.filter( ( element ) => {
@@ -97,11 +106,14 @@ const CloudBackupHistory = ( props ) => {
   }, [] )
 
   useEffect( () =>{
-    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) setShowAlertModal( true )
+    if( cloudBackupInitiated && cloudBackupStatus === CloudBackupStatus.COMPLETED ) props.navigation.popToTop()
   }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
-    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
+    console.log( 'skk levelhealth', levelHealth )
+    console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
+    // if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
+    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ){
       setButtonText( common.backup )
       setShowButton( true )
       setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupSuccessInfo : strings.driveBackupSuccessInfo )
@@ -112,7 +124,7 @@ const CloudBackupHistory = ( props ) => {
     } else if( currentLevel > 0 && levelHealth[ 0 ].levelInfo[ 1 ].status == 'notAccessible' ) {
       setButtonText( common.confirm )
       setShowButton( true )
-      setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupInAccessibleInfo : strings.driveBackupInAccessibleInfo )
+      setBackupInfo( strings.cloudBackupInAccessibleInfo )
     }
   }
 
@@ -121,9 +133,9 @@ const CloudBackupHistory = ( props ) => {
   }, [ levelHealth ] )
 
   useEffect( () => {
-    console.log( cloudBackupHistoryArray )
-    if ( cloudBackupHistoryArray ) setCloudBackupHistory( cloudBackupHistoryArray )
-  }, [ cloudBackupHistoryArray ] )
+    console.log( seedBackupHistoryArray )
+    if ( seedBackupHistoryArray ) setSeedBackupHistory( seedBackupHistoryArray )
+  }, [ seedBackupHistoryArray ] )
 
   useEffect( () => {
     if ( cloudErrorMessage !== '' ) {
@@ -237,10 +249,10 @@ const CloudBackupHistory = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
-        channelKey: selectedKeeper.channelKey
+        channelKey: selectedKeeper.channelKey,
       },
+      selectedLevelId: props.navigation.getParam( 'selectedLevelId' ),
       index: changeIndex,
-      selectedLevelId: props.navigation.getParam( 'selectedLevelId' )
     }
     if ( type == 'contact' ) {
       props.navigation.goBack()
@@ -261,25 +273,11 @@ const CloudBackupHistory = ( props ) => {
         isChangeKeeperType: true,
       } )
     }
-    if ( type == 'seed' ) {
-      props.navigation.navigate( 'SeedBackupHistory', {
+    if( type == 'cloud' ){
+      props.navigation.navigate( 'CloudBackupHistory', {
         ...navigationParams,
         isChangeKeeperType: true,
       } )
-    }
-  }
-
-  const onEncryptionPasswordClick = () =>{
-    if( levelData.length > 0 && levelData[ 0 ].keeper1.shareType == KeeperType.SECURITY_QUESTION ){
-      const navigationParams = {
-        selectedTitle: selectedKeeper.name,
-        SelectedRecoveryKeyNumber,
-        selectedKeeper,
-        selectedLevelId: 1
-      }
-      props.navigation.navigate( 'SecurityQuestionHistoryNewBHR', navigationParams )
-    } else {
-      props.navigation.navigate( 'SetNewPassword' )
     }
   }
 
@@ -298,31 +296,63 @@ const CloudBackupHistory = ( props ) => {
           // props.navigation.goBack()
           props.navigation.popToTop()
         }}
-        selectedTitle={Platform.OS == 'ios' ? 'iCloud Backup' : 'Google Drive Backup'}
+        selectedTitle={'Seed word Backup'}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
           : 'Never'}
         moreInfo={''}
         tintColor={Colors.deepBlue}
-        headerImage={require( '../../assets/images/icons/ico_cloud_backup.png' )}
+        headerImage={require( '../../assets/images/icons/seedwords.png' )}
       />
       <View style={{
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={Platform.OS == 'ios' ? strings.BackupHistory : strings.BackupHistorydrive}
+          infoBoxTitle={strings.BackupHistory}
           infoBoxInfo={backupInfo}
           type={'security'}
           onPressConfirm={() => {
             // ( bottomSheetRef as any ).current.snapTo( 1 )
-            if( levelData.length > 0 && levelData[ 0 ].keeper1.shareType == KeeperType.SECURITY_QUESTION ){
-              setConfirmationModal( true )
-            } else {
-              setPasswordModal( true )
+            // setConfirmationModal( true )
+            // props.navigation.navigate( 'BackupSeedWordsContent', {
+            // fromHistory: true
+            // } )
+            const dbWallet =  dbManager.getWallet()
+            const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+            const primaryMnemonic = walletObj.primaryMnemonic
+            const seed = primaryMnemonic.split( ' ' )
+            const seedData = seed.map( ( word, index ) => {
+              return {
+                name: word, id: ( index+1 )
+              }
+            } )
+
+            // let seed = ''
+            // seedData.forEach( ( { name } ) => {
+            //   if( !seed ) seed = name
+            //   else seed = seed + ' ' + name
+            // } )
+
+            const i = 12, ranNums = []
+            setSeedPosition( 0 )
+            setSeedData( seedData )
+
+            for( let j=0; j<2; j++ ){
+              const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+              if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
+                if( tempNumber == undefined || tempNumber == 0 )
+                  ranNums.push( 1 )
+                else ranNums.push( tempNumber )
+              } else j--
             }
+            setSeedRandomNumber( ranNums )
+
+            setTimeout( () => {
+              setConfirmSeedWordModal( true )
+            }, 500 )
           }}
-          data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
-          confirmButtonText={buttonText}
+          data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
+          confirmButtonText={'Confirm'}
           disableChange={false}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
@@ -330,11 +360,8 @@ const CloudBackupHistory = ( props ) => {
           onPressChange={() => setKeeperTypeModal( true )}
           showButton={showButton}
           changeButtonText={'Change'}
+          showSeedHistoryNote={true}
           isChangeKeeperAllow={true}
-          showSecurityPassword={true}
-          // showSecurityPassword={false}
-          onEncryptionPasswordClick={onEncryptionPasswordClick}
-          // isChangeKeeperAllow={false}
         />
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
@@ -363,7 +390,7 @@ const CloudBackupHistory = ( props ) => {
       />
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
-          selectedType='cloud'
+          selectedType={'seed'}
           selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device or Cloud'}
@@ -375,31 +402,60 @@ const CloudBackupHistory = ( props ) => {
           isCloud={true}
         />
       </ModalContainer>
-      <ModalContainer onBackground={() => setPasswordModal( false )} visible={passwordModal} closeBottomSheet={() => setPasswordModal( false )}>
-        <ErrorModalContents
-          title={strings[ 'PleaseSetPasswordTitle' ]}
-          info={strings[ 'PleaseSetPasswordInfo' ]}
-          proceedButtonText={'Proceed To Password'}
-          cancelButtonText={'Got it'}
-          isIgnoreButton={true}
-          onPressProceed={() => {
-            setPasswordModal( false )
-            onEncryptionPasswordClick()
+      <ModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
+        closeBottomSheet={() => setConfirmSeedWordModal( false )} >
+        <ConfirmSeedWordsModal
+          proceedButtonText={'Next'}
+          seedNumber={seedRandomNumber ? seedRandomNumber[ seedPosition ] : 0}
+          onPressProceed={( word ) => {
+            setConfirmSeedWordModal( false )
+            if( word == '' ){
+              setTimeout( () => {
+                setInfo( 'Please enter seed word' )
+                setShowAlertModal( true )
+              }, 500 )
+            } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
+              setTimeout( () => {
+                setInfo( 'Please enter valid seed word' )
+                setShowAlertModal( true )
+              }, 500 )
+            } else {
+              setSeedWordModal( true )
+              dispatch( updateSeedHealth() )
+              // dispatch(setSeedBackupHistory())
+            }
           }}
-          onPressIgnore={() => setPasswordModal( false )}
+          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          isIgnoreButton={true}
+          cancelButtonText={'Start Over'}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
+        closeBottomSheet={() => setSeedWordModal( false )}>
+        <SeedBacupModalContents
+          title={'Seed Words\nBackup Successful'}
+          info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
+          proceedButtonText={'View Health'}
+          onPressProceed={() => {
+            setSeedWordModal( false )
+            // props.navigation.goBack()
+            setInfo( 'please delete icloud backup' )
+            setShowAlertModal( true )
+          }}
+          onPressIgnore={() => setSeedWordModal( false )}
+          isIgnoreButton={false}
           isBottomImage={true}
-          bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+          bottomImage={require( '../../assets/images/icons/success.png' )}
         />
       </ModalContainer>
       <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           // title={''}
-          info={'Cloud backup is completed you can delete Seed words'}
+          info={info}
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )
-            props.navigation.popToTop()
           }}
           isBottomImage={false}
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
@@ -408,6 +464,6 @@ const CloudBackupHistory = ( props ) => {
     </View>
   )
 }
-export default CloudBackupHistory
+export default SeedBackupHistory
 
 
