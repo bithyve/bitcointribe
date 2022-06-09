@@ -48,6 +48,9 @@ import SecurityQuestion from './NewBHR/SecurityQuestion'
 import Toast from '../components/Toast'
 import SecuritySeedWord from './NewBHR/SecuritySeedWord'
 import AlertModalContents from '../components/AlertModalContents'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -103,6 +106,8 @@ export default function Login( props ) {
   const [ loaderModal, setloaderModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
   const [ showAlertModal, setShowAlertModal ]=useState( false )
+  const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ info, setInfo ] = useState( '' )
 
   const [ ErrorBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
@@ -116,6 +121,7 @@ export default function Login( props ) {
   const [ processedLink, setProcessedLink ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
   const [ creationFlag, setCreationFlag ] = useState( false )
+  const [ ranSeedWord, setRanSeedWord ] = useState( null )
 
   const onPressNumber = useCallback(
     ( text ) => {
@@ -648,7 +654,15 @@ export default function Login( props ) {
                     if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
                       // showSecuiritySeedWordModal( true )
                       // Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
-                      setShowAlertModal( true )
+                      ( async function() {
+                        try {
+                          const SeedWord = await AsyncStorage.getItem( 'randomSeedWord' )
+                          setRanSeedWord( JSON.parse( SeedWord ) )
+                        } catch ( e ) {
+                          console.error( e )
+                        }
+                      } )()
+                      setConfirmSeedWordModal( true )
                     }else {
                       showQuestionModal( true )
                     }
@@ -822,6 +836,36 @@ export default function Login( props ) {
       <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
         {renderSecurityQuestionContent()}
       </ModalContainer>
+      <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
+        closeBottomSheet={() => setConfirmSeedWordModal( false )}  showBlurView={true}>
+        <ConfirmSeedWordsModal
+          proceedButtonText={'Confirm'}
+          seedNumber={ranSeedWord != null ? ranSeedWord.id :1}
+          onPressProceed={( word ) => {
+            setConfirmSeedWordModal( false )
+            if( word == '' ){
+              setTimeout( () => {
+                setInfo( 'Please enter seed word' )
+                setShowAlertModal( true )
+              }, 500 )
+            } else if( word !=  ranSeedWord.name  ){
+              setTimeout( () => {
+                setInfo( 'Please enter valid seed word' )
+                setShowAlertModal( true )
+              }, 500 )
+            } else {
+              props.navigation.navigate( 'SettingGetNewPin', {
+                oldPasscode: '',
+                onPasscodeReset:onPasscodeReset
+              } )
+              // dispatch(setSeedBackupHistory())
+            }
+          }}
+          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          isIgnoreButton={true}
+          cancelButtonText={'Cancel'}
+        />
+      </BottomInputModalContainer>
       {/* <ModalContainer onBackground={()=>showSecuiritySeedWordModal( false )} visible={secuiritySeedWordModal} closeBottomSheet={() => {showSecuiritySeedWordModal( false )}} >
         {renderSeedWordContent()}
       </ModalContainer> */}
@@ -845,7 +889,8 @@ export default function Login( props ) {
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           // title={''}
-          info={'In case you have forgotten passcode, please setup the wallet again and restore it'}
+          // info={'In case you have forgotten passcode, please setup the wallet again and restore it'}
+          info={info}
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )
