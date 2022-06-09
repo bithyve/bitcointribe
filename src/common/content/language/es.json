@@ -451,7 +451,7 @@
       "TransactionDetails": "Detalles de la transacción",
       "Enteraddressmanually": "Ingrese la dirección manualmente",
       "Whatcanyouscan": "¿Qué puedes escanear?",
-      "scan": "Escanee una dirección de bitcoin, una solicitud de Hexa Friends & Family, una solicitud de Hexa Keeper o una solicitud de recuperación",
+      "scan": "Escanee una dirección de bitcoin, una solicitud de Hexa Friends & Family, o una solicitud de recuperación",
       "ScanaBitcoinaddress": "Escanee una dirección de Bitcoin o cualquier QR Hexa",
       "YouhavenotaddedanyContacts": "No has agregado ningún contacto",
       "AddaContact": "Agregue un contacto para enviarles sats sin tener que escanear una dirección",
