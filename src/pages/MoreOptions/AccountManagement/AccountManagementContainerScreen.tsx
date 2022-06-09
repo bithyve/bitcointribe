@@ -119,6 +119,14 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [ hasChangedOrder ] )
 
   useEffect( () => {
+    orderedAccountShells.map( ( item, index )=>{
+      if ( item.primarySubAccount.customDisplayName == 'Savings Account' ) {
+        orderedAccountShells.pop( index )
+      }
+    } )
+    setOrderedAccountShells( orderedAccountShells )
+  }, [] )
+  useEffect( () => {
     if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
       dispatch( resetAccountUpdateFlag() )
       setTimeout( () => {
