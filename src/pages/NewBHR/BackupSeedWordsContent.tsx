@@ -33,7 +33,7 @@ const BackupSeedWordsContent = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'First 6 seed words' )
   const dispatch = useDispatch()
   const fromHistory = props.navigation.getParam( 'fromHistory' )
-
+  const isChangeKeeperType =  props.navigation.getParam( 'isChangeKeeperType' )
   useEffect( ()=>{
     RNPreventScreenshot.enabled( true )
   }, [] )
@@ -162,7 +162,14 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             RNPreventScreenshot.enabled( false )
             setSeedWordModal( false )
-            props.navigation.goBack()
+            if ( isChangeKeeperType ) {
+              props.navigation.navigate( 'SeedBackupHistory', {
+              // ...navigationParams,
+                isChangeKeeperType: true,
+              } )
+            } else {
+              props.navigation.goBack()
+            }
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
