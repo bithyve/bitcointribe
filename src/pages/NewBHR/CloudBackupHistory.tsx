@@ -262,7 +262,7 @@ const CloudBackupHistory = ( props ) => {
       } )
     }
     if ( type == 'seed' ) {
-      props.navigation.navigate( 'SeedBackupHistory', {
+      props.navigation.navigate( 'BackupSeedWordsContent', {
         ...navigationParams,
         isChangeKeeperType: true,
       } )

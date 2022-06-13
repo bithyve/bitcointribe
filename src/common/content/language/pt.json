@@ -452,7 +452,7 @@
       "TransactionDetails": "Detalhes da transação",
       "Enteraddressmanually": "Insira o endereço manualmente",
       "Whatcanyouscan": "O que você pode digitalizar?",
-      "scan": "Digitalize um endereço bitcoin, uma solicitação Hexa Friends & Family, uma solicitação Hexa Keeper ou uma solicitação de recuperação",
+      "scan": "Digitalize um endereço bitcoin, uma solicitação Hexa Friends & Family ou uma solicitação de recuperação",
       "ScanaBitcoinaddress": "Digitalize um endereço Bitcoin ou qualquer Hexa QR",
       "YouhavenotaddedanyContacts": "Você não adicionou nenhum contato",
       "AddaContact": "Adicione um contato para enviar-lhes sats sem ter que digitalizar um endereço",
