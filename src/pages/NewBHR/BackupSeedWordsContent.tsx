@@ -162,9 +162,10 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             RNPreventScreenshot.enabled( false )
             setSeedWordModal( false )
+            const navigationParams =  props.navigation.getParam( 'navigationParams' )
             if ( isChangeKeeperType ) {
               props.navigation.navigate( 'SeedBackupHistory', {
-              // ...navigationParams,
+                navigationParams,
                 isChangeKeeperType: true,
               } )
             } else {
@@ -185,7 +186,7 @@ const BackupSeedWordsContent = ( props ) => {
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )
-            if (info == "please delete icloud backup") {
+            if ( info == 'please delete icloud backup' ) {
 
               props.navigation.popToTop()
             }

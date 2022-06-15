@@ -337,8 +337,15 @@ export default function ManageBackup( props ) {
     if ( isTypeBottomSheetOpen === true && onKeeperButtonClick ) {
       // setShowLoader( false )
       // setTimeout( () => {
-      setKeeperTypeModal( true )
+      // setKeeperTypeModal( true )
       // }, 500 )
+      const obj = {
+        selectedKeeper: {
+          ...selectedKeeper, name: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName, shareType: selectedKeeper.shareType ? selectedKeeper.shareType : selectedKeeperType,
+          shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? metaSharesKeeper[ 1 ] ? metaSharesKeeper[ 1 ].shareId : '' : metaSharesKeeper[ 4 ] ? metaSharesKeeper[ 4 ].shareId : ''
+        },
+      }
+      goToHistory( obj, 'navigationObjIF' )
       dispatch( setIsKeeperTypeBottomSheetOpen( false ) )
     }
   }, [ isTypeBottomSheetOpen ] )
@@ -700,7 +707,7 @@ export default function ManageBackup( props ) {
                 fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular
               }}>{strings[ 'WalletBackup' ]}</Text>
-              <Text style={styles.headerMessageText}>{strings[ 'WalletBackupInfo1' ]}</Text>
+              <Text style={styles.headerMessageText}>{levelData[ 0 ].keeper1.status == 'notSetup' ? strings[ 'WalletBackupInfo1' ] : strings[ 'WalletBackupInfo3' ]}</Text>
             </View>
             <ImageBackground
               source={require( '../../assets/images/icons/keeper_sheild.png' )}

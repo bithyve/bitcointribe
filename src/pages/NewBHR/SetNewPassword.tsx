@@ -306,6 +306,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
     else setPassword(security)
     showSecurityQue(false)
     showEncryptionPswd(false)
+    props.navigation.goBack()
   }
 
   const setButtonVisible = () => {
@@ -472,6 +473,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
                 showEncryptionPswd(false)
                 setShowAGSPmodal(false)
                 setAnswerError('')
+                props.navigation.goBack()
               }}
             >
               <Text style={{
