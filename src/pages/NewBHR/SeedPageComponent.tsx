@@ -438,7 +438,7 @@ const styles = StyleSheet.create( {
     borderRadius: ( 25 ),
     backgroundColor: Colors.white,
     shadowColor: Colors.shadowBlack,
-    elevation: 10,
+    // elevation: 10,
     // shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
@@ -485,7 +485,7 @@ const styles = StyleSheet.create( {
   selectedInput: {
     // backgroundColor: Colors.white,
     // backgroundColor: 'red',
-    elevation: 5,
+    // elevation: 5,
     shadowColor: Colors.shadowBlack,
     shadowOpacity: 1,
     shadowOffset: {

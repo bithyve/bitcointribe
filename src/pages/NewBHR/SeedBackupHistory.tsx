@@ -35,6 +35,7 @@ import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import dbManager from '../../storage/realm/dbManager'
 import AlertModalContents from '../../components/AlertModalContents'
+import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -297,8 +298,8 @@ const SeedBackupHistory = ( props ) => {
           props.navigation.popToTop()
         }}
         selectedTitle={'Seed word Backup'}
-        selectedTime={selectedKeeper.updatedAt
-          ? getTime( selectedKeeper.updatedAt )
+        selectedTime={selectedKeeper?.updatedAt
+          ? getTime( selectedKeeper?.updatedAt )
           : 'Never'}
         moreInfo={''}
         tintColor={Colors.deepBlue}
@@ -402,7 +403,7 @@ const SeedBackupHistory = ( props ) => {
           isCloud={true}
         />
       </ModalContainer>
-      <ModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
+      <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
         closeBottomSheet={() => setConfirmSeedWordModal( false )} >
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
@@ -429,7 +430,7 @@ const SeedBackupHistory = ( props ) => {
           isIgnoreButton={true}
           cancelButtonText={'Start Over'}
         />
-      </ModalContainer>
+      </BottomInputModalContainer>
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
