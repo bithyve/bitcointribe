@@ -27,6 +27,7 @@ const TransactionsListContainerScreen: React.FC<Props> = ( { navigation, }: Prop
         transactions={transactions}
         onTransactionSelected={handleTransactionSelection}
         accountShellId={accountShell.id}
+        showAll={true}
       />
     </View>
   )
