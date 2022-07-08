@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import useSendingState from '../hooks/state-selectors/sending/UseSendingState'
-
+import useTotalSpendingAmount from "../hooks/sending-utils/UseTotalSpendingAmount";
 
 export default function useAccountSendST2CompletionEffect( callbacks: {
-  onSuccess?: ( txid: string | null ) => void;
+  onSuccess?: ( txid: string | null, amt: number | null ) => void;
   onFailure?: ( errorMessage: string | null ) => void;
 } ) {
   const {
@@ -15,9 +15,11 @@ export default function useAccountSendST2CompletionEffect( callbacks: {
     },
   } = useSendingState()
 
+  const amt = useTotalSpendingAmount();
+
   useEffect( () => {
     if ( isSuccessful && callbacks.onSuccess ) {
-      callbacks.onSuccess( txid )
+      callbacks.onSuccess( txid, amt )
     } else if ( hasFailed && callbacks.onFailure ) {
       callbacks.onFailure( failedErrorMessage )
     }
