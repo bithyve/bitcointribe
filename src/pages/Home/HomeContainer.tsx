@@ -75,25 +75,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
   componentDidMount() {
-    const dbWallet =  dbManager.getWallet()
-    if( dbWallet!=undefined && dbWallet!=null ){
-      const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
-      const primaryMnemonic = walletObj.primaryMnemonic
-      const seed = primaryMnemonic.split( ' ' )
-      const seedData = seed.map( ( word, index ) => {
-        return {
-          name: word, id: ( index+1 )
-        }
-      } )
-      const i = 12
-      let ranNums = 1
-      const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
-      if( tempNumber == undefined || tempNumber == 0 )
-        ranNums = 1
-      else ranNums = tempNumber
-      const asyncSeedData=seedData[ ranNums ]
-      AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
-    }
+    setTimeout( () => {
+      const dbWallet =  dbManager.getWallet()
+      if( dbWallet!=undefined && dbWallet!=null ){
+        const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+        const primaryMnemonic = walletObj.primaryMnemonic
+        const seed = primaryMnemonic.split( ' ' )
+        const seedData = seed.map( ( word, index ) => {
+          return {
+            name: word, id: ( index+1 )
+          }
+        } )
+        const i = 12
+        let ranNums = 1
+        const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+        if( tempNumber == undefined || tempNumber == 0 )
+          ranNums = 1
+        else ranNums = tempNumber
+        const asyncSeedData=seedData[ ranNums ]
+        AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
+      }
+    }, 2000 )
   }
   navigateToAddNewAccountScreen = () => {
     // this.props.navigation.navigate( 'AddNewAccount' )
