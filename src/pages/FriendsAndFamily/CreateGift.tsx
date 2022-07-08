@@ -143,7 +143,7 @@ const CreateGift = ({ navigation }) => {
       if (!includeFees && averageLowTxFee) giftAmount += averageLowTxFee
       return giftAmount * numberOfGifts > spendableBalance
     } else {
-      const giftAmountInFiat = giftAmount
+      const giftAmountInFiat = giftAmount ? giftAmount : 1
       const spendableBalanceInFiat = parseFloat(convertSatsToFiat(spendableBalance))
       return giftAmountInFiat * numberOfGifts > spendableBalanceInFiat
     }
