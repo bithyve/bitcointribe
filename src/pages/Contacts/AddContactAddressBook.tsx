@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
   },
   bottomButtonView: {
     height: hp('6%'),
-    width: wp('45%'),
+    width: wp('40%'),
     backgroundColor: Colors.blue,
     borderRadius: 10,
     justifyContent: 'center',

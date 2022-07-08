@@ -182,9 +182,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [] )
 
   useAccountSendST2CompletionEffect( {
-    onSuccess: ( txid: string | null ) => {
+    onSuccess: ( txid: string | null, amt: number | null ) => {
       if ( txid ) {
-        dispatch( sendTxNotification( txid ) )
+        if (amt) {
+          dispatch( sendTxNotification( txid, amt ) )
+        } else {
+          dispatch( sendTxNotification( txid, null ) )
+        }
         // showSendSuccessBottomSheet()
         setSuccess( true )
         setHandleButton( true )

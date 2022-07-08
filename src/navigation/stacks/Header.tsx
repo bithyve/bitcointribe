@@ -1565,7 +1565,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }
                 switch ( this.state.notificationType ) {
                     case 'contact':
-                      this.moveToTransacation( notificationAdditionalInfo )
+                      // this.moveToTransacation( notificationAdditionalInfo )
+                      break
                     case NotificationType.FNF_TRANSACTION:
                       this.moveToAccount( notificationAdditionalInfo.txid )
                       break
