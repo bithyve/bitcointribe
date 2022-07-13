@@ -1724,17 +1724,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // overallHealth={overallHealth}
           />
           <ModalContainer
-            onBackground={()=>{
-              const perviousState = this.state.currentBottomSheetKind
-              this.setState( {
-                currentBottomSheetKind: null
-              } )
-              setTimeout( () => {
+            onBackground={() => {
+              if (this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST) {
+                console.log('bgState');
+              } else {
+                const perviousState = this.state.currentBottomSheetKind
                 this.setState( {
-                  currentBottomSheetKind: perviousState
-                }
-                )
-              }, 200 )
+                  currentBottomSheetKind: null
+                } )
+                setTimeout( () => {
+                  this.setState( {
+                    currentBottomSheetKind: perviousState
+                  }
+                  )
+                }, 200 )
+              }
             }}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
