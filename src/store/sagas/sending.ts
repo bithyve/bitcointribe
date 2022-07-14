@@ -447,7 +447,7 @@ function* sendTxNotificationWorker( { payload } ) {
   const notification: INotification = {
     notificationType: notificationType.contact,
     title: 'Friends & Family notification',
-    body: `Received ${amt} from ${walletName}`,
+    body: amt === null ? `You have a transaction from ${walletName}`: `Received ${amt} from ${walletName}`,
     data: {
       txid
     },

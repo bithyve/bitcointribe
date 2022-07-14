@@ -185,7 +185,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     onSuccess: ( txid: string | null, amt: number | null ) => {
       if ( txid ) {
         if (amt) {
-          dispatch( sendTxNotification( txid, amt ) )
+          // const formatedAmt = useFormattedAmountText(amt);
+          dispatch( sendTxNotification( txid, amt + ' ' + formattedUnitText ) )
         } else {
           dispatch( sendTxNotification( txid, null ) )
         }
