@@ -341,7 +341,7 @@ export default function ManageBackup( props ) {
       // }, 500 )
       const obj = {
         selectedKeeper: {
-          ...selectedKeeper, name: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName, shareType: selectedKeeper.shareType ? selectedKeeper.shareType : selectedKeeperType,
+          ...selectedKeeper, name: selectedKeeper.name ? selectedKeeper.name : selectedKeeperName, shareType: selectedKeeper.shareType ? selectedKeeper.shareType : 'cloud',
           shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? metaSharesKeeper[ 1 ] ? metaSharesKeeper[ 1 ].shareId : '' : metaSharesKeeper[ 4 ] ? metaSharesKeeper[ 4 ].shareId : ''
         },
       }
