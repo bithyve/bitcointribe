@@ -184,11 +184,23 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
       if ( txid ) {
+        let type;
+        if (sourceAccountShell.primarySubAccount.type === undefined) {
+          type = -1;
+        } else if (sourceAccountShell.primarySubAccount.type === 'TEST_ACCOUNT') {
+          type = 0;
+        } else if (sourceAccountShell.primarySubAccount.type === 'CHECKING_ACCOUNT') {
+          type = 1;
+        } else if (sourceAccountShell.primarySubAccount.type === 'SWAN_ACCOUNT') {
+          type = 2;
+        } else if (sourceAccountShell.primarySubAccount.type === 'SAVINGS_ACCOUNT') {
+          type = 3;
+        }
+
         if (amt) {
-          // const formatedAmt = useFormattedAmountText(amt);
-          dispatch( sendTxNotification( txid, amt + ' ' + formattedUnitText ) )
+          dispatch( sendTxNotification( txid, amt + ' ' + formattedUnitText, type ) )
         } else {
-          dispatch( sendTxNotification( txid, null ) )
+          dispatch( sendTxNotification( txid, null, type ) )
         }
         // showSendSuccessBottomSheet()
         setSuccess( true )
