@@ -1346,10 +1346,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToAccount = ( txid ) => {
-    this.props.navigation.navigate( 'AccountDetails', {
-      accountShellID: this.props.accountShells[txid].id,
-      swanDeepLinkContent: this.props.swanDeepLinkContent
-    } )
+    if (txid !== undefined && txid !== null) {
+      this.props.navigation.navigate( 'AccountDetails', {
+        accountShellID: this.props.accountShells[txid].id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      } )
+    }
   }
 
   moveToTransacation = ( notificationAdditionalInfo ) => {
