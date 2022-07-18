@@ -6,7 +6,6 @@ import ImageStyles from '../common/Styles/ImageStyles'
 import { nameToInitials } from '../common/CommonFunctions'
 import { RecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../common/data/enums/RecipientKind'
-import Contacts from 'react-native-contacts'
 import { LocalizationContext } from '../common/content/LocContext'
 
 export type Props = {
