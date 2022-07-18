@@ -92,7 +92,6 @@ const RestoreSeedPageComponent = ( props ) => {
     let initPosition = 0
     let lastPosition = 6
     const totalLength = testingData.length
-    console.log( 'skk length', totalLength )
     testingData.map( ( item, index )=>{
       if( index != 0 && index % 6 == 0 ){
         initPosition = initPosition + 6
@@ -126,15 +125,12 @@ const RestoreSeedPageComponent = ( props ) => {
     } else {
       tempData.splice( 12, 12 )
     }
-
-    console.log( 'skk tempdata', JSON.stringify( tempData ) )
     setSeedData( [ ...tempData ] )
     setExtraSeeds( !extraSeeds )
     setPartialSeedDataFun( tempData )
   }
 
   const onProceedClick = () =>{
-    console.log( 'skk proceed', JSON.stringify( seedData ) )
     let seed = ''
     let showValidation = false
     seedData.forEach( ( { name } ) => {
