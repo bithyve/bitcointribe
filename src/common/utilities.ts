@@ -32,7 +32,7 @@ export const timeConvert = ( valueInMinutes ) => {
 
 export const timeConvertNear30 = ( valueInMinutes ) => {
   if ( valueInMinutes < 60 ) {
-    return '.5 hours'
+    return '0.5 hours'
   }
   const num = Math.ceil( valueInMinutes / 30 ) * 30
   const hours = ( num / 60 )
