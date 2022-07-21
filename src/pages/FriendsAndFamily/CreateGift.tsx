@@ -68,7 +68,7 @@ import { calculateSendMaxFee } from '../../store/actions/sending'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { Shadow } from 'react-native-shadow-2'
 
-const {height, width} = Dimensions.get('window')
+const {height, } = Dimensions.get('window')
 
 const CreateGift = ({ navigation }) => {
   const dispatch = useDispatch()
