@@ -789,7 +789,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setReshareModal( true )
           }}
           isVersionMismatch={isVersionMismatch}
-          isChangeKeeperAllow={isChange ? false : ( selectedKeeper.updatedAt > 0 || selectedKeeper.status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={false}
+          // isChangeKeeperAllow={isChange ? false : ( selectedKeeper.updatedAt > 0 || selectedKeeper.status == 'notAccessible' ) ? true : false}
           reshareButtonText={'Reshare'}
           changeButtonText={'Change'}
         />
