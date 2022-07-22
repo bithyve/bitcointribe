@@ -140,13 +140,13 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
         {transactionPriorities.map( priority => {
           return (
-            <TouchableOpacity 
-            style={styles.priorityRowContainer} 
-            key={priority}
-            onPress={() => {
-              setTransactionPriority( priority )
-              onTransactionPriorityChanged( priority )
-            }}>
+            <TouchableOpacity
+              style={styles.priorityRowContainer}
+              key={priority}
+              onPress={() => {
+                setTransactionPriority( priority )
+                onTransactionPriorityChanged( priority )
+              }}>
               <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -246,7 +246,7 @@ const styles = StyleSheet.create( {
 
   priorityTableText: {
     fontSize: RFValue( 12 ),
-    lineHeight: RFValue( 12 ),
+    lineHeight: RFValue( 14 ),
     color: Colors.textColorGrey,
     textAlign: 'right',
   },

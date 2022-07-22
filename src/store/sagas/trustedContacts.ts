@@ -628,7 +628,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               default:
                 notifType = notificationType.FNF_REQUEST_REJECTED
                 notifTitle = 'Friends & Family notification'
-                notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
+                notifBody = `Keeper request rejected by ${nameAssociatedByContact || wallet.walletName}`
           }
 
           const notification: INotification = {

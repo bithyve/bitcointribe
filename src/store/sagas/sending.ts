@@ -417,7 +417,7 @@ async function updateTrustedContactTxHistory( selectedContacts ) {
 }
 
 function* sendTxNotificationWorker( { payload } ) {
-  const { txid } = payload
+  const { txid, amt, type } = payload
   const sendingState: SendingState = yield select( ( state ) => state.sending )
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
@@ -447,9 +447,10 @@ function* sendTxNotificationWorker( { payload } ) {
   const notification: INotification = {
     notificationType: notificationType.contact,
     title: 'Friends & Family notification',
-    body: `You have a new transaction from ${walletName}`,
+    body: amt === null ? `You have a transaction from ${walletName}`: `Received ${amt} from ${walletName}`,
     data: {
-      txid
+      txid,
+      type,
     },
     tag: notificationTag.IMP,
   }

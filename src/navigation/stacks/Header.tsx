@@ -1346,10 +1346,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToAccount = ( txid ) => {
-    // this.props.navigation.navigate( 'AccountDetails', {
-    //   accountShellID: accountId,
-    //   swanDeepLinkContent: this.props.swanDeepLinkContent
-    // } )
+    if (txid !== undefined && txid !== null) {
+      this.props.navigation.navigate( 'AccountDetails', {
+        accountShellID: this.props.accountShells[txid].id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      } )
+    }
   }
 
   moveToTransacation = ( notificationAdditionalInfo ) => {
@@ -1565,7 +1567,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }
                 switch ( this.state.notificationType ) {
                     case 'contact':
-                      this.moveToTransacation( notificationAdditionalInfo )
+                      if (notificationAdditionalInfo.txid !== undefined) {
+                        this.moveToAccount(notificationAdditionalInfo.type)
+                      }
+                      // this.moveToAccount( notificationAdditionalInfo )
+                      break
                     case NotificationType.FNF_TRANSACTION:
                       this.moveToAccount( notificationAdditionalInfo.txid )
                       break
@@ -1723,17 +1729,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // overallHealth={overallHealth}
           />
           <ModalContainer
-            onBackground={()=>{
-              const perviousState = this.state.currentBottomSheetKind
-              this.setState( {
-                currentBottomSheetKind: null
-              } )
-              setTimeout( () => {
+            onBackground={() => {
+              if (this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST) {
+                console.log('bgState');
+              } else {
+                const perviousState = this.state.currentBottomSheetKind
                 this.setState( {
-                  currentBottomSheetKind: perviousState
-                }
-                )
-              }, 200 )
+                  currentBottomSheetKind: null
+                } )
+                setTimeout( () => {
+                  this.setState( {
+                    currentBottomSheetKind: perviousState
+                  }
+                  )
+                }, 200 )
+              }
             }}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}

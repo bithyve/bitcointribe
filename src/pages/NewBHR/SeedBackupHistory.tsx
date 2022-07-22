@@ -34,6 +34,8 @@ import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import dbManager from '../../storage/realm/dbManager'
+import AlertModalContents from '../../components/AlertModalContents'
+import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -81,6 +83,8 @@ const SeedBackupHistory = ( props ) => {
   const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
   const [ seedData, setSeedData ] = useState( [] )
   const [ seedPosition, setSeedPosition ] = useState( 0 )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ info, setInfo ] = useState( '' )
   const sortedHistory = ( history ) => {
     if( !history ) return
     const currentHistory = history.filter( ( element ) => {
@@ -107,7 +111,10 @@ const SeedBackupHistory = ( props ) => {
   }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
-    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
+    console.log( 'skk levelhealth', levelHealth )
+    console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
+    // if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
+    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ){
       setButtonText( common.backup )
       setShowButton( true )
       setBackupInfo( Platform.OS == 'ios' ? strings.cloudBackupSuccessInfo : strings.driveBackupSuccessInfo )
@@ -176,7 +183,8 @@ const SeedBackupHistory = ( props ) => {
     return ( <CloudPermissionModalContents
       modalRef={bottomSheetRef}
       title={Platform.OS == 'ios' ? strings.AutomatedCloudBackup : strings.AutomatedDriveBackup}
-      info={strings.Thisisthefirstlevel}
+      // info={strings.Thisisthefirstlevel}
+      info={strings.Backupthewalletto}
       note={''}
       onPressProceed={( flag )=> {
         setConfirmationModal( false )
@@ -242,8 +250,9 @@ const SeedBackupHistory = ( props ) => {
         shareId: selectedKeeper.shareId,
         data: {
         },
-        channelKey: selectedKeeper.channelKey
+        channelKey: selectedKeeper.channelKey,
       },
+      selectedLevelId: props.navigation.getParam( 'selectedLevelId' ),
       index: changeIndex,
     }
     if ( type == 'contact' ) {
@@ -265,6 +274,12 @@ const SeedBackupHistory = ( props ) => {
         isChangeKeeperType: true,
       } )
     }
+    if( type == 'cloud' ){
+      props.navigation.navigate( 'CloudBackupHistory', {
+        ...navigationParams,
+        isChangeKeeperType: true,
+      } )
+    }
   }
 
   return (
@@ -278,10 +293,13 @@ const SeedBackupHistory = ( props ) => {
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
-        onPressBack={() => props.navigation.goBack()}
+        onPressBack={() => {
+          // props.navigation.goBack()
+          props.navigation.popToTop()
+        }}
         selectedTitle={'Seed word Backup'}
-        selectedTime={selectedKeeper.updatedAt
-          ? getTime( selectedKeeper.updatedAt )
+        selectedTime={selectedKeeper?.updatedAt
+          ? getTime( selectedKeeper?.updatedAt )
           : 'Never'}
         moreInfo={''}
         tintColor={Colors.deepBlue}
@@ -344,8 +362,8 @@ const SeedBackupHistory = ( props ) => {
           showButton={showButton}
           changeButtonText={'Change'}
           showSeedHistoryNote={true}
-          // isChangeKeeperAllow={true}
-          isChangeKeeperAllow={false}/>
+          isChangeKeeperAllow={true}
+        />
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>
         {renderCloudPermissionContent()}
@@ -373,6 +391,7 @@ const SeedBackupHistory = ( props ) => {
       />
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
+          selectedType={'seed'}
           selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device or Cloud'}
@@ -384,7 +403,7 @@ const SeedBackupHistory = ( props ) => {
           isCloud={true}
         />
       </ModalContainer>
-      <ModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
+      <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
         closeBottomSheet={() => setConfirmSeedWordModal( false )} >
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
@@ -393,11 +412,13 @@ const SeedBackupHistory = ( props ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                Alert.alert( 'Please enter seed name' )
+                setInfo( 'Please enter seed word' )
+                setShowAlertModal( true )
               }, 500 )
             } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
               setTimeout( () => {
-                Alert.alert( 'Please enter valid seed name' )
+                setInfo( 'Please enter valid seed word' )
+                setShowAlertModal( true )
               }, 500 )
             } else {
               setSeedWordModal( true )
@@ -409,7 +430,7 @@ const SeedBackupHistory = ( props ) => {
           isIgnoreButton={true}
           cancelButtonText={'Start Over'}
         />
-      </ModalContainer>
+      </BottomInputModalContainer>
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
@@ -419,11 +440,26 @@ const SeedBackupHistory = ( props ) => {
           onPressProceed={() => {
             setSeedWordModal( false )
             // props.navigation.goBack()
+            setInfo( 'please delete icloud backup' )
+            setShowAlertModal( true )
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
           isBottomImage={true}
           bottomImage={require( '../../assets/images/icons/success.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          info={info}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
     </View>
