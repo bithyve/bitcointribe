@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Image,
-  TouchableWithoutFeedback
+  Dimensions
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -67,6 +67,8 @@ import Toast from '../../components/Toast'
 import { calculateSendMaxFee } from '../../store/actions/sending'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { Shadow } from 'react-native-shadow-2'
+
+const {height, } = Dimensions.get('window')
 
 const CreateGift = ({ navigation }) => {
   const dispatch = useDispatch()
@@ -143,7 +145,7 @@ const CreateGift = ({ navigation }) => {
       if (!includeFees && averageLowTxFee) giftAmount += averageLowTxFee
       return giftAmount * numberOfGifts > spendableBalance
     } else {
-      const giftAmountInFiat = giftAmount
+      const giftAmountInFiat = giftAmount ? giftAmount : 1
       const spendableBalanceInFiat = parseFloat(convertSatsToFiat(spendableBalance))
       return giftAmountInFiat * numberOfGifts > spendableBalanceInFiat
     }
@@ -694,66 +696,80 @@ const CreateGift = ({ navigation }) => {
     width = '90%',
     message = `${currencyKind === CurrencyKind.BITCOIN ? 'Sats' : 'Money'} would be deducted from`,
   ) => {
-    return <TouchableOpacity
-      style={{
-        ...styles.accountSelectionView, width: width
-      }}
-      onPress={() => onPressCallBack()}
-      activeOpacity={activeOpacity}
-    >
-      <View style={{
-        width: wp(13),
-        height: wp(13),
-        marginTop: hp(0.5),
-      }} >
-        {getAvatarForSubAccount(item.primarySubAccount, false, true)}
-      </View>
-      <View style={{
-        marginHorizontal: wp(3),
-        flex: 1
-      }}>
-        <Text style={{
-          color: Colors.gray4,
-          fontSize: RFValue(10),
-          fontFamily: Fonts.FiraSansRegular,
-        }}>
-          {message}
-        </Text>
-        <Text
-          style={{
-            color: Colors.black,
-            fontSize: RFValue(14),
-            fontFamily: Fonts.FiraSansRegular,
-          }}
-        >
-          {item.primarySubAccount.customDisplayName ?? item.primarySubAccount.defaultTitle}
-        </Text>
-        <Text style={styles.availableToSpendText}>
-          {'Available to spend: '}
-          <Text style={styles.balanceText}>
-            {prefersBitcoin
-              ? UsNumberFormat(item.primarySubAccount?.balances?.confirmed)
-              : accountsState.exchangeRates && accountsState.exchangeRates[currencyCode]
-                ? (
-                  (item.primarySubAccount?.balances?.confirmed / SATOSHIS_IN_BTC) *
-                  accountsState.exchangeRates[currencyCode].last
-                ).toFixed(2)
-                : 0}
-          </Text>
-          <Text>
-            {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
-          </Text>
-        </Text>
-      </View>
-      {activeOpacity === 0 && <MaterialCommunityIcons
-        name="dots-vertical"
-        size={24}
-        color="gray"
+    return (
+        <TouchableOpacity
         style={{
-          alignSelf: 'center'
+          ...styles.accountSelectionView, width: width,
         }}
-      />}
-    </TouchableOpacity>
+        onPress={() => onPressCallBack()}
+        activeOpacity={activeOpacity}
+      >
+        <Shadow viewStyle={{
+          borderRadius: wp(2),
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            width: '100%',
+            paddingVertical: hp(2),
+            paddingHorizontal: wp(2),
+            alignItems: 'center'
+          }}>
+            <View style={{
+              width: wp(13),
+              height: '100%',
+              marginTop: hp(0.5),
+            }} >
+              {getAvatarForSubAccount(item.primarySubAccount, false, true)}
+            </View>
+            <View style={{
+              marginHorizontal: wp(3),
+              flex: 1
+            }}>
+              <Text style={{
+                color: Colors.gray4,
+                fontSize: RFValue(10),
+                fontFamily: Fonts.FiraSansRegular,
+              }}>
+                {message}
+              </Text>
+              <Text
+                style={{
+                  color: Colors.black,
+                  fontSize: RFValue(14),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {item.primarySubAccount.customDisplayName ?? item.primarySubAccount.defaultTitle}
+              </Text>
+              <Text style={styles.availableToSpendText}>
+                {'Available to spend: '}
+                <Text style={styles.balanceText}>
+                  {prefersBitcoin
+                    ? UsNumberFormat(item.primarySubAccount?.balances?.confirmed)
+                    : accountsState.exchangeRates && accountsState.exchangeRates[currencyCode]
+                      ? (
+                        (item.primarySubAccount?.balances?.confirmed / SATOSHIS_IN_BTC) *
+                        accountsState.exchangeRates[currencyCode].last
+                      ).toFixed(2)
+                      : 0}
+                </Text>
+                <Text>
+                  {prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
+                </Text>
+              </Text>
+            </View>
+            {activeOpacity === 0 && <MaterialCommunityIcons
+              name="dots-vertical"
+              size={24}
+              color="gray"
+              style={{
+                alignSelf: 'center'
+              }}
+            />}
+          </View>
+        </Shadow>
+      </TouchableOpacity>
+    )
   }
 
   return (
@@ -772,7 +788,8 @@ const CreateGift = ({ navigation }) => {
         }
         <View style={[CommonStyles.headerContainer, {
           backgroundColor: Colors.backgroundColor,
-          marginRight: wp(4)
+          marginRight: wp(4),
+          marginVertical: height < 685 ? wp(0) : 'auto'
         }]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -801,7 +818,7 @@ const CreateGift = ({ navigation }) => {
             }}>
               <Text style={{
                 color: Colors.blue,
-                fontSize: RFValue(24),
+                fontSize: height < 685 ? RFValue(20) : RFValue(24),
                 letterSpacing: 0.01,
                 marginLeft: 20,
                 fontFamily: Fonts.FiraSansRegular
@@ -992,7 +1009,7 @@ const CreateGift = ({ navigation }) => {
         {
           (Number(numbersOfGift) === 1) && !isSendMax && (
             <View style={{
-              marginVertical: hp(2),
+              marginVertical: height < 685 ? hp(1) : hp(2),
               marginHorizontal: wp(7),
               flexDirection: 'row'
             }}>
@@ -1024,7 +1041,7 @@ const CreateGift = ({ navigation }) => {
           )
         }
         <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), justifyContent: 'space-between', marginVertical: hp(2)
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), justifyContent: 'space-between', marginVertical: height < 685 ? hp(1) : hp(3)
         }}>
           <Text style={{
             color: Colors.textColorGrey,
@@ -1051,7 +1068,7 @@ const CreateGift = ({ navigation }) => {
 
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), marginBottom: wp(7)
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), marginBottom: height < 685 ? wp(1) : wp(7)
         }}>
           {renderButton('Create Gift', 'Create Gift')}
         </View>
@@ -1375,19 +1392,15 @@ const styles = StyleSheet.create({
   },
   accountSelectionView: {
     width: '90%',
-    shadowOpacity: 0.06,
-    shadowOffset: {
-      width: 10, height: 10
-    },
-    shadowRadius: 10,
-    elevation: 2,
+    // shadowOpacity: 0.06,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // shadowRadius: 10,
+    // elevation: 2,
     alignSelf: 'center',
-    borderRadius: wp(2),
-    marginTop: hp(3),
-    marginBottom: hp(1),
-    paddingVertical: hp(2),
-    paddingHorizontal: wp(2),
-    flexDirection: 'row'
+    marginTop: hp(2),
+    marginBottom: hp(2),
   },
   modalCrossButton: {
     width: wp(7),

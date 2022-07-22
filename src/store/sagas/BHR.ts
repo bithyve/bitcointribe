@@ -157,6 +157,7 @@ import { updateCloudData } from '../actions/cloud'
 import { restoreAccountShellsWorker } from './accounts'
 import { applyUpgradeSequence } from './upgrades'
 import semver from 'semver'
+import { fetchNotificationStarted, messageFetched, storeMessagesTimeStamp } from '../actions/notifications'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -751,6 +752,18 @@ function* recoverWalletWorker( { payload } ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )
   }
+
+  // RESTORE: notifications
+  console.log()
+  yield put( fetchNotificationStarted( true ) )
+  const timeStamp = yield select(
+    ( state ) => state.notifications.timeStamp,
+  )
+  const { messages } = yield call( Relay.getMessages, image.walletId, timeStamp )
+
+  yield put( messageFetched( messages ) )
+  yield put( storeMessagesTimeStamp() )
+  yield put( fetchNotificationStarted( false ) )
 }
 
 export const recoverWalletHealthWatcher = createWatcher(

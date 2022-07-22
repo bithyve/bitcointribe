@@ -4,7 +4,8 @@ import {
   View,
   Text,
   TextInput,
-  Dimensions
+  Dimensions,
+  Keyboard
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
@@ -64,7 +65,7 @@ export default function ConfirmSeedWordsModal( props ) {
       // flex: 1,
       backgroundColor: Colors.backgroundColor,
     }}>
-      <KeyboardAwareScrollView
+      {/* <KeyboardAwareScrollView
         resetScrollToCoords={{
           x: 0, y: 0
         }}
@@ -74,158 +75,157 @@ export default function ConfirmSeedWordsModal( props ) {
           backgroundColor: Colors.backgroundColor,
           height: 'auto'
         }}
-      >
+      > */}
+      <View style={{
+        // height: hp( '72%' ),
+        paddingHorizontal:8,
+        paddingTop:8
+      }}>
+        <Text style={{
+          // marginBottom: wp( '%' ),
+          color: Colors.blue,
+          fontSize: RFValue( 18 ),
+          fontFamily: Fonts.FiraSansRegular,
+          marginHorizontal: wp( '5%' ),
+          marginTop: 30
+        }} >{'Confirm Seed Words'}</Text>
+        <Text style={{
+          color: Colors.lightTextColor,
+          fontSize: RFValue( 11 ),
+          fontFamily: Fonts.FiraSansRegular,
+          marginHorizontal: wp( '5%' ),
+          marginTop: 5
+        }}>{'Key in the word exactly like it was displayed'}</Text>
+        <Text style={{
+          color: Colors.lightTextColor,
+          fontSize: RFValue( 14 ),
+          fontFamily: Fonts.FiraSansRegular,
+          marginHorizontal: wp( '5%' ),
+          marginTop: RFValue( 25 )
+        }}>{'Enter the '}
+          <Text style={{
+            fontFamily: Fonts.FiraSansMedium
+          }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingRight: 15,
+            borderColor: Colors.borderColor,
+            marginTop: 10,
+            marginHorizontal: wp( '5%' ),
+            backgroundColor: Colors.white,
+            borderWidth: 1,
+            borderRadius: 10
+          }}
+        >
+          <TextInput
+            style={styles.modalInputBox}
+            placeholder={`Enter ${getHint( props.seedNumber )} word`}
+            placeholderTextColor={Colors.borderColor}
+            value={word}
+            // autoCompleteType="off"
+            textContentType="none"
+            returnKeyType='done'
+            autoCorrect={false}
+            // editable={isEditable}
+            autoCapitalize="none"
+            onSubmitEditing={() => Keyboard.dismiss()}
+            onChangeText={( text ) => {
+              setWord( text.trim() )
+            }}
+            // onFocus={() => {
+            //   if ( word.length > 0 ) {
+            //     setWord( '' )
+            //   }
+            // }}
+          />
+        </View>
+
         <View style={{
-          // height: hp( '72%' ),
-          paddingHorizontal:8,
-          paddingTop:8
+          marginTop: hp( '2%' ),
+          marginBottom: hp( 1 ),
+          marginLeft: wp ( '2%' )
         }}>
-          <Text style={{
-            // marginBottom: wp( '%' ),
-            color: Colors.blue,
-            fontSize: RFValue( 18 ),
-            fontFamily: Fonts.FiraSansRegular,
-            marginHorizontal: wp( '5%' ),
-            marginTop: 30
-          }} >{'Confirm Seed Words'}</Text>
-          <Text style={{
-            color: Colors.lightTextColor,
-            fontSize: RFValue( 11 ),
-            fontFamily: Fonts.FiraSansRegular,
-            marginHorizontal: wp( '5%' ),
-            marginTop: 5
-          }}>{'Key in the word exactly like it was displayed'}</Text>
-          <Text style={{
-            color: Colors.lightTextColor,
-            fontSize: RFValue( 14 ),
-            fontFamily: Fonts.FiraSansRegular,
-            marginHorizontal: wp( '5%' ),
-            marginTop: RFValue( 25 )
-          }}>{'Enter the '}
-            <Text style={{
-              fontFamily: Fonts.FiraSansMedium
-            }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingRight: 15,
-              borderColor: Colors.borderColor,
-              marginTop: 10,
-              marginHorizontal: wp( '5%' ),
-              backgroundColor: Colors.white,
-              borderWidth: 1,
-              borderRadius: 10
-            }}
-          >
-            <TextInput
-              style={styles.modalInputBox}
-              placeholder={`Enter ${getHint( props.seedNumber )} word`}
-              placeholderTextColor={Colors.borderColor}
-              value={word}
-              autoCompleteType="off"
-              textContentType="none"
-              returnKeyType="next"
-              autoCorrect={false}
-              // editable={isEditable}
-              autoCapitalize="none"
-              // onSubmitEditing={() =>
-              // }
-              onChangeText={( text ) => {
-                setWord( text.trim() )
-              }}
-              // onFocus={() => {
-              //   if ( word.length > 0 ) {
-              //     setWord( '' )
-              //   }
-              // }}
-            />
-          </View>
+          <BottomInfoBox
+            title={''}
+            infoText={'If you don’t have the words written down you may choose to start over'}
+            italicText={''}
+            backgroundColor={Colors.white}
+          />
+        </View>
 
-          <View style={{
-            marginTop: hp( '2%' ),
-            marginBottom: hp( 1 ),
-            marginLeft: wp ( '2%' )
-          }}>
-            <BottomInfoBox
-              title={''}
-              infoText={'If you don’t have the words written down you may choose to start over'}
-              italicText={''}
-              backgroundColor={Colors.white}
-            />
-          </View>
-
-          <View
-            style={{
-              height: hp( '12%' ),
-              flexDirection: 'row',
-              marginTop: 'auto',
-              alignItems: 'flex-end',
-            }}
-          >
-            <Shadow viewStyle={{
-              ...styles.successModalButtonView,
-              backgroundColor: props.buttonColor
-                ? props.buttonColor
-                : Colors.blue,
-            }} distance={2}
-            startColor={props.buttonShadowColor
-              ? props.buttonShadowColor
-              : Colors.shadowBlue }
-            offset={[ 42, 14 ]}>
-              <AppBottomSheetTouchableWrapper
-                onPress={() => props.onPressProceed( word )}
-                style={{
+        <View
+          style={{
+            height: hp( '12%' ),
+            flexDirection: 'row',
+            marginTop: 'auto',
+            alignItems: 'flex-end',
+          }}
+        >
+          <Shadow viewStyle={{
+            ...styles.successModalButtonView,
+            backgroundColor: props.buttonColor
+              ? props.buttonColor
+              : Colors.blue,
+          }} distance={2}
+          startColor={props.buttonShadowColor
+            ? props.buttonShadowColor
+            : Colors.shadowBlue }
+          offset={[ 42, 14 ]}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressProceed( word )}
+              style={{
                 // ...styles.successModalButtonView,
-                  shadowColor: props.buttonShadowColor
-                    ? props.buttonShadowColor
-                    : Colors.shadowBlue,
+                shadowColor: props.buttonShadowColor
+                  ? props.buttonShadowColor
+                  : Colors.shadowBlue,
 
-                }}
-                delayPressIn={0}
-              >
-                <Text
-                  style={{
-                    ...styles.proceedButtonText,
-                    color: props.buttonTextColor
-                      ? props.buttonTextColor
-                      : Colors.white,
-                  }}
-                >
-                  {props.proceedButtonText}
-                </Text>
-              </AppBottomSheetTouchableWrapper>
-            </Shadow>
-
-            {props.isIgnoreButton && (
-              <AppBottomSheetTouchableWrapper
-                onPress={() => props.onPressIgnore()}
+              }}
+              delayPressIn={0}
+            >
+              <Text
                 style={{
-                  height: wp( '12%' ),
-                  width: wp( '27%' ),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  alignSelf: 'center',
+                  ...styles.proceedButtonText,
+                  color: props.buttonTextColor
+                    ? props.buttonTextColor
+                    : Colors.white,
+                }}
+              >
+                {props.proceedButtonText}
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </Shadow>
+
+          {props.isIgnoreButton && (
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressIgnore()}
+              style={{
+                height: wp( '12%' ),
+                width: wp( '27%' ),
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
                 // position: 'absolute',
                 // left: wp( 53 )
+              }}
+              delayPressIn={0}
+            >
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                  color: props.buttonTextColor
+                    ? props.buttonTextColor
+                    : Colors.blue,
                 }}
-                delayPressIn={0}
               >
-                <Text
-                  style={{
-                    ...styles.proceedButtonText,
-                    color: props.buttonTextColor
-                      ? props.buttonTextColor
-                      : Colors.blue,
-                  }}
-                >
-                  {props.cancelButtonText ? props.cancelButtonText : common.ignore}
-                </Text>
-              </AppBottomSheetTouchableWrapper>
-            )}
-          </View>
+                {props.cancelButtonText ? props.cancelButtonText : common.ignore}
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          )}
         </View>
-      </KeyboardAwareScrollView>
+      </View>
+      {/* </KeyboardAwareScrollView> */}
     </View>
   )
 }

@@ -165,10 +165,10 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
 
   useEffect(() => {
     // if ( !isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].shareType == 'securityQuestion' ) {
-    if (!isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !== 'notSetup' ) {
+    // if (!isChange && !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status !== 'notSetup' ) {
       setLoaderModal(false)
-      props.navigation.goBack()
-    }
+      // props.navigation.goBack()
+    // }
   }, [setupPasswordStatus, levelHealth])
 
   useEffect(() => {
@@ -306,6 +306,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
     else setPassword(security)
     showSecurityQue(false)
     showEncryptionPswd(false)
+    props.navigation.goBack()
   }
 
   const setButtonVisible = () => {
@@ -472,6 +473,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
                 showEncryptionPswd(false)
                 setShowAGSPmodal(false)
                 setAnswerError('')
+                props.navigation.goBack()
               }}
             >
               <Text style={{
@@ -1207,7 +1209,8 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
               onPress={() => {
-                props.navigation.goBack()
+                props.navigation.pop()
+                // props.navigation.popToTop()
               }}
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>

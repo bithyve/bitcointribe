@@ -855,7 +855,7 @@ const SecurityQuestionHistory = ( props ) => {
           confirmButtonText={strings.ConfirmPassword}
           reshareButtonText={strings.ConfirmPassword}
           //changeButtonText={'Change Password'}
-          isChangeKeeperAllow
+          // isChangeKeeperAllow
           disableChange={false}
           onPressReshare={() => {
             // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )

@@ -129,35 +129,35 @@ const SeedPageComponent = ( props ) => {
   }
 
   const getIndex = ( index, seedIndex )=>{
-    let newIndex = index + 1 + ( seedIndex * 6 )
-    let isAdd = false
-    if( index % 2 == 0 ) isAdd = true
+    const newIndex = index + 1 + ( seedIndex * 6 )
+    // let isAdd = false
+    // if( index % 2 == 0 ) isAdd = true
 
-    let tempNumber = 0
-    if( index == 0 || index == 5 ) tempNumber = 0
-    else if( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let tempNumber = 0
+    // if( index == 0 || index == 5 ) tempNumber = 0
+    // else if( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
 
-    if( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // if( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
 
   const getTextIndex = ( index )=>{
-    let newIndex = index
-    let isAdd = false
-    if( index % 2 == 0 ) isAdd = true
+    const newIndex = index
+    // let isAdd = false
+    // if( index % 2 == 0 ) isAdd = true
 
-    let tempNumber = 0
-    if( index == 0 || index == 5 ) tempNumber = 0
-    else if( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let tempNumber = 0
+    // if( index == 0 || index == 5 ) tempNumber = 0
+    // else if( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
 
-    if( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // if( isAdd )
+    // newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
@@ -225,7 +225,7 @@ const SeedPageComponent = ( props ) => {
                   data={seedItem}
                   extraData={seedItem}
                   showsVerticalScrollIndicator={false}
-                  numColumns={2}
+                  // numColumns={2}
                   contentContainerStyle={{
                     marginStart:15
                   }}
@@ -236,9 +236,13 @@ const SeedPageComponent = ( props ) => {
                         onPress={() => SelectOption( value?.id )}
                         style={styles.historyCard}
                       >
-                        <Text style={styles.numberText}>{
-                          getFormattedNumber( getIndex( index, seedIndex ) )
-                        }</Text>
+                        <View style={styles.numberContainer}>
+                          <View style={styles.numberInnerContainer}>
+                            <Text style={styles.numberText}>{
+                              getFormattedNumber( getIndex( index, seedIndex ) )
+                            }</Text>
+                          </View>
+                        </View>
                         <TextInput
                           style={[ styles.modalInputBox,
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
@@ -393,7 +397,6 @@ const styles = StyleSheet.create( {
   historyCard: {
     marginEnd: 15,
     // backgroundColor: Colors.gray7,
-    borderRadius: 10,
     flex: 1 / 2,
     // height: wp( '15%' ),
     // width: wp( '90%' ),
@@ -403,7 +406,11 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20
+    marginBottom: 20,
+    borderRadius: 10,
+    // borderColor: '#E3E3E3',
+    // borderWidth: 1
+    backgroundColor: Colors.backgroundColor1
   },
   historyCardTitleText: {
     color: Colors.textColorGrey,
@@ -425,26 +432,28 @@ const styles = StyleSheet.create( {
     marginRight: wp( '8%' ),
   },
   numberContainer: {
-    margin: 10,
-    height: RFValue( 50 ),
-    width: RFValue( 50 ),
-    borderRadius: RFValue( 25 ),
+    margin: 5,
+    height: ( 50 ),
+    width: ( 50 ),
+    borderRadius: ( 25 ),
     backgroundColor: Colors.white,
     shadowColor: Colors.shadowBlack,
-    elevation: 10,
+    // elevation: 10,
     // shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
       width: 15,
       height: 15,
     },
+    justifyContent: 'center',
+    alignItems: "center"
   },
   numberInnerContainer: {
     backgroundColor: Colors.numberBg,
-    borderRadius: RFValue( 23 ),
-    height: RFValue( 46 ),
-    width: RFValue( 46 ),
-    margin: RFValue( 4 ),
+    borderRadius: ( 23 ),
+    height: ( 46 ),
+    width: ( 46 ),
+    margin: ( 4 ),
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -452,7 +461,7 @@ const styles = StyleSheet.create( {
     color: Colors.numberFont,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginEnd: 10
+    // marginEnd: 10
   },
   nameText: {
     color: Colors.greyTextColor,
@@ -461,21 +470,22 @@ const styles = StyleSheet.create( {
     marginStart: 25
   },
   modalInputBox: {
-    flex: 1,
+    // flex: 1,
+    width:'70%',
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
-    borderRadius: 10,
+    // borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
-    backgroundColor: Colors.backgroundColor1
+    // backgroundColor: Colors.backgroundColor1
   },
   selectedInput: {
-    backgroundColor: Colors.white,
+    // backgroundColor: Colors.white,
     // backgroundColor: 'red',
-    elevation: 5,
+    // elevation: 5,
     shadowColor: Colors.shadowBlack,
     shadowOpacity: 1,
     shadowOffset: {

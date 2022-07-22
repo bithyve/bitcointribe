@@ -8,7 +8,7 @@ import { isEmpty,  buildVersionExists } from '../../common/CommonFunctions'
 import { setVersionHistory, SET_VERSION } from '../actions/versionHistory'
 
 function* versionHistoryWorker( { payload } ) {
-  const versionHistory = yield select(
+  let versionHistory = yield select(
     ( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
   )
 
@@ -41,6 +41,10 @@ function* versionHistoryWorker( { payload } ) {
       .utc()
       .local()
       .format( 'DD MMMM YYYY HH:mm' )
+  }
+
+  if( typeof versionHistory == 'string' ){
+    versionHistory = JSON.parse( versionHistory )
   }
 
   versionHistory.push( data )

@@ -467,10 +467,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
-        title={'Change your\nKeeper'}
-        info={'Having problems with your Keeper'}
+        title={'Change where you store \nyour Recovery Key'}
+        info={'Having problems?'}
         note={
-          'You can change the Keeper you selected to send your Recovery Key'
+          'You can send your Recovery Key to someone else'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -789,7 +789,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setReshareModal( true )
           }}
           isVersionMismatch={isVersionMismatch}
-          isChangeKeeperAllow={isChange ? false : ( selectedKeeper.updatedAt > 0 || selectedKeeper.status == 'notAccessible' ) ? true : false}
+          isChangeKeeperAllow={false}
+          // isChangeKeeperAllow={isChange ? false : ( selectedKeeper.updatedAt > 0 || selectedKeeper.status == 'notAccessible' ) ? true : false}
           reshareButtonText={'Reshare'}
           changeButtonText={'Change'}
         />
