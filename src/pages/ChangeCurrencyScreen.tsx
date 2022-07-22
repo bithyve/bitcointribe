@@ -231,6 +231,7 @@ export default function ChangeCurrencyScreen( props ) {
                 borderWidth: 1,
                 borderColor: Colors.borderColor,
                 overflow: 'hidden',
+                height: wp( '60%' )
               }}
             >
               <ScrollView>
@@ -319,6 +320,7 @@ export default function ChangeCurrencyScreen( props ) {
               borderWidth: 1,
               borderColor: Colors.borderColor,
               overflow: 'hidden',
+              height: wp( '60%' )
             }}
           >
             <ScrollView>
