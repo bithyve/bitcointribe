@@ -550,10 +550,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         async () => {
           if ( nextAppState === 'active' ) {
           //this.scheduleNotification()
+          console.log('ACTIVE')
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
             if( nextAppState === 'background' ) {
               // this.closeBottomSheet()
+              console.log('BACKGROUND')
             }
             // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
@@ -612,6 +614,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   createNotificationListeners = async () => {
+    messaging().onNotificationOpenedApp((data) => {
+      // console.log('awdawdawdwd', data);
+      const content = JSON.parse(data.data.content);
+      // console.log('adadcubsyuf', content.notificationId)
+      this.currentNotificationId =  content.notificationId
+      // console.log('adaesiekf', this.currentNotificationId)
+      const d = this.state.notificationData;
+
+      const msg = [];
+
+      for (const k of d) {
+        if (k.notificationId === content.notificationId) {
+          msg.push(k)
+        }
+      }
+
+      console.log('anwdyhuvedbjkwdd', msg);
+
+      this.handleNotificationBottomSheetSelection(msg[0]);
+    })
+
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       // largeIcon: 'ic_launcher',
