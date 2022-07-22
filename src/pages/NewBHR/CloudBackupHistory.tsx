@@ -306,6 +306,7 @@ const CloudBackupHistory = ( props ) => {
         tintColor={Colors.deepBlue}
         headerImage={require( '../../assets/images/icons/ico_cloud_backup.png' )}
       />
+      {console.log( 'LevelData==cloud history==>' + JSON.stringify( levelData ) )}
       <View style={{
         flex: 1
       }}>
@@ -330,7 +331,7 @@ const CloudBackupHistory = ( props ) => {
           onPressChange={() => setKeeperTypeModal( true )}
           showButton={showButton}
           changeButtonText={'Change'}
-          isChangeKeeperAllow={true}
+          isChangeKeeperAllow={( levelData.length > 1 && levelData[ 1 ].keeper1.shareType != '' ) ? false : true }
           showSecurityPassword={true}
           // showSecurityPassword={false}
           onEncryptionPasswordClick={onEncryptionPasswordClick}

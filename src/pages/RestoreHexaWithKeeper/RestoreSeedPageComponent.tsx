@@ -19,6 +19,7 @@ import { translations } from '../../common/content/LocContext'
 import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
 import ModalContainer from '../../components/home/ModalContainer'
 import AlertModalContents from '../../components/AlertModalContents'
+import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -65,6 +66,7 @@ const RestoreSeedPageComponent = ( props ) => {
   const [ partialSeedData, setPartialSeedData ] = useState( [] )
   const [ currentPosition, setCurrentPosition ] = useState( 0 )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ extraSeeds, setExtraSeeds ]=useState( false )
 
   const width = Dimensions.get( 'window' ).width
   const ref = React.useRef<PagerView>( null )
@@ -81,12 +83,16 @@ const RestoreSeedPageComponent = ( props ) => {
   } )
 
   useEffect( () => {
+    setPartialSeedDataFun( seedData )
+  }, [] )
+
+  const setPartialSeedDataFun = ( testingData ) =>{
     const tempData = []
     let innerTempData = []
     let initPosition = 0
     let lastPosition = 6
-    const totalLength = seedData.length
-    seedData.map( ( item, index )=>{
+    const totalLength = testingData.length
+    testingData.map( ( item, index )=>{
       if( index != 0 && index % 6 == 0 ){
         initPosition = initPosition + 6
         lastPosition = ( lastPosition + 6 > totalLength )?totalLength:lastPosition
@@ -100,12 +106,28 @@ const RestoreSeedPageComponent = ( props ) => {
     }
     setPartialSeedData( tempData )
     setTotal( totalLength )
-  }, [] )
+  }
 
   const onNextClick = () => {
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+  }
+
+  const onCheckPressed = () => {
+    const tempData = [ ...seedData ]
+    if( !extraSeeds ){
+      for( let i = 13; i<25;i++ ){
+        tempData.push( {
+          id:i, name:''
+        } )
+      }
+    } else {
+      tempData.splice( 12, 12 )
+    }
+    setSeedData( [ ...tempData ] )
+    setExtraSeeds( !extraSeeds )
+    setPartialSeedDataFun( tempData )
   }
 
   const onProceedClick = () =>{
@@ -278,6 +300,15 @@ const RestoreSeedPageComponent = ( props ) => {
                       </TouchableOpacity>
                     )
                   }}
+                  ListFooterComponent={()=> seedIndex == 1 &&
+                  <TouchableOpacity onPress={() => onCheckPressed()} style={{
+                    flexDirection:'row', alignItems:'center'
+                  }}>
+                    <Icon name={extraSeeds?'checkbox-marked':'checkbox-blank-outline'} size={24} color={Colors.blue} />
+                    <Text style={ {
+                      color: Colors.blue, marginStart:10
+                    } }>{'I have 24 seed words'}</Text>
+                  </TouchableOpacity>}
                 />
                 {/* <BottomInfoBox
                   backgroundColor={Colors.white}

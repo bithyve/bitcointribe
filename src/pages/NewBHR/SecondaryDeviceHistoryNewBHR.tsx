@@ -677,7 +677,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           }}
           changeButtonText={'Change'}
           // isChangeKeeperAllow={isChange ? false : selectedKeeper.status != 'notSetup' && ( ( selectedKeeper.updatedAt == 0 && isPrimaryKeeper ) || ( selectedKeeper.updatedAt > 0 && !isPrimaryKeeper ) ) ? true : false}
-          isChangeKeeperAllow={true}
+          isChangeKeeperAllow={false}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => {
             if( isPrimaryKeeper ){
