@@ -550,12 +550,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         async () => {
           if ( nextAppState === 'active' ) {
           //this.scheduleNotification()
-          console.log('ACTIVE')
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
             if( nextAppState === 'background' ) {
               // this.closeBottomSheet()
-              console.log('BACKGROUND')
             }
             // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
@@ -629,8 +627,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           msg.push(k)
         }
       }
-
-      console.log('anwdyhuvedbjkwdd', msg);
 
       this.handleNotificationBottomSheetSelection(msg[0]);
     })
