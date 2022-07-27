@@ -2049,6 +2049,7 @@ function* downloadBackupDataWorker( { payload } ) {
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
     console.log( 'Error DOWNLOAD_BACKUP_DATA', error )
+    Alert.alert('Invalid Key')
   }
 }
 
