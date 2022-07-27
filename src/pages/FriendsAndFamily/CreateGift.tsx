@@ -789,7 +789,7 @@ const CreateGift = ({ navigation }) => {
         <View style={[CommonStyles.headerContainer, {
           backgroundColor: Colors.backgroundColor,
           marginRight: wp(4),
-          marginVertical: height < 685 ? wp(0) : 'auto'
+          marginVertical: height < 720 ? wp(0) : 'auto'
         }]}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -818,7 +818,7 @@ const CreateGift = ({ navigation }) => {
             }}>
               <Text style={{
                 color: Colors.blue,
-                fontSize: height < 685 ? RFValue(20) : RFValue(24),
+                fontSize: height < 720 ? RFValue(20) : RFValue(24),
                 letterSpacing: 0.01,
                 marginLeft: 20,
                 fontFamily: Fonts.FiraSansRegular
@@ -1009,7 +1009,7 @@ const CreateGift = ({ navigation }) => {
         {
           (Number(numbersOfGift) === 1) && !isSendMax && (
             <View style={{
-              marginVertical: height < 685 ? hp(1) : hp(2),
+              marginVertical: height < 720 ? hp(1) : hp(2),
               marginHorizontal: wp(7),
               flexDirection: 'row'
             }}>
@@ -1041,7 +1041,7 @@ const CreateGift = ({ navigation }) => {
           )
         }
         <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), justifyContent: 'space-between', marginVertical: height < 685 ? hp(1) : hp(3)
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), justifyContent: 'space-between', marginVertical: height < 720 ? hp(1) : hp(3)
         }}>
           <Text style={{
             color: Colors.textColorGrey,
@@ -1068,7 +1068,7 @@ const CreateGift = ({ navigation }) => {
 
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), marginBottom: height < 685 ? wp(1) : wp(7)
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp(6), marginBottom: height < 720 ? wp(1) : wp(7)
         }}>
           {renderButton('Create Gift', 'Create Gift')}
         </View>
