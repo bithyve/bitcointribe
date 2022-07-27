@@ -14,6 +14,7 @@ import AppInfo from '../../assets/images/svgs/icon_info.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { LevelData } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -24,7 +25,7 @@ interface MenuOption {
   title: string;
   subtitle: string;
   screenName?: string;
-  name ?: string,
+  name?: string,
   onOptionPressed?: () => void;
   // isSwitch: boolean;
   imageSource: ImageSourcePropType;
@@ -35,12 +36,14 @@ const listItemKeyExtractor = ( item: MenuOption ) => item.title
 const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const { translations, } = useContext( LocalizationContext )
   // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
+  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const [ isEnabled, setIsEnabled ] = useState( false )
   const toggleSwitch = () => setIsEnabled( previousState => !previousState )
   const currencyCode = useSelector(
     ( state ) => state.preferences.currencyCode,
   )
   const strings = translations[ 'settings' ]
+  const bhrStrings = translations[ 'bhr' ]
   const common = translations[ 'common' ]
   const menuOptions: MenuOption[] = [
     // {
@@ -102,6 +105,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   },
     // },
     {
+      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
+        ? bhrStrings[ 'WalletBackupInfo1' ]
+        : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+          ? 'seed backup commpleted'
+          :'cloud backup completed',
+      title: bhrStrings[ 'WalletBackup' ],
+      screenName: 'WalletBackup',
+    },
+    {
       imageSource: require( '../../assets/images/icons/settings.png' ),
       subtitle: strings.walletSettingsSub,
       title: strings.walletSettings,
@@ -120,15 +133,17 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   //const [ strings, setstrings ] = useState( content.settings )
   function handleOptionSelection( menuOption: MenuOption ) {
+    console.log( 'menuoption', menuOption )
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
+      console.log( 'menuoption inside', menuOption )
       navigation.navigate( menuOption.screenName )
     }
   }
 
   const findImage = ( name ) => {
-    switch ( name ){
+    switch ( name ) {
         case strings.accountManagement:
           return ( <AccManagement /> )
         case strings.node:
@@ -136,6 +151,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         case strings.walletSettings:
           return ( <Wallet /> )
         case strings.AppInfo:
+          return ( <AppInfo /> )
+        case bhrStrings[ 'WalletBackup' ]:
           return ( <AppInfo /> )
         default:
           return null
@@ -149,7 +166,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
       <View style={styles.accountCardsSectionContainer}>
-
+        {console.log( 'skk leveldata', levelData )}
         <Text style={{
           color: Colors.blue,
           fontSize: RFValue( 18 ),
@@ -262,7 +279,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={[ styles.otherCards, styles.extraHeight ]}
           >
-            <QueActive/>
+            <QueActive />
             <View style={{
               marginLeft: 10
             }}>
