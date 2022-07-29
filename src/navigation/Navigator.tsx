@@ -57,6 +57,7 @@ import IconWithBadge from './stacks/security/IconWithBadge'
 import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
 import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
+import GiftStack from './stacks/gift/GiftStack'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -257,12 +258,14 @@ const Bottomtab = createBottomTabNavigator(
     //   },
     // },
     Securiy: {
-      screen: SecurityStack,
+      screen: GiftStack,
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return (
-            <View style={{marginTop: hp( '1.3%' )}}>
-            <IconWithBadge focused={focused} />
+            <View style={{
+              marginTop: hp( '1.3%' )
+            }}>
+              <IconWithBadge focused={focused} />
             </View>
           )
         }
