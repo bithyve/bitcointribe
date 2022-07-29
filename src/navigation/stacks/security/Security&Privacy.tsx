@@ -61,6 +61,7 @@ import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
 import  FNFToKeeper from '../../../pages/NewBHR/FNFToKeeper'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 import { translations } from '../../../common/content/LocContext'
+import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 
 const strings  = translations[ 'stackTitle' ]
 
