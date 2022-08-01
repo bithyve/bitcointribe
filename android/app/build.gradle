@@ -59,7 +59,7 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 490
+        versionCode 495
         versionName "2.0.80"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
@@ -68,6 +68,7 @@ android {
     lintOptions {
         disable 'InvalidPackage'
         checkReleaseBuilds false
+        abortOnError false
     }
 
      signingConfigs {
