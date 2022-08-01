@@ -200,7 +200,7 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-native": "^3.10.0",
     "jest": "^26.4.2",
-    "jetifier": "^1.6.4",
+    "jetifier": "^2.0.0",
     "metro-react-native-babel-preset": "^0.63.0",
     "react-native-svg-transformer": "^0.14.3",
     "react-test-renderer": "16.13.1",

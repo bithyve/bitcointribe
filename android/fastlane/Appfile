@@ -1,0 +1,2 @@
+json_key_file("replace_with_play_store_secretKey.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("io.hexawallet.hexa") # e.g. com.krausefx.app
