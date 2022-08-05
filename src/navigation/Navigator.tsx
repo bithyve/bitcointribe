@@ -58,6 +58,8 @@ import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBac
 import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
 import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import GiftStack from './stacks/gift/GiftStack'
+import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
+import Gift_tab from '../assets/images/satCards/gift_tab.svg'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -265,7 +267,10 @@ const Bottomtab = createBottomTabNavigator(
             <View style={{
               marginTop: hp( '1.3%' )
             }}>
-              <IconWithBadge focused={focused} />
+              {/* <IconWithBadge focused={focused} /> */}
+              {focused ?
+                <Filled_gift_tab /> : <Gift_tab />
+              }
             </View>
           )
         }

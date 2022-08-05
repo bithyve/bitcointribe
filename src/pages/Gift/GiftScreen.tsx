@@ -20,7 +20,7 @@ import { connect } from 'react-redux'
 import idx from 'idx'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'\
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   syncPermanentChannels,
   PermanentChannelsSyncKind,
@@ -58,6 +58,14 @@ import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import GiftBoxComponent from './GiftBoxCmponent'
+import Gifts from '../../assets/images/satCards/gifts.svg'
+import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
+import Sat_card from '../../assets/images/satCards/sats_card.svg'
+import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
+import VerifySatModalContents from './VerifySatModalContents'
+import ClaimSatComponent from './ClaimSatComponent'
+import GiftUnwrappedComponent from './GiftUnwrappedComponent'
+
 interface GiftPropTypes {
   navigation: any;
   isFocused: boolean;
@@ -81,6 +89,10 @@ interface GiftStateTypes {
   showIndicator: boolean;
   addFnF: boolean;
   activeIndex: number | null;
+  showVerification: boolean;
+  claimVerification: boolean;
+  showGiftModal: boolean;
+  showGiftFailureModal: boolean;
 }
 
 class GiftScreen extends React.Component<
@@ -114,7 +126,11 @@ class GiftScreen extends React.Component<
       showLoader: false,
       showIndicator: false,
       addFnF: false,
-      activeIndex: null
+      activeIndex: null,
+      showVerification: false,
+      claimVerification: false,
+      showGiftModal: false,
+      showGiftFailureModal: false
     }
   }
 
@@ -510,6 +526,62 @@ class GiftScreen extends React.Component<
       </TouchableOpacity>
     )
   }
+  onCloseClick = () =>{
+    this.setState( {
+      showVerification:false
+    } )
+  }
+
+  onClaimClose=() => {
+    this.setState( {
+      claimVerification:false
+    } )
+  }
+
+  onClaimClick=()=>{
+    this.setState( {
+      claimVerification: false
+    }, ()=>{
+      this.setState( {
+        showGiftModal:true
+      } )
+    } )
+  }
+
+  onGiftClose=() => {
+    this.setState( {
+      showGiftModal:false
+    } )
+  }
+
+  onGiftFailureClose=() => {
+    this.setState( {
+      showGiftFailureModal:false
+    } )
+  }
+
+  onViewHealthClick=()=>{
+    this.setState( {
+      showVerification: false
+    }, ()=>{
+      // this.setState( {
+      // claimVerification:true
+      // } )
+      this.props.navigation.navigate( 'SetUpSatNextCard', {
+        fromClaimFlow: 0
+      } )
+    } )
+  }
+
+  onGiftSuccessClick=()=>{
+    this.setState( {
+      showGiftModal: false
+    }, ()=>{
+      this.setState( {
+        showGiftFailureModal:true
+      } )
+    } )
+  }
 
   render() {
     const { syncPermanentChannels, navigation } = this.props
@@ -570,74 +642,100 @@ class GiftScreen extends React.Component<
             marginHorizontal: 39, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.FiraSansLight, marginTop: 18
           }}>{'Give sats as gifts to your friends and family, view and manage created gifts.'}</Text>
           <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={showLoader}
-                onRefresh={() => {
-                  syncPermanentChannels( {
-                    permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-                    metaSync: true
-                  } )
-                }}
-              />
-            }
+            // refreshControl={
+            //   <RefreshControl
+            //     refreshing={showLoader}
+            //     onRefresh={() => {
+            //       syncPermanentChannels( {
+            //         permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+            //         metaSync: true
+            //       } )
+            //     }}
+            //   />
+            // }
             contentContainerStyle={{
               flex: 1, paddingHorizontal: 38, paddingBottom: 20
             }}
           >
-            {/* <GiftBoxComponent
-              titleText={this.strings[ 'giftsats' ]}
+            <GiftBoxComponent
+              titleText={'Create New Gift'}
               subTitleText={this.strings[ 'giftSubTextF&F' ]}
-              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
+              onPress={() => this.props.navigation.navigate( 'CreateGift', {
+                // setActiveTab: buttonPress
+              } )}
+              image={<Add_gifts />}
             />
             <GiftBoxComponent
               titleText={'Available Gifts'}
               subTitleText={'All the gifts you have created, not sent, and gifts you have received are shown here'}
               onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
+              image={<Gifts />}
             />
             <GiftBoxComponent
               titleText={'Claim SATSCARDTm'}
               subTitleText={'Move sats from your SATSCARDTM into your account.'}
-              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
-            /> */}
-
-            <View style={{
-              flexDirection: 'row', alignItems: 'center', marginVertical: RFValue( 20 )
-            }}>
-              <View style={{
-                justifyContent: 'space-between', alignItems: 'center', flex: 1
-              }}>
-                <Text style={{
-                  color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.FiraSansMedium
-                }} >{'Available'}</Text>
-                <View style={{
-                  height: RFValue( 4 ), backgroundColor: Colors.blue, marginTop: RFValue( 7 ), width: '100%', opacity: 1
-                }} />
-              </View>
-              <View style={{
-                justifyContent: 'space-between', alignItems: 'center', flex: 1
-              }}>
-                <Text style={{
-                  color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.FiraSansMedium
-                }} >{'Sent'}</Text>
-                <View style={{
-                  height: RFValue( 4 ), backgroundColor: Colors.blue, marginTop: RFValue( 7 ), width: '100%', opacity: 0.3
-                }} />
-              </View>
-              <View style={{
-                justifyContent: 'space-between', alignItems: 'center', flex: 1
-              }}>
-                <Text style={{
-                  color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.FiraSansMedium
-                }} >{'Expired'}</Text>
-                <View style={{
-                  height: RFValue( 4 ), backgroundColor: Colors.blue, marginTop: RFValue( 7 ), width: '100%', opacity: 0.3
-                }} />
-              </View>
-            </View>
+              onPress={() => this.setState( {
+                showVerification:true
+              } )}
+              image={<Sat_card/>}
+            />
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
+        <ModalContainer onBackground={this.onCloseClick} visible={this.state.showVerification} closeBottomSheet={this.onCloseClick}  >
+          <VerifySatModalContents
+            title={'Verifying SATSCARDTM'}
+            info={'Get your SATSCARDTM ready for verification'}
+            proceedButtonText={'Verify'}
+            subPoints={'Tap your SATSCARDTM on your phone after clicking \'Verify\''}
+            bottomImage={require( '../../assets/images/satCards/illustration.png' )}
+            onCloseClick={this.onCloseClick}
+            onPressProceed={this.onViewHealthClick}
+            closeModal
+          />
+        </ModalContainer>
+        <ModalContainer onBackground={this.onClaimClose} visible={this.state.claimVerification} closeBottomSheet={this.onClaimClose}  >
+          <ClaimSatComponent
+            title={'Claim SATSCARDTM'}
+            info={'Note that this transfers the available sats in the card to your Checking Account.'}
+            proceedButtonText={'Claim sats'}
+            onCloseClick={this.onClaimClose}
+            onPressProceed={this.onClaimClick}
+            closeModal
+            firstHalfLbl={'Enter the '}
+            secondHalfLbl={'Spend code'}
+            cancelText={'Cancel'}
+            onCancelClick={this.onClaimClose}
+          />
+        </ModalContainer>
+        <ModalContainer onBackground={this.onGiftClose} visible={this.state.showGiftModal} closeBottomSheet={this.onGiftClose}  >
+          <GiftUnwrappedComponent
+            title={'Your Gift is unwrapped!'}
+            info={'Gifts sats received transferred to '}
+            infoSelected={'Checking Account.'}
+            info2={'Your checking account balance is '}
+            info2Selected={'100,000 sats'}
+            proceedButtonText={'Back to Home'}
+            onCloseClick={this.onGiftClose}
+            onPressProceed={this.onGiftSuccessClick}
+            closeModal
+            isBottomImage
+          />
+        </ModalContainer>
+        <ModalContainer onBackground={this.onGiftFailureClose} visible={this.state.showGiftFailureModal} closeBottomSheet={this.onGiftFailureClose}  >
+          <GiftUnwrappedComponent
+            title={'Claim Unsuccessful'}
+            info={'Sats were not transferred from your\nSATSCARDTM. Please try again.'}
+            proceedButtonText={'Try again'}
+            onCloseClick={this.onGiftFailureClose}
+            onPressProceed={this.onGiftSuccessClick}
+            isIgnoreButton
+            cancelButtonText={'Back'}
+            closeModal
+            isBottomImage
+            bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+          />
+        </ModalContainer>
       </View>
       /* feature/2.0 */
     )

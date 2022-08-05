@@ -16,13 +16,16 @@ const GiftBoxComponent = ( props ) => {
       style={styles.container}>
       {/* <Gift /> */}
       <View style={{
-        height:RFValue( 26 ), width:RFValue( 26 ), backgroundColor:'red'
+        height:RFValue( 26 ), width:RFValue( 26 ),
       }} >
+        {props.image}
         {/* <CheckingAcc /> */}
       </View>
       <View>
         <Text style={[ styles.pageTitle ]}>
-          {props.titleText}
+          {props.titleText}<Text style={styles.extraSubText}>
+            {/* {'TM'} */}
+          </Text>
         </Text>
         <Text style={styles.subText}>
           {props.subTitleText}
@@ -68,7 +71,24 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansLight,
     marginTop: RFValue( 4 ),
-    letterSpacing: 0.5
+    letterSpacing: 0.5,
+    // paddingTop: RFValue( 40 ),
+
+    // width: '85%',
+  },
+  extraSubText:{
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 6 ),
+    fontFamily: Fonts.FiraSansLight,
+    // marginTop: RFValue( 40 ),
+    letterSpacing: 0.5,
+    margin:15,
+    // backgroundColor: 'red',
+    // alignContent:''
+    top: -20,
+    alignItems: 'flex-start'
+    // alignSelf: 'flex-start',\
+    // textAlign: 'justify'
     // width: '85%',
   }
 } )

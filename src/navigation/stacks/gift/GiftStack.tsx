@@ -35,6 +35,9 @@ import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
 import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
 import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
 import GiftScreen from '../../../pages/Gift/GiftScreen'
+import SetUpSatCardScreen from '../../../pages/Gift/SetUpSatCardScreen'
+import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
+import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -113,7 +116,26 @@ const GiftStack = createStackNavigator(
         header: null,
       },
     },
-    RequestKeyFromContact
+    RequestKeyFromContact,
+    SetUpSatCard: {
+      screen: SetUpSatCardScreen,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
+    SetUpSatNextCard:{
+      screen:SetUpSatNextCardScreen,
+      navigationOptions: {
+        header:null
+      }
+    },
+    GiftCreated:{
+      screen:GiftCreatedScreen,
+      navigationOptions: {
+        header:null
+      }
+    }
   },
   {
     // mode: 'modal',
