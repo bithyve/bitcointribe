@@ -11,10 +11,104 @@ import {
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import { UsNumberFormat } from '../../common/utilities'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import { AccountsState } from '../../store/reducers/accounts'
+import { useSelector } from 'react-redux'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default function GiftUnwrappedComponent( props ) {
   const { translations } = useContext( LocalizationContext )
   const common = translations[ 'common' ]
+  const fiatCurrencyCode = useCurrencyCode()
+  const accountsState: AccountsState = useSelector( state => state.accounts )
+  const currencyCode = useSelector( state => state.preferences.currencyCode )
+
+  const accountElement = (
+    item,
+    activeOpacity = 1,
+    width = '90%',
+    message = `${props.currencyKind === CurrencyKind.BITCOIN ? 'Sats' : 'Money'} would be transferred to`,
+  ) => {
+    return (
+      <TouchableOpacity
+        style={{
+          ...styles.accountSelectionView, width: width,
+        }}
+        // onPress={() => onPressCallBack()}
+        activeOpacity={activeOpacity}
+      >
+        <View style={{
+          borderRadius: wp( 2 ),
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            width: '100%',
+            paddingVertical: hp( 2 ),
+            paddingHorizontal: wp( 2 ),
+            alignItems: 'center'
+          }}>
+            <View style={{
+              width: wp( 13 ),
+              height: '100%',
+              marginTop: hp( 0.5 ),
+            }} >
+              {getAvatarForSubAccount( item.primarySubAccount, false, true )}
+            </View>
+            <View style={{
+              marginHorizontal: wp( 3 ),
+              flex: 1
+            }}>
+              <Text style={{
+                color: Colors.gray4,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular,
+              }}>
+                {message}
+              </Text>
+              <Text
+                style={{
+                  color: Colors.black,
+                  fontSize: RFValue( 14 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {item.primarySubAccount.customDisplayName ?? item.primarySubAccount.defaultTitle}
+              </Text>
+              <Text style={styles.availableToSpendText}>
+                {'Available to spend: '}
+                <Text style={styles.balanceText}>
+                  {props?.prefersBitcoin
+                    ? UsNumberFormat( item.primarySubAccount?.balances?.confirmed )
+                    : accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
+                      ? (
+                        ( item.primarySubAccount?.balances?.confirmed / SATOSHIS_IN_BTC ) *
+                        accountsState.exchangeRates[ currencyCode ].last
+                      ).toFixed( 2 )
+                      : 0}
+                </Text>
+                <Text>
+                  {props?.prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}
+                </Text>
+              </Text>
+            </View>
+            {activeOpacity === 0 && <MaterialCommunityIcons
+              name="dots-vertical"
+              size={24}
+              color="gray"
+              style={{
+                alignSelf: 'center'
+              }}
+            />}
+          </View>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
   return (
     <View style={{
       ...styles.modalContentContainer,
@@ -92,6 +186,10 @@ export default function GiftUnwrappedComponent( props ) {
             </Text>
           ) : null}
         </View>
+        {
+          props.showAccountDetail &&
+            accountElement( props.selectedAccount )
+        }
         <View
           style={{
             height: hp( '18%' ),
@@ -227,5 +325,30 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  accountSelectionView: {
+    width: '90%',
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 2,
+    alignSelf: 'center',
+    marginTop: hp( 2 ),
+    marginBottom: hp( 2 ),
+    backgroundColor:Colors.white,
+    borderRadius:10
+  },
+  availableToSpendText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
+    lineHeight: 15,
+  },
+  balanceText: {
+    color: Colors.blue,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansItalic,
   },
 } )

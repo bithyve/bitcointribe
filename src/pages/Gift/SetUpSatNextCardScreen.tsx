@@ -40,6 +40,7 @@ import useAccountSendST2CompletionEffect from '../../utils/sending/UseAccountSen
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import { number } from 'bitcoinjs-lib/types/script'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -51,7 +52,7 @@ const temp: CKTapCard = {
   auth_delay: 0,
   is_tapsigner: true,
   is_testnet: false,
-  num_backups: null,
+  num_backups: 10,
   num_slots: 10,
   path: null,
 
@@ -64,6 +65,7 @@ const temp: CKTapCard = {
 export default function SetUpSatNextCardScreen( props ) {
   const dispatch = useDispatch()
   const giftAmount = props.navigation?.state?.params?.giftAmount
+  const fromClaimFlow= props.navigation?.state?.params?.fromClaimFlow
 
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
@@ -73,6 +75,8 @@ export default function SetUpSatNextCardScreen( props ) {
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( temp )
   const [ slotAddress, setSlotAddress ] = useState<String | null>( dummySatcardAddress )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ nfcVisible, setNfcVisible ] = React.useState( false )
+
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
   } )
@@ -86,6 +90,17 @@ export default function SetUpSatNextCardScreen( props ) {
     )
   }, [ sendingState ] )
 
+  const withModal = ( callback ) => {
+    return Platform.select( {
+      android: async () => {
+        setNfcVisible( true )
+        const resp = await card.nfcWrapper( callback )
+        setNfcVisible( false )
+        return resp
+      },
+      ios: async () => card.nfcWrapper( callback ),
+    } )
+  }
 
   useEffect( () => {
     let timeoutVariable
@@ -100,17 +115,19 @@ export default function SetUpSatNextCardScreen( props ) {
             if ( cardDetails?._certs_checked ) {
               setStepsVerified( 2 )
               timeout1 = setTimeout( () => {
-                // setStepsVerified( 3 )
-                console.log( 'getAddrees===>' + JSON.stringify( dummySatcardAddress ) )
+                setStepsVerified( 3 )
+                console.log( 'fromClaimFlow===>' + JSON.stringify( fromClaimFlow ) )
 
-                handleManualAddressSubmit( dummySatcardAddress )
-                // timeout1 = setTimeout( () => {
-                //   props.navigation.navigate( 'GiftCreated', {
-                //     numSlots: cardDetails?.num_slots,
-                //     activeSlot: cardDetails?.active_slot,
-                //     fromClaimFlow: props.navigation?.state?.params?.fromClaimFlow
-                //   } )
-                // }, 2000 )
+                // handleManualAddressSubmit( dummySatcardAddress )
+                timeout1 = setTimeout( () => {
+                  props.navigation.navigate( 'GiftCreated', {
+                    numSlots: cardDetails?.num_slots,
+                    activeSlot: cardDetails?.active_slot,
+                    slotFromIndex:fromClaimFlow == 0?
+                      cardDetails?.num_backups == 0 ? 1 : 2
+                      :cardDetails?.num_backups == 0 ? 3 : 4,
+                  } )
+                }, 2000 )
               }, 2000 )
             }
           }, 2000 )
@@ -132,14 +149,14 @@ export default function SetUpSatNextCardScreen( props ) {
 
   async function getCardData() {
     const cardData = await card.first_look()
-    setCardDetails( cardData )
+    setCardDetails( cardDetails )
     console.log( 'card details===>' + JSON.stringify( cardData ) )
 
     if( cardDetails && cardDetails.active_slot!=null ){
     //For Create Flow
       const address: any = await card.address( true, true, cardDetails.active_slot )
       setSlotAddress( address )
-      console.log( 'getAddrees===>' + JSON.stringify( address ) )
+      console.log( 'getAddrees===>' + JSON.stringify( dummySatcardAddress ) )
 
       // handleManualAddressSubmit( dummySatcardAddress )
     }
@@ -199,7 +216,7 @@ export default function SetUpSatNextCardScreen( props ) {
     },
     onFailure: ( error ) => {
       console.log( 'skk111122', error )
-      setShowAlertModal( true )
+      // setShowAlertModal( true )
     },
   } )
 
@@ -230,7 +247,9 @@ export default function SetUpSatNextCardScreen( props ) {
           props.navigation.navigate( 'GiftCreated', {
             numSlots: cardDetails?.num_slots,
             activeSlot: cardDetails?.active_slot,
-            fromClaimFlow: props.navigation?.state?.params?.fromClaimFlow
+            slotFromIndex:fromClaimFlow?
+              cardDetails?.num_backups == 0 ? 1 : 2
+              :cardDetails?.num_backups == 0 ? 3 : 4,
           } )
         }, 2000 )
       }
@@ -288,7 +307,7 @@ export default function SetUpSatNextCardScreen( props ) {
           <GiftStepperComponent
             // extraContainer={{        }}
             showLoader={stepsVerified <= 1}
-            verifiedText={stepsVerified >= 2 ? 'Card detected' : 'Detecting card'}
+            verifiedText={stepsVerified >= 2 ? 'Card found' : 'Detecting card'}
           />
         </>
       }
@@ -301,7 +320,7 @@ export default function SetUpSatNextCardScreen( props ) {
           <GiftStepperComponent
             // extraContainer={{        }}
             showLoader={stepsVerified <= 2}
-            verifiedText={stepsVerified >= 3 ? 'SATSCARDTM ready to use' : 'Getting SATSCARDTM for use'}
+            verifiedText={stepsVerified >= 3 ? 'SATSCARDTM ready to use' : 'Transferring sats into SATSCARDTM'}
           />
         </>
       }

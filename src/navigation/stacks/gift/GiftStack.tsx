@@ -38,6 +38,7 @@ import GiftScreen from '../../../pages/Gift/GiftScreen'
 import SetUpSatCardScreen from '../../../pages/Gift/SetUpSatCardScreen'
 import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
 import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
+import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -132,6 +133,12 @@ const GiftStack = createStackNavigator(
     },
     GiftCreated:{
       screen:GiftCreatedScreen,
+      navigationOptions: {
+        header:null
+      }
+    },
+    ClaimSats :{
+      screen: ClaimSatsScreen,
       navigationOptions: {
         header:null
       }

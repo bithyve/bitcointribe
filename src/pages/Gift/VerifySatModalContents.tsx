@@ -26,8 +26,8 @@ export default function VerifySatModalContents( props ) {
           <AppBottomSheetTouchableWrapper
             onPress={props.onCloseClick}
             style={{
-              marginTop: wp( '8%' ),
-              marginRight: wp( '8%' ),
+              marginTop: wp( '3%' ),
+              marginRight: wp( '3%' ),
               width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
               alignSelf: 'flex-end',
               backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
@@ -84,7 +84,7 @@ export default function VerifySatModalContents( props ) {
               width:RFValue( 5 ), height:RFValue( 5 ), borderRadius: RFValue( 5 ), backgroundColor: Colors.blue, marginTop: RFValue( 5 )
             }}/> */}
             <Text style={{
-              fontSize: RFValue( 13 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, letterSpacing:0.65, marginStart: RFValue( 5 )
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, letterSpacing:0.6, marginStart: RFValue( 5 )
             }}>
               {props.subPoints}
             </Text>
@@ -154,9 +154,9 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     color: Colors.textColorGrey,
     // opacity: 1,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    letterSpacing: 1.3
+    letterSpacing: 0.6
   },
   successModalAmountView: {
     justifyContent: 'center',
@@ -167,8 +167,8 @@ const styles = StyleSheet.create( {
   successModalButtonView: {
     height: wp( '12%' ),
     minWidth: wp( '22%' ),
-    paddingLeft: wp( '12%' ),
-    paddingRight: wp( '12%' ),
+    paddingLeft: wp( '3%' ),
+    paddingRight: wp( '3%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,

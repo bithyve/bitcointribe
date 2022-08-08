@@ -568,7 +568,7 @@ class GiftScreen extends React.Component<
       // claimVerification:true
       // } )
       this.props.navigation.navigate( 'SetUpSatNextCard', {
-        fromClaimFlow: 0
+        fromClaimFlow: 1
       } )
     } )
   }
@@ -684,10 +684,10 @@ class GiftScreen extends React.Component<
         {showLoader ? <Loader /> : null}
         <ModalContainer onBackground={this.onCloseClick} visible={this.state.showVerification} closeBottomSheet={this.onCloseClick}  >
           <VerifySatModalContents
-            title={'Verifying SATSCARDTM'}
+            title={'Tap SATSCARDTM'}
             info={'Get your SATSCARDTM ready for verification'}
-            proceedButtonText={'Verify'}
-            subPoints={'Tap your SATSCARDTM on your phone after clicking \'Verify\''}
+            proceedButtonText={'Detect SATSCARDTM'}
+            subPoints={'Touch your SATSCARDTM on your phone after clicking \'Detect SATSCARDTM\''}
             bottomImage={require( '../../assets/images/satCards/illustration.png' )}
             onCloseClick={this.onCloseClick}
             onPressProceed={this.onViewHealthClick}

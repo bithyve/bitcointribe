@@ -11,7 +11,8 @@ import {
   ScrollView,
   Image,
   Dimensions,
-  Switch
+  Switch,
+  Keyboard
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -29,7 +30,6 @@ import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
 import Dollar from '../../assets/images/svgs/icon_dollar.svg'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
 import ModalContainer from '../../components/home/ModalContainer'
-import DashedContainer from './DashedContainer'
 import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
@@ -42,7 +42,6 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import AccountShell from '../../common/data/models/AccountShell'
-import ToggleContainer from './CurrencyToggle'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../../components/MaterialCurrencyCodeIcon'
@@ -62,18 +61,18 @@ import { updateUserName } from '../../store/actions/storage'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import Loader from '../../components/loader'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-import ErrorLoader from '../../components/ErrorLoader'
 import LoaderModal from '../../components/LoaderModal'
-import Toast from '../../components/Toast'
 import { calculateSendMaxFee } from '../../store/actions/sending'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { Shadow } from 'react-native-shadow-2'
-import VerifySatModalContents from '../Gift/VerifySatModalContents'
+import VerifySatModalContents from './VerifySatModalContents'
+import ClaimSatComponent from './ClaimSatComponent'
+import GiftUnwrappedComponent from './GiftUnwrappedComponent'
 
 const { height, } = Dimensions.get( 'window' )
 
 
-const CreateGift = ( { navigation } ) => {
+const ClaimSatsScreen = ( { navigation } ) => {
   const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells().filter( shell => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT )
   const currencyKind: CurrencyKind = useSelector( state => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN )
@@ -86,7 +85,7 @@ const CreateGift = ( { navigation } ) => {
   const currencyCode = useSelector( state => state.preferences.currencyCode )
   const exchangeRates = useSelector( state => state.accounts.exchangeRates )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
-  const [ amount, setAmount ] = useState( '' )
+  // const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
   const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
@@ -107,15 +106,16 @@ const CreateGift = ( { navigation } ) => {
   const spendableBalance = useSpendableBalanceForAccountShell( selectedAccount )
   const account: Account = accountState.accounts[ selectedAccount.primarySubAccount.id ]
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
-  const [ isExclusive, setIsExclusive ] = useState( true )
   const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
   const [ showErrorLoader, setShowErrorLoader ] = useState( false )
-  const [ satCard, setSatCard ] = useState( false )
-  const [ showVerification, setShowVerification ] = useState( false )
+  const [ spendCode, setSpendCode ] = useState( '' )
+  const [ isExclusive, setIsExclusive ] = useState( true )
+  const [ showGiftModal, setShowGiftModal ] = useState( false )
+  const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
 
   const currentSatsAmountFormValue = useMemo( () => {
-    return Number( amount )
-  }, [ amount ] )
+    return Number( spendCode )
+  }, [ spendCode ] )
 
   useEffect( () => {
     let minimumGiftVal = 1000
@@ -200,16 +200,16 @@ const CreateGift = ( { navigation } ) => {
   }
 
   useEffect( () => {
-    if ( isSendMax ) setAmount( `${spendableBalance - sendMaxFee}` )
+    if ( isSendMax ) setSpendCode( `${spendableBalance - sendMaxFee}` )
   }, [ sendMaxFee, isSendMax ] )
 
   useEffect( () => {
     if ( currencyKind == CurrencyKind.BITCOIN ) {
-      const newAmount = convertFiatToSats( parseFloat( amount ) ).toString()
-      setAmount( newAmount == 'NaN' ? '' : newAmount )
+      const newAmount = convertFiatToSats( parseFloat( spendCode ) ).toString()
+      setSpendCode( newAmount == 'NaN' ? '' : newAmount )
     } else if ( currencyKind == CurrencyKind.FIAT ) {
-      const newAmount = convertSatsToFiat( parseFloat( amount ) ).toString()
-      setAmount( newAmount == 'NaN' ? '' : newAmount )
+      const newAmount = convertSatsToFiat( parseFloat( spendCode ) ).toString()
+      setSpendCode( newAmount == 'NaN' ? '' : newAmount )
     }
   }, [ currencyKind ] )
 
@@ -221,228 +221,16 @@ const CreateGift = ( { navigation } ) => {
     setIsSendMax( true )
   }
 
-  const renderButton = ( text, condn ) => {
-    const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
-
-    let isDisabled = isAmountInvalid
-    if ( !isDisabled ) {
-      if ( prefersBitcoin ) {
-        isDisabled = currentSatsAmountFormValue < minimumGiftValue
-      } else {
-        isDisabled = currentSatsAmountFormValue < parseFloat( convertSatsToFiat( minimumGiftValue ) )
-      }
-    }
-
-    return (
-      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[ 8, 8 ]}>
-        <TouchableOpacity
-          disabled={isDisabled}
-          onPress={() => {
-            if ( satCard ) {
-              setShowVerification( true )
-            } else {
-              switch ( condn ) {
-                  case 'Create Gift':
-                    // creating multiple gift instances(based on giftInstances) of the same amount
-                    const giftInstances = Number( numbersOfGift )
-                    const giftAmountInSats = prefersBitcoin ? Number( amount ) : convertFiatToSats( parseFloat( amount ) )
-                    const giftAmountsInSats = []
-                    for ( let int = 0; int < giftInstances; int++ ) {
-                      giftAmountsInSats.push( giftAmountInSats )
-                    }
-                    if ( giftAmountsInSats.length ) {
-                      setInitGiftCreation( true )
-                      setShowLoader( true )
-                      dispatch( generateGifts( {
-                        amounts: giftAmountsInSats,
-                        accountId: selectedAccount && selectedAccount.primarySubAccount && selectedAccount.primarySubAccount.id ? selectedAccount.primarySubAccount.id : '',
-                        includeFee: includeFees,
-                        exclusiveGifts: giftAmountsInSats.length === 1 ? false : isExclusive,
-                      } ) )
-                    }
-                    break
-
-                  case 'Add F&F and Send':
-                    setGiftModal( false )
-                    navigation.navigate( 'AddContact', {
-                      fromScreen: 'Gift',
-                      giftId: ( createdGift as Gift ).id,
-                      setActiveTab: navigation.state.params.setActiveTab
-                    } )
-                    break
-
-                  case 'Send Gift':
-                    setGiftModal( false )
-                    navigation.navigate( 'EnterGiftDetails', {
-                      giftId: ( createdGift as Gift ).id,
-                      setActiveTab: navigation.state.params.setActiveTab
-                    } )
-                    break
-              }
-            }
-          }}
-          style={isDisabled ? {
-            ...styles.disabledButtonView
-          } : {
-            ...styles.buttonView
-          }
-          }
-        >
-          <Text style={styles.buttonText}>{text}</Text>
-        </TouchableOpacity>
-      </Shadow>
-    )
-  }
-
-  const onCloseClick = () => {
-    setShowVerification( false )
-  }
-
-  const onVerifyClick = () => {
-    setShowVerification( false )
-    navigation.navigate( 'SetUpSatNextCard', {
-      giftAmount: includeFees ? JSON.stringify( parseInt( amount ) - 226 ): amount,
-      fromClaimFlow: 0
-    } )
-  }
-
   function onPressNumber( text ) {
-    let tmpPasscode = amount
+    let tmpPasscode = spendCode
     if ( text != 'x' ) {
       tmpPasscode += text
-      setAmount( tmpPasscode )
+      setSpendCode( tmpPasscode )
     }
-    if ( amount && text == 'x' ) {
-      setAmount( amount.slice( 0, -1 ) )
+    if ( spendCode && text == 'x' ) {
+      setSpendCode( spendCode.slice( 0, -1 ) )
     }
     if ( isSendMax ) setIsSendMax( false )
-  }
-
-
-  const renderCreateGiftModal = () => {
-    return (
-      <View style={styles.modalContentContainer}>
-        <View style={{
-          marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
-        }}>
-          <Illustration />
-        </View>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {
-            setGiftModal( false )
-            navigation.goBack()
-          }}
-          style={{
-            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
-            alignSelf: 'flex-end',
-            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-            marginTop: wp( 3 ), marginRight: wp( 3 )
-          }}
-        >
-          <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
-          }} />
-        </TouchableOpacity>
-        <View>
-          <View style={{
-            marginLeft: wp( 7 ),
-          }}>
-            <Text style={styles.modalTitleText}>Gift Created</Text>
-            <Text style={{
-              ...styles.modalInfoText,
-            }}>{'You\'re ready to elate!'}</Text>
-          </View>
-          <DashedContainer
-            titleText={'Available Gift'}
-            subText={'Someone\'s about to feel extra special'}
-            amt={prefersBitcoin ? numberWithCommas( createdGift.amount ) : convertSatsToFiat( createdGift.amount )}
-            date={new Date()}
-            image={<GiftCard />}
-            currencyCode={prefersBitcoin ? '' : currencyCode}
-          />
-
-
-          <BottomInfoBox
-            containerStyle={{
-              paddingRight: wp( 15 ),
-              backgroundColor: 'transparent',
-              marginTop: hp( -1 )
-            }}
-            infoText={'The Gift is ready to be sent to anyone you choose. If unaccepted, the sats would revert to your wallet.'}
-          />
-
-        </View>
-        {/* <View style={{
-          marginBottom: hp( 4 ),
-          marginHorizontal: wp( 7 ),
-          flexDirection: 'row'
-        }}>
-          <TouchableOpacity
-            onPress={() => setAddfNf( !addfNf )}
-            style={{
-              flexDirection: 'row'
-            }}
-          >
-
-            <View style={styles.imageView}>
-              {addfNf &&
-              <CheckMark style={{
-                marginLeft: 6,
-                marginTop: 6
-              }}/>
-              }
-            </View>
-            <Text style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue( 12 ),
-              fontFamily: Fonts.FiraSansRegular,
-              marginHorizontal: wp( 3 )
-            }}>
-          Add recipient to Friends and Family
-            </Text>
-          </TouchableOpacity>
-        </View> */}
-        <View style={{
-          marginLeft: wp( 4 ), flexDirection: 'row'
-        }}>
-          {renderButton( 'Send Gift', addfNf ? 'Add F&F and Send' : 'Send Gift' )}
-          {/* {renderButton( 'Add F&F and Send' )}   */}
-
-        </View>
-      </View>
-    )
-  }
-
-  const BalanceCurrencyIcon = () => {
-    const style = {
-
-    }
-
-    if ( prefersBitcoin ) {
-      return <Image style={{
-        height: RFValue( 14 ), width: RFValue( 14 ), resizeMode: 'contain'
-      }} source={require( '../../assets/images/currencySymbols/icon_bitcoin_gray.png' )} />
-    }
-
-    if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
-      return (
-        <MaterialCurrencyCodeIcon
-          currencyCode={fiatCurrencyCode}
-          color={Colors.gray2}
-          size={RFValue( 16 )}
-          style={{
-          }}
-        />
-      )
-    } else {
-      return (
-        <Image
-          style={style}
-          source={getCurrencyImageByRegion( fiatCurrencyCode, 'gray' )}
-        />
-      )
-    }
   }
 
   const renderAccountList = () => {
@@ -658,62 +446,12 @@ const CreateGift = ( { navigation } ) => {
     </View>
   }
 
-  // gift creation failure UI
-
-  const renderErrorModal = () => {
-    return <View style={{
-      backgroundColor: Colors.white,
-      padding: wp( '8' )
-    }}>
-      <View style={{
-        flexDirection: 'row',
-      }}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => { setShowErrorLoader( false ) }}
-          style={styles.modalCrossButton}
-        >
-          <FontAwesome name="close" color={Colors.white} size={19} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={{
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-      }}>
-        <Text style={{
-          color: Colors.blue, fontSize: RFValue( 18 ), width: '60%', fontWeight: '200', marginBottom: 30, fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.54
-        }}>Gift Creation Unsuccessful</Text>
-        <Text style={{
-          color: Colors.gray3, marginBottom: 10, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-        }}>Please try again</Text>
-
-        <View style={{
-          justifyContent: 'flex-start', marginStart: wp( -4 )
-        }}>
-          {accountElement( selectedAccount, () => { }, 1, '90%', 'Bitcoin not deducted' )}
-        </View>
-
-        <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'
-        }}>
-          <TouchableOpacity style={styles.buttonView} onPress={() => { setShowErrorLoader( false ) }} >
-            <Text style={styles.buttonText}>Try again</Text>
-          </TouchableOpacity>
-          <Image source={require( '../../assets/images/loader.gif' )} style={{
-            width: wp( '40%' ), height: wp( '35%' ), resizeMode: 'stretch', marginBottom: wp( -8 ), marginRight: wp( -8 ),
-          }} />
-        </View>
-      </View>
-    </View>
-  }
-
   const accountElement = (
     item,
     onPressCallBack,
     activeOpacity = 0,
     width = '90%',
-    message = `${currencyKind === CurrencyKind.BITCOIN ? 'Sats' : 'Money'} would be deducted from`,
+    message = `${currencyKind === CurrencyKind.BITCOIN ? 'Sats' : 'Money'} would be transferred to`,
   ) => {
     return (
       <TouchableOpacity
@@ -791,6 +529,81 @@ const CreateGift = ( { navigation } ) => {
     )
   }
 
+  const renderButton = () => {
+    return(
+      <View
+        style={{
+          height: hp( '12%' ),
+          flexDirection: 'row',
+          marginTop: RFValue( 38 ),
+          // alignItems: 'center',
+          // backgroundColor: 'red',
+          // justifyContent: 'flex-end',
+          marginEnd: RFValue( 20 )
+        }}
+      >
+        <Shadow viewStyle={{
+          ...styles.successModalButtonView,
+          backgroundColor: spendCode == '' ?Colors.lightBlue: Colors.blue
+        }} distance={2}
+        startColor={Colors.shadowBlue}
+        offset={[ 42, 14 ]}>
+          <AppBottomSheetTouchableWrapper
+            disabled={spendCode == ''}
+            onPress={() => onClaimSatsClick()}
+            style={{
+            // ...styles.successModalButtonView,
+              shadowColor: Colors.shadowBlue,
+            }}
+            delayPressIn={0}
+          >
+            <Text
+              style={{
+                ...styles.proceedButtonText,
+                color: Colors.white,
+              }}
+            >
+              {'Claim sats'}
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+        </Shadow>
+        <TouchableOpacity style={{
+          height: wp( '12%' ), paddingHorizontal: RFValue( 20 ), marginStart:RFValue( 20 ),
+          justifyContent:'center', alignItems:'center',
+        // backgroundColor:'red'
+        }} onPress={onCancelClick}>
+          <Text style={{
+            fontSize:RFValue( 13 ), color:Colors.blue, fontFamily:Fonts.FiraSansMedium
+          }}>{'Cancel'}</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  const onCancelClick = () => {
+    navigation.goBack()
+  }
+
+  const onClaimSatsClick = () => {
+    setShowGiftModal( true )
+  }
+
+  const onGiftFailureClose = () => {
+    setShowGiftFailureModal( false )
+  }
+
+  const onGiftFailureClick = () => {
+    setShowGiftFailureModal( false )
+  }
+  const onGiftClose = () => {
+    setShowGiftModal( false )
+  }
+
+  const onGiftSuccessClick = () => {
+    setShowGiftModal( false )
+    setShowGiftFailureModal( true )
+  }
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -800,11 +613,6 @@ const CreateGift = ( { navigation } ) => {
     >
       <SafeAreaView style={styles.viewContainer}>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-        {giftModal &&
-          <ModalContainer onBackground={() => setGiftModal( false )} visible={giftModal} closeBottomSheet={() => { }} >
-            {renderCreateGiftModal()}
-          </ModalContainer>
-        }
         <View style={[ CommonStyles.headerContainer, {
           backgroundColor: Colors.backgroundColor,
           marginRight: wp( 4 ),
@@ -824,307 +632,59 @@ const CreateGift = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-          <ToggleContainer />
         </View>
-        <View style={{
-          flexDirection: 'row', alignItems: 'center',
-        }}>
-          <View style={{
-            flex: 1
-          }}>
-            <View style={{
-              flexDirection: 'row', alignItems: 'center',
-            }}>
-              <Text style={{
-                color: Colors.blue,
-                fontSize: height < 720 ? RFValue( 20 ) : RFValue( 24 ),
-                letterSpacing: 0.01,
-                marginLeft: 20,
-                fontFamily: Fonts.FiraSansRegular
-              }} >
-                {'Create Gift'}
-              </Text>
-              <TouchableOpacity style={{
-                marginLeft: 'auto',
-              }} onPress={() => setAdvanceModal( true )}>
-                <Image style={{
-                  width: wp( '5%' ), height: wp( '5%' ), resizeMode: 'contain', marginRight: wp( '5%' )
-                }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
-              </TouchableOpacity>
-            </View>
-
-
-          </View>
-        </View>
+        <Text style={{
+          color: Colors.blue,
+          fontSize: height < 720 ? RFValue( 20 ) : RFValue( 24 ),
+          letterSpacing: 0.01,
+          marginLeft: 20,
+          fontFamily: Fonts.FiraSansRegular
+        }} >
+          {'Claim Sats'}
+        </Text>
+        <Text style={{
+          color: Colors.textColorGrey,
+          fontSize: RFValue( 12 ),
+          letterSpacing: 0.6,
+          marginHorizontal: 20,
+          fontFamily: Fonts.FiraSansRegular,
+          marginTop: 16
+        }} >
+          {'Note that this transfers the available sats in the card to your Checking Account'}
+        </Text>
         {accountElement( selectedAccount, () => setAccountListModal( !accountListModal ) )}
-        <View style={{
-          flexDirection: 'row'
+        <Text style={{
+          fontFamily:Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
+          letterSpacing: 0.48, color: Colors.gray13,
+          marginTop: RFValue( 10 ), marginStart:20
         }}>
-          <View
-            style={{
-              ...styles.inputBox,
-              flexDirection: 'row',
-              alignItems: 'center',
-              borderColor: Colors.white,
-              marginTop: 10,
-              backgroundColor: Colors.white,
-              paddingHorizontal: wp( 3 ),
-              height: 50,
-              flex: 2,
-              marginRight: numbersOfGift == 1 ? wp( '5%' ) : wp( '2%' )
-            }}
-          >
-            <BalanceCurrencyIcon />
-            <View style={{
-              width: wp( 0.5 ), backgroundColor: Colors.borderColor, height: hp( 2.5 ), marginHorizontal: wp( 4 )
-            }} />
-            <Text style={[ styles.modalInputBox, {
-              color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
-            } ]} onPress={() => setKeyboard( true )}>{currencyKind == CurrencyKind.FIAT ? amount : UsNumberFormat( amount ) === '0' ? '' : UsNumberFormat( amount )}
-              {( !showKeyboard && !amount ) &&
+          {'Enter the '}
+          <Text style={{
+            fontFamily: Fonts.FiraSansSemiBold, fontStyle: 'italic'
+          }}>{'Spend Code'}</Text>
+        </Text>
+        <Shadow viewStyle={{
+          ...styles.shadowModalInput,
+          // backgroundColor: Colors.white,
+        }} distance={2}
+        startColor={Colors.shadowColor}
+        offset={[ 22, 20 ]}>
+          <Text style={[ styles.modalInputBox, {
+            color: spendCode !== '' ? Colors.textColorGrey : Colors.gray1,
+          } ]} onPress={() => setKeyboard( true )}>{currencyKind == CurrencyKind.FIAT ? spendCode : UsNumberFormat( spendCode ) === '0' ? '' : UsNumberFormat( spendCode )}
+            {( !showKeyboard && !spendCode ) &&
                 <Text style={{
-                  fontSize: RFValue( 12 ),
+                  fontSize: RFValue( 12 )
                 }}>
-                  {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
+                  {'Enter the Spend Code'}
                 </Text>
-              }
-              {( showKeyboard ) && <Text style={{
-                color: Colors.lightBlue, fontSize: RFValue( 18 ),
-              }}>|</Text>}
-            </Text>
-
-            {
-              Number( numbersOfGift ) === 1 &&
-              <AppBottomSheetTouchableWrapper
-                onPress={handleSendMaxPress}
-                style={{
-                  padding: 16,
-                }}
-                disabled={spendableBalance <= 0}
-              >
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    textAlign: 'center',
-                    // paddingHorizontal: 10,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansItalic,
-                  }}
-                >
-                  {strings.SendMax}
-                </Text>
-              </AppBottomSheetTouchableWrapper>
             }
-
-          </View>
-
-          {numbersOfGift > 1 ? <View style={{
-            ...styles.inputBox,
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderColor: Colors.gray9,
-            marginTop: 10,
-            backgroundColor: Colors.backgroundColor,
-            paddingHorizontal: wp( 3 ),
-            height: 50,
-            marginLeft: 0,
-            flex: 1
-          }}>
-            <Text style={[ {
-              fontSize: RFValue( 15 ),
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              backgroundColor: Colors.backgroundColor,
-              alignSelf: 'center',
-              flex: 1,
-            }, {
-              color: Colors.textColorGrey
-            } ]} >
-              <Text style={{
-                color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
-              }}>x   </Text>{numbersOfGift}
-            </Text>
-            <Text style={{
-              color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ), marginLeft: 'auto', marginTop: hp( '0.5%' )
-            }}>gifts</Text>
-          </View> : null}
-        </View>
-        {numbersOfGift > 1 ? <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: wp( '5%' ), marginRight: wp( '5%' ), marginTop: wp( '3%' )
-        }}>
-          <Text style={{
-            color: Colors.greyTextColor, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansMedium
-          }}>Total Amount</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginLeft: 'auto'
-            }}
-          >
-            {prefersBitcoin ? (
-              <Image
-                style={{
-                  ...CommonStyles.homepageAmountImage,
-                  marginTop: hp( 0.2 )
-                }}
-                source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
-              />
-            ) : materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
-              <MaterialCurrencyCodeIcon
-                currencyCode={fiatCurrencyCode}
-                color={Colors.white}
-                size={RFValue( 16 )}
-                style={{
-                  marginRight: wp( 1 ), marginLeft: [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode ) ? 0 : -wp( 1 )
-                }}
-              />
-            ) : (
-              <Image
-                style={{
-                  ...styles.cardBitCoinImage,
-                }}
-                source={getCurrencyImageByRegion( fiatCurrencyCode, 'light' )}
-              />
-            )}
-            <Text style={styles.homeHeaderAmountText}>
-              {prefersBitcoin
-                ? UsNumberFormat( parseInt( amount ) * numbersOfGift )
-                : exchangeRates && exchangeRates[ currencyCode ]
-                  ? (
-                    ( parseInt( amount ) * numbersOfGift / SATOSHIS_IN_BTC ) *
-                    exchangeRates[ currencyCode ].last
-                  ).toFixed( 2 )
-                  : ''}
-            </Text>
-            <Text style={styles.homeHeaderAmountUnitText}>
-              {prefersBitcoin ? 'sats' : fiatCurrencyCode}
-            </Text>
-          </View>
-        </View> : null}
-        <View style={{
-          flexDirection:'row', justifyContent:'space-between',
-          // backgroundColor:'red',
-          marginHorizontal: wp( 5 ),
-          alignItems:'center'
-        }}>
-          {/* <View style={{
-             marginTop: wp( '1.5%' )
-          }}> */}
-          <Text style={{
-            color: Colors.textColorGrey,
-            fontSize: RFValue( 11 ),
-            fontFamily: Fonts.FiraSansRegular,
-            // marginHorizontal: wp( 3 ),
-          }}>
-            <Text>{'Minimum gift value '}</Text>
-            <Text style={{
-              fontWeight: 'bold',
-              fontFamily: Fonts.FiraSansItalic
-            }}>{prefersBitcoin ? minimumGiftValue : convertSatsToFiat( minimumGiftValue )} {prefersBitcoin ? 'sats' : currencyCode}</Text>
+            {( showKeyboard ) && <Text style={{
+              color: Colors.lightBlue, fontSize: RFValue( 18 ),
+            }}>|</Text>}
           </Text>
-          {/* </View> */}
-          <View style={{
-            flexDirection:'row',
-            alignItems:'center'
-          }}>
-            <Switch value={includeFees}
-              style={{
-                transform: [ {
-                  scaleX: .4
-                }, {
-                  scaleY: .4
-                } ]
-              }}
-              trackColor={{
-                false: '#C4C4C4', true: '#81b0ff'
-              }}
-              thumbColor={includeFees ? '#fff' : '#fff'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={( value ) => {setFees( value )}} />
-            <Text style={{
-              color:Colors.gray13, fontSize:RFValue( 10 ), fontFamily:Fonts.FiraSansRegular,
-              letterSpacing:0.5,
-              // marginTop: wp( '1.5%' )
-            }}>{'Include '}
-              <Text style={{
-                fontFamily:Fonts.FiraSansSemiBold
-              }}>{'Fee'}</Text>
-            </Text>
-          </View>
-        </View>
-        <View style={{
-          marginLeft: wp( '5%' ),
-          marginTop: wp( '3%' )
-        }}>
-          <Text style={FormStyles.errorText}>{isAmountInvalid ? strings.Insufficient : ''}</Text>
-        </View>
-        {
-          ( Number( numbersOfGift ) === 1 ) && !isSendMax && (
-            <View style={{
-              marginVertical: height < 720 ? hp( 1 ) : hp( 2 ),
-              marginHorizontal: wp( 7 ),
-              flexDirection: 'row'
-            }}>
-              <TouchableOpacity
-                onPress={() => setSatCard( !satCard )}
-                disabled={numbersOfGift ? Number( numbersOfGift ) > 1 : false}
-                style={{
-                  flexDirection: 'row'
-                }}
-              >
-                <View style={styles.imageView}>
-                  {satCard &&
-                    <CheckMark style={{
-                      marginLeft: 6,
-                      marginTop: 6
-                    }} />
-                  }
-                </View>
-                <Text style={{
-                  color: Colors.blue,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansSemiBold,
-                  marginHorizontal: wp( 3 )
-                }}>
-                  Use SATSCARDTM to gift sats
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )
-        }
-        <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), justifyContent: 'space-between', marginVertical: height < 720 ? hp( 1 ) : hp( 3 )
-        }}>
-          <Text style={{
-            color: Colors.textColorGrey,
-            fontSize: RFValue( 14 ),
-            fontFamily: Fonts.FiraSansMedium,
-          }}>Total Amount</Text>
-          <Text>
-            <Text style={{
-              color: Colors.black,
-              fontSize: RFValue( 20 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>
-              {
-                Number( amount ) * numbersOfGift
-              }
-            </Text>
-            <Text style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue( 11 ),
-              fontFamily: Fonts.FiraSansRegular,
-            }}>{prefersBitcoin ? ' sats' : ` ${currencyCode}`}</Text>
-
-          </Text>
-
-        </View>
-        <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), marginBottom: height < 720 ? wp( 1 ) : wp( 7 )
-        }}>
-          {renderButton( 'Create Gift', 'Create Gift' )}
-        </View>
+        </Shadow>
+        {renderButton()}
         {showKeyboard &&
           <View style={{
             marginTop: 'auto'
@@ -1276,32 +836,39 @@ const CreateGift = ( { navigation } ) => {
       <ModalContainer onBackground={() => setAdvanceModal( false )} visible={advanceModal} closeBottomSheet={() => setAdvanceModal( false )}>
         {renderAdvanceModal()}
       </ModalContainer>
-
-      <ModalContainer onBackground={() => setShowLoader( false )} visible={showLoader} closeBottomSheet={() => setShowLoader( false )}>
-        <LoaderModal
-          headerText={'Packing Your Gift'}
-          messageText={'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'}
-          messageText2={''}
-          source={require( '../../assets/images/gift.gif' )}
-        />
-      </ModalContainer>
-
-      <ModalContainer onBackground={() => setShowLoader( false )} visible={( showErrorLoader )}>
-        {renderErrorModal()}
-      </ModalContainer>
-      <ModalContainer onBackground={onCloseClick} visible={showVerification} closeBottomSheet={onCloseClick}  >
-        <VerifySatModalContents
-          title={'Tap SATSCARDTM'}
-          info={'Get your SATSCARDTM ready for verification'}
-          proceedButtonText={'Detect SATSCARDTM'}
-          subPoints={'Touch your SATSCARDTM on your phone after clicking \'Detect SATSCARDTM\'' }
-          bottomImage={require( '../../assets/images/satCards/illustration.png' )}
-          onCloseClick={onCloseClick}
-          onPressProceed={onVerifyClick}
+      <ModalContainer onBackground={onGiftClose} visible={showGiftModal} closeBottomSheet={onGiftClose}  >
+        <GiftUnwrappedComponent
+          selectedAccount={selectedAccount}
+          currencyKind={currencyKind}
+          prefersBitcoin={prefersBitcoin}
+          title={'Your Gift is unwrapped'}
+          info={'Gifts sats received!'}
+          // infoSelected={'Checking Account.'}
+          // info2={'Your checking account balance is '}
+          // info2Selected={'100,000 sats'}
+          proceedButtonText={'View Account'}
+          onCloseClick={onGiftClose}
+          onPressProceed={onGiftSuccessClick}
           closeModal
+          isBottomImage
+          showAccountDetail
         />
       </ModalContainer>
 
+      <ModalContainer onBackground={onGiftFailureClose} visible={showGiftFailureModal} closeBottomSheet={onGiftFailureClose}  >
+        <GiftUnwrappedComponent
+          title={'Claim Unsuccessful'}
+          info={'Sats were not transferred from your\nSATSCARDTM. Please try again.'}
+          proceedButtonText={'Try again'}
+          onPressIgnore={onGiftFailureClose}
+          onPressProceed={onGiftFailureClick}
+          isIgnoreButton
+          cancelButtonText={'Back'}
+          closeModal
+          isBottomImage
+          bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
     </ScrollView>
   )
 }
@@ -1394,20 +961,38 @@ const styles = StyleSheet.create( {
       width: 1, height: 1
     },
   },
+  shadowModalInput:{
+    height: 50,
+    width: '80%',
+    borderRadius: 10,
+    backgroundColor: Colors.white,
+    marginTop: 12,
+    elevation:5,
+    marginHorizontal: 20,
+    // backgroundColor:'red',
+    justifyContent: 'center',
+    // alignItems:'center'
+  },
   modalInputBox: {
-    flex: 1,
-    fontSize: RFValue( 15 ),
+    // flex: 1,
+    // height: 50,
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    backgroundColor: Colors.white,
-    alignSelf: 'center'
+    paddingLeft: 15,
+    borderRadius: 10,
+    // justifyContent: 'center',
+    // alignItems:'center',
+    // textAlignVertical:'center',
+    // textAlign:'center',
+    // backgroundColor:'red',
   },
   inputBox: {
     borderWidth: 0.5,
     borderRadius: 10,
     marginLeft: wp( '5%' ),
     marginRight: wp( '5%' ),
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.white
   },
   inputBoxFocused: {
     borderWidth: 0.5,
@@ -1457,15 +1042,17 @@ const styles = StyleSheet.create( {
   },
   accountSelectionView: {
     width: '90%',
-    // shadowOpacity: 0.06,
-    // shadowOffset: {
-    //   width: 10, height: 10
-    // },
-    // shadowRadius: 10,
-    // elevation: 2,
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 2,
     alignSelf: 'center',
     marginTop: hp( 2 ),
     marginBottom: hp( 2 ),
+    backgroundColor:Colors.white,
+    borderRadius:10
   },
   modalCrossButton: {
     width: wp( 7 ),
@@ -1489,7 +1076,20 @@ const styles = StyleSheet.create( {
     color: Colors.gray2,
     marginTop: hp( 0.7 )
   },
+  successModalButtonView: {
+    height: wp( '12%' ),
+    minWidth: wp( '22%' ),
+    paddingLeft: wp( '5%' ),
+    paddingRight: wp( '5%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: Colors.blue,
+    alignSelf: 'center',
+    marginLeft: wp( '8%' ),
+    marginBottom: hp( '3%' ),
+  },
 } )
 
-export default CreateGift
+export default ClaimSatsScreen
 

@@ -34,6 +34,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
 import ModalContainer from '../../components/home/ModalContainer'
 import ClaimSatComponent from './ClaimSatComponent'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -42,21 +43,22 @@ export default function GiftCreatedScreen( props ) {
   // const [ activeSlot, setActiveSlot ] = useState( 4 )
   const totalSlots = props.navigation?.state?.params?.numSlots
   const activeSlot = props.navigation?.state?.params?.activeSlot
-  const fromClaimFlow = props.navigation?.state?.params?.fromClaimFlow
-  const [ claimVerification, setClaimVerification ]=useState( false )
-  const [ showGiftModal, setShowGiftModal ]=useState( false )
-  const [ showGiftFailureModal, setShowGiftFailureModal ]=useState( false )
+  const slotFromIndex = props.navigation?.state?.params?.slotFromIndex
+  const [ claimVerification, setClaimVerification ] = useState( false )
+  const [ showGiftModal, setShowGiftModal ] = useState( false )
+  const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
+  const balance = 5000
 
-  const onGiftClose =() => {
+  const onGiftClose = () => {
     setShowGiftModal( false )
   }
 
-  const onGiftSuccessClick = () =>{
+  const onGiftSuccessClick = () => {
     setShowGiftModal( false )
     setShowGiftFailureModal( true )
   }
 
-  const onClaimClose=() => {
+  const onClaimClose = () => {
     setClaimVerification( false )
   }
 
@@ -73,14 +75,14 @@ export default function GiftCreatedScreen( props ) {
     setShowGiftFailureModal( false )
   }
 
-  const onConfirmClick=()=> {
-    if( fromClaimFlow == 1 )
-      props.navigation.goBack()
-    else setClaimVerification( true )
+  const onConfirmClick = () => {
+    if ( slotFromIndex == 2  || slotFromIndex ==  4 )
+      props.navigation.navigate( 'ClaimSats' )
+    else props.navigation.popToTop()
   }
 
   const onGiftSatsClick = () => {
-
+    props.navigation.popToTop()
   }
 
   return (
@@ -107,12 +109,20 @@ export default function GiftCreatedScreen( props ) {
       <Text style={{
         fontSize: RFValue( 24 ), marginHorizontal: 20, marginTop: 10,
         fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.01, color: Colors.blue
-      }}>{fromClaimFlow == 0 ? 'SATSCARDTM Detected':'Gift Created'}</Text>
+      }}>{slotFromIndex == 1 ? 'Gift Created'
+          : slotFromIndex == 2 ? 'Sats Detected'
+            : slotFromIndex == 3 ? 'SATSCARDTM Detected'
+              : slotFromIndex == 4 ? 'Here’s Your Gift'
+                :''}</Text>
       <Text style={{
         fontSize: RFValue( 16 ), marginHorizontal: 20, marginTop: 8,
         fontFamily: Fonts.FiraSansMedium, letterSpacing: 0.01, color: Colors.gray13
       }}>
-        {fromClaimFlow == 0 ? 'Claimed sats would be transferred to your Checking Account' : 'You\'re ready to delight!'}
+        {slotFromIndex == 1 ? 'Sats have been transferred into your SATSCARDTM'
+          :slotFromIndex == 2 ?'Clear the balance from your SATSCARDTM'
+            :slotFromIndex == 3 ?'No sats were found'
+              :slotFromIndex == 4 ?'Claimed sats would be transferred to your Checking Account'
+                : ''}
       </Text>
       <View style={{
         height: RFValue( 198 ), marginHorizontal: 20, marginTop: 42,
@@ -123,23 +133,23 @@ export default function GiftCreatedScreen( props ) {
         <View style={{
           top: RFValue( 62 ),
           position: 'absolute',
-          alignSelf: 'center'
+          alignSelf: 'center',
         }}>
           <Text style={{
             fontFamily: Fonts.FiraSansSemiBold, fontSize: RFValue( 29 ),
             // top:62, position:'absolute',
             color: Colors.gray14, alignSelf: 'center',
             // backgroundColor:'red'
-          }}>{'50000 sats'}</Text>
+          }}>{`${balance.toLocaleString()} sats`}</Text>
           <View style={{
-            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 25 ),
+            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 70 ),
           }}>
             {
               [ ...Array( totalSlots ) ].map( ( item, index ) => {
                 return (
                   <View key={index} style={[ styles.slotView,
                     activeSlot == index && styles.activeSlot,
-                    activeSlot > index && styles.previousActiveSlot ]}/>
+                    activeSlot > index && styles.previousActiveSlot ]} />
                 )
               } )
             }
@@ -153,11 +163,29 @@ export default function GiftCreatedScreen( props ) {
 
         {/* <GreySatCard /> */}
       </View>
-      <View style={{
+      {/* <View style={{
         flex: 1
-      }} />
+      }} /> */}
+      {
+        slotFromIndex &&
+        <View style={{
+          backgroundColor: Colors.white, flex: 1, justifyContent: 'center'
+        }}>
+          <BottomInfoBox
+            backgroundColor={Colors.background}
+            title={props.infoBoxTitle}
+            infoText={slotFromIndex == 1 ? 'Your SATSCARD™ is now ready to be gifted to your loved ones The person you gift it to will have to enter the spend code at the back of the card to claim the sats. A transaction fee will be deducted from the sats in the SATSCARD™ when its claimed.'
+              : slotFromIndex == 2 ? 'There are sats in your SATSCARD™ You could gift it as is. But if you’d like to gift a higher/lower amount, withdraw sats to unlock a new slot. This is a security feature. You will be charged <enter amount> sats as transaction fee for withdrawal. The sats would be deducted from the SATSCARD™'
+                : slotFromIndex == 3 ? 'Oops! No sats were found on the SATSCARD™. Either your friend messed up, or is messing around!'
+                  : slotFromIndex == 4 ? 'You could claim sats into your wallet or gift the SATSCARD™ forward as is. To claim sats, enter the spend code at the back of your SATSCARD™ on the next screen. You will be charged <enter amount> sats as transaction fee to claim sats. The sats would be deducted from the SATSCARD™'
+                    : ''
+            }
+          />
+        </View>
+      }
+
       <View style={{
-        flexDirection:'row'
+        flexDirection: 'row', marginTop: RFValue( 20 )
       }}>
 
         <Shadow viewStyle={{
@@ -173,7 +201,7 @@ export default function GiftCreatedScreen( props ) {
           <AppBottomSheetTouchableWrapper
             onPress={() => onConfirmClick()}
             style={{
-            // ...styles.successModalButtonView,
+              // ...styles.successModalButtonView,
               shadowColor: props.buttonShadowColor
                 ? props.buttonShadowColor
                 : Colors.shadowBlue,
@@ -188,12 +216,16 @@ export default function GiftCreatedScreen( props ) {
                   : Colors.white,
               }}
             >
-              {fromClaimFlow == 0 ?'Claim Sats':'Back to Gifts'}
+              {slotFromIndex == 1 ? 'Back to Gifts'
+                : slotFromIndex ==  2 ? 'Withdraw sats'
+                  : slotFromIndex == 3 ? 'Back to Gifts'
+                    : slotFromIndex ==  4 ? 'Claim Sats':'Back to Gifts'
+              }
             </Text>
           </AppBottomSheetTouchableWrapper>
         </Shadow>
 
-        {fromClaimFlow == 0 && (
+        {( slotFromIndex == 4 || slotFromIndex == 2 ) && (
           <AppBottomSheetTouchableWrapper
             onPress={() => onGiftSatsClick()}
             style={{
@@ -218,7 +250,7 @@ export default function GiftCreatedScreen( props ) {
                   : Colors.blue,
               }}
             >
-              {'cancle'}
+              {slotFromIndex == 4?'Not now':'Cancel'}
             </Text>
           </AppBottomSheetTouchableWrapper>
         )}
@@ -226,12 +258,12 @@ export default function GiftCreatedScreen( props ) {
       </View>
       <ModalContainer onBackground={onGiftClose} visible={showGiftModal} closeBottomSheet={onGiftClose}  >
         <GiftUnwrappedComponent
-          title={'Your Gift is unwrapped!'}
-          info={'Gifts sats received transferred to '}
-          infoSelected={'Checking Account.'}
-          info2={'Your checking account balance is '}
-          info2Selected={'100,000 sats'}
-          proceedButtonText={'Back to Home'}
+          title={'Your Gift is unwrapped'}
+          info={'Gifts sats received!'}
+          // infoSelected={'Checking Account.'}
+          // info2={'Your checking account balance is '}
+          // info2Selected={'100,000 sats'}
+          proceedButtonText={'View Account'}
           onCloseClick={onGiftClose}
           onPressProceed={onGiftSuccessClick}
           closeModal
@@ -301,7 +333,7 @@ const styles = StyleSheet.create( {
   activeSlot: {
     backgroundColor: Colors.gray14, borderWidth: 0
   },
-  previousActiveSlot:{
+  previousActiveSlot: {
     backgroundColor: Colors.gray8, borderWidth: 0
   }
 } )
