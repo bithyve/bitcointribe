@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import {
   View,
   StyleSheet,
@@ -33,7 +33,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Illustration from '../../assets/images/svgs/illustration.svg'
-import { generateGifts, giftCreationSuccess } from '../../store/actions/accounts'
+import { generateGifts, giftAccepted, giftCreationSuccess, refreshAccountShells } from '../../store/actions/accounts'
 import { AccountsState } from '../../store/reducers/accounts'
 import { Account, AccountType, Gift, TxPriority } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
@@ -68,6 +68,9 @@ import { Shadow } from 'react-native-shadow-2'
 import VerifySatModalContents from './VerifySatModalContents'
 import ClaimSatComponent from './ClaimSatComponent'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
+import { CKTapCard } from 'cktap-protocol-react-native'
+import { associateGift } from '../../store/actions/trustedContacts'
+import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -112,6 +115,12 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
+  const card = useRef( new CKTapCard() ).current
+
+  const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
+  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
+
+  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( spendCode )
@@ -220,6 +229,39 @@ const ClaimSatsScreen = ( { navigation } ) => {
     } ) )
     setIsSendMax( true )
   }
+  const fetchBanalnceOfSlot  = ( address: string ) =>{
+    // TODO: implement
+    return 100
+  }
+  const claimGifts = async() =>{
+    // For Claim Flow
+    await card.first_look()
+    const { addr:address, pubkey } = await card.address( true, true, card.active_slot )
+    const balance = fetchBanalnceOfSlot( address )
+    if( balance!==0 ){
+      // get the cvc from user
+      const unSealSlot = await card.unseal_slot( 'spendCode/cvc' )
+      // unSealSlot ->
+      // {
+      //     pk: Buffer;
+      //     target: number;
+      // }
+
+      // dispatch( associateGift( unSealSlot.pk.toString(), sourcePrimarySubAccount.id ) )
+      dispatch( associateGift( unSealSlot.pk.toString(), selectedAccount.id ) )
+
+
+      // with this key move all the funds from the slot to checking account (rnd)
+      console.log( 'slot address ===>' + JSON.stringify( unSealSlot ) )
+      // For setup slot for next user
+      const setUpSlot = await card.setup( '123', undefined, true )
+      console.log( 'slot address ===>' + JSON.stringify( setUpSlot ) )
+    }else{
+      // corner case when the slot is unseled but no balance
+      // continue with error flow
+    }
+  }
+
 
   function onPressNumber( text ) {
     let tmpPasscode = spendCode
@@ -494,6 +536,8 @@ const ClaimSatsScreen = ( { navigation } ) => {
                   color: Colors.black,
                   fontSize: RFValue( 14 ),
                   fontFamily: Fonts.FiraSansRegular,
+                  marginVertical: RFValue( 4 )
+
                 }}
               >
                 {item.primarySubAccount.customDisplayName ?? item.primarySubAccount.defaultTitle}
@@ -601,7 +645,17 @@ const ClaimSatsScreen = ( { navigation } ) => {
 
   const onGiftSuccessClick = () => {
     setShowGiftModal( false )
-    setShowGiftFailureModal( true )
+    // setShowGiftFailureModal( true )
+    dispatch( giftAccepted( '' ) )
+    // closeModal()
+    navigation.dispatch(
+      resetStackToAccountDetails( {
+        accountShellID: sourcePrimarySubAccount.accountShellID,
+      } )
+    )
+    dispatch( refreshAccountShells( [ sendingAccount ], {
+      hardRefresh: true
+    } ) )
   }
 
   return (

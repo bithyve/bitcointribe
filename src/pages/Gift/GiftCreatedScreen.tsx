@@ -35,6 +35,7 @@ import GiftUnwrappedComponent from './GiftUnwrappedComponent'
 import ModalContainer from '../../components/home/ModalContainer'
 import ClaimSatComponent from './ClaimSatComponent'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import Tooltip from 'rn-tooltip'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -153,11 +154,15 @@ export default function GiftCreatedScreen( props ) {
                 )
               } )
             }
+            {/* <Tooltip popover={<Text style={styles.infoText}>These are the total number of slots your SATSCARDTM have.</Text>}>
+            </Tooltip>  */}
             <TouchableOpacity style={{
               marginLeft: RFValue( 10 )
             }}>
               <MaterialIcons size={RFValue( 12 )} name={'info'} />
             </TouchableOpacity>
+
+
           </View>
         </View>
 
@@ -335,5 +340,13 @@ const styles = StyleSheet.create( {
   },
   previousActiveSlot: {
     backgroundColor: Colors.gray8, borderWidth: 0
+  },
+  infoText:{
+    color: Colors.black,
+    fontSize: RFValue( 8 ),
+    fontFamily: Fonts.FiraSansRegular,
+    lineHeight: 13,
+    backgroundColor: Colors.white,
+    padding:RFValue( 10 )
   }
 } )

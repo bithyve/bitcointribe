@@ -12,7 +12,8 @@ import {
   ActivityIndicator,
   Image,
   SafeAreaView,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -65,7 +66,7 @@ const temp: CKTapCard = {
 export default function SetUpSatNextCardScreen( props ) {
   const dispatch = useDispatch()
   const giftAmount = props.navigation?.state?.params?.giftAmount
-  const fromClaimFlow= props.navigation?.state?.params?.fromClaimFlow
+  const fromClaimFlow = props.navigation?.state?.params?.fromClaimFlow
 
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
@@ -75,10 +76,10 @@ export default function SetUpSatNextCardScreen( props ) {
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( temp )
   const [ slotAddress, setSlotAddress ] = useState<String | null>( dummySatcardAddress )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
-  const [ nfcVisible, setNfcVisible ] = React.useState( false )
+  const [ showNFCModal, setNFCModal ] = useState( false )
 
   const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
+    bitcoinUnit: sourcePrimarySubAccount?.kind == 'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
   } )
   const sendingState = useSendingState()
 
@@ -90,16 +91,31 @@ export default function SetUpSatNextCardScreen( props ) {
     )
   }, [ sendingState ] )
 
-  const withModal = ( callback ) => {
-    return Platform.select( {
-      android: async () => {
-        setNfcVisible( true )
-        const resp = await card.nfcWrapper( callback )
-        setNfcVisible( false )
-        return resp
-      },
-      ios: async () => card.nfcWrapper( callback ),
-    } )
+  const fetchBanalnceOfSlot = ( address: [] ) => {
+    // TODO: implement
+    return 100
+    //   accountToAddressMapping[ address ] = {
+    //     External: address,
+    //     Internal: [],
+    //     Owned: [],
+    //   }
+    // }
+
+  // try{
+  //   if ( network === bitcoinJS.networks.testnet ) {
+  //     res = await accAxios.post(
+  //       config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+  //       accountToAddressMapping,
+  //     )
+  //   } else {
+  //     res = await accAxios.post(
+  //       config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+  //       accountToAddressMapping,
+  //     )
+  //   }
+  // } catch( err ){
+  //    console.log("error" + err)
+  // }
   }
 
   useEffect( () => {
@@ -123,9 +139,9 @@ export default function SetUpSatNextCardScreen( props ) {
                   props.navigation.navigate( 'GiftCreated', {
                     numSlots: cardDetails?.num_slots,
                     activeSlot: cardDetails?.active_slot,
-                    slotFromIndex:fromClaimFlow == 0?
+                    slotFromIndex: fromClaimFlow == 0 ?
                       cardDetails?.num_backups == 0 ? 1 : 2
-                      :cardDetails?.num_backups == 0 ? 3 : 4,
+                      : cardDetails?.num_backups == 0 ? 3 : 4,
                   } )
                 }, 2000 )
               }, 2000 )
@@ -146,30 +162,53 @@ export default function SetUpSatNextCardScreen( props ) {
     }
   }, [] )
 
-
+  const withModal = async ( callback ) => {
+    try {
+      setNFCModal( true )
+      const resp = await card.nfcWrapper( callback )
+      setNFCModal( false )
+      return {
+        response: resp, error: null
+      }
+    } catch ( error: any ) {
+      if ( error.toString() ) {
+        return {
+          response: null, error: error.toString()
+        }
+      }
+      setNFCModal( false )
+    }
+  }
   async function getCardData() {
     const cardData = await card.first_look()
-    setCardDetails( cardDetails )
+    setCardDetails( cardData )
     console.log( 'card details===>' + JSON.stringify( cardData ) )
 
-    if( cardDetails && cardDetails.active_slot!=null ){
-    //For Create Flow
+    if ( cardDetails && cardDetails.active_slot != null ) {
+      //For Create Flow
       const address: any = await card.address( true, true, cardDetails.active_slot )
-      setSlotAddress( address )
-      console.log( 'getAddrees===>' + JSON.stringify( dummySatcardAddress ) )
+      try {
+        await card.first_look()
+        //For Create Flow
+        const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
+        setSlotAddress( address )
+        console.log( 'getAddrees===>' + JSON.stringify( address ) )
 
-      // handleManualAddressSubmit( dummySatcardAddress )
+        return {
+          address, pubkey
+        }
+        // handleManualAddressSubmit( dummySatcardAddress )
+      } catch ( err ) {
+        // corner case when the slot is not setup
+        if ( err.toString() === 'Error: Current slot is not yet setup.' ) {
+          Alert.alert( 'navigate to setup card here' )
+          await card.setup( 'cvc' )
+          // navigate to setup card (cvc page)
+        }
+        throw err
+      }
     }
-
-    //For Claim Flow
-    // const unSealSlot = await card.unseal_slot( 'spendCode' )
-    // console.log( 'slot address ===>' + JSON.stringify( unSealSlot ) )
-    // // For setup slot for next user
-
-    // const setUpSlot = await card.setup( '123', undefined, true )
-    // console.log( 'slot address ===>' + JSON.stringify( setUpSlot ) )
   }
-
   const handleManualAddressSubmit = ( address: string ) => {
     const addressRecipient = makeAddressRecipientDescription( {
       address
@@ -190,7 +229,7 @@ export default function SetUpSatNextCardScreen( props ) {
     dispatch( recipientSelectedForAmountSetting( recipient ) )
     // navigateToSendDetails( recipient )
     setTimeout( () => {
-      if( recipient.id != null && recipient.id != '' ){
+      if ( recipient.id != null && recipient.id != '' ) {
         console.log( 'skk inside recipent', JSON.stringify( recipient ) )
         dispatch( amountForRecipientUpdated( {
           recipient: recipient,
@@ -210,7 +249,7 @@ export default function SetUpSatNextCardScreen( props ) {
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: TxPriority.LOW,
-        note:''
+        note: ''
       } ) )
 
     },
@@ -247,9 +286,9 @@ export default function SetUpSatNextCardScreen( props ) {
           props.navigation.navigate( 'GiftCreated', {
             numSlots: cardDetails?.num_slots,
             activeSlot: cardDetails?.active_slot,
-            slotFromIndex:fromClaimFlow?
+            slotFromIndex: fromClaimFlow ?
               cardDetails?.num_backups == 0 ? 1 : 2
-              :cardDetails?.num_backups == 0 ? 3 : 4,
+              : cardDetails?.num_backups == 0 ? 3 : 4,
           } )
         }, 2000 )
       }
@@ -299,30 +338,30 @@ export default function SetUpSatNextCardScreen( props ) {
       />
       {
         stepsVerified >= 1 &&
-        <>
-          <View style={styles.dashContainer}>
-            <View style={styles.dashInnerContainer} />
-          </View>
+          <>
+            <View style={styles.dashContainer}>
+              <View style={styles.dashInnerContainer} />
+            </View>
 
-          <GiftStepperComponent
-            // extraContainer={{        }}
-            showLoader={stepsVerified <= 1}
-            verifiedText={stepsVerified >= 2 ? 'Card found' : 'Detecting card'}
-          />
-        </>
+            <GiftStepperComponent
+              // extraContainer={{        }}
+              showLoader={stepsVerified <= 1}
+              verifiedText={stepsVerified >= 2 ? 'Card found' : 'Detecting card'}
+            />
+          </>
       }
       {
         stepsVerified >= 2 &&
-        <>
-          <View style={styles.dashContainer}>
-            <View style={styles.dashInnerContainer} />
-          </View>
-          <GiftStepperComponent
-            // extraContainer={{        }}
-            showLoader={stepsVerified <= 2}
-            verifiedText={stepsVerified >= 3 ? 'SATSCARDTM ready to use' : 'Transferring sats into SATSCARDTM'}
-          />
-        </>
+          <>
+            <View style={styles.dashContainer}>
+              <View style={styles.dashInnerContainer} />
+            </View>
+            <GiftStepperComponent
+              // extraContainer={{        }}
+              showLoader={stepsVerified <= 2}
+              verifiedText={stepsVerified >= 3 ? 'SATSCARDTM ready to use' : 'Transferring sats into SATSCARDTM'}
+            />
+          </>
       }
       <View style={{
         flex: 1

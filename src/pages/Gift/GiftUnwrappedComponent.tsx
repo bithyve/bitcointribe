@@ -31,7 +31,7 @@ export default function GiftUnwrappedComponent( props ) {
     item,
     activeOpacity = 1,
     width = '90%',
-    message = `${props.currencyKind === CurrencyKind.BITCOIN ? 'Sats' : 'Money'} would be transferred to`,
+    message = `${props.currencyKind === CurrencyKind.BITCOIN ? 'Sats' : 'Money'} transferred to`,
   ) => {
     return (
       <TouchableOpacity
@@ -74,12 +74,12 @@ export default function GiftUnwrappedComponent( props ) {
                   color: Colors.black,
                   fontSize: RFValue( 14 ),
                   fontFamily: Fonts.FiraSansRegular,
+                  marginVertical: RFValue( 4 )
                 }}
               >
                 {item.primarySubAccount.customDisplayName ?? item.primarySubAccount.defaultTitle}
               </Text>
               <Text style={styles.availableToSpendText}>
-                {'Available to spend: '}
                 <Text style={styles.balanceText}>
                   {props?.prefersBitcoin
                     ? UsNumberFormat( item.primarySubAccount?.balances?.confirmed )
