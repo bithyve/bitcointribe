@@ -399,6 +399,104 @@ export default class AccountUtilities {
     return outputs
   };
 
+  static fetchSelectedAccountBalance = async (
+    address: string,
+    network: bitcoinJS.Network,
+  ): Promise<
+    {
+      balance: string
+    }> => {
+    let res: AxiosResponse
+    try {
+      const accountToAddressMapping = {
+      }
+      accountToAddressMapping[ address ] = {
+        External: [ address ],
+        Internal: [],
+        Owned: [],
+      }
+
+      let usedFallBack = false
+      try{
+        if ( network === bitcoinJS.networks.testnet ) {
+          res = await accAxios.post(
+            config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        } else {
+          res = await accAxios.post(
+            config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        }
+      } catch( err ){
+        if( config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN === config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN ) throw new Error( err.message ) // not using own-node
+
+        if( !config.USE_ESPLORA_FALLBACK ){
+          Toast( 'We could not connect to your node.\nTry connecting to the BitHyve node- Go to settings ....' )
+          throw new Error( err.message )
+        }
+        console.log( 'using Hexa node as fallback(fetch-balTx)' )
+
+        usedFallBack = true
+        // if ( network === bitcoinJS.networks.testnet ) {
+        //   res = await accAxios.post(
+        //     config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+        //     accountToAddressMapping,
+        //   )
+        // } else {
+        //   res = await accAxios.post(
+        //     config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+        //     accountToAddressMapping,
+        //   )
+        // }
+      }
+
+      const accountToResponseMapping = res.data
+      // const temp:  Array<{
+      //   txId: string;
+      //   vout: number;
+      //   value: number;
+      //   address: string;
+      //   status?: any;
+      // }> = null
+      for( const accountId of Object.keys( accountToResponseMapping ) ){
+        // const cachedUTXOs = temp
+
+        const { Utxos, Txs } = accountToResponseMapping[ accountId ]
+        const UTXOs = []
+        // (re)categorise UTXOs
+        if ( Utxos )
+          for ( const addressSpecificUTXOs of Utxos ) {
+            for ( const utxo of addressSpecificUTXOs ) {
+              const { value, Address, status, vout, txid } = utxo
+              let include = true
+              UTXOs.forEach( ( cachedUTXO ) => {
+                if( cachedUTXO.txId === txid && cachedUTXO.address === Address ) {
+                  if( status.confirmed && !cachedUTXO.status.confirmed ) cachedUTXO.status = status
+                  include = false
+                }
+              } )
+
+              if( include ) UTXOs.push( {
+                txId: txid, vout, value, address: Address, status
+              } )
+            }
+          }
+
+        if( usedFallBack )
+          Toast( 'We could not connect to your own node.\nRefreshed using the BitHyve node....' )
+        let balance = ''
+        if( UTXOs.length >= 1 ) {
+          balance = UTXOs[ 0 ].value
+        }
+        balance
+      }
+    } catch ( err ) {
+      return err
+    }
+  }
+
   static fetchBalanceTransactionsByAccounts = async (
     accounts: {[id: string]: {
     activeAddresses: ActiveAddresses,

@@ -912,7 +912,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
       <ModalContainer onBackground={onGiftFailureClose} visible={showGiftFailureModal} closeBottomSheet={onGiftFailureClose}  >
         <GiftUnwrappedComponent
           title={'Claim Unsuccessful'}
-          info={'Sats were not transferred from your\nSATSCARDTM. Please try again.'}
+          info={'Sats were not transferred from your\nSATSCARD™. Please try again.'}
           proceedButtonText={'Try again'}
           onPressIgnore={onGiftFailureClose}
           onPressProceed={onGiftFailureClick}

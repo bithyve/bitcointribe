@@ -1087,7 +1087,7 @@ const CreateGift = ( { navigation } ) => {
                   fontFamily: Fonts.FiraSansSemiBold,
                   marginHorizontal: wp( 3 )
                 }}>
-                  Use SATSCARDTM to gift sats
+                  Use SATSCARD™ to gift sats
                 </Text>
               </TouchableOpacity>
             </View>
@@ -1291,10 +1291,10 @@ const CreateGift = ( { navigation } ) => {
       </ModalContainer>
       <ModalContainer onBackground={onCloseClick} visible={showVerification} closeBottomSheet={onCloseClick}  >
         <VerifySatModalContents
-          title={'Tap SATSCARDTM'}
-          info={'Get your SATSCARDTM ready for verification'}
-          proceedButtonText={'Detect SATSCARDTM'}
-          subPoints={'Touch your SATSCARDTM on your phone after clicking \'Detect SATSCARDTM\'' }
+          title={'Tap SATSCARD™'}
+          info={'Get your SATSCARD™ ready for verification'}
+          proceedButtonText={'Detect SATSCARD™'}
+          subPoints={'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™\'' }
           bottomImage={require( '../../assets/images/satCards/illustration.png' )}
           onCloseClick={onCloseClick}
           onPressProceed={onVerifyClick}

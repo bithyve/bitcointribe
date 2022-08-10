@@ -495,11 +495,11 @@ export default function SetUpSatCardScreen( props ) {
         <View style={{
           // backgroundColor:'yellow'
         }}>
-          <Text style={styles.headerTitleText}>{'Setting up SATSCARDTM'}</Text>
+          <Text style={styles.headerTitleText}>{'Setting up SATSCARD™'}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              {'Enter the 6-digit code printed\non the back of your SATSCARDTM'}
-              {/* <Text style={styles.boldItalicText}>{'Enter the 6-digit code printed\non the back of your SATSCARDTM'}</Text> */}
+              {'Enter the 6-digit code printed\non the back of your SATSCARD™'}
+              {/* <Text style={styles.boldItalicText}>{'Enter the 6-digit code printed\non the back of your SATSCARD™}</Text> */}
             </Text>
             <View style={{
               alignSelf: 'baseline'

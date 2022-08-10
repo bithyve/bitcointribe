@@ -22,14 +22,37 @@ const GiftBoxComponent = ( props ) => {
         {/* <CheckingAcc /> */}
       </View>
       <View>
-        <Text style={[ styles.pageTitle ]}>
-          {props.titleText}<Text style={styles.extraSubText}>
-            {/* {'TM'} */}
+        <View style={{
+          flexDirection:'row', alignItems:'flex-start',
+          marginTop: RFValue( 11 )
+        }}>
+          <Text style={[ styles.pageTitle ]}>
+            {props.titleText}
           </Text>
-        </Text>
-        <Text style={styles.subText}>
-          {props.subTitleText}
-        </Text>
+          {props.scTitleText &&
+          <Text style={styles.extraSubText}>
+            {props.scTitleText}
+          </Text>
+          }
+        </View>
+        <View style={{
+          flexDirection:'row', alignItems:'flex-start',
+          marginTop: RFValue( 11 )
+        }}>
+          <Text numberOfLines={3} style={styles.subText}>
+            {props.subTitleText}
+          </Text>
+          {props.scSubText &&
+          <Text style={styles.scSubText}>
+            {props.scSubText}
+          </Text>
+          }
+           {props.pendingSubText &&
+          <Text style={styles.subText}>
+            {props.pendingSubText}
+          </Text>
+}
+        </View>
       </View>
     </TouchableOpacity>
   )
@@ -43,7 +66,6 @@ const styles = StyleSheet.create( {
     width: '100%',
     height: RFValue( 111 ),
     backgroundColor: Colors.gray7,
-    // backgroundColor: 'yellow',
     shadowOpacity: 0.06,
     shadowOffset: {
       width: 10, height: 10
@@ -53,8 +75,6 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
     borderRadius: wp( 2 ),
     marginTop: hp( 3 ),
-    // marginBottom: hp( 1 ),
-    // paddingVertical: hp( 4 ),
     paddingHorizontal: wp( 4.5 ),
     justifyContent:'center',
   },
@@ -63,8 +83,7 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.7,
     fontFamily: Fonts.FiraSansMedium,
     alignItems: 'center',
-    fontSize: RFValue( 14 ),
-    marginTop: RFValue( 11 )
+    fontSize: RFValue( 14 )
   },
   subText:{
     color: Colors.textColorGrey,
@@ -72,23 +91,20 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansLight,
     marginTop: RFValue( 4 ),
     letterSpacing: 0.5,
-    // paddingTop: RFValue( 40 ),
-
-    // width: '85%',
   },
-  extraSubText:{
+  scSubText:{
     color: Colors.textColorGrey,
     fontSize: RFValue( 6 ),
     fontFamily: Fonts.FiraSansLight,
-    // marginTop: RFValue( 40 ),
+    marginTop: RFValue( 4 ),
     letterSpacing: 0.5,
-    margin:15,
-    // backgroundColor: 'red',
-    // alignContent:''
-    top: -20,
-    alignItems: 'flex-start'
-    // alignSelf: 'flex-start',\
-    // textAlign: 'justify'
-    // width: '85%',
+    lineHeight: 8,
+  },
+  extraSubText:{
+    fontSize: RFValue( 8 ),
+    lineHeight: 12,
+    color: Colors.blue,
+    letterSpacing: 0.7,
+    fontFamily: Fonts.FiraSansMedium,
   }
 } )

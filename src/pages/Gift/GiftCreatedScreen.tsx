@@ -112,15 +112,15 @@ export default function GiftCreatedScreen( props ) {
         fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.01, color: Colors.blue
       }}>{slotFromIndex == 1 ? 'Gift Created'
           : slotFromIndex == 2 ? 'Sats Detected'
-            : slotFromIndex == 3 ? 'SATSCARDTM Detected'
+            : slotFromIndex == 3 ? 'SATSCARD™ Detected'
               : slotFromIndex == 4 ? 'Here’s Your Gift'
                 :''}</Text>
       <Text style={{
         fontSize: RFValue( 16 ), marginHorizontal: 20, marginTop: 8,
         fontFamily: Fonts.FiraSansMedium, letterSpacing: 0.01, color: Colors.gray13
       }}>
-        {slotFromIndex == 1 ? 'Sats have been transferred into your SATSCARDTM'
-          :slotFromIndex == 2 ?'Clear the balance from your SATSCARDTM'
+        {slotFromIndex == 1 ? 'Sats have been transferred into your SATSCARD™'
+          :slotFromIndex == 2 ?'Clear the balance from your SATSCARD™'
             :slotFromIndex == 3 ?'No sats were found'
               :slotFromIndex == 4 ?'Claimed sats would be transferred to your Checking Account'
                 : ''}
@@ -143,7 +143,7 @@ export default function GiftCreatedScreen( props ) {
             // backgroundColor:'red'
           }}>{`${balance.toLocaleString()} sats`}</Text>
           <View style={{
-            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 70 ),
+            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 30 ),
           }}>
             {
               [ ...Array( totalSlots ) ].map( ( item, index ) => {
@@ -154,15 +154,20 @@ export default function GiftCreatedScreen( props ) {
                 )
               } )
             }
-            {/* <Tooltip popover={<Text style={styles.infoText}>These are the total number of slots your SATSCARDTM have.</Text>}>
-            </Tooltip>  */}
-            <TouchableOpacity style={{
-              marginLeft: RFValue( 10 )
-            }}>
-              <MaterialIcons size={RFValue( 12 )} name={'info'} />
-            </TouchableOpacity>
+            <Tooltip actionType='press'
+              backgroundColor={Colors.white}
+              // highlightColor='red'
+              // height={150}
+              overlayColor='transparent'
+              height={80}
+              popover={<Text style={styles.infoText}>These are the total number of slots your SATSCARD™ have.</Text>}>
+              <View style={{
+                marginLeft: RFValue( 10 )
+              }}>
+                <MaterialIcons size={RFValue( 12 )} name={'info'} />
+              </View>
 
-
+            </Tooltip>
           </View>
         </View>
 
@@ -278,7 +283,7 @@ export default function GiftCreatedScreen( props ) {
 
       <ModalContainer onBackground={onClaimClose} visible={claimVerification} closeBottomSheet={onClaimClose}  >
         <ClaimSatComponent
-          title={'Claim SATSCARDTM'}
+          title={'Claim SATSCARD™'}
           info={'Note that this transfers the available sats in the card to your Checking Account.'}
           proceedButtonText={'Claim sats'}
           onCloseClick={onClaimClose}
@@ -294,7 +299,7 @@ export default function GiftCreatedScreen( props ) {
       <ModalContainer onBackground={onGiftFailureClose} visible={showGiftFailureModal} closeBottomSheet={onGiftFailureClose}  >
         <GiftUnwrappedComponent
           title={'Claim Unsuccessful'}
-          info={'Sats were not transferred from your\nSATSCARDTM. Please try again.'}
+          info={'Sats were not transferred from your\nSATSCARD™. Please try again.'}
           proceedButtonText={'Try again'}
           onPressIgnore={onGiftFailureClose}
           onPressProceed={onGiftFailureClick}
@@ -345,8 +350,8 @@ const styles = StyleSheet.create( {
     color: Colors.black,
     fontSize: RFValue( 8 ),
     fontFamily: Fonts.FiraSansRegular,
-    lineHeight: 13,
-    backgroundColor: Colors.white,
+    // lineHeight: 13,
+    // backgroundColor: Colors.white,
     padding:RFValue( 10 )
   }
 } )

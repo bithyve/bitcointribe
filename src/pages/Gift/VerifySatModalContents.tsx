@@ -45,33 +45,68 @@ export default function VerifySatModalContents( props ) {
           <View style={{
             flexDirection: 'row', justifyContent: 'space-between'
           }}>
-            <Text
-              style={{
-                color: props.headerTextColor
-                  ? props.headerTextColor
-                  : Colors.blue,
-                fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular,
-                letterSpacing: 0.01,
+
+            <View style={{
+              flexDirection:'row', alignItems:'flex-start',
+            }}>
+              <Text
+                style={{
+                  color: props.headerTextColor
+                    ? props.headerTextColor
+                    : Colors.blue,
+                  fontSize: RFValue( 18 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  letterSpacing: 0.01,
                 // marginTop: RFValue( 20 )
                 // width: wp( 65 )
-              }}
-            >
-              {props.title}
-            </Text>
+                }}
+              >
+                {props.title}
+              </Text>
+              {props.scTitleText &&
+          <Text style={styles.extraSubText}>
+            {props.scTitleText}
+          </Text>
+              }
+            </View>
             {/* <TouchableOpacity onPress={props.onCloseClick} style={{
               width: 28, height: 28, backgroundColor: Colors.blue
             }}></TouchableOpacity> */}
           </View>
           {props.info ? (
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginTop: wp( '1.5%' ),
-              }}
-            >
-              {props.info}
-            </Text>
+            <View style={{
+              flexDirection:'row', alignItems:'flex-start',
+            }}>
+              <Text
+                style={{
+                  ...styles.modalInfoText,
+                  marginTop: wp( '1.5%' ),
+                }}
+              >
+                {props.info}
+              </Text>
+              {props.info2 &&
+
+              <Text
+                style={{
+                  ...styles.scInfoText,
+                  marginTop: wp( '1.5%' ),
+                }}
+              >
+                {props.info1}
+              </Text>
+              }
+              {props.info2 &&
+              <Text
+                style={{
+                  ...styles.modalInfoText,
+                  marginTop: wp( '1.5%' ),
+                }}
+              >
+                {props.info2}
+              </Text>
+              }
+            </View>
           ) : null}
           <Image source={props.bottomImage}
             resizeMode='contain' style={{
@@ -79,15 +114,36 @@ export default function VerifySatModalContents( props ) {
             }}/>
           <View style={{
             flexDirection:'row', marginTop: RFValue( 25 )
+            // , alignItems:'flex-start',
           }}>
             {/* <View style={{
               width:RFValue( 5 ), height:RFValue( 5 ), borderRadius: RFValue( 5 ), backgroundColor: Colors.blue, marginTop: RFValue( 5 )
             }}/> */}
             <Text style={{
-              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, letterSpacing:0.6, marginStart: RFValue( 5 )
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, marginStart: RFValue( 5 ), textAlign: 'center'
             }}>
               {props.subPoints}
             </Text>
+            { props.subPoints1 && <Text  style={{
+              fontSize: RFValue( 6 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, lineHeight: 8
+            }}>
+              {props.subPoints1}
+            </Text>}
+            { props.subPoints2 && <Text style={{
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular
+            }}>
+              {props.subPoints2}
+            </Text>}
+            { props.subPoints3 && <Text style={{
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular,
+            }}>
+              {props.subPoints3}
+            </Text>}
+            { props.subPoints4 && <Text style={{
+              fontSize: RFValue( 6 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, lineHeight: 8
+            }}>
+              {props.subPoints4}
+            </Text>}
           </View>
         </View>
         <View
@@ -122,16 +178,32 @@ export default function VerifySatModalContents( props ) {
               }}
               delayPressIn={0}
             >
-              <Text
-                style={{
-                  ...styles.proceedButtonText,
-                  color: props.buttonTextColor
-                    ? props.buttonTextColor
-                    : Colors.white,
-                }}
-              >
-                {props.proceedButtonText}
-              </Text>
+              <View style={{
+                flexDirection: 'row', alignItems: 'flex-start'
+              }}>
+                <Text
+                  style={{
+                    ...styles.proceedButtonText,
+                    color: props.buttonTextColor
+                      ? props.buttonTextColor
+                      : Colors.white,
+                  }}
+                >
+                  {props.proceedButtonText}
+                </Text>
+                {props.proceedButtonSubText &&
+                <Text
+                  style={{
+                    ...styles.proceedButtonSubText,
+                    color: props.buttonTextColor
+                      ? props.buttonTextColor
+                      : Colors.white,
+                  }}
+                >
+                  {props.proceedButtonSubText}
+                </Text>
+                }
+              </View>
             </AppBottomSheetTouchableWrapper>
           </Shadow>
         </View>
@@ -189,5 +261,26 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  proceedButtonSubText: {
+    color: Colors.white,
+    fontSize: RFValue( 8 ),
+    fontFamily: Fonts.FiraSansMedium,
+    lineHeight: 12
+  },
+  extraSubText:{
+    fontSize: RFValue( 9 ),
+    lineHeight:14,
+    color: Colors.blue,
+    letterSpacing: 0.7,
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  scInfoText:{
+    color: Colors.textColorGrey,
+    // opacity: 1,
+    fontSize: RFValue( 6 ),
+    fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    lineHeight: 8
   },
 } )

@@ -36,14 +36,15 @@ import { RecipientDescribing } from '../../common/data/models/interfaces/Recipie
 import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, sendTxNotification } from '../../store/actions/sending'
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useAccountSendST1CompletionEffect from '../../utils/sending/UseAccountSendST1CompletionEffect'
-import { TxPriority } from '../../bitcoin/utilities/Interface'
+import { Account, ActiveAddresses, TxPriority } from '../../bitcoin/utilities/Interface'
 import useAccountSendST2CompletionEffect from '../../utils/sending/UseAccountSendST2CompletionEffect'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
-import { number } from 'bitcoinjs-lib/types/script'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 
-const { height, } = Dimensions.get( 'window' )
+const { height, width } = Dimensions.get( 'window' )
 
 const dummySatcardAddress = '2N7eyWGdtdqQUk65rxb3ysDzFw3pkc72hSU'
 const temp: CKTapCard = {
@@ -71,6 +72,7 @@ export default function SetUpSatNextCardScreen( props ) {
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  const account: Account = useAccountByAccountShell( sourceAccountShell )
 
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( temp )
@@ -101,21 +103,21 @@ export default function SetUpSatNextCardScreen( props ) {
     //   }
     // }
 
-  // try{
-  //   if ( network === bitcoinJS.networks.testnet ) {
-  //     res = await accAxios.post(
-  //       config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-  //       accountToAddressMapping,
-  //     )
-  //   } else {
-  //     res = await accAxios.post(
-  //       config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-  //       accountToAddressMapping,
-  //     )
-  //   }
-  // } catch( err ){
-  //    console.log("error" + err)
-  // }
+    // try{
+    //   if ( network === bitcoinJS.networks.testnet ) {
+    //     res = await accAxios.post(
+    //       config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+    //       accountToAddressMapping,
+    //     )
+    //   } else {
+    //     res = await accAxios.post(
+    //       config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+    //       accountToAddressMapping,
+    //     )
+    //   }
+    // } catch( err ){
+    //    console.log("error" + err)
+    // }
   }
 
   useEffect( () => {
@@ -194,10 +196,14 @@ export default function SetUpSatNextCardScreen( props ) {
         setSlotAddress( address )
         console.log( 'getAddrees===>' + JSON.stringify( address ) )
 
+        const network = AccountUtilities.getNetworkByType( account.networkType )
+        const balance = await AccountUtilities.fetchSelectedAccountBalance( address, network )
+        console.log( 'balance===>' + JSON.stringify( balance ) )
+
         return {
           address, pubkey
         }
-        // handleManualAddressSubmit( dummySatcardAddress )
+        // handleManualAddressSubmit( address )
       } catch ( err ) {
         // corner case when the slot is not setup
         if ( err.toString() === 'Error: Current slot is not yet setup.' ) {
@@ -334,34 +340,34 @@ export default function SetUpSatNextCardScreen( props ) {
           marginTop: 10
         }}
         showLoader={stepsVerified <= 0}
-        verifiedText={stepsVerified >= 1 ? 'SATSCARDTM detected' : 'Detecting SATSCARDTM'}
+        verifiedText={stepsVerified >= 1 ? 'SATSCARD™ detected' : 'Detecting SATSCARD™'}
       />
       {
         stepsVerified >= 1 &&
-          <>
-            <View style={styles.dashContainer}>
-              <View style={styles.dashInnerContainer} />
-            </View>
+        <>
+          <View style={styles.dashContainer}>
+            <View style={styles.dashInnerContainer} />
+          </View>
 
-            <GiftStepperComponent
-              // extraContainer={{        }}
-              showLoader={stepsVerified <= 1}
-              verifiedText={stepsVerified >= 2 ? 'Card found' : 'Detecting card'}
-            />
-          </>
+          <GiftStepperComponent
+            // extraContainer={{        }}
+            showLoader={stepsVerified <= 1}
+            verifiedText={stepsVerified >= 2 ? 'Card found' : 'Detecting card'}
+          />
+        </>
       }
       {
         stepsVerified >= 2 &&
-          <>
-            <View style={styles.dashContainer}>
-              <View style={styles.dashInnerContainer} />
-            </View>
-            <GiftStepperComponent
-              // extraContainer={{        }}
-              showLoader={stepsVerified <= 2}
-              verifiedText={stepsVerified >= 3 ? 'SATSCARDTM ready to use' : 'Transferring sats into SATSCARDTM'}
-            />
-          </>
+        <>
+          <View style={styles.dashContainer}>
+            <View style={styles.dashInnerContainer} />
+          </View>
+          <GiftStepperComponent
+            // extraContainer={{        }}
+            showLoader={stepsVerified <= 2}
+            verifiedText={stepsVerified >= 3 ? 'SATSCARD™ ready to use' : 'Transferring sats into SATSCARD™'}
+          />
+        </>
       }
       <View style={{
         flex: 1

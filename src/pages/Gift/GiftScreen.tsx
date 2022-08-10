@@ -672,8 +672,11 @@ class GiftScreen extends React.Component<
               image={<Gifts />}
             />
             <GiftBoxComponent
-              titleText={'Claim SATSCARDTm'}
-              subTitleText={'Move sats from your SATSCARDTM into your account.'}
+              titleText={'Claim SATSCARD'}
+              scTitleText={'TM'}
+              subTitleText={'Move sats from your SATSCARD'}
+              scSubText={'TM'}
+              pendingSubText={' into your account.'}
               onPress={() => this.setState( {
                 showVerification:true
               } )}
@@ -684,10 +687,14 @@ class GiftScreen extends React.Component<
         {showLoader ? <Loader /> : null}
         <ModalContainer onBackground={this.onCloseClick} visible={this.state.showVerification} closeBottomSheet={this.onCloseClick}  >
           <VerifySatModalContents
-            title={'Tap SATSCARDTM'}
-            info={'Get your SATSCARDTM ready for verification'}
-            proceedButtonText={'Detect SATSCARDTM'}
-            subPoints={'Touch your SATSCARDTM on your phone after clicking \'Detect SATSCARDTM\''}
+            title={'Tap SATSCARD'}
+            scTitleText={'TM'}
+            info={'Get your SATSCARD'}
+            info1={'TM'}
+            info2={' ready for verification'}
+            proceedButtonText={'Detect SATSCARD'}
+            proceedButtonSubText={'TM'}
+            subPoints={'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™'}
             bottomImage={require( '../../assets/images/satCards/illustration.png' )}
             onCloseClick={this.onCloseClick}
             onPressProceed={this.onViewHealthClick}
@@ -696,7 +703,7 @@ class GiftScreen extends React.Component<
         </ModalContainer>
         <ModalContainer onBackground={this.onClaimClose} visible={this.state.claimVerification} closeBottomSheet={this.onClaimClose}  >
           <ClaimSatComponent
-            title={'Claim SATSCARDTM'}
+            title={'Claim SATSCARD™'}
             info={'Note that this transfers the available sats in the card to your Checking Account.'}
             proceedButtonText={'Claim sats'}
             onCloseClick={this.onClaimClose}
@@ -725,7 +732,7 @@ class GiftScreen extends React.Component<
         <ModalContainer onBackground={this.onGiftFailureClose} visible={this.state.showGiftFailureModal} closeBottomSheet={this.onGiftFailureClose}  >
           <GiftUnwrappedComponent
             title={'Claim Unsuccessful'}
-            info={'Sats were not transferred from your\nSATSCARDTM. Please try again.'}
+            info={'Sats were not transferred from your\nSATSCARD™. Please try again.'}
             proceedButtonText={'Try again'}
             onCloseClick={this.onGiftFailureClose}
             onPressProceed={this.onGiftSuccessClick}
