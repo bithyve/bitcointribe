@@ -1,68 +1,41 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react'
+import { Account, ActiveAddresses, NetworkType, TxPriority } from '../../bitcoin/utilities/Interface'
 import {
-  View,
-  Text,
+  Alert,
+  Dimensions,
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  Platform,
-  ImageBackground,
-  StatusBar,
-  ActivityIndicator,
-  Image,
-  SafeAreaView,
-  Dimensions,
-  Alert
+  View
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, sendTxNotification } from '../../store/actions/sending'
 import { connect, useDispatch } from 'react-redux'
-import idx from 'idx'
+
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import AlertModalContents from '../../components/AlertModalContents'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import { CKTapCard } from 'cktap-protocol-react-native'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
 import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import GiftStepperComponent from './GiftStepperComponent'
-import { CKTapCard } from 'cktap-protocol-react-native'
 import ModalContainer from '../../components/home/ModalContainer'
-import AlertModalContents from '../../components/AlertModalContents'
-import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
-import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, sendTxNotification } from '../../store/actions/sending'
-import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
-import useAccountSendST1CompletionEffect from '../../utils/sending/UseAccountSendST1CompletionEffect'
-import { Account, ActiveAddresses, TxPriority } from '../../bitcoin/utilities/Interface'
-import useAccountSendST2CompletionEffect from '../../utils/sending/UseAccountSendST2CompletionEffect'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import axios from 'axios'
+import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import useAccountSendST1CompletionEffect from '../../utils/sending/UseAccountSendST1CompletionEffect'
+import useAccountSendST2CompletionEffect from '../../utils/sending/UseAccountSendST2CompletionEffect'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
+import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 
 const { height, width } = Dimensions.get( 'window' )
 
 const dummySatcardAddress = '2N7eyWGdtdqQUk65rxb3ysDzFw3pkc72hSU'
-const temp: CKTapCard = {
-  _certs_checked: true,
-  active_slot: 6,
-  applet_version: '0.9.0',
-  auth_delay: 0,
-  is_tapsigner: true,
-  is_testnet: false,
-  num_backups: 10,
-  num_slots: 10,
-  path: null,
-
-  card_nonce: null,
-  card_pubkey: null,
-  card_ident: null,
-  birth_height: null,
-}
 
 export default function SetUpSatNextCardScreen( props ) {
   const dispatch = useDispatch()
@@ -71,17 +44,17 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
-  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-  const account: Account = useAccountByAccountShell( sourceAccountShell )
+  // const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  // const account: Account = useAccountByAccountShell( sourceAccountShell )
 
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
-  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( temp )
+  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( )
   const [ slotAddress, setSlotAddress ] = useState<String | null>( dummySatcardAddress )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ showNFCModal, setNFCModal ] = useState( false )
 
   const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: sourcePrimarySubAccount?.kind == 'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
+    bitcoinUnit: BitcoinUnit.SATS,
   } )
   const sendingState = useSendingState()
 
@@ -119,13 +92,14 @@ export default function SetUpSatNextCardScreen( props ) {
     //    console.log("error" + err)
     // }
   }
-
-  useEffect( () => {
-    let timeoutVariable
-    let timeout1
-
-    timeout1 = setTimeout( () => {
-      getCardData()
+  let timeoutVariable
+  let timeout1
+  const flowUpdate = async() =>{
+    timeout1 = setTimeout( async() => {
+      const { response, error } = await withModal( getCardData )
+      console.log( {
+        response, error
+      } )
       timeout1 = setTimeout( () => {
         if ( cardDetails?.is_tapsigner ) {
           setStepsVerified( 1 )
@@ -157,8 +131,14 @@ export default function SetUpSatNextCardScreen( props ) {
         }
       }, 2000 )
     }, 1000 )
+  }
 
+  useEffect( () => {
+    console.log( 'checking....' )
+    flowUpdate()
     return () => {
+      console.log( 'returning....' )
+      card.endNfcSession()
       clearTimeout( timeoutVariable )
       clearTimeout( timeout1 )
     }
@@ -166,19 +146,22 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const withModal = async ( callback ) => {
     try {
+      console.log( 'scanning...' )
       setNFCModal( true )
       const resp = await card.nfcWrapper( callback )
+      await card.endNfcSession()
       setNFCModal( false )
       return {
         response: resp, error: null
       }
     } catch ( error: any ) {
-      if ( error.toString() ) {
-        return {
-          response: null, error: error.toString()
-        }
-      }
+      console.log( error.toString() )
       setNFCModal( false )
+
+      return {
+        response: null, error: error.toString()
+      }
+
     }
   }
   async function getCardData() {
@@ -186,31 +169,34 @@ export default function SetUpSatNextCardScreen( props ) {
     setCardDetails( cardData )
     console.log( 'card details===>' + JSON.stringify( cardData ) )
 
-    if ( cardDetails && cardDetails.active_slot != null ) {
-      //For Create Flow
-      const address: any = await card.address( true, true, cardDetails.active_slot )
+    if ( cardData && !cardData.is_tapsigner ) {
+      console.log( 'came in' )
       try {
-        await card.first_look()
         //For Create Flow
-        const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
+        const { addr: address, pubkey } = await card.address( true, true, cardData.active_slot )
         setSlotAddress( address )
         console.log( 'getAddrees===>' + JSON.stringify( address ) )
 
-        const network = AccountUtilities.getNetworkByType( account.networkType )
-        const balance = await AccountUtilities.fetchSelectedAccountBalance( address, network )
+        const network = AccountUtilities.getNetworkByType( NetworkType.MAINNET )
+        // const balance = await AccountUtilities.fetchSelectedAccountBalance( address, network )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+        const { balance } = data
         console.log( 'balance===>' + JSON.stringify( balance ) )
-
+        handleManualAddressSubmit( dummySatcardAddress )
         return {
           address, pubkey
         }
-        // handleManualAddressSubmit( address )
       } catch ( err ) {
+        console.log( {
+          err
+        } )
+
         // corner case when the slot is not setup
-        if ( err.toString() === 'Error: Current slot is not yet setup.' ) {
-          Alert.alert( 'navigate to setup card here' )
-          await card.setup( 'cvc' )
-          // navigate to setup card (cvc page)
-        }
+        // if ( err.toString() === 'Error: Current slot is not yet setup.' ) {
+        //   Alert.alert( 'navigate to setup card here' )
+        //   await card.setup( '304577' )
+        //   // navigate to setup card (cvc page)
+        // }
         throw err
       }
     }
@@ -287,23 +273,23 @@ export default function SetUpSatNextCardScreen( props ) {
         } else {
           dispatch( sendTxNotification( txid, null, type ) )
         }
-        setStepsVerified( 3 )
-        setTimeout( () => {
-          props.navigation.navigate( 'GiftCreated', {
-            numSlots: cardDetails?.num_slots,
-            activeSlot: cardDetails?.active_slot,
-            slotFromIndex: fromClaimFlow ?
-              cardDetails?.num_backups == 0 ? 1 : 2
-              : cardDetails?.num_backups == 0 ? 3 : 4,
-          } )
-        }, 2000 )
+        // setStepsVerified( 3 )
+        // setTimeout( () => {
+        //   props.navigation.navigate( 'GiftCreated', {
+        //     numSlots: cardDetails?.num_slots,
+        //     activeSlot: cardDetails?.active_slot,
+        //     slotFromIndex: fromClaimFlow ?
+        //       cardDetails?.num_backups == 0 ? 1 : 2
+        //       : cardDetails?.num_backups == 0 ? 3 : 4,
+        //   } )
+        // }, 2000 )
       }
     },
     onFailure: ( errorMessage: string | null ) => {
       if ( errorMessage ) {
         // setError( errorMessage )
         console.log( 'skk111122333' )
-        setShowAlertModal( true )
+        // setShowAlertModal( true )
         // setTimeout( () => {
         // setFailure( true )
         // setHandleButton( true )
