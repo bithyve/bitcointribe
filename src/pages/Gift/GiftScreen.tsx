@@ -630,7 +630,7 @@ class GiftScreen extends React.Component<
           }}>
             <CheckingAcc height={57} width={53} />
             <Text style={[ styles.pageTitle, {
-              fontSize: RFValue( 24 ),
+              fontSize: RFValue( 22 ),
               marginStart: 13,
               marginBottom: 5,
             } ]}>
@@ -672,11 +672,8 @@ class GiftScreen extends React.Component<
               image={<Gifts />}
             />
             <GiftBoxComponent
-              titleText={'Claim SATSCARD'}
-              scTitleText={'TM'}
-              subTitleText={'Move sats from your SATSCARD'}
-              scSubText={'TM'}
-              pendingSubText={' into your account.'}
+              titleText={'Claim SATSCARD™'}
+              subTitleText={'Move sats from your SATSCARD™ into your account.'}
               onPress={() => this.setState( {
                 showVerification:true
               } )}
@@ -687,13 +684,9 @@ class GiftScreen extends React.Component<
         {showLoader ? <Loader /> : null}
         <ModalContainer onBackground={this.onCloseClick} visible={this.state.showVerification} closeBottomSheet={this.onCloseClick}  >
           <VerifySatModalContents
-            title={'Tap SATSCARD'}
-            scTitleText={'TM'}
-            info={'Get your SATSCARD'}
-            info1={'TM'}
-            info2={' ready for verification'}
-            proceedButtonText={'Detect SATSCARD'}
-            proceedButtonSubText={'TM'}
+            title={'Tap SATSCARD™'}
+            info={'Get your SATSCARD™ ready for verification'}
+            proceedButtonText={'Detect SATSCARD™'}
             subPoints={'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™'}
             bottomImage={require( '../../assets/images/satCards/illustration.png' )}
             onCloseClick={this.onCloseClick}
