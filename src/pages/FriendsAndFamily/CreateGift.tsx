@@ -1031,9 +1031,9 @@ const CreateGift = ( { navigation } ) => {
             <Switch value={includeFees}
               style={{
                 transform: [ {
-                  scaleX: .4
+                  scaleX: .6
                 }, {
-                  scaleY: .4
+                  scaleY: .6
                 } ]
               }}
               trackColor={{
