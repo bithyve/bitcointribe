@@ -35,8 +35,14 @@ import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/s
 
 const { height, width } = Dimensions.get( 'window' )
 
-const dummySatcardAddress = '2N7eyWGdtdqQUk65rxb3ysDzFw3pkc72hSU'
-
+const dummySatcardAddress = '2N8yb9sYtwEeysNrSgfqnpdknjFUksRQtnM'
+// const temp = {
+//   'card_nonce':{
+//     'type':'Buffer', 'data':[ 156, 61, 66, 83, 118, 58, 158, 31, 255, 118, 127, 143, 181, 12, 12, 208 ]
+//   }, 'card_pubkey':{
+//     'type':'Buffer', 'data':[ 3, 6, 239, 160, 72, 161, 55, 244, 48, 79, 91, 111, 47, 176, 120, 237, 155, 49, 188, 58, 151, 169, 30, 48, 118, 188, 142, 6, 244, 206, 142, 70, 214 ]
+//   }, 'card_ident':'PLJCZ-CFK24-EMH7F-VPDZF', 'applet_version':'1.0.0', 'birth_height':744019, 'is_testnet':false, 'auth_delay':0, 'is_tapsigner':false, 'path':null, 'num_backups':'NA', 'active_slot':0, 'num_slots':10, '_certs_checked':false
+// }
 export default function SetUpSatNextCardScreen( props ) {
   const dispatch = useDispatch()
   const giftAmount = props.navigation?.state?.params?.giftAmount
@@ -44,12 +50,12 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
-  // const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-  // const account: Account = useAccountByAccountShell( sourceAccountShell )
+  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  const account: Account = useAccountByAccountShell( sourceAccountShell )
 
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
-  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( )
-  const [ slotAddress, setSlotAddress ] = useState<String | null>( dummySatcardAddress )
+  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>()
+  const [ slotAddress, setSlotAddress ] = useState<string | null>()
   const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ showNFCModal, setNFCModal ] = useState( false )
 
@@ -69,28 +75,6 @@ export default function SetUpSatNextCardScreen( props ) {
   const fetchBanalnceOfSlot = ( address: [] ) => {
     // TODO: implement
     return 100
-    //   accountToAddressMapping[ address ] = {
-    //     External: address,
-    //     Internal: [],
-    //     Owned: [],
-    //   }
-    // }
-
-    // try{
-    //   if ( network === bitcoinJS.networks.testnet ) {
-    //     res = await accAxios.post(
-    //       config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
-    //       accountToAddressMapping,
-    //     )
-    //   } else {
-    //     res = await accAxios.post(
-    //       config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
-    //       accountToAddressMapping,
-    //     )
-    //   }
-    // } catch( err ){
-    //    console.log("error" + err)
-    // }
   }
   let timeoutVariable
   let timeout1
@@ -100,17 +84,18 @@ export default function SetUpSatNextCardScreen( props ) {
       console.log( {
         response, error
       } )
+      console.log( 'cardDetails===>' + JSON.stringify( cardDetails ) )
+
       timeout1 = setTimeout( () => {
-        if ( cardDetails?.is_tapsigner ) {
+        if ( !cardDetails?.is_tapsigner ) {
           setStepsVerified( 1 )
           timeout1 = setTimeout( () => {
-            if ( cardDetails?._certs_checked ) {
+            if ( !cardDetails?._certs_checked ) {
               setStepsVerified( 2 )
-              timeout1 = setTimeout( () => {
+              timeout1 = setTimeout( async () => {
                 setStepsVerified( 3 )
                 console.log( 'fromClaimFlow===>' + JSON.stringify( fromClaimFlow ) )
-
-                // handleManualAddressSubmit( dummySatcardAddress )
+                handleManualAddressSubmit( slotAddress )
                 timeout1 = setTimeout( () => {
                   props.navigation.navigate( 'GiftCreated', {
                     numSlots: cardDetails?.num_slots,
@@ -126,7 +111,7 @@ export default function SetUpSatNextCardScreen( props ) {
         } else {
           timeoutVariable = setTimeout( () => {
             console.log( 'skk1111' )
-            setShowAlertModal( true )
+            // setShowAlertModal( true )
           }, 5000 )
         }
       }, 2000 )
@@ -173,23 +158,24 @@ export default function SetUpSatNextCardScreen( props ) {
       console.log( 'came in' )
       try {
         //For Create Flow
-        const { addr: address, pubkey } = await card.address( true, true, cardData.active_slot )
+        const { addr: address, pubkey } = await card.address( true, true, cardDetails.active_slot )
         setSlotAddress( address )
         console.log( 'getAddrees===>' + JSON.stringify( address ) )
 
         const network = AccountUtilities.getNetworkByType( NetworkType.MAINNET )
         // const balance = await AccountUtilities.fetchSelectedAccountBalance( address, network )
-        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${dummySatcardAddress}` )
         const { balance } = data
         console.log( 'balance===>' + JSON.stringify( balance ) )
-        handleManualAddressSubmit( dummySatcardAddress )
-        return {
-          address, pubkey
-        }
+        // handleManualAddressSubmit( dummySatcardAddress )
+        // return {
+        //   address, pubkey
+        // }
       } catch ( err ) {
         console.log( {
           err
         } )
+
 
         // corner case when the slot is not setup
         // if ( err.toString() === 'Error: Current slot is not yet setup.' ) {
@@ -207,9 +193,9 @@ export default function SetUpSatNextCardScreen( props ) {
     } )
 
     console.log( 'skk inside recipent', JSON.stringify( isRecipientSelectedForSending( addressRecipient ) ) )
-    // if ( isRecipientSelectedForSending( addressRecipient ) == false ) {
-    handleRecipientSelection( addressRecipient )
-    // }
+    if ( isRecipientSelectedForSending( addressRecipient ) == false ) {
+      handleRecipientSelection( addressRecipient )
+    }
   }
 
 
@@ -267,7 +253,6 @@ export default function SetUpSatNextCardScreen( props ) {
         } else if ( sourceAccountShell.primarySubAccount.type === 'SAVINGS_ACCOUNT' ) {
           type = 3
         }
-
         if ( amt ) {
           dispatch( sendTxNotification( txid, amt + ' ' + formattedUnitText, type ) )
         } else {
@@ -287,13 +272,9 @@ export default function SetUpSatNextCardScreen( props ) {
     },
     onFailure: ( errorMessage: string | null ) => {
       if ( errorMessage ) {
-        // setError( errorMessage )
         console.log( 'skk111122333' )
         // setShowAlertModal( true )
-        // setTimeout( () => {
-        // setFailure( true )
-        // setHandleButton( true )
-        // }, 200 )
+
       }
     },
   } )
