@@ -193,7 +193,7 @@ export default function GiftCreatedScreen( props ) {
           />
         </View>
       }
-
+      {console.log( 'slotFromIndex' + slotFromIndex )}
       <View style={{
         flexDirection: 'row', marginTop: RFValue( 20 )
       }}>
@@ -229,7 +229,7 @@ export default function GiftCreatedScreen( props ) {
               {slotFromIndex == 1 ? 'Back to Gifts'
                 : slotFromIndex ==  2 ? 'Withdraw sats'
                   : slotFromIndex == 3 ? 'Back to Gifts'
-                    : slotFromIndex ==  4 ? 'Claim Sats':'Back to Gifts'
+                    : slotFromIndex ==  4 ? 'Claim Sats':''
               }
             </Text>
           </AppBottomSheetTouchableWrapper>

@@ -105,7 +105,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   },
     // },
     {
-      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      imageSource: require( '../../assets/images/icons/keeper_sheild.png' ),
       subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
         ? bhrStrings[ 'WalletBackupInfo1' ]
         : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
@@ -153,7 +153,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         case strings.AppInfo:
           return ( <AppInfo /> )
         case bhrStrings[ 'WalletBackup' ]:
-          return ( <AppInfo /> )
+          return ( <Image style={{height: 20, width:20}} source={require( '../../assets/images/icons/keeper_sheild.png' )} /> )
         default:
           return null
     }
@@ -239,7 +239,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     justifyContent: 'center', marginLeft: 10
                   }}>
                     <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
-                    <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
+                    <Text style={[ styles.addModalInfoText, {
+                      color: menuOption.subtitle == bhrStrings[ 'WalletBackupInfo1' ] ? Colors.yellow : Colors.textColorGrey
+                    } ] }>{menuOption.subtitle}</Text>
                   </View>
                   {/* {menuOption.isSwitch &&
                 <View style={{
