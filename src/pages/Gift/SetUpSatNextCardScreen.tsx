@@ -55,7 +55,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>()
-  const [ slotAddress, setSlotAddress ] = useState<string | null>()
   const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ showNFCModal, setNFCModal ] = useState( false )
 
@@ -84,7 +83,12 @@ export default function SetUpSatNextCardScreen( props ) {
       console.log( {
         response, error
       } )
-      console.log( 'cardDetails===>' + JSON.stringify( cardDetails ) )
+      if( error ){
+        console.log( error )
+        Alert.alert( error.toString() )
+        return
+      }
+      const { address } = response
 
       timeout1 = setTimeout( () => {
         if ( !cardDetails?.is_tapsigner ) {
@@ -95,7 +99,7 @@ export default function SetUpSatNextCardScreen( props ) {
               timeout1 = setTimeout( async () => {
                 setStepsVerified( 3 )
                 console.log( 'fromClaimFlow===>' + JSON.stringify( fromClaimFlow ) )
-                handleManualAddressSubmit( slotAddress )
+                handleManualAddressSubmit( address )
                 timeout1 = setTimeout( () => {
                   props.navigation.navigate( 'GiftCreated', {
                     numSlots: cardDetails?.num_slots,
@@ -158,19 +162,18 @@ export default function SetUpSatNextCardScreen( props ) {
       console.log( 'came in' )
       try {
         //For Create Flow
-        const { addr: address, pubkey } = await card.address( true, true, cardDetails.active_slot )
-        setSlotAddress( address )
+        const { addr: address, pubkey } = await card.address( true, true, cardData.active_slot )
+
         console.log( 'getAddrees===>' + JSON.stringify( address ) )
 
         const network = AccountUtilities.getNetworkByType( NetworkType.MAINNET )
         // const balance = await AccountUtilities.fetchSelectedAccountBalance( address, network )
-        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${dummySatcardAddress}` )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
         const { balance } = data
         console.log( 'balance===>' + JSON.stringify( balance ) )
-        // handleManualAddressSubmit( dummySatcardAddress )
-        // return {
-        //   address, pubkey
-        // }
+        return {
+          address, pubkey
+        }
       } catch ( err ) {
         console.log( {
           err
