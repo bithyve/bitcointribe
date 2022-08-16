@@ -93,13 +93,6 @@ const ClipboardAutoRead: React.FC<IClipboardAutoReadProps> = ({navigation}) => {
         bottomSheetRef={undefined}
         releaseNotes={null}
       />
-      {/* <View style={{
-        backgroundColor: 'white',
-      }}>
-        <Text>
-          You have copied a bitcoin address {address}. Would you like to tranfer Sats to it?  
-        </Text>
-      </View> */}
     </ModalContainer>
   );
 };
