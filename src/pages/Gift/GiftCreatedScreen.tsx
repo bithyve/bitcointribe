@@ -48,12 +48,14 @@ export default function GiftCreatedScreen( props ) {
   const [ claimVerification, setClaimVerification ] = useState( false )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
-  const balance = 5000
+  const balance = props.navigation?.state?.params?.slotBalance ? props.navigation?.state?.params?.slotBalance : 0
 
   const onGiftClose = () => {
     setShowGiftModal( false )
   }
-
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
   const onGiftSuccessClick = () => {
     setShowGiftModal( false )
     setShowGiftFailureModal( true )
@@ -141,7 +143,7 @@ export default function GiftCreatedScreen( props ) {
             // top:62, position:'absolute',
             color: Colors.gray14, alignSelf: 'center',
             // backgroundColor:'red'
-          }}>{`${balance.toLocaleString()} sats`}</Text>
+          }}>{`${numberWithCommas( balance )} sats`}</Text>
           <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 30 ),
           }}>
@@ -270,9 +272,6 @@ export default function GiftCreatedScreen( props ) {
         <GiftUnwrappedComponent
           title={'Your Gift is unwrapped'}
           info={'Gifts sats received!'}
-          // infoSelected={'Checking Account.'}
-          // info2={'Your checking account balance is '}
-          // info2Selected={'100,000 sats'}
           proceedButtonText={'View Account'}
           onCloseClick={onGiftClose}
           onPressProceed={onGiftSuccessClick}

@@ -65,6 +65,9 @@ import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
 import VerifySatModalContents from './VerifySatModalContents'
 import ClaimSatComponent from './ClaimSatComponent'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
+import { CKTapCard } from 'cktap-protocol-react-native'
+import axios from 'axios'
+import NfcPrompt from './NfcPromptAndroid'
 
 interface GiftPropTypes {
   navigation: any;
@@ -93,6 +96,9 @@ interface GiftStateTypes {
   claimVerification: boolean;
   showGiftModal: boolean;
   showGiftFailureModal: boolean;
+  cardDetails: CKTapCard | null;
+  showNFCModal: boolean;
+  satCardBalance: number | null;
 }
 
 class GiftScreen extends React.Component<
@@ -105,11 +111,14 @@ class GiftScreen extends React.Component<
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
   helpBottomSheetRef: React.RefObject<BottomSheet>;
   focusListener: any;
+  card: React.RefObject<CKTapCard>;
   strings: object;
 
+  // card = useRef( new CKTapCard() ).current
   constructor( props, context ) {
     super( props, context )
 
+    this.card = React.createRef<CKTapCard>()
     this.focusListener = null
     this.addContactAddressBookBottomSheetRef = React.createRef<BottomSheet>()
     this.helpBottomSheetRef = React.createRef<BottomSheet>()
@@ -130,7 +139,10 @@ class GiftScreen extends React.Component<
       showVerification: false,
       claimVerification: false,
       showGiftModal: false,
-      showGiftFailureModal: false
+      showGiftFailureModal: false,
+      cardDetails: null,
+      showNFCModal: false,
+      satCardBalance: 0
     }
   }
 
@@ -560,17 +572,86 @@ class GiftScreen extends React.Component<
     } )
   }
 
-  onViewHealthClick=()=>{
+  onViewHealthClick=async()=>{
     this.setState( {
       showVerification: false
-    }, ()=>{
-      // this.setState( {
-      // claimVerification:true
+    }, async()=>{
+      // this.props.navigation.navigate( 'SetUpSatNextCard', {
+      //   fromClaimFlow: 1
       // } )
-      this.props.navigation.navigate( 'SetUpSatNextCard', {
-        fromClaimFlow: 1
+      const { response, error } = await this.withModal( this.getCardData )
+      console.log( {
+        response, error
+      } )
+      if( error ){
+        console.log( error )
+        // Alert.alert( error.toString() )
+        return
+      }
+      this.props.navigation.navigate( 'GiftCreated', {
+        numSlots: this.state.cardDetails?.num_slots,
+        activeSlot: this.state.cardDetails?.active_slot,
+        slotFromIndex: this.state.satCardBalance == 0 ? 3 : 4,
+        slotBalance: this.state.satCardBalance,
       } )
     } )
+  }
+
+  withModal = async ( callback ) => {
+    try {
+      console.log( 'scanning...1' )
+      if( Platform.OS == 'android' )
+        this.setState( {
+          showNFCModal: true
+        } )
+      const resp = await this.card.current.nfcWrapper( callback )
+      await this.card.current.endNfcSession()
+      this.setState( {
+        showNFCModal: false
+      } )
+      return {
+        response: resp, error: null
+      }
+    } catch ( error: any ) {
+      console.log( error.toString() )
+      this.setState( {
+        showNFCModal: false
+      } )
+      return {
+        response: null, error: error.toString()
+      }
+    }
+  }
+
+  getCardData = async() =>{
+    const cardData = await this.card.current.first_look()
+    this.setState( {
+      cardDetails: cardData
+    } )
+    console.log( 'card details1===>' + JSON.stringify( cardData ) )
+    if ( cardData && !cardData.is_tapsigner ) {
+      console.log( 'came in 1' )
+      try {
+        //For Create Flow
+        const { addr: address, pubkey } = await this.card.current.address( true, true, cardData.active_slot )
+        console.log( 'getAddrees1===>' + JSON.stringify( address ) )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+        const { balance } = data
+        this.setState( {
+          satCardBalance: balance
+        }, ()=>{
+          console.log( 'balance1===>' + JSON.stringify( balance ) )
+          return {
+            address, pubkey
+          }
+        } )
+      } catch ( err ) {
+        console.log( {
+          err
+        } )
+        throw err
+      }
+    }
   }
 
   onGiftSuccessClick=()=>{
@@ -701,6 +782,7 @@ class GiftScreen extends React.Component<
             closeModal
           />
         </ModalContainer>
+        <NfcPrompt visible={this.state.showNFCModal} />
         <ModalContainer onBackground={this.onClaimClose} visible={this.state.claimVerification} closeBottomSheet={this.onClaimClose}  >
           <ClaimSatComponent
             title={'Claim SATSCARD™'}

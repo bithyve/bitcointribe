@@ -228,13 +228,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
     }
   }, [ currencyKind ] )
 
-  function handleSendMaxPress() {
-    dispatch( calculateSendMaxFee( {
-      numberOfRecipients: Number( numbersOfGift ),
-      accountShell: selectedAccount,
-    } ) )
-    setIsSendMax( true )
-  }
   const fetchBanalnceOfSlot  = ( address: string ) =>{
     // TODO: implement
     return 100
@@ -263,7 +256,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
     // For Claim Flow
     await card.first_look()
     const { addr:address, pubkey } = await card.address( true, true, card.active_slot )
-    console.log( 'slot address ===>' + JSON.stringify( address ) )
+    console.log( 'slot address 2===>' + JSON.stringify( address ) )
     const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
     const { balance } = data
     if( balance!==0 ){
@@ -281,11 +274,11 @@ const ClaimSatsScreen = ( { navigation } ) => {
 
       // with this key move all the funds from the slot to checking account (rnd)
 
-      console.log( 'balance===>' + JSON.stringify( balance ) )
+      console.log( 'balance2===>' + JSON.stringify( balance ) )
       CKTapCard
       // For setup slot for next user
       const setUpSlot = await card.setup( spendCode, undefined, true )
-      console.log( 'setUpSlot for next user ===>' + JSON.stringify( setUpSlot ) )
+      console.log( 'setUpSlot for next user 2===>' + JSON.stringify( setUpSlot ) )
     }else{
       // corner case when the slot is unseled but no balance
       // continue with error flow
@@ -610,9 +603,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
           height: hp( '12%' ),
           flexDirection: 'row',
           marginTop: RFValue( 38 ),
-          // alignItems: 'center',
-          // backgroundColor: 'red',
-          // justifyContent: 'flex-end',
           marginEnd: RFValue( 20 )
         }}
       >
@@ -663,12 +653,12 @@ const ClaimSatsScreen = ( { navigation } ) => {
     console.log( {
       response, error
     } )
-    setShowGiftModal( true )
     if( error ){
       console.log( error )
       setShowGiftFailureModal( true )
       return
     }
+    setShowGiftModal( true )
   }
 
   const onGiftFailureClose = () => {
