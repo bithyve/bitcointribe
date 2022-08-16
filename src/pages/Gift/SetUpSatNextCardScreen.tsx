@@ -1,4 +1,4 @@
-import { Account, ActiveAddresses, NetworkType, TxPriority } from '../../bitcoin/utilities/Interface'
+import { AccountType, NetworkType, TxPriority } from '../../bitcoin/utilities/Interface'
 import {
   Alert,
   Dimensions,
@@ -9,10 +9,11 @@ import {
   View
 } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, sendTxNotification } from '../../store/actions/sending'
-import { connect, useDispatch } from 'react-redux'
+import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, sendTxNotification, sourceAccountSelectedForSending } from '../../store/actions/sending'
+import { useDispatch, useSelector } from 'react-redux'
 
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { AccountsState } from '../../store/reducers/accounts'
 import AlertModalContents from '../../components/AlertModalContents'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { CKTapCard } from 'cktap-protocol-react-native'
@@ -50,9 +51,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
-  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-  const account: Account = useAccountByAccountShell( sourceAccountShell )
-
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>()
   const [ showAlertModal, setShowAlertModal ] = useState( false )
@@ -99,7 +97,7 @@ export default function SetUpSatNextCardScreen( props ) {
               timeout1 = setTimeout( async () => {
                 setStepsVerified( 3 )
                 console.log( 'fromClaimFlow===>' + JSON.stringify( fromClaimFlow ) )
-                handleManualAddressSubmit( address )
+                !fromClaimFlow && handleManualAddressSubmit( address )
                 timeout1 = setTimeout( () => {
                   props.navigation.navigate( 'GiftCreated', {
                     numSlots: cardDetails?.num_slots,
@@ -123,6 +121,13 @@ export default function SetUpSatNextCardScreen( props ) {
   }
 
   useEffect( () => {
+    if( !sourceAccountShell ){
+      const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
+      const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
+      dispatch( sourceAccountSelectedForSending(
+        defaultSourceAccount
+      ) )
+    }
     console.log( 'checking....' )
     flowUpdate()
     return () => {
