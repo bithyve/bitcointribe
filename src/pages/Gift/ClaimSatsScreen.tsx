@@ -74,6 +74,7 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import wif from 'wif'
+import axios from 'axios'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -262,10 +263,12 @@ const ClaimSatsScreen = ( { navigation } ) => {
     // For Claim Flow
     await card.first_look()
     const { addr:address, pubkey } = await card.address( true, true, card.active_slot )
-    const balance = fetchBanalnceOfSlot( address )
+    console.log( 'slot address ===>' + JSON.stringify( address ) )
+    const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+    const { balance } = data
     if( balance!==0 ){
       // get the cvc from user
-      const { pk, target } = await card.unseal_slot( 'cvc state' )
+      const { pk, target } = await card.unseal_slot( spendCode )
       // unSealSlot ->
       // {
       //     pk: Buffer;
@@ -277,10 +280,12 @@ const ClaimSatsScreen = ( { navigation } ) => {
 
 
       // with this key move all the funds from the slot to checking account (rnd)
-      console.log( 'slot address ===>' + JSON.stringify( address ) )
+
+      console.log( 'balance===>' + JSON.stringify( balance ) )
+      CKTapCard
       // For setup slot for next user
-      const setUpSlot = await card.setup( 'cvc state', undefined, true )
-      console.log( 'slot address ===>' + JSON.stringify( setUpSlot ) )
+      const setUpSlot = await card.setup( spendCode, undefined, true )
+      console.log( 'setUpSlot for next user ===>' + JSON.stringify( setUpSlot ) )
     }else{
       // corner case when the slot is unseled but no balance
       // continue with error flow
@@ -653,8 +658,17 @@ const ClaimSatsScreen = ( { navigation } ) => {
     navigation.goBack()
   }
 
-  const onClaimSatsClick = () => {
+  const onClaimSatsClick = async () => {
+    const { response, error } = await withModal( claimGifts() )
+    console.log( {
+      response, error
+    } )
     setShowGiftModal( true )
+    if( error ){
+      console.log( error )
+      setShowGiftFailureModal( true )
+      return
+    }
   }
 
   const onGiftFailureClose = () => {
@@ -670,7 +684,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
 
   const onGiftSuccessClick = () => {
     setShowGiftModal( false )
-    // setShowGiftFailureModal( true )
     dispatch( giftAccepted( '' ) )
     // closeModal()
     navigation.dispatch(
