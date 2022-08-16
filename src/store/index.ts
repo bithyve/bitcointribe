@@ -13,6 +13,7 @@ import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
 import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
+import misc from './reducers/misc'
 import { persistStore, persistReducer, createMigrate } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
 import swanIntegrationReducer from './reducers/SwanIntegration'
@@ -27,7 +28,7 @@ const config = {
   key: 'root', // key is required
   // version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
   storage: AsyncStorage, // storage is now required
-  blacklist: [ 'setupAndAuth', 'loaders' ],
+  blacklist: [ 'setupAndAuth', 'loaders', "doNotStore" ],
   migrate: createMigrate( reduxPersistMigrations, {
     debug: true
   } )
@@ -188,6 +189,7 @@ import { updateUserNameWatcher } from './sagas/storage'
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2'
 import { recreateMissingAccountsWatcher, sweepMissingAccountsWatcher, syncMissingAccountsWatcher } from './sagas/upgrades'
 import upgrades from './reducers/upgrades'
+import doNotStoreReducer from './reducers/doNotStore'
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -382,7 +384,9 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
-  upgrades: upgrades
+  upgrades: upgrades,
+  misc: misc,
+  doNotStore: doNotStoreReducer,
 } )
 
 export default function makeStore() {

@@ -126,6 +126,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
+import ClipboardAutoRead from '../../components/ClipboardAutoRead'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -270,6 +271,7 @@ interface HomePropsTypes {
   trustedContacts: Trusted_Contacts;
   IsCurrentLevel0: boolean;
   walletId: string;
+  clipboardAccess: boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -1679,6 +1681,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         </ModalContainer>
       )
     }
+    console.log('CLIPBOARD_ACCESS', this.props.clipboardAccess)
     return (
       // <ImageBackground
       //   source={require( '../../assets/images/home-bg.png' )}
@@ -1701,6 +1704,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   : 0,
         }}
       >
+        {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
         <ImageBackground
           source={require( '../../assets/images/home-bg.png' )}
           style={{
@@ -1832,7 +1836,8 @@ const mapStateToProps = ( state ) => {
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
     walletId:
-    idx( state, ( _ ) => _.storage.wallet.walletId )
+    idx( state, ( _ ) => _.storage.wallet.walletId ),
+    clipboardAccess: idx(state, ( _ ) => _.misc.clipboardAccess ),
   }
 }
 
@@ -1872,7 +1877,7 @@ export default withNavigationFocus(
     syncPermanentChannels,
     updateLastSeen,
     updateSecondaryShard,
-    rejectedExistingContactRequest
+    rejectedExistingContactRequest,
   } )( Home )
 )
 

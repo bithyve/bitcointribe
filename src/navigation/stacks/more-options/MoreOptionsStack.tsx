@@ -25,6 +25,7 @@ import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import EnableClipboardAutoRead from '../../../pages/EnableClipboardAutoRead'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -127,6 +128,12 @@ const MoreOptionsStack = createStackNavigator(
         // tabBarVisibl
       },
     },
+    EnableClipboard: {
+      screen: EnableClipboardAutoRead,
+      navigationOptions: {
+        header: null
+      }
+    }
   },
   {
     initialRouteName: 'Home',
