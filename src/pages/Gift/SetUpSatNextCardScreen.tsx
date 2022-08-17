@@ -12,6 +12,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, sendTxNotification, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { AccountsState } from '../../store/reducers/accounts'
 import AlertModalContents from '../../components/AlertModalContents'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
@@ -21,6 +22,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import GiftStepperComponent from './GiftStepperComponent'
 import ModalContainer from '../../components/home/ModalContainer'
+import NfcPrompt from './NfcPromptAndroid'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import axios from 'axios'
@@ -32,7 +34,6 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
-import NfcPrompt from './NfcPromptAndroid'
 
 const { height, width } = Dimensions.get( 'window' )
 // const dummySatcardAddress = '2N8yb9sYtwEeysNrSgfqnpdknjFUksRQtnM'
@@ -163,7 +164,7 @@ export default function SetUpSatNextCardScreen( props ) {
       console.log( 'came in' )
       try {
         //For Create Flow
-        const { addr: address, pubkey } = await card.address( true, true, cardData.active_slot )
+        const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
         console.log( 'getAddrees===>' + JSON.stringify( address ) )
         const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
         const { balance } = data

@@ -1,73 +1,74 @@
-import React from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  Platform,
-  ImageBackground,
-  StatusBar,
   ActivityIndicator,
-  Image
+  Image,
+  ImageBackground,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
-import idx from 'idx'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import {
-  syncPermanentChannels,
   PermanentChannelsSyncKind,
+  syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
 import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+
+import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import ModalHeader from '../../components/ModalHeader'
-import KnowMoreButton from '../../components/KnowMoreButton'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
-import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
-import { ListItem } from 'react-native-elements'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
+import { CKTapCard } from 'cktap-protocol-react-native'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
+import ClaimSatComponent from './ClaimSatComponent'
+import Colors from '../../common/Colors'
 import {
   ContactRecipientDescribing,
 } from '../../common/data/models/interfaces/RecipientDescribing'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-import Loader from '../../components/loader'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import Header from '../../navigation/stacks/Header'
-import ModalContainer from '../../components/home/ModalContainer'
+import DeviceInfo from 'react-native-device-info'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { LocalizationContext } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import Gift from '../../assets/images/svgs/icon_gift.svg'
-import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
-import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
-import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import GiftBoxComponent from './GiftBoxCmponent'
+import GiftUnwrappedComponent from './GiftUnwrappedComponent'
 import Gifts from '../../assets/images/satCards/gifts.svg'
-import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
+import Header from '../../navigation/stacks/Header'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import KnowMoreButton from '../../components/KnowMoreButton'
+import { ListItem } from 'react-native-elements'
+import Loader from '../../components/loader'
+import { LocalizationContext } from '../../common/content/LocContext'
+import ModalContainer from '../../components/home/ModalContainer'
+import ModalHeader from '../../components/ModalHeader'
+import { NavigationScreenConfig } from 'react-navigation'
+import { NavigationStackOptions } from 'react-navigation-stack'
+import NfcPrompt from './NfcPromptAndroid'
+import {
+  REGULAR_ACCOUNT,
+} from '../../common/constants/wallet-service-types'
+import { RFValue } from 'react-native-responsive-fontsize'
+import React from 'react'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import Sat_card from '../../assets/images/satCards/sats_card.svg'
 import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import VerifySatModalContents from './VerifySatModalContents'
-import ClaimSatComponent from './ClaimSatComponent'
-import GiftUnwrappedComponent from './GiftUnwrappedComponent'
-import { CKTapCard } from 'cktap-protocol-react-native'
 import axios from 'axios'
-import NfcPrompt from './NfcPromptAndroid'
+import { connect } from 'react-redux'
+import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
+import idx from 'idx'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 
 interface GiftPropTypes {
   navigation: any;
@@ -111,14 +112,14 @@ class GiftScreen extends React.Component<
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
   helpBottomSheetRef: React.RefObject<BottomSheet>;
   focusListener: any;
-  card: React.RefObject<CKTapCard>;
+  card: CKTapCard;
   strings: object;
 
   // card = useRef( new CKTapCard() ).current
   constructor( props, context ) {
     super( props, context )
 
-    this.card = React.createRef<CKTapCard>()
+    this.card = new CKTapCard()
     this.focusListener = null
     this.addContactAddressBookBottomSheetRef = React.createRef<BottomSheet>()
     this.helpBottomSheetRef = React.createRef<BottomSheet>()
@@ -579,20 +580,32 @@ class GiftScreen extends React.Component<
       // this.props.navigation.navigate( 'SetUpSatNextCard', {
       //   fromClaimFlow: 1
       // } )
-      const { response, error } = await this.withModal( this.getCardData )
-      console.log( {
-        response, error
+      const { response, error } = await this.withModal( async ()=>{
+        const cardData = await this.card.first_look()
+        const { addr:address } = await this.card.address( true, false, 0 )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+        const { balance } = data
+        console.log( {
+          num_slots:cardData.num_slots,
+          active_slot:cardData.active_slot,
+          balance
+        } )
+        return{
+          num_slots:cardData.num_slots,
+          active_slot:cardData.active_slot,
+          balance
+        }
       } )
       if( error ){
         console.log( error )
-        // Alert.alert( error.toString() )
         return
       }
+      const { num_slots, active_slot,  balance } = response
       this.props.navigation.navigate( 'GiftCreated', {
-        numSlots: this.state.cardDetails?.num_slots,
-        activeSlot: this.state.cardDetails?.active_slot,
-        slotFromIndex: this.state.satCardBalance == 0 ? 3 : 4,
-        slotBalance: this.state.satCardBalance,
+        numSlots: num_slots,
+        activeSlot: active_slot,
+        slotFromIndex: !balance?3:4,
+        slotBalance: balance,
       } )
     } )
   }
@@ -604,8 +617,8 @@ class GiftScreen extends React.Component<
         this.setState( {
           showNFCModal: true
         } )
-      const resp = await this.card.current.nfcWrapper( callback )
-      await this.card.current.endNfcSession()
+      const resp = await this.card.nfcWrapper( callback )
+      await this.card.endNfcSession()
       this.setState( {
         showNFCModal: false
       } )
@@ -619,37 +632,6 @@ class GiftScreen extends React.Component<
       } )
       return {
         response: null, error: error.toString()
-      }
-    }
-  }
-
-  getCardData = async() =>{
-    const cardData = await this.card.current.first_look()
-    this.setState( {
-      cardDetails: cardData
-    } )
-    console.log( 'card details1===>' + JSON.stringify( cardData ) )
-    if ( cardData && !cardData.is_tapsigner ) {
-      console.log( 'came in 1' )
-      try {
-        //For Create Flow
-        const { addr: address, pubkey } = await this.card.current.address( true, true, cardData.active_slot )
-        console.log( 'getAddrees1===>' + JSON.stringify( address ) )
-        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-        const { balance } = data
-        this.setState( {
-          satCardBalance: balance
-        }, ()=>{
-          console.log( 'balance1===>' + JSON.stringify( balance ) )
-          return {
-            address, pubkey
-          }
-        } )
-      } catch ( err ) {
-        console.log( {
-          err
-        } )
-        throw err
       }
     }
   }

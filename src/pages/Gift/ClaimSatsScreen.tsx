@@ -61,6 +61,7 @@ import { Shadow } from 'react-native-shadow-2'
 import { UsNumberFormat } from '../../common/utilities'
 import VerifySatModalContents from './VerifySatModalContents'
 import { associateGift } from '../../store/actions/trustedContacts'
+import axios from 'axios'
 import { calculateSendMaxFee } from '../../store/actions/sending'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import idx from 'idx'
@@ -74,7 +75,6 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import wif from 'wif'
-import axios from 'axios'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -115,7 +115,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
   const [ showErrorLoader, setShowErrorLoader ] = useState( false )
-  const [ spendCode, setSpendCode ] = useState( '' )
+  const [ spendCode, setSpendCode ] = useState( '866577' )
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
@@ -214,19 +214,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
-  useEffect( () => {
-    if ( isSendMax ) setSpendCode( `${spendableBalance - sendMaxFee}` )
-  }, [ sendMaxFee, isSendMax ] )
-
-  useEffect( () => {
-    if ( currencyKind == CurrencyKind.BITCOIN ) {
-      const newAmount = convertFiatToSats( parseFloat( spendCode ) ).toString()
-      setSpendCode( newAmount == 'NaN' ? '' : newAmount )
-    } else if ( currencyKind == CurrencyKind.FIAT ) {
-      const newAmount = convertSatsToFiat( parseFloat( spendCode ) ).toString()
-      setSpendCode( newAmount == 'NaN' ? '' : newAmount )
-    }
-  }, [ currencyKind ] )
 
   const fetchBanalnceOfSlot  = ( address: string ) =>{
     // TODO: implement
@@ -254,31 +241,34 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
   const claimGifts = async() =>{
     // For Claim Flow
-    await card.first_look()
-    const { addr:address, pubkey } = await card.address( true, true, card.active_slot )
+    const status = await card.first_look()
+    const { addr:address, pubkey } = await card.address( true, false, 0 )
     console.log( 'slot address 2===>' + JSON.stringify( address ) )
     const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
     const { balance } = data
     if( balance!==0 ){
       // get the cvc from user
-      const { pk, target } = await card.unseal_slot( spendCode )
-      // unSealSlot ->
-      // {
-      //     pk: Buffer;
-      //     target: number;
-      // }
-      const privKey = wif.encode( 128, pk, false )
+      const activeSlotUsage =  await card.get_slot_usage( status.active_slot )
+      let privKey
+      if( activeSlotUsage.status !== 'SEALED' ){
+        privKey = await card.get_privkey( spendCode, status.active_slot-1 )
+      }else{
+        const { pk } = await card.unseal_slot( spendCode )
+        privKey=pk
+      }
+      privKey = wif.encode( 128, privKey, false )
       // dispatch( associateGift( unSealSlot.pk.toString(), sourcePrimarySubAccount.id ) )
       dispatch( associateGift( privKey, selectedAccount.id ) )
-
-
       // with this key move all the funds from the slot to checking account (rnd)
-
       console.log( 'balance2===>' + JSON.stringify( balance ) )
-      CKTapCard
       // For setup slot for next user
-      const setUpSlot = await card.setup( spendCode, undefined, true )
-      console.log( 'setUpSlot for next user 2===>' + JSON.stringify( setUpSlot ) )
+
+      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
+      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
+      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
+
+      // const setUpSlot = await card.setup( spendCode, undefined, true )
+      // console.log( 'setUpSlot for next user 2===>' + JSON.stringify( setUpSlot ) )
     }else{
       // corner case when the slot is unseled but no balance
       // continue with error flow
@@ -649,7 +639,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
 
   const onClaimSatsClick = async () => {
-    const { response, error } = await withModal( claimGifts() )
+    const { response, error } = await withModal( claimGifts )
     console.log( {
       response, error
     } )
