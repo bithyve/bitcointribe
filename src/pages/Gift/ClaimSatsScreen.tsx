@@ -1,4 +1,4 @@
-import { Account, AccountType, Gift, TxPriority } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, TxPriority } from '../../bitcoin/utilities/Interface'
 import {
   Dimensions,
   Image,
@@ -11,11 +11,7 @@ import {
   View
 } from 'react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { generateGifts, giftAccepted, giftCreationSuccess, refreshAccountShells } from '../../store/actions/accounts'
-import {
-  getCurrencyImageByRegion,
-  processRequestQR,
-} from '../../common/CommonFunctions/index'
+import { giftAccepted, giftCreationSuccess, refreshAccountShells } from '../../store/actions/accounts'
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -26,45 +22,29 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../../store/reducers/accounts'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import { CKTapCard } from 'cktap-protocol-react-native'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
-import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
-import ClaimSatComponent from './ClaimSatComponent'
 import Colors from '../../common/Colors'
 import CommonStyles from '../../common/Styles/Styles'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import Dollar from '../../assets/images/svgs/icon_dollar.svg'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Fonts from '../../common/Fonts'
-import FormStyles from '../../common/Styles/FormStyles'
-import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
-import HeaderTitle from '../../components/HeaderTitle'
-import Illustration from '../../assets/images/svgs/illustration.svg'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import Loader from '../../components/loader'
-import LoaderModal from '../../components/LoaderModal'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import ModalContainer from '../../components/home/ModalContainer'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { Shadow } from 'react-native-shadow-2'
 import { UsNumberFormat } from '../../common/utilities'
-import VerifySatModalContents from './VerifySatModalContents'
 import { associateGift } from '../../store/actions/trustedContacts'
 import axios from 'axios'
-import { calculateSendMaxFee } from '../../store/actions/sending'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import idx from 'idx'
 import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
 import { translations } from '../../common/content/LocContext'
-import { updateUserName } from '../../store/actions/storage'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import wif from 'wif'
@@ -78,23 +58,17 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells().filter( shell => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT )
   const currencyKind: CurrencyKind = useSelector( state => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN )
-  const strings = translations[ 'accounts' ]
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
   const fiatCurrencyCode = useCurrencyCode()
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const currencyCode = useSelector( state => state.preferences.currencyCode )
-  const exchangeRates = useSelector( state => state.accounts.exchangeRates )
-  const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   // const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
   const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
   const [ initGiftCreation, setInitGiftCreation ] = useState( false )
   const [ includeFees, setFees ] = useState( false )
-  const [ addfNf, setAddfNf ] = useState( false )
-  const [ giftModal, setGiftModal ] = useState( false )
-  const [ createdGift, setCreatedGift ] = useState( null )
   const accountState: AccountsState = useSelector( ( state ) => idx( state, ( _ ) => _.accounts ) )
   const giftCreationStatus = useSelector( state => state.accounts.giftCreationStatus )
   const sendMaxFee = useSelector( ( state ) => idx( state, ( _ ) => _.sending.sendMaxFee ) )
@@ -105,10 +79,8 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const [ advanceModal, setAdvanceModal ] = useState( false )
   const defaultGiftAccount = accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
   const [ selectedAccount, setSelectedAccount ]: [AccountShell, any] = useState( defaultGiftAccount )
-  const spendableBalance = useSpendableBalanceForAccountShell( selectedAccount )
   const account: Account = accountState.accounts[ selectedAccount.primarySubAccount.id ]
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
-  const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
   const [ showErrorLoader, setShowErrorLoader ] = useState( false )
   const [ spendCode, setSpendCode ] = useState( '' )
   const [ isExclusive, setIsExclusive ] = useState( true )
@@ -130,51 +102,20 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }, [ spendCode ] )
 
   useEffect( () => {
-    let minimumGiftVal = 1000
-    if ( includeFees ) minimumGiftVal += averageLowTxFee
-    setMinimumGiftValue( minimumGiftVal )
-  }, [ includeFees ] )
-
-  useEffect( () => {
     if ( numbersOfGift ) setFees( false )
   }, [ numbersOfGift ] )
-
-  function convertFiatToSats( fiatAmount: number ) {
-    return accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
-      ? Math.trunc(
-        ( fiatAmount / accountsState.exchangeRates[ currencyCode ].last ) * SATOSHIS_IN_BTC
-      )
-      : 0
-  }
 
   function convertSatsToFiat( sats ) {
     return accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
       ? ( ( sats / SATOSHIS_IN_BTC ) * accountsState.exchangeRates[ currencyCode ].last ).toFixed( 2 )
       : '0'
   }
-
-  const isAmountInvalid = useMemo( () => {
-    let giftAmount = currentSatsAmountFormValue
-    console.log( giftAmount )
-
-    const numberOfGifts = numbersOfGift ? Number( numbersOfGift ) : 1
-    if ( prefersBitcoin ) {
-      if ( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
-      return giftAmount * numberOfGifts > spendableBalance
-    } else {
-      const giftAmountInFiat = giftAmount ? giftAmount : 1
-      const spendableBalanceInFiat = parseFloat( convertSatsToFiat( spendableBalance ) )
-      return giftAmountInFiat * numberOfGifts > spendableBalanceInFiat
-    }
-
-  }, [ currentSatsAmountFormValue, averageLowTxFee, spendableBalance, includeFees, prefersBitcoin, numbersOfGift, currencyKind ] )
-
   useEffect( () => {
     if ( accountsState.selectedGiftId && initGiftCreation && giftCreationStatus ) {
       const createdGift = accountsState.gifts ? accountsState.gifts[ accountsState.selectedGiftId ] : null
       if ( createdGift ) {
-        setCreatedGift( createdGift )
-        setGiftModal( true )
+        // setCreatedGift( createdGift )
+        // setGiftModal( true )
         setInitGiftCreation( false )
         setShowLoader( false )
         setShowErrorLoader( false )

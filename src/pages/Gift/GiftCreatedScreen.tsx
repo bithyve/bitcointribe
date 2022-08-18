@@ -18,17 +18,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
-import idx from 'idx'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import CommonStyles from '../../common/Styles/Styles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import GiftStepperComponent from './GiftStepperComponent'
-import GreySatCard from '../../assets/images/satCards/Grey_satcard.svg'
 import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons'
-import { Icon } from 'react-native-elements'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
