@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   Text,
   ScrollView,
-  FlatList, Image,RefreshControl
+  FlatList, Image, RefreshControl
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -22,7 +22,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
-import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+// import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import Gifts from '../../assets/images/satCards/gifts.svg'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import idx from 'idx'
 import { Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
@@ -251,65 +252,59 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-          <ToggleContainer />
+          {/* <ToggleContainer /> */}
         </View>
 
         <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-          marginRight: 10, marginTop: 10,
+          flexDirection: 'row', marginHorizontal: 15, marginTop: 6, alignItems: 'flex-end'
         }}>
-          <HeaderTitle
-            firstLineTitle={'Manage Gifts'}
-            secondLineTitle={'View and manage created Gifts'}
-            infoTextNormal={''}
-            infoTextBold={''}
-            infoTextNormal1={''}
-            step={''}
-          />
-          <TouchableOpacity
-            onPress={() => setKnowMore( true )}
-            style={{
-              ...styles.selectedContactsView,
-            }}
-          >
-            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
-
-          </TouchableOpacity>
-
+          <CheckingAcc height={57} width={53} />
+          <Text style={[ styles.pageTitle, {
+            fontSize: RFValue( 24 ),
+            marginStart: 13,
+            marginBottom: 5,
+          } ]}>
+            {strings[ 'giftsats' ]}
+          </Text>
+          <ToggleContainer />
         </View>
+        <Text style={{
+          marginHorizontal: 15, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.FiraSansLight, marginTop: 18
+        }}>{'Give sats as gifts to your friends and family, view and manage created gifts. '}
+          <Text onPress={() => setKnowMore( true )} style={{
+            color:'#006CB4'
+          }}>{common[ 'knowMore' ]}</Text>
+        </Text>
         <ScrollView
-          style={{
-            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 ),
+          contentContainerStyle={{
+            flexDirection: 'row', alignItems: 'center', marginVertical: RFValue( 20 ), marginHorizontal: RFValue( 15 ),
+            flex:1
           }}
           horizontal>
           {
             Object.keys( giftsArr ?? {
             } ).map( ( item ) => {
-              return (               
-                  <TouchableOpacity
-                    key={item}
-                    activeOpacity={0.6}
-                    style={[ styles.buttonNavigator, {
-                      backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
-                      shadowColor: active === item ? '#77B9EB66' : Colors.backgroundColor,
-                      shadowOpacity: 0.9,
-                      shadowOffset: {
-                        width: 5, height: 6,
-                      },
-                      elevation: active === item ? 3.5 : 0,
-                      marginBottom: hp( 2 ),
-                      marginLeft: wp( 1 )
-                    } ]}
-                    onPress={() => buttonPress( item )}
-                  >
-                    <Text style={[ styles.buttonText, {
-                      color: active === item ? Colors.white : Colors.gray2
-                    } ]}>
-                      {item === GiftStatus.CREATED && 'Available'}
-                      {item === GiftStatus.EXPIRED && 'Expired'}
-                      {item === GiftStatus.SENT && 'Sent'}
-                    </Text>
-                  </TouchableOpacity>                              
+              return (
+                <TouchableOpacity
+                  key={item}
+                  activeOpacity={0.6}
+                  style={{
+                    justifyContent: 'space-between', alignItems: 'center', flex: 1
+                  }}
+                  onPress={() => buttonPress( item )}
+                >
+                  <Text style={{
+                    color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.FiraSansMedium
+                  }} >
+                    {item === GiftStatus.CREATED && 'Available'}
+                    {item === GiftStatus.EXPIRED && 'Expired'}
+                    {item === GiftStatus.SENT && 'Sent'}
+                  </Text>
+                  <View style={{
+                    height: RFValue( 4 ), backgroundColor: Colors.blue, marginTop: RFValue( 7 ), width: '100%',
+                    opacity:active === item ? 1:0.3
+                  }} />
+                </TouchableOpacity>
               )
             } )
           }
@@ -317,14 +312,14 @@ const ManageGifts = ( { navigation } ) => {
         {/* <View style={{
           height: 'auto'
         }}> */}
-        {Object.values( gifts ?? {
+        {/* {Object.values( gifts ?? {
         } ).length > 0 &&
           <BottomInfoBox
             // backgroundColor={Colors.white}
             // title={'Note'}
             infoText={getSectionDescription()}
           />
-        }
+        } */}
         { active === GiftStatus.CREATED &&
         <TouchableOpacity
           onPress={() => navigation.navigate( 'CreateGift', {
@@ -403,7 +398,7 @@ const ManageGifts = ( { navigation } ) => {
                     currency={prefersBitcoin ? ' sats' : currencyCode}
                     amt={getAmt( item.amount )}
                     date={item.timestamps?.created}
-                    image={<GiftCard />}
+                    image={<Gifts />}
                     onPress={() => processGift( item, title, contactName, associatedContact )}
                   />
                   :
@@ -423,6 +418,8 @@ const ManageGifts = ( { navigation } ) => {
                         backgroundColor: Colors.backgroundColor1,
                         borderRadius: wp( 2 ),
                         padding: wp( 3 ),
+                        borderColor: Colors.blue,
+                        borderWidth: 1
                       }}
                     >
                       <View style={{
@@ -440,23 +437,28 @@ const ManageGifts = ( { navigation } ) => {
                           alignItems: 'flex-start', marginHorizontal: wp( 2 )
                         }}>
                           <Text style={{
-                            color: Colors.lightTextColor,
-                            fontSize: RFValue( 10 ),
-                            letterSpacing: 0.8,
+                            color: Colors.gray13,
+                            fontSize: RFValue( 8 ),
+                            letterSpacing: 0.4,
                             fontFamily: Fonts.FiraSansRegular,
-                            fontWeight: '600'
+                            // fontWeight: '600'
                           }}>
                             {title}
                           </Text>
                           <Text style={{
-                            fontSize: RFValue( 12 ), textAlign: 'center', color: Colors.textColorGrey
+                            fontFamily: Fonts.FiraSansMedium,
+                            fontSize: RFValue( 12 ),
+                            // textAlign: 'center',
+                            color: Colors.gray13,
+                            marginTop:6,
+                            letterSpacing: 0.6,
                           }}>
                             {contactName ? contactName : 'Checking Account'}
                           </Text>
                           <Text style={{
-                            color: Colors.lightTextColor,
-                            fontSize: RFValue( 10 ),
-                            letterSpacing: 0.1,
+                            color: Colors.gray13,
+                            fontSize: RFValue( 8 ),
+                            letterSpacing: 0.4,
                             fontFamily: Fonts.FiraSansRegular,
                           }}>
                             {moment( item.timestamps?.created ).format( 'lll' )}
@@ -467,24 +469,29 @@ const ManageGifts = ( { navigation } ) => {
                           marginRight: wp( 2 ),
                         }}>
                           <Text style={{
-                            color: Colors.black,
-                            fontSize: RFValue( 18 ),
-                            fontFamily: Fonts.FiraSansRegular,
+                            color: Colors.gray13,
+                            fontSize: RFValue( 16 ),
+                            fontFamily: Fonts.FiraSansSemiBold,
                           }}>
                             {getAmt( item.amount )}
                             <Text style={{
-                              color: Colors.lightTextColor,
-                              fontSize: RFValue( 10 ),
+                              color: Colors.gray13,
+                              fontSize: RFValue( 8 ),
+                              letterSpacing: 0.24,
                               fontFamily: Fonts.FiraSansRegular
                             }}>{prefersBitcoin ? ' sats' : currencyCode}
                             </Text>
                           </Text>
                         </View>
-                        <RightArrow style={{
-                          marginHorizontal: wp( 1 )
-                        }}/>
+                        <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+                          style={{
+                            width: RFValue( 10 ),
+                            height: RFValue( 16 ),
+                            resizeMode: 'contain',
+                            marginStart:RFValue( 11 )
+                          }}
+                        />
                       </View>
-
                     </TouchableOpacity>
                   </View>
                 }
@@ -618,6 +625,15 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
+  },
+  pageTitle: {
+    color: Colors.blue,
+    fontSize: RFValue( 18 ),
+    letterSpacing: 0.7,
+    // fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansMedium,
+    alignItems: 'center',
+    marginHorizontal: wp( 4 ),
   },
 } )
 

@@ -162,6 +162,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       } )
     else {
       setHandleButton( false )
+      console.log( 'skk account shell', JSON.stringify( sourceAccountShell ) )
+      console.log( 'skk transactionPriority', JSON.stringify( transactionPriority ) )
+      console.log( 'skk note shell', JSON.stringify( note ) )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: transactionPriority,
@@ -184,20 +187,20 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
       if ( txid ) {
-        let type;
-        if (sourceAccountShell.primarySubAccount.type === undefined) {
-          type = -1;
-        } else if (sourceAccountShell.primarySubAccount.type === 'TEST_ACCOUNT') {
-          type = 0;
-        } else if (sourceAccountShell.primarySubAccount.type === 'CHECKING_ACCOUNT') {
-          type = 1;
-        } else if (sourceAccountShell.primarySubAccount.type === 'SWAN_ACCOUNT') {
-          type = 2;
-        } else if (sourceAccountShell.primarySubAccount.type === 'SAVINGS_ACCOUNT') {
-          type = 3;
+        let type
+        if ( sourceAccountShell.primarySubAccount.type === undefined ) {
+          type = -1
+        } else if ( sourceAccountShell.primarySubAccount.type === 'TEST_ACCOUNT' ) {
+          type = 0
+        } else if ( sourceAccountShell.primarySubAccount.type === 'CHECKING_ACCOUNT' ) {
+          type = 1
+        } else if ( sourceAccountShell.primarySubAccount.type === 'SWAN_ACCOUNT' ) {
+          type = 2
+        } else if ( sourceAccountShell.primarySubAccount.type === 'SAVINGS_ACCOUNT' ) {
+          type = 3
         }
 
-        if (amt) {
+        if ( amt ) {
           dispatch( sendTxNotification( txid, amt + ' ' + formattedUnitText, type ) )
         } else {
           dispatch( sendTxNotification( txid, null, type ) )
