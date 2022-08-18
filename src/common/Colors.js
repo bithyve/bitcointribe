@@ -77,6 +77,10 @@ const Colors = {
 
   shadowBlack: '#1F000000',
   numberBg: '#F4F4F4',
-  numberFont: '#989898'
+  numberFont: '#989898',
+  gray13: '#525252',
+  black2: '#073B36',
+  gray14:'#313131',
+  gray15: '#727272'
 }
 export default Colors

@@ -45,12 +45,12 @@ const ManageGiftsList = ( props ) => {
       <View style={{
         backgroundColor: Colors.gray7,
         borderRadius: wp( 2 ),
-        paddingVertical: hp( 2 ),
+        paddingVertical: hp( 1 ),
         paddingHorizontal: wp( 4 ),
         borderColor: Colors.lightBlue,
         borderWidth: 1,
         borderStyle: 'dashed',
-        padding: wp( 3 )
+        // padding: wp( 3 )
       }}>
         <View style={{
           flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'
@@ -59,29 +59,33 @@ const ManageGiftsList = ( props ) => {
 
           {props.date &&
           <Text style={{
-            color: Colors.lightTextColor,
+            color: Colors.gray13,
             fontSize: RFValue( 10 ),
             fontFamily: Fonts.FiraSansRegular,
-
+            letterSpacing: 0.3,
+            marginTop:RFValue( 5 )
           }}>
             Created {moment( props.date ).format( 'lll' )}
           </Text>
           }
         </View>
         <View style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: hp( 1 )
+          flexDirection: 'row', justifyContent: 'space-between', paddingTop: RFValue( 4 ),
+          // backgroundColor:'red'
         }}>
-          <View>
-            <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-              fontWeight: '700',
-              letterSpacing: 0.8
-            }}>
-              {props.titleText}
-            </Text>
-            {/* <Text style={{
+          {/* <View> */}
+          <Text style={{
+            color: Colors.blue,
+            fontSize: RFValue( 10 ),
+            fontFamily: Fonts.FiraSansMedium,
+            // fontWeight: '700',
+            letterSpacing: 0.3,
+            marginTop:RFValue( 6 ),
+            lineHeight:12
+          }}>
+            {props.titleText}
+          </Text>
+          {/* <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
               fontFamily: Fonts.FiraSansRegular,
@@ -89,30 +93,33 @@ const ManageGiftsList = ( props ) => {
             }}>
               {props.subText}
             </Text> */}
-          </View>
+          {/* </View> */}
           <View style={{
             flexDirection: 'row', alignItems: 'flex-end',
           }}>
             <Text style={{
-              color: Colors.black,
-              fontSize: RFValue( 24 ),
-              fontFamily: Fonts.FiraSansRegular,
+              color: Colors.gray13,
+              fontSize: RFValue( 16 ),
+              fontFamily: Fonts.FiraSansSemiBold,
+              letterSpacing:0.48
             }}>
               {props.amt}
               <Text style={{
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular
+                color: Colors.gray13,
+                fontSize: RFValue( 8 ),
+                fontFamily: Fonts.FiraSansRegular,
+                letterSpacing:0.24
               }}> {props.currency? props.currency: 'sats'}
               </Text>
             </Text>
             <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
               style={{
-                width: wp( '2.7%' ),
-                height: wp( '2.7%' ),
+                width: RFValue( 10 ),
+                height: RFValue( 16 ),
                 resizeMode: 'contain',
-                marginBottom: hp( 0.7 ),
-                marginLeft: wp( 3 )
+                // marginBottom: hp( 0.7 ),
+                // marginLeft: wp( 3 )
+                marginStart:RFValue( 24 )
               }}
             />
           </View>
