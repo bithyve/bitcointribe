@@ -71,7 +71,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
       style={{
         flexDirection: isVertical ? 'column' : 'row',
         backgroundColor: trackColor || '#1E82C2',
-        height: isVertical ? wp( '17%' ) : changeSettingToggle ? wp( '8%' ) : wp( '10%' ),
+        height: isVertical ? wp( '17%' ) : changeSettingToggle ? wp( '7%' ) : wp( '9%' ),
         width: isVertical ? wp( '10%' ) : changeSettingToggle ? wp( '14%' ) : wp( '17%' ),
         borderRadius: wp( '10%' ) / 2,
         alignItems: 'center',

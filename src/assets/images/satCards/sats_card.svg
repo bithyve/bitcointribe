@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30.194" height="24.327" viewBox="0 0 30.194 24.327">
+  <g id="Group_42043" data-name="Group 42043" transform="translate(-1283.235 -3277.179)">
+    <rect id="Rectangle_7451" data-name="Rectangle 7451" width="26.177" height="16.361" rx="2" transform="matrix(0.94, -0.342, 0.342, 0.94, 1283.235, 3286.133)" fill="#006cb4"/>
+    <g id="Group_38694" data-name="Group 38694" transform="translate(1284.022 3283.56) rotate(-10)">
+      <path id="Path_23917" data-name="Path 23917" d="M2.337,0h21.5a2.337,2.337,0,0,1,2.337,2.337V14.024a2.337,2.337,0,0,1-2.337,2.337H2.337A2.337,2.337,0,0,1,0,14.024V2.337A2.337,2.337,0,0,1,2.337,0Z" transform="translate(0 0)" fill="#76b9eb"/>
+      <path id="Path_23872" data-name="Path 23872" d="M5.611.806,2.652.013a.385.385,0,0,0-.372.1L.113,2.28a.385.385,0,0,0-.1.372l.792,2.96a.385.385,0,0,0,.272.272l2.959.793a.385.385,0,0,0,.372-.1L6.576,4.41a.385.385,0,0,0,.1-.372l-.792-2.96A.385.385,0,0,0,5.611.806Z" transform="translate(15.381 5.048) rotate(-30)" fill="#fbfcfc"/>
+      <line id="Line_821" data-name="Line 821" x2="18.698" transform="translate(3.973 13.322)" fill="none" stroke="#f8f2f2" stroke-width="2" stroke-dasharray="3 2"/>
+    </g>
+  </g>
+</svg>
