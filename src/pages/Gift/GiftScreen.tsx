@@ -69,6 +69,7 @@ import { connect } from 'react-redux'
 import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
 import idx from 'idx'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import AlertModalContents from '../../components/AlertModalContents'
 
 interface GiftPropTypes {
   navigation: any;
@@ -100,6 +101,8 @@ interface GiftStateTypes {
   cardDetails: CKTapCard | null;
   showNFCModal: boolean;
   satCardBalance: number | null;
+  showAlertModal: boolean,
+  errorMessage: string,
 }
 
 class GiftScreen extends React.Component<
@@ -143,7 +146,9 @@ class GiftScreen extends React.Component<
       showGiftFailureModal: false,
       cardDetails: null,
       showNFCModal: false,
-      satCardBalance: 0
+      satCardBalance: 0,
+      showAlertModal: false,
+      errorMessage: '',
     }
   }
 
@@ -628,7 +633,9 @@ class GiftScreen extends React.Component<
     } catch ( error: any ) {
       console.log( error.toString() )
       this.setState( {
-        showNFCModal: false
+        showNFCModal: false,
+        errorMessage: error.toString(),
+        showAlertModal: true
       } )
       return {
         response: null, error: error.toString()
@@ -748,6 +755,21 @@ class GiftScreen extends React.Component<
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
+        <ModalContainer onBackground={() => { this.setState( {
+          showAlertModal: false
+        } ) }} visible={this.state.showAlertModal} closeBottomSheet={() => { }}>
+          <AlertModalContents
+            info={this.state.errorMessage != '' ? this.state.errorMessage : 'SatCards not detected'}
+            proceedButtonText={'Please try again'}
+            onPressProceed={() => {
+              this.setState( {
+                showAlertModal: false
+              } )
+            }}
+            isBottomImage={true}
+            bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+          />
+        </ModalContainer>
         <ModalContainer onBackground={this.onCloseClick} visible={this.state.showVerification} closeBottomSheet={this.onCloseClick}  >
           <VerifySatModalContents
             title={'Tap SATSCARD'}

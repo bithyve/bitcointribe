@@ -2,21 +2,14 @@ import { Account, AccountType, Gift, TxPriority } from '../../bitcoin/utilities/
 import {
   Dimensions,
   Image,
-  Keyboard,
-  KeyboardAvoidingView,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
-  Switch,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native'
-import MaterialCurrencyCodeIcon, {
-  materialIconCurrencyCodes,
-} from '../../components/MaterialCurrencyCodeIcon'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { generateGifts, giftAccepted, giftCreationSuccess, refreshAccountShells } from '../../store/actions/accounts'
 import {
@@ -75,6 +68,8 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import wif from 'wif'
+import NfcPrompt from './NfcPromptAndroid'
+import AlertModalContents from '../../components/AlertModalContents'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -115,11 +110,13 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
   const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
   const [ showErrorLoader, setShowErrorLoader ] = useState( false )
-  const [ spendCode, setSpendCode ] = useState( '866577' )
+  const [ spendCode, setSpendCode ] = useState( '' )
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
   const [ showNFCModal, setNFCModal ] = useState( false )
+  const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ errorMessage, setErrorMessage ] = useState( '' )
 
   const card = useRef( new CKTapCard() ).current
 
@@ -232,7 +229,8 @@ const ClaimSatsScreen = ( { navigation } ) => {
     } catch ( error: any ) {
       console.log( error.toString() )
       setNFCModal( false )
-
+      setErrorMessage( error.toString() )
+      setShowAlertModal( true )
       return {
         response: null, error: error.toString()
       }
@@ -902,6 +900,19 @@ const ClaimSatsScreen = ( { navigation } ) => {
           </View>
         }
       </SafeAreaView>
+      <NfcPrompt visible={showNFCModal} />
+      <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          info={errorMessage != '' ? errorMessage : 'SatCards not detected'}
+          proceedButtonText={'Please try again'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+            navigation.goBack()
+          }}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
       <ModalContainer onBackground={() => setAccountListModal( false )} visible={accountListModal} closeBottomSheet={() => setAccountListModal( false )}>
         {renderAccountList()}
       </ModalContainer>

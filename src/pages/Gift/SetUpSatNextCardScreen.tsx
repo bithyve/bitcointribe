@@ -54,6 +54,7 @@ export default function SetUpSatNextCardScreen( props ) {
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>()
   const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ showNFCModal, setNFCModal ] = useState( false )
   const [ satCardBalance, setSatCardBalance ] = useState( 0 )
 
@@ -149,7 +150,8 @@ export default function SetUpSatNextCardScreen( props ) {
     } catch ( error: any ) {
       console.log( error.toString() )
       setNFCModal( false )
-
+      setErrorMessage( error.toString() )
+      setShowAlertModal( true )
       return {
         response: null, error: error.toString()
       }
@@ -339,7 +341,7 @@ export default function SetUpSatNextCardScreen( props ) {
       </View>
       <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
         <AlertModalContents
-          info={'SatCards not detected '}
+          info={errorMessage != '' ? errorMessage : 'SatCards not detected'}
           proceedButtonText={'Please try again'}
           onPressProceed={() => {
             setShowAlertModal( false )
