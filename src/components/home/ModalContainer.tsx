@@ -82,6 +82,7 @@ const ModalContainer = ( {
         resetScrollToCoords={{
           x: 0, y: 0
         }}
+        keyboardShouldPersistTaps='always'
       >
         {showBlurView &&
         <BlurView

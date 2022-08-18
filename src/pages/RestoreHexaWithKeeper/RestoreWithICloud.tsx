@@ -145,6 +145,7 @@ interface RestoreWithICloudStateTypes {
   common: object;
   restoreStarted: boolean;
   isWithoutCloud: boolean;
+  loading: object;
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -181,6 +182,7 @@ interface RestoreWithICloudPropsTypes {
   setCloudErrorMessage: any;
   setDownloadedBackupData: any;
   restoreWithoutUsingIcloud: any;
+  loading: object;
 }
 
 class RestoreWithICloud extends Component<
@@ -261,7 +263,8 @@ class RestoreWithICloud extends Component<
       strings: translations['bhr'],
       common: translations['common'],
       restoreStarted: false,
-      isWithoutCloud: false
+      isWithoutCloud: false,
+      loading: {}
     }
     this.bottomTextMessage = translations['bhr'].Hexaencrypts
     this.subPoints = [
@@ -653,6 +656,7 @@ class RestoreWithICloud extends Component<
     this.setState( {
       showLoader: true
     } )
+    this.prevLoading = true
     console.log('scannedData', scannedData)
     const { downloadedBackupData } = this.props
     this.props.downloadBackupData({
@@ -872,7 +876,15 @@ class RestoreWithICloud extends Component<
     )
   }
 
+  prevLoading = true
+
   render() {
+    if (this.prevLoading && !this.props.loading.downloadBackupDataStatus) {
+      this.setState({
+        showLoader: false
+      })
+      this.prevLoading = false
+    }
     const {
       cloudBackup,
       selectedBackup,
@@ -1404,6 +1416,7 @@ const mapStateToProps = (state) => {
     keeperInfo: idx(state, (_) => _.bhr.keeperInfo),
     wallet: idx(state, (_) => _.storage.wallet),
     cloudErrorMessage: idx(state, (_) => _.cloud.cloudErrorMessage),
+    loading: idx(state, (_) => _.bhr.loading)
   }
 }
 

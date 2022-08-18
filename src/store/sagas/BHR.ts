@@ -897,9 +897,10 @@ function* updateWalletImageWorker( { payload } ) {
   const primaryMnemonic = walletObj.primaryMnemonic
   const encryptionKey = bip39.mnemonicToSeedSync( primaryMnemonic ).toString( 'hex' )
 
-  if( updateSmShare ) {
-    walletImage.SM_share = BHROperations.encryptWithAnswer( wallet.smShare, encryptionKey ).encryptedData
-  }
+
+  const smShare = wallet.smShare || dbWallet.smShare // fixes smShare backup for apps upgrading from version <2.0.75
+  if( smShare ) walletImage.SM_share = BHROperations.encryptWithAnswer( smShare, encryptionKey ).encryptedData
+
   if( update2fa ) {
     const details2FA = {
       secondaryXpub: wallet.secondaryXpub,
@@ -2049,6 +2050,7 @@ function* downloadBackupDataWorker( { payload } ) {
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
     console.log( 'Error DOWNLOAD_BACKUP_DATA', error )
+    Alert.alert( 'Invalid Key' )
   }
 }
 
