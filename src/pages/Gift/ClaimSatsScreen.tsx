@@ -1,4 +1,4 @@
-import { Account, AccountType, TxPriority } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, ActiveAddressAssigneeType, TxPriority } from '../../bitcoin/utilities/Interface'
 import {
   Dimensions,
   Image,
@@ -50,6 +50,7 @@ import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/
 import wif from 'wif'
 import NfcPrompt from './NfcPromptAndroid'
 import AlertModalContents from '../../components/AlertModalContents'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -197,7 +198,17 @@ const ClaimSatsScreen = ( { navigation } ) => {
       }
       privKey = wif.encode( 128, privKey, false )
       // dispatch( associateGift( unSealSlot.pk.toString(), sourcePrimarySubAccount.id ) )
-      dispatch( associateGift( privKey, selectedAccount.id ) )
+      //{"privKey": "5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y"}
+
+
+      AccountOperations.importAddress( accountsState.accounts[ selectedAccount.id ], privKey, address, {
+        type: ActiveAddressAssigneeType.GIFT,
+        // id: gift.id,
+        senderInfo: {
+          name: 'Satscard'
+        }
+      } )
+      // dispatch( associateGift( privKey, selectedAccount.id ) )
       // with this key move all the funds from the slot to checking account (rnd)
       console.log( 'balance2===>' + JSON.stringify( balance ) )
       // For setup slot for next user
