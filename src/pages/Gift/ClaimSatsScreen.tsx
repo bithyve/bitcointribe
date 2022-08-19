@@ -1,4 +1,4 @@
-import { Account, AccountType, TxPriority } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, ActiveAddressAssigneeType, TxPriority } from '../../bitcoin/utilities/Interface'
 import {
   Dimensions,
   Image,
@@ -11,7 +11,7 @@ import {
   View
 } from 'react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { giftAccepted, giftCreationSuccess, refreshAccountShells } from '../../store/actions/accounts'
+import { giftAccepted, giftCreationSuccess, refreshAccountShells, updateAccountShells } from '../../store/actions/accounts'
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -37,12 +37,10 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { Shadow } from 'react-native-shadow-2'
 import { UsNumberFormat } from '../../common/utilities'
-import { associateGift } from '../../store/actions/trustedContacts'
 import axios from 'axios'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import idx from 'idx'
 import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
-import { translations } from '../../common/content/LocContext'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
@@ -50,6 +48,7 @@ import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/
 import wif from 'wif'
 import NfcPrompt from './NfcPromptAndroid'
 import AlertModalContents from '../../components/AlertModalContents'
+import { updateSatCardAccount } from '../../store/actions/satCardAccount'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -153,7 +152,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
 
 
-  const fetchBanalnceOfSlot  = ( address: string ) =>{
+  const fetchBanalnceOfSlot = ( address: string ) => {
     // TODO: implement
     return 100
   }
@@ -178,53 +177,89 @@ const ClaimSatsScreen = ( { navigation } ) => {
 
     }
   }
-  const claimGifts = async() =>{
+
+  //   function* updateAccount (){
+  //     const associateAccount = accountsState.accounts[ selectedAccount.id ]
+  //     const privKey = '5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y'
+  //     const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
+
+  //     dispatch( updateSatCardAccount( accountState, privKey, dummySatcardAddress, selectedAccount ) )
+  //     // AccountOperations.importAddress( accountsState.accounts[ selectedAccount.id ], privKey, dummySatcardAddress, {
+  //     //   type: ActiveAddressAssigneeType.GIFT,
+  //     //   // id: gift.id,
+  //     //   senderInfo: {
+  //     //     name: 'Satscard'
+  //     //   }
+  //     // } )
+
+  //     // yield put( updateAccountShells( {
+  //     //   accounts: {
+  //     //     [associateAccount.id]: associateAccount
+  //     //   }
+  //     // } ) )
+  //     // yield call( dbManager.updateAccount, associateAccount.id, associateAccount )
+  //     // yield put( updateWalletImageHealth( {
+  //     //   updateAccounts: true,
+  //     //   accountIds:[ selectedAccount.id ],
+  //     //   // updateGifts: true,
+  //     //   // giftIds: [ gift.id ]
+  //     // } ) )
+  //   }
+  // }
+  const claimGifts = async() => {
     // For Claim Flow
     const status = await card.first_look()
-    const { addr:address, pubkey } = await card.address( true, false, 0 )
+    const { addr: address, pubkey } = await card.address( true, false, 0 )
     console.log( 'slot address 2===>' + JSON.stringify( address ) )
     const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
     const { balance } = data
-    if( balance!==0 ){
+    if ( balance !== 0 ) {
       // get the cvc from user
-      const activeSlotUsage =  await card.get_slot_usage( status.active_slot )
+      const activeSlotUsage = await card.get_slot_usage( status.active_slot )
       let privKey
-      if( activeSlotUsage.status !== 'SEALED' ){
-        privKey = await card.get_privkey( spendCode, status.active_slot-1 )
-      }else{
+      if ( activeSlotUsage.status !== 'SEALED' ) {
+        privKey = await card.get_privkey( spendCode, status.active_slot - 1 )
+      } else {
         const { pk } = await card.unseal_slot( spendCode )
-        privKey=pk
+        privKey = pk
       }
       privKey = wif.encode( 128, privKey, false )
-      // dispatch( associateGift( unSealSlot.pk.toString(), sourcePrimarySubAccount.id ) )
-      dispatch( associateGift( privKey, selectedAccount.id ) )
-      // with this key move all the funds from the slot to checking account (rnd)
-      console.log( 'balance2===>' + JSON.stringify( balance ) )
-      // For setup slot for next user
 
+      const associateAccount = accountsState.accounts[ selectedAccount.id ]
+      const tempPrivKey = '5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y'
+      const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
+      console.log( 'balance2===>' + JSON.stringify( balance ) )
+
+      dispatch( updateSatCardAccount( accountState, tempPrivKey, dummySatcardAddress, selectedAccount ) )
+      // dispatch( associateGift( privKey, selectedAccount.id ) )
+
+      // with this key move all the funds from the slot to checking account (rnd)
+      // For setup slot for next user
       // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
       // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
       // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
 
       // const setUpSlot = await card.setup( spendCode, undefined, true )
       // console.log( 'setUpSlot for next user 2===>' + JSON.stringify( setUpSlot ) )
-    }else{
-      // corner case when the slot is unseled but no balance
-      // continue with error flow
+      // }else{
+      //   // corner case when the slot is unseled but no balance
+      //   // continue with error flow
+      // }
     }
   }
 
-
   function onPressNumber( text ) {
+    if ( spendCode && text == 'x' ) {
+      setSpendCode( spendCode.slice( 0, -1 ) )
+    }
+    if( spendCode.length > 7 ) return
+
     let tmpPasscode = spendCode
     if ( text != 'x' ) {
       tmpPasscode += text
       setSpendCode( tmpPasscode )
     }
-    if ( spendCode && text == 'x' ) {
-      setSpendCode( spendCode.slice( 0, -1 ) )
-    }
-    if ( isSendMax ) setIsSendMax( false )
+    // if ( isSendMax ) setIsSendMax( false )
   }
 
   const renderAccountList = () => {
@@ -526,7 +561,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
 
   const renderButton = () => {
-    return(
+    return (
       <View
         style={{
           height: hp( '12%' ),
@@ -537,7 +572,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
       >
         <Shadow viewStyle={{
           ...styles.successModalButtonView,
-          backgroundColor: spendCode == '' ?Colors.lightBlue: Colors.blue
+          backgroundColor: spendCode == '' ? Colors.lightBlue : Colors.blue
         }} distance={2}
         startColor={Colors.shadowBlue}
         offset={[ 42, 14 ]}>
@@ -545,7 +580,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
             disabled={spendCode == ''}
             onPress={() => onClaimSatsClick()}
             style={{
-            // ...styles.successModalButtonView,
+              // ...styles.successModalButtonView,
               shadowColor: Colors.shadowBlue,
             }}
             delayPressIn={0}
@@ -561,12 +596,12 @@ const ClaimSatsScreen = ( { navigation } ) => {
           </AppBottomSheetTouchableWrapper>
         </Shadow>
         <TouchableOpacity style={{
-          height: wp( '12%' ), paddingHorizontal: RFValue( 20 ), marginStart:RFValue( 20 ),
-          justifyContent:'center', alignItems:'center',
-        // backgroundColor:'red'
+          height: wp( '12%' ), paddingHorizontal: RFValue( 20 ), marginStart: RFValue( 20 ),
+          justifyContent: 'center', alignItems: 'center',
+          // backgroundColor:'red'
         }} onPress={onCancelClick}>
           <Text style={{
-            fontSize:RFValue( 13 ), color:Colors.blue, fontFamily:Fonts.FiraSansMedium
+            fontSize: RFValue( 13 ), color: Colors.blue, fontFamily: Fonts.FiraSansMedium
           }}>{'Cancel'}</Text>
         </TouchableOpacity>
       </View>
@@ -582,7 +617,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
     console.log( {
       response, error
     } )
-    if( error ){
+    if ( error ) {
       console.log( error )
       setShowGiftFailureModal( true )
       return
@@ -665,9 +700,9 @@ const ClaimSatsScreen = ( { navigation } ) => {
         </Text>
         {accountElement( selectedAccount, () => setAccountListModal( !accountListModal ) )}
         <Text style={{
-          fontFamily:Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
+          fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
           letterSpacing: 0.48, color: Colors.gray13,
-          marginTop: RFValue( 10 ), marginStart:20
+          marginTop: RFValue( 10 ), marginStart: 20
         }}>
           {'Enter the '}
           <Text style={{
@@ -682,13 +717,15 @@ const ClaimSatsScreen = ( { navigation } ) => {
         offset={[ 22, 20 ]}>
           <Text style={[ styles.modalInputBox, {
             color: spendCode !== '' ? Colors.textColorGrey : Colors.gray1,
-          } ]} onPress={() => setKeyboard( true )}>{currencyKind == CurrencyKind.FIAT ? spendCode : UsNumberFormat( spendCode ) === '0' ? '' : UsNumberFormat( spendCode )}
+          } ]} onPress={() => setKeyboard( true )}>
+            {/* {currencyKind == CurrencyKind.FIAT ? spendCode : UsNumberFormat( spendCode ) === '0' ? '' : UsNumberFormat( spendCode )} */}
+            {spendCode}
             {( !showKeyboard && !spendCode ) &&
-                <Text style={{
-                  fontSize: RFValue( 12 )
-                }}>
-                  {'Enter the Spend Code'}
-                </Text>
+              <Text style={{
+                fontSize: RFValue( 12 )
+              }}>
+                {'Enter the Spend Code'}
+              </Text>
             }
             {( showKeyboard ) && <Text style={{
               color: Colors.lightBlue, fontSize: RFValue( 18 ),
@@ -985,13 +1022,13 @@ const styles = StyleSheet.create( {
       width: 1, height: 1
     },
   },
-  shadowModalInput:{
+  shadowModalInput: {
     height: 50,
     width: '80%',
     borderRadius: 10,
     backgroundColor: Colors.white,
     marginTop: 12,
-    elevation:5,
+    elevation: 5,
     marginHorizontal: 20,
     // backgroundColor:'red',
     justifyContent: 'center',
@@ -1075,8 +1112,8 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
     marginTop: hp( 2 ),
     marginBottom: hp( 2 ),
-    backgroundColor:Colors.white,
-    borderRadius:10
+    backgroundColor: Colors.white,
+    borderRadius: 10
   },
   modalCrossButton: {
     width: wp( 7 ),

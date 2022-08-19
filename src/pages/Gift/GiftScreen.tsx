@@ -582,7 +582,7 @@ class GiftScreen extends React.Component<
     this.setState( {
       showVerification: false
     }, async()=>{
-      // this.props.navigation.navigate( 'SetUpSatNextCard', {
+      // this.props.navigation.navigate( 'ClaimSats', {
       //   fromClaimFlow: 1
       // } )
       const { response, error } = await this.withModal( async ()=>{
