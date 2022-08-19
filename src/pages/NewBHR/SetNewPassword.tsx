@@ -473,7 +473,6 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
                 showEncryptionPswd(false)
                 setShowAGSPmodal(false)
                 setAnswerError('')
-                props.navigation.goBack()
               }}
             >
               <Text style={{
