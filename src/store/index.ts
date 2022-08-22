@@ -167,6 +167,7 @@ import upgrades from './reducers/upgrades'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import { satCardAcountWatcher } from './sagas/satCardAccount'
 
 const config = {
   key: 'root', // key is required
@@ -346,7 +347,10 @@ const rootSaga = function* () {
     // upgrade scripts
     recreateMissingAccountsWatcher,
     syncMissingAccountsWatcher,
-    sweepMissingAccountsWatcher
+    sweepMissingAccountsWatcher,
+
+    // sat card account
+    satCardAcountWatcher
   ]
 
   yield all(
