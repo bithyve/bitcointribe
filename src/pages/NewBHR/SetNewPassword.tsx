@@ -473,7 +473,6 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
                 showEncryptionPswd(false)
                 setShowAGSPmodal(false)
                 setAnswerError('')
-                props.navigation.goBack()
               }}
             >
               <Text style={{
@@ -540,6 +539,9 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             <Text style={styles.contactText}>{common['knowMore']}</Text>
 
           </TouchableOpacity> */}
+          <TouchableOpacity onPress={() => showEncryptionPswd(false)}> 
+            <Text style={{fontSize: RFValue(18), alignSelf: 'flex-end', marginRight: 15}}>x</Text> 
+          </TouchableOpacity>
           <Text style={{
             // marginBottom: wp( '%' ),
             marginTop: wp('5%'),

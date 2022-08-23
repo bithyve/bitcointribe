@@ -18,17 +18,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
-import idx from 'idx'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import CommonStyles from '../../common/Styles/Styles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import GiftStepperComponent from './GiftStepperComponent'
-import GreySatCard from '../../assets/images/satCards/Grey_satcard.svg'
 import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons'
-import { Icon } from 'react-native-elements'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
@@ -48,12 +42,14 @@ export default function GiftCreatedScreen( props ) {
   const [ claimVerification, setClaimVerification ] = useState( false )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
-  const balance = 5000
+  const balance = props.navigation?.state?.params?.slotBalance ? props.navigation?.state?.params?.slotBalance : 0
 
   const onGiftClose = () => {
     setShowGiftModal( false )
   }
-
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
   const onGiftSuccessClick = () => {
     setShowGiftModal( false )
     setShowGiftFailureModal( true )
@@ -141,7 +137,7 @@ export default function GiftCreatedScreen( props ) {
             // top:62, position:'absolute',
             color: Colors.gray14, alignSelf: 'center',
             // backgroundColor:'red'
-          }}>{`${balance.toLocaleString()} sats`}</Text>
+          }}>{`${numberWithCommas( balance )} sats`}</Text>
           <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 30 ),
           }}>
@@ -270,9 +266,6 @@ export default function GiftCreatedScreen( props ) {
         <GiftUnwrappedComponent
           title={'Your Gift is unwrapped'}
           info={'Gifts sats received!'}
-          // infoSelected={'Checking Account.'}
-          // info2={'Your checking account balance is '}
-          // info2Selected={'100,000 sats'}
           proceedButtonText={'View Account'}
           onCloseClick={onGiftClose}
           onPressProceed={onGiftSuccessClick}

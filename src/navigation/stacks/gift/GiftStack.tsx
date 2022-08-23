@@ -1,22 +1,22 @@
 import React from 'react'
-import { createStackNavigator, StackViewTransitionConfigs } from 'react-navigation-stack'
-import HomeScreen from '../../../pages/Home/Home'
-import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen'
-import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
-import MoreOptionsStack from '../more-options/MoreOptionsStack'
-import AllTransactionsStack from '../transactions/AllTransactionsStack'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-import AddNewAccountStack from '../accounts/AddNewAccountStack'
-import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
-import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
-import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
-import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
+import { createStackNavigator } from 'react-navigation-stack'
+// import HomeScreen from '../../../pages/Home/Home'
+// import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen'
+// import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
+// import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+// import MoreOptionsStack from '../more-options/MoreOptionsStack'
+// import AllTransactionsStack from '../transactions/AllTransactionsStack'
+// import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+// import AddNewAccountStack from '../accounts/AddNewAccountStack'
+// import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
+// import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
+// import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
+// import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 import QRStack from '../home/QRStack'
-import Home from '../../../pages/Home/Home'
-import TabNavigator from '../../TabNavigator'
+// import Home from '../../../pages/Home/Home'
+// import TabNavigator from '../../TabNavigator'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
-import Header from '../Header'
+// import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
@@ -39,16 +39,16 @@ import SetUpSatCardScreen from '../../../pages/Gift/SetUpSatCardScreen'
 import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
 import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
 import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
-const strings  = translations[ 'stackTitle' ]
+// const strings  = translations[ 'stackTitle' ]
 
-const MODAL_ROUTES = [
-  'AllTransactions',
-  'QRScanner',
-  'FriendsAndFamily',
-  'MoreOptions',
-  'PlaceWyreOrder',
-  'PlaceRampOrder'
-]
+// const MODAL_ROUTES = [
+//   'AllTransactions',
+//   'QRScanner',
+//   'FriendsAndFamily',
+//   'MoreOptions',
+//   'PlaceWyreOrder',
+//   'PlaceRampOrder'
+// ]
 
 const GiftStack = createStackNavigator(
   {

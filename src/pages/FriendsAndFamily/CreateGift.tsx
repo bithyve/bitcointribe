@@ -72,8 +72,11 @@ import VerifySatModalContents from '../Gift/VerifySatModalContents'
 
 const { height, } = Dimensions.get( 'window' )
 
+export type Props = {
+  navigation: any;
+};
 
-const CreateGift = ( { navigation } ) => {
+const CreateGift = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells().filter( shell => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT )
   const currencyKind: CurrencyKind = useSelector( state => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN )
@@ -85,7 +88,6 @@ const CreateGift = ( { navigation } ) => {
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const currencyCode = useSelector( state => state.preferences.currencyCode )
   const exchangeRates = useSelector( state => state.accounts.exchangeRates )
-  const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
   const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
