@@ -12,6 +12,7 @@ import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 import idx from 'idx'
+import { generateRandomString } from '../../../common/CommonFunctions'
 
 
 const { REQUEST_TIMEOUT } = config
@@ -828,6 +829,71 @@ export default class AccountUtilities {
         err
       } )
       throw new Error( 'Fetching balance-txn by addresses failed' )
+    }
+  }
+
+  static fetchBalanceTransactionByAddresses = async ( addresses: string[], network: bitcoinJS.networks.Network ): Promise<{
+    confirmedUTXOs: any[];
+    unconfirmedUTXOs: any[];
+    balances: {
+        confirmed: number;
+        unconfirmed: number;
+    };
+}> => {
+    const identifier = generateRandomString( 10 )
+    const accountToAddressMapping= {
+      [ identifier ]:{
+        External: addresses,
+        Internal: [],
+        Owned: [],
+      }
+    }
+
+    let res
+    try{
+      if ( network === bitcoinJS.networks.testnet ) {
+        res = await accAxios.post(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+          accountToAddressMapping,
+        )
+      } else {
+        res = await accAxios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+          accountToAddressMapping,
+        )
+      }
+    } catch( err ){ console.log( err ) }
+
+    const accountToResponseMapping = res.data
+    const { Utxos } = accountToResponseMapping[ identifier ]
+    const confirmedUTXOs = []
+    const unconfirmedUTXOs = []
+    const balances = {
+      confirmed: 0, unconfirmed: 0
+    }
+
+    if( Utxos ){
+      for ( const addressSpecificUTXOs of Utxos ) {
+        for ( const utxo of addressSpecificUTXOs ) {
+          const { value, Address, status, vout, txid } = utxo
+          if( status.confirmed ){
+            confirmedUTXOs.push( {
+              txId: txid, vout, value, address: Address, status
+            } )
+            balances.confirmed += utxo.value
+
+          } else {
+            unconfirmedUTXOs.push( {
+              txId: txid, vout, value, address: Address, status
+            } )
+            balances.unconfirmed += utxo.value
+          }
+        }
+      }
+    }
+
+    return {
+      confirmedUTXOs, unconfirmedUTXOs, balances
     }
   }
 
