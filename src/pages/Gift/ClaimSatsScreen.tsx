@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../../store/reducers/accounts'
+import AlertModalContents from '../../components/AlertModalContents'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { CKTapCard } from 'cktap-protocol-react-native'
@@ -33,6 +34,7 @@ import GiftUnwrappedComponent from './GiftUnwrappedComponent'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import ModalContainer from '../../components/home/ModalContainer'
+import NfcPrompt from './NfcPromptAndroid'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { Shadow } from 'react-native-shadow-2'
@@ -41,13 +43,11 @@ import axios from 'axios'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import idx from 'idx'
 import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
+import { updateSatCardAccount } from '../../store/actions/satCardAccount'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import wif from 'wif'
-import NfcPrompt from './NfcPromptAndroid'
-import AlertModalContents from '../../components/AlertModalContents'
-import { updateSatCardAccount } from '../../store/actions/satCardAccount'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -141,36 +141,43 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
   const claimGifts = async() => {
     // For Claim Flow
-    // const status = await card.first_look()
-    // const { addr: address, pubkey } = await card.address( true, false, 0 )
-    // console.log( 'slot address 2===>' + JSON.stringify( address ) )
-    // const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-    // const { balance } = data
-    // if ( balance !== 0 ) {
-    //   // get the cvc from user
-    //   const activeSlotUsage = await card.get_slot_usage( status.active_slot )
-    //   let privKey
-    //   if ( activeSlotUsage.status !== 'SEALED' ) {
-    //     privKey = await card.get_privkey( spendCode, status.active_slot - 1 )
-    //   } else {
-    //     const { pk } = await card.unseal_slot( spendCode )
-    //     privKey = pk
-    //   }
+    const status = await card.first_look()
+    const { addr: address, pubkey } = await card.address( true, false, 0 )
+    console.log( 'slot address 2===>' + JSON.stringify( address ) )
+    const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+    const { balance } = data
+    console.log( balance )
+    if ( balance !== 0 ) {
+      // get the cvc from user
+      const activeSlotUsage = await card.get_slot_usage( status.active_slot )
+      let privKey
+      if ( activeSlotUsage.status !== 'SEALED' ) {
+        privKey = await card.get_privkey( spendCode, 0 )
+        console.log( JSON.stringify( privKey ), 'getpk' )
+      } else {
+        const { pk } = await card.unseal_slot( spendCode )
+        privKey = pk
+        console.log( JSON.stringify( privKey ), 'unseal' )
+      }
+
+      console.log( wif.encode( 128, privKey, false ) )
+      privKey = wif.encode( 128, privKey, true )
       // privKey = wif.encode( 128, privKey, false )
+      console.log( privKey )
 
-    // const associateAccount = accountsState.accounts[ selectedAccount.id ]
-    const tempPrivKey = '5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y'
-    const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
-    // console.log( 'balance2===>' + JSON.stringify( balance ) )
+      // const associateAccount = accountsState.accounts[ selectedAccount.id ]
+      // const tempPrivKey = '5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y'
+      // const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
+      // console.log( 'balance2===>' + JSON.stringify( balance ) )
 
 
-    dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, tempPrivKey, dummySatcardAddress, selectedAccount ) )
+      dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, privKey, address, selectedAccount ) )
 
-    // with this key move all the funds from the slot to checking account (rnd)
-    // For setup slot for next user
-    // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
-    // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
-    // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
+      // with this key move all the funds from the slot to checking account (rnd)
+      // For setup slot for next user
+      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
+      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
+      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
 
     // const setUpSlot = await card.setup( spendCode, undefined, true )
     // console.log( 'setUpSlot for next user 2===>' + JSON.stringify( setUpSlot ) )
@@ -178,7 +185,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
     //   // corner case when the slot is unseled but no balance
     //   // continue with error flow
     // }
-    // }
+    }
   }
 
   function onPressNumber( text ) {
@@ -526,16 +533,16 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
 
   const onClaimSatsClick = async () => {
-    claimGifts()
-    // const { response, error } = await withModal( claimGifts )
-    // console.log( {
-    //   response, error
-    // } )
-    // if( error ){
-    //   console.log( error )
-    //   setShowGiftFailureModal( true )
-    //   return
-    // }
+    // claimGifts()
+    const { response, error } = await withModal( claimGifts )
+    console.log( {
+      response, error
+    } )
+    if( error ){
+      console.log( error )
+      setShowGiftFailureModal( true )
+      return
+    }
     setShowGiftModal( true )
   }
 

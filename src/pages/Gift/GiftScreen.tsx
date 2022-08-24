@@ -23,6 +23,7 @@ import {
 
 import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import AlertModalContents from '../../components/AlertModalContents'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
 import { CKTapCard } from 'cktap-protocol-react-native'
@@ -69,7 +70,6 @@ import { connect } from 'react-redux'
 import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
 import idx from 'idx'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import AlertModalContents from '../../components/AlertModalContents'
 
 interface GiftPropTypes {
   navigation: any;
@@ -582,36 +582,36 @@ class GiftScreen extends React.Component<
     this.setState( {
       showVerification: false
     }, async()=>{
-      this.props.navigation.navigate( 'ClaimSats', {
-        fromClaimFlow: 1
-      } )
-      // const { response, error } = await this.withModal( async ()=>{
-      //   const cardData = await this.card.first_look()
-      //   const { addr:address } = await this.card.address( true, false, 0 )
-      //   const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-      //   const { balance } = data
-      //   console.log( {
-      //     num_slots:cardData.num_slots,
-      //     active_slot:cardData.active_slot,
-      //     balance
-      //   } )
-      //   return{
-      //     num_slots:cardData.num_slots,
-      //     active_slot:cardData.active_slot,
-      //     balance
-      //   }
+      // this.props.navigation.navigate( 'ClaimSats', {
+      //   fromClaimFlow: 1
       // } )
-      // if( error ){
-      //   console.log( error )
-      //   return
-      // }
-    //   const { num_slots, active_slot,  balance } = response
-    //   this.props.navigation.navigate( 'GiftCreated', {
-    //     numSlots: num_slots,
-    //     activeSlot: active_slot,
-    //     slotFromIndex: !balance?3:4,
-    //     slotBalance: balance,
-    //   } )
+      const { response, error } = await this.withModal( async ()=>{
+        const cardData = await this.card.first_look()
+        const { addr:address } = await this.card.address( true, false, 0 )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+        const { balance } = data
+        console.log( {
+          num_slots:cardData.num_slots,
+          active_slot:cardData.active_slot,
+          balance
+        } )
+        return{
+          num_slots:cardData.num_slots,
+          active_slot:cardData.active_slot,
+          balance
+        }
+      } )
+      if( error ){
+        console.log( error )
+        return
+      }
+      const { num_slots, active_slot,  balance } = response
+      this.props.navigation.navigate( 'GiftCreated', {
+        numSlots: num_slots,
+        activeSlot: active_slot,
+        slotFromIndex: !balance?3:4,
+        slotBalance: balance,
+      } )
     } )
   }
 

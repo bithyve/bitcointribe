@@ -1,32 +1,36 @@
-import * as bitcoinJS from 'bitcoinjs-lib'
 import * as bip32 from 'bip32'
-import crypto from 'crypto'
-import coinselect from 'coinselect'
-import coinselectSplit from 'coinselect/split'
+import * as bitcoinJS from 'bitcoinjs-lib'
+
 import {
-  Transaction,
-  TransactionPrerequisite,
-  InputUTXOs,
-  AverageTxFees,
-  TransactionPrerequisiteElements,
   Account,
-  TxPriority,
-  MultiSigAccount,
-  Accounts,
   AccountType,
-  DonationAccount,
-  ActiveAddresses,
+  Accounts,
   ActiveAddressAssignee,
+  ActiveAddresses,
+  AverageTxFees,
   Balances,
+  DerivationPurpose,
+  DonationAccount,
   Gift,
-  GiftType,
   GiftStatus,
   GiftThemeId,
-  DerivationPurpose,
+  GiftType,
+  InputUTXOs,
+  MultiSigAccount,
+  Transaction,
+  TransactionPrerequisite,
+  TransactionPrerequisiteElements,
+  TxPriority,
 } from '../Interface'
+
 import AccountUtilities from './AccountUtilities'
+import coinselect from 'coinselect'
+import coinselectSplit from 'coinselect/split'
 import config from '../../HexaConfig'
+import crypto from 'crypto'
 import idx from 'idx'
+import wif from 'wif'
+
 export default class AccountOperations {
 
   static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ): { updatedAccount: Account | MultiSigAccount, receivingAddress: string} => {
@@ -1020,10 +1024,11 @@ export default class AccountOperations {
 
   static sweepPrivateKey = async (
     privateKey: string,
+    address:string,
     recipientAddress: string,
     averageTxFees: AverageTxFees,
     network: bitcoinJS.networks.Network,
-    derivationPurpose: DerivationPurpose = DerivationPurpose.BIP84
+    derivationPurpose: DerivationPurpose = DerivationPurpose.BIP84,
   ): Promise<{
     txid: string;
    }> => {
@@ -1035,22 +1040,11 @@ export default class AccountOperations {
     console.log( 'skk1 derivationPurpose===', derivationPurpose )
 
     const keyPair = AccountUtilities.getKeyPair( privateKey, network )
-    console.log( 'skk1211 privatekey', keyPair.publicKey )
+    console.log( 'skk1211 privatekey', JSON.stringify( keyPair.privateKey ) )
+    console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, false ) )
+    console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, true ) )
     console.log( 'skk1211 publickey', keyPair.publicKey )
-    try {
-      const address = AccountUtilities.deriveAddressFromKeyPair(
-        keyPair,
-        network,
-        derivationPurpose
-      )
-      console.log( ' skk deriveAddressFromKeyPair address', address )
 
-    } catch ( error ) {
-      console.log( 'skk deriveAddressFromKeyPair', error )
-    }
-
-
-    console.log( 'skk12' )
     // fetch input utxos against the address
     const { confirmedUTXOs } = await AccountUtilities.fetchBalanceTransactionByAddresses( [ address ], network )
     if( confirmedUTXOs.length === 0 ) throw new Error( 'Insufficient balance to perform send' )
@@ -1091,7 +1085,6 @@ export default class AccountOperations {
     // sign transaction
     let vin = 0
     for ( const input of inputs ) {
-      const keyPair = AccountUtilities.getKeyPair( privateKey, network )
       const redeemScript = derivationPurpose === DerivationPurpose.BIP84? null: AccountUtilities.getP2SH( keyPair, network ).redeem.output
       txb.sign( vin, keyPair, redeemScript, null, input.value ) // native segwit
       vin++

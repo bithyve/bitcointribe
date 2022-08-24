@@ -1,20 +1,19 @@
+import { Account, AccountType, Accounts, ActiveAddressAssigneeType, AverageTxFees, TxPriority } from '../../bitcoin/utilities/Interface'
 import { call, put, select } from 'redux-saga/effects'
+
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountShell from '../../common/data/models/AccountShell'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { AccountsState } from '../reducers/accounts'
 import {
   SAT_CARD_ACCOUNT,
 } from '../actions/satCardAccount'
-import { createWatcher } from '../utils/utilities'
-
-import { updateAccountShells } from '../actions/accounts'
-import { AccountsState } from '../reducers/accounts'
-import dbManager from '../../storage/realm/dbManager'
-import { updateWalletImageHealth } from '../actions/BHR'
-import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import AccountShell from '../../common/data/models/AccountShell'
-import { Account, Accounts, AccountType, ActiveAddressAssigneeType, AverageTxFees, TxPriority } from '../../bitcoin/utilities/Interface'
-import { getNextFreeAddressWorker } from './accounts'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import Toast from '../../components/Toast'
-
+import { createWatcher } from '../utils/utilities'
+import dbManager from '../../storage/realm/dbManager'
+import { getNextFreeAddressWorker } from './accounts'
+import { updateAccountShells } from '../actions/accounts'
+import { updateWalletImageHealth } from '../actions/BHR'
 
 function* satCardAccountWorker( { payload }: { payload: { accountId: string, privKey: string, address: string, selectedAccount: AccountShell } } ) {
   try {
@@ -50,9 +49,11 @@ function* satCardAccountWorker( { payload }: { payload: { accountId: string, pri
     const { txid } = yield call(
       AccountOperations.sweepPrivateKey,
       privateKey,
+      payload.address,
       receivingAddress,
       averageTxFeeByNetwork,
-      network )
+      network,
+    )
     console.log( 'skk txid', JSON.stringify( txid ) )
 
     // AccountOperations.importAddress( associateAccount, payload.privKey, payload.address, {
