@@ -10,45 +10,74 @@ import dbManager from '../../storage/realm/dbManager'
 import { updateWalletImageHealth } from '../actions/BHR'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountShell from '../../common/data/models/AccountShell'
-import { Account, Accounts, AccountType, ActiveAddressAssigneeType } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, AccountType, ActiveAddressAssigneeType, AverageTxFees, TxPriority } from '../../bitcoin/utilities/Interface'
+import { getNextFreeAddressWorker } from './accounts'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import Toast from '../../components/Toast'
 
 
 function* satCardAccountWorker( { payload }: { payload: { accountId: string, privKey: string, address: string, selectedAccount: AccountShell } } ) {
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const accounts: Accounts = accountsState.accounts
-  console.log( 'associateAccount accountsState' +  JSON.stringify( accountsState ) )
+  try {
+    const accountsState: AccountsState = yield select( state => state.accounts )
+    const accounts: Accounts = accountsState.accounts
+    console.log( 'associateAccount accountsState' + JSON.stringify( accountsState ) )
 
-  let associateAccount: Account
+    let associateAccount: Account
 
-  if( payload.accountId ){
-    associateAccount = accounts[ payload.accountId ]
-  } else {
-    for( const accountId in accounts ){
-      const account = accounts[ accountId ]
-      if( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ){
-        associateAccount = account
-        break
+    if ( payload.accountId ) {
+      associateAccount = accounts[ payload.accountId ]
+    } else {
+      for ( const accountId in accounts ) {
+        const account = accounts[ accountId ]
+        if ( account.type === AccountType.CHECKING_ACCOUNT && account.instanceNum === 0 ) {
+          associateAccount = account
+          break
+        }
       }
     }
+    console.log( 'skk associateAccount', associateAccount )
+
+    const privateKey1 = 'L2JQbktkgwHM9ENH7k785GZz3ib5bUF6TUzc7w3SBkYqCwf6uFYV'
+    const privateKey = 'L2JQbktkgwHM9ENH7k785GZz3ib5bUF6TUzc7w3SBkYqCwf6uFYV'
+
+    const receivingAddress = yield call( getNextFreeAddressWorker, associateAccount )
+    const network = AccountUtilities.getNetworkByType( associateAccount.networkType )
+    // const defaultTxPriority = TxPriority.LOW
+    // const defaultFeePerByte = accountsState.averageTxFees[ defaultTxPriority ]
+    const averageTxFeeByNetwork = accountsState.averageTxFees[ associateAccount.networkType ]
+
+    console.log( 'skk before txid' )
+    const { txid } = yield call(
+      AccountOperations.sweepPrivateKey,
+      privateKey,
+      receivingAddress,
+      averageTxFeeByNetwork,
+      network )
+    console.log( 'skk txid', JSON.stringify( txid ) )
+
+    // AccountOperations.importAddress( associateAccount, payload.privKey, payload.address, {
+    //   type: ActiveAddressAssigneeType.GIFT,
+    //   senderInfo: {
+    //     name: 'Satscard'
+    //   }
+    // } )
+
+    if ( txid ) {
+      yield put( updateAccountShells( {
+        accounts: {
+          [ associateAccount.id ]: associateAccount
+        }
+      } ) )
+      yield call( dbManager.updateAccount, associateAccount.id, associateAccount )
+      yield put( updateWalletImageHealth( {
+        updateAccounts: true,
+        accountIds: [ payload.selectedAccount.id ],
+      } ) )
+    }
+  } catch ( err ) {
+    Toast( 'Claim not Completed try again' )
+    return
   }
-  AccountOperations.importAddress( associateAccount, payload.privKey, payload.address, {
-    type: ActiveAddressAssigneeType.GIFT,
-    senderInfo: {
-      name: 'Satscard'
-    }
-  } )
-
-  yield put( updateAccountShells( {
-    accounts: {
-      [ associateAccount.id ]: associateAccount
-    }
-  } ) )
-  yield call( dbManager.updateAccount, associateAccount.id, associateAccount )
-  yield put( updateWalletImageHealth( {
-    updateAccounts: true,
-    accountIds:[ payload.selectedAccount.id ],
-  } ) )
-
 }
 
 export const satCardAcountWatcher = createWatcher(

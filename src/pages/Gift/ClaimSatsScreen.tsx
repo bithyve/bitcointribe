@@ -141,29 +141,30 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
   const claimGifts = async() => {
     // For Claim Flow
-    const status = await card.first_look()
-    const { addr: address, pubkey } = await card.address( true, false, 0 )
-    console.log( 'slot address 2===>' + JSON.stringify( address ) )
-    const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-    const { balance } = data
-    if ( balance !== 0 ) {
-      // get the cvc from user
-      const activeSlotUsage = await card.get_slot_usage( status.active_slot )
-      let privKey
-      if ( activeSlotUsage.status !== 'SEALED' ) {
-        privKey = await card.get_privkey( spendCode, status.active_slot - 1 )
-      } else {
-        const { pk } = await card.unseal_slot( spendCode )
-        privKey = pk
-      }
-      privKey = wif.encode( 128, privKey, false )
+    // const status = await card.first_look()
+    // const { addr: address, pubkey } = await card.address( true, false, 0 )
+    // console.log( 'slot address 2===>' + JSON.stringify( address ) )
+    // const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+    // const { balance } = data
+    // if ( balance !== 0 ) {
+    //   // get the cvc from user
+    //   const activeSlotUsage = await card.get_slot_usage( status.active_slot )
+    //   let privKey
+    //   if ( activeSlotUsage.status !== 'SEALED' ) {
+    //     privKey = await card.get_privkey( spendCode, status.active_slot - 1 )
+    //   } else {
+    //     const { pk } = await card.unseal_slot( spendCode )
+    //     privKey = pk
+    //   }
+      // privKey = wif.encode( 128, privKey, false )
 
     // const associateAccount = accountsState.accounts[ selectedAccount.id ]
-    // const tempPrivKey = '5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y'
-    // const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
-    console.log( 'balance2===>' + JSON.stringify( balance ) )
+    const tempPrivKey = '5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y'
+    const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
+    // console.log( 'balance2===>' + JSON.stringify( balance ) )
 
-    dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, privKey, address, selectedAccount ) )
+
+    dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, tempPrivKey, dummySatcardAddress, selectedAccount ) )
 
     // with this key move all the funds from the slot to checking account (rnd)
     // For setup slot for next user
@@ -525,15 +526,16 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
 
   const onClaimSatsClick = async () => {
-    const { response, error } = await withModal( claimGifts )
-    console.log( {
-      response, error
-    } )
-    if( error ){
-      console.log( error )
-      setShowGiftFailureModal( true )
-      return
-    }
+    claimGifts()
+    // const { response, error } = await withModal( claimGifts )
+    // console.log( {
+    //   response, error
+    // } )
+    // if( error ){
+    //   console.log( error )
+    //   setShowGiftFailureModal( true )
+    //   return
+    // }
     setShowGiftModal( true )
   }
 
