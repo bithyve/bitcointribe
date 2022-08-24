@@ -39,7 +39,7 @@ export default function GiftCreatedScreen( props ) {
   const totalSlots = props.navigation?.state?.params?.numSlots
   const activeSlot = props.navigation?.state?.params?.activeSlot
   const slotFromIndex = props.navigation?.state?.params?.slotFromIndex
-  const giftAmount = props.navigation?.state?.params?.giftAmount
+  const giftAmount = props.navigation?.state?.params?.giftAmount ? props.navigation?.state?.params?.giftAmount : null
   const [ claimVerification, setClaimVerification ] = useState( false )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
