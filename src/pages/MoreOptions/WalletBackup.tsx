@@ -774,7 +774,7 @@ const WalletBackup = ( props ) => {
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
-                  }}>{'Encrypt and backup wallet on your cloud'}</Text>
+                  }}>{index == 0 &&  item.keeper1ButtonText == 'Seed' ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
                 <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
                   style={{

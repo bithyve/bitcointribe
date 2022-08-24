@@ -235,7 +235,7 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
-      console.log( 'skk use acc 2 success' )
+      console.log( 'skk use acc 2 success', txid )
       if ( txid ) {
         let type
         if ( sourceAccountShell.primarySubAccount.type === undefined ) {

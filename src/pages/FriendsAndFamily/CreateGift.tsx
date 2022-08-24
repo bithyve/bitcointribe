@@ -951,7 +951,7 @@ const CreateGift = ( { navigation }: Props ) => {
             }}>gifts</Text>
           </View> : null}
         </View>
-        {numbersOfGift > 1 ? <View style={{
+        {numbersOfGift < 1 ? <View style={{
           flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: wp( '5%' ), marginRight: wp( '5%' ), marginTop: wp( '3%' )
         }}>
           <Text style={{
@@ -1062,7 +1062,8 @@ const CreateGift = ( { navigation }: Props ) => {
           <Text style={FormStyles.errorText}>{isAmountInvalid ? strings.Insufficient : ''}</Text>
         </View>
         {
-          ( Number( numbersOfGift ) === 1 ) && !isSendMax && (
+          // ( Number( numbersOfGift ) === 1 ) &&
+          !isSendMax && (
             <View style={{
               marginVertical: height < 720 ? hp( 1 ) : hp( 2 ),
               marginHorizontal: wp( 7 ),
@@ -1070,7 +1071,7 @@ const CreateGift = ( { navigation }: Props ) => {
             }}>
               <TouchableOpacity
                 onPress={() => setSatCard( !satCard )}
-                disabled={numbersOfGift ? Number( numbersOfGift ) > 1 : false}
+                disabled={numbersOfGift ? Number( numbersOfGift ) < 1 : false}
                 style={{
                   flexDirection: 'row'
                 }}
@@ -1125,7 +1126,7 @@ const CreateGift = ( { navigation }: Props ) => {
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), marginBottom: height < 720 ? wp( 1 ) : wp( 7 )
         }}>
-          {renderButton( 'Create Gift', 'Create Gift' )}
+          {renderButton( numbersOfGift > 1 ? 'Create Gifts' : 'Create Gift', 'Create Gift' )}
         </View>
         {showKeyboard &&
           <View style={{

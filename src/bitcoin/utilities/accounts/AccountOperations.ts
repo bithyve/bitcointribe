@@ -1,32 +1,36 @@
-import * as bitcoinJS from 'bitcoinjs-lib'
 import * as bip32 from 'bip32'
-import crypto from 'crypto'
-import coinselect from 'coinselect'
-import coinselectSplit from 'coinselect/split'
+import * as bitcoinJS from 'bitcoinjs-lib'
+
 import {
-  Transaction,
-  TransactionPrerequisite,
-  InputUTXOs,
-  AverageTxFees,
-  TransactionPrerequisiteElements,
   Account,
-  TxPriority,
-  MultiSigAccount,
-  Accounts,
   AccountType,
-  DonationAccount,
-  ActiveAddresses,
+  Accounts,
   ActiveAddressAssignee,
+  ActiveAddresses,
+  AverageTxFees,
   Balances,
+  DerivationPurpose,
+  DonationAccount,
   Gift,
-  GiftType,
   GiftStatus,
   GiftThemeId,
-  DerivationPurpose,
+  GiftType,
+  InputUTXOs,
+  MultiSigAccount,
+  Transaction,
+  TransactionPrerequisite,
+  TransactionPrerequisiteElements,
+  TxPriority,
 } from '../Interface'
+
 import AccountUtilities from './AccountUtilities'
+import coinselect from 'coinselect'
+import coinselectSplit from 'coinselect/split'
 import config from '../../HexaConfig'
+import crypto from 'crypto'
 import idx from 'idx'
+import wif from 'wif'
+
 export default class AccountOperations {
 
   static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ): { updatedAccount: Account | MultiSigAccount, receivingAddress: string} => {
@@ -1020,41 +1024,51 @@ export default class AccountOperations {
 
   static sweepPrivateKey = async (
     privateKey: string,
+    address:string,
     recipientAddress: string,
     averageTxFees: AverageTxFees,
     network: bitcoinJS.networks.Network,
-    derivationPurpose: DerivationPurpose = DerivationPurpose.BIP84
+    derivationPurpose: DerivationPurpose = DerivationPurpose.BIP84,
   ): Promise<{
     txid: string;
    }> => {
 
+    console.log( 'skk1 privateKey==', privateKey )
+    console.log( 'skk1 recipientAddress==', recipientAddress )
+    console.log( 'skk1 averageTxFees==', averageTxFees )
+    console.log( 'skk1 network==', network )
+    console.log( 'skk1 derivationPurpose===', derivationPurpose )
+
     const keyPair = AccountUtilities.getKeyPair( privateKey, network )
-    const address = AccountUtilities.deriveAddressFromKeyPair(
-      keyPair,
-      network,
-      derivationPurpose
-    )
+    console.log( 'skk1211 privatekey', JSON.stringify( keyPair.privateKey ) )
+    console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, false ) )
+    console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, true ) )
+    console.log( 'skk1211 publickey', keyPair.publicKey )
 
     // fetch input utxos against the address
     const { confirmedUTXOs } = await AccountUtilities.fetchBalanceTransactionByAddresses( [ address ], network )
     if( confirmedUTXOs.length === 0 ) throw new Error( 'Insufficient balance to perform send' )
     const inputUTXOs: InputUTXOs[] = confirmedUTXOs
 
+    console.log( 'skk13' )
     // prepare outputs
     const outputUTXOs = [ {
       address: recipientAddress
     } ]
 
+    console.log( 'skk14' )
     // perform coinselection
     const defaultTxPriority = TxPriority.LOW
     const defaultFeePerByte = averageTxFees[ defaultTxPriority ].feePerByte
     const { inputs, outputs } = coinselectSplit( inputUTXOs, outputUTXOs, defaultFeePerByte )
 
+    console.log( 'skk15' )
     // build trasaction
     const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
       network,
     )
 
+    console.log( 'skk16' )
     for ( const input of inputs ) {
       if( derivationPurpose === DerivationPurpose.BIP84 ){
         // native segwit
@@ -1067,17 +1081,19 @@ export default class AccountOperations {
     }
     for ( const output of outputs ) txb.addOutput( output.address, output.value )
 
+    console.log( 'skk17' )
     // sign transaction
     let vin = 0
     for ( const input of inputs ) {
-      const keyPair = AccountUtilities.getKeyPair( privateKey, network )
       const redeemScript = derivationPurpose === DerivationPurpose.BIP84? null: AccountUtilities.getP2SH( keyPair, network ).redeem.output
       txb.sign( vin, keyPair, redeemScript, null, input.value ) // native segwit
       vin++
     }
 
+    console.log( 'skk before1 txid' )
     // broadcast transaciton
     const { txid } = await AccountUtilities.broadcastTransaction( txb.build().toHex(), network )
+    console.log( 'skk before2 txid', JSON.stringify( txid ) )
 
     return {
       txid
