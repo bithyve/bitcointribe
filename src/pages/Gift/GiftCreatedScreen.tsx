@@ -39,6 +39,7 @@ export default function GiftCreatedScreen( props ) {
   const totalSlots = props.navigation?.state?.params?.numSlots
   const activeSlot = props.navigation?.state?.params?.activeSlot
   const slotFromIndex = props.navigation?.state?.params?.slotFromIndex
+  const giftAmount = props.navigation?.state?.params?.giftAmount
   const [ claimVerification, setClaimVerification ] = useState( false )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
@@ -48,7 +49,7 @@ export default function GiftCreatedScreen( props ) {
     setShowGiftModal( false )
   }
   const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : '0'
   }
   const onGiftSuccessClick = () => {
     setShowGiftModal( false )
@@ -137,7 +138,7 @@ export default function GiftCreatedScreen( props ) {
             // top:62, position:'absolute',
             color: Colors.gray14, alignSelf: 'center',
             // backgroundColor:'red'
-          }}>{`${numberWithCommas( balance )} sats`}</Text>
+          }}>{ giftAmount != null && giftAmount != 0 && balance != 0 ? `${numberWithCommas( balance )} sats ` : `${numberWithCommas( giftAmount )} sats`}</Text>
           <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 30 ),
           }}>
@@ -180,10 +181,10 @@ export default function GiftCreatedScreen( props ) {
           <BottomInfoBox
             backgroundColor={Colors.background}
             title={props.infoBoxTitle}
-            infoText={slotFromIndex == 1 ? 'Your SATSCARD™ is now ready to be gifted to your loved ones The person you gift it to will have to enter the spend code at the back of the card to claim the sats. A transaction fee will be deducted from the sats in the SATSCARD™ when its claimed.'
-              : slotFromIndex == 2 ? 'There are sats in your SATSCARD™ You could gift it as is. But if you’d like to gift a higher/lower amount, withdraw sats to unlock a new slot. This is a security feature. You will be charged <enter amount> sats as transaction fee for withdrawal. The sats would be deducted from the SATSCARD™'
-                : slotFromIndex == 3 ? 'Oops! No sats were found on the SATSCARD™. Either your friend messed up, or is messing around!'
-                  : slotFromIndex == 4 ? 'You could claim sats into your wallet or gift the SATSCARD™ forward as is. To claim sats, enter the spend code at the back of your SATSCARD™ on the next screen. You will be charged <enter amount> sats as transaction fee to claim sats. The sats would be deducted from the SATSCARD™'
+            infoText={slotFromIndex == 1 ? 'Your SATSCARD™ is now ready to be gifted to your loved ones\nThe person you gift it to will have to enter the spend code at the back of the card to claim the sats.\nA transaction fee will be deducted from the sats in the SATSCARD™ when its claimed.\n'
+              : slotFromIndex == 2 ? 'There are sats in your SATSCARD™\nYou could gift it as is. But if you’d like to gift a higher/lower amount, withdraw sats to unlock a new slot. This is a security feature.\nYou will be charged <enter amount> sats as transaction fee for withdrawal. The sats would be deducted from the SATSCARD™\n'
+                : slotFromIndex == 3 ? 'Oops! No sats were found on the SATSCARD™. Either your friend messed up, or is messing around!\n\n'
+                  : slotFromIndex == 4 ? 'You could claim sats into your wallet or gift the SATSCARD™ forward as is.\nTo claim sats, enter the spend code at the back of your SATSCARD™ on the next screen.\nYou will be charged <enter amount> sats as transaction fee to claim sats. The sats would be deducted from the SATSCARD™\n'
                     : ''
             }
           />

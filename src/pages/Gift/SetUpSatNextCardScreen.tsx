@@ -103,6 +103,7 @@ export default function SetUpSatNextCardScreen( props ) {
                       satCardBalance == 0 ? 1 : 2
                       : satCardBalance == 0 ? 3 : 4,
                     slotBalance:satCardBalance,
+                    giftAmount : satCardBalance == 0 ? giftAmount: 0
                   } )
                 }, 2000 )
               }, 2000 )
