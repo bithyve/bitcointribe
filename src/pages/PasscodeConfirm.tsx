@@ -80,8 +80,8 @@ export default function PasscodeConfirm( props ) {
       setPasscodeFlag( false )
       setConfirmPasscodeFlag( 1 )
     } else if ( !confirmPasscode && passcode.length > 0 &&  passcode.length <= 4 && confirmPasscodeFlag == 2 ) {
-      setPasscodeFlag( true )
-      setConfirmPasscodeFlag( 0 )
+      // setPasscodeFlag( true )
+      setConfirmPasscodeFlag( 1 )
     } else if ( !confirmPasscode && passcode.length > 0 &&  passcode.length <= 4 ) {
       setPasscodeFlag( true )
       setConfirmPasscodeFlag( 0 )

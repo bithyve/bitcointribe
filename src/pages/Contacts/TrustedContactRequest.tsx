@@ -20,6 +20,7 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
 import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
+import PassCodeTextBox from '../../components/PassCodeTextBox'
 
 export default function TrustedContactRequest( props ) {
   const [ WrongInputError, setWrongInputError ] = useState( '' )
@@ -155,106 +156,107 @@ export default function TrustedContactRequest( props ) {
       )
     } else if ( props.inputType === DeepLinkEncryptionType.OTP ){
       return (
-        <View style={{
-          flexDirection: 'row', marginBottom: wp( '5%' )
-        }}>
-          {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
-            return (
-              <TextInput
-                key={i}
-                maxLength={1}
-                returnKeyType="done"
-                returnKeyLabel="Done"
-                keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                }
-                ref={( input ) => {
-                  if ( i == 0 ) this.textInput = input
-                  if ( i == 1 ) this.textInput2 = input
-                  if ( i == 2 ) this.textInput3 = input
-                  if ( i == 3 ) this.textInput4 = input
-                  if ( i == 4 ) this.textInput5 = input
-                  if ( i == 5 ) this.textInput6 = input
-                }}
-                style={getStyle( i )}
-                onChangeText={( value ) => {
-                  if ( value && i == 0 ) {
-                    onPressNumber( value, 0 )
-                    this.textInput2.focus()
-                  }
-                  if ( value && i == 1 ) {
-                    onPressNumber( value, 1 )
-                    this.textInput3.focus()
-                  }
-                  if ( value && i == 2 ) {
-                    onPressNumber( value, 2 )
-                    this.textInput4.focus()
-                  }
-                  if ( value && i == 3 ) {
-                    onPressNumber( value, 3 )
-                    this.textInput5.focus()
-                  }
-                  if ( value && i == 4 ) {
-                    onPressNumber( value, 4 )
-                    this.textInput6.focus()
-                  }
-                  if ( value && i == 5 ) {
-                    onPressNumber( value, 5 )
-                    this.textInput6.focus()
+        <PassCodeTextBox passcode={passcode} setPasscode={setPasscode} setDisabled={setIsDisabled} />
+        // <View style={{
+        //   flexDirection: 'row', marginBottom: wp( '5%' )
+        // }}>
+        //   {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
+        //     return (
+        //       <TextInput
+        //         key={i}
+        //         maxLength={1}
+        //         returnKeyType="done"
+        //         returnKeyLabel="Done"
+        //         keyboardType={
+        //           Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+        //         }
+        //         ref={( input ) => {
+        //           if ( i == 0 ) this.textInput = input
+        //           if ( i == 1 ) this.textInput2 = input
+        //           if ( i == 2 ) this.textInput3 = input
+        //           if ( i == 3 ) this.textInput4 = input
+        //           if ( i == 4 ) this.textInput5 = input
+        //           if ( i == 5 ) this.textInput6 = input
+        //         }}
+        //         style={getStyle( i )}
+        //         onChangeText={( value ) => {
+        //           if ( value && i == 0 ) {
+        //             onPressNumber( value, 0 )
+        //             this.textInput2.focus()
+        //           }
+        //           if ( value && i == 1 ) {
+        //             onPressNumber( value, 1 )
+        //             this.textInput3.focus()
+        //           }
+        //           if ( value && i == 2 ) {
+        //             onPressNumber( value, 2 )
+        //             this.textInput4.focus()
+        //           }
+        //           if ( value && i == 3 ) {
+        //             onPressNumber( value, 3 )
+        //             this.textInput5.focus()
+        //           }
+        //           if ( value && i == 4 ) {
+        //             onPressNumber( value, 4 )
+        //             this.textInput6.focus()
+        //           }
+        //           if ( value && i == 5 ) {
+        //             onPressNumber( value, 5 )
+        //             this.textInput6.focus()
 
-                  }
-                }}
-                onKeyPress={( e ) => {
-                  if ( e.nativeEvent.key === 'Backspace' && i == 0 ) {
-                    this.textInput.focus()
-                    onPressNumber( '', 0 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 1 ) {
-                    this.textInput.focus()
-                    onPressNumber( '', 1 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 2 ) {
-                    this.textInput2.focus()
-                    onPressNumber( '', 2 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 3 ) {
-                    this.textInput3.focus()
-                    onPressNumber( '', 3 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 4 ) {
-                    this.textInput4.focus()
-                    onPressNumber( '', 4 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 5 ) {
-                    this.textInput5.focus()
-                    onPressNumber( '', 5 )
-                  }
-                }}
-                onFocus={() => {
-                  // if ( Platform.OS == 'ios' ) {
-                  props.bottomSheetRef.current?.expand()
-                  setIsDisabled( true )
-                  // }
-                }}
-                onBlur={() => {
-                  // if ( Platform.OS == 'ios' ) {
-                  if (
-                    ( passcodeArray.length == 0 ||
-                        passcodeArray.length == 6 ) &&
-                      i == 5
-                  ) {
-                    props.bottomSheetRef.current?.snapTo( 1 )
-                    setIsDisabled( false )
-                  }
-                  // }
-                }}
-                autoCorrect={false}
-                autoCompleteType="off"
-                //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
-              />
-            )
-          } )}
-        </View>
+        //           }
+        //         }}
+        //         onKeyPress={( e ) => {
+        //           if ( e.nativeEvent.key === 'Backspace' && i == 0 ) {
+        //             this.textInput.focus()
+        //             onPressNumber( '', 0 )
+        //           }
+        //           if ( e.nativeEvent.key === 'Backspace' && i == 1 ) {
+        //             this.textInput.focus()
+        //             onPressNumber( '', 1 )
+        //           }
+        //           if ( e.nativeEvent.key === 'Backspace' && i == 2 ) {
+        //             this.textInput2.focus()
+        //             onPressNumber( '', 2 )
+        //           }
+        //           if ( e.nativeEvent.key === 'Backspace' && i == 3 ) {
+        //             this.textInput3.focus()
+        //             onPressNumber( '', 3 )
+        //           }
+        //           if ( e.nativeEvent.key === 'Backspace' && i == 4 ) {
+        //             this.textInput4.focus()
+        //             onPressNumber( '', 4 )
+        //           }
+        //           if ( e.nativeEvent.key === 'Backspace' && i == 5 ) {
+        //             this.textInput5.focus()
+        //             onPressNumber( '', 5 )
+        //           }
+        //         }}
+        //         onFocus={() => {
+        //           // if ( Platform.OS == 'ios' ) {
+        //           props.bottomSheetRef.current?.expand()
+        //           setIsDisabled( true )
+        //           // }
+        //         }}
+        //         onBlur={() => {
+        //           // if ( Platform.OS == 'ios' ) {
+        //           if (
+        //             ( passcodeArray.length == 0 ||
+        //                 passcodeArray.length == 6 ) &&
+        //               i == 5
+        //           ) {
+        //             props.bottomSheetRef.current?.snapTo( 1 )
+        //             setIsDisabled( false )
+        //           }
+        //           // }
+        //         }}
+        //         autoCorrect={false}
+        //         autoCompleteType="off"
+        //         //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
+        //       />
+        //     )
+        //   } )}
+        // </View>
       )
     }
   }
