@@ -64,7 +64,7 @@ export default GiftBoxComponent
 const styles = StyleSheet.create( {
   container:{
     width: '100%',
-    height: RFValue( 111 ),
+    height: RFValue( 100 ),
     backgroundColor: Colors.gray7,
     shadowOpacity: 0.06,
     shadowOffset: {
