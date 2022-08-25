@@ -153,7 +153,13 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         case strings.AppInfo:
           return ( <AppInfo /> )
         case bhrStrings[ 'WalletBackup' ]:
-          return ( <AppInfo /> )
+          return ( <Image
+            source={require( '../../assets/images/icons/keeper_sheild.png' )}
+            style={{
+              width: widthPercentageToDP( 5 ),
+              height: widthPercentageToDP( 6 ),
+            }}
+          /> )
         default:
           return null
     }

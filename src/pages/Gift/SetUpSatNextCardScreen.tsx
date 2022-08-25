@@ -103,6 +103,7 @@ export default function SetUpSatNextCardScreen( props ) {
                       satCardBalance == 0 ? 1 : 2
                       : satCardBalance == 0 ? 3 : 4,
                     slotBalance:satCardBalance,
+                    giftAmount : satCardBalance == 0 ? giftAmount: 0
                   } )
                 }, 2000 )
               }, 2000 )
@@ -235,7 +236,7 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
-      console.log( 'skk use acc 2 success' )
+      console.log( 'skk use acc 2 success', txid )
       if ( txid ) {
         let type
         if ( sourceAccountShell.primarySubAccount.type === undefined ) {
