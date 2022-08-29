@@ -27,6 +27,8 @@ import dbManager from '../../storage/realm/dbManager'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
+const {height} = Dimensions.get('window');
+
 const SeedPageComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
@@ -403,10 +405,12 @@ const styles = StyleSheet.create( {
     // justifyContent: 'center',
     // paddingLeft: wp( '3%' ),
     // paddingRight: wp( '3%' ),
+    paddingHorizontal: wp(2),
+    paddingVertical: height > 720 ? hp(1) : 0,
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: height > 720 ? 20 : height > 650 ? 15 : 10,
     borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
@@ -433,9 +437,9 @@ const styles = StyleSheet.create( {
   },
   numberContainer: {
     margin: 5,
-    height: ( 50 ),
-    width: ( 50 ),
-    borderRadius: ( 25 ),
+    height: height > 720 ? (50) : height > 650 ? ( 45 ) : ( 30 ),
+    width: height > 720 ? (50) : height > 650 ? ( 45 ) : ( 30 ),
+    borderRadius: height > 720 ? (25) : ( 15 ),
     backgroundColor: Colors.white,
     shadowColor: Colors.shadowBlack,
     // elevation: 10,
@@ -451,8 +455,8 @@ const styles = StyleSheet.create( {
   numberInnerContainer: {
     backgroundColor: Colors.numberBg,
     borderRadius: ( 23 ),
-    height: ( 46 ),
-    width: ( 46 ),
+    height: height > 720 ? (46) : height > 650 ? ( 41 ) : ( 26 ),
+    width: height > 720 ? (46) : height > 650 ? ( 41 ) : ( 26 ),
     margin: ( 4 ),
     justifyContent: 'center',
     alignItems: 'center'
