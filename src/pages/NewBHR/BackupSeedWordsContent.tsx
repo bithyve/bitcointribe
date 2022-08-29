@@ -36,6 +36,21 @@ const BackupSeedWordsContent = ( props ) => {
   const isChangeKeeperType =  props.navigation.getParam( 'isChangeKeeperType' )
   useEffect( ()=>{
     RNPreventScreenshot.enabled( true )
+
+    //set random number
+    const i = 12, ranNums = []
+    for( let j=0; j<2; j++ ){
+      const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+      if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
+        if ( tempNumber == undefined || tempNumber == 0 ) {
+          ranNums.push( 1 )
+        }
+        else {
+          ranNums.push( tempNumber )
+        }
+      } else j--
+    }
+    setSeedRandomNumber( ranNums )
   }, [] )
   return (
     <View style={{
@@ -61,21 +76,8 @@ const BackupSeedWordsContent = ( props ) => {
           infoBoxTitle={'Note'}
           infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
           onPressConfirm={( seed, seedData )=>{
-            const i = 12, ranNums = []
             setSeedPosition( 0 )
             setSeedData( seedData )
-            for( let j=0; j<2; j++ ){
-              const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
-              if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
-                if ( tempNumber == undefined || tempNumber == 0 ) {
-                  ranNums.push( 1 )
-                }
-                else {
-                  ranNums.push( tempNumber )
-                }
-              } else j--
-            }
-            setSeedRandomNumber( ranNums )
 
             setTimeout( () => {
               setConfirmSeedWordModal( true )

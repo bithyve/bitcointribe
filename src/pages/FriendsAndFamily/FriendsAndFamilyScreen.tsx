@@ -606,7 +606,7 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }}
           >
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
               style={{
                 width: '90%',
@@ -626,9 +626,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 paddingHorizontal: wp( 4.5 )
               }}>
               <View style={[ styles.subInfo, {
-                // marginBottom: hp( 3 )
               } ]}>
-                {/* <Gift /> */}
                 <CheckingAcc />
                 <View style={{
                   flex: 1, marginHorizontal: wp( 2 )
@@ -654,7 +652,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 </View>
                 <RightArrow />
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <View style={{
               marginTop: wp( '5%' )
             }}>

@@ -103,6 +103,7 @@ function SecurityQuestion( props ) {
       resetScrollToCoords={{
         x: 0, y: 0
       }}
+      keyboardShouldPersistTaps='always'
       scrollEnabled={false}
       style={{
         ...styles.modalContentContainer
