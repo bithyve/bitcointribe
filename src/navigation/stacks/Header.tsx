@@ -126,7 +126,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
-import ClipboardAutoRead from '../../components/ClipboardAutoRead'
+// import ClipboardAutoRead from '../../components/ClipboardAutoRead'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -271,7 +271,7 @@ interface HomePropsTypes {
   trustedContacts: Trusted_Contacts;
   IsCurrentLevel0: boolean;
   walletId: string;
-  clipboardAccess: boolean;
+  // clipboardAccess: boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -1734,7 +1734,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             resizeMode: 'stretch',
           }}
         >
-          {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
+          { 
+            // this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />
+          }
           <HomeHeader
             onPressNotifications={this.onPressNotifications}
             navigateToQRScreen={this.navigateToQRScreen}
@@ -1855,7 +1857,7 @@ const mapStateToProps = ( state ) => {
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
     walletId: idx( state, ( _ ) => _.storage.wallet.walletId ),
-    clipboardAccess: idx(state, ( _ ) => _.misc.clipboardAccess ),
+    // clipboardAccess: idx(state, ( _ ) => _.misc.clipboardAccess ),
   }
 }
 

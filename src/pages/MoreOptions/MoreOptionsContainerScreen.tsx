@@ -126,12 +126,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       subtitle: strings.AppInfoSub,
       screenName: 'AppInfo',
     },
-    {
-      title: 'Enable Auto Read from Clipboard',
-      imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle: 'App will prompt to send sats to copied address',
-      screenName: 'EnableClipboard'
-    },
+    // {
+    //   title: 'Enable Auto Read from Clipboard',
+    //   imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    //   subtitle: 'App will prompt to send sats to copied address',
+    //   screenName: 'EnableClipboard'
+    // },
   ]
 
   const listItemKeyExtractor = ( item: MenuOption ) => item.title
@@ -166,8 +166,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               height: widthPercentageToDP( 6 ),
             }}
           /> )
-        case 'Enable Auto Read from Clipboard':
-          return ( <AppInfo />)
+        // case 'Enable Auto Read from Clipboard':
+        //   return ( <AppInfo />)
         default:
           return null
     }
