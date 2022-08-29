@@ -104,6 +104,18 @@ const SeedBackupHistory = ( props ) => {
 
   useEffect( ()=>{
     setInfoOnBackup()
+
+    //set random number
+    const i = 12, ranNums = []
+    for( let j=0; j<2; j++ ){
+      const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+      if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
+        if( tempNumber == undefined || tempNumber == 0 )
+          ranNums.push( 1 )
+        else ranNums.push( tempNumber )
+      } else j--
+    }
+    setSeedRandomNumber( ranNums )
   }, [] )
 
   useEffect( () =>{
@@ -111,8 +123,6 @@ const SeedBackupHistory = ( props ) => {
   }, [ cloudBackupStatus, cloudBackupInitiated ] )
 
   const setInfoOnBackup = () =>{
-    console.log( 'skk levelhealth', levelHealth )
-    console.log( 'skk levelhealth', JSON.stringify( levelHealth ) )
     // if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' && currentLevel > 0 ){
     if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ){
       setButtonText( common.backup )
@@ -333,20 +343,8 @@ const SeedBackupHistory = ( props ) => {
             //   if( !seed ) seed = name
             //   else seed = seed + ' ' + name
             // } )
-
-            const i = 12, ranNums = []
             setSeedPosition( 0 )
             setSeedData( seedData )
-
-            for( let j=0; j<2; j++ ){
-              const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
-              if( ranNums.length == 0 || ( ranNums.length > 0 && ranNums[ j ] != tempNumber ) ){
-                if( tempNumber == undefined || tempNumber == 0 )
-                  ranNums.push( 1 )
-                else ranNums.push( tempNumber )
-              } else j--
-            }
-            setSeedRandomNumber( ranNums )
 
             setTimeout( () => {
               setConfirmSeedWordModal( true )

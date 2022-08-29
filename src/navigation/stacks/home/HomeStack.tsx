@@ -64,6 +64,7 @@ import Login from '../../../pages/Login'
 import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -209,6 +210,12 @@ const HomeStack = createStackNavigator(
       navigationOptions: {
         header: null,
         // tabBarVisibl
+      },
+    },
+    WalletBackupAlert: {
+      screen: WalletBackup,
+      navigationOptions: {
+        header: null,
       },
     },
     PairNewWallet,
