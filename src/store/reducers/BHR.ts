@@ -47,6 +47,7 @@ import {
   PDF_UPGRADE,
   SET_PASSWORD_RESET_STATE,
   SEED_BACKUP_HISTORY,
+  RESTORE_SEED_WORD,
 } from '../actions/BHR'
 
 interface historyObj {
@@ -60,6 +61,7 @@ const initialState: {
   loading: {
     levelHealthCheck: Boolean;
     checkMSharesHealth: Boolean;
+    restoreSeedData: Boolean;
     initLoader: Boolean;
     updateMSharesHealth: Boolean;
     autoShareKeepersData: Boolean;
@@ -141,6 +143,7 @@ const initialState: {
   loading: {
     levelHealthCheck: false,
     checkMSharesHealth: false,
+    restoreSeedData: false,
     initLoader: false,
     updateMSharesHealth: false,
     autoShareKeepersData: false,
@@ -263,6 +266,15 @@ export default ( state = initialState, action ) => {
             ...state.loading,
             checkMSharesHealth: action.payload.beingLoaded,
           },
+        }
+
+      case RESTORE_SEED_WORD:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            restoreSeedData: action.payload.beingLoaded,
+          }
         }
 
       case MSHARES:
@@ -502,11 +514,11 @@ export default ( state = initialState, action ) => {
           pdfUpgrade: action.payload.flag,
         }
 
-        case UPDATE_OLD_META_SHARES_KEEPER:
-      return {
-        ...state,
-        oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
-      }
+      case UPDATE_OLD_META_SHARES_KEEPER:
+        return {
+          ...state,
+          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
+        }
 
       case SEED_BACKUP_HISTORY:
         return {

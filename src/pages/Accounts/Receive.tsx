@@ -47,18 +47,20 @@ import idx from 'idx'
 import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 import DeviceInfo from 'react-native-device-info'
 import AccountShell from '../../common/data/models/AccountShell'
-import { Account, AccountType } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, LevelData } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../components/home/ModalContainer'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import { translations } from '../../common/content/LocContext'
+import ErrorModalContents from '../../components/ErrorModalContents'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
   const [ receiveHelper, showReceiveHelper ] = useState( false )
   const [ receiveModal, setReceiveModal ] = useState( false )
+  const [ backupReminder, setBackupReminder ] = useState( false )
   const [ isReceiveHelperDone, setIsReceiveHelperDone ] = useState( true )
   const isReceiveHelperDoneValue = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.isReceiveHelperDoneValue ),
@@ -74,6 +76,7 @@ export default function Receive( props ) {
   const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
+  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
 
   const {
     present: presentBottomSheet,
@@ -126,6 +129,12 @@ export default function Receive( props ) {
         dispatch( setSavingWarning( true ) )
         //await AsyncStorage.setItem('savingsWarning', 'true');
       }
+    }
+
+    if( levelData[ 0 ].keeper1.status === 'notSetup' ){
+      setTimeout( () => {
+        setBackupReminder( true )
+      }, 500 )
     }
     //})();
   }, [] )
@@ -326,6 +335,30 @@ export default function Receive( props ) {
           />
         )}
       />
+      <ModalContainer onBackground={() => setBackupReminder( false )} visible={backupReminder} closeBottomSheet={() => setBackupReminder( false )}>
+        <ErrorModalContents
+          title={'Wallet is not Backed up'}
+          info={'Backup your wallet to ensure security and easy wallet retrieval'}
+          // note={errorMsg}
+          onPressProceed={() => {
+            setBackupReminder( false )
+            props.navigation.navigate( 'WalletBackupAlert' )
+          }}
+          onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
+          proceedButtonText={'Backup now'}
+          cancelButtonText={'Not now'}
+          isIgnoreButton={true}
+          isBottomImage={true}
+          isBottomImageStyle={{
+            width: wp( '27%' ),
+            height: wp( '27%' ),
+            marginLeft: 'auto',
+            resizeMode: 'stretch',
+            marginBottom: hp( '-3%' ),
+          }}
+          bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

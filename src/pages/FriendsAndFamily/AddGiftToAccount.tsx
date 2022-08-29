@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert, ActivityIndicator } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
@@ -22,7 +22,8 @@ import { resetStackToAccountDetails, } from '../../navigation/actions/Navigation
 import AccountSelected from './AccountSelected'
 import GiftAddedModal from './GiftAddedModal'
 import { giftAccepted, refreshAccountShells } from '../../store/actions/accounts'
-
+// import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
 export type Props = {
   navigation: any;
@@ -39,6 +40,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
   const [ showAccounts, setShowAccounts ] = useState( true )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
   const [ giftAddedModal, setGiftAddedModel ] = useState( false )
+  const [ showLoader, setLoader ] = useState( false )
   const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ accId, setAccId ] = useState( '' )
   const accountShells: AccountShell[] = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.accountShells ) )
@@ -71,13 +73,20 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
   const renderButton = ( text ) => {
     return (
       <TouchableOpacity
-        onPress={() => {
+        onPress={async() => {
 
           if ( text === 'Confirm' ) {
             // closeModal()
-            setConfirmAccount( false )
-            setGiftAddedModel( true )
-            dispatch( associateGift( giftId, accId ) )
+            setLoader( true )
+            await dispatch( associateGift( giftId, accId ) )
+            await dispatch( refreshAccountShells( [ sendingAccount ], {
+              hardRefresh: true
+            } ) )
+            setTimeout( () => {
+              setLoader( false )
+              setConfirmAccount( false )
+              setGiftAddedModel( true )
+            }, 2000 )
           } else if ( text === 'View Account' ) {
             setGiftAddedModel( false )
             dispatch( giftAccepted( '' ) )
@@ -139,6 +148,11 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             giftAmount={giftAmount}
             onCancel={onCancel}
           />
+          {showLoader &&
+            <ActivityIndicator style={{
+              zIndex:999, position:'absolute', left:0, right:0, bottom:0, top:0
+            }} color={Colors.black} size={'large'} />
+          }
         </View>
       }
       {giftAddedModal &&
@@ -150,6 +164,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             renderButton={renderButton}
             formattedUnitText={formattedUnitText}
             spendableBalance={spendableBalance}
+            accountShellID={sourcePrimarySubAccount.accountShellID}
             onCancel={onCancel}
             navigation={navigation}
           />

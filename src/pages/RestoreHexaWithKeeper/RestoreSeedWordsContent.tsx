@@ -18,7 +18,7 @@ import RestoreSeedPageComponent from './RestoreSeedPageComponent'
 import RestoreSeedHeaderComponent from './RestoreSeedHeaderComponent'
 import * as bip39 from 'bip39'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { recoverWalletUsingMnemonic } from '../../store/actions/BHR'
+import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -33,10 +33,11 @@ import { NavigationContext } from 'react-navigation'
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
-  const [ showSeedError, setShowSeedError ]= useState(false)
+  const [ showSeedError, setShowSeedError ] = useState( false )
   const [ showLoader, setShowLoader ] = useState( false )
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ showSeedFailedModal, setSeedFailedModal ] = useState( false )
   const [ seedRecovered, setSeedRecovered ] = useState( false )
   const loaderMessage = {
     heading: translations[ 'bhr' ].Creatingyourwallet,
@@ -46,14 +47,21 @@ const RestoreSeedWordsContent = ( props ) => {
     translations[ 'bhr' ].Settingupmultipleaccounts,
     translations[ 'bhr' ].Preloading,
   ]
-  const  bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
+  const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
 
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+  const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
+
+  useEffect( () => {
+    return () => {
+      dispatch( restoreSeedWordFailed( false ) )
+    }
+  }, [] )
 
   useEffect( () => {
     setLoaderModal( false )
-    if( wallet ){
+    if ( wallet ) {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
@@ -61,13 +69,20 @@ const RestoreSeedWordsContent = ( props ) => {
     }
   }, [ wallet ] )
 
-  const renderSeedErrorModal = () =>{
-    return(
+  useEffect( () => {
+    if( restoreSeedData == 'restoreSeedDataFailed' ){
+      setLoaderModal( false )
+      setSeedFailedModal( true )
+    }
+  }, [ restoreSeedData ] )
+
+  const renderSeedErrorModal = () => {
+    return (
       <ErrorModalContents
         title='Invalid Seed'
         info='Please recheck your seeds and try again'
         proceedButtonText={'Go back'}
-        onPressProceed={() =>  props.navigation.goBack()}
+        onPressProceed={() => props.navigation.goBack()}
       />
     )
   }
@@ -76,14 +91,14 @@ const RestoreSeedWordsContent = ( props ) => {
     setShowLoader( true )
     setTimeout( () => {
       const isValidMnemonic = bip39.validateMnemonic( mnemonic )
-      if( !isValidMnemonic ){
+      if ( !isValidMnemonic ) {
         setShowLoader( false )
         // Alert.alert( 'Invalid mnemonic, try again!' )
         setShowAlertModal( true )
         return
       }
       setShowLoader( false )
-      setLoaderModal ( true )
+      setLoaderModal( true )
       setTimeout( () => {
         dispatch( recoverWalletUsingMnemonic( mnemonic ) )
       }, 500 )
@@ -103,18 +118,18 @@ const RestoreSeedWordsContent = ( props ) => {
     }}>
       {
         showLoader &&
-      <View style={{
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 10
-      }}>
-        <ActivityIndicator size="large" color={Colors.babyGray} />
-      </View>
+        <View style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10
+        }}>
+          <ActivityIndicator size="large" color={Colors.babyGray} />
+        </View>
       }
       <SafeAreaView
         style={{
@@ -146,18 +161,18 @@ const RestoreSeedWordsContent = ( props ) => {
           previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
         />
-        <ModalContainer visible={(showSeedError)} onBackground={()=> setShowSeedError}>
+        <ModalContainer visible={( showSeedError )} onBackground={() => setShowSeedError}>
           {renderSeedErrorModal()}
         </ModalContainer>
       </View>
-      <ModalContainer onBackground={onBackgroundOfLoader} visible={loaderModal} closeBottomSheet={() => {}} >
+      <ModalContainer onBackground={onBackgroundOfLoader} visible={loaderModal} closeBottomSheet={() => { }} >
         <LoaderModal
           headerText={loaderMessage.heading}
           messageText={loaderMessage.text}
           subPoints={subPoints}
           bottomText={bottomTextMessage} />
       </ModalContainer>
-      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+      <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           // title={''}
@@ -167,7 +182,21 @@ const RestoreSeedWordsContent = ( props ) => {
             setShowAlertModal( false )
           }}
           isBottomImage={false}
-          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={() => { setSeedFailedModal( false ) }} visible={showSeedFailedModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          title={'Wallet Not Found'}
+          info={'You can choose to create a new Wallet'}
+          proceedButtonText={'Create New Wallet'}
+          onPressProceed={() => {
+            setSeedFailedModal( false )
+            props.navigation.goBack()
+          }}
+          isBottomImage={false}
+        // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
     </View>
