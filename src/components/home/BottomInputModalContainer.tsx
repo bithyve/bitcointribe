@@ -109,17 +109,17 @@ const BottomInputModalContainer = ( {
           }}
         >
           <TouchableWithoutFeedback>
-            <KeyboardAvoidingView behavior='padding'>
-              <View style={{
-                width: '100%',
-                borderRadius: wp( '4%' ),
-                overflow: 'hidden',
-                // marginBottom: hp( 0.5 )
-              }}>
+            {/* <KeyboardAvoidingView behavior='padding'> */}
+            <View style={{
+              width: '100%',
+              borderRadius: wp( '4%' ),
+              overflow: 'hidden',
+              // marginBottom: hp( 0.5 )
+            }}>
 
-                {children}
-              </View>
-            </KeyboardAvoidingView>
+              {children}
+            </View>
+            {/* </KeyboardAvoidingView> */}
           </TouchableWithoutFeedback>
         </TouchableOpacity>
       </KeyboardAwareScrollView>

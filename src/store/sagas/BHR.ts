@@ -83,6 +83,7 @@ import {
   RECOVER_WALLET_WITH_MNEMONIC,
   updateSeedHealth,
   setSeedBackupHistory,
+  restoreSeedWordFailed,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -599,7 +600,8 @@ function* recoverWalletWorker( { payload } ) {
       if( !image ){
         const getWI = yield call( BHROperations.fetchWalletImage, walletId )
         if( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
-        if( !image ) Alert.alert( 'External mnemonic, wallet image not found' )
+        // if( !image ) Alert.alert( 'External mnemonic, wallet image not found' )
+        if( !image )yield put( restoreSeedWordFailed( 'restoreSeedDataFailed' ) )
       }
     } else {
       if ( shares ) {
