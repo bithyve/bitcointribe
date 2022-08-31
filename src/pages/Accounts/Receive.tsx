@@ -337,7 +337,7 @@ export default function Receive( props ) {
       />
       <ModalContainer onBackground={() => setBackupReminder( false )} visible={backupReminder} closeBottomSheet={() => setBackupReminder( false )}>
         <ErrorModalContents
-          title={'Wallet is not Backed up'}
+          title={'Wallet is not Backed-up'}
           info={'Backup your wallet to ensure security and easy wallet retrieval'}
           // note={errorMsg}
           onPressProceed={() => {
@@ -350,7 +350,7 @@ export default function Receive( props ) {
           isIgnoreButton={true}
           isBottomImage={true}
           isBottomImageStyle={{
-            width: wp( '27%' ),
+            width: wp( '35%' ),
             height: wp( '27%' ),
             marginLeft: 'auto',
             resizeMode: 'stretch',
