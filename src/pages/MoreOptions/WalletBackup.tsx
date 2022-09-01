@@ -533,13 +533,25 @@ const WalletBackup = ( props ) => {
   useEffect( () => {
     const tempData = []
     levelData.map( ( item, index ) => {
-      if ( item.keeper1.status != 'notSetup' || index == 0 ) {
+      if( item.keeper1.status === 'accessible' ) {
+        tempData.push( {
+          ...item,
+          type: 'cloud'
+        } )
+        return
+      }else if ( item.keeper1.status != 'notSetup' || index == 0 ) {
         if ( item.keeper1.shareType == 'seed' ) {
           tempData.push( item )
           return
         }
-        tempData.push( item )
-        tempData.push( item )
+        tempData.push( {
+          ...item,
+          type: 'seed'
+        } )
+        tempData.push( {
+          ...item,
+          type: 'cloud'
+        } )
       }
       else if ( index >= 1 && levelData[ index - 1 ].keeper1.status == 'accessible' && levelData[ index - 1 ].keeper2.status == 'accessible' ) {
         // For Upgrade Functionality
@@ -564,7 +576,7 @@ const WalletBackup = ( props ) => {
   }
 
   const getKeeperIcon = ( item, index ) => {
-    const shareType = index % 2 == 0 ? item.keeper1.shareType : item.keeper2.shareType
+    const shareType = item.status === 'accessible' ? item.keeper2.shareType : item.keeper2.shareType
     const status = index % 2 == 0 ? item.keeper1.status : item.keeper2.status
     const valueStatus = item.status
     const updatedAt = index % 2 == 0 ? item.keeper1.updatedAt : item.keeper2.updatedAt
@@ -755,40 +767,36 @@ const WalletBackup = ( props ) => {
         extraData={localLevelData}
         showsVerticalScrollIndicator={false}
         renderItem={( { item, index } ) => {
-          if ( index == 0 && item.keeper1ButtonText == 'Encryption Password' ){
-            return null
-          } else {
-            return (
-              <AppBottomSheetTouchableWrapper
-                style={styles.addModalView}
-                onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
-              >
-                <View style={styles.modalElementInfoView}>
-                  <Image style={{
-                    width: 32, height: 32
-                  }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
-                  <Text style={{
-                    fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
-                  }}>
-                    {index % 2 == 0 ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
-                  </Text>
-                  <Text style={{
-                    fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
-                  }}>{index == 0 &&  item.keeper1ButtonText == 'Seed' ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
-                </View>
-                <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
-                  style={{
-                    width: 10,
-                    height: 16,
-                    alignSelf: 'flex-end',
-                    resizeMode: 'contain',
-                    marginBottom: 2,
+          return (
+            <AppBottomSheetTouchableWrapper
+              style={styles.addModalView}
+              onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
+            >
+              <View style={styles.modalElementInfoView}>
+                <Image style={{
+                  width: 32, height: 32
+                }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
+                <Text style={{
+                  fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
+                }}>
+                  {item.status === 'accessible' ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                </Text>
+                <Text style={{
+                  fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
+                }}>{index == 0 &&  item.keeper1ButtonText == 'Seed' ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
+              </View>
+              <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+                style={{
+                  width: 10,
+                  height: 16,
+                  alignSelf: 'flex-end',
+                  resizeMode: 'contain',
+                  marginBottom: 2,
                   // backgroundColor:'red'
-                  }}
-                />
-              </AppBottomSheetTouchableWrapper>
-            )
-          }
+                }}
+              />
+            </AppBottomSheetTouchableWrapper>
+          )
         }}
       />
       <ModalContainer onBackground={() => setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
