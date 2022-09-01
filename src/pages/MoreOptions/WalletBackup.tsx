@@ -51,6 +51,7 @@ import BackupTypeModalContent from '../NewBHR/BackupTypeModalContent'
 import KeeperTypeModalContents from '../NewBHR/KeeperTypeModalContent'
 import QRModal from '../Accounts/QRModal'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
+import { Shadow } from 'react-native-shadow-2'
 
 
 const WalletBackup = ( props ) => {
@@ -645,6 +646,9 @@ const WalletBackup = ( props ) => {
       </>
     )
   }
+  const onChangeSeedWordBackUp = () => {
+    setSeedBackupModal( true )
+  }
   const getMessageToShow = () => {
     if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
       return {
@@ -791,6 +795,31 @@ const WalletBackup = ( props ) => {
           }
         }}
       />
+
+      <Shadow viewStyle={{
+        ...styles.successModalButtonView,
+        backgroundColor: Colors.blue,
+      }} distance={2}
+      startColor={Colors.shadowBlue }
+      offset={[ 40, 24 ]}>
+        <AppBottomSheetTouchableWrapper
+          onPress={onChangeSeedWordBackUp}
+          style={{
+            // ...styles.successModalButtonView,
+            shadowColor: Colors.shadowBlue,
+          }}
+          delayPressIn={0}
+        >
+          <Text
+            style={{
+              ...styles.proceedButtonText,
+              color: Colors.white,
+            }}
+          >
+            {'Change to Seed Words Backup'}
+          </Text>
+        </AppBottomSheetTouchableWrapper>
+      </Shadow>
       <ModalContainer onBackground={() => setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
         <KeeperTypeModalContents
           selectedLevelId={selectedLevelId}
@@ -876,10 +905,13 @@ const WalletBackup = ( props ) => {
       <ModalContainer onBackground={() => setSeedBackupModal( false )} visible={seedBackupModal}
         closeBottomSheet={() => setSeedBackupModal( false )}>
         <SeedBacupModalContents
-          title={'Backup using \nSeed Words'}
-          info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
+          // title={'Backup using \nSeed Words'}
+          title={'Backup with Seed words'}
+          // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
+          info={'Backup your wallet to ensure security and easy wallet retrieval.\n\n'}
+          note={'Note: This will only be allowed if the Savings account is empty and archived.'}
           proceedButtonText={'Proceed'}
-          cancelButtonText={'Back'}
+          cancelButtonText={'Cancel'}
           onPressProceed={() => {
             setSeedBackupModal( false )
             props.navigation.navigate( 'BackupSeedWordsContent' )
@@ -1012,6 +1044,25 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular
+  },
+  successModalButtonView: {
+    height: wp( '12%' ),
+    // minWidth: wp( '22%' ),
+    paddingLeft: wp( '5%' ),
+    paddingRight: wp( '5%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: Colors.blue,
+    // alignSelf: 'center',
+    marginLeft: wp( '6%' ),
+    marginBottom:hp ( '2%' ),
+    marginTop: hp( '2%' )
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
   },
 } )
 
