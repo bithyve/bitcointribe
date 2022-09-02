@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -13,12 +13,9 @@ import {
   Platform
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import idx from 'idx'
-import DeviceInfo from 'react-native-device-info'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-  widthPercentageToDP,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
@@ -27,23 +24,17 @@ import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
 import HeaderTitle from '../../components/HeaderTitle'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { getVersions } from '../../common/utilities'
 import ModalContainer from '../../components/home/ModalContainer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { updateWalletName } from '../../store/actions/trustedContacts'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { NavigationActions, StackActions } from 'react-navigation'
-// import { goHomeAction } from '../../../navigation/actions/NavigationActions'
 import { translations } from '../../common/content/LocContext'
-// import Options from '../../../assets/images/svgs/options.svg'
-import { LevelData, LevelHealthInterface, MetaShare, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { AccountType, LevelData, LevelHealthInterface, MetaShare, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, downloadSMShare, setApprovalStatus, upgradeLevelOneKeeper } from '../../store/actions/BHR'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import { setCloudData, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
@@ -52,9 +43,13 @@ import KeeperTypeModalContents from '../NewBHR/KeeperTypeModalContent'
 import QRModal from '../Accounts/QRModal'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
 import { Shadow } from 'react-native-shadow-2'
+import accounts, { AccountsState } from '../../store/reducers/accounts'
+import AccountArchiveModal from '../../pages/Accounts/AccountSettings/AccountArchiveModal'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import { updateAccountSettings } from '../../store/actions/accounts'
 
 
-const WalletBackup = ( props ) => {
+const WalletBackup = ( props, navigation ) => {
   const dispatch = useDispatch()
   const strings = translations[ 'bhr' ]
   const headerStrings = translations[ 'header' ]
@@ -80,6 +75,8 @@ const WalletBackup = ( props ) => {
   const isKeeperInfoUpdated2: boolean = useSelector( ( state ) => state.bhr.isKeeperInfoUpdated2 )
   const isKeeperInfoUpdated3: boolean = useSelector( ( state ) => state.bhr.isKeeperInfoUpdated3 )
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
+  const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
+
   const iCloudErrors = translations[ 'iCloudErrors' ]
   const driveErrors = translations[ 'driveErrors' ]
   const defaultKeeperObj: {
@@ -141,6 +138,19 @@ const WalletBackup = ( props ) => {
 
   const [ localLevelData, setLocalLevelData ] = useState( [] )
   const [ isUpgrade, setIsUpgrade ] = useState( false )
+  const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
+  const [ primarySubAccount, setPrimarySubAccount ] = useState( null )
+  const [ accountShell, setAccountShell ] = useState( null )
+
+  function handleAccountArchive() {
+    const settings = {
+      visibility: AccountVisibility.ARCHIVED
+    }
+    dispatch( updateAccountSettings( {
+      accountShell: accountShell, settings
+    } ) )
+    props.navigation.navigate( 'Home' )
+  }
 
   // After Mount didMount
   useEffect( () => {
@@ -153,6 +163,8 @@ const WalletBackup = ( props ) => {
         }
       } )
     } )
+    console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
+
     const focusListener = props.navigation.addListener( 'didFocus', () => {
       updateAddressBook()
     } )
@@ -167,7 +179,7 @@ const WalletBackup = ( props ) => {
 
   const init = async () => {
     await onRefresh()
-  // dispatch( modifyLevelData() )
+    // dispatch( modifyLevelData() )
   }
 
   const updateAddressBook = async () => {
@@ -388,7 +400,7 @@ const WalletBackup = ( props ) => {
     // Contact or Device type
     if ( contacts ) {
       for ( const ck of Object.keys( contacts ) ) {
-        if ( contacts [ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ) {
+        if ( contacts[ ck ].relationType == TrustedContactRelationTypes.KEEPER || contacts[ ck ].relationType == TrustedContactRelationTypes.PRIMARY_KEEPER ) {
           // initiate permanent channel
           const channelUpdate = {
             contactInfo: {
@@ -398,7 +410,7 @@ const WalletBackup = ( props ) => {
           channelUpdates.push( channelUpdate )
         }
       }
-      dispatch( syncPermanentChannels ( {
+      dispatch( syncPermanentChannels( {
         permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
         channelUpdates: channelUpdates,
         metaSync: true
@@ -413,9 +425,9 @@ const WalletBackup = ( props ) => {
     // autoCloudUpload()
   }
 
-  const autoCloudUpload = () =>{
-    if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
-      if( levelHealth[ 1 ].levelInfo.length == 4 &&
+  const autoCloudUpload = () => {
+    if ( levelHealth[ 0 ] && levelHealth[ 1 ] ) {
+      if ( levelHealth[ 1 ].levelInfo.length == 4 &&
         levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
@@ -445,6 +457,8 @@ const WalletBackup = ( props ) => {
   }
 
   const onKeeperButtonPress = ( value, keeperNumber ) => {
+    if ( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' )
+      return
     // if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
     //   setBackupTypeModal( true )
     //   return
@@ -545,7 +559,8 @@ const WalletBackup = ( props ) => {
       else if ( index >= 1 && levelData[ index - 1 ].keeper1.status == 'accessible' && levelData[ index - 1 ].keeper2.status == 'accessible' ) {
         // For Upgrade Functionality
         // setIsUpgrade(true)
-      } } )
+      }
+    } )
     setLocalLevelData( tempData )
   }, [ levelData ] )
 
@@ -577,21 +592,21 @@ const WalletBackup = ( props ) => {
           } else {
             return require( '../../assets/images/icons/seedwords.png' )
           }
-        case 'securityQuestion' :
+        case 'securityQuestion':
           if ( status == 'notSetup' ) {
             return require( '../../assets/images/icons/icon_password.png' )
           } else {
             return require( '../../assets/images/icons/icon_password.png' )
           }
-        case 'cloud' :
+        case 'cloud':
           return Platform.OS == 'ios' ? require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ) : require( '../../assets/images/icons/icon_google_drive.png' )
-        case 'device' :
-        case 'primaryKeeper' :
+        case 'device':
+        case 'primaryKeeper':
           if ( status == 'accessible' )
             return require( '../../assets/images/icons/icon_ipad_blue.png' )
           else return Platform.OS == 'ios' ? require( '../../assets/images/icons/icon_secondarydevice.png' ) : require( '../../assets/images/icons/icon_secondarydevice.png' )
-        case 'contact' :
-        case 'existingContact' :
+        case 'contact':
+        case 'existingContact':
           if ( updatedAt != 0 ) {
             if ( chosenContact && chosenContact.displayedName && chosenContact.avatarImageSource ) {
               return {
@@ -600,7 +615,7 @@ const WalletBackup = ( props ) => {
             } else return require( '../../assets/images/icons/icon_user.png' )
           }
           return require( '../../assets/images/icons/icon_contact.png' )
-        case 'pdf' :
+        case 'pdf':
           if ( status == 'accessible' )
             if ( valueStatus == 'notSetup' )
               return require( '../../assets/images/icons/files-and-folders-2.png' )
@@ -630,7 +645,7 @@ const WalletBackup = ( props ) => {
       focusListener.remove()
     }
   }, [] )
-  const showBackupMessage = () =>{
+  const showBackupMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
     return (
       <>
@@ -647,67 +662,88 @@ const WalletBackup = ( props ) => {
     )
   }
   const onChangeSeedWordBackUp = () => {
-    setSeedBackupModal( true )
+    let isAccountArchived  = false
+    let isBalanceFilled  = false
+
+    console.log( 'skk before psa', JSON.stringify( primarySubAccount ) )
+    accountsState?.accountShells?.map( ( item, index )=>{
+      if( item?.primarySubAccount?.type == AccountType.SAVINGS_ACCOUNT ){
+        setAccountShell( item )
+        setPrimarySubAccount( item.primarySubAccount )
+        if( item?.primarySubAccount?.balances?.confirmed + item?.primarySubAccount?.balances?.unconfirmed != 0 ) {
+          isBalanceFilled = true
+        } else if( item?.primarySubAccount?.visibility == AccountVisibility.ARCHIVED ){
+          isAccountArchived = true
+        }
+      }
+    } )
+    console.log( 'skk after psa', JSON.stringify( primarySubAccount ) )
+
+    if( isBalanceFilled )
+      alert( 'Please empty your saving account before archive' )
+    else if( isAccountArchived )
+      setSeedBackupModal( true )
+    else setShowAccountArchiveModal( true )
   }
   const getMessageToShow = () => {
-    if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
+    if ( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
       return {
         isFirstMessageBold: false, messageOne: headerStrings.init, messageTwo: '', isError: false, isInit: true
       }
     }
-    if( levelData ){
+    if ( levelData ) {
       let messageOneName = ''
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
-        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
+        if ( element.keeper1.name && element.keeper1.status == 'notAccessible' ) {
           return {
             isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: headerStrings.needAttention, isError: true
           }
         }
-        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
+        if ( element.keeper2.name && element.keeper2.status == 'notAccessible' ) {
           return {
             isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: headerStrings.needAttention, isError: true
           }
         }
-        if( element.keeper1.status == 'accessible'  && element.keeper1.shareType == 'seed' ){
-          messageOneName = 'Seed ' +headerStrings.backupIsCompleted
+        if ( element.keeper1.status == 'accessible' && element.keeper1.shareType == 'seed' ) {
+          messageOneName = 'Seed ' + headerStrings.backupIsCompleted
         }
-        if( element.keeper2.status == 'accessible' ){
+        if ( element.keeper2.status == 'accessible' ) {
           messageOneName = element.keeper2.name
         }
       }
-      if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType != 'seed' ){
+      if ( currentLevel == 0 && levelData[ 0 ].keeper1.shareType != 'seed' ) {
         return {
           isFirstMessageBold: false, messageOne: headerStrings.Backupyour, messageTwo: '', isError: true
         }
-      } else if( currentLevel === 1 ){
-        if( messageOneName ) {
+      } else if ( currentLevel === 1 ) {
+        if ( messageOneName ) {
           return {
-            isFirstMessageBold: false, messageOne: `${messageOneName} `+headerStrings.backupIsCompleted, messageTwo: '', isError: false
+            isFirstMessageBold: false, messageOne: `${messageOneName} ` + headerStrings.backupIsCompleted, messageTwo: '', isError: false
           }
         }
         return {
           isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? headerStrings.l1 : headerStrings.l1Drive, messageTwo: '', isError: false
         }
-      } else if( currentLevel === 2 ){
+      } else if ( currentLevel === 2 ) {
         return {
           isFirstMessageBold: false, messageOne: headerStrings.l2, messageTwo: '', isError: false
         }
-      } else if( currentLevel == 3 ){
+      } else if ( currentLevel == 3 ) {
         return {
           isFirstMessageBold: true, messageOne: headerStrings.l3, messageTwo: '', isError: false
         }
       }
     }
-    if( currentLevel === 1 ){
+    if ( currentLevel === 1 ) {
       return {
         isFirstMessageBold: false, messageOne: Platform.OS == 'ios' ? headerStrings.l1 : headerStrings.l1Drive, messageTwo: '', isError: false
       }
-    } else if( currentLevel == 0 && levelData[ 0 ].keeper1.shareType == 'seed' ) {
+    } else if ( currentLevel == 0 && levelData[ 0 ].keeper1.shareType == 'seed' ) {
       return {
-        isFirstMessageBold: false, messageOne: 'Seed ' +headerStrings.backupIsCompleted, messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: 'Seed ' + headerStrings.backupIsCompleted, messageTwo: '', isError: true
       }
-    }else {
+    } else {
       return {
         isFirstMessageBold: false, messageOne: headerStrings.Backupyour, messageTwo: '', isError: true
       }
@@ -759,12 +795,13 @@ const WalletBackup = ( props ) => {
         extraData={localLevelData}
         showsVerticalScrollIndicator={false}
         renderItem={( { item, index } ) => {
-          if ( index == 0 && item.keeper1ButtonText == 'Encryption Password' ){
+          if ( index == 0 && item.keeper1ButtonText == 'Encryption Password' ) {
             return null
           } else {
             return (
               <AppBottomSheetTouchableWrapper
-                style={styles.addModalView}
+                style={( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' ) ? styles.disableAddModalView : styles.addModalView}
+                activeOpacity={( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' ) ? 1 : 0}
                 onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
               >
                 <View style={styles.modalElementInfoView}>
@@ -778,48 +815,56 @@ const WalletBackup = ( props ) => {
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
-                  }}>{index == 0 &&  item.keeper1ButtonText == 'Seed' ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
+                  }}>{index == 0 && item.keeper1ButtonText == 'Seed' ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
-                <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
-                  style={{
-                    width: 10,
-                    height: 16,
-                    alignSelf: 'flex-end',
-                    resizeMode: 'contain',
-                    marginBottom: 2,
-                  // backgroundColor:'red'
-                  }}
-                />
+                {
+                  ( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' ) ?
+                    null
+                    :
+                    <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+                      style={{
+                        width: 10,
+                        height: 16,
+                        alignSelf: 'flex-end',
+                        resizeMode: 'contain',
+                        marginBottom: 2,
+                      // backgroundColor:'red'
+                      }}
+                    />
+                }
               </AppBottomSheetTouchableWrapper>
             )
           }
         }}
       />
 
-      <Shadow viewStyle={{
-        ...styles.successModalButtonView,
-        backgroundColor: Colors.blue,
-      }} distance={2}
-      startColor={Colors.shadowBlue }
-      offset={[ 40, 24 ]}>
-        <AppBottomSheetTouchableWrapper
-          onPress={onChangeSeedWordBackUp}
-          style={{
-            // ...styles.successModalButtonView,
-            shadowColor: Colors.shadowBlue,
-          }}
-          delayPressIn={0}
-        >
-          <Text
+      {
+        levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType != 'seed' &&
+        <Shadow viewStyle={{
+          ...styles.successModalButtonView,
+          backgroundColor: Colors.blue,
+        }} distance={2}
+        startColor={Colors.shadowBlue}
+        offset={[ 40, 24 ]}>
+          <AppBottomSheetTouchableWrapper
+            onPress={onChangeSeedWordBackUp}
             style={{
-              ...styles.proceedButtonText,
-              color: Colors.white,
+              // ...styles.successModalButtonView,
+              shadowColor: Colors.shadowBlue,
             }}
+            delayPressIn={0}
           >
-            {'Change to Seed Words Backup'}
-          </Text>
-        </AppBottomSheetTouchableWrapper>
-      </Shadow>
+            <Text
+              style={{
+                ...styles.proceedButtonText,
+                color: Colors.white,
+              }}
+            >
+              {'Change to Seed Words Backup'}
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+        </Shadow>
+      }
       <ModalContainer onBackground={() => setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )}>
         <KeeperTypeModalContents
           selectedLevelId={selectedLevelId}
@@ -893,7 +938,7 @@ const WalletBackup = ( props ) => {
               props.navigation.navigate( 'SetNewPassword', {
                 isFromManageBackup: true,
               } )
-            } else if( onPressBackupType == 2 ) {
+            } else if ( onPressBackupType == 2 ) {
               setSeedBackupModal( true )
             }
           }}
@@ -997,6 +1042,19 @@ const WalletBackup = ( props ) => {
           }}
         />
       </ModalContainer>
+      <ModalContainer onBackground={() => setShowAccountArchiveModal( false )} visible={showAccountArchiveModal} closeBottomSheet={() => { }}>
+        <AccountArchiveModal
+          isError={false}
+          onProceed={() => {
+            handleAccountArchive()
+            // closeArchiveModal()
+            setShowAccountArchiveModal( false )
+          }}
+          onBack={() => setShowAccountArchiveModal( false )}
+          onViewAccount={() => setShowAccountArchiveModal( false )}
+          account={primarySubAccount}
+        />
+      </ModalContainer>
     </SafeAreaView>
   )
 }
@@ -1028,6 +1086,16 @@ const styles = StyleSheet.create( {
     marginTop: 40,
     marginHorizontal: 20
   },
+  disableAddModalView: {
+    backgroundColor: Colors.white,
+    paddingVertical: 34,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    borderRadius: wp( '4' ),
+    marginBottom: hp( '1' ),
+    marginTop: 40,
+    marginHorizontal: 20
+  },
   modalElementInfoView: {
     flex: 1,
   },
@@ -1056,7 +1124,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     // alignSelf: 'center',
     marginLeft: wp( '6%' ),
-    marginBottom:hp ( '2%' ),
+    marginBottom: hp( '2%' ),
     marginTop: hp( '2%' )
   },
   proceedButtonText: {
