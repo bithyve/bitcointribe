@@ -348,7 +348,7 @@ export default function Receive( props ) {
           proceedButtonText={'Backup now'}
           cancelButtonText={'Not now'}
           isIgnoreButton={true}
-          isBottomImage={true}
+          isBottomImage={false}
           isBottomImageStyle={{
             width: wp( '35%' ),
             height: wp( '27%' ),
@@ -356,7 +356,6 @@ export default function Receive( props ) {
             resizeMode: 'stretch',
             marginBottom: hp( '-3%' ),
           }}
-          bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
         />
       </ModalContainer>
     </View>
