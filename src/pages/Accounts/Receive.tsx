@@ -346,7 +346,7 @@ export default function Receive( props ) {
           }}
           onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
           proceedButtonText={'Backup now'}
-          cancelButtonText={'Not now'}
+          cancelButtonText={'Later'}
           isIgnoreButton={true}
           isBottomImage={false}
           isBottomImageStyle={{
