@@ -71,6 +71,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
+  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
 
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
@@ -171,7 +172,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
       console.log( 'skk inside use account success' )
-      navigation.navigate( 'SendConfirmation' )
+      navigation.navigate( 'SendConfirmation', {
+        fromWallet
+      } )
     },
     onFailure: ( error ) => {
       console.log( 'skk inside use account' )
@@ -185,7 +188,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   useEffect( ()=> {
     if ( sendingState.feeIntelMissing ) {
       // missing fee intel: custom fee-fallback
-      navigation.navigate( 'SendConfirmation' )
+      navigation.navigate( 'SendConfirmation', {
+        fromWallet
+      } )
     }
   }, [ sendingState.feeIntelMissing ] )
 
@@ -234,6 +239,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             setSelectedAmount( amount )
           }}
           onSendMaxPressed={handleSendMaxPress}
+          fromWallet={fromWallet}
         />
       </View>
 

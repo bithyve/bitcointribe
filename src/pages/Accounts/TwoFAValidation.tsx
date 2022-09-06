@@ -1,4 +1,4 @@
-import React, { useEffect, useState, } from 'react'
+import React, { useCallback, useEffect, useState, } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -26,6 +26,10 @@ import SendConfirmationContent from './SendConfirmationContent'
 import DeviceInfo from 'react-native-device-info'
 import { validateTwoFA } from '../../store/actions/accounts'
 import ModalContainer from '../../components/home/ModalContainer'
+import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
+import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { addRecipientForSending, recipientSelectedForAmountSetting } from '../../store/actions/sending'
 
 export default function TwoFAValidation( props ) {
   const [ Elevation, setElevation ] = useState( 10 )
@@ -38,18 +42,54 @@ export default function TwoFAValidation( props ) {
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
   const twoFAHelpFlags = useSelector( ( state ) => state.accounts.twoFAHelpFlags )
+  const fromWallet = props.navigation?.getParam( 'fromWallet' ) || false
+  const address = props.navigation?.getParam( 'address' ) || null
+
+  const sendingState = useSendingState()
+
+  const isRecipientSelectedForSending = useCallback( ( recipient: RecipientDescribing ) => {
+    return (
+      sendingState
+        .selectedRecipients
+        .some( r => r.id == recipient.id )
+    )
+  }, [ sendingState ] )
 
   useEffect( ()=>{
     if ( token && twoFAHelpFlags ) {
       const validationSucccessful = twoFAHelpFlags.twoFAValid
       if( validationSucccessful ){
-        props.navigation.navigate( 'AccountDetails' )
-      } else if( validationSucccessful === false ) {
+        if( fromWallet ){
+          const addressRecipient = makeAddressRecipientDescription( {
+            address
+          } )
+          if ( isRecipientSelectedForSending( addressRecipient ) == false ) {
+            handleRecipientSelection( addressRecipient )
+          }
+        }  else props.navigation.navigate( 'AccountDetails' )
+      }else if( validationSucccessful === false ) {
         // SendUnSuccessBottomSheet.current.snapTo( 1 )
         setUnsuccessModal( true )
       }
     }
   }, [ twoFAHelpFlags ] )
+
+  function handleRecipientSelection( recipient: RecipientDescribing ) {
+    if ( isRecipientSelectedForSending( recipient ) == false ) {
+      dispatch( addRecipientForSending( recipient ) )
+    }
+
+    dispatch( recipientSelectedForAmountSetting( recipient ) )
+    navigateToSendDetails( recipient )
+  }
+
+  function navigateToSendDetails( selectedRecipient: RecipientDescribing ) {
+    console.log( 'skk fromWallet', fromWallet )
+    props.navigation.navigate( 'SentAmountForContactForm', {
+      selectedRecipientID: selectedRecipient.id,
+      fromWallet: fromWallet
+    } )
+  }
 
 
   function onPressNumber( text ) {
