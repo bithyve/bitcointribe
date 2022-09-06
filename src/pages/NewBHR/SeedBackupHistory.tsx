@@ -360,7 +360,7 @@ const SeedBackupHistory = ( props ) => {
           showButton={showButton}
           changeButtonText={'Change'}
           showSeedHistoryNote={true}
-          isChangeKeeperAllow={true}
+          isChangeKeeperAllow={false}
         />
       </View>
       <ModalContainer onBackground={()=>setConfirmationModal( false )} visible={confirmationModal} closeBottomSheet={() => {}}>

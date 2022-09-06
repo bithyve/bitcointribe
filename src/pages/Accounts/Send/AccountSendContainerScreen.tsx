@@ -51,6 +51,8 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
   const sendableContacts = useSendableTrustedContactRecipients()
+  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
+  const address = navigation?.getParam( 'address' ) || ''
 
   const accountsState = useAccountsState()
   const sendingState = useSendingState()
@@ -86,6 +88,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   function navigateToSendDetails( selectedRecipient: RecipientDescribing ) {
     navigation.navigate( 'SentAmountForContactForm', {
       selectedRecipientID: selectedRecipient.id,
+      fromWallet: fromWallet
     } )
   }
 
@@ -225,6 +228,8 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       if ( twoFASetupDetails && !twoFAValid )
         navigation.navigate( 'TwoFASetup', {
           twoFASetup: twoFASetupDetails,
+          fromWallet: fromWallet,
+          address
         } )
     }
   }, [ primarySubAccount.sourceKind ] )
@@ -232,6 +237,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   return (
     <AccountSendScreen
+      address={address}
       accountShell={accountShell}
       sendableContacts={sendableContacts}
       sendableAccountShells={sendableAccountShells}

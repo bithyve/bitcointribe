@@ -130,7 +130,7 @@ const HomeHeader = ( {
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
     return <TouchableOpacity
-      onPress={()=> {navigation.navigate( 'Setting' ), {
+      onPress={()=> {navigation.navigate( 'WalletBackup' ), {
         messageOne, messageTwo, isFirstMessageBold, isError, isInit
       }}}
       activeOpacity={0.6}

@@ -28,7 +28,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { translations } from '../../common/content/LocContext'
-import { AccountType, LevelData, LevelHealthInterface, MetaShare, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { AccountType, KeeperType, LevelData, LevelHealthInterface, MetaShare, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, downloadSMShare, setApprovalStatus, upgradeLevelOneKeeper } from '../../store/actions/BHR'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
@@ -47,6 +47,12 @@ import accounts, { AccountsState } from '../../store/reducers/accounts'
 import AccountArchiveModal from '../../pages/Accounts/AccountSettings/AccountArchiveModal'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { updateAccountSettings } from '../../store/actions/accounts'
+import { sourceAccountSelectedForSending } from '../../store/actions/sending'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import AccountShell from '../../common/data/models/AccountShell'
+import idx from 'idx'
+import { getNextFreeAddress } from '../../store/sagas/accounts'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 
 
 const WalletBackup = ( props, navigation ) => {
@@ -76,7 +82,12 @@ const WalletBackup = ( props, navigation ) => {
   const isKeeperInfoUpdated3: boolean = useSelector( ( state ) => state.bhr.isKeeperInfoUpdated3 )
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
+  const accountState: AccountsState = useSelector( ( state ) => idx( state, ( _ ) => _.accounts ) )
+  const accountShells: AccountShell[] = accountState.accountShells
 
+  const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
+  const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
+  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
   const iCloudErrors = translations[ 'iCloudErrors' ]
   const driveErrors = translations[ 'driveErrors' ]
   const defaultKeeperObj: {
@@ -141,6 +152,11 @@ const WalletBackup = ( props, navigation ) => {
   const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
   const [ primarySubAccount, setPrimarySubAccount ] = useState( null )
   const [ accountShell, setAccountShell ] = useState( null )
+  const [ emptyAccountErrorModal, setEmptyAccountErrorModal ] = useState( false )
+  const [ checkingAddress, setCheckingAddress ] = useState( null )
+
+  let localPrimarySubAccount = null
+  let localAccountShell = null
 
   function handleAccountArchive() {
     const settings = {
@@ -456,8 +472,8 @@ const WalletBackup = ( props, navigation ) => {
     }
   }
 
-  const onKeeperButtonPress = ( value, keeperNumber ) => {
-    if ( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' )
+  const onKeeperButtonPress = ( value, keeperNumber, showSeedAcion ) => {
+    if ( showSeedAcion )
       return
     // if ( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
     //   setBackupTypeModal( true )
@@ -549,7 +565,7 @@ const WalletBackup = ( props, navigation ) => {
     const tempData = []
     levelData.map( ( item, index ) => {
       if ( item.keeper1.status != 'notSetup' || index == 0 ) {
-        if ( item.keeper1.shareType == 'seed' ) {
+        if ( item.keeper1.shareType == 'seed' || item.keeper1ButtonText == 'Write down seed-words' ) {
           tempData.push( item )
           return
         }
@@ -665,23 +681,29 @@ const WalletBackup = ( props, navigation ) => {
     let isAccountArchived  = false
     let isBalanceFilled  = false
 
+
     console.log( 'skk before psa', JSON.stringify( primarySubAccount ) )
     accountsState?.accountShells?.map( ( item, index )=>{
       if( item?.primarySubAccount?.type == AccountType.SAVINGS_ACCOUNT ){
-        setAccountShell( item )
-        setPrimarySubAccount( item.primarySubAccount )
+        localPrimarySubAccount = item.primarySubAccount
+        localAccountShell = item
+        setAccountShell( localAccountShell )
+        setPrimarySubAccount( localPrimarySubAccount )
         if( item?.primarySubAccount?.balances?.confirmed + item?.primarySubAccount?.balances?.unconfirmed != 0 ) {
           isBalanceFilled = true
         } else if( item?.primarySubAccount?.visibility == AccountVisibility.ARCHIVED ){
           isAccountArchived = true
         }
       }
+      if( item?.primarySubAccount?.type == AccountType.CHECKING_ACCOUNT ){
+        const nextFreeAddress = getNextFreeAddress( dispatch,
+          accountsState.accounts[ item.primarySubAccount.id ] )
+        setCheckingAddress( nextFreeAddress )
+      }
     } )
-    console.log( 'skk after psa', JSON.stringify( primarySubAccount ) )
-
-    if( isBalanceFilled )
-      alert( 'Please empty your saving account before archive' )
-    else if( isAccountArchived )
+    if( isBalanceFilled ){
+      setEmptyAccountErrorModal( true )
+    } else if( isAccountArchived || currentLevel < 2 )
       setSeedBackupModal( true )
     else setShowAccountArchiveModal( true )
   }
@@ -783,7 +805,7 @@ const WalletBackup = ( props, navigation ) => {
       />
       <Text style={{
         fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10, marginStart: 20
-      }}>{'No backup created'}</Text>
+      }}>{( levelData && levelData[ 0 ]?.status == 'notSetup' ) ? 'No backup created' : 'Backup created'}</Text>
       {/* <Text style={{
         fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
       }}>{getMessageToShow()}</Text> */}
@@ -798,11 +820,13 @@ const WalletBackup = ( props, navigation ) => {
           if ( index == 0 && item.keeper1ButtonText == 'Encryption Password' ) {
             return null
           } else {
+            const showSeedAcion = ( levelData && ( levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' )
+            || ( levelData[ 0 ]?.status == 'notSetup' && levelData[ 0 ]?.keeper1?.shareType == KeeperType.SECURITY_QUESTION ) )
             return (
               <AppBottomSheetTouchableWrapper
-                style={( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' ) ? styles.disableAddModalView : styles.addModalView}
-                activeOpacity={( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' ) ? 1 : 0}
-                onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ) )}
+                style={showSeedAcion ? styles.disableAddModalView : styles.addModalView}
+                activeOpacity={showSeedAcion ? 1 : 0}
+                onPress={() => onKeeperButtonPress( item, ( ( index % 2 ) + 1 ), showSeedAcion )}
               >
                 <View style={styles.modalElementInfoView}>
                   <Image style={{
@@ -818,7 +842,7 @@ const WalletBackup = ( props, navigation ) => {
                   }}>{index == 0 && item.keeper1ButtonText == 'Seed' ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
                 {
-                  ( levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' ) ?
+                  showSeedAcion ?
                     null
                     :
                     <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
@@ -839,7 +863,8 @@ const WalletBackup = ( props, navigation ) => {
       />
 
       {
-        levelData && levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType != 'seed' &&
+        ( levelData && ( levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType != 'seed' )
+        || ( levelData[ 0 ]?.status == 'notSetup' && levelData[ 0 ]?.keeper1?.shareType == KeeperType.SECURITY_QUESTION ) ) &&
         <Shadow viewStyle={{
           ...styles.successModalButtonView,
           backgroundColor: Colors.blue,
@@ -954,7 +979,7 @@ const WalletBackup = ( props, navigation ) => {
           title={'Backup with Seed words'}
           // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
           info={'Backup your wallet to ensure security and easy wallet retrieval.\n\n'}
-          note={'Note: This will only be allowed if the Savings account is empty and archived.'}
+          // note={'Note: This will only be allowed if the Savings account is empty and archived.'}
           proceedButtonText={'Proceed'}
           cancelButtonText={'Cancel'}
           onPressProceed={() => {
@@ -1017,6 +1042,37 @@ const WalletBackup = ( props, navigation ) => {
             marginBottom: hp( '-3%' ),
           }}
           bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={() => setEmptyAccountErrorModal( false )} visible={emptyAccountErrorModal} closeBottomSheet={() => setEmptyAccountErrorModal( false )}>
+        <ErrorModalContents
+          title={'Action Required'}
+          info={'Please empty and Archive your Savings Account to backup using Seed Words'}
+          // note={''}
+          onPressProceed={() => {
+            setEmptyAccountErrorModal( false )
+            dispatch( sourceAccountSelectedForSending( accountShell ) )
+
+            props.navigation.navigate( 'AccountSend', {
+              subAccountKind: primarySubAccount.kind,
+              accountShellID: accountShell.id,
+              fromWallet: true,
+              address: checkingAddress
+            } )
+          }}
+          onPressIgnore={() => setTimeout( () => { setEmptyAccountErrorModal( false ) }, 500 )}
+          proceedButtonText={'Sweep funds'}
+          cancelButtonText={'Not now'}
+          isIgnoreButton={true}
+          isBottomImage={true}
+          isBottomImageStyle={{
+            width: wp( '27%' ),
+            height: wp( '27%' ),
+            marginLeft: 'auto',
+            resizeMode: 'stretch',
+            marginBottom: hp( '-3%' ),
+          }}
+          // bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
         />
       </ModalContainer>
       <ModalContainer visible={showQRModal} closeBottomSheet={() => { }} >

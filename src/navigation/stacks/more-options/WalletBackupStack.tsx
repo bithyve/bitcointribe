@@ -14,6 +14,13 @@ import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent
 import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestionHistory'
 import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
+import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
+import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
+import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
+import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
+import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -55,6 +62,43 @@ const WalletBackupStack = createStackNavigator(
     },
     PersonalCopyHistoryNewBHR,
     SecurityQuestionHistoryNewBHR,
+    AccountSend: {
+      screen: AccountSendContainerScreen,
+    },
+    TwoFAValidation,
+    TwoFASetup: {
+      screen: TwoFASetup,
+      navigationOptions: {
+        gesturesEnabled: false,
+        header: null
+      },
+    },
+    AccountDetails: {
+      screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
+    SentAmountForContactForm: {
+      screen: SentAmountForContactFormScreen,
+      navigationOptions: {
+        title: 'Send To'
+      },
+    },
+    SendConfirmation: {
+      screen: AccountSendConfirmationContainerScreen,
+      navigationOptions: {
+        title: 'Send Confirmation',
+
+      },
+    },
+    OTPAuthentication: {
+      screen: OTPAuthenticationScreen,
+      navigationOptions: {
+        header: null,
+      },
+    }
   },
   {
     defaultNavigationOptions: ( { navigation } ) => {
