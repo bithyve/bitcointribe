@@ -35,8 +35,9 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
 
   useEffect( ()=>{
     console.log( 'skk update didmount' )
-    handleTextChange( address )
-  }, [] )
+    if ( address )
+      handleTextChange( address )
+  }, [ address ] )
 
   function handleTextChange( newValue: string ) {
     const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( newValue.trim(), network )
