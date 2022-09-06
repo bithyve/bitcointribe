@@ -241,7 +241,7 @@ class RestoreWithICloud extends Component<
       renderTimer: false,
       walletName: '',
       loaderMessage: {
-        heading: translations[ 'bhr' ].Creatingyourwallet,
+        heading: translations[ 'bhr' ].Importingyourwallet,
         text: translations[ 'bhr' ].Thismaytake
       },
       question: '',
