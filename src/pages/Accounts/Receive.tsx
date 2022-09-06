@@ -346,9 +346,9 @@ export default function Receive( props ) {
           }}
           onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
           proceedButtonText={'Backup now'}
-          cancelButtonText={'Not now'}
+          cancelButtonText={'Later'}
           isIgnoreButton={true}
-          isBottomImage={true}
+          isBottomImage={false}
           isBottomImageStyle={{
             width: wp( '35%' ),
             height: wp( '27%' ),
@@ -356,7 +356,6 @@ export default function Receive( props ) {
             resizeMode: 'stretch',
             marginBottom: hp( '-3%' ),
           }}
-          bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
         />
       </ModalContainer>
     </View>

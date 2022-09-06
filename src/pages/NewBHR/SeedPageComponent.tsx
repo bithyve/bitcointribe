@@ -406,7 +406,7 @@ const styles = StyleSheet.create( {
     // paddingLeft: wp( '3%' ),
     // paddingRight: wp( '3%' ),
     paddingHorizontal: wp(2),
-    paddingVertical: height > 720 ? hp(1) : 0,
+    paddingVertical: height > 760 ? hp(1) : 0,
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
