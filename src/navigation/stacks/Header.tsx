@@ -1757,6 +1757,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onBackground={() => {
               if (this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST) {
                 console.log('bgState');
+              } else if (this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST) {
+                console.log('bgState');
               } else {
                 const perviousState = this.state.currentBottomSheetKind
                 this.setState( {
