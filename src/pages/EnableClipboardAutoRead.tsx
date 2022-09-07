@@ -12,9 +12,10 @@ import CommonStyles from "../common/Styles/Styles";
 import Colors from "../common/Colors";
 import ButtonStyles from "../common/Styles/ButtonStyles";
 import HeaderTitle from "../components/HeaderTitle";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleClipboardAccess } from "../store/actions/misc";
+import ModalContainer from "../components/home/ModalContainer";
 
 const EnableClipboardAutoRead = (props) => {
   const dispatcher = useDispatch();
@@ -30,12 +31,12 @@ const EnableClipboardAutoRead = (props) => {
   };
 
   return (
-    <SafeAreaView style={style.wrapper}>
+    <SafeAreaView>
       <StatusBar
         backgroundColor={Colors.backgroundColor}
         barStyle="dark-content"
       />
-      <View
+      {/* <View
         style={[
           CommonStyles.headerContainer,
           {
@@ -82,7 +83,12 @@ const EnableClipboardAutoRead = (props) => {
           }}
           onPress={changePermission}
         />
-      </View>
+      </View> */}
+      <ModalContainer>
+        <View style={style.wrapper}>
+          
+        </View>
+      </ModalContainer>
     </SafeAreaView>
   );
 };
@@ -91,11 +97,11 @@ export default EnableClipboardAutoRead;
 
 const style = StyleSheet.create({
   wrapper: {
-    flex: 1,
+    height: hp(10),
     backgroundColor: Colors.backgroundColor,
   },
   buttonWrapper: {
-    width: widthPercentageToDP(35),
-    marginHorizontal: widthPercentageToDP(5),
+    width: wp(35),
+    marginHorizontal: wp(5),
   },
 });

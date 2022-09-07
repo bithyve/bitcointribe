@@ -74,8 +74,8 @@ const ClipboardAutoRead: React.FC<IClipboardAutoReadProps> = ({navigation}) => {
       closeBottomSheet={() => setModalShow(false)}
     >
       <NotificationInfoContents
-        title={"Tranfer Sats"}
-        info={`We detected you copied a BTC address.\nWould you like to tranfer Sats to \n${address}`}
+        title={"Tranferring Sats?"}
+        info={`A BTC address was detected in your clipboard.\nWould you like to tranfer Sats to \n${address}`}
         additionalInfo={null}
         onPressProceed={() => onSend(address, 0)}
         onPressIgnore={() => {
