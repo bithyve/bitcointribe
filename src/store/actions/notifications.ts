@@ -17,6 +17,7 @@ export const STORE_MESSAGE_TIMESTAMP = 'STORE_MESSAGE_TIMESTAMP'
 export const MESSAGES_FETCHED = 'MESSAGES_FETCHED'
 export const UPDATE_MESSAGES_STATUS_INAPP = 'UPDATE_MESSAGES_STATUS_INAPP'
 export const UPDATE_MESSAGES_STATUS = 'UPDATE_MESSAGES_STATUS'
+export const NOTIFICATION_PRESSED = 'NOTIFICATION_PRESSED'
 
 export const updateFCMTokens = ( FCMs: string[] ) => {
   return {
@@ -135,3 +136,12 @@ export const updateMessageStatus = ( data : [] ) => {
   }
 }
 
+export const notificationPressed = ( notificationId: string, handleClick: (msg: string) => void ) => {
+  return {
+    type: NOTIFICATION_PRESSED,
+    payload: {
+      notificationId,
+      handleClick,
+    }
+  }
+}

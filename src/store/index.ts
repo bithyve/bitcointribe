@@ -128,6 +128,7 @@ import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import {
   fetchNotificationsWatcher,
   getMessageWatcher,
+  pushNotificationPressedWatcher,
   updateFCMTokensWatcher,
   updateMessageStatusInAppWatcher,
   updateMessageStatusWatcher
@@ -239,6 +240,7 @@ const rootSaga = function* () {
     getMessageWatcher,
     updateMessageStatusWatcher,
     updateMessageStatusInAppWatcher,
+    pushNotificationPressedWatcher,
 
     // Trusted Contacts
     initializeTrustedContactWatcher,
