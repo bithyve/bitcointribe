@@ -80,6 +80,7 @@ import {
   updateMessageStatusInApp,
   updateMessageStatus,
   getMessages,
+  notificationPressed,
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
@@ -271,6 +272,7 @@ interface HomePropsTypes {
   trustedContacts: Trusted_Contacts;
   IsCurrentLevel0: boolean;
   walletId: string;
+  notificationPressed: any;
   // clipboardAccess: boolean;
 }
 
@@ -614,25 +616,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   createNotificationListeners = async () => {
-    messaging().onNotificationOpenedApp((data) => {
-      // console.log('awdawdawdwd', data);
-      const content = JSON.parse(data.data.content);
-      // console.log('adadcubsyuf', content.notificationId)
-      this.currentNotificationId =  content.notificationId
-      // console.log('adaesiekf', this.currentNotificationId)
-      const d = this.state.notificationData;
-
-      const msg = [];
-
-      for (const k of d) {
-        if (k.notificationId === content.notificationId) {
-          msg.push(k)
-        }
-      }
-
-      this.handleNotificationBottomSheetSelection(msg[0]);
-    })
-
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       // largeIcon: 'ic_launcher',
@@ -689,6 +672,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
        */
       requestPermissions: true,
     } )
+
+    messaging().getInitialNotification().then((data) => {
+      const content = JSON.parse(data.data.content)
+      this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
+    })
+
+    messaging().onNotificationOpenedApp((data) => {
+      const content = JSON.parse(data.data.content)
+      this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
+    })
   };
 
   syncChannel= () => {
@@ -1681,7 +1674,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const { netBalance, notificationData, currencyCode } = this.state
-    
+
     const {
       navigation,
       exchangeRates,
@@ -1899,7 +1892,8 @@ export default withNavigationFocus(
     syncPermanentChannels,
     updateLastSeen,
     updateSecondaryShard,
-    rejectedExistingContactRequest
+    rejectedExistingContactRequest,
+    notificationPressed,
   } )( Home )
 )
 

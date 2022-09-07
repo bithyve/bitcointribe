@@ -11,7 +11,8 @@ import {
   storeMessagesTimeStamp,
   messageFetched,
   UPDATE_MESSAGES_STATUS_INAPP,
-  UPDATE_MESSAGES_STATUS
+  UPDATE_MESSAGES_STATUS,
+  NOTIFICATION_PRESSED,
 } from '../actions/notifications'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
@@ -130,4 +131,24 @@ export function* updateMessageStatusWorker( { payload } ) {
 export const updateMessageStatusWatcher = createWatcher(
   updateMessageStatusWorker,
   UPDATE_MESSAGES_STATUS,
+)
+
+export function* pushNotificationPressedWorker( {payload} ) {
+  console.log("PRESED_PAYLOAD", payload);
+  yield call(getMessageWorker)
+  const data = yield select((state) => state.notifications.messages)
+
+  const msg = []
+  for (const k of data) {
+    if (k.notificationId === payload.notificationId) {
+      msg.push(k)
+    }
+  }
+
+  payload.handleClick(msg[0]);
+}
+
+export const pushNotificationPressedWatcher = createWatcher(
+  pushNotificationPressedWorker,
+  NOTIFICATION_PRESSED
 )
