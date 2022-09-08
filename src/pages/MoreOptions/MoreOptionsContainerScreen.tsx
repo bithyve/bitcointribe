@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType } from 'react-native'
+import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType, Dimensions, Switch } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
 import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
 import Node from '../../assets/images/svgs/node.svg'
@@ -15,6 +15,9 @@ import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { LevelData } from '../../bitcoin/utilities/Interface'
+import ModalContainer from '../../components/home/ModalContainer'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
+import { toggleClipboardAccess } from '../../store/actions/misc'
 
 export type Props = {
   navigation: any;
@@ -32,6 +35,8 @@ interface MenuOption {
 }
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
+
+const {height} = Dimensions.get('window')
 
 const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const { translations, } = useContext( LocalizationContext )
@@ -126,13 +131,17 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       subtitle: strings.AppInfoSub,
       screenName: 'AppInfo',
     },
-    // {
-    //   title: 'Enable Auto Read from Clipboard',
-    //   imageSource: require( '../../assets/images/icons/icon_info.png' ),
-    //   subtitle: 'App will prompt to send sats to copied address',
-    //   screenName: 'EnableClipboard'
-    // },
+    {
+      title: 'Enable Auto-Read from Clipboard',
+      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      subtitle: 'App will prompt to send sats to copied address',
+      onOptionPressed: () => {
+        setModalVisible(true)
+      }
+    },
   ]
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
@@ -166,12 +175,105 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               height: widthPercentageToDP( 6 ),
             }}
           /> )
-        // case 'Enable Auto Read from Clipboard':
-        //   return ( <AppInfo />)
+        case 'Enable Auto-Read from Clipboard':
+          return ( <AppInfo />)
         default:
           return null
     }
   }
+
+  const enabled = useSelector((state) => state.misc.clipboardAccess)
+
+  const dispatcher = useDispatch()
+
+  const changePermission = () => {
+    dispatcher(toggleClipboardAccess());
+  };
+
+  const ReadClipboardModal = () => {
+    return (
+      <View style={styles.wrapper}>
+        <View>
+          <AppBottomSheetTouchableWrapper
+            style={{
+              backgroundColor: Colors.lightBlue,
+              width: 30,
+              height: 30,
+              borderRadius: 15,
+              justifyContent: "center",
+              alignItems: "center",
+              alignSelf: "flex-end",
+              margin: widthPercentageToDP(2),
+            }}
+            onPress={() => setModalVisible(false)}
+          >
+            <CrossButton />
+          </AppBottomSheetTouchableWrapper>
+          <View style={{ marginHorizontal: widthPercentageToDP(10) }}>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(20),
+              }}
+            >
+              Auto-Read from Clipboard
+            </Text>
+            <Text
+              style={{
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+                color: Colors.gray8,
+                lineHeight: RFValue(20),
+              }}
+            >
+              {
+                "Grant Hexa access to clipboard \nto copy and paste BTC addresses"
+              }
+            </Text>
+            <View style={{ marginTop: "15%", flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(16),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Allow auto-read access
+              </Text>
+              <Switch
+                onValueChange={changePermission}
+                trackColor={{ false: Colors.gray1, true: Colors.blue }}
+                thumbColor={isEnabled ? Colors.textColorGrey : Colors.white}
+                value={enabled}
+              />
+            </View>
+            <TouchableOpacity
+              style={{
+                marginTop: "20%",
+                backgroundColor: Colors.blue,
+                width: widthPercentageToDP(30),
+                height: heightPercentageToDP(7.5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: widthPercentageToDP(3)
+              }}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontFamily: Fonts.FiraSansSemiBold
+                }}
+              >
+                Proceed
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={{
@@ -179,6 +281,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
+      <ModalContainer visible={modalVisible} closeBottomSheet={() => setModalVisible(false)}>
+        {ReadClipboardModal()}
+      </ModalContainer>
       <View style={styles.accountCardsSectionContainer}>
         {console.log( 'skk leveldata', levelData )}
         <Text style={{
@@ -544,6 +649,10 @@ const styles = StyleSheet.create( {
     paddingHorizontal: 10,
     marginBottom: heightPercentageToDP( 2 ),
     borderRadius: 10,
+  },
+  wrapper: {
+    height: height > 720 ? heightPercentageToDP(35) : heightPercentageToDP(50),
+    backgroundColor: Colors.backgroundColor,
   },
 } )
 
