@@ -150,7 +150,8 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
+          backgroundColor: levelData[ 0 ].keeper1.shareType == '' ? Colors.white : ( levelData[ 0 ].keeper1.shareType == 'seed' ? Colors.green : Colors.red ),
+          // backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
@@ -172,8 +173,10 @@ const HomeHeader = ( {
             />
           }
         </View>
-      }
-      {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
+      }<Text ellipsizeMode="middle" numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text>
+      {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
@@ -181,7 +184,7 @@ const HomeHeader = ( {
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp( 0.8 )
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
-        }}>{messageTwo}</Text></Text>}
+        }}>{messageTwo}</Text></Text>} */}
     </TouchableOpacity>
   }
 

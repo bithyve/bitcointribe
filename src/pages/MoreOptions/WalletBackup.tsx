@@ -165,7 +165,10 @@ const WalletBackup = ( props, navigation ) => {
     dispatch( updateAccountSettings( {
       accountShell: accountShell, settings
     } ) )
-    props.navigation.navigate( 'Home' )
+    setTimeout( () => {
+      onChangeSeedWordBackUp()
+    }, 1000 )
+    // props.navigation.navigate( 'Home' )
   }
 
   // After Mount didMount
@@ -563,10 +566,13 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     const tempData = []
+    let isSeed = false
     levelData.map( ( item, index ) => {
+      if( isSeed ) return
       if ( item.keeper1.status != 'notSetup' || index == 0 ) {
         if ( item.keeper1.shareType == 'seed' || item.keeper1ButtonText == 'Write down seed-words' ) {
           tempData.push( item )
+          isSeed = true
           return
         }
         tempData.push( item )
@@ -806,10 +812,11 @@ const WalletBackup = ( props, navigation ) => {
       <Text style={{
         fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10, marginStart: 20
       }}>{( levelData && levelData[ 0 ]?.status == 'notSetup' ) ? 'No backup created' : 'Backup created'}</Text>
-      {/* <Text style={{
+      <Text style={{
         fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
-      }}>{getMessageToShow()}</Text> */}
-      {showBackupMessage()}
+      }}>{levelData[ 0 ].keeper1.shareType == '' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text>
+      {/* {showBackupMessage()} */}
+      {/* {console.log( 'skk localLevelData', JSON.stringify( localLevelData ) )} */}
 
       <FlatList
         keyExtractor={( item, index ) => item + index}
@@ -839,7 +846,8 @@ const WalletBackup = ( props, navigation ) => {
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
-                  }}>{index == 0 && item.keeper1ButtonText == 'Seed' ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
+                  }}>{index == 0 && ( item.keeper1ButtonText == 'Seed' || item.keeper1ButtonText == 'Write down seed-words' )
+                      ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
                 {
                   showSeedAcion ?
