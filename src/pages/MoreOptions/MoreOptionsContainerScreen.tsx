@@ -193,7 +193,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const ReadClipboardModal = () => {
     return (
       <View style={styles.wrapper}>
-        <View>
+        <View style={{ flex: 1 }}>
           <AppBottomSheetTouchableWrapper
             style={{
               backgroundColor: Colors.lightBlue,
@@ -231,9 +231,20 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 "Grant Hexa access to clipboard \nto copy and paste BTC addresses"
               }
             </Text>
-            <View style={{ marginTop: "15%", flexDirection: 'row', justifyContent: 'space-between' }}>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              marginBottom: widthPercentageToDP(10),
+              marginHorizontal: widthPercentageToDP(10),
+            }}
+          >
+            <View
+              style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}
+            >
               <Text
                 style={{
+                  alignSelf: 'center',
                   color: Colors.textColorGrey,
                   fontSize: RFValue(16),
                   fontFamily: Fonts.FiraSansRegular,
@@ -250,20 +261,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             </View>
             <TouchableOpacity
               style={{
-                marginTop: "20%",
                 backgroundColor: Colors.blue,
                 width: widthPercentageToDP(30),
                 height: heightPercentageToDP(7.5),
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: widthPercentageToDP(3)
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: widthPercentageToDP(3),
               }}
               onPress={() => setModalVisible(false)}
             >
               <Text
                 style={{
                   color: Colors.white,
-                  fontFamily: Fonts.FiraSansSemiBold
+                  fontFamily: Fonts.FiraSansSemiBold,
                 }}
               >
                 Proceed
