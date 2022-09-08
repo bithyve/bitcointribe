@@ -37,8 +37,9 @@ export default function VersionHistoryScreen( props ) {
   const [ data, setData ] = useState( [] )
 
   useEffect( () => {
+    // console.log( 'skk versionHistory' +  JSON.stringify( versionHistory  ) )
     // eslint-disable-next-line prefer-const
-    let versions = getVersions( versionHistory, restoreVersions )
+    let versions = getVersions( versionHistory.length < 50 ? versionHistory : JSON.parse( versionHistory ), restoreVersions )
     if( versions.length ){
       setData( versions )
       setIsDataSet( !isDataSet )
