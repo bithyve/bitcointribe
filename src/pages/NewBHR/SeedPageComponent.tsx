@@ -27,12 +27,12 @@ import dbManager from '../../storage/realm/dbManager'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get( 'window' )
 
 const SeedPageComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
-  const [ SelectedOption, setSelectedOption ] = useState( 0 )
+  const [ SelectedOption, setSelectedOption ] = useState( -1 )
   const SelectOption = ( Id ) => {
   }
 
@@ -68,12 +68,12 @@ const SeedPageComponent = ( props ) => {
     const tempData = []
     let innerTempData = []
     let initPosition = 0
-    let lastPosition = 6
+    let lastPosition = 12
     const totalLength = seedData.length
     seedData.map( ( item, index )=>{
-      if( index != 0 && index % 6 == 0 ){
-        initPosition = initPosition + 6
-        lastPosition = ( lastPosition + 6 > totalLength )?totalLength:lastPosition
+      if( index != 0 && index % 12 == 0 ){
+        initPosition = initPosition + 12
+        lastPosition = ( lastPosition + 12 > totalLength )?totalLength:lastPosition
         tempData.push( innerTempData )
         innerTempData = []
       }
@@ -87,13 +87,16 @@ const SeedPageComponent = ( props ) => {
   }, [] )
 
   const onNextClick = () => {
+    setSelectedOption( -1 )
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
-    props.setHeaderMessage( 'Last 6 seed words' )
+    // props.setHeaderMessage( 'Last 12 seed words' )
+    props.setHeaderMessage( 'Last 12 Backup phrase' )
   }
 
   const onProceedClick = () =>{
+    setSelectedOption( -1 )
     let seed = ''
     let showValidation = false
     seedData.forEach( ( { name } ) => {
@@ -112,10 +115,12 @@ const SeedPageComponent = ( props ) => {
   }
 
   const onPreviousClick = () => {
+    setSelectedOption( -1 )
     const nextPosition = currentPosition-1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
-    props.setHeaderMessage( 'First 6 seed words' )
+    // props.setHeaderMessage( 'First 12 seed words' )
+    props.setHeaderMessage( 'Backup phrase' )
   }
 
   const getFormattedNumber = ( number ) => {
@@ -131,7 +136,7 @@ const SeedPageComponent = ( props ) => {
   }
 
   const getIndex = ( index, seedIndex )=>{
-    const newIndex = index + 1 + ( seedIndex * 6 )
+    const newIndex = index + 1 + ( seedIndex * 12 )
     // let isAdd = false
     // if( index % 2 == 0 ) isAdd = true
 
@@ -194,8 +199,11 @@ const SeedPageComponent = ( props ) => {
           listener: ( { nativeEvent: { position } } ) => {
             setCurrentPosition( position )
             if( position == 0 )
-              props.setHeaderMessage( 'First 6 seed words' )
-            else props.setHeaderMessage( 'Last 6 seed words' )
+              // props.setHeaderMessage( 'First 12 seed words' )
+              props.setHeaderMessage( 'Backup phrase' )
+            else
+            // props.setHeaderMessage( 'Last 12 seed words' )
+              props.setHeaderMessage( 'Last 12 Backup phrase' )
           },
           useNativeDriver: true,
         }
@@ -227,7 +235,7 @@ const SeedPageComponent = ( props ) => {
                   data={seedItem}
                   extraData={seedItem}
                   showsVerticalScrollIndicator={false}
-                  // numColumns={2}
+                  numColumns={2}
                   contentContainerStyle={{
                     marginStart:15
                   }}
@@ -257,15 +265,19 @@ const SeedPageComponent = ( props ) => {
                           textContentType="none"
                           returnKeyType="next"
                           autoCorrect={false}
-                          editable={false}
+                          secureTextEntry={ index == SelectedOption ? false : true}
+                          onFocus={() => {
+                            setSelectedOption( index )
+                          }}
+                          // editable={false}
                           autoCapitalize="none"
                           // onSubmitEditing={() =>
                           // }
-                          onChangeText={( text ) => {
-                            const data = [ ...partialSeedData ]
-                            data[ currentPosition ][ getTextIndex( index ) ].name = text
-                            setPartialSeedData( data )
-                          }}
+                          // onChangeText={( text ) => {
+                          //   const data = [ ...partialSeedData ]
+                          //   data[ currentPosition ][ getTextIndex( index ) ].name = text
+                          //   setPartialSeedData( data )
+                          // }}
                         />
                       </TouchableOpacity>
                     )
@@ -281,7 +293,7 @@ const SeedPageComponent = ( props ) => {
           </AnimatedPagerView>
         ): (
           <View style={{
-            flex: 1
+            flex: 1,
           }}>
             {/* <View style={{
               backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
@@ -298,7 +310,7 @@ const SeedPageComponent = ( props ) => {
         <View style={[ styles.bottomButtonView ]}>
           {props.confirmButtonText ? (
             <TouchableOpacity
-              onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : onProceedClick() }}
+              onPress={() => { ( currentPosition + 1 ) * 12 < total ? onNextClick() : onProceedClick() }}
               style={{
                 ...styles.successModalButtonView,
                 backgroundColor: props.confirmDisable
@@ -314,14 +326,14 @@ const SeedPageComponent = ( props ) => {
                   color: Colors.white,
                 }}
               >
-                {( currentPosition + 1 ) * 6 < total ? props.confirmButtonText : props.proceedButtonText}
+                {( currentPosition + 1 ) * 12 < total ? props.confirmButtonText : props.proceedButtonText}
               </Text>
             </TouchableOpacity>
           ) : null}
           {props.isChangeKeeperAllow ? (
             <TouchableOpacity
               disabled={props.disableChange ? props.disableChange : false}
-              onPress={() => { ( currentPosition  * 6 )!=0 ? onPreviousClick() : props.onPressChange() }}
+              onPress={() => { ( currentPosition  * 12 )!=0 ? onPreviousClick() : props.onPressChange() }}
               style={{
                 marginLeft: 10,
                 height: wp( '13%' ),
@@ -337,7 +349,7 @@ const SeedPageComponent = ( props ) => {
                   color: props.disableChange ? Colors.lightBlue : Colors.blue,
                 }}
               >
-                {(  currentPosition  * 6 )!=0 ? props.previousButtonText : props.changeButtonText}
+                {(  currentPosition  * 12 )!=0 ? props.previousButtonText : props.changeButtonText}
               </Text>
             </TouchableOpacity>
           ) : null}
@@ -405,12 +417,12 @@ const styles = StyleSheet.create( {
     // justifyContent: 'center',
     // paddingLeft: wp( '3%' ),
     // paddingRight: wp( '3%' ),
-    paddingHorizontal: wp(2),
-    paddingVertical: height > 760 ? hp(1) : 0,
+    paddingHorizontal: wp( 2 ),
+    paddingVertical: height > 760 ? hp( 1 ) : 0,
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: height > 720 ? 20 : height > 650 ? 15 : 10,
+    marginBottom: height > 720 ? 15 : height > 650 ? 10 : 5,
     borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
@@ -428,18 +440,18 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
   },
   bottomButtonView: {
-    height: hp( '18%' ),
+    height: hp( '13%' ),
     flexDirection: 'row',
-    marginTop: 'auto',
+    // marginTop: 'auto',
     alignItems: 'center',
     marginLeft: wp( '8%' ),
     marginRight: wp( '8%' ),
   },
   numberContainer: {
     margin: 5,
-    height: height > 720 ? (50) : height > 650 ? ( 45 ) : ( 30 ),
-    width: height > 720 ? (50) : height > 650 ? ( 45 ) : ( 30 ),
-    borderRadius: height > 720 ? (25) : ( 15 ),
+    height: height > 720 ? ( 50 ) : height > 650 ? ( 45 ) : ( 30 ),
+    width: height > 720 ? ( 50 ) : height > 650 ? ( 45 ) : ( 30 ),
+    borderRadius: height > 720 ? ( 25 ) : ( 15 ),
     backgroundColor: Colors.white,
     shadowColor: Colors.shadowBlack,
     // elevation: 10,
@@ -450,13 +462,13 @@ const styles = StyleSheet.create( {
       height: 15,
     },
     justifyContent: 'center',
-    alignItems: "center"
+    alignItems: 'center'
   },
   numberInnerContainer: {
     backgroundColor: Colors.numberBg,
     borderRadius: ( 23 ),
-    height: height > 720 ? (46) : height > 650 ? ( 41 ) : ( 26 ),
-    width: height > 720 ? (46) : height > 650 ? ( 41 ) : ( 26 ),
+    height: height > 720 ? ( 46 ) : height > 650 ? ( 41 ) : ( 26 ),
+    width: height > 720 ? ( 46 ) : height > 650 ? ( 41 ) : ( 26 ),
     margin: ( 4 ),
     justifyContent: 'center',
     alignItems: 'center'
