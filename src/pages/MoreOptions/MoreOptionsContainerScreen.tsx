@@ -66,6 +66,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   isSwitch: true
     // },
     {
+      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
+        ? bhrStrings[ 'WalletBackupInfo1' ]
+        : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+          ? 'Seed backup completed'
+          :'Cloud backup completed',
+      title: bhrStrings[ 'WalletBackup' ],
+      screenName: 'WalletBackup',
+    },
+    {
       title: strings.accountManagement,
       imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
       subtitle: strings.accountManagementSub,
@@ -110,16 +120,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   },
     // },
     {
-      imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
-        ? bhrStrings[ 'WalletBackupInfo1' ]
-        : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-          ? 'seed backup completed'
-          :'cloud backup completed',
-      title: bhrStrings[ 'WalletBackup' ],
-      screenName: 'WalletBackup',
-    },
-    {
       imageSource: require( '../../assets/images/icons/settings.png' ),
       subtitle: strings.walletSettingsSub,
       title: strings.walletSettings,
@@ -131,14 +131,14 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       subtitle: strings.AppInfoSub,
       screenName: 'AppInfo',
     },
-    {
-      title: 'Enable Auto-Read from Clipboard',
-      imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle: 'App will prompt to send sats to copied address',
-      onOptionPressed: () => {
-        setModalVisible(true)
-      }
-    },
+    // {
+    //   title: 'Enable Auto-Read from Clipboard',
+    //   imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    //   subtitle: 'App will prompt to send sats to copied address',
+    //   onOptionPressed: () => {
+    //     setModalVisible(true)
+    //   }
+    // },
   ]
 
   const [modalVisible, setModalVisible] = useState(false);
