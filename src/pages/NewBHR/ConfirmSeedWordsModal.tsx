@@ -88,7 +88,7 @@ export default function ConfirmSeedWordsModal( props ) {
           fontFamily: Fonts.FiraSansRegular,
           marginHorizontal: wp( '5%' ),
           marginTop: 30
-        }} >{'Confirm Seed Words'}</Text>
+        }} >{'Confirm backup phrase'}</Text>
         <Text style={{
           color: Colors.lightTextColor,
           fontSize: RFValue( 11 ),

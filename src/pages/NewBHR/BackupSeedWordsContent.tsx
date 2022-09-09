@@ -113,12 +113,12 @@ const BackupSeedWordsContent = ( props ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                setInfo( 'Please enter seed word' )
+                setInfo( 'Please enter backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
               setTimeout( () => {
-                setInfo( 'Please enter valid seed word' )
+                setInfo( 'Please enter valid backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else if( !fromHistory && seedPosition == 0 ){
@@ -162,7 +162,7 @@ const BackupSeedWordsContent = ( props ) => {
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
-          title={'Seed Words\nBackup Successful'}
+          title={'Backup phrase \nSuccessful'}
           info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
           proceedButtonText={'View Health'}
           onPressProceed={() => {

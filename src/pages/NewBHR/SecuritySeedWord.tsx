@@ -181,7 +181,7 @@ function SecuritySeedWord( props ) {
                       ? Colors.red
                       : Colors.borderColor,
                 }}
-                placeholder={'Enter second seed word'}
+                placeholder={'Enter second backup phrase'}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 textContentType="none"

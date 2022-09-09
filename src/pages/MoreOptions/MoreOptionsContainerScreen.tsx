@@ -70,8 +70,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
         ? bhrStrings[ 'WalletBackupInfo1' ]
         : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-          ? 'Seed backup completed'
-          :'Cloud backup completed',
+          ? 'Wallet backup confirmed'
+          :'Confirm backup phrase to secure your wallet',
       title: bhrStrings[ 'WalletBackup' ],
       screenName: 'WalletBackup',
     },
