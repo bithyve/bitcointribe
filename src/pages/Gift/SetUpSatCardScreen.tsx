@@ -933,6 +933,7 @@ export default function SetUpSatCardScreen( props ) {
               // dispatch(setSeedBackupHistory())
             }
           }}
+          bottomBoxInfo={false}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}
           cancelButtonText={'Cancel'}

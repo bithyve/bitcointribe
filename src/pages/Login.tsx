@@ -861,6 +861,7 @@ export default function Login( props ) {
               // dispatch(setSeedBackupHistory())
             }
           }}
+          bottomBoxInfo={false}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}
           cancelButtonText={'Cancel'}

@@ -142,7 +142,7 @@ export default function ConfirmSeedWordsModal( props ) {
           />
         </View>
 
-        <View style={{
+        { props.bottomBoxInfo && <View style={{
           marginTop: hp( '2%' ),
           marginBottom: hp( 1 ),
           marginLeft: wp ( '2%' )
@@ -154,7 +154,7 @@ export default function ConfirmSeedWordsModal( props ) {
             backgroundColor={Colors.white}
           />
         </View>
-
+        }
         <View
           style={{
             height: hp( '12%' ),

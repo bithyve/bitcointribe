@@ -144,7 +144,6 @@ const SeedBackupHistory = ( props ) => {
   }, [ levelHealth ] )
 
   useEffect( () => {
-    console.log( seedBackupHistoryArray )
     if ( seedBackupHistoryArray ) setSeedBackupHistory( seedBackupHistoryArray )
   }, [ seedBackupHistoryArray ] )
 
@@ -424,9 +423,13 @@ const SeedBackupHistory = ( props ) => {
               // dispatch(setSeedBackupHistory())
             }
           }}
-          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          bottomBoxInfo={false}
+          onPressIgnore={() => {
+            setConfirmSeedWordModal( false )
+            props.navigation.navigate( 'BackupSeedWordsContent' )
+          }}
           isIgnoreButton={true}
-          cancelButtonText={'Start Over'}
+          cancelButtonText={'Forgot phrase'}
         />
       </BottomInputModalContainer>
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
@@ -438,8 +441,8 @@ const SeedBackupHistory = ( props ) => {
           onPressProceed={() => {
             setSeedWordModal( false )
             // props.navigation.goBack()
-            setInfo( 'please delete icloud backup' )
-            setShowAlertModal( true )
+            // setInfo( 'please delete icloud backup' )
+            // setShowAlertModal( true )
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
