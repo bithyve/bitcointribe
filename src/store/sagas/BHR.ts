@@ -2435,7 +2435,7 @@ export const setupPasswordWatcher = createWatcher(
 
 
 const saveConfirmationHistory = async ( title: string, seedBackupHistory: any[] ) => {
-
+  if( seedBackupHistory == undefined ) seedBackupHistory = []
   const obj = {
     title,
     confirmed: Date.now(),
