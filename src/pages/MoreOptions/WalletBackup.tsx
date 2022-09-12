@@ -182,7 +182,7 @@ const WalletBackup = ( props, navigation ) => {
         }
       } )
     } )
-    console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
+    // console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
 
     const focusListener = props.navigation.addListener( 'didFocus', () => {
       updateAddressBook()
@@ -287,6 +287,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( metaSharesKeeper?.length == 3 && onKeeperButtonClick ) {
+      console.log( 'skk inside 1' )
       const obj = {
         selectedKeeper: {
           shareType: 'primaryKeeper',
@@ -313,6 +314,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( metaSharesKeeper?.length == 5 && onKeeperButtonClick ) {
+      console.log( 'skk inside 12' )
       const obj = {
         selectedKeeper: {
           shareType: selectedKeeperType,
@@ -335,6 +337,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
+      console.log( 'skk inside 13' )
       dispatch( keeperProcessStatus( '' ) )
     }
   }, [ keeperProcessStatusFlag ] )
@@ -353,6 +356,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
+      console.log( 'skk inside 14' )
       setSelectedKeeper( navigationObj.selectedKeeper )
       setSelectedLevelId( navigationObj.id )
       if ( selectedLevelId == 2 && SelectedRecoveryKeyNumber == 1 ) {
@@ -504,6 +508,7 @@ const WalletBackup = ( props, navigation ) => {
   }
 
   const goToHistory = ( value, test ) => {
+    console.log( 'skk inside 0' )
     const { selectedKeeper } = value
     setShowLoader( false )
     setShowQRModal( false )
@@ -816,6 +821,7 @@ const WalletBackup = ( props, navigation ) => {
         fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
       }}>{levelData[ 0 ].keeper1.shareType == '' || levelData[ 0 ].keeper1.shareType == 'notSetup' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text> */}
       {/* {showBackupMessage()} */}
+      {/* {console.log( 'skk localleveldata', JSON.stringify( localLevelData ) )} */}
 
       <FlatList
         keyExtractor={( item, index ) => item + index}

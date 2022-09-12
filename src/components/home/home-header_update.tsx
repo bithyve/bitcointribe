@@ -50,6 +50,8 @@ import MaterialCurrencyCodeIcon, {
 } from '../MaterialCurrencyCodeIcon'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -107,6 +109,24 @@ const HomeHeader = ( {
 
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
+  const [ days, setDays ] = useState( 0 )
+
+  useEffect( () => {
+    async function fetchWalletDays() {
+      const walletBackupDate = await AsyncStorage.getItem( 'walletBackupDate' )
+      // console.log( 'skk date', JSON.parse( walletBackupDate ) )
+
+      if( walletBackupDate && walletBackupDate != null ){
+        const backedupDate = moment( JSON.parse( walletBackupDate ) )
+        // const currentDate = moment( '2023-04-10T11:27:25.000Z' )
+        const currentDate = moment( Date() )
+        console.log( 'skk diff', currentDate.diff( backedupDate, 'days' ) )
+        setDays( currentDate.diff( backedupDate, 'days' ) )
+      }
+    }
+
+    fetchWalletDays()
+  }, [] )
 
   useEffect( ()=>{
     if( cloudErrorMessage != '' ){
@@ -173,9 +193,22 @@ const HomeHeader = ( {
             />
           }
         </View>
-      }<Text ellipsizeMode="middle" numberOfLines={1} style={{
+      }
+      { <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
-      }}>{ levelData[ 0 ].keeper1.shareType == '' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text>
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text> }
+
+      {/* <Text ellipsizeMode="middle" numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
+      }}>{days > 180
+          ? 'Your wallet backup phase is expired'
+          : days > 150
+            ? 'Wallet backup phase will expire soon'
+            : levelData[ 0 ].keeper1.shareType == ''
+              ? strings.Backupyour
+              : ( levelData[ 0 ].keeper1.shareType == 'seed'
+                ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' )}</Text> */}
+
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}><Text style={{

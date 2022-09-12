@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType, Dimensions, Switch } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
@@ -14,10 +14,11 @@ import AppInfo from '../../assets/images/svgs/icon_info.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { LevelData } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
 import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
+import { onPressKeeper } from '../../store/actions/BHR'
 
 export type Props = {
   navigation: any;
@@ -36,12 +37,15 @@ interface MenuOption {
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-const {height} = Dimensions.get('window')
+const { height } = Dimensions.get( 'window' )
 
 const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  const dispatch = useDispatch()
   const { translations, } = useContext( LocalizationContext )
   // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
   const [ isEnabled, setIsEnabled ] = useState( false )
   const toggleSwitch = () => setIsEnabled( previousState => !previousState )
   const currencyCode = useSelector(
@@ -141,10 +145,53 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     // },
   ]
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
+  const [ modalVisible, setModalVisible ] = useState( false )
+  const defaultKeeperObj: {
+    shareType: string
+    updatedAt: number;
+    status: string
+    shareId: string
+    reshareVersion: number;
+    name?: string
+    data?: any;
+    channelKey?: string
+  } = {
+    shareType: '',
+    updatedAt: 0,
+    status: 'notAccessible',
+    shareId: '',
+    reshareVersion: 0,
+    name: '',
+    data: {
+    },
+    channelKey: ''
+  }
+  const [ selectedKeeper, setSelectedKeeper ]: [{
+    shareType: string;
+    updatedAt: number;
+    status: string;
+    shareId: string;
+    reshareVersion: number;
+    name?: string;
+    data?: any;
+    channelKey?: string;
+  }, any] = useState( defaultKeeperObj )
 
   const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
+  useEffect( () => {
+    if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
+      setSelectedKeeper( navigationObj.selectedKeeper )
+      const navigationParams = {
+        selectedTitle: navigationObj.selectedKeeper.name,
+        SelectedRecoveryKeyNumber: 1,
+        selectedKeeper: navigationObj.selectedKeeper,
+        selectedLevelId: levelData[ 0 ].id
+      }
+      navigation.navigate( 'SeedBackupHistory', navigationParams )
+    }
+  }, [ navigationObj ] )
 
   //const [ strings, setstrings ] = useState( content.settings )
   function handleOptionSelection( menuOption: MenuOption ) {
@@ -153,7 +200,20 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
       console.log( 'menuoption inside', menuOption )
-      navigation.navigate( menuOption.screenName )
+      if( menuOption.screenName == 'WalletBackup' ) {
+        console.log( 'skk leveldataaaa', levelData )
+        if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+            // if( levelData[ 0 ].status == 'notSetup' )
+            navigation.navigate( 'BackupSeedWordsContent' )
+          } else {
+            setSelectedKeeper( levelData[ 0 ].keeper1 )
+            dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+            setOnKeeperButtonClick( true )
+          }
+        } else navigation.navigate( menuOption.screenName )
+      } else navigation.navigate( menuOption.screenName )
     }
   }
 
@@ -176,19 +236,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
           /> )
         case 'Enable Auto-Read from Clipboard':
-          return ( <AppInfo />)
+          return ( <AppInfo /> )
         default:
           return null
     }
   }
 
-  const enabled = useSelector((state) => state.misc.clipboardAccess)
+  const enabled = useSelector( ( state ) => state.misc.clipboardAccess )
 
   const dispatcher = useDispatch()
 
   const changePermission = () => {
-    dispatcher(toggleClipboardAccess());
-  };
+    dispatcher( toggleClipboardAccess() )
+  }
 
   const ReadClipboardModal = () => {
     return (
@@ -200,42 +260,46 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               width: 30,
               height: 30,
               borderRadius: 15,
-              justifyContent: "center",
-              alignItems: "center",
-              alignSelf: "flex-end",
-              margin: widthPercentageToDP(2),
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'flex-end',
+              margin: widthPercentageToDP( 2 ),
             }}
-            onPress={() => setModalVisible(false)}
+            onPress={() => setModalVisible( false )}
           >
             <CrossButton />
           </AppBottomSheetTouchableWrapper>
-          <View style={{ marginHorizontal: widthPercentageToDP(10) }}>
+          <View style={{
+            marginHorizontal: widthPercentageToDP( 10 )
+          }}>
             <Text
               style={{
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(20),
+                fontSize: RFValue( 20 ),
               }}
             >
               Auto-Read from Clipboard
             </Text>
             <Text
               style={{
-                fontSize: RFValue(13),
+                fontSize: RFValue( 13 ),
                 fontFamily: Fonts.FiraSansRegular,
                 color: Colors.gray8,
-                lineHeight: RFValue(20),
+                lineHeight: RFValue( 20 ),
               }}
             >
               {
-                "Grant Hexa access to clipboard \nto copy and paste BTC addresses"
+                'Grant Hexa access to clipboard \nto copy and paste BTC addresses'
               }
             </Text>
-            <View style={{ marginTop: "15%", flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{
+              marginTop: '15%', flexDirection: 'row', justifyContent: 'space-between'
+            }}>
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontSize: RFValue(16),
+                  fontSize: RFValue( 16 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -243,22 +307,24 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               </Text>
               <Switch
                 onValueChange={changePermission}
-                trackColor={{ false: Colors.gray1, true: Colors.blue }}
+                trackColor={{
+                  false: Colors.gray1, true: Colors.blue
+                }}
                 thumbColor={isEnabled ? Colors.textColorGrey : Colors.white}
                 value={enabled}
               />
             </View>
             <TouchableOpacity
               style={{
-                marginTop: "20%",
+                marginTop: '20%',
                 backgroundColor: Colors.blue,
-                width: widthPercentageToDP(30),
-                height: heightPercentageToDP(7.5),
+                width: widthPercentageToDP( 30 ),
+                height: heightPercentageToDP( 7.5 ),
                 justifyContent: 'center',
                 alignItems: 'center',
-                borderRadius: widthPercentageToDP(3)
+                borderRadius: widthPercentageToDP( 3 )
               }}
-              onPress={() => setModalVisible(false)}
+              onPress={() => setModalVisible( false )}
             >
               <Text
                 style={{
@@ -272,8 +338,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           </View>
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   return (
     <View style={{
@@ -281,7 +347,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
-      <ModalContainer visible={modalVisible} closeBottomSheet={() => setModalVisible(false)}>
+      <ModalContainer visible={modalVisible} closeBottomSheet={() => setModalVisible( false )}>
         {ReadClipboardModal()}
       </ModalContainer>
       <View style={styles.accountCardsSectionContainer}>
@@ -651,7 +717,7 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
   },
   wrapper: {
-    height: height > 720 ? heightPercentageToDP(35) : heightPercentageToDP(50),
+    height: height > 720 ? heightPercentageToDP( 35 ) : heightPercentageToDP( 50 ),
     backgroundColor: Colors.backgroundColor,
   },
 } )

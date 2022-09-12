@@ -41,7 +41,12 @@ const MoreOptionsStack = createStackNavigator(
       },
     },
     Launch,
-    Login,
+    Login:{
+      screen: Login,
+      navigationOptions: {
+        header: null
+      }
+    },
     Intermediate,
     ReLogin: {
       screen: ReLogin,

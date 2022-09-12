@@ -36,6 +36,7 @@ import SeedBacupModalContents from './SeedBacupModalContents'
 import dbManager from '../../storage/realm/dbManager'
 import AlertModalContents from '../../components/AlertModalContents'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -303,8 +304,8 @@ const SeedBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => {
-          // props.navigation.goBack()
-          props.navigation.popToTop()
+          props.navigation.navigate( 'Home' )
+          // props.navigation.popToTop()
         }}
         selectedTitle={'Wallet backup'}
         selectedTime={selectedKeeper?.updatedAt
@@ -421,12 +422,21 @@ const SeedBackupHistory = ( props ) => {
               setSeedWordModal( true )
               dispatch( updateSeedHealth() )
               // dispatch(setSeedBackupHistory())
+              props.navigation.navigate( 'BackupSeedWordsContent' )
+
+              // AsyncStorage.setItem( 'walletBackupDate', JSON.stringify( moment( Date() ) ) )
+              //   console.log( 'skk date', JSON.stringify( moment( Date() ) ) )
+
+            // const a = moment( moment( Date() ) )
+            // const b = moment( '2022-10-10T11:27:25.000Z' )
+            // console.log( 'skk diff', b.diff( a, 'days' ) )
             }
           }}
           bottomBoxInfo={false}
           onPressIgnore={() => {
             setConfirmSeedWordModal( false )
-            props.navigation.navigate( 'BackupSeedWordsContent' )
+            // props.navigation.navigate( 'BackupSeedWordsContent' )
+            props.navigation.navigate( 'CheckPasscode' )
           }}
           isIgnoreButton={true}
           cancelButtonText={'Forgot phrase'}

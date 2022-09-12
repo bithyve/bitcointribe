@@ -30,19 +30,19 @@ const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 const { height } = Dimensions.get( 'window' )
 
 const SeedPageComponent = ( props ) => {
-  const strings  = translations[ 'bhr' ]
+  const strings = translations[ 'bhr' ]
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ SelectedOption, setSelectedOption ] = useState( -1 )
   const SelectOption = ( Id ) => {
   }
 
-  const dbWallet =  dbManager.getWallet()
+  const dbWallet = dbManager.getWallet()
   const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
   const primaryMnemonic = walletObj.primaryMnemonic
   const seed = primaryMnemonic.split( ' ' )
   const seedData = seed.map( ( word, index ) => {
     return {
-      name: word, id: ( index+1 )
+      name: word, id: ( index + 1 )
     }
   } )
 
@@ -70,16 +70,16 @@ const SeedPageComponent = ( props ) => {
     let initPosition = 0
     let lastPosition = 12
     const totalLength = seedData.length
-    seedData.map( ( item, index )=>{
-      if( index != 0 && index % 12 == 0 ){
+    seedData.map( ( item, index ) => {
+      if ( index != 0 && index % 12 == 0 ) {
         initPosition = initPosition + 12
-        lastPosition = ( lastPosition + 12 > totalLength )?totalLength:lastPosition
+        lastPosition = ( lastPosition + 12 > totalLength ) ? totalLength : lastPosition
         tempData.push( innerTempData )
         innerTempData = []
       }
       innerTempData.push( item )
     } )
-    if( innerTempData.length > 0 ){
+    if ( innerTempData.length > 0 ) {
       tempData.push( innerTempData )
     }
     setPartialSeedData( tempData )
@@ -88,26 +88,26 @@ const SeedPageComponent = ( props ) => {
 
   const onNextClick = () => {
     setSelectedOption( -1 )
-    const nextPosition = currentPosition+1
+    const nextPosition = currentPosition + 1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
     // props.setHeaderMessage( 'Last 12 seed words' )
     props.setHeaderMessage( 'Last 12 Backup phrase' )
   }
 
-  const onProceedClick = () =>{
+  const onProceedClick = () => {
     setSelectedOption( -1 )
     let seed = ''
     let showValidation = false
     seedData.forEach( ( { name } ) => {
-      if( name == null || name == '' ) {
+      if ( name == null || name == '' ) {
         showValidation = true
         return
       }
-      if( !seed ) seed = name
+      if ( !seed ) seed = name
       else seed = seed + ' ' + name
     } )
-    if( showValidation ){
+    if ( showValidation ) {
       Alert.alert( 'Please fill all seed words' )
     } else {
       props.onPressConfirm( seed, seedData )
@@ -116,7 +116,7 @@ const SeedPageComponent = ( props ) => {
 
   const onPreviousClick = () => {
     setSelectedOption( -1 )
-    const nextPosition = currentPosition-1
+    const nextPosition = currentPosition - 1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
     // props.setHeaderMessage( 'First 12 seed words' )
@@ -135,7 +135,7 @@ const SeedPageComponent = ( props ) => {
     else return index + 'th'
   }
 
-  const getIndex = ( index, seedIndex )=>{
+  const getIndex = ( index, seedIndex ) => {
     const newIndex = index + 1 + ( seedIndex * 12 )
     // let isAdd = false
     // if( index % 2 == 0 ) isAdd = true
@@ -152,7 +152,7 @@ const SeedPageComponent = ( props ) => {
     return newIndex
   }
 
-  const getTextIndex = ( index )=>{
+  const getTextIndex = ( index ) => {
     const newIndex = index
     // let isAdd = false
     // if( index % 2 == 0 ) isAdd = true
@@ -198,11 +198,11 @@ const SeedPageComponent = ( props ) => {
         {
           listener: ( { nativeEvent: { position } } ) => {
             setCurrentPosition( position )
-            if( position == 0 )
+            if ( position == 0 )
               // props.setHeaderMessage( 'First 12 seed words' )
               props.setHeaderMessage( 'Backup phrase' )
             else
-            // props.setHeaderMessage( 'Last 12 seed words' )
+              // props.setHeaderMessage( 'Last 12 seed words' )
               props.setHeaderMessage( 'Last 12 Backup phrase' )
           },
           useNativeDriver: true,
@@ -216,19 +216,19 @@ const SeedPageComponent = ( props ) => {
       flex: 1
     }} >
       {partialSeedData && partialSeedData.length > 0 && partialSeedData[ currentPosition ] != undefined &&
-      partialSeedData[ currentPosition ] ? (
+        partialSeedData[ currentPosition ] ? (
           <AnimatedPagerView
             initialPage={0}
             ref={ref}
             style={{
-              flex:1
+              flex: 1
             }}
             onPageScroll={onPageScroll}
             onPageSelected={onPageSelected}
           >
             {partialSeedData.map( ( seedItem, seedIndex ) => (
-              <View  key={seedIndex} style={{
-                flex: 1, marginTop: 10
+              <View key={seedIndex} style={{
+                marginTop: 10
               }} >
                 <FlatList
                   keyExtractor={( item, index ) => index.toString()}
@@ -236,9 +236,14 @@ const SeedPageComponent = ( props ) => {
                   extraData={seedItem}
                   showsVerticalScrollIndicator={false}
                   numColumns={2}
+                  scrollEnabled={false}
+                  nestedScrollEnabled={false}
                   contentContainerStyle={{
-                    marginStart:15
+                    marginStart: 15
                   }}
+                  // removeClippedSubviews={false}
+                  // keyboardDismissMode={true}
+                  // keyboardShouldPersistTaps='always'
                   renderItem={( { value, index } ) => {
                     return (
                       <TouchableOpacity
@@ -256,7 +261,7 @@ const SeedPageComponent = ( props ) => {
                         <TextInput
                           style={[ styles.modalInputBox,
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
-                            // value?.name.length > 0 ? styles.selectedInput : null,
+                          // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
                           placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
                           placeholderTextColor={Colors.borderColor}
@@ -265,7 +270,7 @@ const SeedPageComponent = ( props ) => {
                           textContentType="none"
                           returnKeyType="next"
                           autoCorrect={false}
-                          secureTextEntry={ index == SelectedOption ? false : true}
+                          secureTextEntry={index == SelectedOption ? false : true}
                           onFocus={() => {
                             setSelectedOption( index )
                           }}
@@ -291,9 +296,9 @@ const SeedPageComponent = ( props ) => {
               </View>
             ) )}
           </AnimatedPagerView>
-        ): (
+        ) : (
           <View style={{
-            flex: 1,
+            // flex: 1,
           }}>
             {/* <View style={{
               backgroundColor: Colors.backgroundColor, flex: 1, justifyContent: 'flex-end'
@@ -333,7 +338,7 @@ const SeedPageComponent = ( props ) => {
           {props.isChangeKeeperAllow ? (
             <TouchableOpacity
               disabled={props.disableChange ? props.disableChange : false}
-              onPress={() => { ( currentPosition  * 12 )!=0 ? onPreviousClick() : props.onPressChange() }}
+              onPress={() => { ( currentPosition * 12 ) != 0 ? onPreviousClick() : props.onPressChange() }}
               style={{
                 marginLeft: 10,
                 height: wp( '13%' ),
@@ -349,7 +354,7 @@ const SeedPageComponent = ( props ) => {
                   color: props.disableChange ? Colors.lightBlue : Colors.blue,
                 }}
               >
-                {(  currentPosition  * 12 )!=0 ? props.previousButtonText : props.changeButtonText}
+                {( currentPosition * 12 ) != 0 ? props.previousButtonText : props.changeButtonText}
               </Text>
             </TouchableOpacity>
           ) : null}
@@ -357,9 +362,9 @@ const SeedPageComponent = ( props ) => {
             flexDirection: 'row'
           }}>
             {
-              partialSeedData.map( ( item, index )=>{
-                return(
-                  <View key={( index )} style={currentPosition==index ? styles.selectedDot:styles.unSelectedDot} />
+              partialSeedData.map( ( item, index ) => {
+                return (
+                  <View key={( index )} style={currentPosition == index ? styles.selectedDot : styles.unSelectedDot} />
                 )
               } )
             }
@@ -487,7 +492,7 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     // flex: 1,
-    width:'70%',
+    width: '70%',
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
@@ -509,18 +514,18 @@ const styles = StyleSheet.create( {
       height: 15,
     },
   },
-  selectedDot:{
-    width:25,
-    height:5,
-    borderRadius:5,
-    backgroundColor:Colors.blue,
-    marginEnd:5
+  selectedDot: {
+    width: 25,
+    height: 5,
+    borderRadius: 5,
+    backgroundColor: Colors.blue,
+    marginEnd: 5
   },
-  unSelectedDot:{
-    width:6,
-    height:5,
-    borderRadius:5,
-    backgroundColor:Colors.primaryAccentLighter2,
-    marginEnd:5
+  unSelectedDot: {
+    width: 6,
+    height: 5,
+    borderRadius: 5,
+    backgroundColor: Colors.primaryAccentLighter2,
+    marginEnd: 5
   }
 } )
