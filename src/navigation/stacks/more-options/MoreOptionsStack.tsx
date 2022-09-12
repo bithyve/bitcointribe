@@ -135,7 +135,7 @@ const MoreOptionsStack = createStackNavigator(
         // tabBarVisibl
       },
     },
-    WalletBackup: {
+    SeedBackup: {
       screen: WalletBackupStack,
       navigationOptions: {
         header: null,

@@ -82,7 +82,7 @@ export default function SetUpSatCardScreen( props ) {
       // heading: 'Gift Sats',
       // text: 'Send sats as gifts to your friends and family.',
       heading: 'Backup phrase',
-      text: 'New backup method: Now use phrase to backup your wallet',
+      text: 'New backup method: Now note down twelve-word phrase (seed words) to backup your wallet',
       subText: ''
     }
   }

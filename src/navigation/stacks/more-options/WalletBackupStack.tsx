@@ -27,7 +27,13 @@ const strings  = translations[ 'stackTitle' ]
 
 const WalletBackupStack = createStackNavigator(
   {
-    WalletBackupRoot: {
+    SeedBackupHistory: {
+      screen: SeedBackupHistory,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    WalletBackup: {
       screen: WalletBackup,
       navigationOptions: {
         header: null,
@@ -51,12 +57,6 @@ const WalletBackupStack = createStackNavigator(
     },
     CloudBackupHistory: {
       screen: CloudBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
       navigationOptions: {
         header: null,
       },
@@ -108,6 +108,7 @@ const WalletBackupStack = createStackNavigator(
     }
   },
   {
+    initialRouteName: 'SeedBackupHistory',
     defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,

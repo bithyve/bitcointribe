@@ -175,11 +175,11 @@ export default function CheckPasscodeComponent( props ) {
               }}
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitleText}>{strings.welcome}</Text>
+          <Text style={styles.headerTitleText}>{'Confirm Passcode'}</Text>
           <View>
             <Text style={styles.headerInfoText}>
               {strings.enter_your}{' '}
-              <Text style={styles.boldItalicText}>{strings.passcode}</Text>
+              <Text style={styles.boldItalicText}>{'To view your backup'}</Text>
             </Text>
             <View style={{
               alignSelf: 'baseline'
