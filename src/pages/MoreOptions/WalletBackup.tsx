@@ -847,12 +847,12 @@ const WalletBackup = ( props, navigation ) => {
                   <Text style={{
                     fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
                   }}>
-                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Seed Word Backup' : item.keeper1ButtonText )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : (item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText) )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
                   }}>{index == 0 && ( item.keeper1ButtonText == 'Seed' || item.keeper1ButtonText == 'Write down seed-words' )
-                      ? ( item.keeper1ButtonText == 'Seed'? 'Wallet is backed up using Seed Words' : 'Backup your wallet using Seed Words' ) : 'Encrypt and backup wallet on your cloud'}</Text>
+                      ? ( item.keeper1ButtonText == 'Seed'? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' ) : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
                 {
                   showSeedAcion ?
@@ -898,7 +898,7 @@ const WalletBackup = ( props, navigation ) => {
                 color: Colors.white,
               }}
             >
-              {'Change to Seed Words Backup'}
+              {'Change to Backup phrase'}
             </Text>
           </AppBottomSheetTouchableWrapper>
         </Shadow>
@@ -989,7 +989,7 @@ const WalletBackup = ( props, navigation ) => {
         closeBottomSheet={() => setSeedBackupModal( false )}>
         <SeedBacupModalContents
           // title={'Backup using \nSeed Words'}
-          title={'Backup with Seed words'}
+          title={'Backup using phrase'}
           // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
           info={'Backup your wallet to ensure security and easy wallet retrieval.\n\n'}
           // note={'Note: This will only be allowed if the Savings account is empty and archived.'}
@@ -1060,7 +1060,7 @@ const WalletBackup = ( props, navigation ) => {
       <ModalContainer onBackground={() => setEmptyAccountErrorModal( false )} visible={emptyAccountErrorModal} closeBottomSheet={() => setEmptyAccountErrorModal( false )}>
         <ErrorModalContents
           title={'Action Required'}
-          info={'Please empty and Archive your Savings Account to backup using Seed Words'}
+          info={'Please empty and Archive your Savings Account to backup using backup phrase'}
           // note={''}
           onPressProceed={() => {
             setEmptyAccountErrorModal( false )

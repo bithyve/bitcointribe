@@ -73,7 +73,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
       subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
-        ? bhrStrings[ 'WalletBackupInfo1' ]
+        ? 'Note down backup phrase'
         : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
           ? 'Wallet backup confirmed'
           :'Confirm backup phrase to secure your wallet',
@@ -207,6 +207,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
           if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
             // if( levelData[ 0 ].status == 'notSetup' )
+            // navigation.navigate( 'BackupSeedWordsContent' )
             navigation.navigate( 'BackupSeedWordsContent' )
           } else {
             setSelectedKeeper( levelData[ 0 ].keeper1 )

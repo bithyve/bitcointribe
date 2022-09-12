@@ -44,7 +44,7 @@ const BackupSeedWordsContent = ( props ) => {
   const fromHistory = props.navigation.getParam( 'fromHistory' )
   const isChangeKeeperType =  props.navigation.getParam( 'isChangeKeeperType' )
   useEffect( ()=>{
-    RNPreventScreenshot.enabled( true )
+    // RNPreventScreenshot.enabled( true )
 
     //set random number
     const i = 12, ranNums = []
@@ -73,7 +73,7 @@ const BackupSeedWordsContent = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SeedHeaderComponent
         onPressBack={() => {
-          RNPreventScreenshot.enabled( false )
+          // RNPreventScreenshot.enabled( false )
           // props.navigation.goBack()
           props.navigation.navigate( 'Home' )
         }}
@@ -118,7 +118,8 @@ const BackupSeedWordsContent = ( props ) => {
           }}
           onPressChange={() => {
             RNPreventScreenshot.enabled( false )
-            props.navigation.goBack()
+            // props.navigation.goBack()
+            props.navigation.pop()
           }}
           showButton={true}
           changeButtonText={'Back'}

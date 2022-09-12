@@ -150,9 +150,13 @@ const HomeHeader = ( {
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
     return <TouchableOpacity
-      onPress={()=> {navigation.navigate( 'WalletBackup' ), {
-        messageOne, messageTwo, isFirstMessageBold, isError, isInit
-      }}}
+      onPress={()=> {
+
+        // navigation.navigate( 'WalletBackup' ), {
+        // messageOne, messageTwo, isFirstMessageBold, isError, isInit
+      // }
+      }
+      }
       activeOpacity={0.6}
       style={{
         flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
@@ -180,7 +184,7 @@ const HomeHeader = ( {
             source={ require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
-              tintColor: 'green'
+              tintColor: Colors.white
             }}
             resizeMode={'contain'}
           /> :
@@ -188,6 +192,7 @@ const HomeHeader = ( {
               source={isError ? currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
               style={{
                 width: wp( '2.7%' ), height: wp( '2.7%' ),
+                // tintColor: Colors.white
               }}
               resizeMode={'contain'}
             />
@@ -196,7 +201,7 @@ const HomeHeader = ( {
       }
       { <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
-      }}>{ levelData[ 0 ].keeper1.shareType == '' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text> }
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase to secure your wallet' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' )}</Text> }
 
       {/* <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
