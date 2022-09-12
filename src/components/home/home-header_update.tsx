@@ -201,7 +201,7 @@ const HomeHeader = ( {
       }
       { <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
-      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase to secure your wallet' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text> }
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase to secure your wallet' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' )}</Text> }
 
       {/* <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
