@@ -11,6 +11,7 @@ import {
   Alert,
   FlatList,
   TextInput,
+  Keyboard,
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import {
@@ -270,9 +271,11 @@ const SeedPageComponent = ( props ) => {
                           textContentType="none"
                           returnKeyType="next"
                           autoCorrect={false}
+                          showSoftInputOnFocus={false}
                           secureTextEntry={index == SelectedOption ? false : true}
                           onFocus={() => {
                             setSelectedOption( index )
+                            Keyboard.dismiss()
                           }}
                           // editable={false}
                           autoCapitalize="none"
