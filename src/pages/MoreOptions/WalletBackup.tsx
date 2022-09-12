@@ -182,7 +182,7 @@ const WalletBackup = ( props, navigation ) => {
         }
       } )
     } )
-    console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
+    // console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
 
     const focusListener = props.navigation.addListener( 'didFocus', () => {
       updateAddressBook()
@@ -287,6 +287,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( metaSharesKeeper?.length == 3 && onKeeperButtonClick ) {
+      console.log( 'skk inside 1' )
       const obj = {
         selectedKeeper: {
           shareType: 'primaryKeeper',
@@ -313,6 +314,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( metaSharesKeeper?.length == 5 && onKeeperButtonClick ) {
+      console.log( 'skk inside 12' )
       const obj = {
         selectedKeeper: {
           shareType: selectedKeeperType,
@@ -335,6 +337,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
+      console.log( 'skk inside 13' )
       dispatch( keeperProcessStatus( '' ) )
     }
   }, [ keeperProcessStatusFlag ] )
@@ -353,6 +356,7 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
+      console.log( 'skk inside 14' )
       setSelectedKeeper( navigationObj.selectedKeeper )
       setSelectedLevelId( navigationObj.id )
       if ( selectedLevelId == 2 && SelectedRecoveryKeyNumber == 1 ) {
@@ -504,6 +508,7 @@ const WalletBackup = ( props, navigation ) => {
   }
 
   const goToHistory = ( value, test ) => {
+    console.log( 'skk inside 0' )
     const { selectedKeeper } = value
     setShowLoader( false )
     setShowQRModal( false )
@@ -809,14 +814,14 @@ const WalletBackup = ( props, navigation ) => {
         infoTextNormal1={''}
         step={''}
       />
-      <Text style={{
+      {/* <Text style={{
         fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10, marginStart: 20
-      }}>{( levelData && levelData[ 0 ]?.status == 'notSetup' ) ? 'No backup created' : 'Backup created'}</Text>
-      <Text style={{
+      }}>{( levelData && levelData[ 0 ]?.status == 'notSetup' ) ? 'No backup created' : 'Backup created'}</Text> */}
+      {/* <Text style={{
         fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
-      }}>{levelData[ 0 ].keeper1.shareType == '' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text>
+      }}>{levelData[ 0 ].keeper1.shareType == '' || levelData[ 0 ].keeper1.shareType == 'notSetup' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text> */}
       {/* {showBackupMessage()} */}
-      {/* {console.log( 'skk localLevelData', JSON.stringify( localLevelData ) )} */}
+      {/* {console.log( 'skk localleveldata', JSON.stringify( localLevelData ) )} */}
 
       <FlatList
         keyExtractor={( item, index ) => item + index}
@@ -842,12 +847,12 @@ const WalletBackup = ( props, navigation ) => {
                   <Text style={{
                     fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
                   }}>
-                    {index % 2 == 0 ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Seed Word Backup' : item.keeper1ButtonText )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
                   }}>{index == 0 && ( item.keeper1ButtonText == 'Seed' || item.keeper1ButtonText == 'Write down seed-words' )
-                      ? 'BackedUp your wallet with seed word' : 'Encrypt and backup wallet on your cloud'}</Text>
+                      ? ( item.keeper1ButtonText == 'Seed'? 'Wallet is backed up using Seed Words' : 'Backup your wallet using Seed Words' ) : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
                 {
                   showSeedAcion ?

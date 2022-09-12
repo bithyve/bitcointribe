@@ -122,7 +122,7 @@ const WalletInitializationScreen = props => {
             source={require( '../assets/images/icons/seedwords.png' )}
           />
           <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Seed Words</Text>
+            <Text style={styles.touchableText}>Using Beckup phrase</Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons

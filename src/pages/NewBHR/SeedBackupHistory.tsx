@@ -36,6 +36,7 @@ import SeedBacupModalContents from './SeedBacupModalContents'
 import dbManager from '../../storage/realm/dbManager'
 import AlertModalContents from '../../components/AlertModalContents'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -144,7 +145,6 @@ const SeedBackupHistory = ( props ) => {
   }, [ levelHealth ] )
 
   useEffect( () => {
-    console.log( seedBackupHistoryArray )
     if ( seedBackupHistoryArray ) setSeedBackupHistory( seedBackupHistoryArray )
   }, [ seedBackupHistoryArray ] )
 
@@ -304,10 +304,10 @@ const SeedBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => {
-          // props.navigation.goBack()
-          props.navigation.popToTop()
+          props.navigation.navigate( 'Home' )
+          // props.navigation.popToTop()
         }}
-        selectedTitle={'Seed word Backup'}
+        selectedTitle={'Wallet backup'}
         selectedTime={selectedKeeper?.updatedAt
           ? getTime( selectedKeeper?.updatedAt )
           : 'Never'}
@@ -410,36 +410,49 @@ const SeedBackupHistory = ( props ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                setInfo( 'Please enter seed word' )
+                setInfo( 'Please enter backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
               setTimeout( () => {
-                setInfo( 'Please enter valid seed word' )
+                setInfo( 'Please enter valid backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else {
               setSeedWordModal( true )
               dispatch( updateSeedHealth() )
               // dispatch(setSeedBackupHistory())
+              props.navigation.navigate( 'BackupSeedWordsContent' )
+
+              // AsyncStorage.setItem( 'walletBackupDate', JSON.stringify( moment( Date() ) ) )
+              //   console.log( 'skk date', JSON.stringify( moment( Date() ) ) )
+
+            // const a = moment( moment( Date() ) )
+            // const b = moment( '2022-10-10T11:27:25.000Z' )
+            // console.log( 'skk diff', b.diff( a, 'days' ) )
             }
           }}
-          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          bottomBoxInfo={false}
+          onPressIgnore={() => {
+            setConfirmSeedWordModal( false )
+            // props.navigation.navigate( 'BackupSeedWordsContent' )
+            props.navigation.navigate( 'CheckPasscode' )
+          }}
           isIgnoreButton={true}
-          cancelButtonText={'Start Over'}
+          cancelButtonText={'Forgot phrase'}
         />
       </BottomInputModalContainer>
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
-          title={'Seed Words\nBackup Successful'}
+          title={'Backup phrase\nSuccessful'}
           info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
           proceedButtonText={'View Health'}
           onPressProceed={() => {
             setSeedWordModal( false )
             // props.navigation.goBack()
-            setInfo( 'please delete icloud backup' )
-            setShowAlertModal( true )
+            // setInfo( 'please delete icloud backup' )
+            // setShowAlertModal( true )
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}

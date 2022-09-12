@@ -81,8 +81,8 @@ export default function SetUpSatCardScreen( props ) {
     return {
       // heading: 'Gift Sats',
       // text: 'Send sats as gifts to your friends and family.',
-      heading: 'Seed Backup',
-      text: 'New backup method: Now use Seed Words to backup your wallet',
+      heading: 'Backup phrase',
+      text: 'New backup method: Now use phrase to backup your wallet',
       subText: ''
     }
   }
@@ -414,7 +414,7 @@ export default function SetUpSatCardScreen( props ) {
             onPasscodeReset:onPasscodeReset
           } )
         }}
-        title="Enter your Seed Word Details"
+        title="Enter your backup phrase Details"
         title1="Forgot Passcode"
         note="You will be prompted to change your passcode"
         onPasscodeVerify={()=>{ showSecuiritySeedWordModal( true )  }}
@@ -917,12 +917,12 @@ export default function SetUpSatCardScreen( props ) {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                setInfo( 'Please enter seed word' )
+                setInfo( 'Please enter backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else if( word !=  ranSeedWord.name  ){
               setTimeout( () => {
-                setInfo( 'Please enter valid seed word' )
+                setInfo( 'Please enter valid backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else {
@@ -933,6 +933,7 @@ export default function SetUpSatCardScreen( props ) {
               // dispatch(setSeedBackupHistory())
             }
           }}
+          bottomBoxInfo={false}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}
           cancelButtonText={'Cancel'}

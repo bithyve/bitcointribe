@@ -82,8 +82,8 @@ const RestoreSeedWordsContent = ( props ) => {
   const renderSeedErrorModal = () => {
     return (
       <ErrorModalContents
-        title='Invalid Seed'
-        info='Please recheck your seeds and try again'
+        title='Invalid backup phrase'
+        info='Please recheck your phrase and try again'
         proceedButtonText={'Go back'}
         onPressProceed={() => props.navigation.goBack()}
       />
@@ -143,7 +143,7 @@ const RestoreSeedWordsContent = ( props ) => {
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <RestoreSeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Enter Seed Words'}
+        selectedTitle={'Enter backup phrase'}
         moreInfo={''}
       />
       <View style={{

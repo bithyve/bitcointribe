@@ -4,6 +4,7 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import _ from 'underscore'
@@ -17,9 +18,15 @@ import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import { useDispatch } from 'react-redux'
 import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
 import AlertModalContents from '../../components/AlertModalContents'
-import RNPreventScreenshot from 'react-native-screenshot-prevent';
+import RNPreventScreenshot from 'react-native-screenshot-prevent'
 import dbManager from '../../storage/realm/dbManager'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import moment from 'moment'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -30,7 +37,9 @@ const BackupSeedWordsContent = ( props ) => {
   const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
   const [ seedData, setSeedData ] = useState( [] )
   const [ seedPosition, setSeedPosition ] = useState( 0 )
-  const [ headerTitle, setHeaderTitle ]=useState( 'First 6 seed words' )
+  const [ headerTitle, setHeaderTitle ]=useState( 'Backup phrase' )
+  // const [ headerTitle, setHeaderTitle ]=useState( 'First 6 Seed Words' )
+
   const dispatch = useDispatch()
   const fromHistory = props.navigation.getParam( 'fromHistory' )
   const isChangeKeeperType =  props.navigation.getParam( 'isChangeKeeperType' )
@@ -65,13 +74,31 @@ const BackupSeedWordsContent = ( props ) => {
       <SeedHeaderComponent
         onPressBack={() => {
           RNPreventScreenshot.enabled( false )
-          props.navigation.goBack()
+          // props.navigation.goBack()
+          props.navigation.navigate( 'Home' )
         }}
+        info={'Make sure you keep them'}
         selectedTitle={headerTitle}
       />
-      <View style={{
-        flex: 1
-      }}>
+      <KeyboardAwareScrollView
+        // scrollEnabled={false}
+        contentContainerStyle={{
+          // flex: 1,
+          // backgroundColor: background,
+          flex: 1,
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          // alignItems: 'center',
+          // paddingBottom: Platform.OS === 'ios' ? hp( '6%' ) : 2,
+          // paddingHorizontal: wp( '2%' ),
+          // borderRadius: 20
+        }}
+        extraScrollHeight={100} enableOnAndroid={true}
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        keyboardShouldPersistTaps='always'
+      >
         <SeedPageComponent
           infoBoxTitle={'Note'}
           infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
@@ -99,7 +126,7 @@ const BackupSeedWordsContent = ( props ) => {
           isChangeKeeperAllow={true}
           setHeaderMessage={( message )=>setHeaderTitle( message )}
         />
-      </View>
+      </KeyboardAwareScrollView>
 
       <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
         closeBottomSheet={() => setConfirmSeedWordModal( false )}  showBlurView={true}>
@@ -110,12 +137,12 @@ const BackupSeedWordsContent = ( props ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                setInfo( 'Please enter seed word' )
+                setInfo( 'Please enter backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
               setTimeout( () => {
-                setInfo( 'Please enter valid seed word' )
+                setInfo( 'Please enter valid backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else if( !fromHistory && seedPosition == 0 ){
@@ -146,10 +173,12 @@ const BackupSeedWordsContent = ( props ) => {
                 AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
               }
               dispatch( updateSeedHealth() )
+              AsyncStorage.setItem( 'walletBackupDate', JSON.stringify( moment( Date() ) ) )
 
               // dispatch(setSeedBackupHistory())
             }
           }}
+          bottomBoxInfo={true}
           onPressIgnore={() => setConfirmSeedWordModal( false )}
           isIgnoreButton={true}
           cancelButtonText={'Start Over'}
@@ -158,7 +187,7 @@ const BackupSeedWordsContent = ( props ) => {
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
-          title={'Seed Words\nBackup Successful'}
+          title={'Backup phrase \nSuccessful'}
           info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
           proceedButtonText={'View Health'}
           onPressProceed={() => {

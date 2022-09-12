@@ -21,6 +21,7 @@ import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
 import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
 import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
+import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -98,6 +99,12 @@ const WalletBackupStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+    CheckPasscode:{
+      screen: CheckPasscodeComponent,
+      navigationOptions:{
+        header:null
+      }
     }
   },
   {

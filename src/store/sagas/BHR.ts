@@ -2435,7 +2435,7 @@ export const setupPasswordWatcher = createWatcher(
 
 
 const saveConfirmationHistory = async ( title: string, seedBackupHistory: any[] ) => {
-
+  if( seedBackupHistory == undefined ) seedBackupHistory = []
   const obj = {
     title,
     confirmed: Date.now(),
@@ -2495,7 +2495,7 @@ function* updateSeedHealthWorker( ) {
   yield put( updateMSharesHealth( seedLevelInfo, true ) )
 
   const seedBackupHistory = yield select( ( state ) => state.bhr.seedBackupHistory )
-  const title = 'Seed backup confirmed'
+  const title = 'Backup phrase confirmed'
   const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, seedBackupHistory )
   yield put( setSeedBackupHistory( updatedCloudBackupHistory ) )
 }
