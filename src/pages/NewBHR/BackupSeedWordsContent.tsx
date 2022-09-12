@@ -74,10 +74,10 @@ const BackupSeedWordsContent = ( props ) => {
       <SeedHeaderComponent
         onPressBack={() => {
           // RNPreventScreenshot.enabled( false )
-          // props.navigation.goBack()
-          props.navigation.navigate( 'Home' )
+          props.navigation.goBack()
+          // props.navigation.navigate( 'Home' )
         }}
-        info={'Make sure you keep them'}
+        info={'Make sure you keep them safe'}
         selectedTitle={headerTitle}
       />
       <KeyboardAwareScrollView

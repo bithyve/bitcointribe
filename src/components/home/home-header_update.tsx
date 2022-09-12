@@ -52,6 +52,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
+import { onPressKeeper } from '../../store/actions/BHR'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -88,6 +89,8 @@ const HomeHeader = ( {
     ( state ) => state.bhr.levelData
   )
   const currencyKind: CurrencyKind = useCurrencyKind()
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
 
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
@@ -110,6 +113,52 @@ const HomeHeader = ( {
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
   const [ days, setDays ] = useState( 0 )
+
+  const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
+  const [ modalVisible, setModalVisible ] = useState( false )
+  const defaultKeeperObj: {
+    shareType: string
+    updatedAt: number;
+    status: string
+    shareId: string
+    reshareVersion: number;
+    name?: string
+    data?: any;
+    channelKey?: string
+  } = {
+    shareType: '',
+    updatedAt: 0,
+    status: 'notAccessible',
+    shareId: '',
+    reshareVersion: 0,
+    name: '',
+    data: {
+    },
+    channelKey: ''
+  }
+  const [ selectedKeeper, setSelectedKeeper ]: [{
+    shareType: string;
+    updatedAt: number;
+    status: string;
+    shareId: string;
+    reshareVersion: number;
+    name?: string;
+    data?: any;
+    channelKey?: string;
+  }, any] = useState( defaultKeeperObj )
+
+  useEffect( () => {
+    if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
+      setSelectedKeeper( navigationObj.selectedKeeper )
+      const navigationParams = {
+        selectedTitle: navigationObj.selectedKeeper.name,
+        SelectedRecoveryKeyNumber: 1,
+        selectedKeeper: navigationObj.selectedKeeper,
+        selectedLevelId: levelData[ 0 ].id
+      }
+      navigation.navigate( 'SeedBackupHistory', navigationParams )
+    }
+  }, [ navigationObj ] )
 
   useEffect( () => {
     async function fetchWalletDays() {
@@ -151,7 +200,19 @@ const HomeHeader = ( {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
     return <TouchableOpacity
       onPress={()=> {
-
+        if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+          const navigationParams = {
+            selectedTitle: navigationObj?.selectedKeeper?.name,
+            SelectedRecoveryKeyNumber: 1,
+            selectedKeeper: navigationObj?.selectedKeeper,
+            selectedLevelId: levelData[ 0 ].id
+          }
+          navigation.navigate( 'SeedBackupHistory', navigationParams )
+        } else {
+          setSelectedKeeper( levelData[ 0 ].keeper1 )
+          dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+          setOnKeeperButtonClick( true )
+        }
         // navigation.navigate( 'WalletBackup' ), {
         // messageOne, messageTwo, isFirstMessageBold, isError, isInit
       // }
