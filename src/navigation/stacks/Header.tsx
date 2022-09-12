@@ -674,8 +674,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
 
     messaging().getInitialNotification().then((data) => {
-      const content = JSON.parse(data.data.content)
-      this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
+      if (data) {
+        const content = JSON.parse(data.data.content)
+        this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
+      }
     })
 
     messaging().onNotificationOpenedApp((data) => {

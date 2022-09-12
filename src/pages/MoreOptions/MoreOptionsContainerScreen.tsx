@@ -11,6 +11,7 @@ import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
 import Node from '../../assets/images/svgs/node.svg'
 import Wallet from '../../assets/images/svgs/icon_settings.svg'
 import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
@@ -137,10 +138,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     },
     // {
     //   title: 'Enable Auto-Read from Clipboard',
-    //   imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    //   imageSource: require( '../../assets/images/svgs/icons_document_copy.svg' ),
     //   subtitle: 'App will prompt to send sats to copied address',
     //   onOptionPressed: () => {
-    //     setModalVisible(true)
+    //     setModalVisible( true )
     //   }
     // },
   ]
@@ -236,7 +237,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
           /> )
         case 'Enable Auto-Read from Clipboard':
-          return ( <AppInfo /> )
+          return ( <DocumentPad /> )
         default:
           return null
     }
@@ -253,7 +254,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const ReadClipboardModal = () => {
     return (
       <View style={styles.wrapper}>
-        <View>
+        <View style={{
+          flex: 1
+        }}>
           <AppBottomSheetTouchableWrapper
             style={{
               backgroundColor: Colors.lightBlue,
@@ -298,6 +301,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}>
               <Text
                 style={{
+                  alignSelf: 'center',
                   color: Colors.textColorGrey,
                   fontSize: RFValue( 16 ),
                   fontFamily: Fonts.FiraSansRegular,
@@ -329,7 +333,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               <Text
                 style={{
                   color: Colors.white,
-                  fontFamily: Fonts.FiraSansSemiBold
+                  fontFamily: Fonts.FiraSansSemiBold,
                 }}
               >
                 Proceed
