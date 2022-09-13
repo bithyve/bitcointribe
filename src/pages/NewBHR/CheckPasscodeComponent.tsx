@@ -178,8 +178,8 @@ export default function CheckPasscodeComponent( props ) {
           <Text style={styles.headerTitleText}>{'Confirm Passcode'}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              {strings.enter_your}{' '}
-              <Text style={styles.boldItalicText}>{'To view your backup'}</Text>
+              {'Please enter your passcode to view your backup'}
+              {/* <Text style={styles.headerInfoText}>{'passcode to view your backup'}</Text> */}
             </Text>
             <View style={{
               alignSelf: 'baseline'

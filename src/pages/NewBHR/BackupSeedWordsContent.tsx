@@ -201,7 +201,7 @@ const BackupSeedWordsContent = ( props ) => {
                 isChangeKeeperType: true,
               } )
             } else {
-              props.navigation.goBack()
+              props.navigation.navigate( 'Home' )
             }
           }}
           onPressIgnore={() => setSeedWordModal( false )}

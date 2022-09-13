@@ -73,12 +73,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
       subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
-        ? 'Note down backup phrase'
+        ? 'Confirm backup phrase'
         : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
           ? 'Wallet backup confirmed'
-          :'Confirm backup phrase to secure your wallet',
+          :'Confirm backup phrase',
       title: bhrStrings[ 'WalletBackup' ],
-      screenName: 'SeedBackupHistory',
+      screenName: 'WalletBackup',
     },
     {
       title: strings.accountManagement,
@@ -201,7 +201,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
       console.log( 'menuoption inside', menuOption )
-      if( menuOption.screenName == 'SeedBackupHistory' ) {
+      if( menuOption.screenName == 'WalletBackup' ) {
         console.log( 'skk leveldataaaa', levelData )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){

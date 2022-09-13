@@ -77,7 +77,8 @@ const WalletInitializationScreen = props => {
         }}>
           <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
           <Text style={styles.headerInfoText}>
-            {strings.previously}
+            {/* {strings.previously} */}
+            {'Use Backup Phrase if you have 12/18/24 word seed phrase. Recovery Keys are for legacy users'}
           </Text>
         </View>
         <TouchableOpacity
@@ -122,7 +123,7 @@ const WalletInitializationScreen = props => {
             source={require( '../assets/images/icons/seedwords.png' )}
           />
           <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Beckup phrase</Text>
+            <Text style={styles.touchableText}>Using Backup phrase</Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons

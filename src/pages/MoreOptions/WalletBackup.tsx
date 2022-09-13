@@ -10,7 +10,8 @@ import {
   FlatList,
   Keyboard,
   InteractionManager,
-  Platform
+  Platform,
+  BackHandler
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -194,6 +195,18 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     init()
+  }, [] )
+
+  function handleBackButtonClick() {
+    props.navigation.navigate( 'Home' )
+    return true
+  }
+
+  useEffect( () => {
+    BackHandler.addEventListener( 'hardwareBackPress', handleBackButtonClick )
+    return () => {
+      BackHandler.removeEventListener( 'hardwareBackPress', handleBackButtonClick )
+    }
   }, [] )
 
   const init = async () => {
@@ -794,7 +807,8 @@ const WalletBackup = ( props, navigation ) => {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.pop()
+            // props.navigation.pop()
+            props.navigation.navigate( 'Home' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -847,7 +861,7 @@ const WalletBackup = ( props, navigation ) => {
                   <Text style={{
                     fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
                   }}>
-                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : (item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText) )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : ( item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText ) )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
@@ -991,8 +1005,8 @@ const WalletBackup = ( props, navigation ) => {
           // title={'Backup using \nSeed Words'}
           title={'Backup using phrase'}
           // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
-          info={'Backup your wallet to ensure security and easy wallet retrieval.\n\n'}
-          // note={'Note: This will only be allowed if the Savings account is empty and archived.'}
+          info={'Twelve-word wallet backup phrase (Seed Words) Make sure you note them down in private and keep them secure.\n'}
+          note={'Note:\nIf someone gets access to these, they can withdraw all the funds\n\nIf you lose them, you will not be able to restore the wallet'}
           proceedButtonText={'Proceed'}
           cancelButtonText={'Cancel'}
           onPressProceed={() => {
@@ -1162,7 +1176,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     borderRadius: wp( '4' ),
     marginBottom: hp( '1' ),
-    marginTop: 40,
+    marginTop: 25,
     marginHorizontal: 20
   },
   modalElementInfoView: {

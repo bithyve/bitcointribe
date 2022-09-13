@@ -198,22 +198,29 @@ const HomeHeader = ( {
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
+
     return <TouchableOpacity
       onPress={()=> {
-        if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-          const navigationParams = {
-            selectedTitle: navigationObj?.selectedKeeper?.name,
-            SelectedRecoveryKeyNumber: 1,
-            selectedKeeper: navigationObj?.selectedKeeper,
-            selectedLevelId: levelData[ 0 ].id
+        if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+            const navigationParams = {
+              selectedTitle: navigationObj?.selectedKeeper?.name,
+              SelectedRecoveryKeyNumber: 1,
+              selectedKeeper: navigationObj?.selectedKeeper,
+              selectedLevelId: levelData[ 0 ].id
+            }
+            console.log( 'levelHealth' + JSON.stringify( levelHealth ) )
+            console.log( 'levelHealth1' + JSON.stringify( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) )
+            navigation.navigate( 'SeedBackupHistory', navigationParams )
+          } else {
+            console.log( 'levelData[ 0 ].keeper1' + JSON.stringify( levelData[ 0 ].keeper1 ) )
+            setSelectedKeeper( levelData[ 0 ].keeper1 )
+            dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+            setOnKeeperButtonClick( true )
           }
-          navigation.navigate( 'SeedBackupHistory', navigationParams )
-        } else {
-          setSelectedKeeper( levelData[ 0 ].keeper1 )
-          dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
-          setOnKeeperButtonClick( true )
-        }
-        // navigation.navigate( 'WalletBackup' ), {
+        } else navigation.navigate( 'WalletBackup' )
+      // navigation.navigate( 'WalletBackup' ), {
         // messageOne, messageTwo, isFirstMessageBold, isError, isInit
       // }
       }
@@ -262,7 +269,7 @@ const HomeHeader = ( {
       }
       { <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
-      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase to secure your wallet' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' )}</Text> }
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text> }
 
       {/* <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
