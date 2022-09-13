@@ -1176,7 +1176,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     borderRadius: wp( '4' ),
     marginBottom: hp( '1' ),
-    marginTop: 40,
+    marginTop: 25,
     marginHorizontal: 20
   },
   modalElementInfoView: {
