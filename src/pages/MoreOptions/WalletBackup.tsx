@@ -991,8 +991,8 @@ const WalletBackup = ( props, navigation ) => {
           // title={'Backup using \nSeed Words'}
           title={'Backup using phrase'}
           // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
-          info={'Backup your wallet to ensure security and easy wallet retrieval.\n\n'}
-          // note={'Note: This will only be allowed if the Savings account is empty and archived.'}
+          info={'Twelve-word wallet backup phrase (Seed Words) Make sure you note them down in private and keep them secure.\n'}
+          note={'Note:\nIf someone gets access to these, they can withdraw all the funds\n\nIf you lose them, you will not be able to restore the wallet'}
           proceedButtonText={'Proceed'}
           cancelButtonText={'Cancel'}
           onPressProceed={() => {

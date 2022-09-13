@@ -73,10 +73,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
       subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
-        ? 'Note down backup phrase'
+        ? 'Confirm backup phrase'
         : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
           ? 'Wallet backup confirmed'
-          :'Confirm backup phrase to secure your wallet',
+          :'Confirm backup phrase',
       title: bhrStrings[ 'WalletBackup' ],
       screenName: 'SeedBackupHistory',
     },
