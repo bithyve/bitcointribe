@@ -78,7 +78,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           ? 'Wallet backup confirmed'
           :'Confirm backup phrase',
       title: bhrStrings[ 'WalletBackup' ],
-      screenName: 'SeedBackupHistory',
+      screenName: 'WalletBackup',
     },
     {
       title: strings.accountManagement,
@@ -201,7 +201,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
       console.log( 'menuoption inside', menuOption )
-      if( menuOption.screenName == 'SeedBackupHistory' ) {
+      if( menuOption.screenName == 'WalletBackup' ) {
         console.log( 'skk leveldataaaa', levelData )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){

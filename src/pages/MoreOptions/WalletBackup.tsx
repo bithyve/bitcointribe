@@ -10,7 +10,8 @@ import {
   FlatList,
   Keyboard,
   InteractionManager,
-  Platform
+  Platform,
+  BackHandler
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -194,6 +195,18 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     init()
+  }, [] )
+
+  function handleBackButtonClick() {
+    props.navigation.navigate( 'Home' )
+    return true
+  }
+
+  useEffect( () => {
+    BackHandler.addEventListener( 'hardwareBackPress', handleBackButtonClick )
+    return () => {
+      BackHandler.removeEventListener( 'hardwareBackPress', handleBackButtonClick )
+    }
   }, [] )
 
   const init = async () => {
@@ -794,7 +807,8 @@ const WalletBackup = ( props, navigation ) => {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.pop()
+            // props.navigation.pop()
+            props.navigation.navigate( 'Home' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -847,7 +861,7 @@ const WalletBackup = ( props, navigation ) => {
                   <Text style={{
                     fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
                   }}>
-                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : (item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText) )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : ( item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText ) )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
