@@ -276,7 +276,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           </ListItem.Subtitle>
 
         </ListItem.Content>
-        {primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ? <TouchableOpacity
+        { ( primarySubAccount.customDisplayName || primarySubAccount.defaultTitle ) != 'Savings Account' ? primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ? <TouchableOpacity
           style={{
             backgroundColor: Colors.lightBlue,
             marginLeft: 'auto',
@@ -310,7 +310,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           >
             {primarySubAccount.visibility === AccountVisibility.HIDDEN ? strings.Unhide :strings.Restore}
           </Text>
-        </TouchableOpacity> : null}
+        </TouchableOpacity> : null : null}
       </ListItem>
     )
   }
