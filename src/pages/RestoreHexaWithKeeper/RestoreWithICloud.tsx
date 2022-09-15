@@ -281,7 +281,6 @@ class RestoreWithICloud extends Component<
   };
 
   cloudData = () => {
-    // console.log( 'INSIDE cloudData componentDidMount' )
     this.setState( {
       showLoader: true
     } )

@@ -306,7 +306,6 @@ const CloudBackupHistory = ( props ) => {
         tintColor={Colors.deepBlue}
         headerImage={require( '../../assets/images/icons/ico_cloud_backup.png' )}
       />
-      {console.log( 'LevelData==cloud history==>' + JSON.stringify( levelData ) )}
       <View style={{
         flex: 1
       }}>

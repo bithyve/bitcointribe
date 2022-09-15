@@ -113,8 +113,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   }
 
   function updateAmountForRecipient() {
-    console.log( 'skk currentRecipient', JSON.stringify( currentRecipient ) )
-    console.log( 'skk selectedAmount', JSON.stringify( selectedAmount ) )
     dispatch( amountForRecipientUpdated( {
       recipient: currentRecipient,
       amount: selectedAmount
@@ -123,7 +121,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   function handleConfirmationButtonPress() {
     updateAmountForRecipient()
-    console.log( 'skk sourceAccountShell', JSON.stringify( sourceAccountShell ) )
     dispatch( executeSendStage1( {
       accountShell: sourceAccountShell
     } ) )
@@ -171,13 +168,11 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
-      console.log( 'skk inside use account success' )
       navigation.navigate( 'SendConfirmation', {
         fromWallet
       } )
     },
     onFailure: ( error ) => {
-      console.log( 'skk inside use account' )
       setError( error )
       setTimeout( () => {
         setFailure( true )

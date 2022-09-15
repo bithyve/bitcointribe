@@ -163,13 +163,10 @@ const HomeHeader = ( {
   useEffect( () => {
     async function fetchWalletDays() {
       const walletBackupDate = await AsyncStorage.getItem( 'walletBackupDate' )
-      // console.log( 'skk date', JSON.parse( walletBackupDate ) )
-
       if( walletBackupDate && walletBackupDate != null ){
         const backedupDate = moment( JSON.parse( walletBackupDate ) )
         // const currentDate = moment( '2023-04-10T11:27:25.000Z' )
         const currentDate = moment( Date() )
-        console.log( 'skk diff', currentDate.diff( backedupDate, 'days' ) )
         setDays( currentDate.diff( backedupDate, 'days' ) )
       }
     }
@@ -210,11 +207,8 @@ const HomeHeader = ( {
               selectedKeeper: navigationObj?.selectedKeeper,
               selectedLevelId: levelData[ 0 ].id
             }
-            console.log( 'levelHealth' + JSON.stringify( levelHealth ) )
-            console.log( 'levelHealth1' + JSON.stringify( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) )
             navigation.navigate( 'SeedBackupHistory', navigationParams )
           } else {
-            console.log( 'levelData[ 0 ].keeper1' + JSON.stringify( levelData[ 0 ].keeper1 ) )
             setSelectedKeeper( levelData[ 0 ].keeper1 )
             dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
             setOnKeeperButtonClick( true )

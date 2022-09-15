@@ -302,7 +302,6 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( metaSharesKeeper?.length == 3 && onKeeperButtonClick ) {
-      console.log( 'skk inside 1' )
       const obj = {
         selectedKeeper: {
           shareType: 'primaryKeeper',
@@ -329,7 +328,6 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( metaSharesKeeper?.length == 5 && onKeeperButtonClick ) {
-      console.log( 'skk inside 12' )
       const obj = {
         selectedKeeper: {
           shareType: selectedKeeperType,
@@ -352,7 +350,6 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
-      console.log( 'skk inside 13' )
       dispatch( keeperProcessStatus( '' ) )
     }
   }, [ keeperProcessStatusFlag ] )
@@ -371,7 +368,6 @@ const WalletBackup = ( props, navigation ) => {
 
   useEffect( () => {
     if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
-      console.log( 'skk inside 14' )
       setSelectedKeeper( navigationObj.selectedKeeper )
       setSelectedLevelId( navigationObj.id )
       if ( selectedLevelId == 2 && SelectedRecoveryKeyNumber == 1 ) {
@@ -523,7 +519,6 @@ const WalletBackup = ( props, navigation ) => {
   }
 
   const goToHistory = ( value, test ) => {
-    console.log( 'skk inside 0' )
     const { selectedKeeper } = value
     setShowLoader( false )
     setShowQRModal( false )
@@ -533,7 +528,6 @@ const WalletBackup = ( props, navigation ) => {
       selectedKeeper,
       selectedLevelId
     }
-    // console.log( 'skk gotohistory', navigationParams )
     let index = 1
     let count = 0
     if ( selectedKeeper.shareType == 'primaryKeeper' || selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
@@ -708,7 +702,6 @@ const WalletBackup = ( props, navigation ) => {
     let isBalanceFilled = false
     let savingAccountCount = 0
 
-    console.log( 'skk before psa', JSON.stringify( accountsState?.accountShells ) )
     accountsState?.accountShells?.map( ( item, index ) => {
       if ( item?.primarySubAccount?.type == AccountType.SAVINGS_ACCOUNT ) {
         savingAccountCount++
@@ -840,7 +833,6 @@ const WalletBackup = ( props, navigation ) => {
         fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
       }}>{levelData[ 0 ].keeper1.shareType == '' || levelData[ 0 ].keeper1.shareType == 'notSetup' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text> */}
       {/* {showBackupMessage()} */}
-      {/* {console.log( 'skk localleveldata', JSON.stringify( localLevelData ) )} */}
 
       <FlatList
         keyExtractor={( item, index ) => item + index}

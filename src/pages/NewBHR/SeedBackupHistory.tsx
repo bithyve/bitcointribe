@@ -436,11 +436,9 @@ const SeedBackupHistory = ( props ) => {
               // props.navigation.navigate( 'BackupSeedWordsContent' )
 
               // AsyncStorage.setItem( 'walletBackupDate', JSON.stringify( moment( Date() ) ) )
-              //   console.log( 'skk date', JSON.stringify( moment( Date() ) ) )
 
             // const a = moment( moment( Date() ) )
             // const b = moment( '2022-10-10T11:27:25.000Z' )
-            // console.log( 'skk diff', b.diff( a, 'days' ) )
             }
           }}
           bottomBoxInfo={false}

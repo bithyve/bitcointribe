@@ -196,13 +196,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   //const [ strings, setstrings ] = useState( content.settings )
   function handleOptionSelection( menuOption: MenuOption ) {
-    console.log( 'menuoption', menuOption )
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
-      console.log( 'menuoption inside', menuOption )
       if( menuOption.screenName == 'WalletBackup' ) {
-        console.log( 'skk leveldataaaa', levelData )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
           if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
@@ -362,7 +359,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         {ReadClipboardModal()}
       </ModalContainer>
       <View style={styles.accountCardsSectionContainer}>
-        {console.log( 'skk leveldata', levelData )}
         <Text style={{
           color: Colors.blue,
           fontSize: RFValue( 18 ),

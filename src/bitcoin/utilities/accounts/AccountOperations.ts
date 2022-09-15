@@ -1033,42 +1033,42 @@ export default class AccountOperations {
     txid: string;
    }> => {
 
-    console.log( 'skk1 privateKey==', privateKey )
-    console.log( 'skk1 recipientAddress==', recipientAddress )
-    console.log( 'skk1 averageTxFees==', averageTxFees )
-    console.log( 'skk1 network==', network )
-    console.log( 'skk1 derivationPurpose===', derivationPurpose )
+    // console.log( 'skk1 privateKey==', privateKey )
+    // console.log( 'skk1 recipientAddress==', recipientAddress )
+    // console.log( 'skk1 averageTxFees==', averageTxFees )
+    // console.log( 'skk1 network==', network )
+    // console.log( 'skk1 derivationPurpose===', derivationPurpose )
 
     const keyPair = AccountUtilities.getKeyPair( privateKey, network )
-    console.log( 'skk1211 privatekey', JSON.stringify( keyPair.privateKey ) )
-    console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, false ) )
-    console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, true ) )
-    console.log( 'skk1211 publickey', keyPair.publicKey )
+    // console.log( 'skk1211 privatekey', JSON.stringify( keyPair.privateKey ) )
+    // console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, false ) )
+    // console.log( 'skk1211 privatekey', wif.encode( 128, keyPair.privateKey, true ) )
+    // console.log( 'skk1211 publickey', keyPair.publicKey )
 
     // fetch input utxos against the address
     const { confirmedUTXOs } = await AccountUtilities.fetchBalanceTransactionByAddresses( [ address ], network )
     if( confirmedUTXOs.length === 0 ) throw new Error( 'Insufficient balance to perform send' )
     const inputUTXOs: InputUTXOs[] = confirmedUTXOs
 
-    console.log( 'skk13' )
+    // console.log( 'skk13' )
     // prepare outputs
     const outputUTXOs = [ {
       address: recipientAddress
     } ]
 
-    console.log( 'skk14' )
+    // console.log( 'skk14' )
     // perform coinselection
     const defaultTxPriority = TxPriority.LOW
     const defaultFeePerByte = averageTxFees[ defaultTxPriority ].feePerByte
     const { inputs, outputs } = coinselectSplit( inputUTXOs, outputUTXOs, defaultFeePerByte )
 
-    console.log( 'skk15' )
+    // console.log( 'skk15' )
     // build trasaction
     const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
       network,
     )
 
-    console.log( 'skk16' )
+    // console.log( 'skk16' )
     for ( const input of inputs ) {
       if( derivationPurpose === DerivationPurpose.BIP84 ){
         // native segwit
@@ -1081,7 +1081,7 @@ export default class AccountOperations {
     }
     for ( const output of outputs ) txb.addOutput( output.address, output.value )
 
-    console.log( 'skk17' )
+    // console.log( 'skk17' )
     // sign transaction
     let vin = 0
     for ( const input of inputs ) {
@@ -1090,10 +1090,10 @@ export default class AccountOperations {
       vin++
     }
 
-    console.log( 'skk before1 txid' )
+    // console.log( 'skk before1 txid' )
     // broadcast transaciton
     const { txid } = await AccountUtilities.broadcastTransaction( txb.build().toHex(), network )
-    console.log( 'skk before2 txid', JSON.stringify( txid ) )
+    // console.log( 'skk before2 txid', JSON.stringify( txid ) )
 
     return {
       txid

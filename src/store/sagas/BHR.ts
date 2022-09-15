@@ -489,7 +489,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedData
     const secondaryMnemonics = selectedBackup.secondaryShare ? BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedData : ''
     const image: NewWalletImage = icloudData
-    // console.log( 'skk wallet====>' +  image )
     yield call( recoverWalletWorker, {
       payload: {
         level: selectedBackup.levelStatus, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics

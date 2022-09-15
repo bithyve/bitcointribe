@@ -402,11 +402,8 @@ export default function Receive( props ) {
                   selectedKeeper: navigationObj?.selectedKeeper,
                   selectedLevelId: levelData[ 0 ].id
                 }
-                console.log( 'levelHealth' + JSON.stringify( levelHealth ) )
-                console.log( 'levelHealth1' + JSON.stringify( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) )
                 props.navigation.navigate( 'SeedBackupHistory', navigationParams )
               } else {
-                console.log( 'levelData[ 0 ].keeper1' + JSON.stringify( levelData[ 0 ].keeper1 ) )
                 setSelectedKeeper( levelData[ 0 ].keeper1 )
                 dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
                 setOnKeeperButtonClick( true )
