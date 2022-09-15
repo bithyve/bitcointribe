@@ -50,6 +50,9 @@ import MaterialCurrencyCodeIcon, {
 } from '../MaterialCurrencyCodeIcon'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
+import { onPressKeeper } from '../../store/actions/BHR'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -86,6 +89,8 @@ const HomeHeader = ( {
     ( state ) => state.bhr.levelData
   )
   const currencyKind: CurrencyKind = useCurrencyKind()
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
 
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
@@ -107,6 +112,67 @@ const HomeHeader = ( {
 
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
+  const [ days, setDays ] = useState( 0 )
+
+  const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
+  const [ modalVisible, setModalVisible ] = useState( false )
+  const defaultKeeperObj: {
+    shareType: string
+    updatedAt: number;
+    status: string
+    shareId: string
+    reshareVersion: number;
+    name?: string
+    data?: any;
+    channelKey?: string
+  } = {
+    shareType: '',
+    updatedAt: 0,
+    status: 'notAccessible',
+    shareId: '',
+    reshareVersion: 0,
+    name: '',
+    data: {
+    },
+    channelKey: ''
+  }
+  const [ selectedKeeper, setSelectedKeeper ]: [{
+    shareType: string;
+    updatedAt: number;
+    status: string;
+    shareId: string;
+    reshareVersion: number;
+    name?: string;
+    data?: any;
+    channelKey?: string;
+  }, any] = useState( defaultKeeperObj )
+
+  useEffect( () => {
+    if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
+      setSelectedKeeper( navigationObj.selectedKeeper )
+      const navigationParams = {
+        selectedTitle: navigationObj.selectedKeeper.name,
+        SelectedRecoveryKeyNumber: 1,
+        selectedKeeper: navigationObj.selectedKeeper,
+        selectedLevelId: levelData[ 0 ].id
+      }
+      navigation.navigate( 'SeedBackupHistory', navigationParams )
+    }
+  }, [ navigationObj ] )
+
+  useEffect( () => {
+    async function fetchWalletDays() {
+      const walletBackupDate = await AsyncStorage.getItem( 'walletBackupDate' )
+      if( walletBackupDate && walletBackupDate != null ){
+        const backedupDate = moment( JSON.parse( walletBackupDate ) )
+        // const currentDate = moment( '2023-04-10T11:27:25.000Z' )
+        const currentDate = moment( Date() )
+        setDays( currentDate.diff( backedupDate, 'days' ) )
+      }
+    }
+
+    fetchWalletDays()
+  }, [] )
 
   useEffect( ()=>{
     if( cloudErrorMessage != '' ){
@@ -129,10 +195,30 @@ const HomeHeader = ( {
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
+
     return <TouchableOpacity
-      onPress={()=> {navigation.navigate( 'Setting' ), {
-        messageOne, messageTwo, isFirstMessageBold, isError, isInit
-      }}}
+      onPress={()=> {
+        if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+            const navigationParams = {
+              selectedTitle: navigationObj?.selectedKeeper?.name,
+              SelectedRecoveryKeyNumber: 1,
+              selectedKeeper: navigationObj?.selectedKeeper,
+              selectedLevelId: levelData[ 0 ].id
+            }
+            navigation.navigate( 'SeedBackupHistory', navigationParams )
+          } else {
+            setSelectedKeeper( levelData[ 0 ].keeper1 )
+            dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+            setOnKeeperButtonClick( true )
+          }
+        } else navigation.navigate( 'WalletBackup' )
+      // navigation.navigate( 'WalletBackup' ), {
+        // messageOne, messageTwo, isFirstMessageBold, isError, isInit
+      // }
+      }
+      }
       activeOpacity={0.6}
       style={{
         flexDirection: 'row', alignItems: 'center', marginTop: hp( 1.8 )
@@ -150,7 +236,8 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
+          backgroundColor: levelData[ 0 ].keeper1.shareType == '' ? Colors.white : ( levelData[ 0 ].keeper1.shareType == 'seed' ? Colors.green : Colors.red ),
+          // backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
@@ -159,7 +246,7 @@ const HomeHeader = ( {
             source={ require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
-              tintColor: 'green'
+              tintColor: Colors.white
             }}
             resizeMode={'contain'}
           /> :
@@ -167,13 +254,29 @@ const HomeHeader = ( {
               source={isError ? currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
               style={{
                 width: wp( '2.7%' ), height: wp( '2.7%' ),
+                // tintColor: Colors.white
               }}
               resizeMode={'contain'}
             />
           }
         </View>
       }
-      {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
+      { <Text ellipsizeMode="middle" numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text> }
+
+      {/* <Text ellipsizeMode="middle" numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
+      }}>{days > 180
+          ? 'Your wallet backup phase is expired'
+          : days > 150
+            ? 'Wallet backup phase will expire soon'
+            : levelData[ 0 ].keeper1.shareType == ''
+              ? strings.Backupyour
+              : ( levelData[ 0 ].keeper1.shareType == 'seed'
+                ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' )}</Text> */}
+
+      {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
@@ -181,7 +284,7 @@ const HomeHeader = ( {
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp( 0.8 )
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
-        }}>{messageTwo}</Text></Text>}
+        }}>{messageTwo}</Text></Text>} */}
     </TouchableOpacity>
   }
 

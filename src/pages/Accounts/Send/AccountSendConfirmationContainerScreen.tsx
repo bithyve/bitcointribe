@@ -73,6 +73,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const [ note, setNote ] = useState( '' )
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
+  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
@@ -160,13 +161,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
-        note
+        note,
+        fromWallet
       } )
     else {
       setHandleButton( false )
-      console.log( 'skk account shell', JSON.stringify( sourceAccountShell ) )
-      console.log( 'skk transactionPriority', JSON.stringify( transactionPriority ) )
-      console.log( 'skk note shell', JSON.stringify( note ) )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: transactionPriority,

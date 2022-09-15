@@ -28,7 +28,6 @@ import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transacti
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 import WalletBackupStack from './WalletBackupStack'
 import WalletOption from '../../../pages/MoreOptions/WalletOption/WalletOption'
-import EnableClipboardAutoRead from '../../../pages/EnableClipboardAutoRead'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -42,7 +41,12 @@ const MoreOptionsStack = createStackNavigator(
       },
     },
     Launch,
-    Login,
+    Login:{
+      screen: Login,
+      navigationOptions: {
+        header: null
+      }
+    },
     Intermediate,
     ReLogin: {
       screen: ReLogin,
@@ -131,18 +135,12 @@ const MoreOptionsStack = createStackNavigator(
         // tabBarVisibl
       },
     },
-    WalletBackup: {
+    SeedBackup: {
       screen: WalletBackupStack,
       navigationOptions: {
         header: null,
       },
     },
-    EnableClipboard: {
-      screen: EnableClipboardAutoRead,
-      navigationOptions: {
-        header: null
-      }
-    }
   },
   {
     initialRouteName: 'Home',

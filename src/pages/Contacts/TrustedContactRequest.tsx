@@ -313,6 +313,7 @@ export default function TrustedContactRequest( props ) {
       enabled
     >
       <ScrollView
+        keyboardShouldPersistTaps={'always'}
         style={{
           ...styles.modalContentContainer,
           paddingBottom: onBlurFocus ? hp( '30%' ) : 0,

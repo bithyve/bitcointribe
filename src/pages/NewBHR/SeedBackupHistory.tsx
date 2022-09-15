@@ -36,6 +36,7 @@ import SeedBacupModalContents from './SeedBacupModalContents'
 import dbManager from '../../storage/realm/dbManager'
 import AlertModalContents from '../../components/AlertModalContents'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -84,6 +85,7 @@ const SeedBackupHistory = ( props ) => {
   const [ seedData, setSeedData ] = useState( [] )
   const [ seedPosition, setSeedPosition ] = useState( 0 )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
+  const [ seedBackupModal, setSeedBackupModal ] = useState( false )
   const [ info, setInfo ] = useState( '' )
   const sortedHistory = ( history ) => {
     if( !history ) return
@@ -116,6 +118,12 @@ const SeedBackupHistory = ( props ) => {
       } else j--
     }
     setSeedRandomNumber( ranNums )
+
+    if ( ( levelHealth.length == 0 ) ||
+    ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
+      levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+      setSeedBackupModal( true )
+    }
   }, [] )
 
   useEffect( () =>{
@@ -144,7 +152,6 @@ const SeedBackupHistory = ( props ) => {
   }, [ levelHealth ] )
 
   useEffect( () => {
-    console.log( seedBackupHistoryArray )
     if ( seedBackupHistoryArray ) setSeedBackupHistory( seedBackupHistoryArray )
   }, [ seedBackupHistoryArray ] )
 
@@ -304,10 +311,10 @@ const SeedBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => {
-          // props.navigation.goBack()
-          props.navigation.popToTop()
+          props.navigation.navigate( 'Home' )
+          // props.navigation.popToTop()
         }}
-        selectedTitle={'Seed word Backup'}
+        selectedTitle={'Wallet backup'}
         selectedTime={selectedKeeper?.updatedAt
           ? getTime( selectedKeeper?.updatedAt )
           : 'Never'}
@@ -356,9 +363,12 @@ const SeedBackupHistory = ( props ) => {
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
           }}
-          onPressChange={() => setKeeperTypeModal( true )}
+          // onPressChange={() => setKeeperTypeModal( true )}
+          onPressChange={() => {
+            props.navigation.navigate( 'CheckPasscode' )
+          }}
           showButton={showButton}
-          changeButtonText={'Change'}
+          changeButtonText={'Forgot'}
           showSeedHistoryNote={true}
           isChangeKeeperAllow={true}
         />
@@ -410,36 +420,48 @@ const SeedBackupHistory = ( props ) => {
             setConfirmSeedWordModal( false )
             if( word == '' ){
               setTimeout( () => {
-                setInfo( 'Please enter seed word' )
+                setInfo( 'Please enter backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else if( word !=  seedData[ ( seedRandomNumber[ seedPosition ]-1 ) ].name  ){
               setTimeout( () => {
-                setInfo( 'Please enter valid seed word' )
+                setInfo( 'Please enter valid backup phrase' )
                 setShowAlertModal( true )
               }, 500 )
             } else {
               setSeedWordModal( true )
               dispatch( updateSeedHealth() )
               // dispatch(setSeedBackupHistory())
+
+              // props.navigation.navigate( 'BackupSeedWordsContent' )
+
+              // AsyncStorage.setItem( 'walletBackupDate', JSON.stringify( moment( Date() ) ) )
+
+            // const a = moment( moment( Date() ) )
+            // const b = moment( '2022-10-10T11:27:25.000Z' )
             }
           }}
-          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          bottomBoxInfo={false}
+          onPressIgnore={() => {
+            setConfirmSeedWordModal( false )
+            // props.navigation.navigate( 'BackupSeedWordsContent' )
+            // props.navigation.navigate( 'CheckPasscode' )
+          }}
           isIgnoreButton={true}
-          cancelButtonText={'Start Over'}
+          cancelButtonText={'Cancel'}
         />
       </BottomInputModalContainer>
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
-          title={'Seed Words\nBackup Successful'}
+          title={'Backup phrase\nSuccessful'}
           info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
           proceedButtonText={'View Health'}
           onPressProceed={() => {
             setSeedWordModal( false )
             // props.navigation.goBack()
-            setInfo( 'please delete icloud backup' )
-            setShowAlertModal( true )
+            // setInfo( 'please delete icloud backup' )
+            // setShowAlertModal( true )
           }}
           onPressIgnore={() => setSeedWordModal( false )}
           isIgnoreButton={false}
@@ -458,6 +480,28 @@ const SeedBackupHistory = ( props ) => {
           }}
           isBottomImage={false}
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={() => setSeedBackupModal( false )} visible={seedBackupModal}
+        closeBottomSheet={() => setSeedBackupModal( false )}>
+        <SeedBacupModalContents
+          // title={'Backup using \nSeed Words'}
+          title={'Backup using phrase'}
+          // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
+          info={'Twelve-word wallet backup phrase (Seed Words) Make sure you note them down in private and keep them secure.\n'}
+          note={'Note:\nIf someone gets access to these, they can withdraw all the funds\n\nIf you lose them, you will not be able to restore the wallet'}
+          proceedButtonText={'Proceed'}
+          cancelButtonText={'Cancel'}
+          onPressProceed={() => {
+            setSeedBackupModal( false )
+            props.navigation.navigate( 'BackupSeedWordsContent' )
+          }}
+          onPressIgnore={() => {
+            setSeedBackupModal( false )
+            // props.navigation.goBack()
+            props.navigation.navigate( 'Home' )
+          }}
+          isIgnoreButton={true}
         />
       </ModalContainer>
     </View>

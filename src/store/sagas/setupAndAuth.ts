@@ -39,8 +39,11 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean } = payload
-  const primaryMnemonic = bip39.generateMnemonic( )
+  const { walletName, security, mnemonic }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string } = payload
+  let primaryMnemonic = null
+  if( mnemonic && mnemonic != null )
+    primaryMnemonic = mnemonic
+  else primaryMnemonic = bip39.generateMnemonic( )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 

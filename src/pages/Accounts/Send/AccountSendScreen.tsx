@@ -24,6 +24,7 @@ export type Props = {
   onAddressSubmitted: ( address: string ) => void;
   onPaymentURIEntered: ( uri: string ) => void;
   onRecipientSelected: ( recipient: RecipientDescribing ) => void;
+  address: string;
 };
 
 export enum SectionKind {
@@ -44,6 +45,7 @@ const AccountSendScreen: React.FC<Props> = ( {
   onAddressSubmitted,
   onPaymentURIEntered,
   onRecipientSelected,
+  address,
 }: Props ) => {
   const selectedRecipients = useSelectedRecipientsForSending()
   const common  = translations[ 'common' ]
@@ -103,6 +105,7 @@ const AccountSendScreen: React.FC<Props> = ( {
                     width: widthPercentageToDP( 95 ),
                     alignSelf: 'center'
                   }}
+                  address={address}
                   placeholder={strings.Enteraddressmanually}
                   accountShell={accountShell}
                   onAddressEntered={onAddressSubmitted}

@@ -265,7 +265,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
-              marginTop: hp( '1.3%' )
+              marginTop: hp( '0.85%' )
             }}>
               {/* <IconWithBadge focused={focused} /> */}
               {focused ?
