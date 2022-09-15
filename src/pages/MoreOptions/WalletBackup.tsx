@@ -54,6 +54,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import idx from 'idx'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { NavigationActions, StackActions } from 'react-navigation'
 
 
 const WalletBackup = ( props, navigation ) => {
@@ -154,6 +155,7 @@ const WalletBackup = ( props, navigation ) => {
   const [ primarySubAccount, setPrimarySubAccount ] = useState( null )
   const [ accountShell, setAccountShell ] = useState( null )
   const [ emptyAccountErrorModal, setEmptyAccountErrorModal ] = useState( false )
+  const [ multipleAcccountModal, setMultipleAcccountModal ] = useState( false )
   const [ checkingAddress, setCheckingAddress ] = useState( null )
 
   let localPrimarySubAccount = null
@@ -586,7 +588,7 @@ const WalletBackup = ( props, navigation ) => {
     const tempData = []
     let isSeed = false
     levelData.map( ( item, index ) => {
-      if( isSeed ) return
+      if ( isSeed ) return
       if ( item.keeper1.status != 'notSetup' || index == 0 ) {
         if ( item.keeper1.shareType == 'seed' || item.keeper1ButtonText == 'Write down seed-words' ) {
           tempData.push( item )
@@ -702,32 +704,35 @@ const WalletBackup = ( props, navigation ) => {
     )
   }
   const onChangeSeedWordBackUp = () => {
-    let isAccountArchived  = false
-    let isBalanceFilled  = false
+    let isAccountArchived = false
+    let isBalanceFilled = false
+    let savingAccountCount = 0
 
-
-    console.log( 'skk before psa', JSON.stringify( primarySubAccount ) )
-    accountsState?.accountShells?.map( ( item, index )=>{
-      if( item?.primarySubAccount?.type == AccountType.SAVINGS_ACCOUNT ){
+    console.log( 'skk before psa', JSON.stringify( accountsState?.accountShells ) )
+    accountsState?.accountShells?.map( ( item, index ) => {
+      if ( item?.primarySubAccount?.type == AccountType.SAVINGS_ACCOUNT ) {
+        savingAccountCount++
         localPrimarySubAccount = item.primarySubAccount
         localAccountShell = item
         setAccountShell( localAccountShell )
         setPrimarySubAccount( localPrimarySubAccount )
-        if( item?.primarySubAccount?.balances?.confirmed + item?.primarySubAccount?.balances?.unconfirmed != 0 ) {
+        if ( item?.primarySubAccount?.balances?.confirmed + item?.primarySubAccount?.balances?.unconfirmed != 0 ) {
           isBalanceFilled = true
-        } else if( item?.primarySubAccount?.visibility == AccountVisibility.ARCHIVED ){
+        } else if ( item?.primarySubAccount?.visibility == AccountVisibility.ARCHIVED ) {
           isAccountArchived = true
         }
       }
-      if( item?.primarySubAccount?.type == AccountType.CHECKING_ACCOUNT ){
+      if ( item?.primarySubAccount?.type == AccountType.CHECKING_ACCOUNT ) {
         const nextFreeAddress = getNextFreeAddress( dispatch,
           accountsState.accounts[ item.primarySubAccount.id ] )
         setCheckingAddress( nextFreeAddress )
       }
     } )
-    if( isBalanceFilled ){
+    if ( savingAccountCount > 1 ) {
+      setMultipleAcccountModal( true )
+    } else if ( isBalanceFilled ) {
       setEmptyAccountErrorModal( true )
-    } else if( isAccountArchived || currentLevel < 2 )
+    } else if ( isAccountArchived || currentLevel < 2 )
       setSeedBackupModal( true )
     else setShowAccountArchiveModal( true )
   }
@@ -847,7 +852,7 @@ const WalletBackup = ( props, navigation ) => {
             return null
           } else {
             const showSeedAcion = ( levelData && ( levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType !== 'seed' )
-            || ( levelData[ 0 ]?.status == 'notSetup' && levelData[ 0 ]?.keeper1?.shareType == KeeperType.SECURITY_QUESTION ) )
+              || ( levelData[ 0 ]?.status == 'notSetup' && levelData[ 0 ]?.keeper1?.shareType == KeeperType.SECURITY_QUESTION ) )
             return (
               <AppBottomSheetTouchableWrapper
                 style={showSeedAcion ? styles.disableAddModalView : styles.addModalView}
@@ -861,12 +866,12 @@ const WalletBackup = ( props, navigation ) => {
                   <Text style={{
                     fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
                   }}>
-                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : ( item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText ) )|| 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : ( item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText ) ) || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
                   }}>{index == 0 && ( item.keeper1ButtonText == 'Seed' || item.keeper1ButtonText == 'Write down seed-words' )
-                      ? ( item.keeper1ButtonText == 'Seed'? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' ) : 'Encrypt and backup wallet on your cloud'}</Text>
+                      ? ( item.keeper1ButtonText == 'Seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' ) : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
                 {
                   showSeedAcion ?
@@ -879,7 +884,7 @@ const WalletBackup = ( props, navigation ) => {
                         alignSelf: 'flex-end',
                         resizeMode: 'contain',
                         marginBottom: 2,
-                      // backgroundColor:'red'
+                        // backgroundColor:'red'
                       }}
                     />
                 }
@@ -891,7 +896,7 @@ const WalletBackup = ( props, navigation ) => {
 
       {
         ( levelData && ( levelData[ 0 ]?.status != 'notSetup' && levelData[ 0 ]?.keeper1?.shareType != 'seed' )
-        || ( levelData[ 0 ]?.status == 'notSetup' && levelData[ 0 ]?.keeper1?.shareType == KeeperType.SECURITY_QUESTION ) ) &&
+          || ( levelData[ 0 ]?.status == 'notSetup' && levelData[ 0 ]?.keeper1?.shareType == KeeperType.SECURITY_QUESTION ) ) &&
         <Shadow viewStyle={{
           ...styles.successModalButtonView,
           backgroundColor: Colors.blue,
@@ -1099,7 +1104,38 @@ const WalletBackup = ( props, navigation ) => {
             resizeMode: 'stretch',
             marginBottom: hp( '-3%' ),
           }}
-          // bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+        // bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={() => setMultipleAcccountModal( false )} visible={multipleAcccountModal} closeBottomSheet={() => setMultipleAcccountModal( false )}>
+        <ErrorModalContents
+          title={'Action Required'}
+          info={'Please empty and archive all your Savings Accounts to use Backup Phrase'}
+          // note={''}
+          onPressProceed={() => {
+            setMultipleAcccountModal( false )
+            const resetAction = StackActions.reset( {
+              index: 0,
+              actions: [ NavigationActions.navigate( {
+                routeName: 'Landing'
+              } ) ],
+            } )
+            props.navigation.dispatch( resetAction )
+
+          }}
+          onPressIgnore={() => setTimeout( () => { setMultipleAcccountModal( false ) }, 500 )}
+          proceedButtonText={'Ok'}
+          cancelButtonText={'Not now'}
+          isIgnoreButton={true}
+          isBottomImage={true}
+          isBottomImageStyle={{
+            width: wp( '27%' ),
+            height: wp( '27%' ),
+            marginLeft: 'auto',
+            resizeMode: 'stretch',
+            marginBottom: hp( '-3%' ),
+          }}
+        // bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
         />
       </ModalContainer>
       <ModalContainer visible={showQRModal} closeBottomSheet={() => { }} >

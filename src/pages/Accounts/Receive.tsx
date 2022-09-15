@@ -47,7 +47,7 @@ import idx from 'idx'
 import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 import DeviceInfo from 'react-native-device-info'
 import AccountShell from '../../common/data/models/AccountShell'
-import { Account, AccountType, LevelData } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -55,6 +55,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import { translations } from '../../common/content/LocContext'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import { onPressKeeper } from '../../store/actions/BHR'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
@@ -68,8 +69,8 @@ export default function Receive( props ) {
   const savingWarning = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.savingWarning ),
   )
-  const strings  = translations[ 'accounts' ]
-  const common  = translations[ 'common' ]
+  const strings = translations[ 'accounts' ]
+  const common = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
   const [ amount, setAmount ] = useState( '' )
   const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
@@ -77,6 +78,53 @@ export default function Receive( props ) {
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
+  const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
+
+  const defaultKeeperObj: {
+    shareType: string
+    updatedAt: number;
+    status: string
+    shareId: string
+    reshareVersion: number;
+    name?: string
+    data?: any;
+    channelKey?: string
+  } = {
+    shareType: '',
+    updatedAt: 0,
+    status: 'notAccessible',
+    shareId: '',
+    reshareVersion: 0,
+    name: '',
+    data: {
+    },
+    channelKey: ''
+  }
+  const [ selectedKeeper, setSelectedKeeper ]: [{
+    shareType: string;
+    updatedAt: number;
+    status: string;
+    shareId: string;
+    reshareVersion: number;
+    name?: string;
+    data?: any;
+    channelKey?: string;
+  }, any] = useState( defaultKeeperObj )
+
+  useEffect( () => {
+    if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
+      setSelectedKeeper( navigationObj.selectedKeeper )
+      const navigationParams = {
+        selectedTitle: navigationObj.selectedKeeper.name,
+        SelectedRecoveryKeyNumber: 1,
+        selectedKeeper: navigationObj.selectedKeeper,
+        selectedLevelId: levelData[ 0 ].id
+      }
+      props.navigation.navigate( 'SeedBackupHistory', navigationParams )
+    }
+  }, [ navigationObj ] )
 
   const {
     present: presentBottomSheet,
@@ -131,7 +179,9 @@ export default function Receive( props ) {
       }
     }
 
-    if( levelData[ 0 ].keeper1.status === 'notSetup' ){
+    if ( ( levelData[ 0 ].keeper1.status === 'notSetup' ) ||
+      ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' &&
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'write down seed-words' ) ) {
       setTimeout( () => {
         setBackupReminder( true )
       }, 500 )
@@ -151,7 +201,7 @@ export default function Receive( props ) {
   }, [ props.navigation ] )
 
   const showReceiveAmountBottomSheet = useCallback( () => {
-    return(
+    return (
 
       <ReceiveAmountContent
         title={strings.Receivesats}
@@ -181,7 +231,7 @@ export default function Receive( props ) {
         amount: parseInt( amount ) / SATOSHIS_IN_BTC,
       } ).paymentURI
       setPaymentURI( newPaymentURI )
-    } else if( paymentURI ) setPaymentURI( null )
+    } else if ( paymentURI ) setPaymentURI( null )
   }, [ amount ] )
 
   return (
@@ -257,12 +307,12 @@ export default function Receive( props ) {
             </View>
             <ScrollView>
               <View style={styles.QRView}>
-                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI? paymentURI: receivingAddress? receivingAddress: 'null'} size={hp( '27%' )} />
+                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
               </View>
 
               <CopyThisText
                 backgroundColor={Colors.white}
-                text={paymentURI? paymentURI: receivingAddress}
+                text={paymentURI ? paymentURI : receivingAddress}
               />
 
               <AppBottomSheetTouchableWrapper
@@ -300,14 +350,14 @@ export default function Receive( props ) {
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
 
-      <ModalContainer onBackground={()=>showReceiveHelper( false )} visible={receiveHelper} closeBottomSheet={() => {showReceiveHelper( false )}} >
+      <ModalContainer onBackground={() => showReceiveHelper( false )} visible={receiveHelper} closeBottomSheet={() => { showReceiveHelper( false ) }} >
         <ReceiveHelpContents
           titleClicked={() => {
             showReceiveHelper( false )
           }}
         />
       </ModalContainer>
-      <ModalContainer onBackground={()=>setReceiveModal( false )} visible={receiveModal} closeBottomSheet={() => {setReceiveModal( false )} } >
+      <ModalContainer onBackground={() => setReceiveModal( false )} visible={receiveModal} closeBottomSheet={() => { setReceiveModal( false ) }} >
         {showReceiveAmountBottomSheet()}
       </ModalContainer>
       <BottomSheet
@@ -321,17 +371,17 @@ export default function Receive( props ) {
         renderContent={() => (
           <TwoFASetupWarningModal
             onPressOk={() => onPressOkOf2FASetupWarning()}
-            //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+          //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
           />
         )}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.borderColor}
             backgroundColor={Colors.white}
-            // onPressHeader={() => {
-            //   if (SecureReceiveWarningBottomSheet.current)
-            //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-            // }}
+          // onPressHeader={() => {
+          //   if (SecureReceiveWarningBottomSheet.current)
+          //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+          // }}
           />
         )}
       />
@@ -342,7 +392,26 @@ export default function Receive( props ) {
           // note={errorMsg}
           onPressProceed={() => {
             setBackupReminder( false )
-            props.navigation.navigate( 'WalletBackupAlert' )
+            // props.navigation.navigate( 'WalletBackupAlert' )
+            if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
+              levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+              if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+                const navigationParams = {
+                  selectedTitle: navigationObj?.selectedKeeper?.name,
+                  SelectedRecoveryKeyNumber: 1,
+                  selectedKeeper: navigationObj?.selectedKeeper,
+                  selectedLevelId: levelData[ 0 ].id
+                }
+                console.log( 'levelHealth' + JSON.stringify( levelHealth ) )
+                console.log( 'levelHealth1' + JSON.stringify( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) )
+                props.navigation.navigate( 'SeedBackupHistory', navigationParams )
+              } else {
+                console.log( 'levelData[ 0 ].keeper1' + JSON.stringify( levelData[ 0 ].keeper1 ) )
+                setSelectedKeeper( levelData[ 0 ].keeper1 )
+                dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+                setOnKeeperButtonClick( true )
+              }
+            } else props.navigation.navigate( 'WalletBackupAlert' )
           }}
           onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
           proceedButtonText={'Backup now'}
