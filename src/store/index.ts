@@ -128,6 +128,7 @@ import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import {
   fetchNotificationsWatcher,
   getMessageWatcher,
+  pushNotificationPressedWatcher,
   updateFCMTokensWatcher,
   updateMessageStatusInAppWatcher,
   updateMessageStatusWatcher
@@ -167,12 +168,15 @@ import upgrades from './reducers/upgrades'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import { satCardAcountWatcher } from './sagas/satCardAccount'
+import misc from './reducers/misc'
+import doNotStoreReducer from './reducers/doNotStore'
 
 const config = {
   key: 'root', // key is required
   // version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
   storage: AsyncStorage, // storage is now required
-  blacklist: [ 'setupAndAuth', 'loaders' ],
+  blacklist: [ 'setupAndAuth', 'loaders', 'doNotStore' ],
   migrate: createMigrate( reduxPersistMigrations, {
     debug: true
   } )
@@ -236,6 +240,7 @@ const rootSaga = function* () {
     getMessageWatcher,
     updateMessageStatusWatcher,
     updateMessageStatusInAppWatcher,
+    pushNotificationPressedWatcher,
 
     // Trusted Contacts
     initializeTrustedContactWatcher,
@@ -346,7 +351,10 @@ const rootSaga = function* () {
     // upgrade scripts
     recreateMissingAccountsWatcher,
     syncMissingAccountsWatcher,
-    sweepMissingAccountsWatcher
+    sweepMissingAccountsWatcher,
+
+    // sat card account
+    satCardAcountWatcher
   ]
 
   yield all(
@@ -383,7 +391,9 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
-  upgrades: upgrades
+  upgrades: upgrades,
+  misc: misc,
+  doNotStore: doNotStoreReducer
 } )
 
 export default function makeStore() {

@@ -41,7 +41,12 @@ const MoreOptionsStack = createStackNavigator(
       },
     },
     Launch,
-    Login,
+    Login:{
+      screen: Login,
+      navigationOptions: {
+        header: null
+      }
+    },
     Intermediate,
     ReLogin: {
       screen: ReLogin,
@@ -130,7 +135,7 @@ const MoreOptionsStack = createStackNavigator(
         // tabBarVisibl
       },
     },
-    WalletBackup: {
+    SeedBackup: {
       screen: WalletBackupStack,
       navigationOptions: {
         header: null,

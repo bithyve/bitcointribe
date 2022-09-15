@@ -23,6 +23,7 @@ import {
 
 import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import AlertModalContents from '../../components/AlertModalContents'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
 import { CKTapCard } from 'cktap-protocol-react-native'
@@ -69,7 +70,6 @@ import { connect } from 'react-redux'
 import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
 import idx from 'idx'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import AlertModalContents from '../../components/AlertModalContents'
 
 interface GiftPropTypes {
   navigation: any;
@@ -582,7 +582,7 @@ class GiftScreen extends React.Component<
     this.setState( {
       showVerification: false
     }, async()=>{
-      // this.props.navigation.navigate( 'SetUpSatNextCard', {
+      // this.props.navigation.navigate( 'ClaimSats', {
       //   fromClaimFlow: 1
       // } )
       const { response, error } = await this.withModal( async ()=>{
@@ -741,7 +741,7 @@ class GiftScreen extends React.Component<
               onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
               image={<Gifts />}
             />
-            <GiftBoxComponent
+            {/* <GiftBoxComponent
               titleText={'Claim SATSCARD'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD'}
@@ -751,7 +751,7 @@ class GiftScreen extends React.Component<
                 showVerification:true
               } )}
               image={<Sat_card/>}
-            />
+            /> */}
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
@@ -760,7 +760,7 @@ class GiftScreen extends React.Component<
         } ) }} visible={this.state.showAlertModal} closeBottomSheet={() => { }}>
           <AlertModalContents
             info={this.state.errorMessage != '' ? this.state.errorMessage : 'SatCards not detected'}
-            proceedButtonText={'Please try again'}
+            proceedButtonText={ this.state.errorMessage == 'Sorry, this device doesn\'t support NFC' ?'Ok' : 'Try again'}
             onPressProceed={() => {
               this.setState( {
                 showAlertModal: false

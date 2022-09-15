@@ -98,6 +98,7 @@ export default function SeedBacupModalContents( props ) {
                 marginTop: 'auto',
                 letterSpacing: 0.11,
                 fontSize: RFValue( 11 ),
+                color: Colors.blue
               }}
             >
               {props.note}

@@ -524,7 +524,6 @@ export default function ManageBackup( props ) {
       selectedKeeper,
       selectedLevelId
     }
-    // console.log( 'skk gotohistory', navigationParams )
     let index = 1
     let count = 0
     if ( selectedKeeper.shareType == 'primaryKeeper' || selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {

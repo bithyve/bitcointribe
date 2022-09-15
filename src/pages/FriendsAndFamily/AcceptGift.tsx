@@ -517,7 +517,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   }
 
   const checkForValidation = ( text ) => {
-    // console.log( 'TEXT', text.charAt( 0 ) + text.substring( 8 ), hint )
     if ( inputType == DeepLinkEncryptionType.NUMBER ) {
       if ( text.length == 0 ) {
         setWrongInputError( '' )

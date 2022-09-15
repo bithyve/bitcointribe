@@ -103,6 +103,7 @@ export default function SetUpSatNextCardScreen( props ) {
                       satCardBalance == 0 ? 1 : 2
                       : satCardBalance == 0 ? 3 : 4,
                     slotBalance:satCardBalance,
+                    giftAmount : satCardBalance == 0 ? giftAmount: 0
                   } )
                 }, 2000 )
               }, 2000 )
@@ -110,7 +111,6 @@ export default function SetUpSatNextCardScreen( props ) {
           }, 2000 )
         } else {
           timeoutVariable = setTimeout( () => {
-            console.log( 'skk1111' )
             // setShowAlertModal( true )
           }, 5000 )
         }
@@ -187,7 +187,6 @@ export default function SetUpSatNextCardScreen( props ) {
     const addressRecipient = makeAddressRecipientDescription( {
       address
     } )
-    // console.log( 'skk inside recipent', JSON.stringify( isRecipientSelectedForSending( addressRecipient ) ) )
     if ( isRecipientSelectedForSending( addressRecipient ) == false ) {
       handleRecipientSelection( addressRecipient )
     }
@@ -203,8 +202,8 @@ export default function SetUpSatNextCardScreen( props ) {
     // navigateToSendDetails( recipient )
     setTimeout( () => {
       if ( recipient.id != null && recipient.id != '' ) {
-        console.log( 'skk inside recipent', JSON.stringify( recipient ) )
-        console.log( 'skk send giftAmount', JSON.stringify( giftAmount ) )
+        // console.log( 'skk inside recipent', JSON.stringify( recipient ) )
+        // console.log( 'skk send giftAmount', JSON.stringify( giftAmount ) )
         dispatch( amountForRecipientUpdated( {
           recipient: recipient,
           amount: giftAmount
@@ -219,7 +218,7 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
-      console.log( 'skk use acc 1 success' )
+      // console.log( 'skk use acc 1 success' )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: TxPriority.LOW,
@@ -235,7 +234,7 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
-      console.log( 'skk use acc 2 success' )
+      // console.log( 'skk use acc 2 success', txid )
       if ( txid ) {
         let type
         if ( sourceAccountShell.primarySubAccount.type === undefined ) {

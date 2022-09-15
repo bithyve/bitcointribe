@@ -80,6 +80,7 @@ import {
   updateMessageStatusInApp,
   updateMessageStatus,
   getMessages,
+  notificationPressed,
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
@@ -126,6 +127,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
+import ClipboardAutoRead from '../../components/ClipboardAutoRead'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -270,6 +272,8 @@ interface HomePropsTypes {
   trustedContacts: Trusted_Contacts;
   IsCurrentLevel0: boolean;
   walletId: string;
+  notificationPressed: any;
+  clipboardAccess: boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -612,25 +616,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   createNotificationListeners = async () => {
-    messaging().onNotificationOpenedApp((data) => {
-      // console.log('awdawdawdwd', data);
-      const content = JSON.parse(data.data.content);
-      // console.log('adadcubsyuf', content.notificationId)
-      this.currentNotificationId =  content.notificationId
-      // console.log('adaesiekf', this.currentNotificationId)
-      const d = this.state.notificationData;
-
-      const msg = [];
-
-      for (const k of d) {
-        if (k.notificationId === content.notificationId) {
-          msg.push(k)
-        }
-      }
-
-      this.handleNotificationBottomSheetSelection(msg[0]);
-    })
-
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       // largeIcon: 'ic_launcher',
@@ -687,6 +672,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
        */
       requestPermissions: true,
     } )
+
+    messaging().getInitialNotification().then((data) => {
+      if (data) {
+        const content = JSON.parse(data.data.content)
+        this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
+      }
+    })
+
+    messaging().onNotificationOpenedApp((data) => {
+      const content = JSON.parse(data.data.content)
+      this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
+    })
   };
 
   syncChannel= () => {
@@ -1679,6 +1676,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const { netBalance, notificationData, currencyCode } = this.state
+
     const {
       navigation,
       exchangeRates,
@@ -1731,6 +1729,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             resizeMode: 'stretch',
           }}
         >
+          {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
           <HomeHeader
             onPressNotifications={this.onPressNotifications}
             navigateToQRScreen={this.navigateToQRScreen}
@@ -1750,6 +1749,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <ModalContainer
             onBackground={() => {
               if (this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST) {
+                console.log('bgState');
+              } else if (this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST) {
                 console.log('bgState');
               } else {
                 const perviousState = this.state.currentBottomSheetKind
@@ -1850,8 +1851,8 @@ const mapStateToProps = ( state ) => {
     approvalContactData: idx( state, ( _ ) => _.bhr.approvalContactData ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
-    walletId:
-    idx( state, ( _ ) => _.storage.wallet.walletId )
+    walletId: idx( state, ( _ ) => _.storage.wallet.walletId ),
+    clipboardAccess: idx(state, ( _ ) => _.misc.clipboardAccess ),
   }
 }
 
@@ -1891,7 +1892,8 @@ export default withNavigationFocus(
     syncPermanentChannels,
     updateLastSeen,
     updateSecondaryShard,
-    rejectedExistingContactRequest
+    rejectedExistingContactRequest,
+    notificationPressed,
   } )( Home )
 )
 

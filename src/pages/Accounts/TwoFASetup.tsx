@@ -24,6 +24,8 @@ const TwoFASetup = props => {
   const twoFASetup = props.navigation.getParam( 'twoFASetup' )
   // const [ twoFAValidationModal, showTwoFAValidationModal ] = useState( false )
   const { twoFAKey } = twoFASetup
+  const fromWallet = props.navigation?.getParam( 'fromWallet' ) || false
+  const address = props.navigation?.getParam( 'address' ) || null
 
   return (
     <SafeAreaView style={{
@@ -78,7 +80,10 @@ const TwoFASetup = props => {
           <TouchableOpacity
             onPress={
               () => {
-                props.navigation.navigate( 'TwoFAValidation' )
+                props.navigation.navigate( 'TwoFAValidation', {
+                  fromWallet:fromWallet,
+                  address
+                } )
                 // showTwoFAValidationModal( true )
               }
             }

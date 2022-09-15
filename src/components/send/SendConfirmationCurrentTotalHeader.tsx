@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
@@ -12,6 +12,8 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 export type Props = {
   Unit
 };
+
+const {height} = Dimensions.get('window')
 
 const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {Unit}: Props ) => {
 
@@ -48,7 +50,7 @@ const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {Unit}: Props ) =>
 const styles = StyleSheet.create( {
   rootContainer: {
     paddingHorizontal: 24,
-    paddingVertical: heightPercentageToDP( '2.5%' ),
+    paddingVertical: height > 720 ? heightPercentageToDP( 2.5 ) : 0,
   },
 
   headingText: {

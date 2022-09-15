@@ -210,6 +210,40 @@ export default function NotificationInfoContents( props ) {
               )
             }
 
+            {
+              props.cancelButtonText1 !== '' && (
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => {
+                    props.onPressIgnore()
+                  // if ( isOpenFromNotificationList ) props.navigation.goBack()
+                  // else
+                  //   onClick( false, true )
+                  }}
+                  style={{
+                    height: wp( '13%' ),
+                    width: wp( '35%' ),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 15,
+                  }}
+                >
+                  <Text
+                    onPress={() => {
+                      props.onPressIgnore()
+                    // if ( isOpenFromNotificationList ) props.navigation.goBack()
+                    // else
+                    //   onClick( false, true )
+                    }}
+                    style={{
+                      ...styles.proceedButtonText, color: Colors.blue
+                    }}
+                  >
+                    {props.cancelButtonText1}
+                  </Text>
+                </AppBottomSheetTouchableWrapper>
+              )
+            }
+
           </View>
         </View>
       </View>
