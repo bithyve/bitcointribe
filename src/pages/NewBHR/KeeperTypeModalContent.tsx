@@ -157,9 +157,6 @@ export default function KeeperTypeModalContents( props ) {
           {props.subHeader}
         </Text> */}
       </View>
-      {console.log( 'skk currentlevel', currentLevel )}
-      {console.log( 'skk props', props )}
-      {console.log( 'skk keeperTypesData', keeperTypesData )}
       <View
         style={{
           ...styles.successModalAmountView,
@@ -225,7 +222,6 @@ export default function KeeperTypeModalContents( props ) {
         <AppBottomSheetTouchableWrapper
           // disabled={!SelectedKeeperType.name}
           onPress={() => {
-            // console.log( 'skk keeperTypesData' + JSON.stringify( keeperTypesData ) )
             const position = props.selectedType == 'seed' ? 0 : 1
             // onKeeperSelect( keeperTypesData[ position ] )
             // setTimeout( () => {

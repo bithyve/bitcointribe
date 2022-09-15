@@ -166,9 +166,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       } )
     else {
       setHandleButton( false )
-      console.log( 'skk account shell', JSON.stringify( sourceAccountShell ) )
-      console.log( 'skk transactionPriority', JSON.stringify( transactionPriority ) )
-      console.log( 'skk note shell', JSON.stringify( note ) )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: transactionPriority,

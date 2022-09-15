@@ -111,7 +111,6 @@ export default class AccountShell {
     const data = AccountShell
       .getSubAccounts( shell )
       .flatMap( subAccount => subAccount.transactions )
-    console.log( 'skk data', JSON.stringify( data ) )
     return data
   };
 

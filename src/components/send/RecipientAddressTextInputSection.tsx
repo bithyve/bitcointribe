@@ -34,7 +34,6 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   const network = AccountUtilities.getNetworkByType( account.networkType )
 
   useEffect( ()=>{
-    console.log( 'skk update didmount' )
     if ( address )
       handleTextChange( address )
   }, [ address ] )

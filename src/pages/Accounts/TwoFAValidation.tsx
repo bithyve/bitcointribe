@@ -84,7 +84,6 @@ export default function TwoFAValidation( props ) {
   }
 
   function navigateToSendDetails( selectedRecipient: RecipientDescribing ) {
-    console.log( 'skk fromWallet', fromWallet )
     props.navigation.navigate( 'SentAmountForContactForm', {
       selectedRecipientID: selectedRecipient.id,
       fromWallet: fromWallet
