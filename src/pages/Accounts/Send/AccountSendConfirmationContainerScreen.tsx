@@ -98,7 +98,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         isFromContact={false}
         okButtonText={strings.ViewAccount}
         cancelButtonText={common.back}
-        isCancel={false}
+        isCancel={true}
         onPressOk={() => {
         // dismissBottomSheet()
           setSuccess( false )

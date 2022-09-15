@@ -54,7 +54,12 @@ const WalletBackupStack = createStackNavigator(
       },
     },
     PersonalCopyHistoryNewBHR,
-    SecurityQuestionHistoryNewBHR,
+    SecurityQuestionHistoryNewBHR: {
+      screen: SecurityQuestionHistoryNewBHR, 
+      navigationOptions: {
+        header: null,
+      }
+    },
   },
   {
     defaultNavigationOptions: ( { navigation } ) => {
