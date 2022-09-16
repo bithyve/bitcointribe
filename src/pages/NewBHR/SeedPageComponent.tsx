@@ -170,6 +170,14 @@ const SeedPageComponent = ( props ) => {
     return newIndex
   }
 
+  const getSecureData = ( text ) => {
+    let secureText = ''
+    for( let i = 0; i< text.length;i++ ){
+      secureText+='*'
+    }
+    return secureText
+  }
+
   const onPageScroll = useMemo(
     () =>
       Animated.event<PagerViewOnPageScrollEventData>(
@@ -259,7 +267,21 @@ const SeedPageComponent = ( props ) => {
                             }</Text>
                           </View>
                         </View>
-                        <TextInput
+                        <TouchableOpacity style={styles.modalInputContainer}
+                          onPress={() => {
+                            setSelectedOption( index )
+                            Keyboard.dismiss()
+                          }}>
+                          <Text style={[ styles.modalInputBox,
+                            partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
+                          // value?.name.length > 0 ? styles.selectedInput : null,
+                          ]}>
+                            {index == SelectedOption
+                              ? partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name
+                              : getSecureData( partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name )}
+                          </Text>
+                        </TouchableOpacity>
+                        {/* <TextInput
                           style={[ styles.modalInputBox,
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                           // value?.name.length > 0 ? styles.selectedInput : null,
@@ -286,7 +308,7 @@ const SeedPageComponent = ( props ) => {
                           //   data[ currentPosition ][ getTextIndex( index ) ].name = text
                           //   setPartialSeedData( data )
                           // }}
-                        />
+                        /> */}
                       </TouchableOpacity>
                     )
                   }}
@@ -493,14 +515,21 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     marginStart: 25
   },
-  modalInputBox: {
-    // flex: 1,
+  modalInputContainer:{
     width: '70%',
     height: 50,
+    justifyContent:'center',
+    paddingLeft: 15,
+    // backgroundColor: 'red'
+  },
+  modalInputBox: {
+    // backgroundColor: 'yellow',
+    // flex: 1,
+    // width: '70%',
+    // height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
     // borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
