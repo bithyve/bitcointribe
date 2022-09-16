@@ -180,7 +180,11 @@ const BackupSeedWordsContent = ( props ) => {
             }
           }}
           bottomBoxInfo={true}
-          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          onPressIgnore={() => {
+            setConfirmSeedWordModal( false )
+            props.navigation.goBack()
+
+          } }
           isIgnoreButton={true}
           cancelButtonText={'Start Over'}
         />
