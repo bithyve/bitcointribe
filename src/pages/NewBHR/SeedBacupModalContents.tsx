@@ -11,6 +11,7 @@ import {
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 export default function SeedBacupModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -59,7 +60,13 @@ export default function SeedBacupModalContents( props ) {
               style={{
                 ...styles.modalInfoText,
                 marginTop: wp( '1.5%' ),
-                marginRight: wp( 9 )
+                // marginRight: wp( 9 )
+
+                color: Colors.lightTextColor,
+                fontSize: RFValue( 11 ),
+                fontFamily: Fonts.FiraSansRegular,
+                // marginHorizontal: wp( '5%' ),
+                // marginTop: 5
               }}
             >
               {props.info}
@@ -89,7 +96,20 @@ export default function SeedBacupModalContents( props ) {
             </View>
           }
         </View>
-        <View style={styles.successModalAmountView}>
+        { props.bottomBoxInfo && <View style={{
+          marginTop: hp( '2%' ),
+          marginBottom: hp( 1 ),
+          marginLeft: wp ( '2%' )
+        }}>
+          <BottomInfoBox
+            title={'Note:'}
+            infoText={props.note}
+            italicText={''}
+            backgroundColor={Colors.white}
+          />
+        </View>
+        }
+        {/* <View style={styles.successModalAmountView}>
           {props.note ? (
             <Text
               style={{
@@ -98,7 +118,7 @@ export default function SeedBacupModalContents( props ) {
                 marginTop: 'auto',
                 letterSpacing: 0.11,
                 fontSize: RFValue( 11 ),
-                color: Colors.blue
+                color: Colors.textColorGrey
               }}
             >
               {props.note}
@@ -131,7 +151,7 @@ export default function SeedBacupModalContents( props ) {
               } )}
             </View>
           }
-        </View>
+        </View> */}
         {props.otherText ? (
           <View style={styles.successModalAmountView}>
             <Text
@@ -234,7 +254,7 @@ export default function SeedBacupModalContents( props ) {
 const styles = StyleSheet.create( {
   modalContentContainer: {
     // height: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
   },
   successModalHeaderView: {
     marginRight: wp( '8%' ),
