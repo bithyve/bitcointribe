@@ -83,6 +83,7 @@ import {
   RECOVER_WALLET_WITH_MNEMONIC,
   updateSeedHealth,
   setSeedBackupHistory,
+  restoreSeedWordFailed,
 } from '../actions/BHR'
 import { updateHealth } from '../actions/BHR'
 import {
@@ -488,7 +489,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     const primaryMnemonic = BHROperations.decryptWithAnswer ( selectedBackup.seed, answer ).decryptedData
     const secondaryMnemonics = selectedBackup.secondaryShare ? BHROperations.decryptWithAnswer ( selectedBackup.secondaryShare, answer ).decryptedData : ''
     const image: NewWalletImage = icloudData
-    // console.log( 'skk wallet====>' +  image )
     yield call( recoverWalletWorker, {
       payload: {
         level: selectedBackup.levelStatus, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics
@@ -599,7 +599,8 @@ function* recoverWalletWorker( { payload } ) {
       if( !image ){
         const getWI = yield call( BHROperations.fetchWalletImage, walletId )
         if( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
-        if( !image ) Alert.alert( 'External mnemonic, wallet image not found' )
+        // if( !image ) Alert.alert( 'External mnemonic, wallet image not found' )
+        if( !image )yield put( restoreSeedWordFailed( 'restoreSeedDataFailed' ) )
       }
     } else {
       if ( shares ) {
@@ -2433,7 +2434,7 @@ export const setupPasswordWatcher = createWatcher(
 
 
 const saveConfirmationHistory = async ( title: string, seedBackupHistory: any[] ) => {
-
+  if( seedBackupHistory == undefined ) seedBackupHistory = []
   const obj = {
     title,
     confirmed: Date.now(),
@@ -2493,7 +2494,7 @@ function* updateSeedHealthWorker( ) {
   yield put( updateMSharesHealth( seedLevelInfo, true ) )
 
   const seedBackupHistory = yield select( ( state ) => state.bhr.seedBackupHistory )
-  const title = 'Seed backup confirmed'
+  const title = 'Backup phrase confirmed'
   const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, seedBackupHistory )
   yield put( setSeedBackupHistory( updatedCloudBackupHistory ) )
 }

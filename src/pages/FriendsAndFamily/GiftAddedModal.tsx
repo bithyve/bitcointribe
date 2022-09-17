@@ -14,6 +14,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import idx from 'idx'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import AccountShell from '../../common/data/models/AccountShell'
 
 
 export type Props = {
@@ -24,11 +26,13 @@ export type Props = {
   spendableBalance: number;
   formattedUnitText: string;
   onCancel: () => void;
-  navigation: any
+  navigation: any;
+  accountShellID: any;
 };
 
 
-export default function GiftAddedModal( { onCancel, formattedUnitText, renderButton, spendableBalance, sourcePrimarySubAccount, sourceAccountHeadlineText, navigation }: Props ) {
+export default function GiftAddedModal( { onCancel, formattedUnitText, renderButton, spendableBalance, sourcePrimarySubAccount, sourceAccountHeadlineText, navigation, accountShellID }: Props ) {
+  const accountShell = useAccountShellForID( accountShellID )
 
   return (
     <>
@@ -105,7 +109,7 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
           </Text>
           <Text style={styles.availableToSpendText}>
             Balance
-            <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
+            <Text style={styles.balanceText}> {AccountShell.getSpendableBalance( accountShell )} {formattedUnitText}</Text>
           </Text>
         </View>
       </View>

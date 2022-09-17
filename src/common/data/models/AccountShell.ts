@@ -108,9 +108,10 @@ export default class AccountShell {
   static getAllTransactions = (
     shell: AccountShell,
   ): TransactionDescribing[] => {
-    return AccountShell
+    const data = AccountShell
       .getSubAccounts( shell )
       .flatMap( subAccount => subAccount.transactions )
+    return data
   };
 
   static getVisibility( shell: AccountShell ): AccountVisibility {

@@ -128,7 +128,6 @@ function* cloudWorker( { payload } ) {
         } ),
         timeout: delay( 60000 )
       } )
-      // console.log( 'skk response?.status', response?.status )
       if ( !timeout ){
         const isCloudBackupCompleted =  Platform.OS == 'ios' ? response?.status : response
         if( typeof isCloudBackupCompleted === 'boolean' ) {

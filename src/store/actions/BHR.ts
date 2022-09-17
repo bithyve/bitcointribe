@@ -82,6 +82,7 @@ export const RECOVER_WALLET_WITH_MNEMONIC = 'RECOVER_WALLET_WITH_MNEMONIC'
 export const PDF_UPGRADE = 'PDF_UPGRADE'
 export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
 export const SEED_BACKUP_HISTORY = 'SEED_BACKUP_HISTORY'
+export const RESTORE_SEED_WORD = 'RESTORE_SEED_WORD'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -140,6 +141,14 @@ export const healthInitialized = () => {
 export const switchS3LoadingStatus = ( beingLoaded ) => {
   return {
     type: S3_LOADING_STATUS, payload: {
+      beingLoaded
+    }
+  }
+}
+
+export const restoreSeedWordFailed = ( beingLoaded ) => {
+  return {
+    type: RESTORE_SEED_WORD, payload: {
       beingLoaded
     }
   }

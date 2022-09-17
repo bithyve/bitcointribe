@@ -649,6 +649,7 @@
     "BackupusingPDFSub": "The Recovery Key gets stored in a PDF. Keep it safe digitally or physically as a print out",
     "ShareRecoveryKey": "Share Recovery Key",
     "Creatingyourwallet": "Creating your wallet",
+    "Importingyourwallet": "Importing your wallet",
     "Thismaytake": "This may take a short time, while the app sets it all up for you:",
     "Hexaencrypts": "Hexa encrypts and secures all the data on the app and any communication that goes out",
     "Settingupmultipleaccounts": "Setting up multiple accounts",

@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -46,6 +46,8 @@ export type Props = {
   navigation: NavigationProp;
 };
 
+const {height} = Dimensions.get('window')
+
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
@@ -71,6 +73,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const [ note, setNote ] = useState( '' )
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
+  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
@@ -158,13 +161,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
-        note
+        note,
+        fromWallet
       } )
     else {
       setHandleButton( false )
-      console.log( 'skk account shell', JSON.stringify( sourceAccountShell ) )
-      console.log( 'skk transactionPriority', JSON.stringify( transactionPriority ) )
-      console.log( 'skk note shell', JSON.stringify( note ) )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: transactionPriority,
@@ -240,8 +241,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginBottom: heightPercentageToDP( '1%' ),
-        marginTop: heightPercentageToDP( '2%' )
+        marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
+        marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5
       }}>
         <Text style={{
           marginRight: RFValue( 4 )
@@ -345,7 +346,7 @@ const styles = StyleSheet.create( {
     marginBottom: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: height > 720 ? 10 : 5,
     borderColor: Colors.white,
     backgroundColor: Colors.bgColor,
     width: widthPercentageToDP( 90 )
@@ -371,13 +372,13 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
+    height: height > 720 ? 50 : 40,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
     width: '90%',
-    paddingTop:17
+    paddingTop: height > 720 ? 17 : 0
   },
   modalInfoText: {
     width: widthPercentageToDP( 90 ),
@@ -387,14 +388,14 @@ const styles = StyleSheet.create( {
     textAlign: 'justify',
     lineHeight: 18,
     marginLeft: widthPercentageToDP( 5 ),
-    paddingVertical: heightPercentageToDP( 1 )
+    paddingVertical: height > 720 ? heightPercentageToDP( 1 ) : 5
   },
   rootContainer: {
     flex: 1,
   },
 
   headerSection: {
-    paddingVertical: heightPercentageToDP( '1%' ),
+    paddingVertical: height > 720 ? heightPercentageToDP( '1%' ) : 0,
   },
 
   footerSection: {

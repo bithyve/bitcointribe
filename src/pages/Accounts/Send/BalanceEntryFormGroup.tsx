@@ -33,7 +33,8 @@ export type Props = {
   spendableBalance: Satoshis;
   onAmountChanged: ( amount: Satoshis ) => void;
   onSendMaxPressed: ( ) => void;
-  showSendMax: boolean
+  showSendMax: boolean;
+  fromWallet: boolean;
 };
 
 
@@ -44,6 +45,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   onAmountChanged,
   onSendMaxPressed,
   showSendMax= true,
+  fromWallet=false,
 }: Props ) => {
   const exchangeRates = useExchangeRates()
   const currencyCode = useCurrencyCode()
@@ -108,6 +110,12 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
       onSendMaxPressed()
     }
   }
+
+  useEffect( ()=>{
+    if( fromWallet ){
+      handleSendMaxPress()
+    }
+  }, [] )
 
   useEffect( ()=>{
     if( isSendingMax && sendMaxFee ){
@@ -248,7 +256,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
               borderBottomColor: 'transparent',
             }}
             inputStyle={styles.textInputContent}
-            editable={currencyKindForEntry == CurrencyKind.BITCOIN}
+            editable={!fromWallet && currencyKindForEntry == CurrencyKind.BITCOIN}
             placeholder={
               currencyKindForEntry == CurrencyKind.BITCOIN
                 ? subAccountKind == SubAccountKind.TEST_ACCOUNT
