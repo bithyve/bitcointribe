@@ -96,7 +96,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
           balance={transaction.amount}
           isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
           unitTextStyle={{
-            ...ListStyles.listItemSubtitle, marginBottom: 3
+            ...ListStyles.listItemSubtitle, marginTop: widthPercentageToDP(2)
           }}
           amountTextStyle={{
             ...ListStyles.textAmt, marginBottom: -3, marginLeft: -2, color: transactionKindIconColor
@@ -104,6 +104,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
           currencyImageStyle={{
             marginBottom: -3
           }}
+          verticalAlignUnit={'center'}
         />
         {/* <Icon
           // style={styles.transactionKindIcon}
