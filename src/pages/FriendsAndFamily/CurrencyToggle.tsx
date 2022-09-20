@@ -71,5 +71,6 @@ const styles = StyleSheet.create( {
     flex: 3,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
+    marginBottom: RFValue( 5 )
   },
 } )

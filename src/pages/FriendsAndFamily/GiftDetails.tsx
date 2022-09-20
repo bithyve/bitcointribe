@@ -7,8 +7,13 @@ import {
   Text,
   StatusBar,
   ScrollView,
-  Alert
+  Platform,
+  Alert,
+  FlatList,
+  TextInput,
+  TouchableWithoutFeedback,
 } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -23,9 +28,11 @@ import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
 import {
   AccountType,
+  DeepLinkEncryptionType,
   Gift,
   GiftStatus,
   GiftType,
+  TrustedContact,
 } from '../../bitcoin/utilities/Interface'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -35,9 +42,10 @@ import {
   reclaimGift,
 } from '../../store/actions/trustedContacts'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
+import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
-import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import AccountSelection from './AccountSelection'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -46,24 +54,34 @@ import ThemeList from './Theme'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import RadioButton from '../../components/RadioButton'
+import Feather from 'react-native-vector-icons/Feather'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+
 
 const GiftDetails = ( { navigation } ) => {
+
+
   const dispatch = useDispatch()
   const {
     title,
-    walletName,
+    contactName,
+    contact,
     gift,
     avatar,
     contactDetails,
   }: {
     title: string;
-    walletName: string;
+    contactName: string;
+    contact: TrustedContact,
     gift: Gift;
     avatar: boolean;
     contactDetails: any;
   } = navigation.state.params
+
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
+
   const currencyKind = useSelector(
     ( state ) => state.preferences.giftCurrencyKind,
   )
@@ -74,6 +92,8 @@ const GiftDetails = ( { navigation } ) => {
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
+
+  const deepLinkConfig = contact? contact.deepLinkConfig: gift.deepLinkConfig ? gift.deepLinkConfig: null
 
   useEffect( ()=> {
     if( gift.status === GiftStatus.SENT ) setIsOpen( true )
@@ -110,41 +130,37 @@ const GiftDetails = ( { navigation } ) => {
     }
   }
 
+
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flexGrow: 1,
-        height: '100%',
-      }}
-      keyboardShouldPersistTaps="handled"
-    >
-      <SafeAreaView style={styles.viewContainer}>
-        <StatusBar
-          backgroundColor={Colors.backgroundColor}
-          barStyle="dark-content"
-        />
-        <View
-          style={[
-            CommonStyles.headerContainer,
-            {
-              backgroundColor: Colors.backgroundColor,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              navigation.goBack()
-            }}
+    <SafeAreaView style={styles.viewContainer}>
+      <StatusBar
+        backgroundColor={Colors.backgroundColor}
+        barStyle="dark-content"
+      />
+      <ScrollView>
+        <View style={styles.advancedButton}>
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.backgroundColor,
+              },
+            ]}
           >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.goBack()
+              }}
+            >
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <LeftArrow/>
+              </View>
+
+            </TouchableOpacity>
+
+          </View>
+
         </View>
         <View
           style={{
@@ -166,25 +182,24 @@ const GiftDetails = ( { navigation } ) => {
         <TouchableOpacity
           onPress={() => setIsOpen( !isOpen )}
           style={
-            gift.status === GiftStatus.CREATED
+            gift.status === GiftStatus.SENT
               ? [
                 styles.dashedContainer,
-                {
-                  // position: isOpen ? 'absolute': 'relative'
-                },
               ]
-              : [
+              :
+              [
                 styles.dashedContainer,
                 {
                   borderColor: Colors.white,
                   shadowOpacity: isOpen ? 1 : 0,
+                  borderWidth: 1
                 },
               ]
           }
         >
           <View
             style={
-              gift.status === GiftStatus.CREATED
+              gift.status === GiftStatus.SENT
                 ? styles.dashedStyle
                 : styles.normalStyle
             }
@@ -229,7 +244,7 @@ const GiftDetails = ( { navigation } ) => {
                   flexDirection: 'row',
                 }}
               >
-                {avatar && walletName && contactDetails ? (
+                {avatar && contactName && contactDetails ? (
                   <View style={styles.avatarContainer}>
                     <RecipientAvatar
                       recipient={contactDetails}
@@ -253,7 +268,7 @@ const GiftDetails = ( { navigation } ) => {
                       fontWeight: '600',
                     }}
                   >
-                    {walletName ? walletName : 'Checking Account'}
+                    {contactName ? contactName : 'From Checking Account'}
                   </Text>
                   {/* <Text style={styles.subText}>
                     {walletName ?? 'Lorem ipsum dolor'}
@@ -294,109 +309,141 @@ const GiftDetails = ( { navigation } ) => {
                 ) : null}
               </View>
             </View>
-          </View>
-          {isOpen &&
+            {/* {isOpen &&
             gift.status !== GiftStatus.CREATED &&
             gift.type === GiftType.SENT &&
-            gift?.deepLinkConfig?.encryptionType === 'OTP' && (
-            <View
-              style={{
-                marginHorizontal: wp( 1 ),
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.lightTextColor,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontWeight: '600',
-                }}
-              >
-                  Share OTP with contact
-              </Text>
+            deepLinkConfig?.encryptionType === DeepLinkEncryptionType.OTP && (
               <View
                 style={{
-                  flexDirection: 'row',
-                  marginLeft: wp( 3 ),
-                  marginVertical: hp( 2 ),
-                }}
-              >
-                {gift?.deepLinkConfig?.encryptionKey
-                  .split( '' )
-                  .map( ( num, index ) => {
-                    return (
-                      <View
-                        key={index}
-                        style={{
-                          alignItems: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          marginHorizontal: wp( 1 ),
-                          borderRadius: wp( 2 ),
-                        }}
-                      >
-                        <Text
-                          style={{
-                            marginHorizontal: wp( 4 ),
-                            marginVertical: wp( 3 ),
-                          }}
-                        >
-                          {num}
-                        </Text>
-                      </View>
-                    )
-                  } )}
-              </View>
-            </View>
-          )}
-          {isOpen &&
-            gift.status !== GiftStatus.CREATED &&
-            gift.type === GiftType.SENT &&
-            gift.note !== '' && (
-            <View
-              style={{
-                marginHorizontal: wp( 1 ),
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.lightTextColor,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontWeight: '600',
-                }}
-              >
-                  Message to recipient
-              </Text>
-              <View
-                style={{
-                  marginLeft: wp( 3 ),
-                  marginVertical: hp( 2 ),
-                  alignItems: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  marginHorizontal: wp( 2 ),
-                  borderRadius: wp( 2 ),
-                  marginRight: wp( 9 ),
+                  marginHorizontal: wp( 1 ),
                 }}
               >
                 <Text
                   style={{
-                    marginHorizontal: wp( 3 ),
-                    marginVertical: wp( 2 ),
-                    color: Colors.textColorGrey,
+                    color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
-                    letterSpacing: 0.5,
                     fontFamily: Fonts.FiraSansRegular,
+                    fontWeight: '600',
                   }}
                 >
-                  {gift.note}
+                  Share OTP with contact
                 </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginLeft: wp( 3 ),
+                    marginVertical: hp( 2 ),
+                  }}
+                >
+                  {deepLinkConfig?.encryptionKey
+                    .split( '' )
+                    .map( ( num, index ) => {
+                      return (
+                        <View
+                          key={index}
+                          style={{
+                            alignItems: 'center',
+                            backgroundColor: Colors.backgroundColor,
+                            marginHorizontal: wp( 1 ),
+                            borderRadius: wp( 2 ),
+                          }}
+                        >
+                          <Text
+                            style={{
+                              marginHorizontal: wp( 4 ),
+                              marginVertical: wp( 3 ),
+                            }}
+                          >
+                            {num}
+                          </Text>
+                        </View>
+                      )
+                    } )}
+                </View>
               </View>
-            </View>
-          )}
+            )} */}
+            {isOpen &&
+            gift.status !== GiftStatus.CREATED &&
+            gift.type === GiftType.SENT && gift.note &&
+            gift.note !== '' && (
+              <View
+                style={{
+                  marginHorizontal: wp( 1 ),
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontWeight: '600',
+                  }}
+                >
+                  Message to recipient
+                </Text>
+                <View
+                  style={{
+                    marginLeft: wp( 3 ),
+                    marginVertical: hp( 2 ),
+                    backgroundColor: Colors.backgroundColor,
+                    marginHorizontal: wp( 2 ),
+                    borderRadius: wp( 2 ),
+                    marginRight: wp( 9 ),
+                  }}
+                >
+                  <Text
+                    style={{
+                      marginHorizontal: wp( 3 ),
+                      marginVertical: wp( 2 ),
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue( 10 ),
+                      letterSpacing: 0.5,
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                  >
+                    {gift.note}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
+
+        <View style={{
+          backgroundColor: Colors.backgroundColor,
+          paddingBottom: hp( 4 ),
+          marginTop: 10
+        }}>
+          <View>
+            <View
+              style={{
+                marginLeft: wp( 7 ),
+              }}
+            >
+              <Text
+                style={{
+                  ...styles.modalTitleText,
+                  fontSize: 14,
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+              Second Factor used for encryption
+              </Text>
+            </View>
+            <View
+              style={styles.deepLinkEncryptionTextContainer}
+            >
+              <Text style={styles.deepLinkEncryptionText}>
+                {deepLinkConfig?.encryptionKey == undefined ? 'No Second Factor' : deepLinkConfig?.encryptionKey}
+              </Text>
+            </View>
+          </View>
+        </View>
         <View
           style={{
             marginVertical: hp( 2 ),
+            // backgroundColor:'hotpink',
+            marginBottom:hp( Platform.OS == 'ios' ? 12 : 10 ),
           }}
         >
           {Object.entries( gift.timestamps ?? {
@@ -407,7 +454,8 @@ const GiftDetails = ( { navigation } ) => {
                 gift.type === GiftType.RECEIVED &&
                 ( item[ 0 ] == 'created' ||
                   item[ 0 ] == 'sent' ||
-                  item[ 0 ] == 'reclaimed' )
+                  item[ 0 ] == 'reclaimed' ||
+                  item[ 0 ] == 'associated' )
               ) {
                 return null
               }
@@ -459,24 +507,49 @@ const GiftDetails = ( { navigation } ) => {
                 </View>
               )
             } )}
+
         </View>
-      </SafeAreaView>
+
+        <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
+          <View style={styles.modalContentContainer}>
+            <AddGiftToAccount
+              getTheme={getTheme}
+              navigation={navigation}
+              giftAmount={gift.amount}
+              giftId={( gift as Gift ).id}
+              onCancel={() => setAcceptGiftModal( false )}
+              closeModal={()=>setAcceptGiftModal( false )}
+            />
+          </View>
+        </ModalContainer>
+        {/* <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
+        <View style={styles.modalContentContainer}>
+          <AccountSelection
+            onClose={(  ) => {setAcceptGiftModal( false )}}
+            onChangeType={( type ) => { }}
+          />
+        </View>
+      </ModalContainer> */}
+
+      </ScrollView>
       <View style={{
-        marginBottom: wp( '3%' ), marginTop: wp( '3%' ), flexDirection: 'row',
+        marginBottom: wp( '0%' ), flexDirection: 'row',
         justifyContent: 'space-evenly', paddingHorizontal: wp( '2%' ),
-        paddingVertical: wp( '2%' ),
+        paddingVertical: wp( '4%' ),
+        position:'absolute', width:'100%', bottom:0, backgroundColor: Colors.backgroundColor,
       }}>
         {/* Reclaim */}
         {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ? (
           bottomButton( () => {
             dispatch( reclaimGift( gift.id ) )
-            navigation.goBack()
+            navigation.navigate( 'ManageGifts' )
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
-        { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
+        { ( ( gift.type === GiftType.SENT && [ GiftStatus.CREATED, GiftStatus.RECLAIMED, GiftStatus.SENT, GiftStatus.REJECTED ].includes( gift.status ) ) || ( gift.type === GiftType.RECEIVED && gift.status === GiftStatus.ACCEPTED ) ) ? ( bottomButton( () => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
+            giftMsg:gift.note,
             setActiveTab: navigation.state.params.setActiveTab
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
@@ -488,27 +561,8 @@ const GiftDetails = ( { navigation } ) => {
             }, 'Add To Account' )
           ) : null}
       </View>
-      <ModalContainer onBackground={()=>setAcceptGiftModal( false )} visible={acceptGift} closeBottomSheet={() => {}}>
-        <View style={styles.modalContentContainer}>
-          <AddGiftToAccount
-            getTheme={getTheme}
-            navigation={navigation}
-            giftAmount={gift.amount}
-            giftId={( gift as Gift ).id}
-            onCancel={() => setAcceptGiftModal( false )}
-            closeModal={()=>setAcceptGiftModal( false )}
-          />
-        </View>
-      </ModalContainer>
-      {/* <ModalContainer visible={acceptGift} closeBottomSheet={() => {}} >
-        <View style={styles.modalContentContainer}>
-          <AccountSelection
-            onClose={(  ) => {setAcceptGiftModal( false )}}
-            onChangeType={( type ) => { }}
-          />
-        </View>
-      </ModalContainer> */}
-    </ScrollView>
+    </SafeAreaView>
+
   )
 }
 
@@ -520,8 +574,8 @@ const styles = StyleSheet.create( {
   },
   line: {
     height: hp( 7.2 ),
-    width: wp( 0.07 ),
-    backgroundColor: Colors.lightTextColor,
+    width: wp( 0.05 ),
+    backgroundColor: Colors.currencyGray,
     marginHorizontal: wp( 3 ),
   },
   subText: {
@@ -584,7 +638,7 @@ const styles = StyleSheet.create( {
   bottomButton: {
     backgroundColor: Colors.lightBlue,
     height: wp( '13%' ),
-    width: 'auto',
+    width: '40%',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -592,7 +646,7 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
     alignSelf: 'center',
     paddingLeft: wp( '5%' ),
-    paddingRight: wp( '5%' )
+    paddingRight: wp( '5%' ),
   },
   buttonSubText: {
     marginTop: hp( 0.4 ),
@@ -638,7 +692,8 @@ const styles = StyleSheet.create( {
     paddingBottom: hp( 4 ),
   },
   viewContainer: {
-    flex: 1,
+    // flex: 1,
+    flexGrow: 1,
     backgroundColor: Colors.backgroundColor,
   },
   buttonView: {
@@ -697,24 +752,27 @@ const styles = StyleSheet.create( {
   inputBox: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    backgroundColor: Colors.white,
+    width: wp( '85%' ),
+    height: 50,
+    paddingLeft: 15,
+    fontSize: RFValue( 13 ),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
   },
-  inputBoxFocused: {
-    borderWidth: 0.5,
-    borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 10,
-      height: 10,
-    },
-    backgroundColor: Colors.white,
-  },
+  // inputBoxFocused: {
+  //   borderWidth: 0.5,
+  //   borderRadius: 10,
+  //   marginLeft: 20,
+  //   marginRight: 20,
+  //   elevation: 10,
+  //   shadowColor: Colors.borderColor,
+  //   shadowOpacity: 10,
+  //   shadowOffset: {
+  //     width: 10,
+  //     height: 10,
+  //   },
+  //   backgroundColor: Colors.white,
+  // },
   accImage: {
     marginRight: wp( 4 ),
   },
@@ -748,6 +806,89 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
+  cardContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    backgroundColor:'#fff',
+    width:'80%',
+    alignSelf:'center',
+    padding:13,
+    borderRadius:8,
+    paddingHorizontal:20,
+    marginVertical:10,
+  },
+  identificationHeading:{
+    color:'#006DB4',
+    fontSize:13,
+    fontWeight:'400',
+    fontFamily: Fonts.FiraSansRegular,
+
+  },
+  identificationDescription:{
+    color:'#6C6C6C',
+    fontSize:11,
+    fontWeight:'400',
+    width:225,
+    fontFamily: Fonts.FiraSansRegular,
+
+  },
+  radioBtnContainer:{
+    marginRight:10
+  },
+  advancedButton: {
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width: '94%'
+  },
+  textInputContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    width:'85%',
+    alignSelf:'center',
+    marginTop:10,
+    backgroundColor:'#fff',
+    padding:14,
+    borderRadius:10
+  },
+  textInput:{
+    width:'92%'
+  },
+  btnContainer:{
+    marginTop:10,
+    backgroundColor:'#006DB4',
+    width:100,
+    padding:14,
+    borderRadius:6,
+    marginLeft: 30,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  btnText: {
+    color: '#fff',
+    fontWeight:'500',
+    fontSize:15,
+    fontFamily: Fonts.FiraSansRegular
+  },
+  deepLinkEncryptionText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: wp( 10 ),
+    justifyContent:'center',
+    textAlign: 'center',
+    letterSpacing: 2
+  },
+  deepLinkEncryptionTextContainer: {
+    width: wp( '80%' ),
+    borderRadius: wp( 2 ),
+    paddingVertical: hp( 1.5 ),
+    marginTop: hp( 1 ),
+    marginLeft: 40,
+    backgroundColor: Colors.gray7,
+    paddingHorizontal: hp( 1.5 ),
+  }
 } )
 
 export default GiftDetails

@@ -22,7 +22,7 @@ const miniNavButtonText = {
 const actionButton = {
   borderRadius: 10,
   minHeight: 50,
-  minWidth: 144,
+  minWidth: 130,
   justifyContent: 'center',
   alignItems: 'center',
   paddingHorizontal: 20,
@@ -34,13 +34,29 @@ const primaryActionButton = {
   backgroundColor: Colors.blue,
 
 }
+const primaryActionButtonShadow = {
+  ...actionButton,
+  backgroundColor: Colors.blue,
+  elevation: 10,
+  shadowColor: Colors.shadowBlue,
+  shadowOpacity: 1,
+  shadowOffset: {
+    width: 15, height: 15
+  },
+
+}
+
 
 const disabledPrimaryActionButton = {
   ...actionButton,
   backgroundColor: Colors.lightBlue,
 
 }
+const disabledNewPrimaryActionButton = {
+  ...actionButton,
+  backgroundColor: '#cee6f8',
 
+}
 const actionButtonText = {
   color: Colors.white,
   fontSize: RFValue( 13 ),
@@ -53,6 +69,8 @@ const ButtonStyles = StyleSheet.create( {
   miniNavButton,
   primaryActionButton,
   disabledPrimaryActionButton,
+  disabledNewPrimaryActionButton,
+  primaryActionButtonShadow,
   floatingActionButton: {
     ...primaryActionButton,
     minWidth: 48,

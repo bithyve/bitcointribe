@@ -1,23 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import {
-  View,
-  Text,
-  AsyncStorage,
-  StyleSheet,
-  TextInput,
-  Platform,
-  TouchableOpacity,
-  StatusBar,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native'
+import { View, Text, AsyncStorage, StyleSheet, TextInput, Platform, TouchableOpacity, StatusBar, SafeAreaView, ScrollView, KeyboardAvoidingView } from 'react-native'
 import Colors from '../../../../common/Colors'
 import Fonts from '../../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../../../components/AppBottomSheetTouchableWrapper'
 import { useDispatch, useSelector } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -25,9 +11,7 @@ import { setShowAllAccount } from '../../../../store/actions/accounts'
 import { translations } from '../../../../common/content/LocContext'
 
 export default function SecurityQuestionScreen( props ) {
-  const { security } = useSelector(
-    ( state ) => state.storage.wallet,
-  )
+  const { security } = useSelector( ( state ) => state.storage.wallet )
   const common  = translations[ 'common' ]
   const strings  = translations[ 'login' ]
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
@@ -73,128 +57,137 @@ export default function SecurityQuestionScreen( props ) {
   }, [ answer, errorText ] )
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <StatusBar />
-      <View style={{
-        flex: 1
-      }}>
-
-        <Text style={{
-          ...styles.modalInfoText,
-          marginTop: wp( '1.5%' ),
-          marginBottom: wp( '5%' ),
-          paddingLeft: 30,
-          paddingRight: 30
-        }}>
-          {strings.Toviewallaccounts},{' '}
-          <Text style={styles.boldItalicText}>{strings.Specifythe}</Text>
-        </Text>
-
-        <ScrollView style={{
-          paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
-        }}>
-          <View style={styles.dropdownBox}>
-            <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
-          </View>
-          <View style={{
-          }}>
-            <TextInput
-              style={{
-                ...styles.inputBox,
-                width: '100%',
-                marginBottom: hp( '1%' ),
-                borderColor:
-                    errorText == strings.Answerisincorrect
-                      ? Colors.red
-                      : Colors.borderColor,
-              }}
-              placeholder={strings.Enteranswer}
-              placeholderTextColor={Colors.borderColor}
-              value={answer}
-              textContentType="none"
-              autoCompleteType="off"
-              autoCorrect={false}
-              autoCapitalize="none"
-              onKeyPress={( event ) => {
-                setBackspace( event )
-              }}
-              onChangeText={( text ) => {
-                setAnswer( text )
-              }}
-              keyboardType={
-                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-              }
-              onSubmitEditing={( event ) => setConfirm()}
-            />
-            {errorText ? (
-              <Text
-                style={{
-                  marginLeft: 'auto',
-                  color: Colors.red,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                }}
-              >
-                {errorText}
-              </Text>
-            ) : null}
-          </View>
-          {showAnswer && (
-            <View
-              style={{
-                ...styles.inputBox,
-                width: '100%',
-                marginBottom: hp( '1%' ),
-                borderColor: Colors.borderColor,
-                justifyContent: 'center'
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: RFValue( 13 ),
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {securityAnswer}
-              </Text>
-            </View>
-          )}
-        </ScrollView>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}
+    >
+      <KeyboardAvoidingView
+        style={{
+          flex: 1,
+        }}
+        behavior={Platform.OS == 'ios' ? 'padding' : ''}
+        enabled
+      >
+        <StatusBar />
         <View
           style={{
-            paddingLeft: wp( '6%' ),
-            paddingRight: wp( '6%' ),
-            height: hp( '15%' ),
-            justifyContent: 'center',
+            flex: 1,
           }}
         >
-          <AppBottomSheetTouchableWrapper
-            disabled={isDisabled}
-            onPress={() => {
-              setConfirm()
-              if ( answer.trim() == securityAnswer.trim() ) {
-                dispatch( setShowAllAccount( true ) )
-                // props.navigation.popToTop( 3 )
-                props.navigation.navigate( 'AccountManagementRoot' )
-              } else {
-                setErrorText( strings.Answerisincorrect )
-              }
-              setIsDisabled( false )
-            }}
+          <Text
             style={{
-              ...styles.questionConfirmButton,
-              backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+              ...styles.modalInfoText,
+              marginTop: wp( '1.5%' ),
+              marginBottom: wp( '5%' ),
+              paddingLeft: 30,
+              paddingRight: 30,
             }}
           >
-            <Text style={styles.proceedButtonText}>
-              {!errorText ? common.confirm : common.tryAgain}
-            </Text>
-          </AppBottomSheetTouchableWrapper>
+            {strings.Toviewallaccounts}, <Text style={styles.boldItalicText}>{strings.Specifythe}</Text>
+          </Text>
+
+          <ScrollView
+            style={{
+              paddingLeft: wp( '6%' ),
+              paddingRight: wp( '6%' ),
+            }}
+          >
+            <View style={styles.dropdownBox}>
+              <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
+            </View>
+            <View style={{
+            }}>
+              <TextInput
+                style={{
+                  ...styles.inputBox,
+                  width: '100%',
+                  marginBottom: hp( '1%' ),
+                  borderColor: errorText == strings.Answerisincorrect ? Colors.red : Colors.borderColor,
+                }}
+                placeholder={strings.Enteranswer}
+                placeholderTextColor={Colors.borderColor}
+                value={answer}
+                textContentType="none"
+                autoCompleteType="off"
+                autoCorrect={false}
+                autoCapitalize="none"
+                onKeyPress={( event ) => {
+                  setBackspace( event )
+                }}
+                onChangeText={( text ) => {
+                  setAnswer( text )
+                }}
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                onSubmitEditing={( event ) => setConfirm()}
+              />
+              {errorText ? (
+                <Text
+                  style={{
+                    marginLeft: 'auto',
+                    color: Colors.red,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                  }}
+                >
+                  {errorText}
+                </Text>
+              ) : null}
+            </View>
+            {showAnswer && (
+              <View
+                style={{
+                  ...styles.inputBox,
+                  width: '100%',
+                  marginBottom: hp( '1%' ),
+                  borderColor: Colors.borderColor,
+                  justifyContent: 'center'
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: RFValue( 13 ),
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {securityAnswer}
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+          <View
+            style={{
+              marginBottom: hp( '13%' ),
+              paddingLeft: wp( '6%' ),
+              paddingRight: wp( '6%' ),
+              marginTop:'auto'
+            }}
+          >
+            <AppBottomSheetTouchableWrapper
+              disabled={isDisabled}
+              onPress={() => {
+                setConfirm()
+                if ( answer.trim() == securityAnswer.trim() ) {
+                  dispatch( setShowAllAccount( true )
+                  )
+                  // props.navigation.popToTop( 3 )
+                  props.navigation.navigate( 'AccountManagementRoot' )
+                } else {
+                  setErrorText( strings.Answerisincorrect )
+                }
+                setIsDisabled( false )
+              }}
+              style={{
+                ...styles.questionConfirmButton,
+                backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+              }}
+            >
+              <Text style={styles.proceedButtonText}>{!errorText ? common.confirm : common.tryAgain}</Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }

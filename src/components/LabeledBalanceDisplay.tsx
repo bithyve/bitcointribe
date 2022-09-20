@@ -98,7 +98,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
 
   const unitTextStyles = useMemo( () => {
     const fontSize = Number( unitTextStyle.fontSize ) || RFValue( 11 )
-    const paddingTop = fontSize * 0.5
+    const paddingTop = fontSize * 0.3
 
     return {
       ...defaultStyles.unitText,
@@ -153,6 +153,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       </View>
 
       <Text
+        numberOfLines={1}
         style={{
           ...defaultStyles.amountText,
           color: textColor,
@@ -170,20 +171,22 @@ const defaultStyles = StyleSheet.create( {
   rootContainer: {
     flexDirection: 'row',
     // alignItems: 'baseline',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   currencyImage: {
     width: wp( 3 ),
     height: wp( 4 ),
     resizeMode: 'contain',
+    marginTop: wp(0.3)
   },
 
   amountText: {
     fontFamily: Fonts.OpenSans,
-    fontSize: RFValue( 17 ),
-    marginRight: 3,
+    fontSize: RFValue( 14.5 ),
+    marginRight: wp( 1 ),
     // alignItems: 'baseline',
+    // width:wp( 25 )
   },
 
   unitText: {

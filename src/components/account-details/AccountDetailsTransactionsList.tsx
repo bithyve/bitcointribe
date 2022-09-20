@@ -16,12 +16,14 @@ export type Props = {
   transactions: TransactionDescribing[];
   onTransactionSelected: ( transaction: TransactionDescribing ) => void;
   accountShellId: string,
+  showAll: boolean,
 };
 
 const AccountDetailsTransactionsList: React.FC<Props> = ( {
   transactions,
   onTransactionSelected,
   accountShellId,
+  showAll,
 }: Props ) => {
 
   /**
@@ -50,10 +52,11 @@ const AccountDetailsTransactionsList: React.FC<Props> = ( {
       </TouchableOpacity>
     )
   }
-
   return (
     <FlatList
-      data={transactions}
+      // data={ showAll ? transactions.sort( ( a, b ) => b.date.localeCompare( a.date ) ) : transactions.sort( ( a, b ) => b.date.localeCompare( a.date ) ).slice( 0, 3 )}
+      data={ showAll ? transactions : transactions.slice( 0, 3 )}
+      // data={transactions}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
     />

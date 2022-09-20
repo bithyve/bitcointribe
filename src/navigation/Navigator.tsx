@@ -6,6 +6,7 @@ import {
 } from 'react-navigation-stack'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
+import SettingGetNewPin from '../pages/SettingGetNewPin'
 import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
 import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
@@ -53,16 +54,37 @@ import SecurityStack from './stacks/security/Security&Privacy'
 import BuyStack from './stacks/buy/BuyStack'
 import Header from './stacks/Header'
 import IconWithBadge from './stacks/security/IconWithBadge'
+import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
+import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
+import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
+import GiftStack from './stacks/gift/GiftStack'
+import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
+import Gift_tab from '../assets/images/satCards/gift_tab.svg'
 
 const SetupNavigator = createStackNavigator(
   {
     Launch,
     Login,
+    SettingGetNewPin: {
+      screen: SettingGetNewPin,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => {
+              navigation.popToTop() }} />
+          },
+          title: 'Manage Passcode',
+          headerShown: true
+        }
+      },
+    },
     PasscodeConfirm,
     NewWalletName,
     AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,
+    RestoreSeedWordsContent,
     WalletNameRecovery,
     RecoveryQuestion: RecoveryQuestionScreen,
     RestoreSelectedContactsList,
@@ -103,7 +125,7 @@ const MODAL_ROUTES = [
 const styles= StyleSheet.create( {
   activeStyle:{
     alignSelf: 'center',
-    marginTop: 2,
+    marginTop: 5,
     width: widthPercentageToDP( 1 ),
     height: widthPercentageToDP( 1 ),
     borderRadius: widthPercentageToDP( 0.5 ),
@@ -127,7 +149,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
-              // marginVertical: hp( '2%' )
+              marginTop: hp( '1.3%' )
             }}>
               {focused ?
                 <HomeSVG/>
@@ -156,7 +178,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
-              // marginVertical: hp( '2%' )
+              marginTop: hp( '1.3%' )
             }}>
               {focused ?
                 <FnF /> : <FnFInactive />
@@ -238,11 +260,18 @@ const Bottomtab = createBottomTabNavigator(
     //   },
     // },
     Securiy: {
-      screen: SecurityStack,
+      screen: GiftStack,
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return (
-            <IconWithBadge focused={focused} />
+            <View style={{
+              marginTop: hp( '0.85%' )
+            }}>
+              {/* <IconWithBadge focused={focused} /> */}
+              {focused ?
+                <Filled_gift_tab /> : <Gift_tab />
+              }
+            </View>
           )
         }
       },
@@ -254,6 +283,7 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
+              marginTop: hp( '1.3%' )
             }}>
               {focused ?
                 <Settings />

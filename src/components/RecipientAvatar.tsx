@@ -1,10 +1,12 @@
-import React from 'react'
-import { View, Text, Image } from 'react-native'
+import React, {useContext, useEffect, useState} from 'react'
+import { View, Text, Image, Platform, PermissionsAndroid } from 'react-native'
+import * as Permissions from 'expo-permissions'
 import Colors from '../common/Colors'
 import ImageStyles from '../common/Styles/ImageStyles'
 import { nameToInitials } from '../common/CommonFunctions'
 import { RecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../common/data/enums/RecipientKind'
+import { LocalizationContext } from '../common/content/LocContext'
 
 export type Props = {
   recipient: RecipientDescribing;
@@ -16,7 +18,46 @@ const RecipientAvatar: React.FC<Props> = ( {
   recipient,
   contentContainerStyle
 }: Props ) => {
-  if ( recipient.avatarImageSource || recipient.image ) {
+  const [contactPermission, setContactPermission] = useState(false)
+
+  const { translations } = useContext( LocalizationContext )
+  const strings = translations[ 'f&f' ]
+  const common = translations[ 'common' ]
+
+  const checkForContactPermissions = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
+            title: strings.hexaWould,
+            message: strings.Addressbookdetails,
+            buttonPositive: common.allow,
+            buttonNegative: common.deny,
+          }
+        )
+        if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
+          setContactPermission(false)
+        } else {
+          setContactPermission(true)
+        }
+      } else if (Platform.OS === 'ios') {
+        const { status } = await Permissions.getAsync( Permissions.CONTACTS )
+        if ( status === 'denied' ) {
+          setContactPermission(false)
+        } else {
+          setContactPermission(true)
+        }
+      }
+    } catch (e) {
+      console.log("PERMISSION_ERROR", e)
+    }
+  }
+
+  useEffect(() => {
+    checkForContactPermissions();
+  }, [contactPermission])
+
+  if ( contactPermission && (recipient.avatarImageSource || recipient.image) ) {
     return (
       <View
         style={{
@@ -50,7 +91,7 @@ const RecipientAvatar: React.FC<Props> = ( {
           }}
         >
           {nameToInitials(
-            recipient.kind == RecipientKind.ADDRESS ? '@' : ( recipient.displayedName ? recipient.displayedName : recipient.contactName || '' )
+            recipient.kind == RecipientKind.ADDRESS ? 'External Address' : ( recipient.displayedName ? recipient.displayedName : recipient.contactName || '' )
           )}
         </Text>
       </View>

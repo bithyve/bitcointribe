@@ -74,7 +74,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           },
           imageSource: () => <NameNDesc />,
         },
-        ...( !accountShell.primarySubAccount.isTFAEnabled ? [
+        ...( accountShell.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT ?[
           {
             title: strings.ShowxPub,
             subtitle: strings.ShowxPubSub,
@@ -99,7 +99,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           subtitle: strings[ '2FASettingsSub' ],
           screenName: 'SubAccountTFAHelp',
           screenParams: {
-            accountShellID: accountShell.id,
+            sourceAccountShell: accountShell,
           },
           imageSource: () => <Xpub />,
         }
@@ -226,7 +226,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ primarySubAccount ] )
 
   function showArchiveModal() {
-    if ( primarySubAccount.balances.confirmed === 0 ) {
+    if ( primarySubAccount.balances.confirmed + primarySubAccount.balances.unconfirmed === 0 ) {
       setShowAccountArchiveModal( true )
     } else {
       // checkAccountBalance()

@@ -6,6 +6,7 @@ import {
   ViewStyle,
   StyleProp,
   Image,
+  Platform
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -34,6 +35,9 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import HomeBuyCard from './HomeBuyCard'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import dbManager from '../../storage/realm/dbManager'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -70,9 +74,34 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       strings: this.context.translations [ 'home' ],
     }
   }
-
+  componentDidMount() {
+    setTimeout( () => {
+      const dbWallet =  dbManager.getWallet()
+      if( dbWallet!=undefined && dbWallet!=null ){
+        const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+        const primaryMnemonic = walletObj.primaryMnemonic
+        const seed = primaryMnemonic.split( ' ' )
+        const seedData = seed.map( ( word, index ) => {
+          return {
+            name: word, id: ( index+1 )
+          }
+        } )
+        const i = 12
+        let ranNums = 1
+        const tempNumber = ( Math.floor( Math.random() * ( i ) ) )
+        if( tempNumber == undefined || tempNumber == 0 )
+          ranNums = 1
+        else ranNums = tempNumber
+        const asyncSeedData=seedData[ ranNums ]
+        AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
+      }
+    }, 2000 )
+  }
   navigateToAddNewAccountScreen = () => {
-    this.props.navigation.navigate( 'AddNewAccount' )
+    // this.props.navigation.navigate( 'AddNewAccount' )
+    this.props.navigation.navigate( 'ScanNodeConfig', {
+      currentSubAccount: null,
+    } )
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
@@ -87,10 +116,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }
-    this.props.navigation.navigate( 'AccountDetails', {
-      accountShellID: selectedAccount.id,
-      swanDeepLinkContent: this.props.swanDeepLinkContent
-    } )
+    if( selectedAccount.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
+      this.props.navigation.navigate( 'LNAccountDetails', {
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent,
+        node: selectedAccount.primarySubAccount.node
+      } )
+    } else {
+      this.props.navigation.navigate( 'AccountDetails', {
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      } )
+    }
+
     // }
   };
 
@@ -120,8 +158,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}>
           <Text style={{
             color: Colors.blue,
-            fontSize: RFValue( 18 ),
+            fontSize: RFValue( 19 ),
             marginTop: hp( 1 ),
+            marginLeft:wp( 1 ),
             fontFamily: Fonts.FiraSansMedium,
             letterSpacing: 0.54
           }}>
@@ -130,8 +169,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <ToggleContainer />
         </View>
 
-        <ScrollView style={{
-          marginBottom: 20, flex:1
+        <View style={{
+          marginBottom: 0, flex:1,
         }}>
           <HomeAccountCardsList
             contentContainerStyle={{
@@ -141,34 +180,39 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onAddNewSelected={this.navigateToAddNewAccountScreen}
             onCardSelected={this.handleAccountCardSelection}
           />
-          <HomeBuyCard
-            cardContainer={{
-              backgroundColor: 'white',
-              marginLeft: wp( 4 ),
-              marginRight: wp( 6 ),
-              height: hp( '13%' ),
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: hp( 3 ),
-              marginBottom: hp( 3 ),
-              borderRadius: wp( 2 ),
-              padding: hp( '1.4%' ),
-              flexDirection: 'row',
-              shadowColor: Colors.shadowColor,
-              shadowOpacity: 1,
-              shadowOffset: {
-                width: 10, height: 10
-              },
-              elevation: 6
-            }}
-            amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
-            incramount={''}
-            percentIncr={'5%'}
-            asset={'../../assets/images/HomePageIcons/graph.png'}
-            openBottomSheet={( type ) => this.props.openBottomSheet( type )}
-            currencyCode={currencyCode}
-          />
-        </ScrollView>
+          <View style={{
+            justifyContent:'center', flexDirection:'row'
+          }}>
+            <HomeBuyCard
+              cardContainer={{
+                backgroundColor: 'white',
+                // marginLeft: wp( 4 ),
+                marginRight: wp( 2 ),
+                height: hp( Platform.OS == 'ios' ? '13%' : '15%' ),
+                width:wp( '91%' ),
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: hp( 3 ),
+                marginBottom: hp( Platform.OS == 'ios' ? 4 : 2 ),
+                borderRadius: wp( 2 ),
+                padding: hp( '1.4%' ),
+                flexDirection: 'row',
+              // shadowColor: Colors.shadowColor,
+              // shadowOpacity: 1,
+              // shadowOffset: {
+              //   width: 10, height: 10
+              // },
+              // elevation: 6
+              }}
+              amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
+              incramount={''}
+              percentIncr={'5%'}
+              asset={'../../assets/images/HomePageIcons/graph.png'}
+              openBottomSheet={( type ) => this.props.openBottomSheet( type )}
+              currencyCode={currencyCode}
+            />
+          </View>
+        </View>
       </View>
     )
   }

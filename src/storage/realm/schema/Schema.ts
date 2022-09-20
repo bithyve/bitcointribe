@@ -13,10 +13,12 @@ const Details2FA = 'Details2FA'
 const Balances = 'Balances'
 const Bip32 = 'Bip32'
 const Network = 'Network'
-const XPUB = 'XPUB'
+const MultiSigXpubs = 'MultiSigXpubs'
+const MultiSigXprivs = 'MultiSigXprivs'
 const TxIdMap = 'TxIdMap'
 const AccountId = 'AccountId'
 const ContactDetails = 'ContactDetails'
+const PaymentAddresses = 'PaymentAddresses'
 const TrustedContact = 'TrustedContact'
 const Streams = 'Streams'
 const StreamsMetaData = 'StreamsMetaData'
@@ -82,11 +84,14 @@ export const AccountSchema: ObjectSchema = {
     xpriv: {
       type: 'string', optional: true
     },
+    is2FA: {
+      type: 'bool', optional: true
+    },
     xpubs: {
-      type: XPUB, optional: true
+      type: MultiSigXpubs, optional: true
     },
     xprivs: {
-      type: XPUB, optional: true
+      type: MultiSigXprivs, optional: true
     },
     nextFreeAddressIndex: {
       type: 'int', optional: true
@@ -111,9 +116,6 @@ export const AccountSchema: ObjectSchema = {
     },
     txIdMap: {
       type: 'list', objectType: TxIdMap, default: []
-    },
-    addressQueryList: {
-      type: 'string?[]', optional: true
     },
     instanceNum: {
       type: 'int', optional: true
@@ -270,15 +272,21 @@ export const BalancesSchema: ObjectSchema = {
 //   },
 // }
 
-export const XPubSchema: ObjectSchema = {
-  name: XPUB,
+export const MultiSigXPubSchema: ObjectSchema = {
+  name: MultiSigXpubs,
   properties: {
+    secondary: {
+      type: 'string', optional: true
+    },
     bithyve: {
       type: 'string', optional: true
-    },
-    primary: {
-      type: 'string', optional: true
-    },
+    }
+  },
+}
+
+export const MultiSigXPrivSchema: ObjectSchema = {
+  name: MultiSigXprivs,
+  properties: {
     secondary: {
       type: 'string', optional: true
     }
@@ -468,6 +476,22 @@ export const Details2FASchema: ObjectSchema = {
   properties: {
     bithyveXpub: 'string',
     twoFAKey: 'string',
+    twoFAValidated: {
+      type: 'bool', optional: true
+    },
+  },
+}
+
+
+export const PaymentAddressesSchema: ObjectSchema = {
+  name: PaymentAddresses,
+  properties: {
+    TEST_ACCOUNT: {
+      type: 'string', optional: true
+    },
+    CHECKING_ACCOUNT: {
+      type: 'string', optional: true,
+    },
   },
 }
 
@@ -485,7 +509,7 @@ export const PrimaryStreamDataSchema: ObjectSchema = {
       type: 'string', optional: true
     },
     paymentAddresses: {
-      type: 'string?[]', optional: true
+      type: PaymentAddresses, optional: true
     },
     contactDetails: {
       type: ContactDetails, optional: true
@@ -629,7 +653,8 @@ export const UnecryptedStreamDataSchema: ObjectSchema = {
     },
     primaryData: {
       type: PrimaryStreamData, optional: true
-    }, secondaryData: {
+    },
+    secondaryData: {
       type: SecondaryStreamData, optional: true
     },
     backupData: {
@@ -777,14 +802,8 @@ export const S3MetaShareSchema: ObjectSchema = {
 export const BHRSchemaSchema: ObjectSchema = {
   name: BHR,
   properties: {
-    encryptedSecretsKeeper: {
-      type: 'string?[]', optional: true
-    },
     metaSharesKeeper: {
       type: 'list', objectType: S3MetaShare, default: []
-    },
-    encryptedSMSecretsKeeper: {
-      type: 'string?[]', optional: true
     },
     oldMetaSharesKeeper:{
       type: 'list', objectType: S3MetaShare, default: []
@@ -892,13 +911,15 @@ export default {
   Balances,
   Bip32,
   Network,
-  XPUB,
+  MultiSigXpubs,
+  MultiSigXprivs,
   AccountId,
   ContactDetails,
   TrustedContact,
   Streams,
   StreamsMetaData,
   UnecryptedStreamData,
+  PaymentAddresses,
   PrimaryStreamData,
   SecondaryStreamData,
   BackupStreamData,

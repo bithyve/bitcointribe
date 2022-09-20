@@ -37,23 +37,23 @@ export enum TransactionType {
 }
 export interface Transaction {
   txid: string;
-  status: string;
-  confirmations: number;
+  status?: string;
+  confirmations?: number;
 
   /**
    * Sats per byte
    */
-  fee: string;
+  fee?: string;
 
   /**
    * UTC string
    */
-  date: string;
+  date?: string;
 
   /**
    * Inbound(Received)/Outbound(Sent) transaction
    */
-  transactionType: TransactionType;
+  transactionType?: TransactionType;
 
   /**
    * Amount in Satoshis.
@@ -103,9 +103,10 @@ export interface Transaction {
   address?: string
   type?: string
   // sender name
-  sender?: string
+  sender?: string,
+  senderId?: string,
   // receivers info
-  receivers?: {name: string, amount: number}[]
+  receivers?: { id?: string, name: string, amount: number}[]
   // txn tags
   tags?: string[]
   // txn notes
@@ -152,7 +153,7 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
-    scheme?: string,
+    scheme?: ShareSplitScheme,
   };
 }
 
@@ -209,7 +210,6 @@ export interface DerivativeAccountElements {
   };
   transactions?: Transaction[];
   txIdMap?: {[txid: string]: string[]};
-  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: Transaction[];
   blindGeneration?: boolean // temporarily generated during blind refresh
@@ -623,6 +623,9 @@ export interface TrustedContact {
   deepLinkConfig?: {
     encryptionType: DeepLinkEncryptionType,
     encryptionKey: string | null,
+  },
+  timestamps: {
+    created: number,
   }
 }
 export interface Trusted_Contacts {
@@ -643,6 +646,7 @@ export interface NewWalletImage {
   versionHistory?: string;
   SM_share?: string,
   gifts?:object;
+  version: string,
 }
 
 export interface EncryptedImage {
@@ -725,11 +729,28 @@ export interface LevelInfo {
   walletId?: string
 }
 
+export enum ShareSplitScheme {
+  OneOfOne = '1of1',
+  TwoOfThree = '2of3',
+  ThreeOfFive = '3of5'
+}
+
+export enum KeeperType {
+  PRIMARY_KEEPER = 'primaryKeeper',
+  DEVICE = 'device',
+  CONTACT = 'contact',
+  EXISTING_CONTACT = 'existingContact',
+  PDF = 'pdf',
+  SECURITY_QUESTION = 'securityQuestion',
+  CLOUD = 'cloud',
+  SEED = 'seed',
+}
+
 export interface KeeperInfoInterface {
   shareId: string;
   name: string;
-  type: string;
-  scheme: string;
+  type: KeeperType;
+  scheme: ShareSplitScheme;
   currentLevel: number;
   createdAt: number;
   sharePosition: number;
@@ -809,10 +830,11 @@ export interface ActiveAddressAssignee{
     type: AccountType | ActiveAddressAssigneeType;
     id?: string;
     senderInfo?: {
+      id?: string
       name: string,
     };
     recipientInfo?: {
-      [txid: string]: {name: string, amount: number}[],
+      [txid: string]: {id?: string, name: string, amount: number}[],
     };
 }
 export interface ActiveAddresses {
@@ -840,17 +862,34 @@ export interface Wallet {
   walletName: string,
   userName?: string,
   security: { questionId: string, question: string, answer: string },
-  primaryMnemonic: string,
-  primarySeed: string,
+  primaryMnemonic?: string,
+  primarySeed?: string,
   secondaryXpub?: string,
   details2FA? : {
     bithyveXpub?: string,
     twoFAKey?: string,
-  }
+    twoFAValidated?: boolean,
+  },
+  smShare?: string,
   accounts: {
     [accountType: string]: string[] // array of accountIds
   },
-  version: string
+  version: string,
+}
+
+export interface LNNode {
+  host?: string,
+  port?: string,
+  url?: string,
+  lndhubUrl?: string,
+  existingAccount?: boolean,
+  macaroonHex?: string,
+  accessKey?: string,
+  username?: string,
+  password?: string,
+  implementation?: string,
+  certVerification?: boolean,
+  enableTor?: boolean
 }
 
 export interface Account {
@@ -877,7 +916,6 @@ export interface Account {
   lastSynched: number;                  // account's last sync timestamp
   newTransactions?: Transaction[];      // new transactions arrived during the current sync
   txIdMap?: {[txid: string]: string[]}; // tx-mapping; tx insertion checker
-  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
   hasNewTxn?: boolean;                  // indicates new txns
   transactionsNote : {
     [txId: string]: string
@@ -887,7 +925,20 @@ export interface Account {
       address: string,
       privateKey: string
     }
-  }
+  },
+  transactionsMeta?: {
+    receivers: {name: string, amount: number}[];
+    sender: string;
+    txid: string;
+    notes: string;
+    tags: string[]
+    amount: number;
+    accountType: string;
+    address: string;
+    isNew: boolean
+    type: string;
+  }[]
+  node?: LNNode
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -930,7 +981,8 @@ export enum AccountType {
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
-  FNF_ACCOUNT = 'FNF_ACCOUNT'
+  FNF_ACCOUNT = 'FNF_ACCOUNT',
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
 }
 
 export interface Accounts {
@@ -944,7 +996,8 @@ export enum DeepLinkKind {
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER',
   EXISTING_CONTACT = 'EXISTING_CONTACT',
   GIFT = 'GIFT',
-  CONTACT_GIFT = 'CONTACT_GIFT'
+  CONTACT_GIFT = 'CONTACT_GIFT',
+  CAMPAIGN = 'CAMPAIGN'
 }
 
 export enum ShortLinkDomain {
@@ -958,7 +1011,9 @@ export enum DeepLinkEncryptionType {
   DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
   EMAIL = 'EMAIL',
-  OTP = 'OTP'
+  OTP = 'OTP',
+  LONG_OTP = 'LONG_OTP',
+  SECRET_PHRASE = 'SECRET_PHRASE'
 }
 
 export enum GiftThemeId {
@@ -981,8 +1036,29 @@ export enum GiftStatus {
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
   RECLAIMED = 'RECLAIMED',
+  ASSOCIATED = 'ASSOCIATED',
   EXPIRED = 'EXPIRED',
 }
+
+export enum ShortLinkImage {
+  GIFT = 'https://hexawallet.io/wp-content/uploads/2019/07/bitcoingift.png',
+  FF = 'https://hexawallet.io/wp-content/uploads/2019/07/faf.png',
+  DONATION = 'https://hexawallet.io/images/donation.png',
+}
+
+export enum ShortLinkTitle {
+  GIFT = 'Bitcoin gift',
+  FF = 'Friends & Family request',
+  DONATION = 'Bitcoin donation',
+}
+
+export enum ShortLinkDescription {
+  GIFT = 'You\'ve received some sats from your contact! Open the link to accept the gift.',
+  FF = 'You\'ve received a request to be added as a contact. Accept and transact bitcoin more efficiently.',
+  DONATION = 'You can give sats as a donation with this link. Open the link to donate sats to the cause.',
+  KEEPER = 'You\'ve received a request to store a Recovery Key. Accept and help your contact backup their app.'
+}
+
 export interface Gift {
   id: string,
   privateKey: string,
@@ -997,7 +1073,10 @@ export interface Gift {
     sent?: number,
     accepted?: number,
     reclaimed?: number,
-  }
+    associated?: number,
+    rejected?: number,
+  },
+  validitySpan?: number,
   sender: {
     walletId: string,
     accountId: string,
@@ -1020,6 +1099,10 @@ export interface Gift {
 
 export interface GiftMetaData {
   status: GiftStatus,
+  validity?: {
+    sentAt: number,
+    validitySpan: number,
+  },
   exclusiveGiftCode?: string,
   notificationInfo?: {
     walletId: string,
@@ -1028,12 +1111,12 @@ export interface GiftMetaData {
 }
 
 export interface cloudDataInterface {
-  levelStatus: number;
-  encryptedCloudDataJson: string;
-  walletName: string;
-  questionId: string;
-  question: string;
-  keeperData: string;
+  levelStatus?: number;
+  encryptedCloudDataJson?: string;
+  walletName?: string;
+  questionId?: string;
+  question?: string;
+  keeperData?: string;
   bhXpub?: string;
   shares?: any;
   secondaryShare?: string;

@@ -33,7 +33,7 @@ export default function AccountSelection( { onClose, onChangeType } ) {
 //   const dispatch = useDispatch()
   const [ activeIndex, setActiveIndex ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ activeId, setActiveId ] = useState( '' )
-  const activeAccounts = useActiveAccountShells()
+  const activeAccounts = useActiveAccountShells().filter( account => account.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT )
   const renderButton = ( text ) => {
     return (
       <TouchableOpacity
@@ -89,6 +89,7 @@ export default function AccountSelection( { onClose, onChangeType } ) {
                     setActiveId( item.primarySubAccount.id )
                   }}
                   index={item.primarySubAccount.type}
+                  boldText={''}
                   changeBgColor={false}
                 />
               </View>

@@ -66,7 +66,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   ] = useState( React.createRef<BottomSheet>() )
   const [ serverNotRespondingModal, showServerNotRespondingModal ] = useState( false )
   const accountsState: AccountsState = useAccountsState()
-  const sourceAccountShell = useAccountShellForID( navigation.getParam( 'accountShellID' ) )
+  const sourceAccountShell = navigation.getParam( 'sourceAccountShell' )
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
@@ -123,7 +123,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     const generatedSecureXPriv = idx( accountsState.twoFAHelpFlags, ( _ ) => _.xprivGenerated )
     if ( generatedSecureXPriv ) {
       dispatch( resetSendState() )
-      navigation.navigate( 'Send', {
+      dispatch( sourceAccountSelectedForSending( sourceAccountShell ) )
+      navigation.replace( 'Send', {
         subAccountKind: sourceAccountShell.primarySubAccount.kind,
       } )
       dispatch( secondaryXprivGenerated( null ) )
@@ -145,8 +146,11 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     }, 2 )
     if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
     if( qrData && qrData.includes( '{' ) && JSON.parse( qrData ).type == QRCodeTypes.APPROVE_KEEPER ){
-      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, sourceAccountShell ) )
-    } else { Toast( 'You have scanned wrong QR' ) }
+      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType? actionType: 'Sweep Funds', sourceAccountShell ) )
+    } else {
+      setShowLoader( false )
+      dispatch( setResetTwoFALoader( false ) )
+      Toast( 'You have scanned wrong QR' ) }
   }
 
   const renderQrContent = useCallback( () => {
@@ -164,13 +168,6 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }}
         onBackPress={() => {
           showQRModel( false )
-        }}
-        onPressContinue={async() => {
-          const qrData = '{"type":"APPROVE_KEEPER","walletName":"Sfds","channelId":"d0926718fd1ac3ea9459bdfee1fe5020ae1b012293a755e41c3f2b4b3173aefc","streamId":"1a28214d4","secondaryChannelKey":"7k1DPsBhjk0qIiBKzlz2eExl","version":"2.0.0","walletId":"1acc5378bfb653ebe3dfb2ff0b9099aca7430c3e1a0c06e2bb790d4c80fd1c9d"}'
-          if ( qrData ) {
-            showQRModel( false )
-            getQrCodeData( qrData )
-          }
         }}
       />
     )

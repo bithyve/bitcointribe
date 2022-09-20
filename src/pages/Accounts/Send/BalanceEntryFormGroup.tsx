@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Platform } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { Input } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
@@ -26,12 +26,15 @@ import idx from 'idx'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { translations } from '../../../common/content/LocContext'
 
+const placeholder = Platform.OS =='ios' ? 12 : 9
 export type Props = {
   currentRecipient: RecipientDescribing,
   subAccountKind: SubAccountKind;
   spendableBalance: Satoshis;
   onAmountChanged: ( amount: Satoshis ) => void;
   onSendMaxPressed: ( ) => void;
+  showSendMax: boolean;
+  fromWallet: boolean;
 };
 
 
@@ -41,6 +44,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   spendableBalance,
   onAmountChanged,
   onSendMaxPressed,
+  showSendMax= true,
+  fromWallet=false,
 }: Props ) => {
   const exchangeRates = useExchangeRates()
   const currencyCode = useCurrencyCode()
@@ -52,7 +57,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const common  = translations[ 'common' ]
   const [ isSendingMax, setIsSendingMax ] = useState( false )
   const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
-  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String(  currentAmount ? currentAmount : 0 ) )
+  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( Number(  currentAmount ? currentAmount : 0 ) )
   const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ) )
 
   const currentSatsAmountFormValue = useMemo( () => {
@@ -105,6 +110,12 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
       onSendMaxPressed()
     }
   }
+
+  useEffect( ()=>{
+    if( fromWallet ){
+      handleSendMaxPress()
+    }
+  }, [] )
 
   useEffect( ()=>{
     if( isSendingMax && sendMaxFee ){
@@ -193,6 +204,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
           />
 
           {
+            showSendMax &&
             ( currencyKindForEntry == CurrencyKind.FIAT ) &&
             ( isSendingMax == false ) &&
             (
@@ -217,7 +229,6 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
 
             )}
         </TouchableOpacity>
-
 
         {/* BTC Amount */}
         <TouchableOpacity
@@ -245,7 +256,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
               borderBottomColor: 'transparent',
             }}
             inputStyle={styles.textInputContent}
-            editable={currencyKindForEntry == CurrencyKind.BITCOIN}
+            editable={!fromWallet && currencyKindForEntry == CurrencyKind.BITCOIN}
             placeholder={
               currencyKindForEntry == CurrencyKind.BITCOIN
                 ? subAccountKind == SubAccountKind.TEST_ACCOUNT
@@ -256,7 +267,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                   : `${strings.ConvertedIn} sats`
             }
             placeholderTextColor={FormStyles.placeholderText.color}
-            value={currentSatsAmountTextValue}
+            value={String( currentSatsAmountTextValue )}
             returnKeyLabel="Done"
             returnKeyType="done"
             keyboardType={'numeric'}
@@ -264,7 +275,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
               const regEx = /^[0-9]+$/
               if( regEx.test( value ) || value === '' ) {
                 setIsSendingMax( false )
-                setCurrentSatsAmountTextValue( value )
+                setCurrentSatsAmountTextValue( Number( value ) )
                 setCurrentFiatAmountTextValue( String( convertSatsToFiat( Number( value ) ?? 0 ).toFixed( 2 ) ) )
                 onAmountChanged( Number( value ) ?? 0 )
               }
@@ -283,7 +294,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             autoCompleteType="off"
           />
 
-          {
+          {showSendMax &&
             ( currencyKindForEntry == CurrencyKind.BITCOIN ) &&
             ( isSendingMax == false ) &&
             (
@@ -368,7 +379,7 @@ const styles = StyleSheet.create( {
     height: '100%',
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( placeholder ),
     padding: 0,
   },
 

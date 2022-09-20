@@ -55,16 +55,20 @@ function SecurityQuestion( props ) {
         AnswerCounter++
         setAnswerCounter( AnswerCounter )
       } else {
-        props.onClose()
-        props.navigation.navigate( 'ReLogin', {
-          isPasscodeCheck: true,
-          onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
-        } )
-        setShowAnswer( true )
-        setErrorText( '' )
+        if( !props.title1 ) {
+          props.onClose()
+          props.navigation.navigate( 'ReLogin', {
+            isPasscodeCheck: true,
+            onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
+          } )
+          setShowAnswer( true )
+          setErrorText( '' )
+        } else {
+          setAnswerCounter( 0 )
+        }
         return
       }
-      setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
+      setErrorText( security && security.questionId == '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
     } else {
       setErrorText( '' )
     }
@@ -82,8 +86,10 @@ function SecurityQuestion( props ) {
   }
 
   useEffect( () => {
-    if ( answer.trim() == securityAnswer.trim() ) {
-      setErrorText( '' )
+    if( security.questionId ) {
+      if ( answer.trim() == securityAnswer.trim() ) {
+        setErrorText( '' )
+      }
     }
   }, [ answer ] )
 
@@ -97,6 +103,7 @@ function SecurityQuestion( props ) {
       resetScrollToCoords={{
         x: 0, y: 0
       }}
+      keyboardShouldPersistTaps='always'
       scrollEnabled={false}
       style={{
         ...styles.modalContentContainer
@@ -116,15 +123,25 @@ function SecurityQuestion( props ) {
         }} />
       </TouchableOpacity>
       <View style={styles.modalContentContainer}>
+
         <View>
           <View style={{
             paddingHorizontal: wp( '7%' )
           }}>
+            {
+              props.title1 && (
+                <Text style={{
+                  ...styles.modalInfoText, marginTop: wp( '1.5%' )
+                }}>
+                  {props.title1}
+                </Text>
+              )
+            }
             <View style={{
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                {strings.HealthCheckConfirmPassword}
+                {props.title ? props.title : strings.HealthCheckConfirmPassword}
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
@@ -177,8 +194,10 @@ function SecurityQuestion( props ) {
                   setAnswer( text )
                 }}
                 onBlur={() => {
-                  if ( validateAllowedCharacters( answer ) == false ) {
-                    setErrorText( stringsLogin.Answersmust )
+                  if( parseInt( security.questionId ) > 0  ) {
+                    // if ( validateAllowedCharacters( answer ) == false ) {
+                    //   setErrorText( stringsLogin.Answersmust )
+                    // }
                   }
                 }}
                 keyboardType={
@@ -199,6 +218,15 @@ function SecurityQuestion( props ) {
                 </Text>
               ) : null}
             </KeyboardAwareScrollView>
+            {
+              props.note && (
+                <Text style={{
+                  ...styles.modalInfoText, marginTop: wp( '1.5%' )
+                }}>
+                  {props.note}
+                </Text>
+              )
+            }
             {showAnswer && (
               <View
                 style={{
@@ -241,10 +269,12 @@ function SecurityQuestion( props ) {
                 ).then( () => {
                   props.onPressConfirm()
                 } )
-              } else if ( validateAllowedCharacters( answer ) == false ) {
-                setErrorText( stringsLogin.Answersmust )
+              } else if( parseInt( security.questionId ) > 0  ) {
+                // if ( validateAllowedCharacters( answer ) == false ) {
+                //   setErrorText( stringsLogin.Answersmust )
+                // }
               } else {
-                setErrorText( security && security.questionId === '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
+                setErrorText( security && security.questionId == '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
               }
               setIsDisabled( false )
             }}

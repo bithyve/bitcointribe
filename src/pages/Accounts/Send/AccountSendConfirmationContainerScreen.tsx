@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -28,11 +28,12 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
-import { AccountType, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
+import { AccountType, MultiSigAccount, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 import { AccountsState } from '../../../store/reducers/accounts'
+import LoaderModal from '../../../components/LoaderModal'
 
 export type NavigationParams = {
 };
@@ -45,12 +46,15 @@ export type Props = {
   navigation: NavigationProp;
 };
 
+const {height} = Dimensions.get('window')
+
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
   const [ sendSuccessModal, setSuccess ] = useState( false )
   const [ sendFailureModal, setFailure ] = useState( false )
+  const [ handleButton, setHandleButton ] = useState( true )
   const [ errorMessage, setError ] = useState( '' )
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
@@ -61,7 +65,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const account = accountState.accounts[ sourcePrimarySubAccount.id ]
   const sendingState = useSendingState()
   const formattedUnitText = useFormattedUnitText( {
-    bitcoinUnit: BitcoinUnit.SATS,
+    bitcoinUnit: sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
   } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
@@ -69,6 +73,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const [ note, setNote ] = useState( '' )
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
+  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
@@ -153,17 +158,20 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
-    if( sourceAccountShell.primarySubAccount.isTFAEnabled )
+    if( sourceAccountShell.primarySubAccount.isTFAEnabled && !( account as MultiSigAccount ).xprivs?.secondary )
       navigation.navigate( 'OTPAuthentication', {
         txnPriority: transactionPriority,
-        note
+        note,
+        fromWallet
       } )
-    else
+    else {
+      setHandleButton( false )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: transactionPriority,
         note
       } ) )
+    }
   }
 
   function handleBackButtonPress() {
@@ -178,19 +186,37 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [] )
 
   useAccountSendST2CompletionEffect( {
-    onSuccess: ( txid: string | null ) => {
-
+    onSuccess: ( txid: string | null, amt: number | null ) => {
       if ( txid ) {
-        dispatch( sendTxNotification( txid ) )
+        let type
+        if ( sourceAccountShell.primarySubAccount.type === undefined ) {
+          type = -1
+        } else if ( sourceAccountShell.primarySubAccount.type === 'TEST_ACCOUNT' ) {
+          type = 0
+        } else if ( sourceAccountShell.primarySubAccount.type === 'CHECKING_ACCOUNT' ) {
+          type = 1
+        } else if ( sourceAccountShell.primarySubAccount.type === 'SWAN_ACCOUNT' ) {
+          type = 2
+        } else if ( sourceAccountShell.primarySubAccount.type === 'SAVINGS_ACCOUNT' ) {
+          type = 3
+        }
+
+        if ( amt ) {
+          dispatch( sendTxNotification( txid, amt + ' ' + formattedUnitText, type ) )
+        } else {
+          dispatch( sendTxNotification( txid, null, type ) )
+        }
         // showSendSuccessBottomSheet()
         setSuccess( true )
+        setHandleButton( true )
       }
     },
     onFailure: ( errorMessage: string | null ) => {
       if ( errorMessage ) {
         setError( errorMessage )
         setTimeout( () => {
-          // setFailure( true )
+          setFailure( true )
+          setHandleButton( true )
         }, 200 )
       }
     },
@@ -215,8 +241,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginBottom: heightPercentageToDP( '1%' ),
-        marginTop: heightPercentageToDP( '2%' )
+        marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
+        marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5
       }}>
         <Text style={{
           marginRight: RFValue( 4 )
@@ -239,11 +265,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           subAccountKind={sourcePrimarySubAccount.kind}
         />
       </View>
-      <SendConfirmationCurrentTotalHeader />
+      <SendConfirmationCurrentTotalHeader
+        Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
+      />
 
       <TransactionPriorityMenu
         accountShell={sourceAccountShell}
-        bitcoinDisplayUnit={sourceAccountShell.unit}
+        bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
         onTransactionPriorityChanged={setTransactionPriority}
       />
       {selectedRecipients.length === 1 &&
@@ -257,6 +285,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         >
           <TextInput
             style={styles.modalInputBox}
+            multiline={true}
+            numberOfLines={3}
+            textAlignVertical={'bottom'}
             placeholder={`${common.note} (${common.optional})`}
             placeholderTextColor={Colors.gray1}
             value={note}
@@ -280,7 +311,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <View style={styles.footerSection}>
         <TouchableOpacity
           onPress={handleConfirmationButtonPress}
-          style={ButtonStyles.primaryActionButton}
+          style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
         >
           <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
         </TouchableOpacity>
@@ -301,6 +332,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           </Text>
         </TouchableOpacity>
       </View>
+      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+        <LoaderModal
+          headerText={'Sending...'}
+        />
+      </ModalContainer>
     </KeyboardAwareScrollView>
   )
 }
@@ -310,7 +346,7 @@ const styles = StyleSheet.create( {
     marginBottom: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: height > 720 ? 10 : 5,
     borderColor: Colors.white,
     backgroundColor: Colors.bgColor,
     width: widthPercentageToDP( 90 )
@@ -336,13 +372,13 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
+    height: height > 720 ? 50 : 40,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
-    width: '90%'
-
+    width: '90%',
+    paddingTop: height > 720 ? 17 : 0
   },
   modalInfoText: {
     width: widthPercentageToDP( 90 ),
@@ -352,20 +388,22 @@ const styles = StyleSheet.create( {
     textAlign: 'justify',
     lineHeight: 18,
     marginLeft: widthPercentageToDP( 5 ),
-    paddingVertical: heightPercentageToDP( 1 )
+    paddingVertical: height > 720 ? heightPercentageToDP( 1 ) : 5
   },
   rootContainer: {
     flex: 1,
   },
 
   headerSection: {
-    paddingVertical: heightPercentageToDP( '1%' ),
+    paddingVertical: height > 720 ? heightPercentageToDP( '1%' ) : 0,
   },
 
   footerSection: {
     flexDirection: 'row',
     alignContent: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
+    marginBottom: heightPercentageToDP( '2%' ),
+    paddingHorizontal:10,
   },
 
 } )

@@ -40,14 +40,28 @@ import {
   TYPE_BOTTOMSHEET_OPEN,
   ALLOW_SECURE_ACCOUNT,
   OPEN_CLOSE_APPROVAL,
-  SET_SECONDARY_DATA_INFO_STATUS
+  SET_SECONDARY_DATA_INFO_STATUS,
+  UPDATE_META_SHARES_KEEPER,
+  UPDATE_OLD_META_SHARES_KEEPER,
+  SET_IS_CURRENT_LEVEL0,
+  PDF_UPGRADE,
+  SET_PASSWORD_RESET_STATE,
+  SEED_BACKUP_HISTORY,
+  RESTORE_SEED_WORD,
 } from '../actions/BHR'
+
+interface historyObj {
+  title: string,
+  confirmed: number,
+  date: number,
+}
 
 const initialState: {
   mnemonic: string;
   loading: {
     levelHealthCheck: Boolean;
     checkMSharesHealth: Boolean;
+    restoreSeedData: Boolean;
     initLoader: Boolean;
     updateMSharesHealth: Boolean;
     autoShareKeepersData: Boolean;
@@ -66,6 +80,7 @@ const initialState: {
     generateMetaShareStatus: boolean;
     updateSecondaryShardStatus: boolean;
     getSecondaryDataInfoStatus: boolean;
+    changeAnswerStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -81,9 +96,10 @@ const initialState: {
   }[];
   keeperInfo: KeeperInfoInterface[];
   shares: any;
-  metaShare: MetaShare;
+  metaSharesKeeper: MetaShare[];
+  oldMetaSharesKeeper: MetaShare[];
   errorReceiving: Boolean;
-  secondaryShareDownloaded: any;
+  secondaryShareDownloaded: MetaShare; // secondary share
   pdfInfo: {
     filePath: string;
     shareId: string;
@@ -111,17 +127,23 @@ const initialState: {
   navigationObj: any;
   errorTitle: string;
   errorInfo: string;
-  status: LevelStatus,
-  isTypeBottomSheetOpen: boolean,
+  status: LevelStatus;
+  isTypeBottomSheetOpen: boolean;
   AllowSecureAccount: boolean;
   openApproval: boolean;
-  availableKeepers: KeeperInfoInterface[]
-  approvalContactData: ContactRecipientDescribing
+  availableKeepers: KeeperInfoInterface[];
+  approvalContactData: ContactRecipientDescribing;
+  IsCurrentLevel0: boolean;
+  pdfUpgrade: boolean;
+  passwordResetState: string;
+  seedBackupHistory: historyObj[];
 } = {
+  seedBackupHistory: [],
   mnemonic: '',
   loading: {
     levelHealthCheck: false,
     checkMSharesHealth: false,
+    restoreSeedData: false,
     initLoader: false,
     updateMSharesHealth: false,
     autoShareKeepersData: false,
@@ -140,6 +162,7 @@ const initialState: {
     generateMetaShareStatus: false,
     updateSecondaryShardStatus: false,
     getSecondaryDataInfoStatus: false,
+    changeAnswerStatus: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -152,7 +175,8 @@ const initialState: {
   errorSending: false,
   shares: null,
   keeperInfo: [],
-  metaShare: null,
+  metaSharesKeeper: [],
+  oldMetaSharesKeeper: [],
   errorReceiving: false,
   secondaryShareDownloaded: null,
   pdfInfo: {
@@ -184,7 +208,10 @@ const initialState: {
   AllowSecureAccount: false,
   openApproval: false,
   availableKeepers: [],
-  approvalContactData: null
+  approvalContactData: null,
+  IsCurrentLevel0: false,
+  pdfUpgrade: false,
+  passwordResetState: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -214,6 +241,18 @@ export default ( state = initialState, action ) => {
           currentLevel: action.payload.currentLevel,
         }
 
+      case UPDATE_META_SHARES_KEEPER:
+        return {
+          ...state,
+          metaSharesKeeper: action.payload.metaSharesKeeper
+        }
+
+      case UPDATE_OLD_META_SHARES_KEEPER:
+        return {
+          ...state,
+          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
+        }
+
       case ERROR_SENDING:
         return {
           ...state,
@@ -227,6 +266,15 @@ export default ( state = initialState, action ) => {
             ...state.loading,
             checkMSharesHealth: action.payload.beingLoaded,
           },
+        }
+
+      case RESTORE_SEED_WORD:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            restoreSeedData: action.payload.beingLoaded,
+          }
         }
 
       case MSHARES:
@@ -443,7 +491,40 @@ export default ( state = initialState, action ) => {
             getSecondaryDataInfoStatus: action.payload.flag,
           },
         }
+      case SET_PASSWORD_RESET_STATE:
+        return {
+          ...state,
+          passwordResetState: action.payload.state,
+        }
+      case UPDATE_META_SHARES_KEEPER:
+        return {
+          ...state,
+          metaSharesKeeper: action.payload.metaSharesKeeper
+        }
 
+      case SET_IS_CURRENT_LEVEL0:
+        return {
+          ...state,
+          IsCurrentLevel0: action.payload.flag,
+        }
+
+      case PDF_UPGRADE:
+        return {
+          ...state,
+          pdfUpgrade: action.payload.flag,
+        }
+
+      case UPDATE_OLD_META_SHARES_KEEPER:
+        return {
+          ...state,
+          oldMetaSharesKeeper: action.payload.oldMetaSharesKeeper
+        }
+
+      case SEED_BACKUP_HISTORY:
+        return {
+          ...state,
+          seedBackupHistory: action.payload.seedBackupHistory,
+        }
   }
   return state
 }

@@ -140,7 +140,13 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
         {transactionPriorities.map( priority => {
           return (
-            <View style={styles.priorityRowContainer} key={priority}>
+            <TouchableOpacity
+              style={styles.priorityRowContainer}
+              key={priority}
+              onPress={() => {
+                setTransactionPriority( priority )
+                onTransactionPriorityChanged( priority )
+              }}>
               <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -167,7 +173,6 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
               <Text style={{
                 ...styles.priorityTableText,
-                flex: 1,
               }}>
                 ~
                 {timeConvertNear30(
@@ -176,7 +181,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                 )}
               </Text>
               <TextValue amt={transactionFeeInfo[ priority.toUpperCase() ].amount} unit={{
-                bitcoinUnit: BitcoinUnit.SATS,
+                bitcoinUnit: bitcoinDisplayUnit,
               }}/>
               {/* <Text style={{
                 ...styles.priorityTableText,
@@ -186,7 +191,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                   bitcoinUnit: BitcoinUnit.SATS,
                 } )}
               </Text> */}
-            </View>
+            </TouchableOpacity>
           )
         } )}
 
@@ -241,7 +246,7 @@ const styles = StyleSheet.create( {
 
   priorityTableText: {
     fontSize: RFValue( 12 ),
-    lineHeight: RFValue( 12 ),
+    lineHeight: RFValue( 14 ),
     color: Colors.textColorGrey,
     textAlign: 'right',
   },
@@ -272,7 +277,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
     borderTopColor: Colors.borderColor,
     borderTopWidth: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 25,
   },
 
   priorityValueContainer: {

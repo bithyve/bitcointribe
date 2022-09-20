@@ -1,6 +1,7 @@
 package io.hexawallet.hexa;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -15,7 +16,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
-
 
 
 import android.graphics.Bitmap;
@@ -64,9 +64,11 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             Font.BOLD);
     private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
             Font.BOLD);
+
     public PdfPassword(ReactApplicationContext reactContext) {
         super(reactContext); // required by React Native
     }
+
     private static float qrImageSize = 320f;
 
     @Override
@@ -83,17 +85,17 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             Document document = new Document(PageSize.A4);
             Context context = this.getCurrentActivity().getApplicationContext();
 
-            String path = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath() +"/"+jsonObj.getString("fileName");
+            String path = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath() + "/" + jsonObj.getString("fileName");
             Log.d("createPdf: ", path);
             //String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
             //Create PDFWriter instance.
-            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(path));
+            PdfWriter pdfWriter = PdfWriter.getInstance(document, new FileOutputStream(path));
             //Add password protection.
             pdfWriter.setEncryption(jsonObj.getString("password").getBytes(), jsonObj.getString("password").getBytes(),
                     PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
             document.open();
             addMetaData(document);
-            addTitlePage(document,pdfData);
+            addTitlePage(document, pdfData);
             document.close();
             successCallback.invoke(path);
         } catch (Exception e) {
@@ -111,7 +113,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         document.addCreator("Bithyve");
     }
 
-    private static void addTitlePage(Document document,String pdfData)
+    private static void addTitlePage(Document document, String pdfData)
             throws DocumentException, JSONException {
         JSONObject jsonObj = new JSONObject(pdfData);
         JSONArray qrcode = jsonObj.getJSONArray("qrcode");
@@ -119,7 +121,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 
         Paragraph preface = new Paragraph();
         preface.add(new Paragraph(jsonObj.getString("title"), catFont));
-        preface.add(new Paragraph("Follow the instructions on the app to scan the 8 QRs below", subFont));
+        preface.add(new Paragraph("Follow the instructions in the app to scan the 8 QR below", subFont));
         document.add(preface);
         addEmptyLine(preface, 1);
         // part 1
@@ -128,7 +130,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 1:",
                 subFont));
         document.add(preface);
-        BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), (int)qrImageSize, (int)qrImageSize, null);
+        BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), (int) qrImageSize, (int) qrImageSize, null);
         Image codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -143,7 +145,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 2:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -160,7 +162,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 3:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(2), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(2), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -175,7 +177,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 4:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(3), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(3), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -192,7 +194,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 5:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(4), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(4), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -207,7 +209,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 6:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(5), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(5), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -224,7 +226,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 7:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(6), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(6), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -239,7 +241,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 8:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(7), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(7), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -272,7 +274,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         document.add(preface);*/
 
 
-        /*  // Exit Key and BitHyve Xpub
+        // Exit Key and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Exit/Regenerate 2FA Key:",
@@ -281,7 +283,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Use this key to reset the 2FA if you have lost your authenticator app or for transferring your funds from Savings account if the BitHyve server is not responding",
                 smallBold));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
@@ -292,7 +294,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 //        document.add(preface);
 
 
-        preface = new Paragraph();
+        /*preface = new Paragraph();
         preface.add(new Paragraph(
                 "BitHyve Xpub:",
                 catFont));
@@ -310,8 +312,6 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         document.add(preface);*/
 
 
-
-
     }
 
     @ReactMethod
@@ -321,13 +321,13 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             Document document = new Document(PageSize.A4);
             //String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
             Context context = this.getCurrentActivity().getApplicationContext();
-            String path = context.getExternalFilesDir(null).getPath() +"/"+jsonObj.getString("fileName");
+            String path = context.getExternalFilesDir(null).getPath() + "/" + jsonObj.getString("fileName");
             Log.d("createPdf: ", path);
             //Create PDFWriter instance.
-            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(path));
+            PdfWriter pdfWriter = PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
             addMetaData(document);
-            addTitlePageKeeper(document,pdfData);
+            addTitlePageKeeper(document, pdfData);
             document.close();
             successCallback.invoke(path);
         } catch (Exception e) {
@@ -336,7 +336,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         }
     }
 
-    private static void addTitlePageKeeper(Document document,String pdfData)
+    private static void addTitlePageKeeper(Document document, String pdfData)
             throws DocumentException, JSONException {
         JSONObject jsonObj = new JSONObject(pdfData);
         JSONArray qrcode = jsonObj.getJSONArray("qrcode");
@@ -344,7 +344,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 
         Paragraph preface = new Paragraph();
         preface.add(new Paragraph(jsonObj.getString("title"), catFont));
-        preface.add(new Paragraph("Follow the instructions on the app to scan QRs below", subFont));
+        preface.add(new Paragraph("Follow the instructions in the app to scan QR below", subFont));
         document.add(preface);
         addEmptyLine(preface, 1);
         // part 1
@@ -353,12 +353,12 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Recovery Key:",
                 subFont));
         document.add(preface);
-        BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), (int)qrImageSize, (int)qrImageSize, null);
+        BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), (int) qrImageSize, (int) qrImageSize, null);
         Image codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
 
-        /*// Exit Key and BitHyve Xpub
+        // Exit Key and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Exit/Regenerate 2FA Key:",
@@ -367,11 +367,11 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Use this key to reset the 2FA if you have lost your authenticator app or for transferring your funds from Savings account if the BitHyve server is not responding",
                 smallBold));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int)qrImageSize, (int)qrImageSize, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int) qrImageSize, (int) qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
         codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        */
+
     }
 
 
@@ -387,24 +387,31 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         try {
             JSONObject jsonObj = new JSONObject(descFile);
             PdfReader reader = new PdfReader(jsonObj.getString("path"), jsonObj.getString("password").getBytes());
-            System.out.println(new String(reader.computeUserPassword()));
-            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("filename");
+//            System.out.println("skk internal:"+ new String(reader.computeUserPassword()));
+            String outPath = "";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+                Context context = this.getCurrentActivity().getApplicationContext();
+                outPath = context.getExternalFilesDir(Environment.DIRECTORY_DCIM) + "/" + jsonObj.getString("filename");
+            } else {
+                outPath = Environment.getExternalStorageDirectory() + "/" + jsonObj.getString("filename");
+            }
+//            System.out.println("skk outputpath: " + outPath);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outPath));
             stamper.close();
-            reader.close();
             successCallback.invoke(outPath);
 
         } catch (Exception e) {
             errorCallback.invoke(e.getMessage());
         }
     }
+
     @ReactMethod
-    public  void deleteFile(String filePath,Callback errorCallback,Callback successCallback){
-        try{
+    public void deleteFile(String filePath, Callback errorCallback, Callback successCallback) {
+        try {
             File file = new File(filePath);
             boolean deleted = file.delete();
             successCallback.invoke(deleted);
-        }catch (Exception e){
+        } catch (Exception e) {
             errorCallback.invoke(e.getMessage());
         }
     }

@@ -30,7 +30,7 @@ import { Wallet } from '../../../bitcoin/utilities/Interface'
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 
 function validateAllowedCharacters( answer: string ): boolean {
-  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+  return answer !== ''
 }
 
 function SecurityQuestion( props ) {
@@ -130,7 +130,9 @@ function SecurityQuestion( props ) {
             <Text style={styles.modalBoldText}>Step 1</Text>
             <Text style={{
               ...styles.modalInfoText,
-            }}>{` ${strings.ConfirmSecurityQuestion}`}</Text>
+            }}>
+              {` ${strings.ConfirmEncryptionPassword}`}
+            </Text>
           </View>
           <View style={{
             paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )

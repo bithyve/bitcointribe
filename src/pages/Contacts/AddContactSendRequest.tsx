@@ -70,9 +70,10 @@ export default function AddContactSendRequest( props ) {
   const note = props.navigation.getParam( 'note' )
   const giftToSend = giftId? accountsState.gifts[ giftId ]: null
   const [ trustedLink, setTrustedLink ] = useState( '' )
+  const [ longLink, setLongLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
-  const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.NUMBER: DeepLinkEncryptionType.DEFAULT )
+  const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? null: DeepLinkEncryptionType.DEFAULT )
   const [ isOTPType, setIsOTPType ] = useState( false )
   const themeId = props.navigation.getParam( 'themeId' )
   const senderEditedName = props.navigation.getParam( 'senderName' )
@@ -106,6 +107,10 @@ export default function AddContactSendRequest( props ) {
 
   const existingContact = props.navigation.getParam( 'existingContact' )
     ? props.navigation.getParam( 'existingContact' )
+    : false
+
+  const skipClicked = props.navigation.getParam( 'skipClicked' )
+    ? props.navigation.getParam( 'skipClicked' )
     : false
 
   const [ Contact ] = useState(
@@ -161,6 +166,10 @@ export default function AddContactSendRequest( props ) {
 
   useEffect( ()=> {
     if ( !Contact ) return
+    if( Contact.phoneNumbers && Contact.phoneNumbers.length ) setEncryptLinkWith( DeepLinkEncryptionType.NUMBER )
+    else if( Contact.emails && Contact.emails.length ) setEncryptLinkWith( DeepLinkEncryptionType.EMAIL )
+    else setEncryptLinkWith( DeepLinkEncryptionType.OTP )
+
     createTrustedContact()
     if( trustedLink || trustedQR ){
       setTrustedLink( '' )
@@ -173,7 +182,7 @@ export default function AddContactSendRequest( props ) {
   }, [ Contact, trustedContacts ] )
 
   useEffect( ()=> {
-    generate() // re-generate deeplink if encryption key changes
+    if( encryptLinkWith ) generate() // re-generate deeplink if encryption key changes
   }, [ encryptLinkWith ] )
 
   const generate = async () => {
@@ -200,11 +209,11 @@ export default function AddContactSendRequest( props ) {
       const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
       if( encryptLinkWith === encryptionType ) encryption_key = encryptionKey
     }
-    if( !encryption_key )
+
+    if( !encryption_key ){
       switch( encryptLinkWith ){
           case DeepLinkEncryptionType.NUMBER:
             const phoneNumber = idx( contactInfo, ( _ ) => _.phoneNumbers[ 0 ].number )
-
             if( phoneNumber ){
               const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
               encryption_key = number.slice( number.length - 10 ) // last 10 digits only
@@ -221,7 +230,7 @@ export default function AddContactSendRequest( props ) {
             break
 
           case DeepLinkEncryptionType.OTP:
-            // openTimer()
+          // openTimer()
             encryption_key = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
             setOTP( encryption_key )
             setEncryptKey( encryption_key )
@@ -230,6 +239,7 @@ export default function AddContactSendRequest( props ) {
             // setEncryptLinkWith( DeepLinkEncryptionType.DEFAULT )
             break
       }
+    }
 
     const keysToEncrypt = currentContact.channelKey + '-' + ( currentContact.secondaryChannelKey ? currentContact.secondaryChannelKey : '' )
     const extraData = giftToSend?  {
@@ -250,6 +260,7 @@ export default function AddContactSendRequest( props ) {
     } )
     const link = shortLink !== '' ? shortLink: deepLink
     setTrustedLink( link )
+    setLongLink( deepLink )
     const appVersion = DeviceInfo.getVersion()
 
     let qrType: string
@@ -478,6 +489,7 @@ export default function AddContactSendRequest( props ) {
           contact={Contact}
           QR={trustedQR}
           link={trustedLink}
+          longLink={longLink}
           contactEmail={''}
           onPressBack={() => {
             props.navigation.goBack()
@@ -485,7 +497,7 @@ export default function AddContactSendRequest( props ) {
           onPressDone={() => {
             // openTimer()
           }}
-          amt={numberWithCommas( giftToSend?.amount )}
+          amt={giftToSend?.amount}
           onPressShare={() => {
             setTimeout( () => {
               setRenderTimer( true )

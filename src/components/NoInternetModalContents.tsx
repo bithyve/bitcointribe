@@ -4,6 +4,7 @@ import {
   Image,
   Text,
   StyleSheet,
+  Dimensions
 } from 'react-native'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
@@ -12,6 +13,8 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Entypo from 'react-native-vector-icons/Entypo'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../common/content/LocContext'
+
+const windowHeight = Dimensions.get( 'window' ).height
 
 export default function NoInternetModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -27,21 +30,21 @@ export default function NoInternetModalContents( props ) {
     <View style={styles.successModalHeaderView}>
       <Text style={styles.modalTitleText}>{`${strings.no}\n${strings.Connection}`}</Text>
       <Text style={{
-        ...styles.modalInfoText, marginTop: wp( '1.5%' )
+        ...styles.modalInfoTextOpacity, marginTop: wp( '3%' )
       }}>{`${strings.there}\n`}<Text style={{
-          fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic'
+          fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic', color:'#605f5f'
         }}>{`${strings.internet}`}</Text></Text>
     </View>
     <View style={styles.successModalAmountView}>
       <Text style={{
-        ...styles.modalInfoText, marginBottom: hp( '3%' )
+        ...styles.modalInfoTextOpacity, marginBottom: hp( '3%' )
       }}>{`${strings.some}`}</Text>
       <View style={{
       }}>
         <View style={{
-          flexDirection: 'row', alignItems: 'center', marginBottom: 5
+          flexDirection: 'row', alignItems: 'center', marginBottom: 5,
         }}>
-          <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
+          <Entypo name={'dot-single'} size={24} color={Colors.textColorGrey} />
           <Text style={{
             ...styles.modalInfoText,
           }}>{strings.fetching}</Text>
@@ -49,20 +52,20 @@ export default function NoInternetModalContents( props ) {
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginBottom: 5
         }}>
-          <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
+          <Entypo name={'dot-single'} size={24} color={Colors.textColorGrey} />
           <Text style={styles.modalInfoText}>{strings.sending}</Text>
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginBottom: 5
         }}>
-          <Entypo name={'dot-single'} size={18} color={Colors.textColorGrey} />
+          <Entypo name={'dot-single'} size={24} color={Colors.textColorGrey} />
           <Text style={styles.modalInfoText}>{strings.contact}
           </Text>
         </View>
       </View>
     </View>
     <View style={{
-      flexDirection: 'row', marginTop: 'auto', alignItems: 'center'
+      flexDirection: 'row', marginTop: 'auto', alignItems: 'center', justifyContent:'space-between'
     }} >
       <AppBottomSheetTouchableWrapper
         onPress={() => props.onPressIgnore()}
@@ -99,13 +102,15 @@ const styles = StyleSheet.create( {
     marginRight: wp( '10%' ),
     marginLeft: wp( '10%' ),
     marginTop: wp( '10%' ),
-    // flex: 1.7
+    // flex: 1.7,
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
-    letterSpacing: 0.54
+    letterSpacing: 0.54,
+    fontWeight:'400',
+    marginTop:wp( '3%' )
   },
   modalInfoText: {
     color: Colors.textColorGrey,
@@ -113,6 +118,14 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     letterSpacing: 0.6,
     opacity: 1
+  },
+  modalInfoTextOpacity:{
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6,
+    opacity: 0.7,
+    fontWeight:'400'
   },
   successModalAmountView: {
     // flex: 2,
@@ -157,19 +170,18 @@ const styles = StyleSheet.create( {
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
+    shadowOpacity: 0.9,
     shadowOffset: {
-      width: 15, height: 15
+      width: 12, height: 13
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '10%' ),
   },
   successModalImage: {
-    width: wp( '25%' ),
-    height: hp( '18%' ),
-    marginLeft: 'auto',
-    resizeMode: 'cover'
+    width: wp( windowHeight >= 850 ? '42%' : windowHeight >= 750 ? '35%' : windowHeight >= 650 && '27%' ),
+    height: hp( windowHeight >= 850 ? '19%' : windowHeight >= 750 ? '17%' : windowHeight >= 650 && '15%' ),
+    resizeMode: 'contain',
   },
   proceedButtonText: {
     color: Colors.white,

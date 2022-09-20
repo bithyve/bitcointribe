@@ -35,6 +35,7 @@ function* processRecipients( accountShell: AccountShell ){
 
   const recipients:
     {
+      id?: string,
       address: string;
       amount: number;
       name?: string
@@ -86,6 +87,7 @@ function* processRecipients( accountShell: AccountShell ){
           if( !paymentAddress ) throw new Error( `Payment address missing for: ${recipient.displayedName}` )
 
           recipients.push( {
+            id: contact.channelKey,
             address: paymentAddress,
             amount: recipient.amount,
             name: contact.contactDetails.contactName || idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.walletName ),
@@ -168,36 +170,43 @@ function* executeSendStage2( { payload }: {payload: {
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
   const network = AccountUtilities.getNetworkByType( account.networkType )
 
-  const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, recipients, token, customTxPrerequisites )
+  try {
+    const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, recipients, token, customTxPrerequisites )
 
-  if ( txid ){
-    yield put( sendStage2Executed( {
-      successful: true,
-      txid,
-    } ) )
+    if ( txid ){
+      yield put( sendStage2Executed( {
+        successful: true,
+        txid,
+      } ) )
 
-    if( note ){
-      account.transactionsNote[ txid ] = note
-      if( account.type === AccountType.DONATION_ACCOUNT ) Relay.sendDonationNote( account.id.slice( 0, 15 ), {
-        txId: txid, note
-      } )
-    }
+      if( note ){
+        account.transactionsNote[ txid ] = note
+        if( account.type === AccountType.DONATION_ACCOUNT ) Relay.sendDonationNote( account.id.slice( 0, 15 ), {
+          txId: txid, note
+        } )
+      }
 
-    const accounts = {
-      [ account.id ]: account
-    }
-    yield put( updateAccountShells( {
-      accounts
-    } ) )
-    // const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-    // tempDB.accounts[ account.id ] = account
-    // yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
-    yield call( dbManager.updateAccount, account.id, account )
-  } else
+      const accounts = {
+        [ account.id ]: account
+      }
+      yield put( updateAccountShells( {
+        accounts
+      } ) )
+      // const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
+      // tempDB.accounts[ account.id ] = account
+      // yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
+      yield call( dbManager.updateAccount, account.id, account )
+    } else
+      yield put( sendStage2Executed( {
+        successful: false,
+        err: 'Send failed: unable to generate txid'
+      } ) )
+  } catch( err ){
     yield put( sendStage2Executed( {
       successful: false,
-      err: 'Send failed: unable to generate txid'
+      err: 'Send failed: ' + err.message
     } ) )
+  }
 }
 
 export const executeSendStage2Watcher = createWatcher(
@@ -408,7 +417,7 @@ async function updateTrustedContactTxHistory( selectedContacts ) {
 }
 
 function* sendTxNotificationWorker( { payload } ) {
-  const { txid } = payload
+  const { txid, amt, type } = payload
   const sendingState: SendingState = yield select( ( state ) => state.sending )
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
@@ -438,9 +447,10 @@ function* sendTxNotificationWorker( { payload } ) {
   const notification: INotification = {
     notificationType: notificationType.contact,
     title: 'Friends & Family notification',
-    body: `You have a new transaction from ${walletName}`,
+    body: amt === null ? `You have a transaction from ${walletName}`: `Received ${amt} from ${walletName}`,
     data: {
-      txid
+      txid,
+      type,
     },
     tag: notificationTag.IMP,
   }

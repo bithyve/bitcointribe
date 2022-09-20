@@ -368,13 +368,17 @@ export interface SendTxNotificationAction extends Action {
   type: typeof SEND_TX_NOTIFICATION;
   payload?: {
     txid: string;
+    amt: string;
+    type: number;
    };
 }
 
-export const sendTxNotification = ( txid? ): SendTxNotificationAction => {
+export const sendTxNotification = ( txid?, amt?, type? ): SendTxNotificationAction => {
   return {
     type: SEND_TX_NOTIFICATION, payload:{
-      txid
+      txid,
+      amt,
+      type,
     }
   }
 }

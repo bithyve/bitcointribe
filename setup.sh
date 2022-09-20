@@ -11,8 +11,11 @@ echo "patch cocoapods"
 cp ./rnPatchFiles/RNLocalize.podspec ./node_modules/react-native-localize/RNLocalize.podspec
 cp ./rnPatchFiles/react-native-netinfo.podspec ./node_modules/@react-native-community/netinfo/react-native-netinfo.podspec
 
+rm -rf ./node_modules/react-native-tcp/ios/CocoaAsyncSocket/
+cp ./rnPatchFiles/TcpSockets.podspec ./node_modules/react-native-tcp/TcpSockets.podspec
+
 # ios dependency installation
-cd ios && pod deintegrate && pod install
+cd ios && pod deintegrate && rm -f Podfile.lock && pod install
 
 # android SDK location configuration
 cd ../android && touch local.properties && echo "sdk.dir = /Users/$(whoami)/Library/Android/sdk" >local.properties

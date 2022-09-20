@@ -210,6 +210,7 @@ interface HomePropsTypes {
   getMessages: any;
   syncPermanentChannels: any;
   updateWIStatus: boolean;
+  isGoogleLoginCancelled: boolean
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -274,7 +275,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidMount = async() => {
     if( this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.currentLevel == 0 ) {
-      this.props.setCloudData()
+      if( Platform.OS === 'android' ) {
+        if( !this.props.isGoogleLoginCancelled ) {
+          this.props.setCloudData()
+        }
+      } else {
+        this.props.setCloudData()
+      }
     }
     requestAnimationFrame( () => {
       this.setUpFocusListener()
@@ -584,6 +591,7 @@ const mapStateToProps = ( state ) => {
     keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.bhr.newBHRFlowStarted ),
+    isGoogleLoginCancelled: idx( state, ( _ ) => _.cloud.isGoogleLoginCancelled ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
     isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),

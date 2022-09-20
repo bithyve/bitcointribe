@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react'
-import { StyleSheet, FlatList } from 'react-native'
+import { StyleSheet, FlatList, Dimensions } from 'react-native'
 import { TEST_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
 import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
+
+const {height} = Dimensions.get('window')
 
 export type Props = {
   recipients: RecipientDescribing[];
@@ -61,7 +63,7 @@ const SelectedRecipientsCarousel: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   listContentContainer: {
-    paddingVertical: 24,
+    paddingVertical: height > 720 ? 24 : 5,
   }
 } )
 

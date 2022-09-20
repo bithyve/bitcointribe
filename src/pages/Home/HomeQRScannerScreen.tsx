@@ -58,7 +58,6 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const common = translations[ 'common' ]
   const strings = translations[ 'accounts' ]
   function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    console.log( 'scannedData', scannedData )
     const networkType: NetworkType = AccountUtilities.networkType( scannedData )
     if ( networkType ) {
       const network = AccountUtilities.getNetworkByType( networkType )
@@ -76,7 +75,11 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     }
 
     const onCodeScanned = navigation.getParam( 'onCodeScanned' )
-    if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
+    try {
+      if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
+    } catch ( error ) {
+      //
+    }
     navigation.goBack( null )
   }
 
@@ -216,7 +219,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             __DEV__ && (
               <TouchableOpacity onPress={() => {
                 const qrScannedData = {
-                  data: '{"type":"PRIMARY_KEEPER_REQUEST","encryptedChannelKeys":"xaK8GkkEDyjJGSQZqRCzIO8J-vPggEiXBKJHeVONcPQfi94Cg","encryptionType":"DEFAULT","encryptionHint":"","walletName":"Wes","version":"2.0.1"}'
+                  data: '{"type":"KEEPER_REQUEST","encryptedChannelKeys":"0BvnLFWTJfNP3hFy43qYk136-upToEzzuNHJ75QYqyRz9Q6Lc","encryptionType":"DEFAULT","encryptionHint":"","walletName":"Asa","version":"2.0.8","currentLevel":1}'
                 }
                 handleBarcodeRecognized( qrScannedData )
               }} >

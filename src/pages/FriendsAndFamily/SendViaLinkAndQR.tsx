@@ -9,7 +9,8 @@ import {
   Text,
   Alert,
   ActivityIndicator,
-  Platform
+  Platform,
+  TextInput
 } from 'react-native'
 import Share from 'react-native-share'
 import {
@@ -29,10 +30,21 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import ViewShot from 'react-native-view-shot'
 import ThemeList from './Theme'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import ModalContainer from '../../components/home/ModalContainer'
+import Fonts from '../../common/Fonts'
+import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
+import Clipboard from '@react-native-clipboard/clipboard'
+import Toast from '../../components/Toast'
+
 
 export default function SendViaLinkAndQR( props ) {
+
+  const [ OTPmodal, setOTPmodal ] = useState( false )
+
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
+  const common  = translations[ 'common' ]
+
   const type = props.navigation.getParam( 'type' )
   const qrCode = props.navigation.getParam( 'qrCode' )
   const link = props.navigation.getParam( 'link' )
@@ -40,11 +52,21 @@ export default function SendViaLinkAndQR( props ) {
   const senderName = props.navigation.getParam( 'senderName' )
   const themeId = props.navigation.getParam( 'themeId' )
   const giftNote = props.navigation.getParam( 'giftNote' )
+  const OTP =  props.navigation.state.params.OTP
+  const encryptLinkWith =  props.navigation.state.params.encryptLinkWith
+  const shortOTP = OTP && OTP.split( '' )
+
   const viewRef = useRef( null )
 
   useEffect( () => {
-    onPress()
+    init()
   }, [ qrCode ] )
+
+  function init() {
+    setTimeout( () => {
+      onPress()
+    }, 1000 )
+  }
 
   // useEffect( () => {
   //   setShareLink( props.link.replace( /\s+/g, '' ) )
@@ -58,11 +80,9 @@ export default function SendViaLinkAndQR( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `${link}`,
+          message: `You have received a bitcoin gift from ${senderName}. Click on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet\n\n${link}`,
         },
       } )
-
-
       Share.open( options )
         .then( ( res ) => {
           // if (res.success) {
@@ -77,8 +97,131 @@ export default function SendViaLinkAndQR( props ) {
     }
   }
 
+  const writeToClipboard = () => {
+    setOTPmodal( false )
+    Clipboard.setString( OTP )
+    Toast( common.copied )
+  }
+
+  const shareOTPModal = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setOTPmodal( false )
+          }}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} />
+        </TouchableOpacity>
+        <View>
+          <View
+            style={{
+              marginLeft: wp( 7 ),
+            }}
+          >
+            <Text
+              style={{
+                ...styles.modalTitleText,
+                fontSize: 18,
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Show Second Factor
+              {/* {props.encryptLinkWith === DeepLinkEncryptionType.NUMBER ? 'Share phone' : props.encryptLinkWith === DeepLinkEncryptionType.EMAIL ? 'Share Email ' : props.encryptLinkWith === DeepLinkEncryptionType.SECRET_PHRASE ? 'Secret Phrase ' : 'Share OTP '} */}
+
+            </Text>
+          </View>
+          <Text
+            style={{
+              ...styles.modalInfoText,
+              paddingTop: 8,
+              marginLeft: 30,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: 14,
+            }}
+          >
+            {'Touch to copy'}
+          </Text>
+          {OTP.length == '6' &&
+                <TouchableOpacity style={styles.otpContainer} onPress={writeToClipboard}>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 0 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 1 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 2 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 3 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 4 ]}</Text>
+                  </View>
+                  <View style={styles.otpBoxContainer}>
+                    <Text style={styles.otpBoxText}>{shortOTP[ 5 ]}</Text>
+                  </View>
+                </TouchableOpacity>
+          }
+          {OTP.length > 6 &&
+            <TouchableOpacity onPress={writeToClipboard} style={styles.otpInputFieldContainer}>
+              <Text style={styles.otpInput}>{OTP}</Text>
+            </TouchableOpacity>
+          }
+          <View>
+            <Text
+              style={{
+                margin: 10,
+                marginLeft: 35,
+                color: '#6C6C6C',
+                width:'85%',
+                fontFamily: Fonts.FiraSansRegular
+              }}
+            >
+              Use a medium/ app different to that used for sending the gift
+            </Text>
+
+          </View>
+
+          {/* <TouchableOpacity
+            style={{
+              ...styles.btnContainer,
+            }}
+            onPress={() => {
+              props.navigation.pop( 3 )
+              try {
+                if ( props.navigation.state.params.setActiveTab ) {
+                  props.navigation.state.params.setActiveTab( 'SENT' )
+                }
+              } catch ( error ) {
+                //
+              }
+            }}
+          >
+            <Text style={styles.btnText}>Proceed</Text>
+          </TouchableOpacity> */}
+        </View>
+      </View>
+    )
+
+  }
+
+
   function onPress() {
-    if( type === 'QR'  && qrCode ) {
+    if( type === 'QR'  && qrCode  ) {
       capture()
     } else {
       shareOption()
@@ -91,7 +234,7 @@ export default function SendViaLinkAndQR( props ) {
         Platform.select( {
           default: {
             title: 'Share Gift Card',
-            message: `${link}`,
+            message: 'Scan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet.',
             url: `file://${uri}`,
           },
           ios: {
@@ -111,9 +254,7 @@ export default function SendViaLinkAndQR( props ) {
     } )
   }
 
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  }
+
   const getTheme = () => {
     // props.themeId
     const filteredArr = ThemeList.filter( ( item => item.id === themeId ) )
@@ -152,7 +293,7 @@ export default function SendViaLinkAndQR( props ) {
       </View>
       <HeaderTitle
         firstLineTitle={`Share via ${type === 'Link' ? 'link' : 'QR'}`}
-        secondLineTitle={type === 'Link' ? 'Send the link to your contact from any app below' : ''}
+        secondLineTitle={type === 'Link' ? 'Once you have shared the QR/ link, you can view the Second Factor set (if any)' : ''}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -163,14 +304,16 @@ export default function SendViaLinkAndQR( props ) {
       }}>
 
         <DashedLargeContainer
-          titleText={'Gift Card'}
+          titleText={'Gift Sats'}
           titleTextColor={Colors.black}
           subText={senderName}
           extraText={giftNote? giftNote: 'This is to get you started!\nWelcome to Bitcoin'}
           amt={amt}
+          type={type}
           onPress={onPress}
           image={<GiftCard height={60} width={60} />}
           theme={getTheme()}
+          isSend
           renderQrOrLink={() => {
             return (
               <>
@@ -184,12 +327,12 @@ export default function SendViaLinkAndQR( props ) {
             >
               <View style={[ styles.qrContainer, {
               } ]}>
-                {!qrCode ? (
+                {!link ? (
                   <ActivityIndicator size="large" color={Colors.babyGray} />
                 ) : (
                   <QRCode
                     title={'Gift card'}
-                    value={qrCode}
+                    value={link}
                     size={hp( '24%' )} />
                 )}
               </View>
@@ -242,9 +385,24 @@ export default function SendViaLinkAndQR( props ) {
         />
       </ViewShot>
 
+
+      <Text style={{
+        color: Colors.lightTextColor,
+        fontSize: RFValue( 14 ),
+        fontFamily: Fonts.FiraSansRegular,
+        // fontWeight: '700',
+        letterSpacing: 0.01,
+        lineHeight: 18,
+        marginHorizontal: wp( 8 ),
+        marginVertical: 10
+      }}>
+        Once you have shared the QR/link, you can view the OTP
+      </Text>
+
       <AppBottomSheetTouchableWrapper
         onPress={() => {
-          props.navigation.pop( 3 )
+          OTP && DeepLinkEncryptionType.SECRET_PHRASE !==  encryptLinkWith ? ( setOTPmodal( true ) ) :
+            props.navigation.pop( 1 )
           try {
             if( props.navigation.state.params.setActiveTab ) {
               props.navigation.state.params.setActiveTab( 'SENT' )
@@ -260,8 +418,16 @@ export default function SendViaLinkAndQR( props ) {
                Colors.blue
         }}
       >
-        <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
+        <Text style={styles.proceedButtonText}>{OTP ? 'Show 2nd Factor' : 'Yes, I have shared'}</Text>
       </AppBottomSheetTouchableWrapper>
+      {OTPmodal &&
+      <ModalContainer
+        closeBottomSheet={() => setOTPmodal( false )}
+        visible={OTPmodal}
+        onBackground={()=>setOTPmodal( false )}
+      >
+        {shareOTPModal()}
+      </ModalContainer>}
       {/* <RequestKeyFromContact
         isModal={false}
         headerText={'Send Gift'}
@@ -327,4 +493,69 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 13 ),
   },
+  modalContentContainer: {
+    backgroundColor: Colors.backgroundColor,
+    paddingBottom: hp( 4 ),
+  },
+  modalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  modalInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: wp( 10 )
+  },
+  otpContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    paddingHorizontal:30,
+    marginTop:20
+  },
+  otpBoxContainer:{
+    height:50,
+    width: 45,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:'#fff',
+    borderRadius:10
+  },
+  otpBoxText:{
+    fontSize:26,
+    color:'#000',
+    fontWeight:'400'
+  },
+  otpInput:{
+    //letterSpacing:7,
+    fontSize:22,
+  },
+  otpInputFieldContainer:{
+    marginTop:20,
+    borderRadius: 10,
+    backgroundColor:'#fff',
+    // height:50,
+    justifyContent:'center',
+    alignItems:'center',
+    padding:10,
+    marginHorizontal:30,
+  },
+  btnContainer:{
+    marginTop:10,
+    backgroundColor:'#006DB4',
+    width:100,
+    padding:14,
+    borderRadius:6,
+    marginLeft: 30,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  btnText: {
+    color: '#fff',
+    fontWeight:'500',
+    fontSize:15,
+    fontFamily: Fonts.FiraSansRegular
+  }
 } )

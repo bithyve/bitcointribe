@@ -119,7 +119,9 @@ export default function CustomPriorityContent( props ) {
           keyboardType={'numeric'}
           onChangeText={( value ) => {
             const regEx = /^[0-9]+$/
-            if( regEx.test( value ) ) {
+            if (value === '') {
+              setAmount('')
+            } else if( regEx.test( value ) ) {
               onCustomFeeChange( value )
             }
           }}

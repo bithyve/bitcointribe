@@ -7,6 +7,7 @@ require_relative '../node_modules/react-native-unimodules/cocoapods.rb'
 platform :ios, '10.0'
 
 def all_pods
+    use_flipper!({'Flipper' => '0.140.0'})
     config = use_native_modules!
     use_react_native!(:path => config["reactNativePath"])
     use_unimodules!
@@ -32,5 +33,13 @@ post_install do |installer|
     if target.name == "React"
       target.remove_from_project
     end
+  end
+  installer.aggregate_targets.each do |aggregate_target|
+    aggregate_target.user_project.native_targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['LIBRARY_SEARCH_PATHS'] = ['$(SDKROOT)/usr/lib/swift', '$(inherited)']
+      end
+    end
+    aggregate_target.user_project.save
   end
 end

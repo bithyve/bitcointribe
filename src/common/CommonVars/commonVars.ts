@@ -45,7 +45,8 @@ export const LevelDataVar = [
   {
     levelName: 'Level 1',
     status: 'notSetup',
-    keeper1ButtonText: 'Set Password',
+    // keeper1ButtonText: 'Set Password',
+    keeper1ButtonText: 'Write down seed-words',
     keeper2ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive',
     keeper1: obj,
     keeper2: obj,
@@ -58,9 +59,7 @@ export const LevelDataVar = [
     status: 'notSetup',
     keeper1ButtonText: 'Share Recovery Key 1',
     keeper2ButtonText: 'Share Recovery Key 2',
-    keeper1: {
-      ...obj, shareType: 'primaryKeeper'
-    },
+    keeper1: obj,
     keeper2: obj,
     note:'Manage Level 2 backup/ recovery keys',
     info:'Double Backup',

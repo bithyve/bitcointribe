@@ -24,6 +24,10 @@ import AppInfo from '../../../pages/MoreOptions/AppInfo/Appinfo'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import { translations } from '../../../common/content/LocContext'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
+import WalletBackupStack from './WalletBackupStack'
+import WalletOption from '../../../pages/MoreOptions/WalletOption/WalletOption'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -37,7 +41,12 @@ const MoreOptionsStack = createStackNavigator(
       },
     },
     Launch,
-    Login,
+    Login:{
+      screen: Login,
+      navigationOptions: {
+        header: null
+      }
+    },
     Intermediate,
     ReLogin: {
       screen: ReLogin,
@@ -51,6 +60,9 @@ const MoreOptionsStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
     },
     PasscodeChangeSuccessPage: {
       screen: PasscodeChangeSuccessPage,
@@ -121,6 +133,12 @@ const MoreOptionsStack = createStackNavigator(
       navigationOptions: {
         header: null,
         // tabBarVisibl
+      },
+    },
+    SeedBackup: {
+      screen: WalletBackupStack,
+      navigationOptions: {
+        header: null,
       },
     },
   },

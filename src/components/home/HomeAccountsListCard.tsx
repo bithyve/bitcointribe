@@ -17,6 +17,7 @@ import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import { translations } from '../../common/content/LocContext'
+import { Shadow } from 'react-native-shadow-2'
 
 export type Props = {
   accountShell: AccountShell;
@@ -161,12 +162,14 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
 
   return (
-    <View style={opacityChange ? {
-      ...styles.rootContainer, opacity:0.3
-    } : styles.rootContainer}>
-      <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
-      <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
-    </View>
+    <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[ 7, 7 ]}>
+      <View style={opacityChange ? {
+        ...styles.rootContainer, opacity:0.3
+      } : styles.rootContainer}>
+        <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
+        <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
+      </View>
+    </Shadow>
   )
 }
 
@@ -184,20 +187,21 @@ const styles = StyleSheet.create( {
     // borderColor: Colors.borderColor,
     // borderWidth: 1,
     paddingHorizontal: 12,
-    paddingVertical: widthPercentageToDP( 2.5 ),
+    paddingVertical: widthPercentageToDP( 4.5 ),
     backgroundColor: Colors.white,
     justifyContent: 'space-between',
-    shadowColor: Colors.shadowColor,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 10, height: 10
-    },
-    elevation: 6
+    // shadowColor: 'red',
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // elevation: 6,
   },
 
   headerSectionContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginBottom:0,
   },
 
   headerAccountSync: {
@@ -257,10 +261,10 @@ const styles = StyleSheet.create( {
   },
 
   subtitleText: {
-    marginTop: widthPercentageToDP( 0.5 ),
+    marginTop: widthPercentageToDP( 1 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 10 ),
   },
 
   balanceRow: {

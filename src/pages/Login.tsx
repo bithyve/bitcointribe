@@ -7,7 +7,9 @@ import {
   StatusBar,
   Platform,
   BackHandler,
-  Linking
+  Linking,
+  Keyboard,
+  Alert
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -41,6 +43,14 @@ import Relay from '../bitcoin/utilities/Relay'
 import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { setCloudBackupStatus } from '../store/actions/cloud'
+import { setOpenToApproval } from '../store/actions/BHR'
+import SecurityQuestion from './NewBHR/SecurityQuestion'
+import Toast from '../components/Toast'
+import SecuritySeedWord from './NewBHR/SecuritySeedWord'
+import AlertModalContents from '../components/AlertModalContents'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -56,16 +66,29 @@ export default function Login( props ) {
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
+  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
+  const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
+
   const getRandomMessage = () => {
     //const randomIndex = Math.floor( Math.random() * 5 )
     //return strings.loaderMessages[ randomIndex ]
     // added static message for 2.0.5 #4833
     return {
-      heading: 'Gift Sats',
-      text: 'Send sats as gifts to your friends and family.',
+      // heading: 'Gift Sats',
+      // text: 'Send sats as gifts to your friends and family.',
+      heading: 'Backup phrase',
+      text: 'New backup method: Now note down twelve-word phrase (seed words) to backup your wallet',
       subText: ''
     }
   }
+  const [
+    questionModal,
+    showQuestionModal,
+  ] = useState( false )
+  const [
+    secuiritySeedWordModal,
+    showSecuiritySeedWordModal,
+  ] = useState( false )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
   const [ subTextMessage1 ] = useState( initialMessage.text )
@@ -76,11 +99,15 @@ export default function Login( props ) {
   const [ JailBrokenInfo, setJailBrokenInfo ] = useState( '' )
   const [ passcodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
+  const [ attempts, setAttempts ] = useState( 0 )
   // const [ loaderBottomSheet ] = useState(
   //   React.createRef<BottomSheet>(),
   // )
   const [ loaderModal, setloaderModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
+  const [ showAlertModal, setShowAlertModal ]=useState( false )
+  const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
+  const [ info, setInfo ] = useState( '' )
 
   const [ ErrorBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
@@ -94,6 +121,7 @@ export default function Login( props ) {
   const [ processedLink, setProcessedLink ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
   const [ creationFlag, setCreationFlag ] = useState( false )
+  const [ ranSeedWord, setRanSeedWord ] = useState( null )
 
   const onPressNumber = useCallback(
     ( text ) => {
@@ -118,6 +146,7 @@ export default function Login( props ) {
 
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    dispatch( setOpenToApproval( false, [], null ) )
     Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
@@ -179,10 +208,10 @@ export default function Login( props ) {
         setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
-            'Your phone does not have any secure entry like Pin or Biometric',
+            'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'This may be a security risk to your funds on Hexa',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Hexa',
           )
           setElevation( 0 )
         }, 2 )
@@ -327,7 +356,7 @@ export default function Login( props ) {
       setTimeout( () => {
         // loaderBottomSheet.current.snapTo( 0 )
         setloaderModal( false )
-      }, 2 )
+      }, 300 )
 
       return (
         <View style={{
@@ -339,11 +368,61 @@ export default function Login( props ) {
     }
   }
 
+  const onPasscodeReset= () => {
+    setCheckAuth( false )
+    setAttempts( 0 )
+    Toast( 'Passcode reset successfully, please login with new passcode' )
+  }
+
+  const renderSecurityQuestionContent = useCallback( () => {
+    return (
+      <SecurityQuestion
+        onClose={() => showQuestionModal( false )}
+        onPressConfirm={async () => {
+          Keyboard.dismiss()
+          showQuestionModal( false )
+          props.navigation.navigate( 'SettingGetNewPin', {
+            oldPasscode: '',
+            onPasscodeReset:onPasscodeReset
+          } )
+        }}
+        title="Enter your Passphrase"
+        title1="Forgot Passcode"
+        note="You will be prompted to change your passcode"
+        onPasscodeVerify={()=>{ showQuestionModal( true )  }}
+        showAnswer={false}
+      />
+    )
+  }, [ questionModal ] )
+
+  const renderSeedWordContent = useCallback( () => {
+    return (
+      <SecuritySeedWord
+        onClose={() => showSecuiritySeedWordModal( false )}
+        onPressConfirm={async () => {
+          Keyboard.dismiss()
+          showSecuiritySeedWordModal( false )
+          props.navigation.navigate( 'SettingGetNewPin', {
+            oldPasscode: '',
+            onPasscodeReset:onPasscodeReset
+          } )
+        }}
+        title="Enter your backup phrase Details"
+        title1="Forgot Passcode"
+        note="You will be prompted to change your passcode"
+        onPasscodeVerify={()=>{ showSecuiritySeedWordModal( true )  }}
+        showAnswer={false}
+      />
+    )
+  }, [ questionModal ] )
+
+
   useEffect( () => {
     if ( authenticationFailed && passcode ) {
       setCheckAuth( true )
       checkPasscode()
       setPasscode( '' )
+      setAttempts( attempts + 1 )
     } else {
       setCheckAuth( false )
     }
@@ -531,31 +610,71 @@ export default function Login( props ) {
             </View>
           </View>
 
-          {passcode.length == 4 ? (
-            <View>
-              <TouchableOpacity
-                disabled={isDisabledProceed}
-                onPress={() => {
-                  setCheckAuth( false )
-                  setTimeout( () => {
-                    setIsDisabledProceed( true )
-                    setElevation( 0 )
-                  }, 2 )
-                  setTimeout( () => setloaderModal( true ), 2 )
-                  handleLoaderMessages( passcode )
-                }}
-                style={{
-                  ...styles.proceedButtonView,
-                  elevation: Elevation,
-                  backgroundColor: isDisabledProceed
-                    ? Colors.lightBlue
-                    : Colors.blue,
-                }}
-              >
-                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}>
+            <TouchableOpacity
+              disabled={passcode.length !==4}
+              onPress={() => {
+                setCheckAuth( false )
+                setTimeout( () => {
+                  setIsDisabledProceed( true )
+                  setElevation( 0 )
+                }, 2 )
+                setTimeout( () => setloaderModal( true ), 2 )
+                handleLoaderMessages( passcode )
+              }}
+              style={{
+                ...styles.proceedButtonView,
+                elevation: Elevation,
+                backgroundColor: isDisabledProceed
+                  ? Colors.lightBlue
+                  : Colors.blue,
+              }}
+            >
+              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+            </TouchableOpacity>
+
+            {
+              attempts >= 3&&(
+                <TouchableOpacity
+                  style={{
+                    ...styles.proceedButtonView,
+                    elevation: Elevation,
+                    marginHorizontal: 15,
+                  }}
+                  onPress={()=> {
+                    if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+                      setJailBrokenTitle( strings.EncryptionKeyNotSet )
+                      setJailBrokenInfo( strings.Youcanreset )
+                      setErrorModal( true )
+                      return
+                    }
+                    if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
+                      // showSecuiritySeedWordModal( true )
+                      // Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
+                      ( async function() {
+                        try {
+                          const SeedWord = await AsyncStorage.getItem( 'randomSeedWord' )
+                          setRanSeedWord( JSON.parse( SeedWord ) )
+                        } catch ( e ) {
+                          console.error( e )
+                        }
+                      } )()
+                      setConfirmSeedWordModal( true )
+                    }else {
+                      showQuestionModal( true )
+                    }
+                  }}>
+                  <Text style={{
+                    color: Colors.blue,
+                    fontFamily: Fonts.FiraSansMedium
+                  }}>{strings.ForgotPasscode}</Text>
+                </TouchableOpacity>
+              )
+            }
+          </View>
         </View>
 
         <View style={{
@@ -714,6 +833,43 @@ export default function Login( props ) {
       <ModalContainer onBackground={()=>setErrorModal( false )} visible={errorModal} closeBottomSheet={() => {}}>
         {renderErrorModalContent()}
       </ModalContainer>
+      <ModalContainer onBackground={()=>showQuestionModal( false )} visible={questionModal} closeBottomSheet={() => {showQuestionModal( false )}} >
+        {renderSecurityQuestionContent()}
+      </ModalContainer>
+      <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
+        closeBottomSheet={() => setConfirmSeedWordModal( false )}  showBlurView={true}>
+        <ConfirmSeedWordsModal
+          proceedButtonText={'Confirm'}
+          seedNumber={ranSeedWord != null ? ranSeedWord.id :1}
+          onPressProceed={( word ) => {
+            setConfirmSeedWordModal( false )
+            if( word == '' ){
+              setTimeout( () => {
+                setInfo( 'Please enter backup phrase' )
+                setShowAlertModal( true )
+              }, 500 )
+            } else if( word !=  ranSeedWord.name  ){
+              setTimeout( () => {
+                setInfo( 'Please enter valid backup phrase' )
+                setShowAlertModal( true )
+              }, 500 )
+            } else {
+              props.navigation.navigate( 'SettingGetNewPin', {
+                oldPasscode: '',
+                onPasscodeReset:onPasscodeReset
+              } )
+              // dispatch(setSeedBackupHistory())
+            }
+          }}
+          bottomBoxInfo={false}
+          onPressIgnore={() => setConfirmSeedWordModal( false )}
+          isIgnoreButton={true}
+          cancelButtonText={'Cancel'}
+        />
+      </BottomInputModalContainer>
+      {/* <ModalContainer onBackground={()=>showSecuiritySeedWordModal( false )} visible={secuiritySeedWordModal} closeBottomSheet={() => {showSecuiritySeedWordModal( false )}} >
+        {renderSeedWordContent()}
+      </ModalContainer> */}
       {/* <BottomSheet
         onCloseEnd={() => {
           setElevation( 10 )
@@ -730,6 +886,20 @@ export default function Login( props ) {
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       /> */}
+      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          // modalRef={this.ErrorBottomSheet}
+          // title={''}
+          // info={'In case you have forgotten passcode, please setup the wallet again and restore it'}
+          info={info}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

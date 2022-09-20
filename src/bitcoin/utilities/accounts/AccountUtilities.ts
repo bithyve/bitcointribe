@@ -12,6 +12,7 @@ import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 import idx from 'idx'
+import { generateRandomString } from '../../../common/CommonFunctions'
 
 
 const { REQUEST_TIMEOUT } = config
@@ -45,9 +46,9 @@ export default class AccountUtilities {
     else return bitcoinJS.networks.bitcoin
   }
 
-  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number ): string => {
+  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number, debug?: boolean ): string => {
     const { series, upperBound } = config.ACCOUNT_INSTANCES[ accountType ]
-    if( instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
+    if( !debug && instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
     const accountNumber = series + instanceNumber
 
     if( type === NetworkType.TESTNET ) return `m/49'/1'/${accountNumber}'`
@@ -257,7 +258,8 @@ export default class AccountUtilities {
     for ( let itr = 0; itr <= closingExtIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
       }, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
@@ -275,7 +277,8 @@ export default class AccountUtilities {
     for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( {
         primary: account.xpub,
-        ...( account as MultiSigAccount ).xpubs
+        secondary: ( account as MultiSigAccount ).xpubs.secondary,
+        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
       }, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
@@ -367,7 +370,8 @@ export default class AccountUtilities {
         if( ( account as MultiSigAccount ).is2FA )
           changeAddress = AccountUtilities.createMultiSig( {
             primary: account.xpub,
-            ...( account as MultiSigAccount ).xpubs
+            secondary: ( account as MultiSigAccount ).xpubs.secondary,
+            bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
           }, 2, network, nextFreeChangeAddressIndex, true ).address
         else
           changeAddress = AccountUtilities.getAddressByIndex(
@@ -396,6 +400,104 @@ export default class AccountUtilities {
     return outputs
   };
 
+  static fetchSelectedAccountBalance = async (
+    address: string,
+    network: bitcoinJS.Network,
+  ): Promise<
+    {
+      balance: string
+    }> => {
+    let res: AxiosResponse
+    try {
+      const accountToAddressMapping = {
+      }
+      accountToAddressMapping[ address ] = {
+        External: [ address ],
+        Internal: [],
+        Owned: [],
+      }
+
+      let usedFallBack = false
+      try{
+        if ( network === bitcoinJS.networks.testnet ) {
+          res = await accAxios.post(
+            config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        } else {
+          res = await accAxios.post(
+            config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+            accountToAddressMapping,
+          )
+        }
+      } catch( err ){
+        if( config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN === config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN ) throw new Error( err.message ) // not using own-node
+
+        if( !config.USE_ESPLORA_FALLBACK ){
+          Toast( 'We could not connect to your node.\nTry connecting to the BitHyve node- Go to settings ....' )
+          throw new Error( err.message )
+        }
+        console.log( 'using Hexa node as fallback(fetch-balTx)' )
+
+        usedFallBack = true
+        // if ( network === bitcoinJS.networks.testnet ) {
+        //   res = await accAxios.post(
+        //     config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+        //     accountToAddressMapping,
+        //   )
+        // } else {
+        //   res = await accAxios.post(
+        //     config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+        //     accountToAddressMapping,
+        //   )
+        // }
+      }
+
+      const accountToResponseMapping = res.data
+      // const temp:  Array<{
+      //   txId: string;
+      //   vout: number;
+      //   value: number;
+      //   address: string;
+      //   status?: any;
+      // }> = null
+      for( const accountId of Object.keys( accountToResponseMapping ) ){
+        // const cachedUTXOs = temp
+
+        const { Utxos, Txs } = accountToResponseMapping[ accountId ]
+        const UTXOs = []
+        // (re)categorise UTXOs
+        if ( Utxos )
+          for ( const addressSpecificUTXOs of Utxos ) {
+            for ( const utxo of addressSpecificUTXOs ) {
+              const { value, Address, status, vout, txid } = utxo
+              let include = true
+              UTXOs.forEach( ( cachedUTXO ) => {
+                if( cachedUTXO.txId === txid && cachedUTXO.address === Address ) {
+                  if( status.confirmed && !cachedUTXO.status.confirmed ) cachedUTXO.status = status
+                  include = false
+                }
+              } )
+
+              if( include ) UTXOs.push( {
+                txId: txid, vout, value, address: Address, status
+              } )
+            }
+          }
+
+        if( usedFallBack )
+          Toast( 'We could not connect to your own node.\nRefreshed using the BitHyve node....' )
+        let balance = ''
+        if( UTXOs.length >= 1 ) {
+          balance = UTXOs[ 0 ].value
+        }
+        balance
+      }
+    } catch ( err ) {
+      return err
+    }
+  }
+
   static fetchBalanceTransactionsByAccounts = async (
     accounts: {[id: string]: {
     activeAddresses: ActiveAddresses,
@@ -411,7 +513,6 @@ export default class AccountUtilities {
     }>,
     cachedTxs: Transaction[],
     cachedTxIdMap: {[txid: string]: string[]},
-    cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
     accountType: string,
@@ -437,7 +538,6 @@ export default class AccountUtilities {
       }>;
       txIdMap:  {[txid: string]: string[]},
       transactions: Transaction[];
-      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       activeAddresses: ActiveAddresses;
@@ -526,10 +626,9 @@ export default class AccountUtilities {
       }
 
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName, transactionsNote } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, accountType, primaryAccType, accountName, transactionsNote } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
         const UTXOs = cachedUTXOs
-
         // (re)categorise UTXOs
         if ( Utxos )
           for ( const addressSpecificUTXOs of Utxos ) {
@@ -673,7 +772,10 @@ export default class AccountUtilities {
           addresses.forEach( address => {
             if( activeAddresses.external[ address ] ){
               activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
-              if( tx.transactionType === TransactionType.RECEIVED ) tx.sender = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.name )
+              if( tx.transactionType === TransactionType.RECEIVED ){
+                tx.sender = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.name )
+                tx.senderId = idx( activeAddresses.external[ address ], _ => _.assignee.senderInfo.id )
+              }
               else if( tx.transactionType === TransactionType.SENT ) {
                 const recipientInfo = idx( activeAddresses.external[ address ], _ => _.assignee.recipientInfo )
                 if( recipientInfo ) tx.receivers =  recipientInfo[ tx.txid ]
@@ -693,8 +795,6 @@ export default class AccountUtilities {
           if( tx.confirmations > 6 ){
             const addresses = txIdMap[ tx.txid ]
             addresses.forEach( address => {
-              // if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
-              // else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
               if( activeAddresses.external[ address ] ) delete activeAddresses.external[ address ]
               else if( activeAddresses.internal[ address ] ) delete activeAddresses.internal[ address ]
             } )
@@ -710,7 +810,6 @@ export default class AccountUtilities {
           UTXOs,
           txIdMap,
           transactions,
-          addressQueryList: cachedAQL,
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
           activeAddresses,
@@ -730,6 +829,71 @@ export default class AccountUtilities {
         err
       } )
       throw new Error( 'Fetching balance-txn by addresses failed' )
+    }
+  }
+
+  static fetchBalanceTransactionByAddresses = async ( addresses: string[], network: bitcoinJS.networks.Network ): Promise<{
+    confirmedUTXOs: any[];
+    unconfirmedUTXOs: any[];
+    balances: {
+        confirmed: number;
+        unconfirmed: number;
+    };
+}> => {
+    const identifier = generateRandomString( 10 )
+    const accountToAddressMapping= {
+      [ identifier ]:{
+        External: addresses,
+        Internal: [],
+        Owned: [],
+      }
+    }
+
+    let res
+    try{
+      if ( network === bitcoinJS.networks.testnet ) {
+        res = await accAxios.post(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
+          accountToAddressMapping,
+        )
+      } else {
+        res = await accAxios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
+          accountToAddressMapping,
+        )
+      }
+    } catch( err ){ console.log( err ) }
+
+    const accountToResponseMapping = res.data
+    const { Utxos } = accountToResponseMapping[ identifier ]
+    const confirmedUTXOs = []
+    const unconfirmedUTXOs = []
+    const balances = {
+      confirmed: 0, unconfirmed: 0
+    }
+
+    if( Utxos ){
+      for ( const addressSpecificUTXOs of Utxos ) {
+        for ( const utxo of addressSpecificUTXOs ) {
+          const { value, Address, status, vout, txid } = utxo
+          if( status.confirmed ){
+            confirmedUTXOs.push( {
+              txId: txid, vout, value, address: Address, status
+            } )
+            balances.confirmed += utxo.value
+
+          } else {
+            unconfirmedUTXOs.push( {
+              txId: txid, vout, value, address: Address, status
+            } )
+            balances.unconfirmed += utxo.value
+          }
+        }
+      }
+    }
+
+    return {
+      confirmedUTXOs, unconfirmedUTXOs, balances
     }
   }
 
@@ -1037,9 +1201,11 @@ export default class AccountUtilities {
     setupSuccessful: boolean;
   }> => {
 
-    const xpubs = []
-    if( account.xpub ) xpubs.push( account.xpub )
-    else xpubs.push( ...Object.values( ( account as MultiSigAccount ).xpubs ) )
+    const xpubs = [ account.xpub ]
+    if( ( account as MultiSigAccount ).is2FA ){
+      xpubs.push( ( account as MultiSigAccount ).xpubs.secondary )
+      xpubs.push( ( account as MultiSigAccount ).xpubs.bithyve )
+    }
 
     let res: AxiosResponse
     try {

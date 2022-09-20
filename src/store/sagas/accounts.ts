@@ -1,4 +1,4 @@
-import { call, delay, put, select } from 'redux-saga/effects'
+import { all, call, delay, put, select } from 'redux-saga/effects'
 import { createWatcher } from '../utils/utilities'
 import {
   GET_TESTCOINS,
@@ -51,6 +51,7 @@ import {
   updateAccountSettings,
 } from '../actions/accounts'
 import {
+  setAllowSecureAccount,
   updateWalletImageHealth
 } from '../actions/BHR'
 import {
@@ -74,6 +75,7 @@ import {
   Trusted_Contacts,
   UnecryptedStreamData,
   Wallet,
+  LNNode
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -95,6 +97,7 @@ import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/Hexa
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import LightningSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
 
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
@@ -106,6 +109,8 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
+import RESTUtils from '../../utils/ln/RESTUtils'
+import { Alert } from 'react-native'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -137,7 +142,7 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
-export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, shouldEncrypt?: boolean, generateShortLink?: boolean ) {
+export async function generateGiftLink( giftToSend: Gift, walletName: string, fcmToken: string, themeId: GiftThemeId, note?: string, encryptionType?: DeepLinkEncryptionType, generateShortLink?: boolean, secretPhrase?: string, secretPhraseHint?: string ) {
   const encryptionKey = BHROperations.generateKey( config.CIPHER_SPEC.keyLength )
   try{
     giftToSend.status = GiftStatus.SENT
@@ -152,10 +157,17 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
     giftToSend.note = note
     giftToSend.sender.walletName = walletName
     giftToSend.themeId = themeId
+
+    let previousChannelAddress
+    if( giftToSend.channelAddress ) previousChannelAddress = giftToSend.channelAddress // gift is being resent
     giftToSend.channelAddress = giftToSend.id.slice( 0, 10 ) + Math.floor( Math.random() * 10e4 )
 
     const giftMetaData: GiftMetaData = {
       status: giftToSend.status,
+      validity: giftToSend.validitySpan? {
+        sentAt: giftToSend.timestamps.sent,
+        validitySpan: giftToSend.validitySpan
+      }: null,
       exclusiveGiftCode: giftToSend.exclusiveGiftCode,
       notificationInfo: {
         walletId: giftToSend.sender.walletId,
@@ -163,35 +175,61 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       }
     }
 
-    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData ) // non-awaited upload
+    Relay.updateGiftChannel( encryptionKey, giftToSend, giftMetaData, previousChannelAddress ) // non-awaited upload
 
-    let deepLinkEncryptionOTP
-    if( shouldEncrypt ) {
-      deepLinkEncryptionOTP = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
-      giftToSend.deepLinkConfig = {
-        encryptionType: DeepLinkEncryptionType.OTP,
-        encryptionKey: deepLinkEncryptionOTP,
-      }
-    } else {
-      giftToSend.deepLinkConfig = null // removes previous link config(if any)
+    let deepLinkEncryptionKey
+    switch ( encryptionType ) {
+        case DeepLinkEncryptionType.DEFAULT:
+          giftToSend.deepLinkConfig = null // removes previous link config(if any)
+          break
+
+        case DeepLinkEncryptionType.OTP:
+          deepLinkEncryptionKey = TrustedContactsOperations.generateKey( 6 ).toUpperCase()
+          giftToSend.deepLinkConfig = {
+            encryptionType: DeepLinkEncryptionType.OTP,
+            encryptionKey: deepLinkEncryptionKey,
+          }
+          break
+
+        case DeepLinkEncryptionType.LONG_OTP:
+          deepLinkEncryptionKey = TrustedContactsOperations.generateKey( 15 ).toUpperCase()
+          giftToSend.deepLinkConfig = {
+            encryptionType: DeepLinkEncryptionType.LONG_OTP,
+            encryptionKey: deepLinkEncryptionKey,
+          }
+          break
+
+        case DeepLinkEncryptionType.SECRET_PHRASE:
+          deepLinkEncryptionKey = secretPhrase
+          giftToSend.deepLinkConfig = {
+            encryptionType: DeepLinkEncryptionType.SECRET_PHRASE,
+            encryptionKey: deepLinkEncryptionKey,
+          }
+          break
+
+        default:
+          giftToSend.deepLinkConfig = null // removes previous link config(if any)
+          break
     }
 
-    const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
+    const { deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, shortLink } = await generateDeepLink( {
       deepLinkKind: DeepLinkKind.GIFT,
-      encryptionType: shouldEncrypt? DeepLinkEncryptionType.OTP: DeepLinkEncryptionType.DEFAULT,
-      encryptionKey: deepLinkEncryptionOTP,
+      encryptionType: encryptionType? encryptionType: DeepLinkEncryptionType.DEFAULT,
+      encryptionKey: deepLinkEncryptionKey,
       walletName: walletName,
       keysToEncrypt: encryptionKey,
-      generateShortLink,
+      generateShortLink: encryptionType !== DeepLinkEncryptionType.DEFAULT ? generateShortLink: false,
       extraData: {
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
         note,
-        themeId: giftToSend.themeId
+        themeId: giftToSend.themeId,
+        giftHint: secretPhraseHint
       }
     } )
+
     return {
-      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
+      updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, deepLinkEncryptionOTP: deepLinkEncryptionKey, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
     }
   } catch( err ){
     console.log( 'An error occured while generating gift: ', err )
@@ -245,7 +283,7 @@ function* updatePaymentAddressesToChannels( activeAddressesWithNewTxsMap: {
     } )
 }
 
-function* syncAccountsWorker( { payload }: {payload: {
+export function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
   options: {
     hardRefresh?: boolean;
@@ -514,7 +552,24 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
   const { token } = payload
   try {
     const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
-    if ( valid ) yield put( twoFAValid( true ) )
+    if ( valid ){
+      const details2FA = {
+        ...wallet.details2FA,
+        twoFAValidated: true
+      }
+      const updatedWallet: Wallet = {
+        ...wallet,
+        details2FA
+      }
+      yield put( updateWallet( updatedWallet ) )
+      yield put( twoFAValid( true ) )
+      yield call ( dbManager.updateWallet, {
+        details2FA
+      } )
+      yield put( updateWalletImageHealth( {
+        update2fa: true
+      } ) )
+    }
     else yield put( twoFAValid( false ) )
   } catch ( error ) {
     yield put( twoFAValid( false ) )
@@ -599,6 +654,48 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
+function* refreshLNShellsWorker( { payload }: { payload: {
+  shells: AccountShell[],
+}} ){
+  const accountShells: AccountShell[] = payload.shells
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accounts: Accounts = accountState.accounts
+  yield put( accountShellRefreshStarted( accountShells ) )
+  const accountsToSync: Accounts = {
+  }
+  for( const accountShell of accountShells ){
+    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
+  }
+  const { synchedAccounts } = yield call( syncLnAccountsWorker, {
+    payload: {
+      accounts: accountsToSync,
+    }
+  } )
+  yield put( updateAccountShells( {
+    accounts: synchedAccounts
+  } ) )
+  yield put( recomputeNetBalance() )
+  yield put( accountShellRefreshCompleted( accountShells ) )
+}
+
+function* syncLnAccountsWorker( { payload }: {payload: {
+  accounts: Accounts }} ) {
+  const { accounts } = payload
+  const nodesToSync: LNNode [] = []
+  for( const account of Object.values( accounts ) ){
+    nodesToSync.push( account.node )
+  }
+  const res = yield call( RESTUtils.getNodeBalance, nodesToSync[ 0 ]  )
+  for( const account of Object.values( accounts ) ){
+    account.balances.confirmed = Number( res[ 0 ].total_balance ) + Number( res[ 1 ].balance )
+  }
+  return {
+    synchedAccounts: accounts
+  }
+}
+
 export const refreshAccountShellsWatcher = createWatcher(
   refreshAccountShellsWorker,
   REFRESH_ACCOUNT_SHELLS
@@ -611,17 +708,24 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   )
 
   const shellsToSync: AccountShell[] = []
+  const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
+  const lnShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
       if( !shell.primarySubAccount.isUsable ) continue
 
       switch( shell.primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
+            if( syncAll ) testShellsToSync.push( shell )
             break
 
           case AccountType.DONATION_ACCOUNT:
             donationShellsToSync.push( shell )
+            break
+
+          case AccountType.LIGHTNING_ACCOUNT:
+            lnShellsToSync.push( shell )
             break
 
           default:
@@ -636,6 +740,21 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       options: {
         hardRefresh
       }
+    }
+  } )
+
+  if( syncAll && testShellsToSync.length )  yield call( refreshAccountShellsWorker, {
+    payload: {
+      shells: testShellsToSync,
+      options: {
+        hardRefresh
+      }
+    }
+  } )
+
+  if( lnShellsToSync.length ) yield call( refreshLNShellsWorker, {
+    payload: {
+      shells: lnShellsToSync,
     }
   } )
 
@@ -667,19 +786,26 @@ export function* setup2FADetails( wallet: Wallet ) {
   const { setupData } = yield call( AccountUtilities.setupTwoFA, wallet.walletId )
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
+  const details2FA = {
+    bithyveXpub,
+    twoFAKey
+  }
   const updatedWallet = {
     ...wallet,
-    details2FA: {
-      bithyveXpub,
-      twoFAKey
-    }
+    details2FA
   }
   yield put( updateWallet( updatedWallet ) )
+  yield call( dbManager.updateWallet, {
+    details2FA
+  } )
   return updatedWallet
 }
 
 
 export function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
+  const accountShells: AccountShell[] = yield select(
+    ( state ) => state.accounts.accountShells
+  )
   const network = AccountUtilities.getNetworkByType( account.networkType )
   let primarySubAccount: SubAccountDescribing
 
@@ -757,25 +883,53 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           serviceAccountKind,
         } )
         break
+
+      case AccountType.LIGHTNING_ACCOUNT:
+        primarySubAccount = new LightningSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          node: account.node
+        } )
+        break
   }
 
-  const accountShell = new AccountShell( {
-    primarySubAccount,
-    unit: account.networkType === NetworkType.TESTNET ? BitcoinUnit.TSATS: BitcoinUnit.SATS,
-    displayOrder: 1
+  let accountShell: AccountShell
+  accountShells.forEach( shell => { // during re-creation of a some-how deleted account, if account shell already exists, then update that account shell else create new
+    if( shell.primarySubAccount.id === primarySubAccount.id ){
+      accountShell = {
+        ... shell,
+        primarySubAccount: primarySubAccount
+      }
+    }
   } )
+
+  if( !accountShell ){
+    accountShell = new AccountShell( {
+      primarySubAccount,
+      unit: account.networkType === NetworkType.TESTNET ? BitcoinUnit.TSATS: BitcoinUnit.SATS,
+      displayOrder: 1
+    } )
+  }
+
   accountShell.syncStatus = SyncStatus.COMPLETED
   return accountShell
 }
 
-export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails ) {
+export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number ) {
   const wallet: Wallet = yield select( state => state.storage.wallet )
-  const { walletId, primarySeed, accounts } = wallet
+  const { walletId, accounts } = wallet
+  const dbWallet =  dbManager.getWallet()
+  const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
+  const primarySeed = walletObj.primarySeed
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
   switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
-        const testInstanceCount = ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
+        const testInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
         const testAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.TEST_ACCOUNT,
@@ -789,7 +943,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return testAccount
 
       case AccountType.CHECKING_ACCOUNT:
-        const checkingInstanceCount = ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
+        const checkingInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
         const checkingAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.CHECKING_ACCOUNT,
@@ -805,7 +959,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
       case AccountType.SAVINGS_ACCOUNT:
         // if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
-        const savingsInstanceCount = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
+        const savingsInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
         const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
           walletId,
           type: AccountType.SAVINGS_ACCOUNT,
@@ -824,7 +978,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( is2FAEnabled )
           if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
 
-        const donationInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const donationInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber :( accounts[ accountType ] )?.length | 0
         const donationAccount: DonationAccount = yield call( generateDonationAccount, {
           walletId,
           type: accountType,
@@ -860,7 +1014,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
               break
         }
 
-        const serviceInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const serviceInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ accountType ] )?.length | 0
         const serviceAccount: Account = yield call( generateAccount, {
           walletId,
           type: accountType,
@@ -874,6 +1028,22 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( accountType === AccountType.SWAN_ACCOUNT ) serviceAccount.isUsable = false
 
         return serviceAccount
+
+      case AccountType.LIGHTNING_ACCOUNT:
+        const { node } = accountDetails
+        const lnAccountCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ accountType ] )?.length | 0
+        const lnAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: lnAccountCount,
+          accountName: accountName? accountName: defaultAccountName,
+          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
+          primarySeed,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, lnAccountCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+          node
+        } )
+        return lnAccount
   }
 }
 export interface newAccountDetails {
@@ -881,10 +1051,14 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
+  youtubeURL: string,
+  imageURL: any,
+  node?: LNNode
 }
 export interface newAccountsInfo {
   accountType: AccountType,
-  accountDetails?: newAccountDetails
+  accountDetails?: newAccountDetails,
+  recreationInstanceNumber?: number,
 }
 
 export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[], } ) {
@@ -894,12 +1068,13 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const accountIds = []
   let testcoinsToAccount
 
-  for ( const { accountType, accountDetails } of newAccountsInfo ){
+  for ( const { accountType, accountDetails, recreationInstanceNumber } of newAccountsInfo ){
     const account: Account | MultiSigAccount | DonationAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
-      }
+      },
+      recreationInstanceNumber
     )
     accountIds.push( account.id )
     const accountShell = yield call( generateShellFromAccount, account )
@@ -912,7 +1087,9 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const wallet: Wallet = yield select( state => state.storage.wallet )
   let presentAccounts = _.cloneDeep( wallet.accounts )
   Object.values( ( accounts as Accounts ) ).forEach( account => {
-    if( presentAccounts[ account.type ] ) presentAccounts[ account.type ].push( account.id )
+    if( presentAccounts[ account.type ] ){
+      if( !presentAccounts[ account.type ].includes( account.id ) )  presentAccounts[ account.type ].push( account.id )
+    }
     else presentAccounts = {
       ...presentAccounts,
       [ account.type ]: [ account.id ]
@@ -1052,12 +1229,11 @@ export const mergeAccountShellsWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
     const { qrdata, QRModalHeader, accountShell } = payload
-    const walletDB = yield call( dbManager.getWallet )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const walletId = wallet.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     let secondaryMnemonic
-    const sharesArray = [ walletDB.smShare ]
+    const sharesArray = [ wallet.smShare ]
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
@@ -1078,7 +1254,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const shard: string = res.secondaryData.secondaryMnemonicShard
     sharesArray.push( shard )
     if( sharesArray.length>1 ){
-      secondaryMnemonic = BHROperations.getMnemonics( sharesArray, wallet.security.answer )
+      secondaryMnemonic = BHROperations.getMnemonics( sharesArray )
     }
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
@@ -1087,6 +1263,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     }
   } catch ( error ) {
     yield put( setResetTwoFALoader( false ) )
+    Alert.alert( 'Invalid Wallet 2FA' )
     console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }
@@ -1096,50 +1273,6 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-function parseAA( addresses ) {
-  try {
-    if( addresses.length > 0 ) {
-      const obj = {
-      }
-      addresses.forEach( aa => {
-        const tmp = {
-          index : aa.index
-        }
-        if( aa.assignee ) {
-          const assignee = {
-            ...aa.assignee
-          }
-          if( aa.assignee.recipientInfo ) {
-            const recipientInfo = {
-            }
-            aa.assignee.recipientInfo.forEach( info => {
-              recipientInfo[ info.txid ] = info.recipient
-            } )
-            assignee.recipientInfo = recipientInfo
-            tmp.assignee = assignee
-          }
-        }
-        obj[ aa.address ] = tmp
-      } )
-      return obj
-    } else {
-      return {
-      }
-    }
-  } catch ( error ) {
-    console.log( error )
-    return {
-    }
-  }
-}
-
-function getAA( activeAddresses:{external: [], internal: []} ) {
-  return {
-    external: parseAA( activeAddresses.external ),
-    internal: parseAA( activeAddresses.internal  )
-  }
-}
-
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []
   const accounts: Accounts = {
@@ -1147,11 +1280,14 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account shells for respective accountss
   for ( const account of restoredAccounts ){
     const accountShell: AccountShell = yield call( generateShellFromAccount, account )
+
+    // turn on the UI-level usability flag if savings account is already usable(level 2 completed)
+    if( account.type === AccountType.SAVINGS_ACCOUNT && account.isUsable ) yield put( setAllowSecureAccount( true ) )
+
     accountShell.primarySubAccount.visibility = account.accountVisibility
-    const aa = getAA( account.activeAddresses )
-    account.activeAddresses = aa
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
+    accountShell.primarySubAccount.transactions = account.transactionsMeta
   }
 
   // update redux store & database
@@ -1183,13 +1319,7 @@ export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { p
   // restore account's balance and transactions
   const syncAll = true
   const hardRefresh = true
-
-  yield call( autoSyncShellsWorker, {
-    payload: {
-      syncAll, hardRefresh
-    }
-  } )
-  //yield call( syncTxAfterRestore, restoredAccounts )
+  yield put( autoSyncShells( syncAll, hardRefresh ) )
 }
 
 export const restoreAccountShellsWatcher = createWatcher(
@@ -1197,7 +1327,7 @@ export const restoreAccountShellsWatcher = createWatcher(
   RESTORE_ACCOUNT_SHELLS,
 )
 
-export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean, exclusiveGifts?: boolean }} ) {
+export function* generateGiftstWorker( { payload } : {payload: { amounts: number[], accountId?: string, includeFee?: boolean, exclusiveGifts?: boolean, validity?: number }} ) {
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
@@ -1221,7 +1351,7 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
   }
 
   try{
-    const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee, payload.exclusiveGifts )
+    const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee, payload.exclusiveGifts, payload.validity )
     if( txid ) {
       const giftIds = []
       for( const giftId in gifts ){
@@ -1250,7 +1380,7 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
 
   } catch( err ){
     yield put( giftCreationSuccess( false ) )
-    Toast( 'Transaction failed due to dust limit. Please increase the gift amount and try' )
+    Toast( err.message )
   }
 }
 

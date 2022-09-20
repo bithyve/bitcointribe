@@ -68,16 +68,12 @@ export default function EditWalletName( props ) {
       >
         <TouchableOpacity
           disabled={!(
-            answer.trim() === confirmAnswer.trim() &&
-              confirmAnswer.trim() &&
-              answer.trim() && answerError.length === 0
+            answer.trim() && answerError.length === 0
           )}
           onPress={()=>props.onPressConfirm( answer )}
           style={{
             ...styles.buttonView, backgroundColor: !(
-              answer.trim() === confirmAnswer.trim() &&
-                  confirmAnswer.trim() &&
-                  answer.trim() && answerError.length === 0
+              answer.trim() && answerError.length === 0
             ) ? Colors.lightBlue : Colors.blue, elevation: Elevation
           }}
         >
@@ -152,25 +148,27 @@ export default function EditWalletName( props ) {
           }}
         >
           <TextInput
+            maxLength={10}
             style={styles.modalInputBox}
             placeholder={strings.Enternewwalletname}
             placeholderTextColor={Colors.borderColor}
             value={answer}
             autoCompleteType="off"
             textContentType="none"
-            returnKeyType="next"
+            returnKeyType="done"
             autoCorrect={false}
             editable={isEditable}
             autoCapitalize="none"
-            onSubmitEditing={() =>
-              ( confirmAnswerTextInput as any ).current.focus()
-            }
+            // onSubmitEditing={() =>
+            //   props.onPressConfirm( answer )
+            // }
             keyboardType={
               Platform.OS == 'ios'
                 ? 'ascii-capable'
                 : 'visible-password'
             }
             onChangeText={( text ) => {
+              text = text.replace( /[^A-Za-z]/g, '' )
               setAnswer( text )
             }}
             onFocus={() => {
@@ -204,20 +202,21 @@ export default function EditWalletName( props ) {
           ) : null} */}
         </View>
         <View
-          style={{
-            ...confirmInputStyle,
-            marginBottom: 15,
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingRight: 15,
-            marginTop: 10,
-            borderColor: answerError ? Colors.red : Colors.white,
-            backgroundColor: Colors.white,
-            width: wp( 80 )
-          }}
+          // style={{
+          //   ...confirmInputStyle,
+          //   marginBottom: 15,
+          //   flexDirection: 'row',
+          //   alignItems: 'center',
+          //   paddingRight: 15,
+          //   marginTop: 10,
+          //   borderColor: answerError ? Colors.red : Colors.white,
+          //   backgroundColor: Colors.white,
+          //   width: wp( 80 )
+          // }}
         >
-          <TextInput
+          {/* <TextInput
             style={styles.modalInputBox}
+            maxLength = {10}
             ref={confirmAnswerTextInput}
             placeholder={strings.Confirmnewwalletname}
             placeholderTextColor={Colors.borderColor}
@@ -234,7 +233,7 @@ export default function EditWalletName( props ) {
             editable={isEditable}
             autoCapitalize="none"
             onChangeText={( text ) => {
-              setTempAns( text )
+              setTempAns( text.replace( /[^A-Za-z]/g, '' ) )
             }}
             onSubmitEditing={handleSubmit}
             onFocus={() => {
@@ -251,7 +250,7 @@ export default function EditWalletName( props ) {
               setConfirmAnswerInputStyle( styles.inputBox )
               handleSubmit()
             }}
-          />
+          /> */}
           {/* {tempAns ? (
             <TouchableWithoutFeedback
               onPress={() => {

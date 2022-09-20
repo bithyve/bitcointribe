@@ -12,41 +12,53 @@ import {
   credsAuthenticated,
   switchSetupLoader,
   switchReLogin,
-  INIT_RECOVERY,
   CHANGE_AUTH_CRED,
+  RESET_PIN,
   credsChanged,
   pinChangedFailed,
-  initializeRecoveryCompleted,
   completedWalletSetup,
-  WALLET_SETUP_COMPLETION,
   updateApplication,
   UPDATE_APPLICATION,
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup, updateWalletImageHealth } from '../actions/BHR'
+import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange, upgradePDF, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
+import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet, WalletDB } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
-import { newAccountShellCreationCompleted, updateAccountSettings } from '../actions/accounts'
+import { newAccountShellCreationCompleted } from '../actions/accounts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import AccountShell from '../../common/data/models/AccountShell'
-import semver from 'semver'
-
+import semverLte from 'semver/functions/lte'
+import { applyUpgradeSequence } from './upgrades'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
-  const primaryMnemonic = bip39.generateMnemonic( 256 )
+  const { walletName, security, mnemonic }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string } = payload
+  let primaryMnemonic = null
+  if( mnemonic && mnemonic != null )
+    primaryMnemonic = mnemonic
+  else primaryMnemonic = bip39.generateMnemonic( )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 
-  const wallet: Wallet = {
+  // const wallet: Wallet = {
+  //   walletId,
+  //   walletName,
+  //   userName: walletName,
+  //   security,
+  //   primaryMnemonic,
+  //   primarySeed: primarySeed.toString( 'hex' ),
+  //   accounts: {
+  //   },
+  //   version: DeviceInfo.getVersion()
+  // }
+  const walletDB: Wallet = {
     walletId,
     walletName,
     userName: walletName,
@@ -57,13 +69,27 @@ function* setupWalletWorker( { payload } ) {
     },
     version: DeviceInfo.getVersion()
   }
-
+  const wallet: Wallet = {
+    walletId,
+    walletName,
+    userName: walletName,
+    security,
+    // primaryMnemonic: '',
+    // primarySeed: '',
+    accounts: {
+    },
+    version: DeviceInfo.getVersion()
+  }
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
-  yield call( dbManager.createWallet, wallet )
+  yield call( dbManager.createWallet, walletDB )
   // prepare default accounts for the wallet
-  const accountsInfo: newAccountsInfo[] = [];
-  [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ].forEach( ( accountType ) => {
+
+  const accountsInfo: newAccountsInfo[] = []
+  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ]
+  // !newBie && accountArray.splice( 0, 1 )
+  accountArray.forEach( ( accountType ) => {
+
     const accountInfo: newAccountsInfo = {
       accountType
     }
@@ -107,8 +133,48 @@ export const credentialStorageWatcher = createWatcher(
   STORE_CREDS,
 )
 
+function* resetPasswordWorker( { payload } ) {
+  try {
+    yield put( setPasswordResetState( 'init' ) )
+    const wallet: Wallet = yield select( state => state.storage.wallet )
+    const { security } = wallet
+    const oldSecurity =  {
+      ...security
+    }
+    console.log( oldSecurity )
+    yield put( updateWallet( {
+      ...wallet,
+      security: payload
+    } ) )
+    yield call( dbManager.updateWallet, {
+      ...wallet,
+      security: payload
+    } )
+    // update cloud
+    yield call( updateCloudBackupWorker )
+    // update shares
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
+    const { metaSharesKeeper, oldMetaSharesKeeper } = yield select( ( state ) => state.bhr )
+    const metaShares: MetaShare[] = [ ...metaSharesKeeper ]
+
+    const { updatedMetaShares, updatedOldMetaShares }: {updatedMetaShares:MetaShare[], updatedOldMetaShares:MetaShare[]} = yield call( BHROperations.encryptMetaSharesWithNewAnswer, metaShares, oldMetaSharesKeeper, wallet.security.answer, payload.answer, payload )
+    yield put( updateMetaSharesKeeper( updatedMetaShares ) )
+    yield put( updateOldMetaSharesKeeper( updatedOldMetaShares ) )
+    yield call( dbManager.updateBHR, {
+      metaSharesKeeper: updatedMetaShares,
+      oldMetaSharesKeeper: updatedOldMetaShares
+    } )
+
+    yield put( setPasswordResetState( 'completed' ) )
+    yield put ( resetLevelsAfterPasswordChange() )
+    yield put( setPasswordResetState( '' ) )
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+
 function* credentialsAuthWorker( { payload } ) {
-  console.clear()
   // let t = timer('credentialsAuthWorker')
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
@@ -119,6 +185,8 @@ function* credentialsAuthWorker( { payload } ) {
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
+    console.log( 'err', err )
+
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
     return
@@ -181,6 +249,34 @@ function* changeAuthCredWorker( { payload } ) {
   }
 }
 
+function* resetPinWorker( { payload } ) {
+  const { newPasscode } = payload
+  try {
+    const key = yield select( ( state ) => state.storage.key )
+    // setup new pin
+    const newHash = yield call( Cipher.hash, newPasscode )
+    const encryptedKey = yield call( Cipher.encrypt, key, newHash )
+
+    //store the AES key against the hash
+    if ( !( yield call( SecureStore.store, newHash, encryptedKey ) ) ) {
+      throw new Error( 'Unable to access secure store' )
+    }
+    yield put( credsChanged( 'changed' ) )
+  } catch ( err ) {
+    console.log( {
+      err
+    } )
+    yield put( pinChangedFailed( true ) )
+    // Alert.alert('Pin change failed!', err.message);
+    yield put( credsChanged( 'not-changed' ) )
+  }
+}
+
+export const resetPinCredWatcher = createWatcher(
+  resetPinWorker,
+  RESET_PIN,
+)
+
 export const changeAuthCredWatcher = createWatcher(
   changeAuthCredWorker,
   CHANGE_AUTH_CRED,
@@ -188,16 +284,19 @@ export const changeAuthCredWatcher = createWatcher(
 
 
 function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, previousVersion: string }} ) {
-  const { newVersion } = payload
+  const { newVersion, previousVersion } = payload
 
-  // update wallet version
   const wallet: Wallet = yield select( state => state.storage.wallet )
+  const levelData: LevelData[] = yield select( ( state ) => state.bhr.levelData )
+  const storedVersion = wallet.version
+  // update wallet version
   yield put( updateWallet( {
     ...wallet,
     version: newVersion
   } ) )
-  yield call( dbManager.updateWallet, {
-    version: newVersion
+
+  yield call( applyUpgradeSequence, {
+    storedVersion, newVersion
   } )
 
   // update permanent channels w/ new version
@@ -228,6 +327,11 @@ function* applicationUpdateWorker( { payload }: {payload: { newVersion: string, 
   yield put( updateWalletImageHealth( {
     updateVersion: true
   } ) )
+  if( semverLte( previousVersion, '2.0.6' ) ){
+    if( levelData.find( value=>value.keeper1.shareType == 'pdf' || value.keeper2.shareType == 'pdf' ) ){
+      yield put( upgradePDF() )
+    }
+  }
 }
 
 export const applicationUpdateWatcher = createWatcher(

@@ -33,7 +33,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-            marginTop: wp( 3 ), marginRight: wp( 3 )
+            marginTop: wp( 3 ), marginRight: wp( 3 ) , marginBottom:wp(-4),zIndex:999
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
@@ -42,12 +42,13 @@ export default function TestAccountKnowMoreSheetContents( props ) {
         </TouchableOpacity>
         <AppBottomSheetTouchableWrapper
           style={{
-            justifyContent: 'center', alignItems: 'center'
+            justifyContent: 'center', alignItems: 'center',
           }}
           activeOpacity={10}
           onPress={() => props.titleClicked && props.titleClicked()}
         >
           <Text style={styles.headerText}>Gift Sats</Text>
+          
         </AppBottomSheetTouchableWrapper>
         <ScrollView
           ref={scrollViewRef}
@@ -66,7 +67,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '1%' ),
               }}
             >
-              Hexa creates a link or QR code for you that allows you to send bitcoin as gifts to anyone using Hexa wallet.
+              Hexa creates a link or QR code that allows you to send sats as gifts to anyone using Hexa Wallet
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -79,8 +80,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '15%' ),
               }}
             >
-              {/* {strings.test2} */}
-              You can manage these Gifts from here. Send them when you want to and even reclaim them if not accepted. The recipient will be directed to download Hexa if they don’t have one.
+              You can manage these Gifts from here. Send them when you want to and reclaim them if not accepted. The recipient will be directed to download Hexa wallet if they don't have it already
             </Text>
           </View>
         </ScrollView>

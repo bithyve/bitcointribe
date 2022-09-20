@@ -54,6 +54,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { LocalizationContext } from '../../common/content/LocContext'
 import Gift from '../../assets/images/svgs/icon_gift.svg'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -188,7 +189,7 @@ class FriendsAndFamilyScreen extends React.Component<
       const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
       if( contact.isActive ){
         if( isGuardian || isWard ){
-          if( isGuardian && ( keeperInfo.findIndex( value=> value.channelKey == channelKey && ( value.type == 'device' || value.type == 'primaryKeeper' || value.type == 'pdf' ) ) === -1 && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) ) keepers.push(  makeContactRecipientDescription(
+          if( isGuardian && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) keepers.push(  makeContactRecipientDescription(
             channelKey,
             contact,
             ContactTrustKind.KEEPER_OF_USER,
@@ -575,11 +576,11 @@ class FriendsAndFamilyScreen extends React.Component<
                 } )
               }}
               style={{
-                ...styles.selectedContactsView,
+                ...styles.selectedContactsView,backgroundColor: Colors.lightBlue,
               }}
             >
               <Text style={[ styles.contactText, {
-                fontSize: RFValue( 24 ),
+                fontSize: RFValue( 24 ), lineHeight:30
               } ]}>+</Text>
               {/* <Image
                     style={styles.addGrayImage}
@@ -605,7 +606,7 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }}
           >
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
               style={{
                 width: '90%',
@@ -625,9 +626,8 @@ class FriendsAndFamilyScreen extends React.Component<
                 paddingHorizontal: wp( 4.5 )
               }}>
               <View style={[ styles.subInfo, {
-                // marginBottom: hp( 3 )
               } ]}>
-                <Gift />
+                <CheckingAcc />
                 <View style={{
                   flex: 1, marginHorizontal: wp( 2 )
                 }}>
@@ -646,13 +646,13 @@ class FriendsAndFamilyScreen extends React.Component<
                     marginTop: 3,
                     width: '85%',
                   }}>
-                    {this.strings[ 'giftSubText' ]}
+                    {this.strings[ 'giftSubTextF&F' ]}
                   </Text>
 
                 </View>
                 <RightArrow />
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <View style={{
               marginTop: wp( '5%' )
             }}>

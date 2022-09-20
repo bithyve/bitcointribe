@@ -18,6 +18,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import semver from 'semver'
 
 const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -46,6 +47,20 @@ const DashedLargeContainer = ( props ) => {
       } else {
         return numberWithCommas( sats )
       }
+    }
+  }
+
+  const getText = text => {
+    try {
+      if( semver.gte( props.version, '2.0.66' ) ){
+        return Buffer.from( text, 'hex' ).toString( 'utf-8' )
+      } else {
+        return text.replace( /%20/g, ' ' )
+      }
+
+    } catch ( error ) {
+      console.log( error )
+      return text.replace( /%20/g, ' ' )
     }
   }
 
@@ -83,7 +98,7 @@ const DashedLargeContainer = ( props ) => {
         padding: wp( 3 )
       }}>
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'
+          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between',
         }}>
           <View>
             <Text style={{
@@ -102,9 +117,9 @@ const DashedLargeContainer = ( props ) => {
               letterSpacing: 0.55,
               lineHeight: RFValue( 15 ),
               fontFamily: Fonts.FiraSansRegular,
-              marginRight: wp( 9 )
+              marginRight: wp( 3 ),
             }}>
-              {'You have received a gift from '}
+              {'You have received a bitcoin gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),
@@ -112,7 +127,7 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {'\nYou can choose to add the sats to any of your accounts, or forward the gift to any of your friends and family (at no extra fees!)'}
+              {!props.isAccept ? '\n\nClick on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet': '\n\nYou can either add the sats to an Account or retain it to forward to your loved ones.'}
             </Text>
           </View>
           {props.date &&
@@ -132,16 +147,17 @@ const DashedLargeContainer = ( props ) => {
           flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: hp( 1 )
         }}>
 
-          <View>
+          <View style={{
+            flex: 1
+          }}>
             <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 12 ),
               letterSpacing: 0.12,
               lineHeight: 18,
-              fontFamily: Fonts.FiraSansRegular,
-              width: wp( '63%' )
+              fontFamily: Fonts.FiraSansItalic,
             }}>
-              {props.extraText}
+              {props.extraText ? props.isSend ? props.extraText.replace( /%20/g, ' ' ): getText( props.extraText ) : ''}
             </Text>
             <Text style={{
               color: Colors.blue,

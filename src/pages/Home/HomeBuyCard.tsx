@@ -20,6 +20,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
 import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
 import { LocalizationContext } from '../../common/content/LocContext'
+import {Shadow} from 'react-native-shadow-2';
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -88,22 +89,23 @@ const HomeBuyCard = ( {
   const { translations, formatString } = useContext( LocalizationContext )
   const strings = translations[ 'home' ]
   return (
-    <View
-      style={cardContainer}
-    >
+    <Shadow startColor={Colors.shadowColor} distance={0} offset={[8,8] }
+      viewStyle={cardContainer}
+     >
       <View>
         <Text style={{
           color: Colors.blue,
-          fontSize: RFValue( 10 ),
-          // marginLeft: 2,
+          fontSize: RFValue( 11 ),
+          marginLeft: 5,
           fontFamily: Fonts.FiraSansRegular,
           alignSelf: 'flex-start',
-          letterSpacing: 0.33
+          letterSpacing: 0.33,
+          fontWeight:'500'
         }}>
           {formatString( strings.btcTo, fiatCurrencyCode )}
         </Text>
         <View style={{
-          flexDirection: 'row', marginTop: hp( '1' ), alignItems: 'center'
+          flexDirection: 'row', marginTop: hp( '0.4' ), alignItems: 'center'
         }}>
           {materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
           // setCurrencyCodeToImage(
@@ -112,7 +114,7 @@ const HomeBuyCard = ( {
           // )
             <MaterialCurrencyCodeIcon
               currencyCode={fiatCurrencyCode}
-              color={Colors.blue}
+              color={Colors.gray9}
               size={wp( '3.5%' )}
               style={{
                 width: wp( 4 )
@@ -125,10 +127,11 @@ const HomeBuyCard = ( {
               {setCurrencyCodeToImage( getCurrencyImageName( currencyCode ), Colors.blue )}
             </Text>
           )}
-          <Text>{amount ? amount : '--'}</Text>
+          <Text style={{fontSize:17,color:'#8B8B8B'}}>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>
       </View>
+    <Shadow startColor={Colors.shadowBlue} distance={11} offset={[9 ,10] }>
       <TouchableOpacity
         // icon={
         //   <Image
@@ -142,15 +145,15 @@ const HomeBuyCard = ( {
         // }
         style={{
           borderRadius: wp( 2 ),
-          paddingVertical: wp( 2.7 ),
+          paddingVertical: wp( 2.5 ),
           paddingHorizontal: wp( 4 ),
           backgroundColor: Colors.blue,
-          shadowColor: Colors.shadowBlue,
-          shadowOpacity: 1,
-          shadowOffset: {
-            width: 15, height: 15
-          },
-          elevation: 15
+          // shadowColor: Colors.shadowBlue,
+          // shadowOpacity: 1,
+          // shadowOffset: {
+          //   width: 9, height: 10
+          // },
+          // elevation: 15
         }}
         onPress={() =>
           openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
@@ -162,7 +165,8 @@ const HomeBuyCard = ( {
           {strings.buy}
         </Text>
       </TouchableOpacity>
-    </View>
+    </Shadow>
+  </Shadow>
   )
 }
 // const styles = StyleSheet.create( {

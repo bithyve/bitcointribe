@@ -48,7 +48,11 @@ import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestio
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
+import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
+import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
+import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import Header from '../Header'
@@ -56,6 +60,10 @@ import QRStack from '../home/QRStack'
 import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
 import  FNFToKeeper from '../../../pages/NewBHR/FNFToKeeper'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
+import { translations } from '../../../common/content/LocContext'
+import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
+
+const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
@@ -87,6 +95,9 @@ const SecurityStack = createStackNavigator(
     Intermediate,
     AccountDetails: {
       screen: AccountDetailsStack,
+    },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
     },
     QRScanner: {
       screen: QRStack,
@@ -132,7 +143,7 @@ const SecurityStack = createStackNavigator(
       },
     },
     PersonalCopyHistoryNewBHR,
-    CloudBackupHistory,
+    // CloudBackupHistory,
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,
@@ -145,27 +156,49 @@ const SecurityStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
+    BackupSeedWordsContent: {
+      screen: BackupSeedWordsContent,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null
       },
     },
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null
       },
     },
     WyreIntegrationScreen: {
       screen: WyreIntegrationScreen,
       navigationOptions: {
-        title: 'Wyre Home'
+        title: 'Wyre Home',
+        header: null
       }
     },
     RequestKeyFromContact,
     TrustedContactNewBHR,
-    SetNewPassword
+    SetNewPassword,
+    CloudBackupHistory: {
+      screen: CloudBackupHistory,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    SeedBackupHistory: {
+      screen: SeedBackupHistory,
+      navigationOptions: {
+        header: null,
+      },
+    },
   },
   {
     headerLayoutPreset: 'center',

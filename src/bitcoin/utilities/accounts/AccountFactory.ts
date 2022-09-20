@@ -1,4 +1,4 @@
-import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType } from '../Interface'
+import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
@@ -12,7 +12,8 @@ export function generateAccount(
     accountDescription,
     primarySeed,
     derivationPath,
-    networkType
+    networkType,
+    node
   }: {
     walletId: string,
     type: AccountType,
@@ -22,6 +23,7 @@ export function generateAccount(
     primarySeed: string,
     derivationPath: string,
     networkType: NetworkType,
+    node?: LNNode
   }
 ): Account {
 
@@ -63,16 +65,13 @@ export function generateAccount(
     lastSynched: 0,
     txIdMap: {
     },
-    addressQueryList: {
-      external: {
-      },
-      internal: {
-      }
-    },
     transactionsNote: {
     },
     importedAddresses: {
     },
+  }
+  if( type === AccountType.LIGHTNING_ACCOUNT ) {
+    account.node = node
   }
 
   return account
@@ -121,7 +120,15 @@ export function generateMultiSigAccount(
   }
 
   let initialRecevingAddress = ''
-  const id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
+
+  let id
+  if( type === AccountType.SAVINGS_ACCOUNT && instanceNum === 0 ){
+    const secondary = undefined
+    const bithyve = undefined
+    id = crypto.createHash( 'sha256' ).update( primaryXpub + secondary + bithyve ).digest( 'hex' ) // recreation consistency(id) for saving's account first instance
+  }
+  else id = crypto.createHash( 'sha256' ).update( primaryXpub + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
+
   let isUsable = false
   if( secondaryXpub ){
     initialRecevingAddress = AccountUtilities.createMultiSig( {
@@ -165,12 +172,6 @@ export function generateMultiSigAccount(
     transactions: [],
     lastSynched: 0,
     txIdMap: {
-    },
-    addressQueryList: {
-      external: {
-      },
-      internal: {
-      }
     },
     transactionsNote: {
     },

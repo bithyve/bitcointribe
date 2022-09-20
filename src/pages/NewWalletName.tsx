@@ -1,5 +1,4 @@
-import React, { useContext, useState, createRef } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useContext, useState, createRef, useEffect, useCallback } from 'react'
 import {
   StyleSheet,
   View,
@@ -26,7 +25,7 @@ import {
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
-import HeaderTitle from '../components/HeaderTitle'
+import HeaderTitle1 from '../components/HeaderTitle1'
 import BottomInfoBox from '../components/BottomInfoBox'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { updateCloudPermission } from '../store/actions/BHR'
@@ -38,6 +37,12 @@ import { Easing } from 'react-native-reanimated'
 import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
 import ModalContainer from '../components/home/ModalContainer'
 import { LocalizationContext } from '../common/content/LocContext'
+import { useDispatch, useSelector } from 'react-redux'
+import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
+import { setVersion } from '../store/actions/versionHistory'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { initNewBHRFlow } from '../store/actions/BHR'
+import LoaderModal from '../components/LoaderModal'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -63,27 +68,35 @@ export default function NewWalletName( props ) {
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
+  const common = translations[ 'common' ]
+  const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
+  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
+  const [ loaderModal, setLoaderModal ] = useState( false )
+  const [ subTextMessage, setSubTextMessage ] = useState( strings.Thismay )
+  const [ bottomTextMessage ] = useState( strings.Hexaencrypts )
+  const subPoints = [ strings.multi, strings.creatingbackup, strings.preloading ]
+  const [ message, setMessage ] = useState( strings.Creatingyourwallet )
+  const [ signUpStarted, setSignUpStarted ] = useState( false )
+  const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
 
-  // useEffect( () => {
-  //   if( timeLeft===0 ){
-  //     props.autoClose()
-  //     setTimeLeft( null )
-  //   }
-  //   if ( !timeLeft ) return
-  //   const intervalId = setInterval( () => {
-  //     setTimeLeft( timeLeft - 1 )
-  //     if( timeLeft - 1 == 2 ){ setTimerArray( [ 1, 1, 0 ] )
-  //     } else if( timeLeft - 1 == 1 ){
-  //       setTimerArray( [ 1, 0, 0 ] )
-  //     }
-  //     else if( timeLeft - 1 == 0 ){
-  //       setTimerArray( [ 0, 0, 0 ] )
-  //     }
-  //   }, 1000 )
-  //   console.log( 'timeLeft', timeLeft )
-  //   setIntervalRef( intervalId )
-  //   return () => { clearInterval( intervalId ) }
-  // }, [ timeLeft ] )
+  useEffect( () => {
+    if ( walletSetupCompleted ) {
+      setLoaderModal( false )
+      props.navigation.navigate( 'HomeNav', {
+        walletName,
+      } )
+    }
+  }, [ walletSetupCompleted, cloudBackupStatus ] )
+
+  const renderLoaderModalContent = useCallback( () => {
+    return <LoaderModal
+      // headerText={'Gift Sats'}
+      // messageText={'Send sats as gifts to your friends and family.'}
+      headerText={'Backup phrase'}
+      messageText={'New backup method: Now note down twelve-word phrase (seed words) to backup your wallet'}
+      showGif={false}
+    />
+  }, [ message, subTextMessage, loaderModal ] )
 
   const renderBottomSheetContent = () =>{
 
@@ -92,7 +105,8 @@ export default function NewWalletName( props ) {
           return (
             <CloudPermissionModalContents
               title={'Automated Cloud Backup'}
-              info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              // info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              info={'Backup the wallet to easily restore it in case your phone gets damaged or lost'}
               note={''}
               onPressProceed={( flag )=>{
                 closeBottomSheet()
@@ -154,6 +168,15 @@ export default function NewWalletName( props ) {
     onBottomSheetClosed()
   }
 
+  const onBackgroundOfLoader = () => {
+    setLoaderModal( false )
+    if ( signUpStarted )
+      setTimeout( () => {
+        console.log( 'TIMEOUT' )
+        setLoaderModal( true )
+      }, 100 )
+  }
+
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -162,6 +185,9 @@ export default function NewWalletName( props ) {
       <View style={{
         flex: 1
       }}>
+        <ModalContainer onBackground={() => onBackgroundOfLoader()} visible={loaderModal} closeBottomSheet={null}>
+          {renderLoaderModalContent()}
+        </ModalContainer>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -188,10 +214,10 @@ export default function NewWalletName( props ) {
           <View style={{
             flex: 1
           }} >
-            <HeaderTitle
-              firstLineTitle={strings.Step1}
-              secondLineBoldTitle={'New Wallet '}
-              secondLineTitle={strings.creation}
+            <HeaderTitle1
+              firstLineTitle={`${strings.Step1}`}
+              secondLineBoldTitle={strings.NameyourWallet}
+              secondLineTitle={''}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -228,7 +254,13 @@ export default function NewWalletName( props ) {
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
-                {strings.numbers}</Text>
+                {strings.WalletCreationNumbers}</Text>
+              {/* <Text style={{
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                alignSelf: 'flex-end'
+              }}>
+                {strings.numbers}</Text> */}
             </View>
           </View>
           {/* </KeyboardAvoidingView> */}
@@ -251,16 +283,28 @@ export default function NewWalletName( props ) {
               >
                 <TouchableOpacity
                   onPress={() => {
+                    setLoaderModal( true )
                     Keyboard.dismiss()
-                    props.navigation.navigate( 'NewWalletQuestion', {
-                      walletName,
-                    } )
-                  // setIsCloudPermissionRender( true )
-                  // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+                    // props.navigation.navigate( 'NewWalletQuestion', {
+                    //   walletName,
+                    // } )
+                    setTimeout( () => {
+                      setSignUpStarted( true )
+                      dispatch( updateCloudPermission( false ) )
+                      dispatch( setupWallet( walletName, null, mnemonic ) )
+                      dispatch( initNewBHRFlow( true ) )
+                      dispatch( setVersion( 'Current' ) )
+                      const current = Date.now()
+                      AsyncStorage.setItem( 'SecurityAnsTimestamp', JSON.stringify( current ) )
+                      const securityQuestionHistory = {
+                        created: current,
+                      }
+                      AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
+                    }, 1000 )
                   }}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>{strings.Next}</Text>
+                  <Text style={styles.buttonText}>{common.proceed}</Text>
                 </TouchableOpacity>
               </View>
             ) : null}

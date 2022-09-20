@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkImage, ShortLinkTitle, ShortLinkDescription, Trusted_Contacts, Accounts, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
-import { Alert } from 'react-native'
+import { Alert, Linking } from 'react-native'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
@@ -47,6 +47,10 @@ export const isEmpty = ( obj ) => {
   return Object.keys( obj ).every( ( k ) => !Object.keys( obj[ k ] ).length )
 }
 export const  buildVersionExists = ( versionData ) =>{
+  if( typeof versionData == 'string' ){
+    versionData = JSON.parse( versionData )
+  }
+
   return (
     ( versionData.filter( version => version.buildNumber == DeviceInfo.getBuildNumber() ).length > 0 )
     &&
@@ -169,13 +173,14 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   }
 }
 
-export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer, accountShells,
+export const WIEncryption = async ( accounts: Accounts, encKey, contacts: Trusted_Contacts, walletDB, answer, accountShells,
   activePersonalNode,
   versionHistory,
   restoreVersions, ) => {
   const acc = {
   }
-  accounts.forEach( account => {
+
+  Object.values( accounts ).forEach( account => {
     const cipher = crypto.createCipheriv(
       BHROperations.cipherSpec.algorithm,
       encKey,
@@ -201,7 +206,7 @@ export const WIEncryption = async ( accounts, encKey, contacts, walletDB, answer
     details2FA: walletDB.details2FA,
   }
   const channelIds = []
-  contacts.forEach( contact => {
+  Object.values( contacts ).forEach( contact => {
     channelIds.push( contact.channelKey )
   } )
   if( channelIds.length > 0 ) {
@@ -350,7 +355,44 @@ export const getDeepLinkKindFromContactsRelationType = ( contactRelationType: Tr
   return deepLinkKind
 }
 
-export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any } ) => {
+const getLinkImage = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkImage.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT
+   || linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+   || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ) {
+    return ShortLinkImage.FF
+  } else {
+    return ''
+  }
+}
+
+const getLinkTitle = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkTitle.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT
+   || linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+   || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ) {
+    return ShortLinkTitle.FF
+  } else {
+    return ''
+  }
+}
+
+const getLinkDescription = ( linkType: DeepLinkKind ) => {
+  if( linkType === DeepLinkKind.GIFT ) {
+    return ShortLinkDescription.GIFT
+  } else if( linkType === DeepLinkKind.CONTACT ) {
+    return ShortLinkDescription.FF
+  } else if( linkType === DeepLinkKind.KEEPER || linkType === DeepLinkKind.EXISTING_CONTACT
+    || linkType === DeepLinkKind.PRIMARY_KEEPER || linkType === DeepLinkKind.RECIPROCAL_KEEPER ){
+    return ShortLinkDescription.KEEPER
+  }else {
+    return ''
+  }
+}
+
+export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptionKey, walletName, keysToEncrypt, generateShortLink, extraData, currentLevel }:{ deepLinkKind: DeepLinkKind, encryptionType: DeepLinkEncryptionType, encryptionKey: string, walletName: string, keysToEncrypt: string, generateShortLink?: boolean, extraData?: any, currentLevel?: number } ) => {
 
   let encryptedChannelKeys: string
   let encryptionHint: string
@@ -363,7 +405,16 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
       case DeepLinkEncryptionType.NUMBER:
       case DeepLinkEncryptionType.EMAIL:
       case DeepLinkEncryptionType.OTP:
+      case DeepLinkEncryptionType.LONG_OTP:
         encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
+        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+          keysToEncrypt,
+          encryptionKey
+        )
+        break
+
+      case DeepLinkEncryptionType.SECRET_PHRASE:
+        encryptionHint = `${Buffer.from( extraData.giftHint ).toString( 'hex' )}`
         encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
           keysToEncrypt,
           encryptionKey
@@ -373,15 +424,18 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 
   const appType = config.APP_STAGE
   const appVersion = DeviceInfo.getVersion()
-
   let deepLink: string
+  if( extraData?.note ) {
+    //extraData.note=  extraData.note.replace( / /g, '%20' )
+    extraData.note=`${Buffer.from( extraData.note ).toString( 'hex' )}`
+  }
 
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
     `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}`
+    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
 
   let shortLink = ''
@@ -393,6 +447,8 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         domain = ShortLinkDomain.CONTACT
       } else if( deepLinkKind === DeepLinkKind.GIFT ||  deepLinkKind === DeepLinkKind.CONTACT_GIFT ) {
         domain = ShortLinkDomain.GIFT
+      } else if( deepLinkKind === DeepLinkKind.KEEPER || deepLinkKind === DeepLinkKind.PRIMARY_KEEPER || deepLinkKind === DeepLinkKind.RECIPROCAL_KEEPER ) {
+        domain = ShortLinkDomain.CONTACT
       } else {
         domain = ShortLinkDomain.DEFAULT
       }
@@ -408,7 +464,12 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
           bundleId: DeviceInfo.getBundleId()
         },
         navigation: {
-          forcedRedirectEnabled: false
+          forcedRedirectEnabled:  false
+        },
+        social: {
+          descriptionText: getLinkDescription( deepLinkKind ),
+          title: getLinkTitle( deepLinkKind ),
+          imageUrl: getLinkImage( deepLinkKind ),
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
@@ -425,7 +486,6 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 export const processDeepLink = ( deepLink: string ) => {
   try {
     const splits = deepLink.split( '/' )
-
     // swan link(external)
     if ( splits.includes( 'swan' ) )
       return {
@@ -434,23 +494,33 @@ export const processDeepLink = ( deepLink: string ) => {
         }
       }
 
-    // hexa links
-    if ( splits[ 3 ] !== config.APP_STAGE ){
-      Alert.alert(
-        'Invalid deeplink',
-        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[ 3 ].toUpperCase()
-        }`,
-      )
+    if ( splits.includes( 'wyre' ) ) {
+      if( splits.includes( 'failed' ) ) {
+        Alert.alert( 'Wyre purchase failed', 'Please try again after sometime.' )
+      }
       return
     }
 
+    // hexa links GiftQR
+    // if ( splits[ 3 ] !== config.APP_STAGE ){
+    //   Alert.alert(
+    //     'Invalid deeplink',
+    //     `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+    //       splits[ 3 ].toUpperCase()
+    //     }`,
+    //   )
+    //   return
+    // }
 
+    if( splits[ 4 ] === DeepLinkKind.CAMPAIGN ){
+      return{
+        campaignId:  splits[ 5 ]
+      }
+    }
     const version = splits.pop().slice( 1 )
     const encryptionMetaSplits = splits[ 7 ].split( '-' )
     const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
     const encryptionHint = encryptionMetaSplits[ 1 ]
-
     switch( splits[ 4 ] as DeepLinkKind ){
         case DeepLinkKind.CONTACT:
         case DeepLinkKind.KEEPER:
@@ -512,17 +582,41 @@ export const processDeepLink = ( deepLink: string ) => {
           return {
             trustedContactRequest: trustedContactGiftRequest
           }
+
+        default:
+          throw new Error() // no mechanism to process an otherwise valid link
     }
   }
   catch ( error ) {
-    Alert.alert( 'Invalid/Incompatible link, updating your app might help' )
+    Linking.openURL( deepLink )
+      .then( ( ) => {
+        // console.log('WhatsApp Opened');
+      } )
+      .catch( () => {
+        //
+      } )
+    return
+
   }
 }
 
-export const processRequestQR = ( qrData: string ) => {
-  try {
-    const parsedData = JSON.parse( qrData )
+const isUrl = string => {
+  try { return Boolean( new URL( string ) ) }
+  catch( e ){ return false }
+}
 
+const isJson = ( str ) => {
+  try {
+    JSON.parse( str )
+  } catch ( e ) {
+    return false
+  }
+  return true
+}
+
+export const processRequestQR =async ( qrData: string ) => {
+  if( isJson( qrData ) ) {
+    const parsedData = JSON.parse( qrData )
     let trustedContactRequest, giftRequest
     switch ( parsedData.type ) {
         case QRCodeTypes.CONTACT_REQUEST:
@@ -539,6 +633,7 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -551,7 +646,8 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: true
+            isExistingContact: true,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -564,7 +660,8 @@ export const processRequestQR = ( qrData: string ) => {
             isQR: true,
             version: parsedData.version,
             type: parsedData.type,
-            isExistingContact: false
+            isExistingContact: false,
+            isCurrentLevel0: parsedData.currentLevel == 0 ? true : false
           }
           break
 
@@ -603,12 +700,30 @@ export const processRequestQR = ( qrData: string ) => {
             type: parsedData.type,
           }
           break
-    }
 
+        default:
+          throw new Error() // no mechanism to process an otherwise valid link
+    }
     return {
       trustedContactRequest, giftRequest
     }
-  } catch ( err ) {
-    Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
+  } else {
+    if( isUrl( qrData ) ) {
+      try {
+        const { url } = await dynamicLinks().resolveLink( qrData )
+        if( url ) {
+          return processDeepLink( url )
+        } else {
+          return processDeepLink( qrData )
+        }
+      } catch ( error ) {
+        return processDeepLink( qrData )
+      }
+    } else {
+      Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
+      return {
+      }
+    }
   }
+
 }
