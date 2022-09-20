@@ -741,7 +741,7 @@ class GiftScreen extends React.Component<
               onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
               image={<Gifts />}
             />
-            {/* <GiftBoxComponent
+            <GiftBoxComponent
               titleText={'Claim SATSCARD'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD'}
@@ -751,7 +751,7 @@ class GiftScreen extends React.Component<
                 showVerification:true
               } )}
               image={<Sat_card/>}
-            /> */}
+            />
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}

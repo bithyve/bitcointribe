@@ -1063,7 +1063,7 @@ const CreateGift = ( { navigation }: Props ) => {
         }}>
           <Text style={FormStyles.errorText}>{isAmountInvalid ? strings.Insufficient : ''}</Text>
         </View>
-        {/* {
+        {
           // ( Number( numbersOfGift ) === 1 ) &&
           !isSendMax && (
             <View style={{
@@ -1097,7 +1097,7 @@ const CreateGift = ( { navigation }: Props ) => {
               </TouchableOpacity>
             </View>
           )
-        } */}
+        }
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), justifyContent: 'space-between', marginVertical: height < 720 ? hp( 1 ) : hp( 3 )
         }}>

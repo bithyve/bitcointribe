@@ -57,6 +57,7 @@ export default function SetUpSatNextCardScreen( props ) {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ showNFCModal, setNFCModal ] = useState( false )
   const [ satCardBalance, setSatCardBalance ] = useState( 0 )
+  const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
 
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
@@ -120,7 +121,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useEffect( () => {
     if( !sourceAccountShell ){
-      const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
       const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
       dispatch( sourceAccountSelectedForSending(
         defaultSourceAccount
