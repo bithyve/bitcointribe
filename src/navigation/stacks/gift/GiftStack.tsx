@@ -1,5 +1,19 @@
-import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
+// import Header from '../Header'
+import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+// import Home from '../../../pages/Home/Home'
+// import TabNavigator from '../../TabNavigator'
+import ContactDetails from '../../../pages/Contacts/ContactDetails'
+import CreateGift from '../../../pages/FriendsAndFamily/CreateGift'
+import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
+// import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
+import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
+import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
+import Intermediate from '../../../pages/Intermediate'
+import Launch from '../../../pages/Launch'
+import Login from '../../../pages/Login'
+import ManageGifts from '../../../pages/FriendsAndFamily/ManageGifts'
 // import HomeScreen from '../../../pages/Home/Home'
 // import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen'
 // import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
@@ -13,32 +27,18 @@ import { createStackNavigator } from 'react-navigation-stack'
 // import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 // import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 import QRStack from '../home/QRStack'
-// import Home from '../../../pages/Home/Home'
-// import TabNavigator from '../../TabNavigator'
-import ContactDetails from '../../../pages/Contacts/ContactDetails'
-// import Header from '../Header'
-import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 import QrAndLink from '../../../pages/NewBHR/QrAndLink'
-import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
-import ManageGifts from '../../../pages/FriendsAndFamily/ManageGifts'
-import CreateGift from '../../../pages/FriendsAndFamily/CreateGift'
-import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
-import Launch from '../../../pages/Launch'
-import Login from '../../../pages/Login'
 import ReLogin from '../../../pages/ReLogin'
-import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
-import Intermediate from '../../../pages/Intermediate'
-import AccountDetailsStack from '../accounts/AccountDetailsStack'
-import { translations } from '../../../common/content/LocContext'
+import React from 'react'
+import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import SendGift from '../../../pages/FriendsAndFamily/SendGift'
-import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
-import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
 import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
-import GiftScreen from '../../../pages/Gift/GiftScreen'
+// import GiftScreen from '../../../pages/Gift/GiftScreen'
 import SetUpSatCardScreen from '../../../pages/Gift/SetUpSatCardScreen'
-import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
-import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
-import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import { createStackNavigator } from 'react-navigation-stack'
+import { translations } from '../../../common/content/LocContext'
+// import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
 // const strings  = translations[ 'stackTitle' ]
 
 // const MODAL_ROUTES = [
@@ -53,7 +53,7 @@ import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
 const GiftStack = createStackNavigator(
   {
     Home: {
-      screen: GiftScreen,
+      screen: null,
       navigationOptions: {
         header: null,
         // tabBarVisibl
@@ -126,7 +126,7 @@ const GiftStack = createStackNavigator(
       },
     },
     SetUpSatNextCard:{
-      screen:SetUpSatNextCardScreen,
+      screen:null,
       navigationOptions: {
         header:null
       }
@@ -138,7 +138,7 @@ const GiftStack = createStackNavigator(
       }
     },
     ClaimSats :{
-      screen: ClaimSatsScreen,
+      screen: null,
       navigationOptions: {
         header:null
       }

@@ -26,7 +26,7 @@ import AddressBookHelpContents from '../../components/Helper/AddressBookHelpCont
 import AlertModalContents from '../../components/AlertModalContents'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
-import { CKTapCard } from 'cktap-protocol-react-native'
+// import { CKTapCard } from 'cktap-protocol-react-native'
 import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
 import ClaimSatComponent from './ClaimSatComponent'
 import Colors from '../../common/Colors'
@@ -98,7 +98,7 @@ interface GiftStateTypes {
   claimVerification: boolean;
   showGiftModal: boolean;
   showGiftFailureModal: boolean;
-  cardDetails: CKTapCard | null;
+  // cardDetails: CKTapCard | null;
   showNFCModal: boolean;
   satCardBalance: number | null;
   showAlertModal: boolean,
@@ -115,14 +115,14 @@ class GiftScreen extends React.Component<
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
   helpBottomSheetRef: React.RefObject<BottomSheet>;
   focusListener: any;
-  card: CKTapCard;
+  // card: CKTapCard;
   strings: object;
 
   // card = useRef( new CKTapCard() ).current
   constructor( props, context ) {
     super( props, context )
 
-    this.card = new CKTapCard()
+    // this.card = new CKTapCard()
     this.focusListener = null
     this.addContactAddressBookBottomSheetRef = React.createRef<BottomSheet>()
     this.helpBottomSheetRef = React.createRef<BottomSheet>()
@@ -144,7 +144,7 @@ class GiftScreen extends React.Component<
       claimVerification: false,
       showGiftModal: false,
       showGiftFailureModal: false,
-      cardDetails: null,
+      // cardDetails: null,
       showNFCModal: false,
       satCardBalance: 0,
       showAlertModal: false,
@@ -585,63 +585,63 @@ class GiftScreen extends React.Component<
       // this.props.navigation.navigate( 'ClaimSats', {
       //   fromClaimFlow: 1
       // } )
-      const { response, error } = await this.withModal( async ()=>{
-        const cardData = await this.card.first_look()
-        const { addr:address } = await this.card.address( true, false, 0 )
-        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-        const { balance } = data
-        console.log( {
-          num_slots:cardData.num_slots,
-          active_slot:cardData.active_slot,
-          balance
-        } )
-        return{
-          num_slots:cardData.num_slots,
-          active_slot:cardData.active_slot,
-          balance
-        }
-      } )
-      if( error ){
-        console.log( error )
-        return
-      }
-      const { num_slots, active_slot,  balance } = response
-      this.props.navigation.navigate( 'GiftCreated', {
-        numSlots: num_slots,
-        activeSlot: active_slot,
-        slotFromIndex: !balance?3:4,
-        slotBalance: balance,
-      } )
+      // const { response, error } = await this.withModal( async ()=>{
+      //   const cardData = await this.card.first_look()
+      //   const { addr:address } = await this.card.address( true, false, 0 )
+      //   const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+      //   const { balance } = data
+      //   console.log( {
+      //     num_slots:cardData.num_slots,
+      //     active_slot:cardData.active_slot,
+      //     balance
+      //   } )
+      //   return{
+      //     num_slots:cardData.num_slots,
+      //     active_slot:cardData.active_slot,
+      //     balance
+      //   }
+      // } )
+      // if( error ){
+      //   console.log( error )
+      //   return
+      // }
+      // const { num_slots, active_slot,  balance } = response
+      // this.props.navigation.navigate( 'GiftCreated', {
+      //   numSlots: num_slots,
+      //   activeSlot: active_slot,
+      //   slotFromIndex: !balance?3:4,
+      //   slotBalance: balance,
+      // } )
     } )
   }
 
-  withModal = async ( callback ) => {
-    try {
-      console.log( 'scanning...1' )
-      if( Platform.OS == 'android' )
-        this.setState( {
-          showNFCModal: true
-        } )
-      const resp = await this.card.nfcWrapper( callback )
-      await this.card.endNfcSession()
-      this.setState( {
-        showNFCModal: false
-      } )
-      return {
-        response: resp, error: null
-      }
-    } catch ( error: any ) {
-      console.log( error.toString() )
-      this.setState( {
-        showNFCModal: false,
-        errorMessage: error.toString(),
-        showAlertModal: true
-      } )
-      return {
-        response: null, error: error.toString()
-      }
-    }
-  }
+  // withModal = async ( callback ) => {
+  //   try {
+  //     console.log( 'scanning...1' )
+  //     if( Platform.OS == 'android' )
+  //       this.setState( {
+  //         showNFCModal: true
+  //       } )
+  //     const resp = await this.card.nfcWrapper( callback )
+  //     await this.card.endNfcSession()
+  //     this.setState( {
+  //       showNFCModal: false
+  //     } )
+  //     return {
+  //       response: resp, error: null
+  //     }
+  //   } catch ( error: any ) {
+  //     console.log( error.toString() )
+  //     this.setState( {
+  //       showNFCModal: false,
+  //       errorMessage: error.toString(),
+  //       showAlertModal: true
+  //     } )
+  //     return {
+  //       response: null, error: error.toString()
+  //     }
+  //   }
+  // }
 
   onGiftSuccessClick=()=>{
     this.setState( {
