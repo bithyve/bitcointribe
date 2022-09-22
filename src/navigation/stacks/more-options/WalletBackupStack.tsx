@@ -14,12 +14,26 @@ import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent
 import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
 import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestionHistory'
 import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
+import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
+import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
+import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
+import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
+import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
+import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
 
 const strings  = translations[ 'stackTitle' ]
 
 const WalletBackupStack = createStackNavigator(
   {
-    WalletBackupRoot: {
+    SeedBackupHistory: {
+      screen: SeedBackupHistory,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    WalletBackup: {
       screen: WalletBackup,
       navigationOptions: {
         header: null,
@@ -47,21 +61,54 @@ const WalletBackupStack = createStackNavigator(
         header: null,
       },
     },
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
+    PersonalCopyHistoryNewBHR,
+    SecurityQuestionHistoryNewBHR,
+    AccountSend: {
+      screen: AccountSendContainerScreen,
+    },
+    TwoFAValidation,
+    TwoFASetup: {
+      screen: TwoFASetup,
+      navigationOptions: {
+        gesturesEnabled: false,
+        header: null
+      },
+    },
+    AccountDetails: {
+      screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
+      },
+    },
+    SentAmountForContactForm: {
+      screen: SentAmountForContactFormScreen,
+      navigationOptions: {
+        title: 'Send To'
+      },
+    },
+    SendConfirmation: {
+      screen: AccountSendConfirmationContainerScreen,
+      navigationOptions: {
+        title: 'Send Confirmation',
+
+      },
+    },
+    OTPAuthentication: {
+      screen: OTPAuthenticationScreen,
       navigationOptions: {
         header: null,
       },
     },
-    PersonalCopyHistoryNewBHR,
-    SecurityQuestionHistoryNewBHR: {
-      screen: SecurityQuestionHistoryNewBHR, 
-      navigationOptions: {
-        header: null,
+    CheckPasscode:{
+      screen: CheckPasscodeComponent,
+      navigationOptions:{
+        header:null
       }
-    },
+    }
   },
   {
+    initialRouteName: 'SeedBackupHistory',
     defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,

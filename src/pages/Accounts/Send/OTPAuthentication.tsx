@@ -33,6 +33,7 @@ import LoaderModal from '../../../components/LoaderModal'
 
 
 export default function OTPAuthenticationScreen( { navigation } ) {
+  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
   const txnPriority = navigation.getParam( 'txnPriority' )
   const note = navigation.getParam( 'note' )
   const [ Elevation, setElevation ] = useState( 10 )
@@ -76,6 +77,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
         infoText={'bitcoin successfully sent to Contact'}
         isFromContact={false}
         recipients={sendingState.selectedRecipients}
+        // okButtonText={fromWallet ? 'Back to Wallet' : 'View Account'}
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
         isCancel={false}
@@ -84,11 +86,15 @@ export default function OTPAuthenticationScreen( { navigation } ) {
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
           dispatch( refreshAccountShells( [ sourceAccountShell ], {
           } ) )
+          // if( fromWallet ){
+          //   navigation.navigate( 'WalletBackup' )
+          // } else {
           navigation.dispatch(
             resetStackToAccountDetails( {
               accountShellID: sourceAccountShell.id,
             } )
           )
+          // }
         }}
         onPressCancel={dismissBottomSheet}
         isSuccess={true}
@@ -115,12 +121,15 @@ export default function OTPAuthenticationScreen( { navigation } ) {
         onPressOk={dismissBottomSheet}
         onPressCancel={() => {
           dismissBottomSheet()
-
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
-            } )
-          )
+          if( fromWallet ) {
+            navigation.navigate( 'WalletBackup' )
+          } else {
+            navigation.dispatch(
+              resetStackToAccountDetails( {
+                accountShellID: sourceAccountShell.id,
+              } )
+            )
+          }
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}

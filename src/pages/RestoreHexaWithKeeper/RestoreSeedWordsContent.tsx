@@ -40,7 +40,7 @@ const RestoreSeedWordsContent = ( props ) => {
   const [ showSeedFailedModal, setSeedFailedModal ] = useState( false )
   const [ seedRecovered, setSeedRecovered ] = useState( false )
   const loaderMessage = {
-    heading: translations[ 'bhr' ].Creatingyourwallet,
+    heading: translations[ 'bhr' ].Importingyourwallet,
     text: translations[ 'bhr' ].Thismaytake
   }
   const subPoints = [
@@ -52,6 +52,7 @@ const RestoreSeedWordsContent = ( props ) => {
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
+  const [ mnemonic, setMnemonic ] = useState( null )
 
   useEffect( () => {
     return () => {
@@ -72,15 +73,17 @@ const RestoreSeedWordsContent = ( props ) => {
   useEffect( () => {
     if( restoreSeedData == 'restoreSeedDataFailed' ){
       setLoaderModal( false )
-      setSeedFailedModal( true )
+      props.navigation.navigate( 'NewWalletName', {
+        mnemonic,
+      } )
     }
   }, [ restoreSeedData ] )
 
   const renderSeedErrorModal = () => {
     return (
       <ErrorModalContents
-        title='Invalid Seed'
-        info='Please recheck your seeds and try again'
+        title='Invalid backup phrase'
+        info='Please recheck your phrase and try again'
         proceedButtonText={'Go back'}
         onPressProceed={() => props.navigation.goBack()}
       />
@@ -89,6 +92,7 @@ const RestoreSeedWordsContent = ( props ) => {
 
   const recoverWalletViaSeed = ( mnemonic: string ) => {
     setShowLoader( true )
+    setMnemonic( mnemonic )
     setTimeout( () => {
       const isValidMnemonic = bip39.validateMnemonic( mnemonic )
       if ( !isValidMnemonic ) {
@@ -139,7 +143,7 @@ const RestoreSeedWordsContent = ( props ) => {
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <RestoreSeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Enter Seed Words'}
+        selectedTitle={'Enter backup phrase'}
         moreInfo={''}
       />
       <View style={{

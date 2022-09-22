@@ -63,9 +63,6 @@ export default class AccountUtilities {
     network: bitcoinJS.Network,
     purpose: DerivationPurpose = DerivationPurpose.BIP49,
   ): string => {
-    console.log( 'skk purpose', purpose )
-    console.log( 'skk network', network )
-
     if ( purpose === DerivationPurpose.BIP44 ) {
       return bitcoinJS.payments.p2pkh( {
         pubkey: keyPair.publicKey,

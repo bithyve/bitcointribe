@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
@@ -16,6 +16,7 @@ export type Props = {
   accountShell: AccountShell,
   onAddressEntered: ( address: string ) => void;
   onPaymentURIEntered: ( uri: string ) => void;
+  address: string;
 };
 
 const RecipientAddressTextInputSection: React.FC<Props> = ( {
@@ -25,11 +26,17 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   accountShell,
   onAddressEntered,
   onPaymentURIEntered,
+  address,
 }: Props ) => {
   const [ recipientAddress, setRecipientAddress ] = useState( '' )
   const [ isAddressInvalid, setIsAddressInvalid ] = useState( false )
   const account: Account = useAccountByAccountShell( accountShell )
   const network = AccountUtilities.getNetworkByType( account.networkType )
+
+  useEffect( ()=>{
+    if ( address )
+      handleTextChange( address )
+  }, [ address ] )
 
   function handleTextChange( newValue: string ) {
     const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( newValue.trim(), network )
