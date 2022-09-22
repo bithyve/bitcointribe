@@ -39,6 +39,7 @@ import { editTrustedContact } from '../../store/actions/trustedContacts'
 import HeaderTitle1 from '../../components/HeaderTitle1'
 import { LocalizationContext } from '../../common/content/LocContext'
 import PaginationIcon from '../../assets/images/svgs/pagination_1.svg'
+import CreateFNFInvite from '../../components/friends-and-family/CreateFNFInvite'
 
 export default function AddContactAddressBook(props) {
   let [selectedContacts, setSelectedContacts] = useState([])
@@ -56,6 +57,7 @@ export default function AddContactAddressBook(props) {
   const common = translations['common']
   const [permissionModal, setModal] = useState(false)
   const [permissionErrModal, setErrModal] = useState(false)
+  const [createFNFInvite, setCreateFNFInvite] = useState(false)
   const [
     contactPermissionBottomSheet,
     setContactPermissionBottomSheet,
@@ -317,9 +319,15 @@ export default function AddContactAddressBook(props) {
           contact: selectedContacts,
           setActiveTab: props.navigation.state.params.setActiveTab
         })
-
       } else {
-        props.navigation.navigate('AddContactSendRequest', {
+        setCreateFNFInvite(true)
+      }
+
+    }
+  }
+  const sendRequestToContact = () => {
+    setCreateFNFInvite(false)
+    props.navigation.navigate('AddContactSendRequest', {
           SelectedContact: selectedContacts,
           giftId: props.navigation.state.params?.giftId,
           headerText: strings.addContact,
@@ -329,12 +337,16 @@ export default function AddContactAddressBook(props) {
           showDone: true,
           note: props?.navigation?.state?.params?.note
         })
-      }
-
-    }
   }
-
-
+  const goCreateGifts = () => {
+    console.log('goCreateGifts',props.navigation.state.params?.giftId)
+    setCreateFNFInvite(false)
+    props.navigation.navigate( 'CreateGift',{
+      selectedContact: selectedContacts,
+      statusFlag: 'Invitation',
+      giftId: props.navigation.state.params?.giftId,
+    })
+  }
   const onPressBack = () => {
     props.navigation.goBack()
   }
@@ -730,6 +742,14 @@ export default function AddContactAddressBook(props) {
               isBottomImage={true}
               bottomImage={require('../../assets/images/icons/contactPermission.png')}
             />
+          </ModalContainer>
+          {/* create FNF Invite */}
+          <ModalContainer onBackground={() => setCreateFNFInvite(false)} visible={createFNFInvite} closeBottomSheet={() => { }}>
+              <CreateFNFInvite 
+                closeModal={()=> setCreateFNFInvite(false)}
+                sendRequestToContact={()=> sendRequestToContact()}
+                createGifts={()=> goCreateGifts()}
+              />
           </ModalContainer>
         </View>
       </View>
