@@ -36,7 +36,8 @@ import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendin
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 
 const { height, width } = Dimensions.get( 'window' )
-// const dummySatcardAddress = '2N8yb9sYtwEeysNrSgfqnpdknjFUksRQtnM'
+const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
+// const dummySatcardAddress = '3LcY5MMQXibVJ1RA4XYAeVyfrgbrD1WEzj'
 // const temp = {
 //   'card_nonce':{
 //     'type':'Buffer', 'data':[ 156, 61, 66, 83, 118, 58, 158, 31, 255, 118, 127, 143, 181, 12, 12, 208 ]
@@ -44,6 +45,14 @@ const { height, width } = Dimensions.get( 'window' )
 //     'type':'Buffer', 'data':[ 3, 6, 239, 160, 72, 161, 55, 244, 48, 79, 91, 111, 47, 176, 120, 237, 155, 49, 188, 58, 151, 169, 30, 48, 118, 188, 142, 6, 244, 206, 142, 70, 214 ]
 //   }, 'card_ident':'PLJCZ-CFK24-EMH7F-VPDZF', 'applet_version':'1.0.0', 'birth_height':744019, 'is_testnet':false, 'auth_delay':0, 'is_tapsigner':false, 'path':null, 'num_backups':'NA', 'active_slot':0, 'num_slots':10, '_certs_checked':false
 // }
+const temp = {
+  '_certs_checked': false, 'active_slot': 6, 'applet_version': '0.9.0', 'auth_delay': 0,
+  'birth_height': 730131, 'card_ident': '2BCN2-QJDCZ-COFX5-4N3WS', 'card_nonce': {
+    'data': [ Array ], 'type': 'Buffer'
+  }, 'card_pubkey': {
+    'data': [ Array ], 'type': 'Buffer'
+  }, 'is_tapsigner': false, 'is_testnet': false, 'num_backups': 'NA', 'num_slots': 10, 'path': null
+}
 export default function SetUpSatNextCardScreen( props ) {
   const dispatch = useDispatch()
   const giftAmount = props.navigation?.state?.params?.giftAmount
@@ -52,7 +61,7 @@ export default function SetUpSatNextCardScreen( props ) {
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
-  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>()
+  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( temp )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ showNFCModal, setNFCModal ] = useState( false )
@@ -75,16 +84,17 @@ export default function SetUpSatNextCardScreen( props ) {
   let timeout1
   const flowUpdate = async() =>{
     timeout1 = setTimeout( async() => {
-      const { response, error } = await withModal( getCardData )
-      console.log( {
-        response, error
-      } )
-      if( error ){
-        console.log( error )
-        Alert.alert( error.toString() )
-        return
-      }
-      const { address } = response
+      getCardData()
+      // const { response, error } = await withModal( getCardData )
+      // console.log( {
+      //   response, error
+      // } )
+      // if( error ){
+      //   console.log( error )
+      //   Alert.alert( error.toString() )
+      //   return
+      // }
+      // const { address } = response
 
       timeout1 = setTimeout( () => {
         if ( !cardDetails?.is_tapsigner ) {
@@ -95,7 +105,7 @@ export default function SetUpSatNextCardScreen( props ) {
               timeout1 = setTimeout( async () => {
                 setStepsVerified( 3 )
                 console.log( 'fromClaimFlow===>' + JSON.stringify( fromClaimFlow ) )
-                !fromClaimFlow && handleManualAddressSubmit( address )
+                !fromClaimFlow && handleManualAddressSubmit( dummySatcardAddress )
                 timeout1 = setTimeout( () => {
                   props.navigation.navigate( 'GiftCreated', {
                     numSlots: cardDetails?.num_slots,
@@ -159,22 +169,22 @@ export default function SetUpSatNextCardScreen( props ) {
     }
   }
   async function getCardData() {
-    const cardData = await card.first_look()
-    setCardDetails( cardData )
-    console.log( 'card details===>' + JSON.stringify( cardData ) )
-    if ( cardData && !cardData.is_tapsigner ) {
+    // const cardData = await card.first_look()
+    // setCardDetails( cardData )
+    // console.log( 'card details===>' + JSON.stringify( cardData ) )
+    if ( cardDetails && !cardDetails.is_tapsigner ) {
       console.log( 'came in' )
       try {
         //For Create Flow
-        const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
-        console.log( 'getAddrees===>' + JSON.stringify( address ) )
-        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+        // const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
+        console.log( 'getAddrees===>' + JSON.stringify( dummySatcardAddress ) )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${dummySatcardAddress}` )
         const { balance } = data
         setSatCardBalance( balance )
         console.log( 'balance===>' + JSON.stringify( balance ) )
-        return {
-          address, pubkey
-        }
+        // return {
+        //   cardDetails, cardDetails.card_pubkey
+        // }
       } catch ( err ) {
         console.log( {
           err
@@ -218,7 +228,7 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
-      // console.log( 'skk use acc 1 success' )
+      console.log( 'skk use acc 1 success' )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: TxPriority.LOW,
@@ -234,7 +244,7 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
-      // console.log( 'skk use acc 2 success', txid )
+      console.log( 'skk use acc 2 success', txid )
       if ( txid ) {
         let type
         if ( sourceAccountShell.primarySubAccount.type === undefined ) {
@@ -267,7 +277,7 @@ export default function SetUpSatNextCardScreen( props ) {
     },
     onFailure: ( errorMessage: string | null ) => {
       if ( errorMessage ) {
-        console.log( 'skk111122333' )
+        console.log( 'skk111122333', JSON.stringify( errorMessage ) )
         // setShowAlertModal( true )
 
       }
