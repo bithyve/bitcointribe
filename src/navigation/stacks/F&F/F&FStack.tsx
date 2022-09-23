@@ -34,6 +34,9 @@ import SendGift from '../../../pages/FriendsAndFamily/SendGift'
 import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
 import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
 import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
+import FnFAndSherpaChoice from '../../../pages/FriendsAndFamily/FnFAndSherpaChoice'
+import SherpaStack from '../sherpa/SherpaStack'
+
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -112,7 +115,19 @@ const FriendsAndFamily = createStackNavigator(
         header: null,
       },
     },
-    RequestKeyFromContact
+    RequestKeyFromContact,
+    FnFSherpaChoice: {
+      screen: FnFAndSherpaChoice,
+      navigationOptions: {
+        header: null,
+      }
+    },
+    Sherpa: {
+      screen: SherpaStack,
+      navigationOptions: {
+        header: null,
+      }
+    }
   },
   {
     // mode: 'modal',

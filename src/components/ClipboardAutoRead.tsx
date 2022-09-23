@@ -2,24 +2,28 @@ import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AccountUtilities from "../bitcoin/utilities/accounts/AccountUtilities";
-import {
-  Account,
-  AccountType,
-} from "../bitcoin/utilities/Interface";
+import { Account, AccountType } from "../bitcoin/utilities/Interface";
 import ModalContainer from "./home/ModalContainer";
 import useAccountByAccountShell from "../utils/hooks/state-selectors/accounts/UseAccountByAccountShell";
 import { AccountsState } from "../store/reducers/accounts";
 import NotificationInfoContents from "./NotificationInfoContents";
 import { makeAddressRecipientDescription } from "../utils/sending/RecipientFactories";
-import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from "../store/actions/sending";
+import {
+  addRecipientForSending,
+  amountForRecipientUpdated,
+  recipientSelectedForAmountSetting,
+  sourceAccountSelectedForSending,
+} from "../store/actions/sending";
 import { resetStackToSend } from "../navigation/actions/NavigationActions";
 import { SATOSHIS_IN_BTC } from "../common/constants/Bitcoin";
 import { Satoshis } from "../common/data/typealiases/UnitAliases";
 import { clipboardReadAction } from "../store/actions/doNotStore";
 
-export type IClipboardAutoReadProps = {navigation: any};
+export type IClipboardAutoReadProps = { navigation: any };
 
-const ClipboardAutoRead: React.FC<IClipboardAutoReadProps> = ({navigation}) => {
+const ClipboardAutoRead: React.FC<IClipboardAutoReadProps> = ({
+  navigation,
+}) => {
   const [modalShow, setModalShow] = useState<boolean>(false);
   const [address, setAddress] = useState<string>("");
   const didAccess = useSelector((state) => state.doNotStore.didAccess);
@@ -33,26 +37,26 @@ const ClipboardAutoRead: React.FC<IClipboardAutoReadProps> = ({navigation}) => {
   const network = AccountUtilities.getNetworkByType(account.networkType);
   const dispatcher = useDispatch();
 
-  function onSend( address: string, amount: Satoshis ) {
-    const recipient = makeAddressRecipientDescription( {
-      address
-    } )
+  function onSend(address: string, amount: Satoshis) {
+    const recipient = makeAddressRecipientDescription({
+      address,
+    });
 
-    dispatcher( sourceAccountSelectedForSending(
-      defaultSourceAccount
-    ) )
-    dispatcher( addRecipientForSending( recipient ) )
-    dispatcher( recipientSelectedForAmountSetting( recipient ) )
-    dispatcher( amountForRecipientUpdated( {
-      recipient,
-      amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
-    } ) )
+    dispatcher(sourceAccountSelectedForSending(defaultSourceAccount));
+    dispatcher(addRecipientForSending(recipient));
+    dispatcher(recipientSelectedForAmountSetting(recipient));
+    dispatcher(
+      amountForRecipientUpdated({
+        recipient,
+        amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount,
+      })
+    );
 
     navigation.dispatch(
-      resetStackToSend( {
+      resetStackToSend({
         selectedRecipientID: recipient.id,
-      } )
-    )
+      })
+    );
   }
 
   const checkClipboard = async () => {

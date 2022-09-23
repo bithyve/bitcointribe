@@ -319,12 +319,12 @@ export default function AddContactAddressBook(props) {
         })
 
       } else {
-        props.navigation.navigate('AddContactSendRequest', {
+        props.navigation.navigate('FnFSherpaChoice', {
           SelectedContact: selectedContacts,
           giftId: props.navigation.state.params?.giftId,
           headerText: strings.addContact,
-          subHeaderText: strings.send,
-          contactText: strings.adding,
+          subHeaderText: 'Send a Sherpa Request',
+          contactText: 'Request for Sherpa',
           senderName: props?.navigation?.state?.params?.senderName,
           showDone: true,
           note: props?.navigation?.state?.params?.note
@@ -343,7 +343,7 @@ export default function AddContactAddressBook(props) {
     const skippedContact = {
       id: uuid(),
     }
-    props.navigation.navigate('AddContactSendRequest', {
+    props.navigation.navigate('FnFSherpaChoice', {
       SelectedContact: [skippedContact],
       giftId: props.navigation.state.params?.giftId,
       headerText: strings.addContact,
@@ -664,7 +664,8 @@ export default function AddContactAddressBook(props) {
                 style={{
                   // height: wp( '8%' ),
                   marginTop: hp(1.8),
-                  width: wp('25%'),
+                  // width: wp('25%'),
+                  flex: 1,
                   alignSelf: 'flex-start',
                   paddingLeft: wp('8%'),
                 }}
@@ -742,6 +743,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 'auto',
     marginHorizontal: wp('6%'),
+    marginRight: wp(10),
     marginBottom: hp(2)
   },
   statusIndicatorActiveView: {
