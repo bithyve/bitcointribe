@@ -10,11 +10,13 @@ import {
 import Colors from "../../common/Colors";
 import { AppBottomSheetTouchableWrapper } from "../AppBottomSheetTouchableWrapper";
 import { LocalizationContext } from "../../common/content/LocContext";
+import Gifts from "../../assets/images/satCards/gifts.svg";
+import Add_gifts from "../../assets/images/satCards/Add_gifts.svg";
 
 export type Props = {
   closeModal: () => {};
   sendRequestToContact: () => {};
-  createGifts: () => {}
+  createGifts: () => {};
 };
 
 const CreateFNFInvite = (props: Props) => {
@@ -46,20 +48,53 @@ const CreateFNFInvite = (props: Props) => {
           }
         />
       </AppBottomSheetTouchableWrapper>
-      <View style={{padding: 10}}>
+      <View style={{ padding: 10 }}>
         <View>
-          <Text style={[styles.titleText, {fontSize: RFValue(14), marginBottom: 10}]}>Create an F{"&"}F invite</Text>
+          <Text
+            style={[
+              styles.titleText,
+              { fontSize: RFValue(14), marginBottom: 10 },
+            ]}
+          >
+            Create an F{"&"}F invite
+          </Text>
         </View>
-        <TouchableOpacity style={styles.cardBackView} onPress={()=>props.sendRequestToContact()}>
-          <Text style={[styles.titleText, {fontSize: RFValue(12)}]}>Create Invitation link</Text>
-          <Text style={styles.paragraphTitleText}>Send an invite link to any of your family and friends using generated link</Text>
+        <TouchableOpacity
+          style={styles.cardBackView}
+          onPress={() => props.sendRequestToContact()}
+        >
+          <View style={{width: '15%'}}>
+            <Add_gifts />
+          </View>
+          <View style={{width: '85%'}}>
+            <Text style={[styles.titleText, { fontSize: RFValue(12) }]}>
+              Create Invitation link
+            </Text>
+            <Text style={styles.paragraphTitleText}>
+              Send an invite link to any of your family and friends using
+              generated link
+            </Text>
+          </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.cardBackView} onPress={()=> props.createGifts()}>
-          <Text style={[styles.titleText, {fontSize: RFValue(12)}]}>Create Invitation link with gift</Text>
-          <Text style={styles.paragraphTitleText}>Add gifts when sending an invite link to any of your family and friends using the generated link</Text>
+        <TouchableOpacity
+          style={styles.cardBackView}
+          onPress={() => props.createGifts()}
+        >
+          <View style={{width: '15%'}}>
+            <Gifts />
+          </View>
+          <View style={{width: '85%'}}>
+            <Text style={[styles.titleText, { fontSize: RFValue(12) }]}>
+              Create Invitation link with gift
+            </Text>
+            <Text style={styles.paragraphTitleText}>
+              Add gifts when sending an invite link to any of your family and
+              friends using the generated link
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
-    </View> 
+    </View>
   );
 };
 const styles = StyleSheet.create({
@@ -68,19 +103,24 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   titleText: {
-      color: Colors.blueText,
-      fontWeight: '600',
-      marginBottom: 5
+    color: Colors.blueText,
+    fontWeight: "600",
+    marginBottom: 5,
   },
   paragraphTitleText: {
-      fontSize: 12,
-      color: Colors.gray3
+    fontSize: 12,
+    color: Colors.gray3,
+    textAlign: 'left',
+    flexWrap: 'wrap'
   },
   cardBackView: {
-      backgroundColor: Colors.numberBg,
-      padding: 15,
-      marginVertical: 5,
-      borderRadius: 10
-  }
+    alignItems: 'center',
+    flexDirection: "row",
+    width: "100%",
+    backgroundColor: Colors.numberBg,
+    padding: 15,
+    marginVertical: 5,
+    borderRadius: 10,
+  },
 });
 export default CreateFNFInvite;
