@@ -36,7 +36,7 @@ import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendin
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 
 const { height, width } = Dimensions.get( 'window' )
-const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
+const dummySatcardAddress = '3Ax781srE163xdH9DR9JKPRWooQ3xkbM4m'
 // const dummySatcardAddress = '3LcY5MMQXibVJ1RA4XYAeVyfrgbrD1WEzj'
 // const temp = {
 //   'card_nonce':{
@@ -107,15 +107,15 @@ export default function SetUpSatNextCardScreen( props ) {
                 console.log( 'fromClaimFlow===>' + JSON.stringify( fromClaimFlow ) )
                 !fromClaimFlow && handleManualAddressSubmit( dummySatcardAddress )
                 timeout1 = setTimeout( () => {
-                  props.navigation.navigate( 'GiftCreated', {
-                    numSlots: cardDetails?.num_slots,
-                    activeSlot: cardDetails?.active_slot,
-                    slotFromIndex: fromClaimFlow == 0 ?
-                      satCardBalance == 0 ? 1 : 2
-                      : satCardBalance == 0 ? 3 : 4,
-                    slotBalance:satCardBalance,
-                    giftAmount : satCardBalance == 0 ? giftAmount: 0
-                  } )
+                  // props.navigation.navigate( 'GiftCreated', {
+                  //   numSlots: cardDetails?.num_slots,
+                  //   activeSlot: cardDetails?.active_slot,
+                  //   slotFromIndex: fromClaimFlow == 0 ?
+                  //     satCardBalance == 0 ? 1 : 2
+                  //     : satCardBalance == 0 ? 3 : 4,
+                  //   slotBalance:satCardBalance,
+                  //   giftAmount : satCardBalance == 0 ? giftAmount: 0
+                  // } )
                 }, 2000 )
               }, 2000 )
             }
@@ -264,15 +264,15 @@ export default function SetUpSatNextCardScreen( props ) {
           dispatch( sendTxNotification( txid, null, type ) )
         }
         // setStepsVerified( 3 )
-        // setTimeout( () => {
-        //   props.navigation.navigate( 'GiftCreated', {
-        //     numSlots: cardDetails?.num_slots,
-        //     activeSlot: cardDetails?.active_slot,
-        //     slotFromIndex: fromClaimFlow ?
-        //       cardDetails?.num_backups == 0 ? 1 : 2
-        //       : cardDetails?.num_backups == 0 ? 3 : 4,
-        //   } )
-        // }, 2000 )
+        setTimeout( () => {
+          props.navigation.navigate( 'GiftCreated', {
+            numSlots: cardDetails?.num_slots,
+            activeSlot: cardDetails?.active_slot,
+            slotFromIndex: fromClaimFlow ?
+              cardDetails?.num_backups == 0 ? 1 : 2
+              : cardDetails?.num_backups == 0 ? 3 : 4,
+          } )
+        }, 2000 )
       }
     },
     onFailure: ( errorMessage: string | null ) => {
