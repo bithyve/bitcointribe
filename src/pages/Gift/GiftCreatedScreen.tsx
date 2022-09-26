@@ -1,34 +1,35 @@
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  ImageBackground,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import React, { useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  Platform,
-  ImageBackground,
-  StatusBar,
-  ActivityIndicator,
-  Image,
-  SafeAreaView,
-  Dimensions
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import CommonStyles from '../../common/Styles/Styles'
-import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons'
-import { Shadow } from 'react-native-shadow-2'
+
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import GiftUnwrappedComponent from './GiftUnwrappedComponent'
-import ModalContainer from '../../components/home/ModalContainer'
-import ClaimSatComponent from './ClaimSatComponent'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import ClaimSatComponent from './ClaimSatComponent'
+import Colors from '../../common/Colors'
+import CommonStyles from '../../common/Styles/Styles'
+import Fonts from '../../common/Fonts'
+import GiftUnwrappedComponent from './GiftUnwrappedComponent'
+import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons'
+import ModalContainer from '../../components/home/ModalContainer'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { Shadow } from 'react-native-shadow-2'
 import Tooltip from 'rn-tooltip'
 
 const { height, } = Dimensions.get( 'window' )
@@ -37,7 +38,7 @@ export default function GiftCreatedScreen( props ) {
 
   // const [ activeSlot, setActiveSlot ] = useState( 4 )
   const totalSlots = props.navigation?.state?.params?.numSlots
-  const activeSlot = props.navigation?.state?.params?.activeSlot
+  const activeSlot = props.navigation?.state?.params?.activeSlot -1
   const slotFromIndex = props.navigation?.state?.params?.slotFromIndex
   const giftAmount = props.navigation?.state?.params?.giftAmount ? props.navigation?.state?.params?.giftAmount : null
   const [ claimVerification, setClaimVerification ] = useState( false )

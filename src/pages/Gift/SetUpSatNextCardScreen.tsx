@@ -34,6 +34,7 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import { weekdaysShort } from 'moment'
 
 const { height, width } = Dimensions.get( 'window' )
 const dummySatcardAddress = '3Ax781srE163xdH9DR9JKPRWooQ3xkbM4m'
@@ -45,14 +46,7 @@ const dummySatcardAddress = '3Ax781srE163xdH9DR9JKPRWooQ3xkbM4m'
 //     'type':'Buffer', 'data':[ 3, 6, 239, 160, 72, 161, 55, 244, 48, 79, 91, 111, 47, 176, 120, 237, 155, 49, 188, 58, 151, 169, 30, 48, 118, 188, 142, 6, 244, 206, 142, 70, 214 ]
 //   }, 'card_ident':'PLJCZ-CFK24-EMH7F-VPDZF', 'applet_version':'1.0.0', 'birth_height':744019, 'is_testnet':false, 'auth_delay':0, 'is_tapsigner':false, 'path':null, 'num_backups':'NA', 'active_slot':0, 'num_slots':10, '_certs_checked':false
 // }
-const temp = {
-  '_certs_checked': false, 'active_slot': 6, 'applet_version': '0.9.0', 'auth_delay': 0,
-  'birth_height': 730131, 'card_ident': '2BCN2-QJDCZ-COFX5-4N3WS', 'card_nonce': {
-    'data': [ Array ], 'type': 'Buffer'
-  }, 'card_pubkey': {
-    'data': [ Array ], 'type': 'Buffer'
-  }, 'is_tapsigner': false, 'is_testnet': false, 'num_backups': 'NA', 'num_slots': 10, 'path': null
-}
+
 export default function SetUpSatNextCardScreen( props ) {
   const dispatch = useDispatch()
   const giftAmount = props.navigation?.state?.params?.giftAmount
@@ -61,7 +55,7 @@ export default function SetUpSatNextCardScreen( props ) {
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
-  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>( temp )
+  const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>(  )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ showNFCModal, setNFCModal ] = useState( false )
@@ -84,17 +78,15 @@ export default function SetUpSatNextCardScreen( props ) {
   let timeout1
   const flowUpdate = async() =>{
     timeout1 = setTimeout( async() => {
-      getCardData()
-      // const { response, error } = await withModal( getCardData )
-      // console.log( {
-      //   response, error
-      // } )
-      // if( error ){
-      //   console.log( error )
-      //   Alert.alert( error.toString() )
-      //   return
-      // }
-      // const { address } = response
+      // getCardData()
+      const { response, error } = await withModal( getCardData )
+
+      if( error ){
+        console.log( error )
+        Alert.alert( error.toString() )
+        return
+      }
+      const { address } = response
 
       timeout1 = setTimeout( () => {
         if ( !cardDetails?.is_tapsigner ) {
@@ -104,8 +96,7 @@ export default function SetUpSatNextCardScreen( props ) {
               setStepsVerified( 2 )
               timeout1 = setTimeout( async () => {
                 setStepsVerified( 3 )
-                console.log( 'fromClaimFlow===>' + JSON.stringify( fromClaimFlow ) )
-                !fromClaimFlow && handleManualAddressSubmit( dummySatcardAddress )
+                !fromClaimFlow && handleManualAddressSubmit( address )
                 timeout1 = setTimeout( () => {
                   // props.navigation.navigate( 'GiftCreated', {
                   //   numSlots: cardDetails?.num_slots,
@@ -136,10 +127,8 @@ export default function SetUpSatNextCardScreen( props ) {
         defaultSourceAccount
       ) )
     }
-    console.log( 'checking....' )
     flowUpdate()
     return () => {
-      console.log( 'returning....' )
       card.endNfcSession()
       clearTimeout( timeoutVariable )
       clearTimeout( timeout1 )
@@ -148,7 +137,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const withModal = async ( callback ) => {
     try {
-      console.log( 'scanning...' )
       if( Platform.OS == 'android' )
         setNFCModal( true )
       const resp = await card.nfcWrapper( callback )
@@ -169,22 +157,25 @@ export default function SetUpSatNextCardScreen( props ) {
     }
   }
   async function getCardData() {
-    // const cardData = await card.first_look()
-    // setCardDetails( cardData )
-    // console.log( 'card details===>' + JSON.stringify( cardData ) )
-    if ( cardDetails && !cardDetails.is_tapsigner ) {
+    const cardData = await card.first_look()
+    setCardDetails( cardData )
+    console.log( 'card details===>' + JSON.stringify( cardData ) )
+    if ( cardData && !cardData.is_tapsigner ) {
       console.log( 'came in' )
       try {
         //For Create Flow
-        // const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
-        console.log( 'getAddrees===>' + JSON.stringify( dummySatcardAddress ) )
-        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${dummySatcardAddress}` )
+        const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
+        console.log( 'getAddrees===>' + JSON.stringify( address ) )
+        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
         const { balance } = data
         setSatCardBalance( balance )
         console.log( 'balance===>' + JSON.stringify( balance ) )
-        // return {
-        //   cardDetails, cardDetails.card_pubkey
-        // }
+        console.log( {
+          address, pubkey
+        } )
+        return {
+          address, pubkey
+        }
       } catch ( err ) {
         console.log( {
           err
