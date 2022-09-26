@@ -1303,7 +1303,7 @@ const CreateGift = ( { navigation }: Props ) => {
           bottomImage={require( '../../assets/images/satCards/illustration.png' )}
           onCloseClick={onCloseClick}
           onPressProceed={onVerifyClick}
-          closeModal
+          // closeModal
         />
       </ModalContainer>
 
