@@ -130,7 +130,7 @@ const BackupSeedWordsContent = ( props ) => {
       </KeyboardAwareScrollView>
 
       <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
-        closeBottomSheet={() => setConfirmSeedWordModal( false )}  showBlurView={true}>
+        closeBottomSheet={() => {}} showBlurView={true}>
         <ConfirmSeedWordsModal
           proceedButtonText={'Next'}
           seedNumber={seedRandomNumber ? seedRandomNumber[ seedPosition ] : 0}
@@ -205,7 +205,10 @@ const BackupSeedWordsContent = ( props ) => {
                 isChangeKeeperType: true,
               } )
             } else {
-              props.navigation.navigate( 'Home' )
+              props.navigation.navigate( 'SeedBackupHistory', {
+                navigationParams,
+                // isChangeKeeperType: true,
+              } )
             }
           }}
           onPressIgnore={() => setSeedWordModal( false )}
