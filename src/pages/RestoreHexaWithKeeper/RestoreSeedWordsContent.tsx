@@ -48,6 +48,7 @@ const RestoreSeedWordsContent = ( props ) => {
     translations[ 'bhr' ].Preloading,
   ]
   const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
+  const mnemonicSuggestions = bip39.wordlists.english
 
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
@@ -55,6 +56,7 @@ const RestoreSeedWordsContent = ( props ) => {
   const [ mnemonic, setMnemonic ] = useState( null )
 
   useEffect( () => {
+    console.log( 'skk sugg words', JSON.stringify( mnemonicSuggestions ) )
     return () => {
       dispatch( restoreSeedWordFailed( false ) )
     }
@@ -153,6 +155,7 @@ const RestoreSeedWordsContent = ( props ) => {
           // infoBoxTitle={'Note'}
           // infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
           onPressConfirm={recoverWalletViaSeed}
+          mnemonicSuggestions={mnemonicSuggestions}
           data={[]}
           confirmButtonText={'Next'}
           proceedButtonText={'Proceed'}
