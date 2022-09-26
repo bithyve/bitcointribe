@@ -56,7 +56,7 @@ const RestoreSeedWordsContent = ( props ) => {
   const [ mnemonic, setMnemonic ] = useState( null )
 
   useEffect( () => {
-    console.log( 'skk sugg words', JSON.stringify( mnemonicSuggestions ) )
+    // console.log( 'skk sugg words', JSON.stringify( mnemonicSuggestions ) )
     return () => {
       dispatch( restoreSeedWordFailed( false ) )
     }
