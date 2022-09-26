@@ -38,6 +38,7 @@ export type Props = {
   amountTextStyle?: Record<string, unknown>;
   unitTextStyle?: Record<string, unknown>;
   isTestAccount?: boolean;
+  verticalAlignUnit?: "center" | "bottom" | "auto" | "top";
 };
 
 /**
@@ -60,6 +61,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
   unitTextStyle = {
   },
   isTestAccount = false,
+  verticalAlignUnit = 'bottom',
 }: Props ) => {
   const fiatCurrencyCode = useCurrencyCode()
 
@@ -98,14 +100,15 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
 
   const unitTextStyles = useMemo( () => {
     const fontSize = Number( unitTextStyle.fontSize ) || RFValue( 11 )
-    const paddingTop = fontSize * 0.3
+    const paddingTop = fontSize * 0.5
 
     return {
       ...defaultStyles.unitText,
       color: textColor,
       ...unitTextStyle,
       fontSize,
-      paddingTop,
+      height: '100%'
+      // paddingTop,
     }
   }, [ unitTextStyle ] )
 
@@ -162,7 +165,9 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       >
         {formattedBalanceText}
       </Text>
-      <Text style={unitTextStyles}>{`${formattedUnitText}`}</Text>
+      <Text style={[unitTextStyles, {
+        textAlignVertical: verticalAlignUnit
+      }]}>{`${formattedUnitText}`}</Text>
     </View>
   )
 }

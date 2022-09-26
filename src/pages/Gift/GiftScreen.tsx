@@ -737,7 +737,7 @@ class GiftScreen extends React.Component<
             />
             <GiftBoxComponent
               titleText={'Available Gifts'}
-              subTitleText={'All the gifts you have created, not sent, and gifts you have received are shown here'}
+              subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
               onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
               image={<Gifts />}
             />

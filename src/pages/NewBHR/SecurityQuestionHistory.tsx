@@ -44,6 +44,7 @@ import HeaderTitle from '../../components/HeaderTitle'
 import Feather from 'react-native-vector-icons/Feather'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 const SecurityQuestionHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -336,6 +337,23 @@ const SecurityQuestionHistory = ( props ) => {
           height: hp( '72%' ),
           paddingTop:  hp( '4%' ),
         }}>
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center', alignItems: 'center',
+              backgroundColor: Colors.lightBlue,
+              height: 30,
+              width: 30,
+              borderRadius: 15,
+              padding: 4,
+              marginHorizontal: 10,
+              marginTop: 10,
+              alignSelf: 'flex-end'
+            }}
+            activeOpacity={10}
+            onPress={() => showEncryptionPswd(false)}
+          >
+            <FontAwesome name="close" color={Colors.white} size={19} />
+          </TouchableOpacity>
           <Text style={{
             // marginBottom: wp( '%' ),
             color: Colors.blue,
