@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   Image,
   ImageBackground,
   Platform,
@@ -586,7 +587,10 @@ class GiftScreen extends React.Component<
         const cardData = await this.card.first_look()
         const { addr:address } = await this.card.address( true, false, cardData.active_slot )
         const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-        const { balance } = data
+        const { balance, unconfirmed_balance } = data
+        if( unconfirmed_balance > 0 ){
+          Alert.alert( 'There are unconfirmed balance on the current slot' )
+        }
         console.log( {
           num_slots:cardData.num_slots,
           active_slot:cardData.active_slot,

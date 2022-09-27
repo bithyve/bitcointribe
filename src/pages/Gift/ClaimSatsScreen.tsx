@@ -146,7 +146,11 @@ const ClaimSatsScreen = ( { navigation } ) => {
     const { addr: address } = await card.address( true, false, status.active_slot )
     console.log( 'slot address ===>' + JSON.stringify( address ) )
     const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-    const { balance } = data
+    const { balance, unconfirmed_balance } = data
+    if( unconfirmed_balance >0 ){
+      Alert.alert( 'Your gift is still being confirmed. Please wait for a while to claim' )
+      return
+    }
     if ( balance > 0 ) {
       // get the cvc from user
       // 'SEALED' or 'UNSEALED' or 'UNUSED'

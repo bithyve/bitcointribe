@@ -158,7 +158,10 @@ export default function SetUpSatNextCardScreen( props ) {
           const { addr: address, pubkey } = await card.address( true, true, cardData.active_slot )
           console.log( 'getAddrees===>' + JSON.stringify( address ) )
           const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-          const { balance } = data
+          const { balance, unconfirmed_balance } = data
+          if( unconfirmed_balance >0 ){
+            throw new Error( 'Your previous gift is still being confirmed. Please wait for a while' )
+          }
           setSatCardBalance( balance )
           console.log( 'balance===>' + JSON.stringify( balance ) )
           console.log( {
