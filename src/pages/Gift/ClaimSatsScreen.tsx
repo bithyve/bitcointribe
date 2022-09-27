@@ -1,5 +1,6 @@
 import { Account, AccountType, ActiveAddressAssigneeType, TxPriority } from '../../bitcoin/utilities/Interface'
 import {
+  Alert,
   Dimensions,
   Image,
   SafeAreaView,
@@ -75,7 +76,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const [ selectedAccount, setSelectedAccount ]: [AccountShell, any] = useState( defaultGiftAccount )
   const account: Account = accountState.accounts[ selectedAccount.primarySubAccount.id ]
   const [ showErrorLoader, setShowErrorLoader ] = useState( false )
-  const [ spendCode, setSpendCode ] = useState( '' )
+  const [ spendCode, setSpendCode ] = useState( '304577' )
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
@@ -142,49 +143,41 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const claimGifts = async() => {
     // For Claim Flow
     const status = await card.first_look()
-    const { addr: address, pubkey } = await card.address( true, false, 0 )
-    console.log( 'slot address 2===>' + JSON.stringify( address ) )
+    const { addr: address } = await card.address( true, false, status.active_slot )
+    console.log( 'slot address ===>' + JSON.stringify( address ) )
     const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
     const { balance } = data
-    console.log( balance )
-    if ( balance !== 0 ) {
+    if ( balance > 0 ) {
       // get the cvc from user
+      // 'SEALED' or 'UNSEALED' or 'UNUSED'
       const activeSlotUsage = await card.get_slot_usage( status.active_slot )
       let privKey
-      if ( activeSlotUsage.status !== 'SEALED' ) {
-        privKey = await card.get_privkey( spendCode, 0 )
-        console.log( JSON.stringify( privKey ), 'getpk' )
-      } else {
+      if ( activeSlotUsage.status === 'SEALED' ) {
+        // ideal case
+        console.log( 'unsealing slot...' )
         const { pk } = await card.unseal_slot( spendCode )
         privKey = pk
-        console.log( JSON.stringify( privKey ), 'unseal' )
+      } else if( activeSlotUsage.status === 'UNSEALED' ){
+        // will never get into this case (should have raised before)
+        console.log( 'getting pk from unsealed slot...' )
+        privKey = await card.get_privkey( spendCode, status.active_slot )
+      }else{
+        Alert.alert( 'Please setup the slot before use' )
+        return
       }
-
-      console.log( wif.encode( 128, privKey, false ) )
       privKey = wif.encode( 128, privKey, true )
-      // privKey = wif.encode( 128, privKey, false )
-      console.log( privKey )
-
-      // const associateAccount = accountsState.accounts[ selectedAccount.id ]
-      // const tempPrivKey = '5KhTnBjpKrH8p52jGaQPrSfq5BhLEe4KmEdwUgzyzyrQ5G7DE8y'
-      // const dummySatcardAddress = 'bc1qy9m3wx8v42z55pur8k7t59xqnkt7jx9rsvruu4'
-      // console.log( 'balance2===>' + JSON.stringify( balance ) )
-
-
-      dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, privKey, address, selectedAccount ) )
-
+      console.log( 'wid compressed', {
+        privKey
+      } )
       // with this key move all the funds from the slot to checking account (rnd)
+      dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, privKey, address, selectedAccount ) )
       // For setup slot for next user
       // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
-      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
-      // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
-
-    // const setUpSlot = await card.setup( spendCode, undefined, true )
-    // console.log( 'setUpSlot for next user 2===>' + JSON.stringify( setUpSlot ) )
-    // }else{
-    //   // corner case when the slot is unseled but no balance
-    //   // continue with error flow
-    // }
+      const setUpSlot = await card.setup( spendCode, undefined, true )
+      console.log( 'setUpSlot for next user ===>' + JSON.stringify( setUpSlot ) )
+    }else{
+      Alert.alert( 'Sorry this slot has no funds or the funds are yet to be confirmed' )
+      return
     }
   }
 
@@ -533,7 +526,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
   }
 
   const onClaimSatsClick = async () => {
-    // claimGifts()
     const { response, error } = await withModal( claimGifts )
     console.log( {
       response, error

@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, sendTxNotification, sourceAccountSelectedForSending } from '../../store/actions/sending'
+import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, resetSendStage1, resetSendState, sendTxNotification, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { AccountsState } from '../../store/reducers/accounts'
@@ -54,6 +54,7 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
+
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>(  )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
@@ -80,7 +81,10 @@ export default function SetUpSatNextCardScreen( props ) {
     timeout1 = setTimeout( async() => {
       // getCardData()
       const { response, error } = await withModal( getCardData )
-
+      if( response.balance > 0 ){
+        Alert.alert( 'Please claim the existing gift before creating new one!' )
+        return
+      }
       if( error ){
         console.log( error )
         Alert.alert( error.toString() )
@@ -97,17 +101,7 @@ export default function SetUpSatNextCardScreen( props ) {
               timeout1 = setTimeout( async () => {
                 setStepsVerified( 3 )
                 !fromClaimFlow && handleManualAddressSubmit( address )
-                timeout1 = setTimeout( () => {
-                  // props.navigation.navigate( 'GiftCreated', {
-                  //   numSlots: cardDetails?.num_slots,
-                  //   activeSlot: cardDetails?.active_slot,
-                  //   slotFromIndex: fromClaimFlow == 0 ?
-                  //     satCardBalance == 0 ? 1 : 2
-                  //     : satCardBalance == 0 ? 3 : 4,
-                  //   slotBalance:satCardBalance,
-                  //   giftAmount : satCardBalance == 0 ? giftAmount: 0
-                  // } )
-                }, 2000 )
+
               }, 2000 )
             }
           }, 2000 )
@@ -121,12 +115,7 @@ export default function SetUpSatNextCardScreen( props ) {
   }
 
   useEffect( () => {
-    if( !sourceAccountShell ){
-      const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
-      dispatch( sourceAccountSelectedForSending(
-        defaultSourceAccount
-      ) )
-    }
+
     flowUpdate()
     return () => {
       card.endNfcSession()
@@ -163,18 +152,26 @@ export default function SetUpSatNextCardScreen( props ) {
     if ( cardData && !cardData.is_tapsigner ) {
       console.log( 'came in' )
       try {
-        //For Create Flow
-        const { addr: address, pubkey } = await card.address( true, true, card.active_slot )
-        console.log( 'getAddrees===>' + JSON.stringify( address ) )
-        const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-        const { balance } = data
-        setSatCardBalance( balance )
-        console.log( 'balance===>' + JSON.stringify( balance ) )
-        console.log( {
-          address, pubkey
-        } )
-        return {
-          address, pubkey
+        const activeSlotUsage = await card.get_slot_usage( cardData.active_slot )
+        if ( activeSlotUsage.status === 'SEALED' ) {
+          //For Create Flow
+          const { addr: address, pubkey } = await card.address( true, true, cardData.active_slot )
+          console.log( 'getAddrees===>' + JSON.stringify( address ) )
+          const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
+          const { balance } = data
+          setSatCardBalance( balance )
+          console.log( 'balance===>' + JSON.stringify( balance ) )
+          console.log( {
+            address
+          } )
+          return {
+            address, pubkey, balance
+          }
+        }else if ( activeSlotUsage.status === 'UNUSED' ){
+          // Alert.alert('Sorry the current slot is not setup yet!')
+          throw new Error( 'Sorry the current slot is not setup yet!' )
+        }else{
+          throw new Error( 'Active slot cannot be unsealed' )
         }
       } catch ( err ) {
         console.log( {
@@ -184,23 +181,27 @@ export default function SetUpSatNextCardScreen( props ) {
       }
     }
   }
-  const handleManualAddressSubmit = ( address: string ) => {
+  const handleManualAddressSubmit = useCallback( ( address: string ) => {
     const addressRecipient = makeAddressRecipientDescription( {
       address
     } )
+
     if ( isRecipientSelectedForSending( addressRecipient ) == false ) {
+
       handleRecipientSelection( addressRecipient )
     }
-  }
+  }, [ sourceAccountShell ] )
 
 
-  const handleRecipientSelection = async ( recipient: RecipientDescribing ) => {
+  const handleRecipientSelection = useCallback( async ( recipient: RecipientDescribing )=>{
     if ( isRecipientSelectedForSending( recipient ) == false ) {
+
       dispatch( addRecipientForSending( recipient ) )
     }
 
     dispatch( recipientSelectedForAmountSetting( recipient ) )
     // navigateToSendDetails( recipient )
+
     setTimeout( () => {
       if ( recipient.id != null && recipient.id != '' ) {
         // console.log( 'skk inside recipent', JSON.stringify( recipient ) )
@@ -209,13 +210,14 @@ export default function SetUpSatNextCardScreen( props ) {
           recipient: recipient,
           amount: giftAmount
         } ) )
+        dispatch( addRecipientForSending( recipient ) )
         dispatch( executeSendStage1( {
           accountShell: sourceAccountShell
         } ) )
         dispatch( recipientRemovedFromSending( recipient ) )
       }
     }, 2000 )
-  }
+  }, [ sourceAccountShell ] )
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
@@ -254,6 +256,8 @@ export default function SetUpSatNextCardScreen( props ) {
         } else {
           dispatch( sendTxNotification( txid, null, type ) )
         }
+
+        dispatch( resetSendState() )
         // setStepsVerified( 3 )
         setTimeout( () => {
           props.navigation.navigate( 'GiftCreated', {
@@ -275,7 +279,6 @@ export default function SetUpSatNextCardScreen( props ) {
     },
   } )
 
-
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <StatusBar />
@@ -285,6 +288,7 @@ export default function SetUpSatNextCardScreen( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
+
             props.navigation.goBack()
           }}
         >

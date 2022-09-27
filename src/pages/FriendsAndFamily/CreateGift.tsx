@@ -1,76 +1,78 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Text,
-  StatusBar,
-  TextInput,
-  KeyboardAvoidingView,
-  ScrollView,
-  Image,
-  Dimensions,
-  Switch,
-  Platform
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import HeaderTitle from '../../components/HeaderTitle'
-import CommonStyles from '../../common/Styles/Styles'
-import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
-import Dollar from '../../assets/images/svgs/icon_dollar.svg'
-import CheckMark from '../../assets/images/svgs/checkmark.svg'
-import ModalContainer from '../../components/home/ModalContainer'
-import DashedContainer from './DashedContainer'
-import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Illustration from '../../assets/images/svgs/illustration.svg'
-import { generateGifts, giftCreationSuccess } from '../../store/actions/accounts'
-import { AccountsState } from '../../store/reducers/accounts'
 import { Account, AccountType, Gift, TxPriority } from '../../bitcoin/utilities/Interface'
-import idx from 'idx'
-import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
-import AccountShell from '../../common/data/models/AccountShell'
-import ToggleContainer from './CurrencyToggle'
+import {
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
 } from '../../components/MaterialCurrencyCodeIcon'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import React, { useEffect, useMemo, useState } from 'react'
+import { calculateSendMaxFee, resetSendState, sourceAccountSelectedForSending } from '../../store/actions/sending'
+import { generateGifts, giftCreationSuccess } from '../../store/actions/accounts'
 import {
-  getCurrencyImageByRegion, processRequestQR,
+  getCurrencyImageByRegion,
+  processRequestQR,
 } from '../../common/CommonFunctions/index'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { UsNumberFormat } from '../../common/utilities'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { translations } from '../../common/content/LocContext'
-import FormStyles from '../../common/Styles/FormStyles'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import { updateUserName } from '../../store/actions/storage'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import Loader from '../../components/loader'
-import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-import ErrorLoader from '../../components/ErrorLoader'
-import LoaderModal from '../../components/LoaderModal'
-import Toast from '../../components/Toast'
-import { calculateSendMaxFee } from '../../store/actions/sending'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+
+import AccountShell from '../../common/data/models/AccountShell'
+import { AccountsState } from '../../store/reducers/accounts'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CheckMark from '../../assets/images/svgs/checkmark.svg'
+import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
+import Colors from '../../common/Colors'
+import CommonStyles from '../../common/Styles/Styles'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import DashedContainer from './DashedContainer'
+import Dollar from '../../assets/images/svgs/icon_dollar.svg'
+import ErrorLoader from '../../components/ErrorLoader'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Fonts from '../../common/Fonts'
+import FormStyles from '../../common/Styles/FormStyles'
+import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
+import HeaderTitle from '../../components/HeaderTitle'
+import Illustration from '../../assets/images/svgs/illustration.svg'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Loader from '../../components/loader'
+import LoaderModal from '../../components/LoaderModal'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import ModalContainer from '../../components/home/ModalContainer'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { Shadow } from 'react-native-shadow-2'
+import Toast from '../../components/Toast'
+import ToggleContainer from './CurrencyToggle'
+import { UsNumberFormat } from '../../common/utilities'
 import VerifySatModalContents from '../Gift/VerifySatModalContents'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import idx from 'idx'
 import { platform } from 'process'
+import { translations } from '../../common/content/LocContext'
+import { updateUserName } from '../../store/actions/storage'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -130,6 +132,10 @@ const CreateGift = ( { navigation }: Props ) => {
   useEffect( () => {
     if ( numbersOfGift ) setFees( false )
   }, [ numbersOfGift ] )
+
+  useEffect( () => {
+    dispatch( resetSendState() )
+  }, [  ] )
 
   function convertFiatToSats( fiatAmount: number ) {
     return accountsState.exchangeRates && accountsState.exchangeRates[ currencyCode ]
@@ -242,6 +248,11 @@ const CreateGift = ( { navigation }: Props ) => {
         <TouchableOpacity
           disabled={isDisabled}
           onPress={() => {
+            const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
+
+            dispatch( sourceAccountSelectedForSending(
+              defaultSourceAccount
+            ) )
             if ( satCard ) {
               setShowVerification( true )
             } else {

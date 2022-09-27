@@ -582,12 +582,9 @@ class GiftScreen extends React.Component<
     this.setState( {
       showVerification: false
     }, async()=>{
-      // this.props.navigation.navigate( 'ClaimSats', {
-      //   fromClaimFlow: 1
-      // } )
       const { response, error } = await this.withModal( async ()=>{
         const cardData = await this.card.first_look()
-        const { addr:address } = await this.card.address( true, false, 0 )
+        const { addr:address } = await this.card.address( true, false, cardData.active_slot )
         const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
         const { balance } = data
         console.log( {
@@ -730,9 +727,11 @@ class GiftScreen extends React.Component<
             <GiftBoxComponent
               titleText={'Create New Gift'}
               subTitleText={this.strings[ 'giftSubTextF&F' ]}
-              onPress={() => this.props.navigation.navigate( 'CreateGift', {
+              onPress={() => {
+
+                this.props.navigation.navigate( 'CreateGift', {
                 // setActiveTab: buttonPress
-              } )}
+                } )}}
               image={<Add_gifts />}
             />
             <GiftBoxComponent
