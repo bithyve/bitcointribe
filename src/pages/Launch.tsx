@@ -25,6 +25,7 @@ import {
   getMessages,
 } from '../store/actions/notifications'
 import { LocalizationContext } from '../common/content/LocContext'
+import RestClient from '../services/rest/RestClient'
 
 type LaunchScreenProps = {
   navigation: any;
@@ -33,6 +34,7 @@ type LaunchScreenProps = {
   getMessages: any;
   walletId: any;
   walletExists: Boolean,
+  torEnabled: boolean,
 }
 
 type LaunchScreenState = { }
@@ -94,7 +96,8 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
       //console.log( 'url', url )
 
       const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
-
+      // enable tor status
+      RestClient.setUseTor(this.props.torEnabled);
       // scenario based navigation
       if ( hasCreds ) {
         const now: any = new Date()
@@ -209,7 +212,8 @@ const mapStateToProps = ( state ) => {
   return {
     lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
     walletId: idx( state, ( _ ) => _.preferences.walletId ),
-    walletExists: idx( state, ( _ ) => _.storage.walletExists )
+    walletExists: idx( state, ( _ ) => _.storage.walletExists ),
+    torEnabled: idx( state, ( _ ) => _.preferences.torEnabled )
   }
 }
 
