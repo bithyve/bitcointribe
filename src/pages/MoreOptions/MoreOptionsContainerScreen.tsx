@@ -581,12 +581,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             />
           </TouchableOpacity>
           {/* enable tor toggle */}
-          <TouchableOpacity
-            onPress={() => {
-              console.log('toggle')
-            }}
-            style={styles.otherCards}
-          >
+          <TouchableOpacity style={styles.otherCards}>
             <Telegram />
             <View style={{
               marginLeft: 10,
@@ -596,7 +591,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 {'Enable Tor'}
               </Text>
               <Text style={styles.addModalInfoText}>
-                {'Enable to tor for more security'}
+                {`Status: ${isTorEnabled}`}
               </Text>
 
             </View>
