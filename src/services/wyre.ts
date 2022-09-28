@@ -1,6 +1,7 @@
 import config from '../../src/bitcoin/HexaConfig'
 const { HEXA_ID } = config
 import { BH_AXIOS } from './api'
+import RestClient from './rest/RestClient'
 
 export const fetchWyreReservation = ( amount, receiveAddress, currencyCode, country ) => {
   try {
@@ -11,7 +12,7 @@ export const fetchWyreReservation = ( amount, receiveAddress, currencyCode, coun
       receiveAddress,
       referenceId: Date.now()
     }
-    return BH_AXIOS.post( 'fetchWyreReservation', {
+    return RestClient.post( 'fetchWyreReservation', {
       HEXA_ID,
       ...body
     } )

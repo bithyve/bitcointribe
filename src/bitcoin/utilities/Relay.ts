@@ -5,6 +5,7 @@ import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
 import crypto from 'crypto'
 import TrustedContactsOperations from './TrustedContactsOperations'
+import RestClient from '../../services/rest/RestClient'
 
 const { HEXA_ID } = config
 export default class Relay {
@@ -18,9 +19,9 @@ export default class Relay {
       message: string;
     };
   }> => {
-    let res: AxiosResponse
+    let res: any
     try {
-      res = await BH_AXIOS.post( 'checkCompatibility', {
+      res = await RestClient.post( 'checkCompatibility', {
         HEXA_ID,
         method,
         version,
@@ -40,9 +41,9 @@ export default class Relay {
   ): Promise<{
     releases: any[];
   }> => {
-    let res: AxiosResponse
+    let res: any
     try {
-      res = await BH_AXIOS.post( 'fetchReleases', {
+      res = await RestClient.post( 'fetchReleases', {
         HEXA_ID,
         build,
       } )
@@ -64,9 +65,9 @@ export default class Relay {
     updated: boolean;
   }> => {
     try {
-      let res: AxiosResponse
+      let res: any
       try {
-        res = await BH_AXIOS.post( 'updateFCMTokens', {
+        res = await RestClient.post( 'updateFCMTokens', {
           HEXA_ID,
           walletID,
           FCMs,
@@ -75,7 +76,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      return res.data
+      return res.data || res.json;
     } catch ( err ) {
       throw new Error( 'Failed to fetch GetBittr Details' )
     }
@@ -87,9 +88,9 @@ export default class Relay {
     notifications: INotification[];
     DHInfos: [{ address: string; publicKey: string }];
   }> => {
-    let res: AxiosResponse
+    let res: any
     try {
-      res = await BH_AXIOS.post( 'fetchNotifications', {
+      res = await RestClient.post( 'fetchNotifications', {
         HEXA_ID,
         walletID,
       } )
@@ -101,7 +102,7 @@ export default class Relay {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { notifications, DHInfos } = res.data
+    const { notifications, DHInfos } = res.data || res.json
     return {
       notifications, DHInfos
     }
@@ -114,13 +115,13 @@ export default class Relay {
     sent: boolean;
   }> => {
     try {
-      let res: AxiosResponse
+      let res: any
 
       if ( !receivers.length )
         throw new Error( 'Failed to deliver notification: receivers missing' )
 
       try {
-        res = await BH_AXIOS.post( 'sendNotifications', {
+        res = await RestClient.post( 'sendNotifications', {
           HEXA_ID,
           receivers,
           notification,
@@ -133,7 +134,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { sent } = res.data
+      const { sent } = res.data || res.json
       if ( !sent ) throw new Error()
 
       return {
@@ -155,13 +156,13 @@ export default class Relay {
       if ( !txNote || !txNote.txId || !txNote.note )
         throw new Error( 'Failed to send donation note: txid|note missing' )
 
-      const res: AxiosResponse = await BH_AXIOS.post( 'addDonationTxNote', {
+      const res: any = await RestClient.post( 'addDonationTxNote', {
         HEXA_ID,
         donationId,
         txNote,
       } )
 
-      const { added } = res.data
+      const { added } = res.data || res.json
       if ( !added ) throw new Error()
 
       return {
@@ -177,9 +178,9 @@ export default class Relay {
     averageTxFees: any;
   }> => {
     try {
-      let res: AxiosResponse
+      let res;
       try {
-        res = await BH_AXIOS.post( 'fetchFeeAndExchangeRates', {
+        res = await RestClient.post( 'fetchFeeAndExchangeRates', {
           HEXA_ID,
           currencyCode
         } )
@@ -188,7 +189,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { exchangeRates, averageTxFees } = res.data
+      const { exchangeRates, averageTxFees } = res.data || res.json
 
       return {
         exchangeRates, averageTxFees
@@ -204,14 +205,14 @@ export default class Relay {
     walletID: string
   ) => {
     try {
-      let res: AxiosResponse
+      let res: any
       try {
-        res = await BH_AXIOS.post( 'claimCampaignGift', {
+        res = await RestClient.post( 'claimCampaignGift', {
           HEXA_ID,
           campaignId: campaignId,
           walletID,
         } )
-        return res.data
+        return res.data || res.json;
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
@@ -226,19 +227,19 @@ export default class Relay {
     notification: INotification,
   ) => {
     try {
-      let res: AxiosResponse
+      let res: any
       const obj = {
         HEXA_ID,
         receivers,
         notification,
       }
       try {
-        res = await BH_AXIOS.post( 'sendKeeperNotifications', {
+        res = await RestClient.post( 'sendKeeperNotifications', {
           HEXA_ID,
           receivers,
           notification,
         } )
-        const { sent } = res.data
+        const { sent } = res.data || res.json;
         if ( !sent ) throw new Error()
         return {
           sent
@@ -259,9 +260,9 @@ export default class Relay {
   ): Promise<{
     messages:[];
   }> => {
-    let res: AxiosResponse
+    let res: any
     try {
-      res = await BH_AXIOS.post( 'getMessages', {
+      res = await RestClient.post( 'getMessages', {
         HEXA_ID,
         walletID,
         timeStamp
@@ -274,7 +275,7 @@ export default class Relay {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { messages } = res.data
+    const { messages } = res.data || res.json
     return {
       messages
     }
@@ -287,9 +288,9 @@ export default class Relay {
     updated: boolean;
   }> => {
     try {
-      let res: AxiosResponse
+      let res: any
       try {
-        res = await BH_AXIOS.post( 'updateMessages', {
+        res = await RestClient.post( 'updateMessages', {
           HEXA_ID,
           walletID,
           data,
@@ -298,7 +299,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { updated } = res.data
+      const { updated } = res.data || res.json
       return {
         updated
       }
@@ -313,7 +314,7 @@ export default class Relay {
     exchangeRates: { [currency: string]: number };
     averageTxFees: any;
   }> => {
-    const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
+    const res = await RestClient.post( 'v2/walletCheckIn', {
       HEXA_ID,
       ...currencyCode && {
         currencyCode
@@ -323,7 +324,7 @@ export default class Relay {
     const {
       exchangeRates,
       averageTxFees,
-    } = res.data
+    } = res.data || res.json;
 
     return {
       exchangeRates,
@@ -343,12 +344,12 @@ export default class Relay {
       message?: undefined;
     }  > => {
     try {
-      const res: AxiosResponse = await BH_AXIOS.post( 'v2/updateWalletImage', {
+      const res: any = await RestClient.post( 'v2/updateWalletImage', {
         HEXA_ID,
         walletID: walletImage.walletId,
         walletImage,
       } )
-      const { updated } = res.data
+      const { updated } = res.data || res.json
       return {
         status: res.status,
         data: updated
@@ -362,9 +363,9 @@ export default class Relay {
     walletImage: NewWalletImage;
   }> => {
     try {
-      let res: AxiosResponse
+      let res: any
       try {
-        res = await BH_AXIOS.post( 'v2/fetchWalletImage', {
+        res = await RestClient.post( 'v2/fetchWalletImage', {
           HEXA_ID,
           walletID: walletId,
         } )
@@ -372,7 +373,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { walletImage } = res.data
+      const { walletImage } = res.data || res.Json
       return {
         walletImage
       }
@@ -387,9 +388,9 @@ export default class Relay {
     try {
       if( !gift.channelAddress ) throw new Error( 'channel address missing' )
       const encryptedGift = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( gift ), encryptionKey )
-      let res: AxiosResponse
+      let res: any
       try {
-        res = await BH_AXIOS.post( 'updateGiftChannel', {
+        res = await RestClient.post( 'updateGiftChannel', {
           HEXA_ID,
           channelAddress: gift.channelAddress,
           encryptedGift,
@@ -400,7 +401,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { updated } = res.data
+      const { updated } = res.data || res.json;
       return {
         updated,
       }
@@ -415,9 +416,9 @@ export default class Relay {
   }> => {
     try {
 
-      let res: AxiosResponse
+      let res: any
       try {
-        res = await BH_AXIOS.post( 'fetchGiftChannel', {
+        res = await RestClient.post( 'fetchGiftChannel', {
           HEXA_ID,
           channelAddress,
         } )
@@ -425,7 +426,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { encryptedGift, metaData } = res.data
+      const { encryptedGift, metaData } = res.data || res.json
 
       let gift: Gift
       if( encryptedGift )
@@ -453,9 +454,9 @@ export default class Relay {
     }
   } }> => {
     try {
-      let res: AxiosResponse
+      let res: any
       try {
-        res = await BH_AXIOS.post( 'syncGiftChannelsMetaData', {
+        res = await RestClient.post( 'syncGiftChannelsMetaData', {
           HEXA_ID,
           giftChannelsToSync,
         } )
@@ -466,7 +467,7 @@ export default class Relay {
       const { synchedGiftChannels }: { synchedGiftChannels: {
         [channelAddress: string]: {
           metaData: GiftMetaData
-      } }} = res.data
+      } }} = res.data || res.json;
 
       return {
         synchedGiftChannels

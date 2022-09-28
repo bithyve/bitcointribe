@@ -3,13 +3,14 @@ const { HEXA_ID, SWAN_BASE_URL, SWAN_URL_PREFIX } = config
 import { BH_AXIOS, SWAN_AXIOS } from './api'
 import axios from 'axios'
 import qs from 'querystring'
+import RestClient from './rest/RestClient'
 export const redeemAuthCodeForToken = ( { code, state, code_verifier } ) => {
   try {
     const body = {
       code_verifier, code, state
     }
 
-    return BH_AXIOS.post( 'swanAuth', {
+    return RestClient.post( 'swanAuth', {
       HEXA_ID,
       ...body
     } )
