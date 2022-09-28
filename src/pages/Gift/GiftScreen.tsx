@@ -725,7 +725,8 @@ class GiftScreen extends React.Component<
             //   />
             // }
             contentContainerStyle={{
-              flex: 1, paddingHorizontal: 38, paddingBottom: 20
+              // flex: 1,
+              paddingHorizontal: 38, paddingBottom: 20
             }}
           >
             <GiftBoxComponent

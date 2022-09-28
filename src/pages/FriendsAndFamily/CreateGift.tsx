@@ -1569,7 +1569,7 @@ const CreateGift = ({ navigation }: Props) => {
             {isAmountInvalid ? strings.Insufficient : ""}
           </Text>
         </View>
-        {/* {
+        {
           // ( Number( numbersOfGift ) === 1 ) &&
           !isSendMax && (
             <View style={{
@@ -1603,7 +1603,7 @@ const CreateGift = ({ navigation }: Props) => {
               </TouchableOpacity>
             </View>
           )
-        } */}
+        }
         <View
           style={{
             flexDirection: "row",
