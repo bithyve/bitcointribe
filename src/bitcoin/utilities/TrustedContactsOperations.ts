@@ -16,6 +16,7 @@ import config from '../HexaConfig'
 import { BH_AXIOS } from '../../services/api'
 import { AxiosResponse } from 'axios'
 import idx from 'idx'
+import RestClient from '../../services/rest/RestClient'
 const { HEXA_ID } = config
 
 export default class TrustedContactsOperations {
@@ -379,7 +380,7 @@ export default class TrustedContactsOperations {
       }
 
       if ( Object.keys( channelOutstreams ).length ) {
-        const res: AxiosResponse = await BH_AXIOS.post(
+        const res: any = await RestClient.post(
           'syncPermanentChannels',
           {
             HEXA_ID,
@@ -387,7 +388,7 @@ export default class TrustedContactsOperations {
           }
         )
 
-        const { channelInstreams } = res.data
+        const { channelInstreams } = res.data || res.json
         for ( const permanentChannelAddress of Object.keys( channelInstreams ) ) {
           const { updated, isActive, instream } =
             channelInstreams[ permanentChannelAddress ]
@@ -454,7 +455,7 @@ export default class TrustedContactsOperations {
          .digest( 'hex' )
        const streamId = StreamId ? StreamId : TrustedContactsOperations.getStreamId( walletId )
 
-       const res: AxiosResponse = await BH_AXIOS.post( 'retrieveFromStream', {
+       const res: any = await RestClient.post( 'retrieveFromStream', {
          HEXA_ID,
          permanentChannelAddress,
          streamId,
@@ -465,7 +466,7 @@ export default class TrustedContactsOperations {
         primaryEncryptedData?: string;
         encryptedBackupData?: string;
         secondaryEncryptedData?: string;
-      } = res.data.streamData
+      } = res.data.streamData || res.json.streamData
 
        const unencryptedStreamData: {
         primaryData?: PrimaryStreamData;
@@ -527,7 +528,7 @@ export default class TrustedContactsOperations {
           .digest( 'hex' )
         const streamId = StreamId ? StreamId : TrustedContactsOperations.getStreamId( walletId )
 
-        const res: AxiosResponse = await BH_AXIOS.post( 'retrieveFromStream', {
+        const res: any = await RestClient.post( 'retrieveFromStream', {
           HEXA_ID,
           permanentChannelAddress,
           streamId,
@@ -536,7 +537,7 @@ export default class TrustedContactsOperations {
 
         const streamData: {
           secondaryEncryptedData?: string;
-        } = res.data.streamData
+        } = res.data.streamData || res.json.streamData
 
         if( streamData.secondaryEncryptedData ) return {
           status: true
@@ -566,13 +567,13 @@ export default class TrustedContactsOperations {
          .update( channelKey )
          .digest( 'hex' )
 
-       const res: AxiosResponse = await BH_AXIOS.post( 'updateStream', {
+       const res: any = await RestClient.post( 'updateStream', {
          HEXA_ID,
          permanentChannelAddress,
          streamUpdates
        } )
 
-       const { updated } = res.data
+       const { updated } = res.data || res.json
        return {
          updated
        }
@@ -598,14 +599,14 @@ export default class TrustedContactsOperations {
            .update( channelKey )
            .digest( 'hex' )
        )
-       const res: AxiosResponse = await BH_AXIOS.post( 'retrieveChannels', {
+       const res: any = await RestClient.post( 'retrieveChannels', {
          HEXA_ID,
          channelAddresses,
        } )
 
        const permanentChannels: {
         [channelAddress: string]: Streams;
-        } = res.data.permanentChannels
+        } = res.data.permanentChannels || res.json.permanentChannels
        if( !Object.keys( permanentChannels ).length ) throw new Error( 'Unable to recover trusted contacts: no permanent channels found' )
 
        const restoredContacts: Trusted_Contacts = {
