@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import useSendingState from '../hooks/state-selectors/sending/UseSendingState'
-import useTotalSpendingAmount from "../hooks/sending-utils/UseTotalSpendingAmount";
+import useSourceAccountShellForSending from '../hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import useTotalSpendingAmount from '../hooks/sending-utils/UseTotalSpendingAmount'
 
 export default function useAccountSendST2CompletionEffect( callbacks: {
   onSuccess?: ( txid: string | null, amt: number | null ) => void;
@@ -15,7 +16,8 @@ export default function useAccountSendST2CompletionEffect( callbacks: {
     },
   } = useSendingState()
 
-  const amt = useTotalSpendingAmount();
+  const amt = useTotalSpendingAmount()
+  const sourceAccountShell = useSourceAccountShellForSending()
 
   useEffect( () => {
     if ( isSuccessful && callbacks.onSuccess ) {
@@ -23,5 +25,5 @@ export default function useAccountSendST2CompletionEffect( callbacks: {
     } else if ( hasFailed && callbacks.onFailure ) {
       callbacks.onFailure( failedErrorMessage )
     }
-  }, [ hasFailed, isSuccessful ] )
+  }, [ hasFailed, isSuccessful, sourceAccountShell ] )
 }
