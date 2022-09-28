@@ -138,7 +138,7 @@ export default function GiftCreatedScreen( props ) {
             // top:62, position:'absolute',
             color: Colors.gray14, alignSelf: 'center',
             // backgroundColor:'red'
-          }}>{  giftAmount != 0 && balance != 0 ? `${numberWithCommas( balance )} sats ` : `${numberWithCommas( giftAmount )} sats`}</Text>
+          }}>{giftAmount == null && giftAmount != 0 && balance != 0 ? `${numberWithCommas( balance )} sats ` : `${numberWithCommas( giftAmount )} sats`}</Text>
           <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: RFValue( 30 ),
           }}>

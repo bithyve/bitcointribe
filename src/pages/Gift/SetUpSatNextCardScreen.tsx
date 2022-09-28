@@ -101,7 +101,6 @@ export default function SetUpSatNextCardScreen( props ) {
               timeout1 = setTimeout( async () => {
                 setStepsVerified( 3 )
                 !fromClaimFlow && handleManualAddressSubmit( address )
-
               }, 2000 )
             }
           }, 2000 )
@@ -266,6 +265,7 @@ export default function SetUpSatNextCardScreen( props ) {
           props.navigation.navigate( 'GiftCreated', {
             numSlots: cardDetails?.num_slots,
             activeSlot: cardDetails?.active_slot,
+            giftAmount : satCardBalance == 0 ? giftAmount: 0,
             slotFromIndex: fromClaimFlow ?
               cardDetails?.num_backups == 0 ? 1 : 2
               : cardDetails?.num_backups == 0 ? 3 : 4,
