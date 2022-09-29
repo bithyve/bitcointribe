@@ -100,15 +100,15 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
 
   const unitTextStyles = useMemo( () => {
     const fontSize = Number( unitTextStyle.fontSize ) || RFValue( 11 )
-    const paddingTop = fontSize * 0.5
+    const paddingTop = fontSize * 0.1
 
     return {
       ...defaultStyles.unitText,
       color: textColor,
       ...unitTextStyle,
       fontSize,
-      height: '100%'
-      // paddingTop,
+      height: '70%',
+      paddingTop
     }
   }, [ unitTextStyle ] )
 
@@ -134,7 +134,8 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
           }}
         />
       )
-    } else {
+    } 
+    else {
       return (
         <Image
           style={style}
