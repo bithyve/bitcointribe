@@ -29,13 +29,15 @@ const GiftBoxComponent = ( props ) => {
           style={{
             flexDirection: "row",
             alignItems: "flex-start",
-            marginTop: height > 720 ? 5 : wp(3),
+            marginTop: height > 720 ? 12 : wp(3),
           }}
         >
           <Text style={[styles.pageTitle]}>{props.titleText}</Text>
-          {props.scTitleText && (
+          {props.scTitleText 
+          && (
             <Text style={styles.extraSubText}>{props.scTitleText}</Text>
-          )}
+          )
+          }
         </View>
         <View
           style={{
