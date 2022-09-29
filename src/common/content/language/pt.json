@@ -68,11 +68,6 @@
       "Incorrect": "Senha incorreta, tente novamente!",
       "loaderMessages": [
           {
-              "heading": "Conta Poupança",
-              "text": "A conta poupança é desbloqueada quando seu backup está no nível 2. Além disso, configure seu código 2FA em um aplicativo autenticador",
-              "subText": ""
-          },
-          {
               "heading": "Compras sem custódia",
               "text": "Obtenha sats diretamente na sua carteira a partir de bolsas compatíveis",
               "subText": ""
@@ -80,11 +75,6 @@
           {
               "heading": "Família & amigos",
               "text": "Adicione contatos ao Hexa e envie sats sem pedir o endereço da carteira todas as vezes",
-              "subText": ""
-          },
-          {
-              "heading": "Contas de doação",
-              "text": "Comece a receber doações diretamente em sua carteira Hexa, de qualquer lugar do mundo",
               "subText": ""
           },
           {
