@@ -20,6 +20,7 @@
   <uses-permission android:name="android.permission.READ_PROFILE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.NFC" />
   <!-- END OPTIONAL PERMISSIONS -->
 <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
