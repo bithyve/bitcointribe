@@ -257,7 +257,7 @@ const CreateGift = ({ navigation }: Props) => {
             fromScreen: "Gift",
             selectedContact: selectedContact,
             giftId: (createdGift as Gift).id,
-            encryptionType: DeepLinkEncryptionType.SECRET_PHRASE,
+            encryptionType: DeepLinkEncryptionType.OTP,
             note: "Bitcoin is a new type of money that is not controlled by any government or company",
             contact: selectedContact,
             senderName: name,

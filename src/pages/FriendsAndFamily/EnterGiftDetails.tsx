@@ -592,6 +592,7 @@ const GiftDetails = ({ navigation }) => {
         disabled={isDisabled}
         onPress={() => {
           if (contact) {
+            console.log('contact if', contact)
             navigation.replace('AddContactSendRequest', {
               SelectedContact: contact,
               giftId: giftId,
