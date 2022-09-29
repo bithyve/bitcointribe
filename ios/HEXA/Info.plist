@@ -44,6 +44,8 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NFCReaderUsageDescription</key>
+	<string>$(PRODUCT_NAME) would like to use NFC</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
