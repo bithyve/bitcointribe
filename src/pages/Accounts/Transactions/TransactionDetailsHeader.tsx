@@ -78,7 +78,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
         <View style={{
           flex: 1
         }}>
-          <Text
+          {/* <Text
             style={ListStyles.listItemTitle}
             numberOfLines={1}
           >
@@ -90,7 +90,7 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
             numberOfLines={2}
           >
             {date.toLocaleString()}
-          </Text>
+          </Text> */}
         </View>
         <LabeledBalanceDisplay
           balance={transaction.amount}
@@ -99,10 +99,13 @@ const TransactionDetailsHeader: React.FC<Props> = ( {
             ...ListStyles.listItemSubtitle, marginTop: widthPercentageToDP(2)
           }}
           amountTextStyle={{
-            ...ListStyles.textAmt, marginBottom: -3, marginLeft: -2, color: transactionKindIconColor
+            ...ListStyles.textAmt, 
+            marginBottom: -3,
+             marginLeft: -1,
+              color: transactionKindIconColor
           }}
           currencyImageStyle={{
-            marginBottom: -3
+            // marginBottom: -3
           }}
           verticalAlignUnit={'center'}
         />
