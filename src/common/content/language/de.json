@@ -68,11 +68,6 @@
       "Incorrect": "Falscher Passcode, versuchen Sie es erneut!",
       "loaderMessages": [
           {
-              "heading": "Sparkonto",
-              "text": "Das Sparkonto wird entsperrt, sobald Backup Level 2 erreicht ist. Richte einen 2FA-Code in einer Authenticator-App ein",
-              "subText": ""
-          },
-          {
               "heading": "Nicht verwahrte Käufe",
               "text": "Erhalte Sats von kompatiblen Börsen direkt auf deine Wallet",
               "subText": ""
