@@ -33,6 +33,8 @@
 			</array>
 		</dict>
 	</array>
+  <key>NFCReaderUsageDescription</key>
+  <string>$(PRODUCT_NAME) would like to use NFC</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
