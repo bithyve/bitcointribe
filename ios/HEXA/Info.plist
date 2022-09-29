@@ -33,8 +33,6 @@
 			</array>
 		</dict>
 	</array>
-  <key>NFCReaderUsageDescription</key>
-  <string>$(PRODUCT_NAME) would like to use NFC</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
@@ -57,6 +55,8 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>$(PRODUCT_NAME) would like to use NFC</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
