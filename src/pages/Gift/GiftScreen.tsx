@@ -764,7 +764,7 @@ class GiftScreen extends React.Component<
         } ) }} visible={this.state.showAlertModal} closeBottomSheet={() => { }}>
           <AlertModalContents
             info={this.state.errorMessage != '' ? this.state.errorMessage : 'SatCards not detected'}
-            proceedButtonText={ this.state.errorMessage == 'Sorry, this device doesn\'t support NFC' ?'Ok' : 'Try again'}
+            proceedButtonText={ this.state.errorMessage == 'Sorry, this device doesn\'t support NFC' ?'Ok' : 'Ok'}
             onPressProceed={() => {
               this.setState( {
                 showAlertModal: false
