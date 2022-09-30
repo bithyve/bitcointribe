@@ -494,7 +494,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.NEW_KEEPER_INFO:
         case NotificationType.GIFT_ACCEPTED:
           this.closeBottomSheet();
-          this.props.navigation.navigate( 'ManageGifts');
+          this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
           break
         case NotificationType.GIFT_REJECTED:
           // console.log( 'message.AdditionalInfo', message.additionalInfo )
@@ -509,7 +509,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             notificationType: message.type
           }, () => {
             this.closeBottomSheet();
-            this.props.navigation.navigate( 'ManageGifts');
+            this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
           } )
           break
         case NotificationType.FNF_TRANSACTION:
@@ -1613,12 +1613,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                       case NotificationType.GIFT_ACCEPTED:
                         this.closeBottomSheet();
-                        this.props.navigation.navigate( 'ManageGifts');
+                        this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
                       break
 
                       case NotificationType.GIFT_REJECTED:
                         this.closeBottomSheet();
-                        this.props.navigation.navigate( 'ManageGifts');
+                        this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
                       break
 
                     case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
