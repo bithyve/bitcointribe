@@ -10,6 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
 import { translations } from '../../common/content/LocContext'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
 
 export default function MBNewBhrKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
@@ -19,7 +20,28 @@ export default function MBNewBhrKnowMoreSheetContents( props ) {
     <View style={{
       ...styles.modalContainer, ...props.containerStyle
     }}>
-      <AppBottomSheetTouchableWrapper
+      <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center', alignItems: 'center'
+          }}
+        >
+          <Text style={styles.headerText}>{props.type == 'manageBackup' ? 'Manage Backup using Levels' : props.type == 'Level 3' ? 'Level 3' : props.type == 'Level 1' ? 'Level 1' : 'Level 2'}</Text>
+          <AppBottomSheetTouchableWrapper style={{
+            width: wp(8),
+            height: wp(8),
+            borderRadius: wp(4),
+            backgroundColor: Colors.lightBlue,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: wp(2),
+            marginLeft: -wp(10)
+          }}
+          onPress={() => props.titleClicked && props.titleClicked()}>
+            <CrossButton />
+          </AppBottomSheetTouchableWrapper>
+        </View>
+      {/* <AppBottomSheetTouchableWrapper
         style={{
           justifyContent: 'center', alignItems: 'center',
           paddingBottom: wp( '4%' ),
@@ -28,8 +50,8 @@ export default function MBNewBhrKnowMoreSheetContents( props ) {
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
-        <Text style={styles.headerText}>{props.type == 'manageBackup' ? 'Manage Backup using Levels' : props.type == 'Level 3' ? 'Level 3' : props.type == 'Level 1' ? 'Level 1' : 'Level 2'}</Text>
-      </AppBottomSheetTouchableWrapper>
+        <Text style={styles.headerText}></Text>
+      </AppBottomSheetTouchableWrapper> */}
       <View style={styles.headerSeparator} />
       <ScrollView
         ref={scrollViewRef}
@@ -84,6 +106,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
+    textAlign: 'center',
+    flex: 1,
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,

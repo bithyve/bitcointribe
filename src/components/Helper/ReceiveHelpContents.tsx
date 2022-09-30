@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import { View, Image, Text, StyleSheet, ScrollView } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -11,8 +11,9 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { translations } from '../../common/content/LocContext'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
 
-export default function ReceiveHelpContents( props ) {
+const ReceiveHelpContents: React.FC<{titleClicked: () => void}> = ( props ) => {
   const scrollViewRef = useRef<ScrollView>()
   const strings  = translations[ 'accounts' ]
 
@@ -21,15 +22,27 @@ export default function ReceiveHelpContents( props ) {
       <View style={{
         height: hp( 81 )
       }}>
-        <AppBottomSheetTouchableWrapper
+        <View
           style={{
-            justifyContent: 'center', alignItems: 'center'
+            justifyContent: 'center', alignItems: 'center', 
+            flexDirection: 'row'
           }}
-          activeOpacity={10}
-          onPress={() => props.titleClicked && props.titleClicked()}
         >
           <Text style={styles.headerText}>{strings.ReceiveBitcoins}</Text>
-        </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper style={{
+            width: wp(8),
+            height: wp(8),
+            borderRadius: wp(4),
+            backgroundColor: Colors.lightBlue,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: wp(2),
+            marginLeft: -wp(10)
+          }}
+          onPress={props.titleClicked}>
+            <CrossButton />
+          </AppBottomSheetTouchableWrapper>
+        </View>
         <View style={styles.headerSeparator} />
         <ScrollView
           ref={scrollViewRef}
@@ -201,6 +214,9 @@ export default function ReceiveHelpContents( props ) {
     </View>
   )
 }
+
+export default ReceiveHelpContents
+
 const styles = StyleSheet.create( {
   modalContainer: {
     // height: '100%',
@@ -220,6 +236,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
+    flex: 1,
+    textAlign: 'center'
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,

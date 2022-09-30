@@ -70,17 +70,10 @@ export default function Login( props ) {
   const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
 
   const getRandomMessage = () => {
-    //const randomIndex = Math.floor( Math.random() * 5 )
-    //return strings.loaderMessages[ randomIndex ]
-    // added static message for 2.0.5 #4833
-    return {
-      // heading: 'Gift Sats',
-      // text: 'Send sats as gifts to your friends and family.',
-      heading: 'Backup phrase',
-      text: 'New backup method: Now note down twelve-word phrase (seed words) to backup your wallet',
-      subText: ''
-    }
+    const randomIndex = Math.floor( Math.random() * strings.loaderMessages.length )
+    return strings.loaderMessages[ randomIndex ]
   }
+
   const [
     questionModal,
     showQuestionModal,

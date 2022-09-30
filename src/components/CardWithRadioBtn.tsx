@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { View, Image, TouchableOpacity, Text } from 'react-native';
+import { View, Image, TouchableOpacity, Text, Dimensions } from 'react-native';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import CheckMark from '../assets/images/svgs/checkmark.svg';
 import Arrow from '../assets/images/svgs/icon_arrow.svg';
+
+const {width} = Dimensions.get('window')
 
 export default function CardWithRadioBtn({
   setActiveIndex,
@@ -86,6 +88,7 @@ export default function CardWithRadioBtn({
         <View
           style={{
             flex: 1,
+            marginLeft: width > 450 ? 15 : wp(4)
           }}
         >
           <View

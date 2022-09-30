@@ -86,7 +86,7 @@ const ClipboardAutoRead: React.FC<IClipboardAutoReadProps> = ({navigation}) => {
         }}
         proceedButtonText={"Tranfer"}
         cancelButtonText={""}
-        cancelButtonText1={"Close"}
+        // cancelButtonText1={"Close"}
         isIgnoreButton={false}
         note={null}
         bottomSheetRef={undefined}

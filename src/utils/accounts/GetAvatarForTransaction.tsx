@@ -60,14 +60,14 @@ const getAvatarForSubAccount = (
       if (transaction.receivers.length > 1) {
 
         return <Image style={styles.image} source={
-          trustedContacts[transaction?.receivers[0].id].contactDetails.image ?
-            trustedContacts[transaction?.receivers[0].id].contactDetails.image :
+          trustedContacts[transaction?.receivers[0].id]?.contactDetails.image ?
+            trustedContacts[transaction?.receivers[0].id]?.contactDetails.image :
             require('../../assets/images/icons/user.png')} />
       } else {
-        if (transaction.receivers[0] && transaction.receivers[0].name) {
+        if (transaction.receivers[0] && transaction.receivers[0]?.name) {
           return <Image style={styles.image} source={
-            trustedContacts[transaction?.receivers[0].id].contactDetails.image ?
-              trustedContacts[transaction?.receivers[0].id].contactDetails.image :
+            trustedContacts[transaction?.receivers[0].id]?.contactDetails.image ?
+              trustedContacts[transaction?.receivers[0].id]?.contactDetails.image :
               require('../../assets/images/icons/user.png')} />
         } else {
           return <Text style={styles.text}>@</Text>

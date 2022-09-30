@@ -34,10 +34,6 @@ function* satCardAccountWorker( { payload }: { payload: { accountId: string, pri
         }
       }
     }
-    // console.log( 'skk associateAccount', associateAccount )
-
-    const privateKey1 = 'L2JQbktkgwHM9ENH7k785GZz3ib5bUF6TUzc7w3SBkYqCwf6uFYV'
-    const privateKey = 'L2JQbktkgwHM9ENH7k785GZz3ib5bUF6TUzc7w3SBkYqCwf6uFYV'
 
     const receivingAddress = yield call( getNextFreeAddressWorker, associateAccount )
     const network = AccountUtilities.getNetworkByType( associateAccount.networkType )
@@ -45,10 +41,10 @@ function* satCardAccountWorker( { payload }: { payload: { accountId: string, pri
     // const defaultFeePerByte = accountsState.averageTxFees[ defaultTxPriority ]
     const averageTxFeeByNetwork = accountsState.averageTxFees[ associateAccount.networkType ]
 
-    // console.log( 'skk before txid' )
+    console.log( 'skk before txid', payload.privKey )
     const { txid } = yield call(
       AccountOperations.sweepPrivateKey,
-      privateKey,
+      payload.privKey,
       payload.address,
       receivingAddress,
       averageTxFeeByNetwork,

@@ -47,10 +47,12 @@ import ToggleContainer from './CurrencyToggle'
 
 const listItemKeyExtractor = ( item ) => item.id
 
-const ManageGifts = ( { navigation } ) => {
+const ManageGifts = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
+  const { navigation} = props;
+  const giftScreenNav = navigation.getParam('giftType');
   const [ timer, setTimer ] = useState( true )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
@@ -63,7 +65,13 @@ const ManageGifts = ( { navigation } ) => {
     ( state ) => state.accounts.exchangeRates
   )
   const [ giftsArr, setGiftsArr ] = useState( null )
-  const [ active, setActive ] = useState( GiftStatus.CREATED )
+  let statusGift = GiftStatus.CREATED
+  if(giftScreenNav == 0 || giftScreenNav == '0'){
+    statusGift = GiftStatus.CREATED
+  } else {
+    statusGift = GiftStatus.SENT
+  }
+  const [ active, setActive ] = useState(statusGift )
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
