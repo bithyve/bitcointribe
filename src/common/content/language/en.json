@@ -76,11 +76,6 @@
     "Incorrect": "Incorrect Passcode, Try Again!",
     "loaderMessages": [
       {
-        "heading": "Savings Account",
-        "text": "The Savings Account unlocks once your backup is at Level 2. Also, setup your 2FA code on an authenticator app",
-        "subText": ""
-      },
-      {
         "heading": "Self-custody buys",
         "text": "Get sats directly in your wallet from compatible exchanges",
         "subText": ""
@@ -91,14 +86,19 @@
         "subText": ""
       },
       {
-        "heading": "Donation Accounts",
-        "text": "Start receiving donations directly in your Hexa Wallet, from anywhere in the world",
-        "subText": ""
-      },
-      {
         "heading": "Satoshis or Sats",
         "text": "1 bitcoin = 100 million satoshis or sats",
         "subText": "Hexa uses sats to make using bitcoin easier"
+      },
+      {
+          "heading": "Gift Sats",
+          "text": "Send sats as gifts to your friends and family.",
+          "subText": ""
+      },
+      {
+          "heading": "Backup phrase",
+          "text": "New backup method: Now note down twelve-word phrase (seed words) to backup your wallet",
+          "subText": ""
       }
     ],
     "Hello": "Hello!",
